@@ -22,7 +22,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from . import config, jobs, models, schemas, seed
+from . import character_files, config, jobs, models, schemas, seed
 from .db import SessionLocal, get_db, init_db
 
 logger = logging.getLogger(__name__)
@@ -31,6 +31,8 @@ VERSION = config.VERSION
 SHOT_STATUSES = {"pending", "queued", "generating", "ready", "failed"}
 ASSET_ROLES = {"host", "guest"}
 ASSET_TYPES = {"character", "scene", "prop", "style"}
+STYLE_PRESETS = {"3d_toon", "3d_cel", "2d_cel", "2d_paint", "anime", "guoman"}
+DEFAULT_STYLE = "3d_toon"
 
 # 导入即建表 + 播种（幂等），保证直接 uvicorn 启动即可用
 init_db()
@@ -63,6 +65,10 @@ def _recover_stale_jobs() -> None:
                 episode = db.get(models.Episode, job.episode_id)
                 if episode is not None and episode.status == "rendering":
                     episode.status = "failed"
+            if job.character_id:
+                character = db.get(models.Character, job.character_id)
+                if character is not None and character.status == "generating":
+                    character.status = "failed"
         db.commit()
         logger.warning("启动恢复：%d 个未完成任务已标记 failed（可重试）", len(stale))
 
@@ -127,6 +133,88 @@ def _sync_episode_counts(db: Session, episode: models.Episode) -> bool:
     episode.shots_total = total
     episode.shots_done = done
     episode.progress = progress
+    return changed
+
+
+def _normalize_style(raw: Any) -> Dict[str, Any]:
+    """把 style 规范成 {primary, variants} 对象。"""
+    if isinstance(raw, str) and raw.strip():
+        return {"primary": raw.strip(), "variants": [raw.strip()]}
+    if isinstance(raw, dict):
+        primary = str(raw.get("primary") or "").strip()
+        variants = [str(item).strip() for item in (raw.get("variants") or []) if str(item).strip()]
+        if not primary:
+            primary = variants[0] if variants else DEFAULT_STYLE
+        if primary not in variants:
+            variants.insert(0, primary)
+        return {"primary": primary, "variants": list(dict.fromkeys(variants))}
+    return {"primary": DEFAULT_STYLE, "variants": [DEFAULT_STYLE]}
+
+
+def _is_color(value: Any) -> bool:
+    text = str(value or "")
+    return len(text) == 7 and text.startswith("#") and all(ch in "0123456789abcdefABCDEF" for ch in text[1:])
+
+
+def _first_episode(db: Session, project: models.Project) -> models.Episode:
+    """项目下第一集（角色资产挂到该集；新项目创建时已自动带第 1 集）。"""
+    episode = (
+        db.query(models.Episode)
+        .filter(models.Episode.project_id == project.id)
+        .order_by(models.Episode.no.asc())
+        .first()
+    )
+    if episode is not None:
+        return episode
+    setting = seed.get_settings(db)
+    fmt = _load_format(project.format_id)
+    episode = models.Episode(
+        id=models.new_id("ep"),
+        project_id=project.id,
+        no=1,
+        title=f"{project.name} · 第 1 期",
+        target_duration=int(fmt.get("target_duration") or 296),
+        status="draft",
+        progress=0.0,
+        shots_total=0,
+        shots_done=0,
+        cost=0.0,
+        aspect=project.aspect,
+        resolution=setting.resolution or "1280x720",
+        fps=int(setting.fps or 25),
+        packaging=fmt.get("packaging") or {},
+    )
+    db.add(episode)
+    db.commit()
+    return episode
+
+
+def _sync_character_asset(db: Session, character: models.Character) -> bool:
+    """角色字段/半身像同步到关联 Asset（供资产库/分镜台引用）。"""
+    if not character.asset_id:
+        return False
+    asset = db.get(models.Asset, character.asset_id)
+    if asset is None:
+        return False
+    changed = False
+    for field in ("name", "title", "persona", "voice", "accent_color"):
+        value = getattr(character, field)
+        if getattr(asset, field) != value:
+            setattr(asset, field, value)
+            changed = True
+    expected = character.portrait_url or character_files.expected_portrait_url(character.id)
+    if list(asset.images or []) != [expected]:
+        asset.images = [expected]
+        changed = True
+    return changed
+
+
+def _sync_character(db: Session, character: models.Character, commit: bool = True) -> bool:
+    """懒同步：磁盘产物 -> Character URL/status，并保持 Asset 一致。"""
+    changed = character_files.apply(character)
+    changed = _sync_character_asset(db, character) or changed
+    if changed and commit:
+        db.commit()
     return changed
 
 
@@ -325,6 +413,216 @@ def patch_asset(aid: str, payload: schemas.AssetUpdate, db: Session = Depends(ge
             setattr(asset, key, value)
     db.commit()
     return asset
+
+
+# --------------------------------------------------------------------------- #
+# 角色工坊（contract/CHARACTER.md）
+# --------------------------------------------------------------------------- #
+def _character_spec_from_payload(payload: schemas.CharacterCreate):
+    """兼容 {spec:{...}} 包裹与扁平对象；返回 (spec, provided_id)。"""
+    spec = dict(payload.spec) if isinstance(payload.spec, dict) else {}
+    flat: Dict[str, Any] = {}
+    for field in ("name", "title", "persona", "voice", "accent_color", "style", "appearance", "role"):
+        value = getattr(payload, field, None)
+        if value is not None:
+            flat[field] = value
+    for key, value in (payload.model_extra or {}).items():
+        if key not in flat:
+            flat[key] = value
+    provided_id = None
+    if spec:
+        provided_id = spec.get("id")
+        spec.update(flat)
+        return spec, provided_id
+    if flat:
+        return flat, None
+    return None, None
+
+
+def _character_fields_from_spec(spec: Dict[str, Any], character_id: str) -> Dict[str, Any]:
+    name = str(spec.get("name") or character_id).strip() or character_id
+    title = str(spec.get("title") or "")
+    persona = str(spec.get("persona") or "")
+    voice = str(spec.get("voice") or "")
+    accent_color = str(spec.get("accent_color") or "#888888")
+    if not _is_color(accent_color):
+        raise HTTPException(status_code=400, detail="accent_color 必须是 #RRGGBB 格式")
+    style = _normalize_style(spec.get("style"))
+    if style["primary"] not in STYLE_PRESETS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"style.primary 必须是 {sorted(STYLE_PRESETS)} 之一",
+        )
+    spec["id"] = character_id
+    spec["name"] = name
+    spec.setdefault("title", title)
+    spec.setdefault("persona", persona)
+    spec.setdefault("voice", voice)
+    spec.setdefault("accent_color", accent_color)
+    spec["style"] = style
+    return {
+        "name": name,
+        "title": title,
+        "persona": persona,
+        "voice": voice,
+        "accent_color": accent_color,
+        "style": style,
+    }
+
+
+@router.get("/projects/{pid}/characters", response_model=List[schemas.CharacterOut])
+def list_characters(pid: str, db: Session = Depends(get_db)):
+    _get_or_404(db, models.Project, pid, "项目")
+    characters = (
+        db.query(models.Character)
+        .filter(models.Character.project_id == pid)
+        .order_by(models.Character.created_at.asc())
+        .all()
+    )
+    changed = False
+    for character in characters:
+        changed = _sync_character(db, character, commit=False) or changed
+    if changed:
+        db.commit()
+    return characters
+
+
+@router.post("/projects/{pid}/characters", response_model=schemas.CharacterOut)
+def create_character(
+    pid: str,
+    payload: schemas.CharacterCreate,
+    db: Session = Depends(get_db),
+):
+    project = _get_or_404(db, models.Project, pid, "项目")
+    spec, provided_id = _character_spec_from_payload(payload)
+    if not spec:
+        raise HTTPException(
+            status_code=400,
+            detail="缺少角色 spec：请传扁平对象或 {spec:{...}}",
+        )
+    character_id = str(provided_id or "").strip() or models.new_id("char")
+    if db.get(models.Character, character_id) is not None:
+        raise HTTPException(status_code=409, detail=f"角色 id 已存在: {character_id}")
+
+    fields = _character_fields_from_spec(spec, character_id)
+    episode = _first_episode(db, project)
+    role = spec.get("role") if spec.get("role") in ASSET_ROLES else "guest"
+    portrait_url = character_files.expected_portrait_url(character_id)
+    asset = models.Asset(
+        id=models.new_id("asset"),
+        episode_id=episode.id,
+        role=role,
+        type="character",
+        name=fields["name"],
+        title=fields["title"],
+        persona=fields["persona"],
+        voice=fields["voice"],
+        accent_color=fields["accent_color"],
+        images=[portrait_url],
+        locked=False,
+    )
+    db.add(asset)
+    db.flush()
+
+    character = models.Character(
+        id=character_id,
+        project_id=project.id,
+        asset_id=asset.id,
+        name=fields["name"],
+        title=fields["title"],
+        persona=fields["persona"],
+        voice=fields["voice"],
+        accent_color=fields["accent_color"],
+        style=fields["style"],
+        spec=spec,
+        portrait_url=None,
+        sheet_url=None,
+        turntable_url=None,
+        expressions={},
+        status="pending",
+    )
+    db.add(character)
+    db.commit()
+    _sync_character(db, character)
+    return character
+
+
+@router.get("/characters/{cid}", response_model=schemas.CharacterOut)
+def get_character(cid: str, db: Session = Depends(get_db)):
+    character = _get_or_404(db, models.Character, cid, "角色")
+    _sync_character(db, character)
+    return character
+
+
+@router.patch("/characters/{cid}", response_model=schemas.CharacterOut)
+def patch_character(
+    cid: str,
+    payload: schemas.CharacterPatch,
+    db: Session = Depends(get_db),
+):
+    character = _get_or_404(db, models.Character, cid, "角色")
+    changes = payload.model_dump(exclude_unset=True)
+    spec_update = changes.pop("spec", None)
+
+    if spec_update is not None:
+        merged = dict(character.spec or {})
+        merged.update(spec_update)
+        merged["id"] = character.id
+        character.spec = merged
+        derived_style = _normalize_style(merged.get("style"))
+        if derived_style["primary"] not in STYLE_PRESETS:
+            raise HTTPException(
+                status_code=400,
+                detail=f"style.primary 必须是 {sorted(STYLE_PRESETS)} 之一",
+            )
+        character.style = derived_style
+        for field in ("name", "title", "persona", "voice", "accent_color"):
+            if changes.get(field) is None and merged.get(field) is not None:
+                setattr(character, field, merged[field])
+
+    for field in ("name", "title", "persona", "voice", "accent_color"):
+        value = changes.get(field)
+        if value is None:
+            continue
+        if field == "accent_color" and not _is_color(value):
+            raise HTTPException(status_code=400, detail="accent_color 必须是 #RRGGBB 格式")
+        setattr(character, field, str(value))
+
+    _sync_character_asset(db, character)
+    db.commit()
+    return character
+
+
+@router.post("/characters/{cid}/generate", response_model=schemas.JobOut)
+def generate_character(
+    cid: str,
+    payload: Optional[schemas.CharacterGenerateRequest] = None,
+    db: Session = Depends(get_db),
+):
+    character = _get_or_404(db, models.Character, cid, "角色")
+    styles = payload.styles if payload else []
+    invalid = [style for style in styles if style not in STYLE_PRESETS]
+    if invalid:
+        raise HTTPException(
+            status_code=400,
+            detail=f"不支持的 style: {invalid}；可选 {sorted(STYLE_PRESETS)}",
+        )
+    job, _created = jobs.enqueue_character_job(db, character, styles)
+    return job
+
+
+@router.get("/characters/{cid}/files", response_model=schemas.CharacterFilesOut)
+def get_character_files(cid: str, db: Session = Depends(get_db)):
+    character = _get_or_404(db, models.Character, cid, "角色")
+    _sync_character(db, character)
+    data = character_files.scan(character.id)
+    return {
+        "portrait": character.portrait_url,
+        "sheet": character.sheet_url,
+        "turntable": character.turntable_url,
+        "expressions": dict(character.expressions or {}),
+        "meta": data.get("meta") or {},
+    }
 
 
 # --------------------------------------------------------------------------- #

@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { api, errorText, mediaUrl } from "../../lib/api";
-import type { CostReport, Job } from "../../types";
+import type { Character, CostReport, Job } from "../../types";
 import {
-  JOB_STATUS_LABEL,
-  fmtDateTime,
+  CHARACTER_STYLE_LABEL,
+  characterStyles,
   fmtDuration,
   fmtMoney,
   fmtTime,
+  styleFamily,
 } from "../../lib/format";
 import { usePolling } from "../../hooks/usePolling";
 import { useToast } from "../Toast";
@@ -23,9 +24,11 @@ import {
   IconWallet,
 } from "../icons";
 import { TEMPLATES } from "../../lib/templates";
+import { CharacterAvatar } from "../CharacterAvatar";
 
 interface Props extends TabBaseProps {
   jobs: Job[];
+  characters: Character[];
 }
 
 const BY_TYPE_LABEL: Record<string, string> = {
@@ -36,7 +39,7 @@ const BY_TYPE_LABEL: Record<string, string> = {
   other: "其他",
 };
 
-export function Finishing({ episode, jobs, onChanged }: Props) {
+export function Finishing({ episode, jobs, characters, onChanged }: Props) {
   const notify = useToast();
   const [rendering, setRendering] = useState(false);
 
@@ -155,6 +158,37 @@ export function Finishing({ episode, jobs, onChanged }: Props) {
             成片规格：1280×720 · 25fps · 横屏 16:9 · 硬字幕 · hard_cut 转场
           </div>
         </section>
+
+        {characters.length > 0 && (
+          <section className="panel packaging-panel cast-style-panel">
+            <SectionHead
+              title="角色画风"
+              en="CAST STYLE"
+              extra={<span className="muted">全部为平台自主生成的原创动漫角色 · 成片不使用真人素材</span>}
+            />
+            <div className="cast-style-grid">
+              {characters.map((character) => {
+                const styles = characterStyles(character.style);
+                return (
+                  <div key={character.id} className="cast-style-item">
+                    <CharacterAvatar character={character} size={44} />
+                    <div className="cast-style-main">
+                      <b>{character.name}</b>
+                      <span>{character.title}</span>
+                    </div>
+                    <div className="char-style-row">
+                      {styles.slice(0, 2).map((style) => (
+                        <span key={style} className="char-style-chip">
+                          {styleFamily(style)} · {CHARACTER_STYLE_LABEL[style] || style}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
       </div>
 
       <CostPanel episodeId={episode.id} fallbackTotal={episode.cost || 0} />

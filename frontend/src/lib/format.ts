@@ -90,6 +90,116 @@ export const ASSET_TYPE_LABEL: Record<string, string> = {
   style: "风格",
 };
 
+export const CHARACTER_STATUS_LABEL: Record<string, string> = {
+  pending: "待生成",
+  draft: "待生成",
+  queued: "排队中",
+  generating: "生成中",
+  running: "生成中",
+  ready: "已就绪",
+  done: "已就绪",
+  failed: "生成失败",
+};
+
+export const CHARACTER_STYLE_LABEL: Record<string, string> = {
+  "3d_toon": "3D 卡通",
+  "3d_cel": "3D 赛璐璐",
+  "2d_cel": "2D 赛璐璐",
+  "2d_paint": "2D 厚涂",
+  anime: "日漫",
+  guoman: "国漫",
+};
+
+export const CHARACTER_STYLE_DESC: Record<string, string> = {
+  "3d_toon": "Blender 三渲二卡通",
+  "3d_cel": "3D 赛璐璐描边",
+  "2d_cel": "2D 平涂赛璐璐",
+  "2d_paint": "2D 厚涂质感",
+  anime: "日系动画",
+  guoman: "国产动画",
+};
+
+export const CHARACTER_STYLE_KEYS = ["3d_toon", "3d_cel", "2d_cel", "2d_paint", "anime", "guoman"];
+
+export const GENDER_LABEL: Record<string, string> = {
+  male: "男",
+  female: "女",
+  neutral: "中性",
+};
+
+export const HAIR_STYLE_LABEL: Record<string, string> = {
+  short_swept: "短碎盖",
+  spiky: "刺猬头",
+  bob: "波波头",
+  twin_tail: "双马尾",
+  ponytail: "马尾",
+  long_straight: "黑长直",
+  bald: "光头",
+  bun: "丸子头",
+};
+
+export const OUTFIT_LABEL: Record<string, string> = {
+  suit: "西装",
+  hoodie: "连帽卫衣",
+  jacket: "夹克",
+  shirt: "衬衫",
+  dress: "连衣裙",
+  coat: "风衣",
+};
+
+export const ACCESSORY_LABEL: Record<string, string> = {
+  glasses: "眼镜",
+  watch: "腕表",
+  headphones: "耳机",
+  earring: "耳饰",
+  none: "无",
+};
+
+export const BROW_LABEL: Record<string, string> = {
+  thick: "浓眉",
+  soft: "柔和",
+  sharp: "锐利",
+};
+
+export const FACIAL_HAIR_LABEL: Record<string, string> = {
+  none: "无",
+  stubble: "胡茬",
+  goatee: "山羊胡",
+  mustache: "八字胡",
+};
+
+export const VOICE_OPTIONS: { value: string; label: string }[] = [
+  { value: "zh-CN-YunxiNeural", label: "云希 · 男声 · 沉稳" },
+  { value: "zh-CN-YunjianNeural", label: "云健 · 男声 · 浑厚" },
+  { value: "zh-CN-XiaoxiaoNeural", label: "晓晓 · 女声 · 明亮" },
+  { value: "zh-CN-XiaoyiNeural", label: "晓伊 · 女声 · 少女" },
+];
+
+export const STYLE_SWATCHES = ["#F5C518", "#5AC8FA", "#FF6B6B", "#C89B3C", "#8B7CF6", "#35C08A", "#FF9F43", "#E8E8EA"];
+
+export const HAIR_SWATCHES = ["#2B2B33", "#6B4A8F", "#E8B15A", "#C0392B", "#F2F2F2", "#5AC8FA"];
+
+export interface CharacterStyleLike {
+  primary?: string | null;
+  variants?: (string | null | undefined)[] | null;
+}
+
+/** 角色 style 字段兼容 string / {primary,variants} 两种形态 */
+export function characterStyles(style?: CharacterStyleLike | string | null): string[] {
+  if (!style) return [];
+  if (typeof style === "string") return [style];
+  const list = [style.primary, ...(style.variants || [])].filter((item): item is string => !!item);
+  return Array.from(new Set(list));
+}
+
+/** 3D / 2D 视觉家族（用于徽章） */
+export function styleFamily(style?: string | null): "3D" | "2D" | "—" {
+  if (!style) return "—";
+  if (style.startsWith("3d")) return "3D";
+  if (style.startsWith("2d")) return "2D";
+  return "2D";
+}
+
 export const VERSION_STATUS_LABEL: Record<string, string> = {
   ready: "可用",
   done: "已完成",

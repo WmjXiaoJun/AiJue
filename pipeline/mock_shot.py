@@ -1,26 +1,30 @@
-"""mock 镜头生成：ffmpeg lavfi 背景 + drawtext 差异化视觉。
+"""mock 镜头生成：ffmpeg lavfi 背景 + 角色立绘 + drawtext 差异化视觉。
 
-按镜头类型给出不同画风（全部离线、单镜头约 0.5-2 秒生成）：
-- title_card    暖黄径向渐变 + 大字标题 + 品牌角标
-- host_to_camera 暖黄灯光 + 主持人名牌 + 大号水印名
-- shot_reverse  蓝/红左右渐变 + 当前说话人高亮 + 双方标签
-- reaction      暗红聚光 + REACTION 标签 + 说话人小标
-- b_roll        冷蓝科技网格 + 扫描线 + 时间码
-- meme_card     黑底 + 花字大字（punchline）
-- end_card      品牌收尾 + 下期见（字幕阶段补）
-- guest_intro   单人大字介绍（兜底）
+镜头类型画风（角色素材可用时以「角色画面」为主，缺失自动回退文字卡视觉）：
+- title_card     角色蒙太奇背景（模糊+压暗）+ 大字标题 + 品牌角标
+- host_to_camera 节目暖黄背景 + 主持人立绘/转面面板 + 主持人名牌
+- shot_reverse   蓝/红节目背景 + 当前说话人立绘面板 + 发言状态
+- reaction       暗红聚光 + 表情特写面板（按 mood/台词选 neutral/happy/surprised/thinking）
+- b_roll         冷蓝科技纹理 + 主持人小窗
+- meme_card      黑底 + 花字大字（punchline）+ 主持人小窗
+- end_card       角色蒙太奇背景 + 品牌收尾
+- guest_intro    单角色立绘 + 名字介绍（兜底）
 
-约定：以 scratch_dir 为 ffmpeg cwd，filter 只用相对路径（fonts/、text/），
-避免 Windows 盘符冒号在 filter 参数里被误解析。
+约定：以 scratch_dir 为 ffmpeg cwd，drawtext 只引用相对路径（fonts/、text/），
+避免 Windows 盘符冒号在 filter 参数里被误解析；角色图片/视频走 ffmpeg 输入参数。
 """
 from __future__ import annotations
 
 import logging
 from pathlib import Path
 
-from . import config, fonts, utils
+from . import characters, config, fonts, utils
 
 LOG = logging.getLogger("pipeline")
+
+CHARACTER_SHOT_TYPES = ("host_to_camera", "shot_reverse", "reaction", "guest_intro")
+CARD_MONTAGE_TYPES = ("title_card", "end_card")
+PIP_TYPES = ("meme_card", "b_roll")
 
 
 def _hex_to_ff(color: str, default: str = "0xF5C518") -> str:
@@ -84,7 +88,6 @@ def _box(x, y, w, h, color: str, thickness: int | None = None) -> str:
 
 
 def _fit_size(text: str, base: int, steps) -> int:
-    """按字符数从 (阈值, 系数) 列表里挑字号。"""
     n = len(text or "")
     for limit, factor in steps:
         if n <= limit:
@@ -111,7 +114,8 @@ def _role_text(asset: dict) -> str:
 
 class _ShotCtx:
     def __init__(self, shot: dict, assets: list, scratch: Path, font_info: dict,
-                 width: int, height: int, duration: float, fps: int) -> None:
+                 width: int, height: int, duration: float, fps: int,
+                 char_map: dict | None = None) -> None:
         self.shot = shot or {}
         self.assets = [a for a in (assets or []) if isinstance(a, dict)]
         self.scratch = scratch
@@ -135,6 +139,45 @@ class _ShotCtx:
         self.right = self.guests[1] if len(self.guests) >= 2 else {}
         self.accent = _asset_color(self.speaker) if self.speaker else config.ACCENT_DEFAULT
 
+        # ---- 角色素材映射 ----
+        self.char_map = char_map or {}
+        self.character = self.char_map.get(str(self.speaker_id)) or {}
+        self.cast = [c for c in characters.order_cast(self.char_map)
+                     if c.get("portrait") or c.get("h3_portrait")]
+        # 无 speaker 的角色镜头（如 reaction 冷笑）：按画面/台词里出现的角色名推断，兜底用主持人
+        if not self.character and self.cast:
+            hint = " ".join(str(self.shot.get(k) or "") for k in (
+                "speaker_name", "visual", "line", "subtitle"))
+            for char in self.cast:
+                cname = str(char.get("name") or "")
+                if cname and cname in hint:
+                    self.character = char
+                    break
+        if (not self.character) and self.cast \
+                and self.type in ("host_to_camera", "reaction", "guest_intro"):
+            self.character = self.cast[0]
+        if self.character and not self.speaker_name:
+            self.speaker_name = str(self.character.get("name") or "")
+        # 真实 H3 素材优先：host_to_camera 用 H3 视频，其余角色镜头用 H3 中段帧 Ken Burns
+        self.media = None
+        if self.character:
+            if self.type == "host_to_camera" and self.character.get("h3_video"):
+                self.media = {"kind": "h3_video",
+                              "path": self.character["h3_video"]}
+            elif self.type in CHARACTER_SHOT_TYPES \
+                    and self.character.get("h3_portrait"):
+                self.media = {"kind": "h3_still",
+                              "path": self.character["h3_portrait"]}
+        self.char_mode = (bool(self.character.get("portrait"))
+                          or self.media is not None) \
+            and self.type in CHARACTER_SHOT_TYPES
+        self.cast_mode = bool(self.cast) and self.type in CARD_MONTAGE_TYPES
+        self.cutout_active = False
+        self.pip_char = None
+        if self.type in PIP_TYPES and self.cast:
+            host = next((c for c in self.cast if "主持" in str(c.get("title") or "")), self.cast[0])
+            self.pip_char = host
+
     # ---- 小工具 ----------------------------------------------------------
     def _asset(self, aid: str) -> dict:
         for a in self.assets:
@@ -145,6 +188,9 @@ class _ShotCtx:
     def _accent_of(self, asset: dict) -> str:
         return _asset_color(asset)
 
+    def _char_accent(self, char: dict) -> str:
+        return _hex_to_ff(char.get("accent_color") or config.ACCENT_DEFAULT)
+
     def _brand(self, parts: list, opacity: str = "white@0.72") -> None:
         accent = config.ACCENT_HOST
         parts.append(_box(46, 32, 6, 30, accent))
@@ -152,23 +198,299 @@ class _ShotCtx:
                          size=26, color=opacity, x=64, y=35,
                          font=self.font_body, border=1, border_color="black@0.35"))
 
-    def _caption(self, parts: list) -> None:
+    def _caption(self, parts: list, left: bool = False,
+                 y: int | None = None) -> None:
         if not self.visual:
             return
         parts.append(_dt(self.texts.put(self.visual, "cap"),
-                         size=23, color="white@0.34", x=f"w-tw-46", y=38,
+                         size=23, color="white@0.34",
+                         x=64 if left else "w-tw-46",
+                         y=(78 if left else 38) if y is None else int(y),
                          font=self.font_body, border=1, border_color="black@0.25"))
 
-    # ---- 各类型视觉 ------------------------------------------------------
+    # ---- 角色合成 --------------------------------------------------------
+    def _add_image(self, inputs: list, path) -> int:
+        inputs.append(["-loop", "1", "-i", str(path)])
+        return len(inputs)
+
+    def _add_video(self, inputs: list, path) -> int:
+        inputs.append(["-stream_loop", "-1", "-i", str(path)])
+        return len(inputs)
+
+    def _panel(self, inputs: list, filters: list, source, pw: int, ph: int,
+               accent: str) -> str:
+        """生成带黑边+品牌色描边的角色面板，返回 overlay 用标签。"""
+        is_video = str(source).lower().endswith((".mp4", ".mov", ".webm", ".mkv"))
+        idx = self._add_video(inputs, source) if is_video \
+            else self._add_image(inputs, source)
+        filters.append(
+            f"[{idx}:v]scale={pw}:{ph}:force_original_aspect_ratio=increase,"
+            f"crop={pw}:{ph},setsar=1,fps={self.fps}[p{idx}]"
+        )
+        filters.append(
+            f"[p{idx}]pad=iw+20:ih+20:10:10:color=0x080808,"
+            f"drawbox=x=0:y=0:w=iw:h=ih:color={accent}@0.92:t=4[panel{idx}]"
+        )
+        return f"panel{idx}"
+
+    def _overlay(self, filters: list, current: str, panel: str, x, y,
+                 out: str) -> str:
+        filters.append(
+            f"[{current}][{panel}]overlay=x={x}:y={y}:shortest=0[{out}]"
+        )
+        return out
+
+    def _overlay_character(self, inputs: list, filters: list, source,
+                           accent: str, *, drift: int = 0,
+                           panel_size: int = 600, panel_x: int | None = None,
+                           panel_y: int = 60,
+                           cutout_height: int = 700,
+                           cutout_x: int | None = None,
+                           cutout_y: int | None = None) -> str:
+        """透明 PNG 立绘 -> 抠像直接叠到节目背景；不透明/视频 -> 描边面板。"""
+        is_video = str(source).lower().endswith((".mp4", ".mov", ".webm", ".mkv"))
+        if (not is_video) and characters.has_alpha(source):
+            self.cutout_active = True
+            idx = self._add_image(inputs, source)
+            filters.append(
+                f"[{idx}:v]scale=-1:{cutout_height}:"
+                f"force_original_aspect_ratio=decrease,setsar=1,"
+                f"fps={self.fps},format=rgba[c{idx}]"
+            )
+            x = cutout_x if cutout_x is not None else self.w - cutout_height - 60
+            y = cutout_y if cutout_y is not None else self.h - cutout_height
+            filters.append(f"[0:v][c{idx}]overlay=x={x}:y={y}:shortest=0[base]")
+            return "base"
+        panel = self._panel(inputs, filters, source, panel_size, panel_size, accent)
+        x = panel_x if panel_x is not None else self.w - panel_size - 80
+        filters.append(
+            f"[0:v][{panel}]overlay=x={x - 10}+{drift}*sin(t*0.6):y={panel_y - 10}"
+            f":shortest=0[base]"
+        )
+        return "base"
+
+    def _bust_geometry(self) -> tuple[int, int, int]:
+        """统一胸像构图：高度≈画面 91%，底部对齐，人物放在右侧 1/3。"""
+        height = int(round(self.h * 0.91))
+        x = self.w - height - 50
+        y = self.h - height
+        return height, x, y
+
+    def _h3_layout(self, inputs: list, filters: list, idx: int,
+                   accent: str, ratio: float, ken_burns: bool) -> str:
+        """H3 素材构图：节目背景 + 右侧 1/3 的 H3 胸像画窗（细描边 + Ken Burns）。
+
+        768x768 的 H3 素材直接 cover 裁切会把脸放大到失真，这里保留完整构图，
+        以「画窗」形式叠在节目背景右侧，人物按统一胸像规格（高≈91%、底部对齐）。
+        """
+        fg_h, fg_x, fg_y = self._bust_geometry()
+        stretch = f",setpts=PTS*{ratio:.4f}" if ratio > 1.02 else ""
+        fg = (
+            f"[{idx}:v]scale={fg_h}:{fg_h}:force_original_aspect_ratio=increase,"
+            f"crop={fg_h}:{fg_h},setsar=1{stretch},fps={self.fps}"
+        )
+        if ken_burns:
+            frames = max(2, int(round(self.dur * self.fps)))
+            step = 0.12 / frames
+            fg += (f",zoompan=z='min(zoom+{step:.6f},1.12)':"
+                   "x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':"
+                   f"d={frames}:s={fg_h}x{fg_h}:fps={self.fps}")
+        fg += f",pad=iw+20:ih+20:10:10:color=0x080808,drawbox=x=0:y=0:w=iw:h=ih:color={accent}@0.85:t=4[fg]"
+        filters.append(fg)
+        filters.append(
+            f"[0:v][fg]overlay=x={fg_x - 10}:y={fg_y - 10}:shortest=0,"
+            "vignette=PI/5[base]"
+        )
+        return "base"
+
+    def _compose_h3_video(self) -> dict | None:
+        """H3 真实视频：广播式构图铺满画面，必要时慢放对齐镜头时长。"""
+        src = self.media["path"]
+        accent = self._char_accent(self.character)
+        inputs: list = []
+        filters: list = []
+        idx = self._add_video(inputs, src)
+        try:
+            vdur = float(utils.probe_duration(src) or 0.0)
+        except Exception:  # noqa: BLE001
+            vdur = 0.0
+        ratio = min(self.dur / vdur, 1.8) if (vdur > 0.1 and self.dur > vdur) else 1.0
+        self._h3_layout(inputs, filters, idx, accent, ratio, ken_burns=False)
+        LOG.debug("H3 视频镜头 %s: 源 %.2fs / 拉伸 %.2fx", src, vdur, ratio)
+        return {"inputs": inputs, "filters": filters, "label": "base"}
+
+    def _compose_h3_still(self) -> dict | None:
+        """H3 中段帧：广播式构图 + Ken Burns 缓推（静帧有运动感）。"""
+        src = self.media["path"]
+        accent = self._char_accent(self.character)
+        inputs: list = []
+        filters: list = []
+        idx = self._add_image(inputs, src)
+        self._h3_layout(inputs, filters, idx, accent, 1.0, ken_burns=True)
+        return {"inputs": inputs, "filters": filters, "label": "base"}
+
+    def _compose_host_to_camera(self) -> dict | None:
+        char = self.character
+        source = char.get("turntable") or char.get("portrait")
+        if source is None:
+            return None
+        accent = self._char_accent(char)
+        inputs: list = []
+        filters: list = []
+        # 转面视频走面板（带运动感）；透明立绘优先抠像直叠，否则描边面板
+        bust_h, bust_x, bust_y = self._bust_geometry()
+        self._overlay_character(
+            inputs, filters, source, accent,
+            drift=4, panel_size=600, panel_y=60,
+            cutout_height=bust_h, cutout_x=bust_x, cutout_y=bust_y,
+        )
+        return {"inputs": inputs, "filters": filters, "label": "base"}
+
+    def _compose_reaction(self) -> dict | None:
+        char = self.character
+        source = characters.choose_expression(
+            char,
+            text=(self.shot.get("line") or self.shot.get("subtitle") or ""),
+            mood=str(self.shot.get("mood") or ""),
+        )
+        if source is None:
+            return None
+        accent = self._char_accent(char)
+        inputs: list = []
+        filters: list = []
+        bust_h, bust_x, bust_y = self._bust_geometry()
+        self._overlay_character(
+            inputs, filters, source, accent,
+            panel_size=620, panel_y=40,
+            cutout_height=bust_h, cutout_x=bust_x, cutout_y=bust_y,
+        )
+        return {"inputs": inputs, "filters": filters, "label": "base"}
+
+    def _compose_shot_reverse(self) -> dict | None:
+        char = self.character
+        source = char.get("portrait") or char.get("turntable")
+        if source is None:
+            return None
+        accent = self._char_accent(char)
+        inputs: list = []
+        filters: list = []
+        bust_h, bust_x, bust_y = self._bust_geometry()
+        self._overlay_character(
+            inputs, filters, source, accent,
+            drift=3, panel_size=540, panel_y=110,
+            cutout_height=bust_h, cutout_x=bust_x, cutout_y=bust_y,
+        )
+        return {"inputs": inputs, "filters": filters, "label": "base"}
+
+    def _compose_guest_intro(self) -> dict | None:
+        char = self.character
+        source = char.get("portrait")
+        if source is None:
+            return None
+        accent = self._char_accent(char)
+        inputs: list = []
+        filters: list = []
+        bust_h, bust_x, bust_y = self._bust_geometry()
+        self._overlay_character(
+            inputs, filters, source, accent,
+            panel_size=560, panel_y=80,
+            cutout_height=bust_h, cutout_x=bust_x, cutout_y=bust_y,
+        )
+        return {"inputs": inputs, "filters": filters, "label": "base"}
+
+    def _preferred_still(self, char: dict):
+        """角色静帧：H3 中段帧优先，其次 Blender 立绘。"""
+        return char.get("h3_portrait") or char.get("portrait")
+
+    def _compose_cast_montage(self) -> dict | None:
+        cast = [c for c in self.cast if self._preferred_still(c)][:3]
+        if not cast:
+            return None
+        n = len(cast)
+        total = self.w
+        widths = [total // n + (1 if i < total % n else 0) for i in range(n)]
+        inputs: list = []
+        filters: list = []
+        labels: list[str] = []
+        for i, char in enumerate(cast):
+            idx = self._add_image(inputs, self._preferred_still(char))
+            filters.append(
+                f"[{idx}:v]scale={widths[i]}:{self.h}:"
+                f"force_original_aspect_ratio=increase,"
+                f"crop={widths[i]}:{self.h},setsar=1,fps={self.fps}[m{i}]"
+            )
+            labels.append(f"[m{i}]")
+        blur = "boxblur=20:3,eq=saturation=0.85"
+        if n == 1:
+            filters.append(
+                f"[m0]{blur},drawbox=x=0:y=0:w=iw:h=ih:color=black@0.62:t=fill[cast]"
+            )
+        else:
+            filters.append(
+                "".join(labels) + f"hstack=inputs={n},{blur},"
+                "drawbox=x=0:y=0:w=iw:h=ih:color=black@0.62:t=fill[cast]"
+            )
+        filters.append("[0:v][cast]overlay=0:0:shortest=0[base]")
+        return {"inputs": inputs, "filters": filters, "label": "base"}
+
+    def _compose_pip(self) -> dict | None:
+        char = self.pip_char
+        still = self._preferred_still(char) if char else None
+        if not char or not still:
+            return None
+        accent = self._char_accent(char)
+        inputs: list = []
+        filters: list = []
+        if self.type == "meme_card":
+            panel_x, panel_y = 52, 430
+            cutout_x, cutout_y = 60, self.h - 250
+        else:
+            panel_x, panel_y = self.w - 220 - 72, 360
+            cutout_x, cutout_y = self.w - 250 - 56, self.h - 250
+        self._overlay_character(
+            inputs, filters, still, accent,
+            drift=3, panel_size=220, panel_x=panel_x, panel_y=panel_y,
+            cutout_height=250, cutout_x=cutout_x, cutout_y=cutout_y,
+        )
+        return {"inputs": inputs, "filters": filters, "label": "base"}
+
+    def compose(self) -> dict | None:
+        """返回角色合成方案；无素材/该镜头不用角色画面时返回 None。"""
+        if self.media is not None:
+            if self.media["kind"] == "h3_video":
+                return self._compose_h3_video()
+            return self._compose_h3_still()
+        if self.char_mode:
+            handler = getattr(self, "_compose_" + self.type, None)
+            if handler is not None:
+                result = handler()
+                if result:
+                    return result
+        if self.cast_mode:
+            return self._compose_cast_montage()
+        if self.type in PIP_TYPES:
+            return self._compose_pip()
+        return None
+
+    def used_character_id(self) -> str:
+        if self.char_mode and self.character:
+            return str(self.character.get("id") or "")
+        if self.cast_mode:
+            return "cast"
+        if self.pip_char:
+            return str(self.pip_char.get("id") or "")
+        return ""
+
+    # ---- 各类型视觉（文字层） -------------------------------------------
     def _build_title_card(self, parts: list) -> None:
         accent = config.ACCENT_HOST
         title = str(self.shot.get("title") or self.shot.get("subtitle")
                     or config.BRAND_NAME)
         ep_no = int(self.shot.get("episode_no") or 1)
         parts.append(_dt(self.texts.put(f"造片局 出品  ·  EP.{ep_no:03d}", "top"),
-                         size=27, color="white@0.6", x=46, y=32,
-                         font=self.font_body, border=1, border_color="black@0.4"))
-        parts.append(_box(46, 68, 300, 3, "0xFFFFFF@0.25"))
+                         size=27, color="white@0.72", x=46, y=32,
+                         font=self.font_body, border=1, border_color="black@0.5"))
+        parts.append(_box(46, 68, 300, 3, "0xFFFFFF@0.3"))
         size = _fit_size(title, 88, [(8, 1.0), (12, 0.88), (17, 0.74), (99, 0.62)])
         parts.append(_dt(self.texts.put(title, "title"), size=size,
                          color="white", x="(w-tw)/2", y="(h-th)/2-64",
@@ -177,7 +499,6 @@ class _ShotCtx:
                          alpha="min(1,max(0,t/0.45))"))
         parts.append(_box("(iw-420)/2", 470, 420, 5, accent))
         parts.append(_box("(iw-70)/2", 483, 70, 3, "0xFFFFFF@0.5"))
-        parts.append("fade=t=in:st=0:d=0.5")
 
     def _build_end_card(self, parts: list) -> None:
         accent = config.ACCENT_HOST
@@ -193,36 +514,58 @@ class _ShotCtx:
         parts.append(_dt(self.texts.put("第 001 期", "next"),
                          size=28, color="white@0.6", x="(w-tw)/2", y=572,
                          font=self.font_body, alpha="min(1,max(0,(t-0.5)/0.6))"))
-        parts.append(f"fade=t=in:st=0:d=0.5")
-        parts.append(f"fade=t=out:st={max(0.0, self.dur - 1.2):.3f}:d=1.2")
 
     def _build_host_to_camera(self, parts: list) -> None:
-        accent = self.accent
+        accent = self._char_accent(self.character) if self.char_mode else self.accent
         name = self.speaker_name or "主持人"
         role = _role_text(self.speaker) if self.speaker else "主持人"
-        if name:
-            parts.append(_dt(self.texts.put(name, "wm"), size=300,
-                             color="white@0.055", x="(w-tw)/2", y="(h-th)/2-40",
-                             font=self.font_display))
+        if not self.char_mode:
+            if name:
+                parts.append(_dt(self.texts.put(name, "wm"), size=300,
+                                 color="white@0.055", x="(w-tw)/2", y="(h-th)/2-40",
+                                 font=self.font_display))
         self._brand(parts)
-        self._caption(parts)
-        parts.append(_box(62, 556, 8, 96, accent))
+        self._caption(parts, y=22 if self.char_mode else None)
+        # 名字条上移，给底部字幕（\pos(640,655)）让位
+        parts.append(_box(62, 496, 8, 96, accent))
         parts.append(_dt(self.texts.put(name, "name"), size=48, color=accent,
-                         x=86, y=562, font=self.font_display, border=3,
+                         x=86, y=502, font=self.font_display, border=3,
                          border_color="black@0.7", shadow=(0, 3, "black@0.5"),
                          alpha="min(1,max(0,(t-0.15)/0.4))"))
         parts.append(_dt(self.texts.put(role, "role"), size=27,
-                         color="white@0.82", x=88, y=622, font=self.font_body,
+                         color="white@0.82", x=88, y=562, font=self.font_body,
                          border=1, border_color="black@0.5",
                          alpha="min(1,max(0,(t-0.3)/0.4))"))
-        parts.append("fade=t=in:st=0:d=0.35")
+        if self.char_mode:
+            # 右侧角色面板的对侧小引语，强化综艺包装
+            parts.append(_dt(self.texts.put("● LIVE  虚拟演播厅 A", "live"),
+                             size=22, color="white@0.42", x=62, y=448,
+                             font=self.font_body, border=1,
+                             border_color="black@0.35"))
 
     def _build_shot_reverse(self, parts: list) -> None:
-        accent = self.accent
+        accent = self._char_accent(self.character) if self.char_mode else self.accent
         name = self.speaker_name or "嘉宾"
         role = _role_text(self.speaker) if self.speaker else "嘉宾"
         self._brand(parts)
         self._caption(parts)
+        if self.char_mode:
+            # 顶部发言状态 + 左下角当前说话人名字条（逐镜头按 shot.speaker_name 绑定）
+            parts.append(_dt(self.texts.put(f"● {name}  ·  {role}  ·  发言中", "status"),
+                             size=30, color=accent, x="(w-tw)/2", y=92,
+                             font=self.font_display, border=3,
+                             border_color="black@0.75",
+                             alpha="min(1,max(0,t/0.35))"))
+            parts.append(_box(62, 496, 8, 96, accent))
+            parts.append(_dt(self.texts.put(name, "name"), size=48, color=accent,
+                             x=86, y=502, font=self.font_display, border=3,
+                             border_color="black@0.7", shadow=(0, 3, "black@0.5"),
+                             alpha="min(1,max(0,(t-0.15)/0.4))"))
+            parts.append(_dt(self.texts.put(role, "role"), size=27,
+                             color="white@0.82", x=88, y=562, font=self.font_body,
+                             border=1, border_color="black@0.5",
+                             alpha="min(1,max(0,(t-0.3)/0.4))"))
+            return
         parts.append(_box(638, 0, 4, 720, "0xFFFFFF@0.12"))
         parts.append(_dt(self.texts.put(name, "name"), size=86, color=accent,
                          x="(w-tw)/2", y="(h-th)/2-90",
@@ -233,7 +576,6 @@ class _ShotCtx:
                          size=29, color="white@0.85", x="(w-tw)/2", y="(h/2)+18",
                          font=self.font_body, border=2, border_color="black@0.6",
                          alpha="min(1,max(0,(t-0.25)/0.4))"))
-        # 左侧嘉宾
         lname = str(self.left.get("name") or "")
         if lname:
             active = self.speaker_id == self.left.get("id")
@@ -248,7 +590,6 @@ class _ShotCtx:
                              border_color="black@0.4"))
             if active:
                 parts.append(_box(62, 578, 74, 4, self._accent_of(self.left)))
-        # 右侧嘉宾
         rname = str(self.right.get("name") or "")
         if rname:
             active = self.speaker_id == self.right.get("id")
@@ -264,13 +605,27 @@ class _ShotCtx:
                              border_color="black@0.4"))
             if active:
                 parts.append(_box("iw-136", 578, 74, 4, self._accent_of(self.right)))
-        parts.append("fade=t=in:st=0:d=0.3")
 
     def _build_reaction(self, parts: list) -> None:
-        accent = self.accent
+        accent = self._char_accent(self.character) if self.char_mode else self.accent
         name = self.speaker_name or "嘉宾"
         self._brand(parts)
-        self._caption(parts)
+        self._caption(parts, left=True, y=238) if self.char_mode else self._caption(parts)
+        if self.char_mode:
+            parts.append(_dt(self.texts.put("REACTION · 表情特写", "label"), size=38,
+                             color="white@0.55", x=64, y=148,
+                             font=self.font_display, border=2,
+                             border_color="black@0.5",
+                             alpha="min(1,max(0,t/0.3))"))
+            parts.append(_box(66, 200, 96, 4, accent))
+            parts.append(_dt(self.texts.put(name, "name"), size=52, color=accent,
+                             x=66, y="h-th-160",
+                             font=self.font_display, border=3,
+                             border_color="black@0.75", shadow=(0, 3, "black@0.5")))
+            parts.append(_dt(self.texts.put("反应镜头", "role"), size=24,
+                             color="white@0.5", x=68, y="h-th-92",
+                             font=self.font_body))
+            return
         parts.append(_dt(self.texts.put("REACTION · 特写", "label"), size=40,
                          color="white@0.5", x="(w-tw)/2", y="(h-th)/2-10",
                          font=self.font_body, border=2,
@@ -283,7 +638,6 @@ class _ShotCtx:
         parts.append(_dt(self.texts.put("反应镜头", "role"), size=24,
                          color="white@0.5", x="w-tw-68", y="h-th-84",
                          font=self.font_body))
-        parts.append("fade=t=in:st=0:d=0.25")
 
     def _build_b_roll(self, parts: list) -> None:
         cy = "0x5AC8FA"
@@ -307,7 +661,6 @@ class _ShotCtx:
                          border_color="black@0.4",
                          alpha="if(lt(mod(t,1.2),0.75),0.95,0.25)"))
         parts.append(_box(0, "ih-92", 1280, 2, "0x5AC8FA@0.18"))
-        parts.append("fade=t=in:st=0:d=0.3")
 
     def _build_meme_card(self, parts: list) -> None:
         accent = config.ACCENT_HOST
@@ -328,14 +681,28 @@ class _ShotCtx:
                          border_color="white@0.9", shadow=(5, 5, "black@0.8"),
                          alpha="min(1,max(0,t/0.28))"))
         parts.append(_box("(iw-120)/2", "ih/2+150", 120, 6, accent))
-        parts.append("fade=t=in:st=0:d=0.25")
 
     def _build_guest_intro(self, parts: list) -> None:
-        accent = self.accent
+        accent = self._char_accent(self.character) if self.char_mode else self.accent
         name = self.speaker_name or str(self.speaker.get("name") or "嘉宾")
         role = _role_text(self.speaker) if self.speaker else "嘉宾"
         self._brand(parts)
-        self._caption(parts)
+        self._caption(parts, left=self.char_mode)
+        if self.char_mode:
+            parts.append(_dt(self.texts.put("嘉宾介绍", "label"), size=32,
+                             color="white@0.55", x=70, y=170,
+                             font=self.font_body, border=1,
+                             border_color="black@0.4"))
+            parts.append(_dt(self.texts.put(name, "name"), size=120, color=accent,
+                             x=70, y=220, font=self.font_display, border=5,
+                             border_color="black@0.8", shadow=(0, 4, "black@0.5"),
+                             alpha="min(1,max(0,t/0.4))"))
+            parts.append(_box(74, 400, 260, 4, accent))
+            parts.append(_dt(self.texts.put(role, "role"), size=36,
+                             color="white@0.85", x=74, y=422,
+                             font=self.font_body, border=2,
+                             border_color="black@0.5"))
+            return
         parts.append(_dt(self.texts.put("嘉宾介绍", "label"), size=30,
                          color="white@0.5", x="(w-tw)/2", y="(h-th)/2-150",
                          font=self.font_body, border=1, border_color="black@0.4"))
@@ -348,7 +715,6 @@ class _ShotCtx:
         parts.append(_dt(self.texts.put(role, "role"), size=34,
                          color="white@0.82", x="(w-tw)/2", y="ih/2+112",
                          font=self.font_body, border=2, border_color="black@0.5"))
-        parts.append("fade=t=in:st=0:d=0.3")
 
     # ---- 主入口 ----------------------------------------------------------
     def build(self) -> str:
@@ -393,8 +759,13 @@ def _base_source(ctx: _ShotCtx) -> str:
 
 def generate_mock_clip(spec: dict, out_path, scratch_dir,
                        resolution: str | None = None,
-                       fps: int | None = None) -> dict:
-    """按 contract 的 shot_spec.json 生成一个 mock 片段。"""
+                       fps: int | None = None,
+                       char_map: dict | None = None) -> dict:
+    """按 contract 的 shot_spec.json 生成一个 mock 片段。
+
+    char_map: {asset_id: char_assets}，由 characters.resolve_for_assets 构建；
+    为 None 时自动扫描 outputs/characters/（供 gen-shot CLI 独立调用）。
+    """
     spec = spec or {}
     shot = dict(spec.get("shot") or {})
     assets = list(spec.get("assets") or [])
@@ -407,17 +778,29 @@ def generate_mock_clip(spec: dict, out_path, scratch_dir,
         duration = 5.0
     scratch = utils.ensure_dir(scratch_dir)
     font_info = fonts.ensure_fonts(scratch)
+    if char_map is None:
+        char_map = characters.resolve_for_assets(assets)
     ctx = _ShotCtx(shot, assets, scratch, font_info, width, height,
-                   duration, fps)
+                   duration, fps, char_map=char_map)
     vf = ctx.build()
     src = _base_source(ctx)
+    compose = ctx.compose()
     out = Path(out_path)
     if not out.is_absolute():
         out = scratch / out
     utils.ensure_dir(out.parent)
-    args = [
-        "-f", "lavfi", "-i", src,
-        "-vf", vf,
+    args = ["-f", "lavfi", "-i", src]
+    if compose:
+        for extra in compose["inputs"]:
+            args += extra
+        filter_complex = (
+            ";".join(compose["filters"])
+            + f";[{compose['label']}]{vf}[vout]"
+        )
+        args += ["-filter_complex", filter_complex, "-map", "[vout]"]
+    else:
+        args += ["-vf", vf]
+    args += [
         "-t", f"{duration:.3f}",
         "-r", str(fps),
         "-c:v", "libx264", "-preset", "veryfast", "-crf", "20",
@@ -434,4 +817,6 @@ def generate_mock_clip(spec: dict, out_path, scratch_dir,
         "height": height,
         "fps": fps,
         "type": ctx.type,
+        "character": ctx.used_character_id(),
+        "visual": "character" if compose else "card",
     }

@@ -1,7 +1,7 @@
 # 造片局 · AI 微综艺 -- 后端（backend/）
 
-FastAPI + SQLAlchemy + SQLite 的 demo 后端：实现 contract/API.md 全部端点，
-托管 outputs/ 生成产物，并在 frontend/dist 存在时托管前端构建产物。
+FastAPI + SQLAlchemy + SQLite 的 demo 后端：实现 contract/API.md 与 contract/CHARACTER.md
+全部端点，托管 outputs/ 生成产物，并在 frontend/dist 存在时托管前端构建产物。
 
 ## 快速启动
 
@@ -22,8 +22,10 @@ FastAPI + SQLAlchemy + SQLite 的 demo 后端：实现 contract/API.md 全部端
 
 ## 数据与播种
 
-- SQLite 文件：backend/data/zaopianju.db（启动时自动建表）
+- SQLite 文件：backend/data/zaopianju.db（启动时自动建表 + 轻量迁移）
 - 空库自动从 contract/demo_episode.json 播种：1 项目 / 1 集 / 5 资产 / 52 镜头
+- 角色播种：contract/characters/{laozhou,ali,dawei}.json -> 3 个 Character，
+  分别关联 host / guest_a / guest_b 资产（每次启动幂等补齐，老库也会补）
 - 已有数据则跳过，可重复启动；强制重建：
 
       cd backend
@@ -38,9 +40,11 @@ FastAPI + SQLAlchemy + SQLite 的 demo 后端：实现 contract/API.md 全部端
         models.py    ORM：Project/Episode/Asset/Shot/ShotVersion/Job/Setting
         schemas.py   Pydantic 请求/响应模型
         seed.py      空库播种 / 强制重建
-        jobs.py      后台任务线程（shot 生成 / render 渲染）
+        jobs.py      后台任务线程（shot / render / character 角色生成）
         comfyui.py   ComfyUI（MiniMax H3）适配器，httpx 可注入 mock
-        main.py      FastAPI 应用与全部 /api 端点
+        character_files.py  角色产物扫描（outputs/characters/{cid}/ -> URL）
+        workflows/   ComfyUI 工作流模板示例
+        main.py      FastAPI 应用与全部 /api 端点（含角色工坊）
       run.ps1        启动脚本
       requirements.txt
       data/          运行期生成（SQLite + 任务 spec 临时文件）
@@ -66,9 +70,45 @@ FastAPI + SQLAlchemy + SQLite 的 demo 后端：实现 contract/API.md 全部端
   queued/running 任务标记 failed（error 注明「服务重启，任务中断，可点重试」），
   避免前端出现永远转圈的幽灵任务；用户可在任务中心点重试重新入队。
 
+## 角色工坊（Character Studio，contract/CHARACTER.md）
+
+Character：{id,project_id,asset_id,name,title,persona,voice,accent_color,style,spec,
+portrait_url,sheet_url,turntable_url,expressions,status,created_at}
+
+端点（demo 无鉴权）：
+
+- GET   /api/projects/{pid}/characters             角色列表（含懒同步磁盘产物）
+- POST  /api/projects/{pid}/characters             创建角色；兼容扁平对象与 {spec:{...}} 包裹
+- GET   /api/characters/{cid}                      角色详情
+- PATCH /api/characters/{cid}                      {name?,title?,persona?,voice?,accent_color?,spec?}
+- POST  /api/characters/{cid}/generate             {styles?:[]} -> Job(type=character)
+- GET   /api/characters/{cid}/files                {portrait,sheet,turntable,expressions,meta}
+
+约定：
+
+- 扁平创建体示例：{name,title,persona,voice,accent_color,style:{primary,variants},appearance:{...}}，
+  id 由后端生成（char_xxx）；{spec:{id,...}} 包裹时沿用 spec.id。
+- 创建角色时同步在 assets 表生成 type=character 的资产（挂到项目第 1 集），
+  其 images 指向 /media/characters/{cid}/portrait.png；PATCH 角色会同步资产字段。
+- style.primary 预设：3d_toon / 3d_cel / 2d_cel / 2d_paint / anime / guoman；
+  accent_color 必须 #RRGGBB。
+- generate 任务：后台线程执行
+
+      python -m studio3d.cli create --spec <tmp.json> --outdir outputs/characters/{cid} --styles 3d_toon,2d_cel
+
+  （cwd = 仓库根，stdout 最后一行 JSON）。产物约定：
+  portrait.png / sheet.png / turntable.mp4 / expressions/{neutral,happy,surprised,thinking}.png / meta.json。
+  成功后回填 portrait_url 等字段、expressions、status=ready，并同步 Asset.images；失败 exit!=0 或
+  未产出 portrait.png 时 Job.failed + error，角色 status=failed，不拖垮 API 进程。
+- 产物经 /media 静态访问：/media/characters/{cid}/portrait.png 等。
+- GET .../files 与 GET 角色详情都会懒扫描 outputs/characters/{cid}/，即使角色是外部 CLI 直接生成、
+  未经后端任务，也会自动回填 URL/status。状态口径：只要 portrait.png 存在即 status=ready；
+  sheet/turntable 可缺失（前端显示占位），生成中的角色保持 generating。
+- jobs 表新增可选 character_id（启动时对老库自动 ALTER TABLE jobs ADD COLUMN character_id）。
+
 ## 静态托管
 
-- /media -> 仓库 outputs/（生成片段、成片）
+- /media -> 仓库 outputs/（生成片段、成片、角色素材）
 - frontend/dist 存在时 / 挂载该目录并做 SPA fallback（未命中路径回落 index.html）
 - 前端尚未构建时 / 返回一个后端状态说明页
 
@@ -87,7 +127,9 @@ FastAPI + SQLAlchemy + SQLite 的 demo 后端：实现 contract/API.md 全部端
     python -m pytest tests -q
 
 测试使用临时数据目录并关闭自动任务（ZAOPIANJU_JOBS_AUTORUN=0），
-通过注入假的 pipeline CLI 验证 shot/render 成功与失败路径，不污染开发库、不真连 ComfyUI。
+通过注入假的 pipeline / studio3d CLI 验证 shot / render / character 成功与失败路径，
+不污染开发库、不真连 ComfyUI / Blender。覆盖：contract/API.md 全部端点、
+角色工坊 CRUD/资产联动/files/生成任务（tests/test_characters.py）、ComfyUI 适配器 mock。
 
 ## ComfyUI 适配器
 
@@ -112,3 +154,5 @@ ComfyUI 导出的 API 格式 H3 工作流即可。demo 默认 generation_mode=mo
 - 任务为进程内守护线程；同一 episode 的 render 应串行触发（后端会自动复用同集活跃任务）。
   服务重启会把遗留 queued/running 任务标记 failed，用户可 retry。
 - 若前端构建产物 frontend/dist 在服务启动时不存在，需要重启后端才会挂载 /。
+- 角色画面由 studio3d（Blender 程序化建模 + 卡通渲染，外部模块）生成；后端只负责任务编排与
+  产物回填。studio3d 未就绪 / Blender 不可用时，角色任务会 failed 并记录 error，API 与前端不受影响。

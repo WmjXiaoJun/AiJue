@@ -1,0 +1,41 @@
+{
+  "id": "ali",
+  "name": "阿栗",
+  "title": "AI 内容创业者",
+  "persona": "语速快、乐观、张口就是案例",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "accent_color": "#5AC8FA",
+  "style": {
+    "primary": "2d_cel",
+    "variants": [
+      "2d_cel",
+      "3d_toon"
+    ]
+  },
+  "appearance": {
+    "gender": "female",
+    "age": 24,
+    "height_ratio": 0.96,
+    "head_scale": 1.2,
+    "chibi": 0.35,
+    "skin": "#F6DCCB",
+    "hair_color": "#6B4A8F",
+    "hair_style": "twin_tail",
+    "eye_color": "#3A6FE0",
+    "eye_size": 1.25,
+    "brow": "soft",
+    "facial_hair": "none",
+    "outfit": {
+      "type": "hoodie",
+      "main": "#8B6BB5",
+      "accent": "#5AC8FA",
+      "shirt": "#FFFFFF"
+    },
+    "accessories": [
+      "headphones"
+    ],
+    "marks": [
+      "star_clip"
+    ]
+  }
+}

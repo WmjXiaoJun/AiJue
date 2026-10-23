@@ -15,19 +15,20 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import shutil
 import subprocess
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
-from . import ass_builder, config, fonts, mock_shot, tts_engine, utils
+from . import ass_builder, characters, config, fonts, mock_shot, tts_engine, utils
 
 LOG = logging.getLogger("pipeline")
 
 CLIP_WORKERS = 6
 AUDIO_WORKERS = 8
-CLIP_VERSION = "mock-v6"
+CLIP_VERSION = "mock-v10-bust"
 TTS_LEAD_IN = 0.15
 BGM_DURATION = 32.0
 
@@ -123,10 +124,13 @@ def _normalize_external_clip(src: Path, dst: Path, width: int, height: int,
 
 
 def ensure_clip(shot: dict, assets: list, episode: dict, workdir: Path,
-                width: int, height: int, fps: int, force: bool = False) -> dict:
-    """返回 {"id","path","duration","reused","source","elapsed"}；失败抛异常。
+                width: int, height: int, fps: int, force: bool = False,
+                char_map: dict | None = None, char_fp: str = "",
+                h3_dir: Path | None = None) -> dict:
+    """返回 {"id","path","duration","reused","source","character","elapsed"}。
 
-    片段来源优先级：clips/ 缓存 -> <workdir>/shots/<sid>.mp4 平台片段 -> mock 生成。
+    片段来源优先级：clips/ 缓存 -> <workdir>/shots/<sid>.mp4 平台片段
+    ->（--use-h3 时）outputs/h3/<sid>.mp4 真镜头 -> 角色/mock 生成。
     """
     sid = _shot_id(shot)
     clip_path = workdir / "clips" / f"{sid}.mp4"
@@ -134,10 +138,21 @@ def ensure_clip(shot: dict, assets: list, episode: dict, workdir: Path,
     duration = _shot_duration(shot)
     external = None if force else _shot_source_path(workdir, sid)
     external_fp = _shot_source_fingerprint(external)
+    h3_path = None
+    if h3_dir is not None:
+        candidate = Path(h3_dir) / f"{sid}.mp4"
+        if _valid_file(candidate, 2000):
+            h3_path = candidate
+    h3_fp = _shot_source_fingerprint(h3_path)
     digest = _clip_hash(shot, width, height, fps)
     if external_fp:
         # 平台片段变化（生成台重新生成）时让 clips 缓存失效
         digest = utils.sha1_text(digest, external_fp)
+    if char_fp:
+        # 角色素材更新（重新生成立绘/表情/转面）时让 clips 缓存失效
+        digest = utils.sha1_text(digest, char_fp)
+    if h3_fp:
+        digest = utils.sha1_text(digest, "h3", h3_fp)
     if not force:
         meta = utils.read_json(meta_path) or {}
         if _valid_file(clip_path, 2000) and meta.get("hash") == digest:
@@ -145,6 +160,7 @@ def ensure_clip(shot: dict, assets: list, episode: dict, workdir: Path,
                     "duration": float(meta.get("duration") or duration),
                     "reused": True,
                     "source": meta.get("source") or "cache",
+                    "character": meta.get("character") or "",
                     "elapsed": 0.0}
     # ---- 平台「生成台」版本优先复用（生成台选版本 -> 成片房渲染 闭环）----
     if not force:
@@ -177,6 +193,26 @@ def ensure_clip(shot: dict, assets: list, episode: dict, workdir: Path,
                         "source": "shots-normalized", "elapsed": 0.0}
             except Exception as exc:  # noqa: BLE001
                 LOG.warning("平台片段 %s 不可用（%s），回退 mock 生成", external, exc)
+    # ---- 可选：真实 H3 动漫镜头替换（--use-h3，默认关闭）----
+    if (not force) and h3_path is not None:
+        probe = _probe_external(h3_path, width, height, fps, duration)
+        try:
+            if probe.get("ok"):
+                utils.ensure_dir(clip_path.parent)
+                shutil.copyfile(h3_path, clip_path)
+            else:
+                _normalize_external_clip(h3_path, clip_path, width, height,
+                                         fps, duration)
+            utils.write_json(meta_path, {
+                "hash": digest, "duration": duration, "source": "h3",
+                "h3_fp": h3_fp, "character": "", "version": CLIP_VERSION,
+            })
+            LOG.info("使用 H3 真镜头: %s (outputs/h3/%s.mp4)", sid, sid)
+            return {"id": sid, "path": str(clip_path), "duration": duration,
+                    "reused": True, "source": "h3", "character": "",
+                    "elapsed": 0.0}
+        except Exception as exc:  # noqa: BLE001
+            LOG.warning("H3 镜头 %s 不可用（%s），回退角色/mock 生成", h3_path, exc)
     spec = {
         "shot": shot,
         "assets": assets,
@@ -190,7 +226,8 @@ def ensure_clip(shot: dict, assets: list, episode: dict, workdir: Path,
     }
     t0 = time.time()
     result = mock_shot.generate_mock_clip(
-        spec, clip_path, workdir, resolution=f"{width}x{height}", fps=fps
+        spec, clip_path, workdir, resolution=f"{width}x{height}", fps=fps,
+        char_map=char_map,
     )
     elapsed = round(time.time() - t0, 2)
     utils.write_json(meta_path, {
@@ -199,6 +236,7 @@ def ensure_clip(shot: dict, assets: list, episode: dict, workdir: Path,
         "type": shot.get("type"),
         "elapsed": elapsed,
         "source": "mock",
+        "character": result.get("character") or "",
         "shots_fp": external_fp,
         "version": CLIP_VERSION,
     })
@@ -606,13 +644,28 @@ def run_render(args) -> int:
     LOG.info("字体: body=%s display=%s",
              font_info["body"]["family"], font_info["display"]["family"])
 
+    # ---- 角色工坊素材（outputs/characters/，可用 CHARACTERS_DIR 覆盖）----
+    char_assets = characters.discover()
+    char_map = characters.resolve_for_assets(assets, char_assets)
+    char_fp = characters.fingerprint(char_map)
+    LOG.info("角色素材: %d 个 | 映射到角色资产 %d 个%s",
+             len(char_assets), len(char_map),
+             "" if char_map else "（无素材，回退文字卡视觉）")
+    h3_dir = None
+    if getattr(args, "use_h3", False):
+        h3_env = os.environ.get("H3_DIR")
+        h3_dir = Path(h3_env) if h3_env \
+            else (config.REPO_ROOT / "outputs" / "h3")
+
     # ---- 1) 镜头片段 ---------------------------------------------------
     prog(2, "生成/复用镜头片段")
     clip_results: dict[str, dict] = {}
     with ThreadPoolExecutor(max_workers=CLIP_WORKERS) as pool:
         futures = {
             pool.submit(ensure_clip, shot, assets, episode, workdir,
-                        width, height, fps, force): _shot_id(shot)
+                        width, height, fps, force,
+                        char_map=char_map, char_fp=char_fp,
+                        h3_dir=h3_dir): _shot_id(shot)
             for shot in shots
         }
         done = 0
@@ -625,9 +678,13 @@ def run_render(args) -> int:
     reused = sum(1 for r in clip_results.values() if r.get("reused"))
     from_shots = sum(1 for r in clip_results.values()
                      if str(r.get("source") or "").startswith("shots"))
-    LOG.info("镜头片段: %d 个 | 平台片段复用 %d | 缓存复用 %d | 新生成 %d",
-             len(clip_results), from_shots, reused - from_shots,
+    from_h3 = sum(1 for r in clip_results.values() if r.get("source") == "h3")
+    char_shots = sum(1 for r in clip_results.values() if r.get("character"))
+    LOG.info("镜头片段: %d 个 | 平台片段复用 %d | H3 真镜头 %d | 缓存复用 %d | 新生成 %d",
+             len(clip_results), from_shots, from_h3, reused - from_shots - from_h3,
              len(clip_results) - reused)
+    LOG.info("角色画面镜头: %d / %d（角色素材 %d 个）",
+             char_shots, len(clip_results), len(char_assets))
 
     # ---- 2) TTS --------------------------------------------------------
     voices = _voice_map(assets)
@@ -677,9 +734,12 @@ def run_render(args) -> int:
     segments = data.get("segments") or episode.get("segments") or []
     ass_episode = dict(episode)
     ass_episode["segments"] = segments
+    char_shot_ids = {sid for sid, res in clip_results.items()
+                     if res.get("character")}
     ass_info = ass_builder.build_ass(
         ass_episode, timings, assets, font_info,
         workdir / "final.ass", width=width, height=height,
+        char_shot_ids=char_shot_ids,
     )
 
     # ---- 6) 拼接音轨 ---------------------------------------------------
@@ -719,6 +779,9 @@ def run_render(args) -> int:
         "tts_failures": tts_fail,
         "clips_reused": reused,
         "clips_from_shots": from_shots,
+        "clips_from_h3": from_h3,
+        "characters": len(char_assets),
+        "character_shots": char_shots,
         "audio_reused": audio_reused,
         "bgm": bgm_path is not None,
         "ass_events": ass_info["events"],

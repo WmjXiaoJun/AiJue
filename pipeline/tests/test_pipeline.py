@@ -12,7 +12,9 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from pipeline import ass_builder, cli, config, mock_shot, render, tts_engine  # noqa: E402
+from pipeline import (  # noqa: E402
+    ass_builder, characters, cli, config, mock_shot, render, tts_engine,
+)
 
 DEMO = REPO_ROOT / "contract" / "demo_episode.json"
 FONT_STUB = {
@@ -284,6 +286,23 @@ def test_ensure_clip_reuses_platform_shot(monkeypatch, tmp_path):
     assert meta["source"] == "shots"
 
 
+def test_h3_switch_reuses_real_clip(monkeypatch, tmp_path):
+    h3_dir = tmp_path / "h3"
+    h3_dir.mkdir()
+    (h3_dir / "s001.mp4").write_bytes(b"h" * 5000)
+    monkeypatch.setattr(render.utils, "probe_video", lambda p: _fake_probe())
+    shot = {"id": "s001", "type": "title_card", "duration": 6}
+    result = render.ensure_clip(shot, [], {}, tmp_path, 1280, 720, 25, False,
+                                h3_dir=h3_dir)
+    assert result["source"] == "h3"
+    assert (tmp_path / "clips" / "s001.mp4").read_bytes() == b"h" * 5000
+    # 未开启 --use-h3（h3_dir=None）时不走 H3 分支
+    result2 = render.ensure_clip({"id": "s002", "type": "meme_card",
+                                  "duration": 3}, [], {}, tmp_path,
+                                 1280, 720, 25, True)
+    assert result2.get("source") != "h3"
+
+
 def test_platform_shot_change_invalidates_clips_cache(monkeypatch, tmp_path):
     shots_dir = tmp_path / "shots"
     shots_dir.mkdir()
@@ -310,3 +329,115 @@ def test_normalize_external_clip_mismatch(monkeypatch, tmp_path):
         render._normalize_external_clip(
             tmp_path / "a.mp4", tmp_path / "b.mp4", 1280, 720, 25, 6.0,
         )
+
+
+# --------------------------------------------------- 角色素材接入 ----
+def _write(path: Path, data: bytes = b"x" * 1024) -> Path:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(data)
+    return path
+
+
+def test_characters_discover_priority(tmp_path, monkeypatch):
+    monkeypatch.delenv("CHARACTERS_DIR", raising=False)
+    root = tmp_path / "characters"
+    # laozhou: 3D 根目录 + 2D 子目录 -> 3D 优先
+    _write(root / "laozhou" / "portrait.png", b"3d" * 600)
+    _write(root / "laozhou" / "2d" / "portrait.png", b"2d" * 600)
+    _write(root / "laozhou" / "expressions" / "neutral.png")
+    # dawei: 只有 2D -> 用 2d/
+    _write(root / "dawei" / "2d" / "portrait.png", b"d2" * 600)
+    chars = characters.discover(root)
+    assert chars["laozhou"]["visual_style"] == "3d"
+    assert chars["laozhou"]["portrait"].parent.name == "laozhou"
+    assert chars["dawei"]["visual_style"] == "2d"
+    assert chars["dawei"]["portrait"].parent.name == "2d"
+
+
+def test_characters_style_dir_fallback(tmp_path):
+    root = tmp_path / "characters"
+    _write(root / "ali" / "style2d_cel" / "portrait.png")
+    chars = characters.discover(root)
+    assert chars["ali"]["portrait"].parent.name == "style2d_cel"
+    assert chars["ali"]["visual_style"] == "2d"
+
+
+def test_characters_resolve_for_assets(tmp_path):
+    root = tmp_path / "characters"
+    _write(root / "laozhou" / "portrait.png")
+    chars = characters.discover(root)
+    assets = [
+        {"id": "host", "type": "character", "name": "老周", "role": "host"},
+        {"id": "guest_a", "type": "character", "name": "阿栗", "role": "guest"},
+        {"id": "scene", "type": "scene", "name": "演播厅"},
+    ]
+    mapping = characters.resolve_for_assets(assets, chars)
+    assert mapping["host"]["id"] == "laozhou"
+    assert "guest_a" not in mapping  # 阿栗无素材
+    assert "scene" not in mapping
+
+
+def test_characters_choose_expression(tmp_path):
+    exprs = {name: tmp_path / f"{name}.png"
+             for name in ("neutral", "happy", "surprised", "thinking")}
+    char = {"portrait": tmp_path / "p.png", "expressions": exprs}
+    assert characters.choose_expression(char, "哈哈") == exprs["happy"]
+    assert characters.choose_expression(char, "？！") == exprs["surprised"]
+    assert characters.choose_expression(char, "……这话我认。") == exprs["thinking"]
+    assert characters.choose_expression(char, "", mood="happy") == exprs["happy"]
+    assert characters.choose_expression(char, "普通台词") == exprs["neutral"]
+    # 无表情素材时回退立绘
+    assert characters.choose_expression({"portrait": tmp_path / "p.png"}) == tmp_path / "p.png"
+
+
+def test_characters_fingerprint_changes(tmp_path):
+    portrait = tmp_path / "portrait.png"
+    portrait.write_bytes(b"a" * 1000)
+    fp1 = characters.fingerprint({"host": {"id": "laozhou", "portrait": portrait}})
+    portrait.write_bytes(b"b" * 2000)
+    fp2 = characters.fingerprint({"host": {"id": "laozhou", "portrait": portrait}})
+    assert fp1 and fp2 and fp1 != fp2
+    assert characters.fingerprint({}) == ""
+
+
+def test_shot_ctx_character_compose(tmp_path):
+    portrait = tmp_path / "portrait.png"
+    portrait.write_bytes(b"x" * 1000)
+    char = {
+        "id": "laozhou", "name": "老周", "title": "主持人",
+        "accent_color": "#F5C518", "portrait": portrait,
+        "turntable": None, "expressions": {},
+    }
+    shot = {"id": "s002", "type": "host_to_camera", "duration": 6,
+            "speaker": "host", "speaker_name": "老周", "visual": "虚拟演播厅"}
+    ctx = mock_shot._ShotCtx(shot, [], tmp_path, FONT_STUB, 1280, 720, 6.0, 25,
+                             char_map={"host": char})
+    assert ctx.char_mode is True
+    plan = ctx.compose()
+    assert plan and plan["inputs"]
+    assert any("overlay=" in item for item in plan["filters"])
+    assert "drawtext=" in ctx.build()
+    assert ctx.used_character_id() == "laozhou"
+    # 无角色素材 -> 回退文字卡，不合成
+    ctx2 = mock_shot._ShotCtx(shot, [], tmp_path, FONT_STUB, 1280, 720, 6.0, 25,
+                              char_map={})
+    assert ctx2.char_mode is False
+    assert ctx2.compose() is None
+
+
+def test_shot_ctx_reaction_expression_and_fallback(tmp_path):
+    exprs = {}
+    for name in ("neutral", "happy", "surprised", "thinking"):
+        exprs[name] = _write(tmp_path / f"{name}.png")
+    char = {"id": "dawei", "name": "大魏", "title": "传统综艺导演",
+            "accent_color": "#FF6B6B", "portrait": tmp_path / "portrait.png",
+            "turntable": None, "expressions": exprs}
+    # 无 speaker 的 reaction：按台词推断角色并选表情
+    shot = {"id": "s004", "type": "reaction", "duration": 4,
+            "speaker": None, "speaker_name": "", "subtitle": "（冷笑）",
+            "visual": "主持人反应特写", "line": ""}
+    ctx = mock_shot._ShotCtx(shot, [], tmp_path, FONT_STUB, 1280, 720, 4.0, 25,
+                             char_map={"guest_b": char})
+    # visual 未出现角色名 -> 兜底主持人（cast[0]），仍应进入角色画面
+    assert ctx.char_mode is True
+    assert ctx.compose() is not None

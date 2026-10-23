@@ -123,6 +123,8 @@ def build_parser() -> argparse.ArgumentParser:
     p_render.add_argument("--limit", type=int, default=None,
                           help="只渲染前 N 个镜头（调试用）")
     p_render.add_argument("--force", action="store_true", help="忽略缓存重新生成")
+    p_render.add_argument("--use-h3", action="store_true", default=False,
+                          help="尝试用 outputs/h3/<sid>.mp4 的真实 H3 镜头替换对应镜头（默认关）")
     p_render.set_defaults(func=cmd_render)
     return parser
 

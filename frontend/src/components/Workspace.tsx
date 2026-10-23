@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api, errorText } from "../lib/api";
-import type { Asset, Episode, Job, Project, Shot } from "../types";
+import { ApiError, api, errorText } from "../lib/api";
+import type { Asset, Character, Episode, Job, Project, Shot } from "../types";
 import { fmtDuration, fmtMoney, fmtPercent, isActiveJob, label, EPISODE_STATUS_LABEL } from "../lib/format";
 import { templateLabel } from "../lib/templates";
 import { usePolling } from "../hooks/usePolling";
@@ -46,6 +46,9 @@ export function Workspace({ project, episode: initialEpisode, tab, offline, onTa
   const [episode, setEpisode] = useState<Episode>(initialEpisode);
   const [shots, setShots] = useState<Shot[] | null>(null);
   const [assets, setAssets] = useState<Asset[] | null>(null);
+  const [characters, setCharacters] = useState<Character[] | null>(null);
+  const [charactersSupported, setCharactersSupported] = useState(true);
+  const [charactersError, setCharactersError] = useState<string | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -93,14 +96,40 @@ export function Workspace({ project, episode: initialEpisode, tab, offline, onTa
   const refreshRef = useRef(refresh);
   refreshRef.current = refresh;
 
+  /** 角色工坊：真实接口；404/405 视为「后端未就绪」但不阻塞其它模块 */
+  const refreshCharacters = useCallback(async (): Promise<Character[] | null> => {
+    try {
+      const list = await api.characters(project.id);
+      setCharacters(list);
+      setCharactersSupported(true);
+      setCharactersError(null);
+      return list;
+    } catch (err) {
+      setCharactersError(errorText(err));
+      const status = err instanceof ApiError ? err.status : 0;
+      setCharacters((prev) => prev ?? []);
+      setCharactersSupported(!(status === 404 || status === 405));
+      return null;
+    }
+  }, [project.id]);
+
+  const refreshAssets = useCallback(async () => {
+    try {
+      setAssets(await api.assets(eid));
+    } catch {
+      /* 保留已有资产列表 */
+    }
+  }, [eid]);
+
   const loadInitial = useCallback(async () => {
     setLoading(true);
     setLoadError(null);
-    const [epRes, shotsRes, assetsRes, jobsRes] = await Promise.allSettled([
+    const [epRes, shotsRes, assetsRes, jobsRes, charRes] = await Promise.allSettled([
       api.episode(eid),
       api.shots(eid),
       api.assets(eid),
       api.jobs({ episode_id: eid }),
+      api.characters(project.id),
     ]);
     if (epRes.status === "rejected") {
       setLoadError(errorText(epRes.reason));
@@ -110,6 +139,17 @@ export function Workspace({ project, episode: initialEpisode, tab, offline, onTa
     setShots(shotsRes.status === "fulfilled" ? shotsRes.value : []);
     setAssets(assetsRes.status === "fulfilled" ? assetsRes.value : []);
     setJobs(jobsRes.status === "fulfilled" ? jobsRes.value : []);
+    if (charRes.status === "fulfilled") {
+      setCharacters(charRes.value);
+      setCharactersSupported(true);
+      setCharactersError(null);
+    } else {
+      const reason = charRes.reason;
+      const status = reason instanceof ApiError ? reason.status : 0;
+      setCharacters([]);
+      setCharactersError(errorText(reason));
+      setCharactersSupported(!(status === 404 || status === 405));
+    }
     setLoading(false);
     setLastSync(Date.now());
     if (epRes.status === "fulfilled" && jobsRes.status === "fulfilled") {
@@ -118,7 +158,7 @@ export function Workspace({ project, episode: initialEpisode, tab, offline, onTa
         cost: epRes.value.cost || 0,
       });
     }
-  }, [eid]);
+  }, [eid, project.id]);
 
   useEffect(() => {
     void loadInitial();
@@ -266,10 +306,20 @@ export function Workspace({ project, episode: initialEpisode, tab, offline, onTa
         ) : (
           <>
             {tab === "script" && <Screenwriting {...baseProps} />}
-            {tab === "assets" && <AssetLibrary {...baseProps} onAssetUpdated={handleAssetUpdated} />}
-            {tab === "storyboard" && <Storyboard {...baseProps} jobByShot={jobByShot} />}
+            {tab === "assets" && (
+              <AssetLibrary
+                {...baseProps}
+                onAssetUpdated={handleAssetUpdated}
+                characters={characters}
+                charactersSupported={charactersSupported}
+                charactersError={charactersError}
+                onRefreshCharacters={refreshCharacters}
+                onRefreshAssets={refreshAssets}
+              />
+            )}
+            {tab === "storyboard" && <Storyboard {...baseProps} jobByShot={jobByShot} characters={characters || []} />}
             {tab === "generate" && <Generation {...baseProps} jobs={jobs} />}
-            {tab === "finish" && <Finishing {...baseProps} jobs={jobs} />}
+            {tab === "finish" && <Finishing {...baseProps} jobs={jobs} characters={characters || []} />}
           </>
         )}
       </div>

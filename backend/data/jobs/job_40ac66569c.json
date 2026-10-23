@@ -1,0 +1,156 @@
+{
+  "shot": {
+    "id": "s012",
+    "episode_id": "ep_001",
+    "segment_id": "topic1",
+    "no": 12,
+    "type": "shot_reverse",
+    "duration": 8.0,
+    "speaker": "guest_b",
+    "speaker_name": "大魏",
+    "line": "七十分？那是没见过现场。艺人一个眼神，台本全废。",
+    "visual": "大魏中景 · 挑眉",
+    "lower_third": null,
+    "punchline": "",
+    "sfx": "",
+    "mood": "",
+    "status": "generating",
+    "selected_version_id": "sv_f14847fd51",
+    "title": null,
+    "subtitle": null
+  },
+  "assets": [
+    {
+      "id": "host",
+      "episode_id": "ep_001",
+      "role": "host",
+      "type": "character",
+      "name": "老周",
+      "title": "主持人",
+      "persona": "老练、冷幽默、爱抛梗、控场稳",
+      "voice": "zh-CN-YunxiNeural",
+      "accent_color": "#F5C518",
+      "images": [
+        "/media/characters/laozhou/portrait.png"
+      ],
+      "locked": true
+    },
+    {
+      "id": "guest_a",
+      "episode_id": "ep_001",
+      "role": "guest",
+      "type": "character",
+      "name": "阿栗",
+      "title": "AI 内容创业者",
+      "persona": "语速快、乐观、张口就是案例",
+      "voice": "zh-CN-XiaoxiaoNeural",
+      "accent_color": "#5AC8FA",
+      "images": [
+        "/media/characters/ali/portrait.png"
+      ],
+      "locked": false
+    },
+    {
+      "id": "guest_b",
+      "episode_id": "ep_001",
+      "role": "guest",
+      "type": "character",
+      "name": "大魏",
+      "title": "传统综艺导演",
+      "persona": "毒舌、保守、金句多",
+      "voice": "zh-CN-YunjianNeural",
+      "accent_color": "#FF6B6B",
+      "images": [
+        "/media/characters/dawei/portrait.png"
+      ],
+      "locked": false
+    },
+    {
+      "id": "scene_studio",
+      "episode_id": "ep_001",
+      "role": "guest",
+      "type": "scene",
+      "name": "虚拟演播厅 A",
+      "title": "主场景",
+      "persona": "暖黄灯、木色背景、节目灯箱",
+      "voice": "",
+      "accent_color": "#C89B3C",
+      "images": [],
+      "locked": false
+    },
+    {
+      "id": "scene_tech",
+      "episode_id": "ep_001",
+      "role": "guest",
+      "type": "scene",
+      "name": "剪辑机房",
+      "title": "B-roll 场景",
+      "persona": "冷色、时间线、服务器指示灯",
+      "voice": "",
+      "accent_color": "#3C7AC8",
+      "images": [],
+      "locked": false
+    }
+  ],
+  "episode": {
+    "id": "ep_001",
+    "aspect": "16:9",
+    "resolution": "1280x720",
+    "fps": 25,
+    "packaging": {
+      "intro": "logo_sting",
+      "outro": "end_card",
+      "lower_third_style": "zaopianju_yellow",
+      "transition": "hard_cut",
+      "bgm": "talk_light",
+      "subtitle_style": "variety"
+    }
+  },
+  "mode": "mock",
+  "params": {},
+  "settings": {
+    "generation_mode": "mock",
+    "comfyui_url": "http://127.0.0.1:8188",
+    "workflow_template": {
+      "_comment": "造片局 ComfyUI(MiniMax H3) 工作流模板示例（API 格式）。demo 默认 mock，不使用本文件。真机使用时请用你本机 ComfyUI 的『导出 API 格式工作流』替换本文件内容；pipeline 会把镜头台词/画面描述写入第一个 CLIPTextEncode.text，comfyui 相关地址在 /api/settings 配置。",
+      "1": {
+        "class_type": "CLIPTextEncode",
+        "inputs": {
+          "text": "AI 微综艺 演播厅 暖黄灯",
+          "clip": [
+            "2",
+            1
+          ]
+        }
+      },
+      "2": {
+        "class_type": "MiniMaxH3ModelLoader",
+        "inputs": {
+          "model": "minimax_h3.safetensors"
+        }
+      },
+      "3": {
+        "class_type": "MiniMaxH3Sampler",
+        "inputs": {
+          "positive": [
+            "1",
+            0
+          ],
+          "width": 1280,
+          "height": 720,
+          "length": 150,
+          "seed": 42
+        }
+      }
+    },
+    "resolution": "1280x720",
+    "fps": 25,
+    "tts_provider": "edge-tts",
+    "voice_map": {
+      "host": "zh-CN-YunxiNeural",
+      "guest_a": "zh-CN-XiaoxiaoNeural",
+      "guest_b": "zh-CN-YunjianNeural"
+    },
+    "h3_price_per_second": 0.09
+  }
+}

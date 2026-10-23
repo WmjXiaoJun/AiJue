@@ -111,6 +111,77 @@ export interface CostReport {
   items: CostItem[];
 }
 
+/** 角色工坊（contract/CHARACTER.md） */
+export type CharacterStyleKey = string;
+
+export interface CharacterStyle {
+  primary: CharacterStyleKey;
+  variants?: CharacterStyleKey[];
+}
+
+export interface CharacterOutfit {
+  type?: string;
+  main?: string;
+  accent?: string;
+  shirt?: string;
+}
+
+export interface CharacterAppearance {
+  gender?: string;
+  age?: number;
+  height_ratio?: number;
+  head_scale?: number;
+  chibi?: number;
+  skin?: string;
+  hair_color?: string;
+  hair_style?: string;
+  eye_color?: string;
+  eye_size?: number;
+  brow?: string;
+  facial_hair?: string;
+  outfit?: CharacterOutfit;
+  accessories?: string[];
+  marks?: string[];
+}
+
+export interface CharacterSpec {
+  id?: string;
+  name: string;
+  title: string;
+  persona: string;
+  voice: string;
+  accent_color: string;
+  style: CharacterStyle;
+  appearance: CharacterAppearance;
+}
+
+export interface Character {
+  id: string;
+  project_id: string;
+  asset_id?: string | null;
+  name: string;
+  title: string;
+  persona: string;
+  voice: string;
+  accent_color: string;
+  style?: CharacterStyle | string | null;
+  spec?: CharacterSpec | null;
+  portrait_url?: string | null;
+  sheet_url?: string | null;
+  turntable_url?: string | null;
+  expressions?: Record<string, string> | null;
+  status: string;
+  created_at: string;
+}
+
+export interface CharacterFiles {
+  portrait?: string | null;
+  sheet?: string | null;
+  turntable?: string | null;
+  expressions?: Record<string, string> | null;
+  meta?: Record<string, unknown> | null;
+}
+
 export interface Health {
   status: string;
   version?: string;

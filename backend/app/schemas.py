@@ -145,6 +145,7 @@ class JobOut(ORMModel):
     message: str
     episode_id: Optional[str] = None
     shot_id: Optional[str] = None
+    character_id: Optional[str] = None
     output_url: Optional[str] = None
     cost: float
     error: Optional[str] = None
@@ -177,6 +178,63 @@ class SettingsUpdate(BaseModel):
     tts_provider: Optional[str] = None
     voice_map: Optional[Dict[str, str]] = None
     h3_price_per_second: Optional[float] = Field(default=None, ge=0)
+
+
+# ---------------- Character（角色工坊） ----------------
+class CharacterOut(ORMModel):
+    id: str
+    project_id: str
+    asset_id: Optional[str] = None
+    name: str
+    title: str
+    persona: str
+    voice: str
+    accent_color: str
+    style: Dict[str, Any] = Field(default_factory=dict)
+    spec: Dict[str, Any] = Field(default_factory=dict)
+    portrait_url: Optional[str] = None
+    sheet_url: Optional[str] = None
+    turntable_url: Optional[str] = None
+    expressions: Dict[str, str] = Field(default_factory=dict)
+    status: str
+    created_at: datetime
+
+
+class CharacterCreate(BaseModel):
+    """创建角色：兼容扁平对象与 {spec:{...}} 包裹（id 由后端生成）。"""
+
+    model_config = ConfigDict(extra="allow")
+
+    spec: Optional[Dict[str, Any]] = None
+    name: Optional[str] = None
+    title: Optional[str] = None
+    persona: Optional[str] = None
+    voice: Optional[str] = None
+    accent_color: Optional[str] = None
+    style: Optional[Any] = None
+    appearance: Optional[Dict[str, Any]] = None
+    role: Optional[str] = None
+
+
+class CharacterPatch(BaseModel):
+    name: Optional[str] = None
+    title: Optional[str] = None
+    persona: Optional[str] = None
+    voice: Optional[str] = None
+    accent_color: Optional[str] = None
+    spec: Optional[Dict[str, Any]] = None
+
+
+class CharacterGenerateRequest(BaseModel):
+    styles: List[str] = Field(default_factory=list)
+
+
+class CharacterFilesOut(BaseModel):
+    portrait: Optional[str] = None
+    sheet: Optional[str] = None
+    turntable: Optional[str] = None
+    expressions: Dict[str, str] = Field(default_factory=dict)
+    meta: Dict[str, Any] = Field(default_factory=dict)
 
 
 class HealthOut(BaseModel):

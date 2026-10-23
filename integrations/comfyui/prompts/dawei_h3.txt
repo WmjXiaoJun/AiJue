@@ -1,0 +1,5 @@
+integrated_multimodal_description: [Shot 1] Anime-style medium close-up of the same middle-aged man shown in the first frame, standing in a dark studio with a warm red rim light. He is a sharp-tongued traditional TV director: he looks straight into the camera with a skeptical, unimpressed expression, then speaks slowly and deliberately, lips moving naturally, one eyebrow lifting, a slow firm head shake and natural blinks; he raises one hand slightly to adjust his glasses. Keep his bald head, black goatee, thick brows, small brow scar, dark jacket with red accents and grey shirt exactly the same as in the first frame, and keep the cel-shaded anime look. The camera holds steady with a very slow push-in; subtle collar and shoulder movement; clean line art, filmic studio lighting, no text, no watermark.
+
+overall_soundscape: Quiet studio room tone with a low hum, a soft exhale and a faint cloth rustle in stereo ambience.
+
+non_diegetic_music: N/A

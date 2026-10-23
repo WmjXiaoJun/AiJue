@@ -50,6 +50,13 @@ class Project(Base):
         lazy="selectin",
         order_by="Episode.no",
     )
+    characters = relationship(
+        "Character",
+        back_populates="project",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+        order_by="Character.created_at",
+    )
 
     @property
     def episode_count(self) -> int:
@@ -180,12 +187,44 @@ class Job(Base):
     message = Column(String(500), nullable=False, default="")
     episode_id = Column(String(64), nullable=True)
     shot_id = Column(String(64), nullable=True)
+    character_id = Column(String(64), nullable=True)
     output_url = Column(String(400), nullable=True)
     cost = Column(Float, nullable=False, default=0.0)
     error = Column(Text, nullable=True)
     params = Column(JSON, nullable=False, default=dict)
     created_at = Column(DateTime, nullable=False, default=utcnow)
     updated_at = Column(DateTime, nullable=False, default=utcnow, onupdate=utcnow)
+
+
+class Character(Base):
+    """原创动漫角色（角色工坊产物，字段与 contract/CHARACTER.md 对齐）。"""
+
+    __tablename__ = "characters"
+
+    id = Column(String(64), primary_key=True)
+    project_id = Column(
+        String(64), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False
+    )
+    asset_id = Column(
+        String(64), ForeignKey("assets.id", ondelete="SET NULL"), nullable=True
+    )
+    name = Column(String(120), nullable=False, default="")
+    title = Column(String(120), nullable=False, default="")
+    persona = Column(Text, nullable=False, default="")
+    voice = Column(String(64), nullable=False, default="")
+    accent_color = Column(String(16), nullable=False, default="#888888")
+    style = Column(JSON, nullable=False, default=dict)
+    # 契约字段名 spec（DB 列名为 spec_json）
+    spec = Column("spec_json", JSON, nullable=False, default=dict)
+    portrait_url = Column(String(400), nullable=True)
+    sheet_url = Column(String(400), nullable=True)
+    turntable_url = Column(String(400), nullable=True)
+    # 契约字段名 expressions（DB 列名为 expressions_json）
+    expressions = Column("expressions_json", JSON, nullable=False, default=dict)
+    status = Column(String(16), nullable=False, default="pending")
+    created_at = Column(DateTime, nullable=False, default=utcnow)
+
+    project = relationship("Project", back_populates="characters")
 
 
 class Setting(Base):

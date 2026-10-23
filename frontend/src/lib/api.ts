@@ -1,6 +1,9 @@
 // 极薄的 fetch 封装：相对 /api（生产同源），dev 可用 VITE_API_BASE 直连后端。
 import type {
   Asset,
+  Character,
+  CharacterFiles,
+  CharacterSpec,
   CostReport,
   Episode,
   Health,
@@ -111,6 +114,38 @@ export const api = {
   retryJob: (jid: string) => request<Job>("/jobs/" + jid + "/retry", { method: "POST", body: "{}" }),
 
   costs: (eid: string) => request<CostReport>("/episodes/" + eid + "/costs"),
+
+  // ---- 角色工坊（contract/CHARACTER.md） ----
+  characters: (pid: string) => request<Character[]>("/projects/" + pid + "/characters"),
+  character: (cid: string) => request<Character>("/characters/" + cid),
+  /** 契约要求扁平 spec；后端亦兼容 {spec:{...}}，422/400 时自动回退 */
+  createCharacter: async (pid: string, spec: CharacterSpec): Promise<Character> => {
+    try {
+      return await request<Character>("/projects/" + pid + "/characters", {
+        method: "POST",
+        body: JSON.stringify(spec),
+      });
+    } catch (err) {
+      if (err instanceof ApiError && (err.status === 400 || err.status === 422)) {
+        return request<Character>("/projects/" + pid + "/characters", {
+          method: "POST",
+          body: JSON.stringify({ spec }),
+        });
+      }
+      throw err;
+    }
+  },
+  patchCharacter: (
+    cid: string,
+    body: Partial<Pick<Character, "name" | "persona" | "voice" | "accent_color">> & { spec?: CharacterSpec }
+  ) => request<Character>("/characters/" + cid, { method: "PATCH", body: JSON.stringify(body) }),
+  generateCharacter: (cid: string, styles?: string[]) =>
+    request<Job>("/characters/" + cid + "/generate", {
+      method: "POST",
+      body: JSON.stringify({ styles: styles ?? [] }),
+    }),
+  characterFiles: (cid: string) => request<CharacterFiles>("/characters/" + cid + "/files"),
+
   settings: () => request<Settings>("/settings"),
   patchSettings: (body: Partial<Settings>) =>
     request<Settings>("/settings", { method: "PATCH", body: JSON.stringify(body) }),

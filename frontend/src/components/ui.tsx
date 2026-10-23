@@ -1,5 +1,6 @@
 import { useEffect, type CSSProperties, type ReactNode } from "react";
 import {
+  CHARACTER_STATUS_LABEL,
   EPISODE_STATUS_LABEL,
   JOB_STATUS_LABEL,
   SHOT_STATUS_LABEL,
@@ -29,10 +30,28 @@ const EPISODE_TONE: Record<string, Tone> = {
   storyboard: "info",
   generating: "accent",
   rendering: "accent",
+  ready: "success",
   rendered: "success",
   done: "success",
   failed: "danger",
 };
+const CHARACTER_TONE: Record<string, Tone> = {
+  pending: "neutral",
+  draft: "neutral",
+  queued: "info",
+  generating: "accent",
+  running: "accent",
+  ready: "success",
+  done: "success",
+  failed: "danger",
+};
+
+const STATUS_SETS = {
+  shot: { tone: SHOT_TONE, labels: SHOT_STATUS_LABEL },
+  job: { tone: JOB_TONE, labels: JOB_STATUS_LABEL },
+  episode: { tone: EPISODE_TONE, labels: EPISODE_STATUS_LABEL },
+  character: { tone: CHARACTER_TONE, labels: CHARACTER_STATUS_LABEL },
+} as const;
 
 export function StatusBadge({
   status,
@@ -40,13 +59,12 @@ export function StatusBadge({
   labelText,
 }: {
   status: string;
-  kind?: "shot" | "job" | "episode";
+  kind?: keyof typeof STATUS_SETS;
   labelText?: string;
 }) {
-  const tone = (kind === "job" ? JOB_TONE : kind === "episode" ? EPISODE_TONE : SHOT_TONE)[status] || "neutral";
-  const text =
-    labelText ||
-    label(kind === "job" ? JOB_STATUS_LABEL : kind === "episode" ? EPISODE_STATUS_LABEL : SHOT_STATUS_LABEL, status);
+  const set = STATUS_SETS[kind] || STATUS_SETS.shot;
+  const tone = set.tone[status] || "neutral";
+  const text = labelText || label(set.labels, status);
   return (
     <span className={"badge badge-" + tone}>
       <i className="badge-dot" />

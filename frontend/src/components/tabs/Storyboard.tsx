@@ -1,21 +1,26 @@
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { api, errorText, mediaUrl } from "../../lib/api";
-import type { Job, Shot } from "../../types";
+import type { Character, Job, Shot } from "../../types";
 import {
+  CHARACTER_STYLE_LABEL,
   SHOT_STATUS_LABEL,
   SHOT_TYPE_LABEL,
   SHOT_TYPE_SHORT,
   TYPE_ACCENT,
+  characterStyles,
   fmtShotDuration,
   segmentName,
+  styleFamily,
 } from "../../lib/format";
 import { useToast } from "../Toast";
 import type { TabBaseProps } from "./types";
-import { Avatar, EmptyState, ProgressBar, SectionHead, Spinner, StatusBadge } from "../ui";
+import { EmptyState, ProgressBar, SectionHead, Spinner, StatusBadge } from "../ui";
+import { CharacterAvatar } from "../CharacterAvatar";
 import { IconBoard, IconCheck, IconGrid, IconSpark, IconTable } from "../icons";
 
 interface Props extends TabBaseProps {
   jobByShot: Map<string, Job>;
+  characters: Character[];
 }
 
 type ViewMode = "table" | "grid";
@@ -28,7 +33,7 @@ const STATUS_FILTERS = [
   { key: "failed", label: "失败" },
 ];
 
-export function Storyboard({ assets, shots, jobByShot, onChanged, onOpenShot }: Props) {
+export function Storyboard({ assets, shots, jobByShot, characters, onChanged, onOpenShot }: Props) {
   const notify = useToast();
   const [viewMode, setViewMode] = useState<ViewMode>("table");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -39,6 +44,23 @@ export function Storyboard({ assets, shots, jobByShot, onChanged, onOpenShot }: 
 
   const assetMap = useMemo(() => new Map(assets.map((asset) => [asset.id, asset])), [assets]);
   const types = useMemo(() => Array.from(new Set(shots.map((shot) => shot.type))), [shots]);
+
+  // 角色工坊角色：按 asset_id / 角色名 / speaker 匹配（后端可能同步生成资产）
+  const characterMap = useMemo(() => {
+    const byAsset = new Map<string, Character>();
+    const byName = new Map<string, Character>();
+    characters.forEach((character) => {
+      if (character.asset_id) byAsset.set(character.asset_id, character);
+      byAsset.set(character.id, character);
+      byName.set(character.name, character);
+    });
+    return { byAsset, byName };
+  }, [characters]);
+  const characterForShot = (shot: Shot): Character | undefined => {
+    if (shot.speaker && characterMap.byAsset.has(shot.speaker)) return characterMap.byAsset.get(shot.speaker);
+    if (shot.speaker_name && characterMap.byName.has(shot.speaker_name)) return characterMap.byName.get(shot.speaker_name);
+    return undefined;
+  };
 
   useEffect(() => {
     // 镜头集合变化后，剔除已不存在的选择
@@ -63,6 +85,11 @@ export function Storyboard({ assets, shots, jobByShot, onChanged, onOpenShot }: 
   );
 
   const allChecked = filtered.length > 0 && filtered.every((shot) => selected.has(shot.id));
+  const characterStyleLabel = (character: Character): string => {
+    const styles = characterStyles(character.style);
+    if (!styles.length) return "";
+    return styleFamily(styles[0]) + " · " + (CHARACTER_STYLE_LABEL[styles[0]] || styles[0]);
+  };
 
   const toggleOne = (shot: Shot) => {
     setSelected((prev) => {
@@ -214,7 +241,8 @@ export function Storyboard({ assets, shots, jobByShot, onChanged, onOpenShot }: 
             <tbody>
               {filtered.map((shot) => {
                 const asset = shot.speaker ? assetMap.get(shot.speaker) : undefined;
-                const accent = asset?.accent_color || TYPE_ACCENT[shot.type] || "#8A94A6";
+                const character = characterForShot(shot);
+                const accent = character?.accent_color || asset?.accent_color || TYPE_ACCENT[shot.type] || "#8A94A6";
                 const job = jobByShot.get(shot.id);
                 const checked = selected.has(shot.id);
                 return (
@@ -238,7 +266,7 @@ export function Storyboard({ assets, shots, jobByShot, onChanged, onOpenShot }: 
                     <td className="col-speaker">
                       {shot.speaker_name ? (
                         <span className="speaker-mini">
-                          <Avatar name={shot.speaker_name} color={accent} size={22} />
+                          <CharacterAvatar character={character} name={shot.speaker_name} color={accent} size={22} />
                           {shot.speaker_name}
                         </span>
                       ) : (
@@ -265,7 +293,8 @@ export function Storyboard({ assets, shots, jobByShot, onChanged, onOpenShot }: 
         <div className="sb-grid">
           {filtered.map((shot) => {
             const asset = shot.speaker ? assetMap.get(shot.speaker) : undefined;
-            const accent = asset?.accent_color || TYPE_ACCENT[shot.type] || "#8A94A6";
+            const character = characterForShot(shot);
+            const accent = character?.accent_color || asset?.accent_color || TYPE_ACCENT[shot.type] || "#8A94A6";
             const checked = selected.has(shot.id);
             const job = jobByShot.get(shot.id);
             return (
@@ -312,8 +341,9 @@ export function Storyboard({ assets, shots, jobByShot, onChanged, onOpenShot }: 
                   <div className="shot-body-top">
                     {shot.speaker_name ? (
                       <span className="speaker-mini">
-                        <Avatar name={shot.speaker_name} color={accent} size={22} />
+                        <CharacterAvatar character={character} name={shot.speaker_name} color={accent} size={24} />
                         {shot.speaker_name}
+                        {character && <span className="speaker-char-tag">{characterStyleLabel(character)}</span>}
                       </span>
                     ) : (
                       <span className="muted">画外 · {fmtShotDuration(shot.duration)}</span>

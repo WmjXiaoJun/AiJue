@@ -1,0 +1,5 @@
+integrated_multimodal_description: [Shot 1] A slow, smooth cinematic push-in over the scene shown in the first frame. Soft ambient light gently shifts and drifts across the composition, faint dust motes float through the air, and subtle depth-of-field changes give the shot a dreamy anime-film atmosphere. Preserve the exact composition, colors and shapes of the input frame; only add gentle camera motion and environmental motion.
+
+overall_soundscape: Very quiet room tone with a faint airy breeze and a soft low drone in stereo ambience.
+
+non_diegetic_music: N/A

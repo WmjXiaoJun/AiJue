@@ -14,8 +14,8 @@
 |---|---|---|
 | 可运行平台（前端 + 后端） | `backend/` + `frontend/` | ✅ 已跑通 |
 | 成片流水线（mock 画面 + 中文 TTS + 字幕/花字/BGM + ffmpeg 合成） | `pipeline/` | ✅ 已跑通 |
-| 样例成片 1（流水线直出） | `outputs/demo/final.mp4` | ✅ 299s / 1280×720 / 15.7MB |
-| 样例成片 2（平台端到端渲染） | `outputs/episodes/ep_001/final.mp4` | ✅ 299s / 1280×720 / 15.4MB |
+| 样例成片 1（流水线直出，角色版） | `outputs/demo/final.mp4` | ✅ 299s / 1280×720 / 31,687,266 B（约 30.2 MiB） |
+| 样例成片 2（平台端到端渲染，角色版） | `outputs/episodes/ep_001/final.mp4` | ✅ 299s / 1280×720 / 27,220,652 B（约 26 MiB） |
 | 演示项目数据 | 1 项目 / 1 集 / 5 资产 / 52 镜头 / 41 条台词 | ✅ 已入库 |
 | 测试 | backend 45 passed；pipeline 17 passed | ✅ |
 | 截图 | `docs/screenshots/`（8 张） | ✅ |
@@ -117,8 +117,43 @@ FastAPI (8090) ── SQLite
 ## 10. 今晚协作记录
 
 - Lead：方案/契约/演示剧本/品牌/脚本/集成/QA/验收/文档
-- backend-core：FastAPI + SQLite + 任务 + ComfyUI 适配器 + 43 单测
+- backend-core：FastAPI + SQLite + 任务 + ComfyUI 适配器 + 角色 API（60 单测）
 - frontend-ui：Vite+React 五步工作台 + 真实 API 联调 + 构建
-- media-render：mock 画面 + edge-tts + ASS + ffmpeg 渲染 + 13 单测
+- media-render：角色画面/edge-tts/ASS/ffmpeg 渲染（17 单测）
+- character-3d：Blender 程序化角色生成器（studio3d）+ 3 角色素材 + 2D 变体
+- h3-comfy：ComfyUI MiniMax H3 真实生成接入 + 3 条角色镜头
 
 详见 `docs/decisions.md`。
+## 11. 角色工坊（原创动漫人物，2026-10-24 追加）
+
+- **要求**：全部角色为平台自主生成的原创动漫人物；支持 3D/2D 多种风格；可依托 Blender 造人。
+- **3D 生成器（studio3d/）**：Blender 5.0 程序化建模 + 卡通渲染（EEVEE + 3 阶色带 + inverted-hull 描边 + 三点光），按 spec 生成大眼/发型/服装/配饰；支持预设 3d_toon、3d_cel、2d_cel、2d_paint、anime、guoman；单角色约 10–20s。
+- **演示角色（全部原创）**：
+  - 老周（主持人，3D 卡通，暖黄 accent，深色短发+西装）
+  - 阿栗（AI 内容创业者，2D 赛璐璐为主风格，双马尾+耳机+卫衣）
+  - 大魏（传统综艺导演，3D 赛璐璐，光头+眼镜+黑夹克）
+- **产物**：每角色 portrait.png(768²)、cutout/ 透明底、4 表情（neutral/happy/surprised/thinking）、2d_cel 变体（老周）、dawei 的 sheet.png(1600×900) + turntable.mp4；meta.json。
+- **平台集成**：后端 Character 表 + 6 个端点；前端「角色工坊」（角色卡/详情抽屉/新建角色弹窗/表情/转面/重新生成）；分镜台按 speaker 显示角色头像；成片房展示角色画风。
+- **截帧**：![角色工坊](screenshots/09_character_workshop.png)
+
+## 12. 真实 H3 生成（MiniMax H3 · 本机 ComfyUI）
+
+- 环境：本机 ComfyUI + int8 量化 MiniMax H3（20.97GB）+ 4step turbo LoRA + Qwen3-VL 文本编码器 + 视频/音频 VAE；RTX 3080 Ti 12GB；ComfyUI 0.39.0 / torch 2.11+cu130。
+- 接入：integrations/comfyui/{workflow_to_api.py, run_h3.py, start_comfyui.ps1}，UI workflow → API prompt，提交/轮询/取回/ffprobe。
+- **实测成果**：`outputs/h3/laozhou_h3.mp4` —— 5.167s / 768×768 / 24fps / H.264+AAC（含音轨），4step/124帧，单条约 115–150s（含模型 offload），把 Blender 立绘升级为干净的赛璐璐动漫角色。
+- 抽帧：![H3 镜头](screenshots/11_h3_laozhou.png)
+- 成果：laozhou/ali/dawei 三条全部完成（各 768×768/5.167s/124 帧/含音轨），产物 outputs/h3/{id}_h3.mp4 + 中段帧 outputs/characters/{id}/h3_portrait.png；单条单独跑 115–150s（含 offload），12GB 显存峰值 11.9GB，ComfyUI 单 worker 串行；成片 52/52 镜头均已使用角色画面。
+- 字幕/画面修复：去除片段 fade（blackdetect=0）、角色胸像构图、名字条逐镜头绑定、字幕去空格/强制单行/均衡换行（WrapStyle=2），200s 长句已修。
+
+## 13. 角色化成片
+
+- 成片渲染优先级：H3 视频/中段帧 → Blender cutout → 2d → 文字卡兜底；角色按 speaker 逐镜头绑定名字条与表情。
+- 修复：切点单帧黑帧（去除片段 fade）、胸像构图、名字条错位。
+- 最终成片：`outputs/demo/final.mp4`（299s / 1280×720 / 31.9MB，全部原创动漫角色；三人 H3 真实生成镜头均已接入）；平台端 ep_001 final.mp4 27.4MB 同步角色化。
+
+## 14. 测试与构建（终态）
+
+- backend：`python -m pytest tests -q` → **60 passed**
+- pipeline：`python -m pytest pipeline/tests -q` → **25 passed**（含字幕去空格/换行/角色素材/缓存指纹）
+- frontend：`npm run build` 通过（dist 240KB JS / 71KB CSS）
+- 角色/H3 资产与截图均已入库文档。

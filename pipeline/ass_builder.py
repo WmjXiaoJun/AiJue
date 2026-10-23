@@ -6,11 +6,40 @@
 from __future__ import annotations
 
 import logging
+import re
 from pathlib import Path
 
 from . import config, utils
 
 LOG = logging.getLogger("pipeline")
+
+
+SUB_MAX_CHARS = 24      # 42 号字下约 1000px（中文字宽≈字号）
+SUB_WRAP_TARGET = 15    # 超过最大宽度时手动换行，每行目标字数
+_PUNCT = "，。！？；：、,.!?;:）)】」』"
+
+
+def plain_subtitle(text: str) -> str:
+    """字幕文本清洗：去掉空格/换行（避免 ASS 按空格断行，如「AI 版本」）。"""
+    return re.sub(r"\s+", "", str(text or ""))
+
+
+def wrap_subtitle(text: str) -> list[str]:
+    """超过最大宽度时在标点附近均衡拆成两行；两行手动换行后仍以 x=640 居中。"""
+    text = plain_subtitle(text)
+    if len(text) <= SUB_MAX_CHARS:
+        return [text]
+    ideal = len(text) / 2.0
+    best = None
+    for i, ch in enumerate(text[:-1]):
+        if ch not in _PUNCT:
+            continue
+        if abs((i + 1) - ideal) <= 6:
+            best = i + 1
+            break
+    if best is None:
+        best = max(1, min(len(text) - 1, int(round(ideal))))
+    return [text[:best], text[best:]]
 
 
 def ass_time(seconds: float) -> str:
@@ -49,8 +78,14 @@ def _accent_map(assets: list) -> dict:
     return mapping
 
 
-def build_events(episode: dict, timings: list, assets: list) -> list[tuple]:
-    """返回 [(start, end, layer, style, text)]。"""
+def build_events(episode: dict, timings: list, assets: list,
+                 char_shot_ids: set[str] | None = None) -> list[tuple]:
+    """返回 [(start, end, layer, style, text)]。
+
+    char_shot_ids: 使用角色画面的镜头 id 集合；这些镜头的字幕用 SubChar 样式
+    （右移避开左下名字条、最大宽度约 62%）。
+    """
+    char_shot_ids = char_shot_ids or set()
     events: list[tuple] = []
     accents = _accent_map(assets)
     segment_names = {}
@@ -103,8 +138,10 @@ def build_events(episode: dict, timings: list, assets: list) -> list[tuple]:
             if body:
                 s_start = start + 0.12
                 s_end = max(s_start + 0.6, end - 0.10)
-                events.append((s_start, s_end, 4, "Sub",
-                               r"{\fad(110,90)}" + _esc(body)))
+                sub_style = "SubChar" if str(shot.get("id")) in char_shot_ids else "Sub"
+                lines = [_esc(part) for part in wrap_subtitle(body)]
+                sub_text = (r"{\an2\pos(640,596)\fad(110,90)}" + r"\N".join(lines))
+                events.append((s_start, s_end, 4, sub_style, sub_text))
 
         # ---- 人名条（lower_third）----
         if isinstance(lower, dict) and lower.get("name"):
@@ -125,7 +162,8 @@ def build_events(episode: dict, timings: list, assets: list) -> list[tuple]:
 
 
 def build_ass(episode: dict, timings: list, assets: list, fonts: dict,
-              out_path, width: int = 1280, height: int = 720) -> dict:
+              out_path, width: int = 1280, height: int = 720,
+              char_shot_ids: set[str] | None = None) -> dict:
     """生成全局 ASS 文件，返回统计信息。"""
     template_path = config.TEMPLATES_DIR / "subtitle_variety.ass"
     try:
@@ -140,7 +178,8 @@ def build_ass(episode: dict, timings: list, assets: list, fonts: dict,
         header = header.replace("PlayResX: 1280", f"PlayResX: {width}")
         header = header.replace("PlayResY: 720", f"PlayResY: {height}")
 
-    events = build_events(episode or {}, timings, assets or [])
+    events = build_events(episode or {}, timings, assets or [],
+                          char_shot_ids=char_shot_ids)
     lines = []
     for start, end, layer, style, text in events:
         lines.append(

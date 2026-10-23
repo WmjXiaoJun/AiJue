@@ -1,0 +1,5 @@
+integrated_multimodal_description: [Shot 1] Anime-style medium close-up of the same young woman shown in the first frame, standing in a dark studio with a cool cyan rim light. She is an energetic AI content creator: she looks straight into the camera and talks fast with a bright, confident smile, lips moving naturally, small quick head bobs and natural blinks, one hand lifting slightly into frame. Keep her long purple twin tails, big blue eyes, lavender hoodie with cyan accents, cyan headphones and star hair clip exactly the same as in the first frame, and keep the clean cel-shaded 2D anime look. The camera holds steady with a very slow push-in; subtle hair and sleeve movement; clean line art, filmic studio lighting, no text, no watermark.
+
+overall_soundscape: Quiet studio room tone with a soft breath, a light sleeve rustle and a faint airy ambience in stereo.
+
+non_diegetic_music: N/A

@@ -1,0 +1,215 @@
+import { useEffect, useMemo, useState } from "react";
+import { api, errorText, mediaUrl } from "../lib/api";
+import type { Character, CharacterFiles, CharacterSpec, Job } from "../types";
+import {
+  ACCESSORY_LABEL,
+  BROW_LABEL,
+  CHARACTER_STATUS_LABEL,
+  CHARACTER_STYLE_LABEL,
+  FACIAL_HAIR_LABEL,
+  GENDER_LABEL,
+  HAIR_STYLE_LABEL,
+  OUTFIT_LABEL,
+  characterStyles,
+  fmtDateTime,
+  firstChar,
+  isActiveJob,
+  label,
+  styleFamily,
+} from "../lib/format";
+import { Drawer, Meta, Notice, ProgressBar, StatusBadge } from "./ui";
+import { IconExternal, IconImage, IconRefresh, IconSpark, IconVideo } from "./icons";
+
+interface Props {
+  character: Character | null;
+  job: Job | null;
+  onClose: () => void;
+  onRegenerate: (character: Character) => void;
+}
+
+const EXPRESSIONS: { key: string; label: string }[] = [
+  { key: "neutral", label: "平静" },
+  { key: "happy", label: "开心" },
+  { key: "surprised", label: "惊讶" },
+  { key: "thinking", label: "思考" },
+];
+
+export function CharacterDrawer({ character, job, onClose, onRegenerate }: Props) {
+  const [files, setFiles] = useState<CharacterFiles | null>(null);
+  const [filesError, setFilesError] = useState<string | null>(null);
+
+  const characterId = character?.id || "";
+  const characterStatus = character?.status || "";
+
+  useEffect(() => {
+    setFiles(null);
+    setFilesError(null);
+    if (!characterId) return;
+    let alive = true;
+    api
+      .characterFiles(characterId)
+      .then((data) => {
+        if (alive) setFiles(data);
+      })
+      .catch((err) => {
+        if (alive) setFilesError(errorText(err));
+      });
+    return () => {
+      alive = false;
+    };
+  }, [characterId, characterStatus]);
+
+  const appearance = useMemo(() => (character?.spec as CharacterSpec | null | undefined)?.appearance || {}, [character]);
+  const styles = characterStyles(character?.style);
+  const primary = styles[0] || "";
+  const accent = character?.accent_color || "#F5C518";
+  const busy = !!job && isActiveJob(job);
+  const progress = job ? Math.max(0, Math.min(100, job.progress || 0)) : 0;
+
+  const portrait = files?.portrait || character?.portrait_url;
+  const sheet = files?.sheet || character?.sheet_url;
+  const turntable = files?.turntable || character?.turntable_url;
+  const expressions = files?.expressions || character?.expressions || null;
+  const outfit = appearance.outfit || {};
+
+  return (
+    <Drawer
+      open={!!character}
+      onClose={onClose}
+      width={520}
+      title={
+        <span className="drawer-title-row">
+          <span className="drawer-shot-no">角色工坊</span>
+          <span>{character?.name || ""}</span>
+          {character && <StatusBadge status={character.status} kind="character" labelText={label(CHARACTER_STATUS_LABEL, character.status)} />}
+        </span>
+      }
+      subtitle={character ? character.title + " · " + (styles.map((style) => CHARACTER_STYLE_LABEL[style] || style).join(" / ") || "未设定风格") : undefined}
+    >
+      {character && (
+        <div className="char-detail">
+          <div className="char-hero">
+            <div
+              className="char-hero-portrait"
+              style={{ borderColor: accent + "55", background: "linear-gradient(150deg, " + accent + "33, #0a0d13 70%)" }}
+            >
+              {portrait ? <img src={mediaUrl(portrait)} alt={character.name} /> : <span className="char-initial">{firstChar(character.name)}</span>}
+            </div>
+            <div className="char-hero-main">
+              <div className="char-hero-name">{character.name}</div>
+              <div className="char-hero-title">{character.title}</div>
+              <div className="char-style-row">
+                {styles.map((style) => (
+                  <span key={style} className={"char-style-chip" + (style === primary ? " is-primary" : "")}>
+                    {styleFamily(style)} · {CHARACTER_STYLE_LABEL[style] || style}
+                  </span>
+                ))}
+              </div>
+              <div className="char-hero-voice">声线 {character.voice || "未分配"}</div>
+            </div>
+          </div>
+
+          <div className="char-regen-row">
+            <button type="button" className="btn btn-primary btn-block" onClick={() => onRegenerate(character)} disabled={busy}>
+              {busy ? <IconRefresh size={15} /> : <IconSpark size={15} />}
+              {busy ? "正在重新生成…" : "重新生成角色素材"}
+            </button>
+            {busy && (
+              <div className="char-regen-progress">
+                <ProgressBar value={progress} label={Math.round(progress) + "%"} />
+                <span>{job?.message || "Blender 正在渲染半身像 / 三视图 / 表情 / 转面"}</span>
+              </div>
+            )}
+          </div>
+
+          {(filesError && !portrait && !sheet) && (
+            <Notice tone="warn">角色素材接口暂不可用：{filesError}（生成完成后会自动出现）</Notice>
+          )}
+
+          <section className="detail-block">
+            <h4>角色设定三视图</h4>
+            {sheet ? (
+              <div className="char-sheet-wrap">
+                <img className="char-sheet" src={mediaUrl(sheet)} alt={character.name + " 三视图"} loading="lazy" />
+                <a className="char-sheet-open" href={mediaUrl(sheet)} target="_blank" rel="noreferrer">
+                  <IconExternal size={13} /> 查看大图
+                </a>
+              </div>
+            ) : (
+              <div className="char-media-placeholder">
+                <IconImage size={22} />
+                <span>设定图待生成（正面 / 侧面 / 四分之三 + 配色条）</span>
+              </div>
+            )}
+          </section>
+
+          <section className="detail-block">
+            <h4>四表情</h4>
+            <div className="char-expression-grid">
+              {EXPRESSIONS.map((item) => {
+                const url = expressions ? expressions[item.key] : null;
+                return (
+                  <div key={item.key} className="char-expression">
+                    {url ? (
+                      <img src={mediaUrl(url)} alt={character.name + " " + item.label} loading="lazy" />
+                    ) : (
+                      <div className="char-expression-empty">
+                        <IconImage size={16} />
+                      </div>
+                    )}
+                    <span>{item.label}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          <section className="detail-block">
+            <h4>转面预览</h4>
+            {turntable ? (
+              <video className="char-turntable" src={mediaUrl(turntable)} controls muted loop playsInline preload="metadata" />
+            ) : (
+              <div className="char-media-placeholder char-media-placeholder-sm">
+                <IconVideo size={20} />
+                <span>360° 转面视频待生成（720×720 / 4s）</span>
+              </div>
+            )}
+          </section>
+
+          <section className="detail-block">
+            <h4>基本设定</h4>
+            <div className="char-meta-grid">
+              <Meta label="声音" value={character.voice || "—"} />
+              <Meta label="主风格" value={primary ? CHARACTER_STYLE_LABEL[primary] || primary : "—"} />
+              <Meta label="变体" value={styles.slice(1).map((style) => CHARACTER_STYLE_LABEL[style] || style).join(" / ") || "—"} />
+              <Meta label="资产 ID" value={<code>{character.asset_id || "—"}</code>} />
+              <Meta label="角色 ID" value={<code>{character.id}</code>} />
+              <Meta label="创建时间" value={character.created_at ? fmtDateTime(character.created_at) : "—"} />
+            </div>
+            <p className="char-persona-detail">{character.persona || "—"}</p>
+          </section>
+
+          <section className="detail-block detail-block-last">
+            <h4>外观参数</h4>
+            <div className="detail-tags">
+              <span className="tag">性别 {label(GENDER_LABEL, appearance.gender)}</span>
+              <span className="tag">年龄 {appearance.age ?? "—"}</span>
+              <span className="tag">Q 版度 {appearance.chibi ?? "—"}</span>
+              <span className="tag">肤色 {appearance.skin || "—"}</span>
+              <span className="tag">发型 {label(HAIR_STYLE_LABEL, appearance.hair_style)}</span>
+              <span className="tag">发色 {appearance.hair_color || "—"}</span>
+              <span className="tag">眼型 {label(BROW_LABEL, appearance.brow)}</span>
+              <span className="tag">胡型 {label(FACIAL_HAIR_LABEL, appearance.facial_hair)}</span>
+              <span className="tag">服装 {label(OUTFIT_LABEL, outfit.type)}</span>
+              <span className="tag">服色 {outfit.main || "—"}</span>
+              <span className="tag">
+                配饰 {(appearance.accessories || []).map((item) => label(ACCESSORY_LABEL, item)).join(" / ") || "无"}
+              </span>
+              {appearance.marks && appearance.marks.length > 0 && <span className="tag">标记 {appearance.marks.join(" / ")}</span>}
+            </div>
+          </section>
+        </div>
+      )}
+    </Drawer>
+  );
+}

@@ -10,16 +10,17 @@ import json
 import logging
 from typing import Any, Dict
 
-from . import config
+from . import character_files, config
 from .db import SessionLocal
 from .models import (
     Asset,
+    Character,
     Episode,
     Job,
     Project,
-    Setting,
     Shot,
     ShotVersion,
+    Setting,
 )
 
 logger = logging.getLogger(__name__)
@@ -179,6 +180,95 @@ def seed_demo(db) -> bool:
     return True
 
 
+CHARACTER_ASSET_IDS = {
+    "老周": "host",
+    "阿栗": "guest_a",
+    "大魏": "guest_b",
+}
+
+
+def seed_characters(db) -> int:
+    """为 demo 项目播种 contract/characters/*.json（幂等，关联 host/guest_a/guest_b 资产）。"""
+    project = db.get(Project, DEMO_PROJECT_ID)
+    folder = config.CONTRACT_DIR / "characters"
+    if project is None or not folder.is_dir():
+        return 0
+    episode = (
+        db.query(Episode)
+        .filter(Episode.project_id == project.id)
+        .order_by(Episode.no.asc())
+        .first()
+    )
+    assets = {}
+    if episode is not None:
+        for asset in db.query(Asset).filter(Asset.episode_id == episode.id).all():
+            assets[asset.id] = asset
+
+    created = 0
+    for path in sorted(folder.glob("*.json")):
+        try:
+            spec = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            logger.exception("角色 spec 读取失败: %s", path)
+            continue
+        character_id = str(spec.get("id") or path.stem)
+        if db.get(Character, character_id) is not None:
+            continue
+        name = str(spec.get("name") or character_id)
+        target_asset_id = CHARACTER_ASSET_IDS.get(name)
+        asset = assets.get(target_asset_id) if target_asset_id else None
+        if asset is None:
+            asset = next(
+                (
+                    item
+                    for item in assets.values()
+                    if item.type == "character" and item.name == name
+                ),
+                None,
+            )
+        style = spec.get("style")
+        if isinstance(style, str):
+            style = {"primary": style, "variants": [style]}
+        if not isinstance(style, dict) or not style:
+            style = {"primary": "3d_toon", "variants": ["3d_toon"]}
+        expected_portrait = character_files.expected_portrait_url(character_id)
+        if asset is not None:
+            asset.type = "character"
+            if not asset.images:
+                # 契约要求 Asset.images 指向角色 portrait（生成后即真实可用）
+                asset.images = [expected_portrait]
+        db.add(
+            Character(
+                id=character_id,
+                project_id=project.id,
+                asset_id=asset.id if asset is not None else None,
+                name=name,
+                title=str(spec.get("title") or ""),
+                persona=str(spec.get("persona") or ""),
+                voice=str(spec.get("voice") or ""),
+                accent_color=str(spec.get("accent_color") or "#888888"),
+                style=style,
+                spec=spec,
+                portrait_url=None,
+                sheet_url=None,
+                turntable_url=None,
+                expressions={},
+                status="pending",
+            )
+        )
+        created += 1
+        logger.info("播种角色: %s (%s)", character_id, name)
+    if created:
+        db.commit()
+    # 若 outputs/characters 下已有产物（studio3d 已跑过），回填 URL/status
+    changed = False
+    for character in db.query(Character).filter(Character.project_id == project.id).all():
+        changed = character_files.apply(character) or changed
+    if changed:
+        db.commit()
+    return created
+
+
 def purge_demo(db) -> int:
     """删除 demo 项目及其集/资产/镜头/版本/任务，返回删除的集数。"""
     episode_ids = [
@@ -212,6 +302,7 @@ def main() -> None:
             "episodes": db.query(Episode).count(),
             "assets": db.query(Asset).count(),
             "shots": db.query(Shot).count(),
+            "characters": db.query(Character).count(),
             "mode": setting.generation_mode,
         }
     print(json.dumps({"seeded": seeded, "removed_episodes": removed, **counts}, ensure_ascii=False))

@@ -1,0 +1,41 @@
+{
+  "id": "laozhou",
+  "name": "老周",
+  "title": "主持人",
+  "persona": "老练、冷幽默、爱抛梗、控场稳",
+  "voice": "zh-CN-YunxiNeural",
+  "accent_color": "#F5C518",
+  "style": {
+    "primary": "3d_toon",
+    "variants": [
+      "3d_toon",
+      "2d_cel"
+    ]
+  },
+  "appearance": {
+    "gender": "male",
+    "age": 42,
+    "height_ratio": 1,
+    "head_scale": 1.15,
+    "chibi": 0.25,
+    "skin": "#F2D6C3",
+    "hair_color": "#2B2B33",
+    "hair_style": "short_swept",
+    "eye_color": "#2B2B33",
+    "eye_size": 1,
+    "brow": "thick",
+    "facial_hair": "stubble",
+    "outfit": {
+      "type": "suit",
+      "main": "#2F3A4F",
+      "accent": "#F5C518",
+      "shirt": "#F4F1E8"
+    },
+    "accessories": [
+      "watch"
+    ],
+    "marks": [
+      "warm_smile"
+    ]
+  }
+}

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from sqlalchemy import create_engine, event
+from sqlalchemy import create_engine, event, inspect, text
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 from . import config
@@ -48,12 +48,25 @@ def get_db():
         db.close()
 
 
+def migrate_columns() -> None:
+    """轻量迁移：老库补新增列（SQLite 用 ALTER TABLE ADD COLUMN，可重复执行）。"""
+    inspector = inspect(engine)
+    tables = set(inspector.get_table_names())
+    if "jobs" in tables:
+        columns = {column["name"] for column in inspector.get_columns("jobs")}
+        if "character_id" not in columns:
+            with engine.begin() as connection:
+                connection.execute(text("ALTER TABLE jobs ADD COLUMN character_id VARCHAR(64)"))
+
+
 def init_db() -> None:
-    """建表 + 默认设置 + 空库播种（可重复执行）。"""
+    """建表 + 轻量迁移 + 默认设置 + 空库播种 + 角色播种（可重复执行）。"""
     from . import models, seed  # noqa: F401  确保模型已注册
 
     config.ensure_dirs()
     Base.metadata.create_all(bind=engine)
+    migrate_columns()
     with SessionLocal() as db:
         seed.ensure_defaults(db)
         seed.seed_if_empty(db)
+        seed.seed_characters(db)

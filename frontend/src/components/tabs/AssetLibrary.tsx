@@ -1,14 +1,23 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { api, errorText } from "../../lib/api";
-import type { Asset } from "../../types";
-import { ASSET_ROLE_LABEL, ASSET_TYPE_LABEL } from "../../lib/format";
+import type { Asset, Character, Job } from "../../types";
+import { ASSET_ROLE_LABEL, ASSET_TYPE_LABEL, characterStyles } from "../../lib/format";
 import { useToast } from "../Toast";
 import type { TabBaseProps } from "./types";
 import { Avatar, EmptyState, SectionHead, Spinner } from "../ui";
+import { CharacterWorkshop } from "../CharacterWorkshop";
+import { CharacterDrawer } from "../CharacterDrawer";
+import { CharacterAvatar } from "../CharacterAvatar";
+import { NewCharacterModal } from "../NewCharacterModal";
 import { IconBox, IconImage, IconLock, IconPalette, IconUnlock, IconUser, IconUsers } from "../icons";
 
 interface Props extends TabBaseProps {
   onAssetUpdated: (asset: Asset) => void;
+  characters: Character[] | null;
+  charactersSupported: boolean;
+  charactersError: string | null;
+  onRefreshCharacters: () => Promise<Character[] | null>;
+  onRefreshAssets: () => Promise<void>;
 }
 
 const TYPE_FILTERS: { key: string; label: string; icon: (props: { size?: number }) => JSX.Element }[] = [
@@ -19,10 +28,91 @@ const TYPE_FILTERS: { key: string; label: string; icon: (props: { size?: number 
   { key: "style", label: "风格", icon: IconPalette },
 ];
 
-export function AssetLibrary({ assets, shots, onAssetUpdated }: Props) {
+interface CharacterJobState {
+  characterId: string;
+  job: Job;
+}
+
+export function AssetLibrary({
+  assets,
+  shots,
+  project,
+  characters,
+  charactersSupported,
+  charactersError,
+  onAssetUpdated,
+  onRefreshCharacters,
+  onRefreshAssets,
+}: Props) {
   const notify = useToast();
   const [filter, setFilter] = useState("all");
   const [lockingId, setLockingId] = useState<string | null>(null);
+  const [showNewCharacter, setShowNewCharacter] = useState(false);
+  const [activeCharacterId, setActiveCharacterId] = useState<string | null>(null);
+  const [charJob, setCharJob] = useState<CharacterJobState | null>(null);
+
+  const activeCharacter = (characters || []).find((item) => item.id === activeCharacterId) || null;
+  const activeJob = charJob && activeCharacter && charJob.characterId === activeCharacter.id ? charJob.job : null;
+
+  // 角色生成任务轮询：完成/失败后刷新卡片与素材
+  useEffect(() => {
+    if (!charJob) return;
+    let alive = true;
+    const tick = async () => {
+      try {
+        const job = await api.job(charJob.job.id);
+        if (!alive) return;
+        setCharJob((prev) => (prev && prev.job.id === job.id ? { ...prev, job } : prev));
+        if (job.status === "done") {
+          setCharJob(null);
+          notify("角色素材生成完成", "success");
+          await onRefreshCharacters();
+          await onRefreshAssets();
+        } else if (job.status === "failed" || job.status === "canceled") {
+          setCharJob(null);
+          notify("角色生成" + (job.status === "failed" ? "失败" : "已取消") + "：" + (job.error || job.message || "未知原因"), "error");
+          await onRefreshCharacters();
+        } else {
+          void onRefreshCharacters();
+        }
+      } catch {
+        /* 轮询暂时失败，保留任务状态等下一轮重试 */
+      }
+    };
+    const timer = window.setInterval(() => {
+      void tick();
+    }, 1600);
+    void tick();
+    return () => {
+      alive = false;
+      window.clearInterval(timer);
+    };
+  }, [charJob?.job.id, notify, onRefreshCharacters, onRefreshAssets]);
+
+  const handleRegenerate = useCallback(
+    async (character: Character) => {
+      try {
+        const job = await api.generateCharacter(character.id, characterStyles(character.style));
+        setCharJob({ characterId: character.id, job });
+        notify("已提交「" + character.name + "」重新生成任务", "success");
+        void onRefreshCharacters();
+      } catch (err) {
+        notify(errorText(err), "error");
+      }
+    },
+    [notify, onRefreshCharacters]
+  );
+
+  const handleCharacterSubmitted = useCallback(
+    async (character: Character, job: Job | null) => {
+      setShowNewCharacter(false);
+      setActiveCharacterId(character.id);
+      await onRefreshCharacters();
+      await onRefreshAssets();
+      if (job) setCharJob({ characterId: character.id, job });
+    },
+    [onRefreshCharacters, onRefreshAssets]
+  );
 
   const counts = useMemo(() => {
     const map: Record<string, number> = { all: assets.length };
@@ -33,7 +123,16 @@ export function AssetLibrary({ assets, shots, onAssetUpdated }: Props) {
   }, [assets]);
 
   const filtered = filter === "all" ? assets : assets.filter((asset) => asset.type === filter);
-  const characters = assets.filter((asset) => asset.type === "character");
+  const characterAssets = assets.filter((asset) => asset.type === "character");
+  const characterByAssetId = useMemo(() => {
+    const map = new Map<string, Character>();
+    (characters || []).forEach((character) => {
+      if (character.asset_id) map.set(character.asset_id, character);
+      map.set(character.id, character);
+    });
+    return map;
+  }, [characters]);
+
   const shotCountBySpeaker = useMemo(() => {
     const map = new Map<string, number>();
     shots.forEach((shot) => {
@@ -57,9 +156,20 @@ export function AssetLibrary({ assets, shots, onAssetUpdated }: Props) {
 
   return (
     <div className="assets-view">
+      <CharacterWorkshop
+        characters={characters}
+        supported={charactersSupported}
+        error={charactersError}
+        onRefresh={() => void onRefreshCharacters()}
+        onNew={() => setShowNewCharacter(true)}
+        onOpen={(character) => setActiveCharacterId(character.id)}
+      />
+
+      <div className="asset-section-divider" />
+
       <SectionHead
-        title="资产库"
-        en="ASSETS"
+        title="固定资产"
+        en="PRODUCTION ASSETS"
         extra={
           <div className="filter-tabs">
             {TYPE_FILTERS.map((item) => {
@@ -84,8 +194,8 @@ export function AssetLibrary({ assets, shots, onAssetUpdated }: Props) {
       <div className="asset-overview">
         <div className="asset-overview-item">
           <span>角色</span>
-          <b>{characters.length}</b>
-          <em>{characters.filter((asset) => asset.locked).length} 个已锁定</em>
+          <b>{characterAssets.length}</b>
+          <em>{characterAssets.filter((asset) => asset.locked).length} 个已锁定</em>
         </div>
         <div className="asset-overview-item">
           <span>场景</span>
@@ -94,12 +204,12 @@ export function AssetLibrary({ assets, shots, onAssetUpdated }: Props) {
         </div>
         <div className="asset-overview-item">
           <span>声线</span>
-          <b>{characters.filter((asset) => asset.voice).length}</b>
+          <b>{characterAssets.filter((asset) => asset.voice).length}</b>
           <em>edge-tts 中文</em>
         </div>
         <div className="asset-overview-item">
           <span>锁定策略</span>
-          <b>{characters.filter((asset) => asset.locked).length}/{characters.length}</b>
+          <b>{characterAssets.filter((asset) => asset.locked).length}/{characterAssets.length}</b>
           <em>锁定后保持人设与形象</em>
         </div>
       </div>
@@ -112,6 +222,7 @@ export function AssetLibrary({ assets, shots, onAssetUpdated }: Props) {
             <AssetCard
               key={asset.id}
               asset={asset}
+              character={characterByAssetId.get(asset.id)}
               shotCount={shotCountBySpeaker.get(asset.id) || 0}
               busy={lockingId === asset.id}
               onToggleLock={() => void toggleLock(asset)}
@@ -119,17 +230,33 @@ export function AssetLibrary({ assets, shots, onAssetUpdated }: Props) {
           ))}
         </div>
       )}
+
+      <CharacterDrawer
+        character={activeCharacter}
+        job={activeJob}
+        onClose={() => setActiveCharacterId(null)}
+        onRegenerate={(character) => void handleRegenerate(character)}
+      />
+
+      <NewCharacterModal
+        open={showNewCharacter}
+        projectId={project.id}
+        onClose={() => setShowNewCharacter(false)}
+        onSubmitted={(character, job) => void handleCharacterSubmitted(character, job)}
+      />
     </div>
   );
 }
 
 function AssetCard({
   asset,
+  character,
   shotCount,
   busy,
   onToggleLock,
 }: {
   asset: Asset;
+  character?: Character;
   shotCount: number;
   busy: boolean;
   onToggleLock: () => void;
@@ -140,7 +267,11 @@ function AssetCard({
     <article className={"asset-card" + (asset.locked ? " locked" : "")} style={{ ["--accent" as string]: accent }}>
       <div className="asset-accent" />
       <div className="asset-head">
-        <Avatar name={asset.name} color={accent} size={52} square={!isCharacter} />
+        {isCharacter ? (
+          <CharacterAvatar character={character} name={asset.name} color={accent} size={52} square={false} />
+        ) : (
+          <Avatar name={asset.name} color={accent} size={52} square />
+        )}
         <div className="asset-title">
           <div className="asset-name">
             {asset.name}
