@@ -1,0 +1,11 @@
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+tmp/
+outputs/
+frontend/dist/
+frontend/node_modules/
+.pytest_cache/
+*.log

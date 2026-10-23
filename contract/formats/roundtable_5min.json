@@ -1,0 +1,78 @@
+{
+  "id": "roundtable_5min",
+  "name": "横屏 AI 圆桌 · 5 分钟",
+  "aspect": "16:9",
+  "target_duration": 296,
+  "segments": [
+    {
+      "id": "open",
+      "name": "片头",
+      "duration": 6,
+      "pattern": [
+        "title_card"
+      ]
+    },
+    {
+      "id": "cold_open",
+      "name": "冷开场",
+      "duration": 17,
+      "pattern": [
+        "host_to_camera",
+        "reaction"
+      ]
+    },
+    {
+      "id": "intro",
+      "name": "嘉宾介绍",
+      "duration": 32,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction"
+      ]
+    },
+    {
+      "id": "topic1",
+      "name": "话题一 · AI 与导演",
+      "duration": 113,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "meme_card",
+        "b_roll"
+      ]
+    },
+    {
+      "id": "topic2",
+      "name": "话题二 · 现场改台本",
+      "duration": 76,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "meme_card",
+        "b_roll"
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "结尾",
+      "duration": 52,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "meme_card",
+        "end_card"
+      ]
+    }
+  ],
+  "packaging": {
+    "intro": "logo_sting",
+    "outro": "end_card",
+    "lower_third_style": "zaopianju_yellow",
+    "transition": "hard_cut",
+    "bgm": "talk_light",
+    "subtitle_style": "variety"
+  }
+}

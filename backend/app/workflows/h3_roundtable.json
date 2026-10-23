@@ -1,0 +1,26 @@
+{
+  "_comment": "造片局 ComfyUI(MiniMax H3) 工作流模板示例（API 格式）。demo 默认 mock，不使用本文件。真机使用时请用你本机 ComfyUI 的『导出 API 格式工作流』替换本文件内容；pipeline 会把镜头台词/画面描述写入第一个 CLIPTextEncode.text，comfyui 相关地址在 /api/settings 配置。",
+  "1": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "AI 微综艺 演播厅 暖黄灯",
+      "clip": ["2", 1]
+    }
+  },
+  "2": {
+    "class_type": "MiniMaxH3ModelLoader",
+    "inputs": {
+      "model": "minimax_h3.safetensors"
+    }
+  },
+  "3": {
+    "class_type": "MiniMaxH3Sampler",
+    "inputs": {
+      "positive": ["1", 0],
+      "width": 1280,
+      "height": 720,
+      "length": 150,
+      "seed": 42
+    }
+  }
+}

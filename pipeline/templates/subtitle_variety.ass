@@ -1,0 +1,25 @@
+; 造片局 · 综艺风字幕/花字样式模板（render 阶段替换 {{FONT_BODY}} / {{FONT_DISPLAY}} 后追加 Events）
+; 颜色格式 ASS = &HAABBGGRR（AA=00 不透明；BB/GG/RR 为 BGR 顺序）
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1280
+PlayResY: 720
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+YCbCr Matrix: TV.709
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+; 正文旁白：白字 + 深色粗描边 + 轻投影（综艺风）
+Style: Sub,{{FONT_BODY}},46,&H00FFFFFF,&H000000FF,&H00141414,&H96000000,0,0,0,0,100,100,1,0,1,3,2,2,70,70,58,1
+; 花字大字：品牌黄 + 白描边（用于非 meme 镜头的 punchline）
+Style: Punch,{{FONT_DISPLAY}},92,&H0018C5F5,&H000000FF,&H00FFFFFF,&H96000000,-1,0,0,0,100,100,2,0,1,5,3,5,60,60,60,1
+; 人名条：品牌黄实心底框 + 白字（BorderStyle=3；\3c 可逐条改底色）
+Style: Lower,{{FONT_DISPLAY}},38,&H00FFFFFF,&H000000FF,&H0018C5F5,&H00000000,-1,0,0,0,100,100,1,0,3,14,0,1,64,60,120,1
+; 台标水印：右上角半透明白
+Style: Brand,{{FONT_BODY}},24,&H99FFFFFF,&H000000FF,&H88000000,&H00000000,0,0,0,0,100,100,2,0,1,1,0,9,40,44,30,1
+; 段落章节小标：左上角品牌黄
+Style: Chapter,{{FONT_DISPLAY}},30,&H0018C5F5,&H000000FF,&H00101010,&H00000000,-1,0,0,0,100,100,1,0,1,2,1,7,64,60,88,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
