@@ -190,6 +190,7 @@ FastAPI (8090) ── SQLite
 
 ### 18.2 概念图 → H3 动画
 - `POST /api/characters/{cid}/h3-animate` → Job(type=h3) → run_h3.py → outputs/h3/{cid}_h3.mp4（ComfyUI 串行，20 分钟超时）
+- 真链路验收：`POST /characters/laozhou/h3-animate` → job **done 121.5s** → outputs/h3/laozhou_h3.mp4（768×768/24fps/h264+aac/5.167s/1,574,453 B，含音轨）；h3 中段帧回填 h3_portrait；Character 回填 h3_video_url/h3_portrait_url；/media 200。
 - 前端角色抽屉可播放 H3 视频；截图：![H3 动画](screenshots/22_h3_animation.png)
 
 ### 18.3 剪映草稿导出
