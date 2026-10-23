@@ -32,3 +32,10 @@ scripts/         启动/构建/渲染/截图脚本
 - 渲染层：pipeline 读取角色素材（H3 视频/中段帧优先 → Blender cutout → 2d → 文字卡兜底），成片全部使用原创动漫角色。
 - 后端：Character 表 + /api/characters* 端点 + type=character 任务；portrait 存在即 ready；Studio3D CLI 由任务线程调用。
 - 前端：资产库「角色工坊」（角色卡/详情/新建/表情层）、分镜台角色头像、成片房角色画风。
+## 角色 2.0（2026-10-24 追加）
+- imagegen/：SDXL 动漫文生图（Animagine XL 4.0，sha256 已校验），原生 ComfyUI txt2img 工作流 + 角色 prompt 构建 + sheet 合成；CLI 支持 portrait/three_view/expressions/scene/all。
+- outputs/concepts/{cid}/：概念立绘(832×1216)、三视图×3、4 表情、设定图 sheet、场景图、meta。
+- 后端：/characters/{cid}/concept/generate、/concepts、/portrait/from-concept、/h3-animate；/episodes/{eid}/export（capcut）。
+- H3 动画：概念图 → run_h3.py → outputs/h3/{cid}_h3.mp4 + h3_portrait.png，回填角色字段。
+- 导出：pipeline/capcut.py（pyJianYingDraft 0.3.1）生成剪映草稿（52 视频段/1 旁白/42 字幕轨，299s，audit ok）；剪映 10.x 加密草稿限制见 README。
+- 前端：角色抽屉「AI 概念图」区（风格/提示词/seed/生成/图集/设为立绘/H3 动画）、角色卡概念图优先、成片房「导出剪映草稿」。

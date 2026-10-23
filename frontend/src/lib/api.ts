@@ -4,6 +4,7 @@ import type {
   Character,
   CharacterFiles,
   CharacterSpec,
+  ConceptFiles,
   CostReport,
   Episode,
   Health,
@@ -145,6 +146,47 @@ export const api = {
       body: JSON.stringify({ styles: styles ?? [] }),
     }),
   characterFiles: (cid: string) => request<CharacterFiles>("/characters/" + cid + "/files"),
+
+  // ---- 概念图 / H3 动画 / 导出（contract/CONCEPT.md、contract/EXPORT.md） ----
+  characterConcepts: (cid: string) => request<ConceptFiles>("/characters/" + cid + "/concepts"),
+  generateConcept: (cid: string, body: { modes?: string[]; style?: string; prompt_extra?: string; seed?: number }) =>
+    request<Job>("/characters/" + cid + "/concept/generate", { method: "POST", body: JSON.stringify(body) }),
+  /** 优先 outputs 相对路径；400/422 时回退为 /media URL，兼容不同后端实现 */
+  setPortraitFromConcept: async (cid: string, path: string, fallbackPath?: string): Promise<Character> => {
+    try {
+      return await request<Character>("/characters/" + cid + "/portrait/from-concept", {
+        method: "POST",
+        body: JSON.stringify({ path }),
+      });
+    } catch (err) {
+      if (fallbackPath && err instanceof ApiError && (err.status === 400 || err.status === 422)) {
+        return request<Character>("/characters/" + cid + "/portrait/from-concept", {
+          method: "POST",
+          body: JSON.stringify({ path: fallbackPath }),
+        });
+      }
+      throw err;
+    }
+  },
+  h3Animate: async (
+    cid: string,
+    body: { image?: string; prompt?: string } = {},
+    fallbackImage?: string
+  ): Promise<Job> => {
+    try {
+      return await request<Job>("/characters/" + cid + "/h3-animate", { method: "POST", body: JSON.stringify(body) });
+    } catch (err) {
+      if (fallbackImage && body.image && err instanceof ApiError && (err.status === 400 || err.status === 422)) {
+        return request<Job>("/characters/" + cid + "/h3-animate", {
+          method: "POST",
+          body: JSON.stringify({ ...body, image: fallbackImage }),
+        });
+      }
+      throw err;
+    }
+  },
+  exportEpisode: (eid: string, type = "capcut") =>
+    request<Job>("/episodes/" + eid + "/export", { method: "POST", body: JSON.stringify({ type }) }),
 
   settings: () => request<Settings>("/settings"),
   patchSettings: (body: Partial<Settings>) =>

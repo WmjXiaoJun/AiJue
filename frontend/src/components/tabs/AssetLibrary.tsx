@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { api, errorText } from "../../lib/api";
-import type { Asset, Character, Job } from "../../types";
-import { ASSET_ROLE_LABEL, ASSET_TYPE_LABEL, characterStyles } from "../../lib/format";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ApiError, api, errorText } from "../../lib/api";
+import type { Asset, Character, ConceptFiles, Job } from "../../types";
+import { ASSET_ROLE_LABEL, ASSET_TYPE_LABEL, characterStyles, conceptFromCharacter } from "../../lib/format";
 import { useToast } from "../Toast";
 import type { TabBaseProps } from "./types";
 import { Avatar, EmptyState, SectionHead, Spinner } from "../ui";
@@ -50,8 +50,58 @@ export function AssetLibrary({
   const [showNewCharacter, setShowNewCharacter] = useState(false);
   const [activeCharacterId, setActiveCharacterId] = useState<string | null>(null);
   const [charJob, setCharJob] = useState<CharacterJobState | null>(null);
+  const [conceptMap, setConceptMap] = useState<Record<string, ConceptFiles>>({});
+  const [conceptSupported, setConceptSupported] = useState(true);
+  const [conceptError, setConceptError] = useState<string | null>(null);
+
+  const charactersRef = useRef(characters);
+  charactersRef.current = characters;
+  const charactersKey = (characters || []).map((item) => item.id).join(",");
+
+  /** 角色卡优先展示 AI 概念图：批量拉取 /concepts；先探测一个避免未就绪时连续 404 */
+  const refreshConcepts = useCallback(async () => {
+    const list = charactersRef.current || [];
+    if (!list.length) {
+      setConceptMap({});
+      return;
+    }
+    try {
+      const first = await api.characterConcepts(list[0].id);
+      const others = await Promise.all(
+        list.slice(1).map(async (item) => {
+          try {
+            return [item.id, await api.characterConcepts(item.id)] as const;
+          } catch {
+            return null;
+          }
+        })
+      );
+      const map: Record<string, ConceptFiles> = { [list[0].id]: first };
+      others.forEach((entry) => {
+        if (entry) map[entry[0]] = entry[1];
+      });
+      setConceptMap(map);
+      setConceptSupported(true);
+      setConceptError(null);
+    } catch (err) {
+      const status = err instanceof ApiError ? err.status : 0;
+      setConceptMap({});
+      setConceptSupported(!(status === 404 || status === 405));
+      setConceptError(errorText(err));
+    }
+  }, []);
+
+  useEffect(() => {
+    void refreshConcepts();
+  }, [charactersKey, refreshConcepts]);
 
   const activeCharacter = (characters || []).find((item) => item.id === activeCharacterId) || null;
+  // /concepts 未返回时（未就绪/未生成），用 Character 上已回填的 concept_* 字段兜底
+  const conceptFor = (character: Character | null): ConceptFiles | null => {
+    if (!character) return null;
+    return conceptMap[character.id] || conceptFromCharacter(character);
+  };
+  const activeConcept = conceptFor(activeCharacter);
   const activeJob = charJob && activeCharacter && charJob.characterId === activeCharacter.id ? charJob.job : null;
 
   // 角色生成任务轮询：完成/失败后刷新卡片与素材
@@ -68,6 +118,7 @@ export function AssetLibrary({
           notify("角色素材生成完成", "success");
           await onRefreshCharacters();
           await onRefreshAssets();
+          void refreshConcepts();
         } else if (job.status === "failed" || job.status === "canceled") {
           setCharJob(null);
           notify("角色生成" + (job.status === "failed" ? "失败" : "已取消") + "：" + (job.error || job.message || "未知原因"), "error");
@@ -87,7 +138,7 @@ export function AssetLibrary({
       alive = false;
       window.clearInterval(timer);
     };
-  }, [charJob?.job.id, notify, onRefreshCharacters, onRefreshAssets]);
+  }, [charJob?.job.id, notify, onRefreshCharacters, onRefreshAssets, refreshConcepts]);
 
   const handleRegenerate = useCallback(
     async (character: Character) => {
@@ -102,6 +153,10 @@ export function AssetLibrary({
     },
     [notify, onRefreshCharacters]
   );
+
+  const handleCharacterChanged = useCallback(() => {
+    void onRefreshCharacters();
+  }, [onRefreshCharacters]);
 
   const handleCharacterSubmitted = useCallback(
     async (character: Character, job: Job | null) => {
@@ -158,9 +213,13 @@ export function AssetLibrary({
     <div className="assets-view">
       <CharacterWorkshop
         characters={characters}
+        concepts={conceptMap}
         supported={charactersSupported}
         error={charactersError}
-        onRefresh={() => void onRefreshCharacters()}
+        onRefresh={() => {
+          void onRefreshCharacters();
+          void refreshConcepts();
+        }}
         onNew={() => setShowNewCharacter(true)}
         onOpen={(character) => setActiveCharacterId(character.id)}
       />
@@ -236,6 +295,11 @@ export function AssetLibrary({
         job={activeJob}
         onClose={() => setActiveCharacterId(null)}
         onRegenerate={(character) => void handleRegenerate(character)}
+        concept={activeConcept}
+        conceptSupported={conceptSupported}
+        conceptError={conceptError}
+        onRefreshConcepts={refreshConcepts}
+        onCharacterChanged={handleCharacterChanged}
       />
 
       <NewCharacterModal

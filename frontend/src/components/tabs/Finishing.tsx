@@ -15,9 +15,11 @@ import type { TabBaseProps } from "./types";
 import { Notice, ProgressBar, SectionHead, Spinner, StatusBadge, EmptyState } from "../ui";
 import {
   IconAlert,
+  IconCopy,
   IconDownload,
   IconExternal,
   IconFilm,
+  IconFolder,
   IconPlay,
   IconRefresh,
   IconSpark,
@@ -31,9 +33,36 @@ interface Props extends TabBaseProps {
   characters: Character[];
 }
 
+const JIANYING_DRAFT_DIR = "%LOCALAPPDATA%\\JianyingPro\\User Data\\Projects\\com.lveditor.draft";
+
+async function copyText(text: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    try {
+      const area = document.createElement("textarea");
+      area.value = text;
+      area.style.position = "fixed";
+      area.style.opacity = "0";
+      document.body.appendChild(area);
+      area.select();
+      const ok = document.execCommand("copy");
+      area.remove();
+      return ok;
+    } catch {
+      return false;
+    }
+  }
+}
+
 const BY_TYPE_LABEL: Record<string, string> = {
   shot: "镜头生成",
   render: "成片渲染",
+  character: "角色生成",
+  concept: "AI 概念图",
+  h3: "H3 动画",
+  export: "剪映导出",
   tts: "配音 TTS",
   llm: "文本生成",
   other: "其他",
@@ -42,6 +71,9 @@ const BY_TYPE_LABEL: Record<string, string> = {
 export function Finishing({ episode, jobs, characters, onChanged }: Props) {
   const notify = useToast();
   const [rendering, setRendering] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [exportPending, setExportPending] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
 
   const renderJobs = useMemo(
     () =>
@@ -57,6 +89,38 @@ export function Finishing({ episode, jobs, characters, onChanged }: Props) {
   const finalUrl = mediaUrl(episode.render_url || doneRender?.output_url || null);
   const renderProgress = isRendering ? latestRender.progress || 0 : episode.render_url ? 100 : 0;
   const packaging = TEMPLATES[0].packaging;
+
+  const exportJobs = useMemo(
+    () =>
+      jobs
+        .filter((job) => job.type === "export")
+        .slice()
+        .sort((a, b) => String(b.created_at).localeCompare(String(a.created_at))),
+    [jobs]
+  );
+  const latestExport = exportJobs[0];
+  const exportRunning = !!latestExport && (latestExport.status === "queued" || latestExport.status === "running");
+  const exportDone = latestExport?.status === "done";
+  const exportPath = latestExport?.output_url || "";
+  const exportMessagePath = latestExport?.message || "";
+
+  const handleExport = async () => {
+    setExporting(true);
+    setExportError(null);
+    try {
+      await api.exportEpisode(episode.id, "capcut");
+      setExportPending(true);
+      window.setTimeout(() => setExportPending(false), 6000);
+      notify("剪映草稿导出任务已提交", "success");
+      onChanged();
+    } catch (err) {
+      const message = errorText(err);
+      setExportError("导出接口暂不可用：" + message + "（POST /api/episodes/" + episode.id + "/export）");
+      notify("导出失败：" + message, "error");
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const handleRender = async () => {
     setRendering(true);
@@ -143,6 +207,80 @@ export function Finishing({ episode, jobs, characters, onChanged }: Props) {
           )}
         </section>
 
+        <section className="panel export-panel">
+          <SectionHead
+            title="交付导出"
+            en="EXPORT"
+            extra={<span className="muted">剪映专业版草稿 · SRT 字幕 · 导出清单</span>}
+          />
+          <div className="export-top">
+            <p className="export-desc">
+              把成片时间线导出为剪映专业版可导入的草稿（draft_content.json / draft_meta_info.json / 素材 /
+              subtitles.srt / README），兼容本机 com.lveditor.draft 结构。
+            </p>
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={() => void handleExport()}
+              disabled={exporting || exportRunning || exportPending}
+            >
+              {exporting || exportRunning ? <Spinner size={14} /> : <IconDownload size={15} />}
+              {exportRunning ? "导出中…" : exportPending ? "已提交…" : "导出剪映草稿"}
+            </button>
+          </div>
+
+          {exportError && <Notice tone="warn">{exportError}</Notice>}
+
+          {latestExport && (
+            <div className={"export-job export-job-" + latestExport.status}>
+              <div className="export-job-row">
+                <span className="export-job-id">{latestExport.id}</span>
+                <StatusBadge status={latestExport.status} kind="job" />
+                <span className="muted">{fmtTime(latestExport.updated_at || latestExport.created_at)}</span>
+              </div>
+              {(exportRunning || exportDone) && (
+                <ProgressBar
+                  value={exportDone ? 100 : latestExport.progress || 0}
+                  label={Math.round(exportDone ? 100 : latestExport.progress || 0) + "%"}
+                />
+              )}
+              {latestExport.status === "failed" && latestExport.error && (
+                <div className="export-failed">
+                  <IconAlert size={14} /> {latestExport.error}
+                </div>
+              )}
+            </div>
+          )}
+
+          {exportDone && (
+            <div className="export-result">
+              <div className="export-result-row">
+                <span>草稿产物</span>
+                <code>{exportPath || exportMessagePath || "由后端导出至 outputs/exports/"}</code>
+                {(exportPath || exportMessagePath) && (
+                  <CopyButton text={exportPath || exportMessagePath} label="复制路径" />
+                )}
+              </div>
+              <div className="export-result-row">
+                <span>剪映草稿目录</span>
+                <code>{JIANYING_DRAFT_DIR}</code>
+                <CopyButton text={JIANYING_DRAFT_DIR} label="复制目录" />
+              </div>
+              <ol className="export-steps">
+                <li>关闭剪映专业版（避免草稿被占用）。</li>
+                <li>
+                  将导出的草稿文件夹复制到{" "}
+                  <code>%LOCALAPPDATA%\JianyingPro\User Data\Projects\com.lveditor.draft</code>。
+                </li>
+                <li>重新打开剪映 → 首页「本地草稿」即可看到《造片局_EP001》；也可用「导入草稿」直接选择导出文件夹。</li>
+              </ol>
+              <div className="export-hint">
+                <IconFolder size={13} /> 草稿内附带 subtitles.srt 与 README.txt，可继续在剪映内精修。
+              </div>
+            </div>
+          )}
+        </section>
+
         <section className="panel packaging-panel">
           <SectionHead title="包装配置" en="PACKAGING" extra={<span className="muted">来自节目模式 roundtable_5min</span>} />
           <div className="packaging-grid">
@@ -193,6 +331,23 @@ export function Finishing({ episode, jobs, characters, onChanged }: Props) {
 
       <CostPanel episodeId={episode.id} fallbackTotal={episode.cost || 0} />
     </div>
+  );
+}
+
+function CopyButton({ text, label }: { text: string; label: string }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = async () => {
+    const ok = await copyText(text);
+    if (ok) {
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    }
+  };
+  return (
+    <button type="button" className="btn btn-ghost btn-sm export-copy" onClick={() => void handleCopy()}>
+      {copied ? <IconSpark size={13} /> : <IconCopy size={13} />}
+      {copied ? "已复制" : label}
+    </button>
   );
 }
 
@@ -258,7 +413,7 @@ function CostPanel({ episodeId, fallbackTotal }: { episodeId: string; fallbackTo
           {visibleItems.map((item, index) => (
             <div key={item.label + index} className="cost-item">
               <div className="cost-item-row">
-                <span title={item.label}>{item.label}</span>
+                <span title={item.label}>{BY_TYPE_LABEL[item.label] || item.label}</span>
                 <b>{fmtMoney(item.amount)}</b>
               </div>
               <ProgressBar value={(item.amount / maxItem) * 100} size="sm" tone="success" />

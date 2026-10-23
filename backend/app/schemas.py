@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class ORMModel(BaseModel):
@@ -198,6 +198,18 @@ class CharacterOut(ORMModel):
     expressions: Dict[str, str] = Field(default_factory=dict)
     status: str
     created_at: datetime
+    # AI 概念图 / H3 动画（扩展字段，前端可选用）
+    concept_portrait_url: Optional[str] = None
+    concept_sheet_url: Optional[str] = None
+    concept_three_view: Dict[str, str] = Field(default_factory=dict)
+    concept_expressions: Dict[str, str] = Field(default_factory=dict)
+    h3_video_url: Optional[str] = None
+    h3_portrait_url: Optional[str] = None
+
+    @field_validator("concept_three_view", "concept_expressions", mode="before")
+    @classmethod
+    def _none_to_empty_dict(cls, value):
+        return value or {}
 
 
 class CharacterCreate(BaseModel):
@@ -235,6 +247,37 @@ class CharacterFilesOut(BaseModel):
     turntable: Optional[str] = None
     expressions: Dict[str, str] = Field(default_factory=dict)
     meta: Dict[str, Any] = Field(default_factory=dict)
+
+
+# ---------------- concept / imagegen / h3 / export ----------------
+class ConceptGenerateRequest(BaseModel):
+    modes: List[str] = Field(default_factory=lambda: ["portrait", "three_view"])
+    style: Optional[str] = None
+    prompt_extra: Optional[str] = None
+    seed: Optional[int] = None
+
+
+class ConceptFilesOut(BaseModel):
+    portrait: Optional[str] = None
+    three_view: Dict[str, str] = Field(default_factory=dict)
+    expressions: Dict[str, str] = Field(default_factory=dict)
+    sheet: Optional[str] = None
+    meta: Dict[str, Any] = Field(default_factory=dict)
+
+
+class PortraitFromConceptRequest(BaseModel):
+    path: str
+
+
+class H3AnimateRequest(BaseModel):
+    image: Optional[str] = None
+    prompt: Optional[str] = None
+
+
+class EpisodeExportRequest(BaseModel):
+    type: str = "capcut"
+    # 可选导出名（默认 造片局_EPxxx）；测试/演示可用独立 name 避免覆盖 canonical 草稿
+    name: Optional[str] = None
 
 
 class HealthOut(BaseModel):

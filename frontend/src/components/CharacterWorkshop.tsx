@@ -1,6 +1,6 @@
 import { useState, type CSSProperties } from "react";
 import { mediaUrl } from "../lib/api";
-import type { Character } from "../types";
+import type { Character, ConceptFiles } from "../types";
 import {
   CHARACTER_STYLE_LABEL,
   characterStyles,
@@ -15,6 +15,7 @@ import { IconArrowRight, IconRefresh, IconSpark, IconUsers } from "./icons";
 
 interface Props {
   characters: Character[] | null;
+  concepts: Record<string, ConceptFiles>;
   supported: boolean;
   error: string | null;
   onRefresh: () => void;
@@ -22,7 +23,7 @@ interface Props {
   onOpen: (character: Character) => void;
 }
 
-export function CharacterWorkshop({ characters, supported, error, onRefresh, onNew, onOpen }: Props) {
+export function CharacterWorkshop({ characters, concepts, supported, error, onRefresh, onNew, onOpen }: Props) {
   const [refreshing, setRefreshing] = useState(false);
   const list = characters || [];
   const ready = list.filter((item) => item.status === "ready" || item.status === "done").length;
@@ -100,7 +101,12 @@ export function CharacterWorkshop({ characters, supported, error, onRefresh, onN
       ) : (
         <div className="char-grid">
           {list.map((character) => (
-            <CharacterCard key={character.id} character={character} onOpen={() => onOpen(character)} />
+            <CharacterCard
+              key={character.id}
+              character={character}
+              concept={concepts[character.id]}
+              onOpen={() => onOpen(character)}
+            />
           ))}
         </div>
       )}
@@ -108,13 +114,24 @@ export function CharacterWorkshop({ characters, supported, error, onRefresh, onN
   );
 }
 
-function CharacterCard({ character, onOpen }: { character: Character; onOpen: () => void }) {
+function CharacterCard({
+  character,
+  concept,
+  onOpen,
+}: {
+  character: Character;
+  concept?: ConceptFiles;
+  onOpen: () => void;
+}) {
   const [failed, setFailed] = useState(false);
+  const [conceptFailed, setConceptFailed] = useState(false);
   const styles = characterStyles(character.style);
   const primary = styles[0] || "3d_toon";
   const family = styleFamily(primary);
   const accent = character.accent_color || "#F5C518";
-  const portrait = character.portrait_url;
+  // 角色卡优先展示 AI 概念图（Character.concept_portrait_url 或 /concepts.portrait），否则回落 Blender portrait
+  const conceptPortrait = character.concept_portrait_url || concept?.portrait || null;
+  const portrait = conceptPortrait && !conceptFailed ? conceptPortrait : character.portrait_url;
   const generating = character.status === "generating" || character.status === "queued";
 
   return (
@@ -130,11 +147,21 @@ function CharacterCard({ character, onOpen }: { character: Character; onOpen: ()
         style={{ background: "linear-gradient(150deg, " + accent + "33, #0a0d13 62%), radial-gradient(circle at 78% 14%, " + accent + "33, transparent 52%)" }}
       >
         {portrait && !failed ? (
-          <img src={mediaUrl(portrait)} alt={character.name} loading="lazy" onError={() => setFailed(true)} />
+          <img
+            src={mediaUrl(portrait)}
+            alt={character.name}
+            loading="lazy"
+            onError={() => (conceptPortrait && !conceptFailed ? setConceptFailed(true) : setFailed(true))}
+          />
         ) : (
           <span className="char-initial">{firstChar(character.name)}</span>
         )}
         <span className={"char-family family-" + family.toLowerCase()}>{family}</span>
+        {conceptPortrait && !conceptFailed && (
+          <span className="char-concept-badge" title="角色卡优先展示 AI 概念图">
+            AI 概念图
+          </span>
+        )}
         <span className="char-status">
           <StatusBadge status={character.status} kind="character" labelText={label(CHARACTER_STATUS_LABEL, character.status)} />
         </span>
@@ -164,7 +191,7 @@ function CharacterCard({ character, onOpen }: { character: Character; onOpen: ()
         </div>
       </div>
       <div className="char-card-foot">
-        <span>查看三视图 / 表情 / 转面</span>
+        <span>概念图 / 三视图 / 表情 / H3 动画</span>
         <IconArrowRight size={14} />
       </div>
     </button>

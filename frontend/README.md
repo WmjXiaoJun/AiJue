@@ -47,6 +47,12 @@ Vite + React 18 + TypeScript 的深色影棚风制片工作台。无 UI 框架�
   新建角色弹窗（风格多选 + 外观预设 + 实时预览）。创建 → 自动 `POST /generate` → 轮询 Job → 刷新卡片；
   分镜台按 `asset_id`/`speaker` 匹配角色头像，成片房展示「角色画风」。
   角色接口未就绪时展示空态 + 提示（不伪造数据、不阻塞其它模块）。
+- AI 概念图（contract/CONCEPT.md）：角色详情抽屉内「AI 概念图」区块 — 风格（anime / illustrious / guoman）+ 额外提示词 + seed
+  → `POST /characters/{cid}/concept/generate`（1.6s 轮询 Job）→ 图集（立绘 / 三视图 / 四表情 / 设定总览），每图可
+  「设为角色立绘」（`POST /portrait/from-concept`）与「用此图生成 H3 动画」（`POST /h3-animate`，完成后播放 `/media/h3/...`）。
+  角色卡优先展示 `GET /characters/{cid}/concepts` 的 portrait（带「AI 概念图」徽标），否则回落 Blender portrait。
+- 成片导出（contract/EXPORT.md）：成片房「交付导出」面板 → `POST /episodes/{eid}/export {type:"capcut"}` → 轮询任务，
+  展示产物路径、复制剪映草稿目录（`%LOCALAPPDATA%\JianyingPro\User Data\Projects\com.lveditor.draft`）与导入步骤。
 
 ## 数据与容错
 

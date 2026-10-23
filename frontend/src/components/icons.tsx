@@ -193,6 +193,13 @@ export const IconInfo = make(
     <path d="M12 11v5.5M12 7.6v.2" />
   </>
 );
+export const IconCopy = make(
+  <>
+    <rect x="9" y="9" width="11" height="11" rx="2" />
+    <path d="M15 5.5A1.5 1.5 0 0013.5 4H5.5A1.5 1.5 0 004 5.5v8A1.5 1.5 0 005.5 15" />
+  </>
+);
+
 export const IconFolder = make(
   <>
     <path d="M3.5 6.5A1.5 1.5 0 015 5h4.2l2 2.5H19a1.5 1.5 0 011.5 1.5V18a1.5 1.5 0 01-1.5 1.5H5A1.5 1.5 0 013.5 18V6.5z" />

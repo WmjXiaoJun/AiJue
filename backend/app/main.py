@@ -13,6 +13,9 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import re
+import shutil
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
@@ -22,7 +25,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from . import character_files, config, jobs, models, schemas, seed
+from . import character_files, concept_files, config, jobs, models, schemas, seed
 from .db import SessionLocal, get_db, init_db
 
 logger = logging.getLogger(__name__)
@@ -61,11 +64,11 @@ def _recover_stale_jobs() -> None:
                 shot = db.get(models.Shot, job.shot_id)
                 if shot is not None and shot.status in ("queued", "generating"):
                     shot.status = "failed"
-            if job.episode_id:
+            if job.type == "render" and job.episode_id:
                 episode = db.get(models.Episode, job.episode_id)
                 if episode is not None and episode.status == "rendering":
                     episode.status = "failed"
-            if job.character_id:
+            if job.type == "character" and job.character_id:
                 character = db.get(models.Character, job.character_id)
                 if character is not None and character.status == "generating":
                     character.status = "failed"
@@ -210,8 +213,9 @@ def _sync_character_asset(db: Session, character: models.Character) -> bool:
 
 
 def _sync_character(db: Session, character: models.Character, commit: bool = True) -> bool:
-    """懒同步：磁盘产物 -> Character URL/status，并保持 Asset 一致。"""
+    """懒同步：磁盘产物（Blender / 概念图 / H3）-> Character URL/status，并保持 Asset 一致。"""
     changed = character_files.apply(character)
+    changed = concept_files.apply(character) or changed
     changed = _sync_character_asset(db, character) or changed
     if changed and commit:
         db.commit()
@@ -623,6 +627,288 @@ def get_character_files(cid: str, db: Session = Depends(get_db)):
         "expressions": dict(character.expressions or {}),
         "meta": data.get("meta") or {},
     }
+
+
+# --------------------------------------------------------------------------- #
+# AI 概念图 / H3 动画（contract/CONCEPT.md）
+# --------------------------------------------------------------------------- #
+def _resolve_output_file(raw: Any) -> Optional[Path]:
+    """把 /media/... URL 或仓库相对/绝对路径解析为 outputs 内存在的文件（限制在 outputs）。"""
+    text = str(raw or "").strip()
+    if not text or text.lower().startswith(("http://", "https://", "data:")):
+        return None
+    prefix = config.MEDIA_URL_PREFIX + "/"
+    if text.startswith(prefix):
+        path = config.OUTPUTS_DIR / text[len(prefix):]
+    else:
+        candidate = Path(text)
+        path = candidate if candidate.is_absolute() else config.REPO_ROOT / candidate
+    try:
+        resolved = path.resolve()
+        resolved.relative_to(config.OUTPUTS_DIR.resolve())
+    except (ValueError, OSError):
+        return None
+    return resolved if resolved.is_file() else None
+
+
+def _character_default_image(character: models.Character) -> Optional[Path]:
+    """H3 动画默认输入图：优先概念图立绘，其次 Blender 立绘。"""
+    for url in (character.concept_portrait_url, character.portrait_url):
+        path = _resolve_output_file(url)
+        if path is not None:
+            return path
+    return None
+
+
+def _build_export_manifest(
+    db: Session, episode: models.Episode, export_type: str = "capcut"
+) -> Dict[str, Any]:
+    """按 contract/EXPORT.md 生成导出清单（视频/音频/字幕/画布参数）。
+
+    视频优先用分镜片段铺时间线（与 pipeline.capcut build-manifest 行为一致，剪映里可逐镜编辑）：
+    workdir/clips/{sid}.mp4 -> outputs/episodes/{eid}/shots/{sid}.mp4 -> 单段 final.mp4。
+    音频优先 workdir/audio/narration.wav（render 产出的旁白混音）；
+    字幕来自镜头 line/subtitle，按镜头时长累计时间轴。
+    """
+    shots = (
+        db.query(models.Shot)
+        .filter(models.Shot.episode_id == episode.id)
+        .order_by(models.Shot.no.asc())
+        .all()
+    )
+    workdir = config.OUTPUTS_DIR / "episodes" / episode.id
+    clips_dir = workdir / "clips"
+    shots_dir = workdir / "shots"
+    final_path = workdir / "final.mp4"
+
+    cursor = 0.0
+    subtitles: List[Dict[str, Any]] = []
+    for shot in shots:
+        duration = float(shot.duration or 0.0)
+        # 字幕只收对白/反应（不把花字、片头片尾等包装文本当字幕）
+        text = str(shot.line or "").strip()
+        if not text and shot.type == "reaction":
+            text = str(shot.subtitle or "").strip()
+        if text:
+            subtitles.append(
+                {
+                    "start": round(cursor, 3),
+                    "end": round(cursor + duration, 3),
+                    "text": text,
+                }
+            )
+        cursor += duration
+    shots_total = cursor
+
+    use_shot_timeline = bool(shots) and all(
+        (clips_dir / f"{shot.id}.mp4").is_file()
+        or (shots_dir / f"{shot.id}.mp4").is_file()
+        for shot in shots
+    )
+    video: List[Dict[str, Any]] = []
+    if use_shot_timeline:
+        start = 0.0
+        for shot in shots:
+            duration = float(shot.duration or 0.0)
+            clip = clips_dir / f"{shot.id}.mp4"
+            if clip.is_file():
+                rel_path = f"outputs/episodes/{episode.id}/clips/{shot.id}.mp4"
+            else:
+                clip = shots_dir / f"{shot.id}.mp4"
+                rel_path = f"outputs/episodes/{episode.id}/shots/{shot.id}.mp4"
+            video.append(
+                {
+                    "path": rel_path,
+                    "start": round(start, 3),
+                    "duration": round(duration, 3),
+                    "type": "shot",
+                }
+            )
+            start += duration
+        total = start
+    else:
+        total = jobs.probe_video_duration(final_path) or float(
+            episode.target_duration or shots_total or 0.0
+        )
+        if final_path.is_file():
+            video.append(
+                {
+                    "path": f"outputs/episodes/{episode.id}/final.mp4",
+                    "start": 0,
+                    "duration": round(float(total or 0.0), 3),
+                    "type": "main",
+                }
+            )
+
+    audio: List[Dict[str, Any]] = []
+    narration = workdir / "audio" / "narration.wav"
+    if narration.is_file():
+        audio.append(
+            {
+                "path": f"outputs/episodes/{episode.id}/audio/narration.wav",
+                "start": 0,
+                "duration": round(float(total or 0.0), 3),
+                "volume": 1.0,
+            }
+        )
+
+    resolution = str(episode.resolution or "1280x720").lower()
+    try:
+        width, height = (int(part) for part in resolution.split("x", 1))
+    except (TypeError, ValueError):
+        width, height = 1280, 720
+    name = f"造片局_EP{int(episode.no or 1):03d}"
+    return {
+        "name": name,
+        "width": width,
+        "height": height,
+        "fps": int(episode.fps or 25),
+        "duration": round(float(total or 0.0), 3),
+        "video": video,
+        "audio": audio,
+        "subtitles": subtitles,
+    }
+
+
+@router.post("/characters/{cid}/concept/generate", response_model=schemas.JobOut)
+def generate_character_concept(
+    cid: str,
+    payload: Optional[schemas.ConceptGenerateRequest] = None,
+    db: Session = Depends(get_db),
+):
+    character = _get_or_404(db, models.Character, cid, "角色")
+    modes = [str(mode) for mode in (payload.modes if payload else []) if str(mode)]
+    if not modes:
+        modes = ["portrait", "three_view"]
+    invalid_modes = [mode for mode in modes if mode not in jobs.CONCEPT_MODES]
+    if invalid_modes:
+        raise HTTPException(
+            status_code=400,
+            detail=f"不支持的模式: {invalid_modes}；可选 {list(jobs.CONCEPT_MODES)}",
+        )
+    style = payload.style if payload else None
+    if style and style not in jobs.CONCEPT_STYLES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"不支持的 style: {style}；可选 {list(jobs.CONCEPT_STYLES)}",
+        )
+    job, _created = jobs.enqueue_concept_job(
+        db,
+        character,
+        modes=modes,
+        style=style,
+        prompt_extra=payload.prompt_extra if payload else None,
+        seed=payload.seed if payload else None,
+    )
+    return job
+
+
+@router.get("/characters/{cid}/concepts", response_model=schemas.ConceptFilesOut)
+def get_character_concepts(cid: str, db: Session = Depends(get_db)):
+    character = _get_or_404(db, models.Character, cid, "角色")
+    _sync_character(db, character)
+    data = concept_files.scan(character.id)
+    return {
+        "portrait": character.concept_portrait_url,
+        "three_view": dict(character.concept_three_view or data.get("three_view") or {}),
+        "expressions": dict(character.concept_expressions or data.get("expressions") or {}),
+        "sheet": character.concept_sheet_url,
+        "meta": data.get("meta") or {},
+    }
+
+
+@router.post("/characters/{cid}/portrait/from-concept", response_model=schemas.CharacterOut)
+def set_portrait_from_concept(
+    cid: str,
+    payload: schemas.PortraitFromConceptRequest,
+    db: Session = Depends(get_db),
+):
+    character = _get_or_404(db, models.Character, cid, "角色")
+    source = _resolve_output_file(payload.path)
+    if source is None:
+        raise HTTPException(
+            status_code=400,
+            detail="path 必须是 outputs 下存在的图片路径（也接受 /media/... URL）",
+        )
+    if source.suffix.lower() not in (".png", ".jpg", ".jpeg", ".webp"):
+        raise HTTPException(status_code=400, detail="仅支持 png/jpg/webp 图片")
+    base = character_files.character_dir(character.id)
+    base.mkdir(parents=True, exist_ok=True)
+    dest = base / "portrait_from_concept.png"
+    shutil.copy2(source, dest)
+    # 同步 cutout（若概念图旁有 cutout 版本）
+    for candidate in (
+        source.parent / "cutout" / source.name,
+        source.parent.parent / "cutout" / source.name,
+    ):
+        if candidate.is_file():
+            cutout_dir = base / "cutout"
+            cutout_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(candidate, cutout_dir / "portrait.png")
+            break
+    character.portrait_url = config.media_url(dest)
+    character.status = "ready"
+    _sync_character_asset(db, character)
+    db.commit()
+    return character
+
+
+@router.post("/characters/{cid}/h3-animate", response_model=schemas.JobOut)
+def h3_animate_character(
+    cid: str,
+    payload: Optional[schemas.H3AnimateRequest] = None,
+    db: Session = Depends(get_db),
+):
+    character = _get_or_404(db, models.Character, cid, "角色")
+    _sync_character(db, character)
+    if payload is not None and payload.image:
+        resolved = _resolve_output_file(payload.image)
+        if resolved is None:
+            raise HTTPException(
+                status_code=400,
+                detail="image 必须是 outputs 下存在的图片（也接受 /media/... URL）",
+            )
+        image_path = resolved
+    else:
+        image_path = _character_default_image(character)
+        if image_path is None:
+            raise HTTPException(
+                status_code=400,
+                detail="角色还没有可用立绘/概念图，请先生成概念图或用 image 指定",
+            )
+    prompt = payload.prompt if payload is not None else None
+    job, _created = jobs.enqueue_h3_job(db, character, str(image_path), prompt)
+    return job
+
+
+# --------------------------------------------------------------------------- #
+# 成片导出（contract/EXPORT.md：剪映草稿）
+# --------------------------------------------------------------------------- #
+def _sanitize_export_name(raw: Any) -> Optional[str]:
+    """导出名清洗：去掉 Windows 非法文件字符，避免目录穿越/覆盖意外路径。"""
+    text = str(raw or "").strip()
+    if not text:
+        return None
+    cleaned = re.sub(r'[\\/:*?"<>|]+', "_", text).strip(" .")
+    return cleaned[:64] or None
+
+
+@router.post("/episodes/{eid}/export", response_model=schemas.JobOut)
+def export_episode(
+    eid: str,
+    payload: Optional[schemas.EpisodeExportRequest] = None,
+    db: Session = Depends(get_db),
+):
+    episode = _get_or_404(db, models.Episode, eid, "集")
+    export_type = (payload.type if payload is not None else None) or "capcut"
+    if export_type != "capcut":
+        raise HTTPException(status_code=400, detail="目前仅支持 type=capcut")
+    manifest = _build_export_manifest(db, episode, export_type)
+    export_name = _sanitize_export_name(payload.name) if payload is not None else None
+    if export_name:
+        manifest["name"] = export_name
+    job, _created = jobs.enqueue_export_job(db, episode, manifest, export_type)
+    return job
 
 
 # --------------------------------------------------------------------------- #

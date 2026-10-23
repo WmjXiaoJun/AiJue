@@ -13,6 +13,14 @@ FastAPI + SQLAlchemy + SQLite 的 demo 后端：实现 contract/API.md 与 contr
 
     powershell -ExecutionPolicy Bypass -File backend\run.ps1 -Port 8090
 
+**长期运行（推荐给 demo/演示）**：用独立进程启动，关终端/Agent 会话后服务不退出：
+
+    powershell -ExecutionPolicy Bypass -File backend\run-detached.ps1          # 启动（8090）
+    powershell -ExecutionPolicy Bypass -File backend\run-detached.ps1 -Stop    # 停止
+
+pid 与日志落在 backend/data/（server-8090.pid / server-8090.out.log / server-8090.err.log）。
+scripts/dev.ps1 是前台调试入口；需要后台常驻时用 run-detached.ps1。
+
 打开：
 
 - http://127.0.0.1:8090/api/health          健康检查
@@ -40,9 +48,10 @@ FastAPI + SQLAlchemy + SQLite 的 demo 后端：实现 contract/API.md 与 contr
         models.py    ORM：Project/Episode/Asset/Shot/ShotVersion/Job/Setting
         schemas.py   Pydantic 请求/响应模型
         seed.py      空库播种 / 强制重建
-        jobs.py      后台任务线程（shot / render / character 角色生成）
+        jobs.py      后台任务线程（shot / render / character / concept / h3 / export）
         comfyui.py   ComfyUI（MiniMax H3）适配器，httpx 可注入 mock
         character_files.py  角色产物扫描（outputs/characters/{cid}/ -> URL）
+        concept_files.py    概念图产物扫描（outputs/concepts/{cid}/ -> URL）
         workflows/   ComfyUI 工作流模板示例
         main.py      FastAPI 应用与全部 /api 端点（含角色工坊）
       run.ps1        启动脚本
@@ -106,9 +115,55 @@ portrait_url,sheet_url,turntable_url,expressions,status,created_at}
   sheet/turntable 可缺失（前端显示占位），生成中的角色保持 generating。
 - jobs 表新增可选 character_id（启动时对老库自动 ALTER TABLE jobs ADD COLUMN character_id）。
 
+## AI 概念图 / H3 动画（contract/CONCEPT.md）
+
+端点：
+
+- POST /api/characters/{cid}/concept/generate
+  body {modes?:["portrait","three_view","expressions","scene"], style?:anime|illustrious|guoman,
+        prompt_extra?, seed?} -> Job(type=concept)
+- GET  /api/characters/{cid}/concepts -> {portrait, three_view:{front,side,three_quarter},
+        expressions:{neutral,happy,surprised,thinking}, sheet, meta}
+- POST /api/characters/{cid}/portrait/from-concept {path} -> Character
+- POST /api/characters/{cid}/h3-animate {image?, prompt?} -> Job(type=h3)
+
+后台任务：
+
+- concept 任务按 modes 逐个调用（cwd = 仓库根，ComfyUI 串行锁内）：
+
+      python -m imagegen.cli generate --spec <tmp spec> --outdir outputs/concepts/{cid} --mode <mode>         [--style anime] [--prompt-extra "..."] [--seed 42]
+
+  产物回填 Character.concept_portrait_url / concept_sheet_url / concept_three_view /
+  concept_expressions，/media 访问路径 /media/concepts/{cid}/...；GET .../concepts 会懒扫描目录，
+  外部直接生成的概念图也会被识别。
+- portrait/from-concept：把 path（/media/... URL 或 outputs 下相对/绝对路径）复制为
+  outputs/characters/{cid}/portrait_from_concept.png（如概念图旁有 cutout/ 一并同步），
+  更新 Character.portrait_url/status=ready 与关联 Asset.images；角色卡/资产库随即使用概念图立绘。
+- h3 任务调用：
+
+      python integrations/comfyui/run_h3.py --image <path> --prompt "..."         --out outputs/h3/{cid}_h3.mp4 --width 768 --height 768 --length 124
+
+  ComfyUI 串行锁内执行，子进程超时 20 分钟（>= 契约 15 分钟）；成功后回填
+  Character.h3_video_url 与 h3_portrait_url（ffmpeg 抽中段帧到 outputs/characters/{cid}/h3_portrait.png，
+  run_h3.py 自带 _fmid.png 侧车帧也会被懒扫描识别）。
+- CLI 未就绪 / 失败时 Job.failed + error（含 stderr 摘要），不拖垮 API 进程。
+
+## 成片导出（contract/EXPORT.md：剪映草稿）
+
+- POST /api/episodes/{eid}/export {type:"capcut"} -> Job(type=export)
+- 后台按 contract/EXPORT.md 生成 manifest：视频优先用分镜片段铺时间线（workdir/clips/{sid}.mp4 ->
+  outputs/episodes/{eid}/shots/{sid}.mp4，剪映里可逐镜编辑；缺失时回退单段 final.mp4）；音频优先
+  workdir/audio/narration.wav；字幕只收对白/反应（过滤花字、片头片尾等包装文本），按镜头时长累计，调用：
+
+      python -m pipeline.capcut export --manifest <tmp manifest> --outdir outputs/exports         --name 造片局_EP001 --copy-media
+
+- 成功后 Job.output_url 为草稿目录（仓库相对路径，如 outputs/exports/造片局_EP001），
+  message 同时给出路径；草稿内含 draft_content.json / draft_meta_info.json / subtitles.srt / README.txt。
+- 失败时 Job.error 保留 CLI 输出（如缺依赖、素材缺失），任务中心可读。
+
 ## 静态托管
 
-- /media -> 仓库 outputs/（生成片段、成片、角色素材）
+- /media -> 仓库 outputs/（生成片段、成片、角色素材、概念图、导出草稿、H3 视频）
 - frontend/dist 存在时 / 挂载该目录并做 SPA fallback（未命中路径回落 index.html）
 - 前端尚未构建时 / 返回一个后端状态说明页
 
@@ -127,9 +182,10 @@ portrait_url,sheet_url,turntable_url,expressions,status,created_at}
     python -m pytest tests -q
 
 测试使用临时数据目录并关闭自动任务（ZAOPIANJU_JOBS_AUTORUN=0），
-通过注入假的 pipeline / studio3d CLI 验证 shot / render / character 成功与失败路径，
+通过注入假的 pipeline / studio3d / imagegen / run_h3 / capcut CLI 验证各类任务成功与失败路径，
 不污染开发库、不真连 ComfyUI / Blender。覆盖：contract/API.md 全部端点、
-角色工坊 CRUD/资产联动/files/生成任务（tests/test_characters.py）、ComfyUI 适配器 mock。
+角色工坊 CRUD/资产联动/files/生成任务（tests/test_characters.py）、
+概念图/H3/剪映导出（tests/test_concept.py）、ComfyUI 适配器 mock。
 
 ## ComfyUI 适配器
 
@@ -156,3 +212,7 @@ ComfyUI 导出的 API 格式 H3 工作流即可。demo 默认 generation_mode=mo
 - 若前端构建产物 frontend/dist 在服务启动时不存在，需要重启后端才会挂载 /。
 - 角色画面由 studio3d（Blender 程序化建模 + 卡通渲染，外部模块）生成；后端只负责任务编排与
   产物回填。studio3d 未就绪 / Blender 不可用时，角色任务会 failed 并记录 error，API 与前端不受影响。
+- 概念图依赖 imagegen + 本机 ComfyUI + SDXL 动漫 checkpoint（animagine-xl-4.0）；checkpoint 损坏/
+  未下载完时 imagegen 会报错，后端 Job.failed 记录 ComfyUI execution_error，不影响 API。
+- 剪映导出依赖 pipeline.capcut（pyJianYingDraft）。若 CLI 的 --copy-media 有缺陷（例如先复制素材
+  后被 create_draft 重建目录清掉），后端 Job 会 failed 并保留可读 error，等 CLI 修复后重试即可。

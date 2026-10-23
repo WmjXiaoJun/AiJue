@@ -92,6 +92,7 @@ export interface Job {
   message?: string | null;
   episode_id?: string | null;
   shot_id?: string | null;
+  character_id?: string | null;
   output_url?: string | null;
   cost?: number;
   error?: string | null;
@@ -170,8 +171,25 @@ export interface Character {
   sheet_url?: string | null;
   turntable_url?: string | null;
   expressions?: Record<string, string> | null;
+  /** 后端 CharacterOut 回填：概念图与 H3 产物（可选） */
+  concept_portrait_url?: string | null;
+  concept_sheet_url?: string | null;
+  concept_three_view?: Record<string, string> | null;
+  concept_expressions?: Record<string, string> | null;
+  h3_video_url?: string | null;
+  h3_portrait_url?: string | null;
   status: string;
   created_at: string;
+}
+
+
+/** 概念图（contract/CONCEPT.md） */
+export interface ConceptFiles {
+  portrait?: string | null;
+  three_view?: Record<string, string> | string[] | null;
+  expressions?: Record<string, string> | null;
+  sheet?: string | null;
+  meta?: Record<string, unknown> | null;
 }
 
 export interface CharacterFiles {

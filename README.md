@@ -11,8 +11,10 @@
 
 - 前端：ArcReel 式项目制工作台（编剧间 / 资产库 / 角色工坊 / 分镜台 / 生成台 / 成片房）
 - 后端：FastAPI + SQLite，任务后台线程，角色工坊 API，ComfyUI(MiniMax H3) 适配器 + mock provider
-- 角色：studio3d（Blender 程序化原创动漫角色，3D 卡通/赛璐璐 + 2D 平涂）+ studio2d（Pillow 程序化 2D 日漫风，3 角色全套）
+- 角色：studio3d（Blender 程序化 3D/2D）+ studio2d（Pillow 2D）+ **imagegen（SDXL 动漫 AI 概念图，30 张）**
 - 真实生成：integrations/comfyui（本机 MiniMax H3 int8 + 4step turbo，768²/5.17s 动漫镜头）
+- 图像生成：imagegen（SDXL 动漫 Animagine XL 4.0，文生角色概念图/三视图/表情）
+- 导出：pipeline/capcut.py（pyJianYingDraft，剪映草稿 52 段）
 - 流水线：ffmpeg 合成 + edge-tts 中文配音 + ASS 字幕/花字 + 片头片尾 + BGM，CLI 可独立运行
 
 ## 快速开始（Windows）
@@ -49,10 +51,10 @@ pip install fastapi "uvicorn[standard]" sqlalchemy pydantic pillow edge-tts pyte
 |---|---|
 | 编剧间 | 按段落展示台本/台词/镜头数/时长，一键生成分镜 |
 | 资产库 | 主持/嘉宾/场景卡，声音、人设、锁定状态 |
-| 角色工坊 | 平台自主生成原创动漫角色：3D 卡通/赛璐璐、2D 平涂多风格；4 表情/三视图/转面；新建角色→生成→入资产 |
+| 角色工坊 | 平台自主生成原创动漫角色：Blender 3D/2D 平涂 + **SDXL 动漫 AI 概念图**（立绘/三视图/4 表情/设定图）；新建角色→生成→入资产→H3 动画 |
 | 分镜台 | 52 镜头，表格/宫格切换，状态过滤，批量生成，详情抽屉 |
 | 生成台 | 任务队列（进度/费用/失败/重试）、多版本预览与选用 |
-| 成片房 | 一键渲染、进度、成片播放、费用汇总、包装配置 |
+| 成片房 | 一键渲染、进度、成片播放、费用汇总、包装配置、**导出剪映草稿（52 段可编辑时间线）** |
 | 设置 | 生成模式（mock/comfyui）、ComfyUI 地址、工作流模板、分辨率、TTS、计费单价 |
 
 ![角色工坊](docs/screenshots/09_character_workshop.png)
@@ -91,6 +93,7 @@ FastAPI · SQLAlchemy · SQLite · Vite · React · TypeScript · FFmpeg 6.1 · 
 - TTS 使用 edge-tts **在线合成**（需要网络）；失败时静音兜底。
 - 转场为硬切，字幕烧录；剪映草稿/OTIO 导出为后续项。
 - 长片质感（口型、多人同框、运镜）需接真实 H3/云模型后验证。
+- 剪映 10.x 会加密草稿 JSON，明文草稿（pyJianYingDraft 社区格式）适用于 ≤5.9 或按 README 用 materials/+srt 重建；本机 10.3 实测不识别明文草稿。
 
 ## 文档
 

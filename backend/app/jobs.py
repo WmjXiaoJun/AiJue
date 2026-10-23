@@ -19,13 +19,16 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from sqlalchemy import func
 
-from . import character_files, config, models, seed
+from . import character_files, concept_files, config, models, seed
 from .db import SessionLocal
 
 logger = logging.getLogger(__name__)
 
 ACTIVE_STATUSES = ("queued", "running")
 _ERR_LIMIT = 2000
+# ComfyUI 串行锁：concept（SDXL）与 h3（MiniMax H3）共用本机显卡，必须排队执行
+GPU_LOCK = threading.Lock()
+H3_TIMEOUT_SECONDS = 20 * 60  # H3 长任务超时（契约要求 >= 15 分钟）
 
 
 def utcnow():
@@ -39,11 +42,13 @@ def run_cli(
     cmd: List[str],
     cwd: Optional[str | Path] = None,
     on_line: Optional[Callable[[str], None]] = None,
+    timeout: Optional[float] = None,
 ) -> Tuple[int, List[str], str]:
-    """执行 pipeline CLI，实时回调 stdout 行。
+    """执行 CLI，实时回调 stdout 行。
 
     返回 (returncode, stdout_lines, stderr_text)。不会抛出 CLI 的业务失败，
     只有启动失败（如解释器不存在）才抛异常，由 run_job 兜底置 failed。
+    timeout（秒）到时会终止子进程，用于 ComfyUI H3 等长任务。
     """
     env = dict(os.environ)
     env.setdefault("PYTHONIOENCODING", "utf-8")
@@ -86,10 +91,23 @@ def run_cli(
         reader = threading.Thread(target=_pump, args=(proc.stderr, stderr_lines), daemon=True)
         reader.start()
         readers.append(reader)
-    returncode = proc.wait()
+    timed_out = False
+    try:
+        returncode = proc.wait(timeout=timeout) if timeout else proc.wait()
+    except subprocess.TimeoutExpired:
+        timed_out = True
+        returncode = -9
+        try:
+            proc.kill()
+        except Exception:  # noqa: BLE001
+            pass
+        logger.warning("命令超时 %ss，已终止: %s", timeout, cmd[:4])
     for reader in readers:
         reader.join(timeout=5)
-    return returncode, stdout_lines, "\n".join(stderr_lines)
+    stderr_text = "\n".join(stderr_lines)
+    if timed_out:
+        stderr_text = (stderr_text + "\n[timeout] 命令超过 %.0fs，已终止" % (timeout or 0)).strip()
+    return returncode, stdout_lines, stderr_text
 
 
 def _last_json(lines: List[str]) -> Dict[str, Any]:
@@ -234,6 +252,12 @@ def run_job(job_id: str) -> None:
                 run_render_job(db, job)
             elif job.type == "character":
                 run_character_job(db, job)
+            elif job.type == "concept":
+                run_concept_job(db, job)
+            elif job.type == "h3":
+                run_h3_job(db, job)
+            elif job.type == "export":
+                run_export_job(db, job)
             else:
                 _fail(db, job, f"未知任务类型: {job.type}")
     except Exception as exc:  # noqa: BLE001 - 后台线程必须兜底
@@ -247,15 +271,15 @@ def _mark_failed_isolated(job_id: str, exc: Exception) -> None:
             job = db.get(models.Job, job_id)
             if job is not None:
                 _update(db, job, status="failed", error=str(exc), message=str(exc)[:200])
-                if job.shot_id:
+                if job.type == "shot" and job.shot_id:
                     shot = db.get(models.Shot, job.shot_id)
                     if shot is not None:
                         shot.status = "failed"
-                if job.episode_id:
+                if job.type == "render" and job.episode_id:
                     episode = db.get(models.Episode, job.episode_id)
                     if episode is not None:
                         episode.status = "failed"
-                if job.character_id:
+                if job.type == "character" and job.character_id:
                     character = db.get(models.Character, job.character_id)
                     if character is not None:
                         character.status = "failed"
@@ -748,6 +772,463 @@ def run_character_job(db, job: models.Job) -> None:
     )
     db.commit()
     logger.info("character 任务完成: job=%s character=%s", job.id, character.id)
+
+
+# --------------------------------------------------------------------------- #
+# concept 任务（AI 概念图：调用 imagegen CLI，ComfyUI/SDXL）
+# --------------------------------------------------------------------------- #
+CONCEPT_MODES = ("portrait", "three_view", "expressions", "scene", "sheet", "all")
+CONCEPT_STYLES = ("anime", "illustrious", "guoman")
+
+
+def _character_spec_payload(character: models.Character) -> Dict[str, Any]:
+    """把 Character 还原成 contract/CHARACTER.md 的 spec JSON（供 CLI 使用）。"""
+    spec = dict(character.spec or {})
+    spec.setdefault("id", character.id)
+    spec.setdefault("name", character.name)
+    spec.setdefault("title", character.title)
+    spec.setdefault("persona", character.persona)
+    spec.setdefault("voice", character.voice)
+    spec.setdefault("accent_color", character.accent_color)
+    if not spec.get("style"):
+        spec["style"] = character.style or {"primary": "3d_toon", "variants": ["3d_toon"]}
+    return spec
+
+
+def enqueue_concept_job(
+    db,
+    character: models.Character,
+    modes: Optional[List[str]] = None,
+    style: Optional[str] = None,
+    prompt_extra: Optional[str] = None,
+    seed: Optional[int] = None,
+):
+    """入队概念图任务；同一角色已有活跃概念图任务时复用。返回 (job, created)。"""
+    active = (
+        db.query(models.Job)
+        .filter(
+            models.Job.type == "concept",
+            models.Job.character_id == character.id,
+            models.Job.status.in_(ACTIVE_STATUSES),
+        )
+        .order_by(models.Job.created_at.desc())
+        .first()
+    )
+    if active is not None:
+        return active, False
+    chosen_modes = [str(mode) for mode in (modes or []) if str(mode)] or ["portrait", "three_view"]
+    episode = (
+        db.query(models.Episode)
+        .filter(models.Episode.project_id == character.project_id)
+        .order_by(models.Episode.no.asc())
+        .first()
+    )
+    job = models.Job(
+        id=models.new_id("job"),
+        type="concept",
+        status="queued",
+        progress=0.0,
+        message="概念图生成排队中",
+        episode_id=episode.id if episode is not None else None,
+        character_id=character.id,
+        params={
+            "modes": chosen_modes,
+            "style": style,
+            "prompt_extra": prompt_extra,
+            "seed": seed,
+        },
+    )
+    db.add(job)
+    db.commit()
+    dispatch(job.id)
+    return job, True
+
+
+def run_concept_job(db, job: models.Job) -> None:
+    character = db.get(models.Character, job.character_id) if job.character_id else None
+    if character is None:
+        _fail(db, job, "角色不存在，无法生成概念图")
+        return
+    params = dict(job.params or {})
+    modes = [str(mode) for mode in (params.get("modes") or ["portrait", "three_view"]) if str(mode)]
+    style = params.get("style")
+    prompt_extra = params.get("prompt_extra")
+    seed = params.get("seed")
+
+    _update(db, job, status="running", progress=2, message=f"准备生成概念图（{','.join(modes)}）")
+    db.commit()
+
+    outdir = concept_files.concept_dir(character.id)
+    outdir.mkdir(parents=True, exist_ok=True)
+    config.JOBS_TMP_DIR.mkdir(parents=True, exist_ok=True)
+    spec_path = config.JOBS_TMP_DIR / f"{job.id}_concept_spec.json"
+    spec_path.write_text(
+        json.dumps(_character_spec_payload(character), ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+    total = len(modes)
+    _update(db, job, progress=4, message="等待 ComfyUI 空闲")
+    db.commit()
+    with GPU_LOCK:
+        for index, mode in enumerate(modes):
+            cmd = [
+                sys.executable,
+                "-m",
+                "imagegen.cli",
+                "generate",
+                "--spec",
+                str(spec_path),
+                "--outdir",
+                str(outdir),
+                "--mode",
+                mode,
+            ]
+            if style:
+                cmd += ["--style", str(style)]
+            if prompt_extra:
+                cmd += ["--prompt-extra", str(prompt_extra)]
+            if seed is not None:
+                cmd += ["--seed", str(seed)]
+            _update(
+                db,
+                job,
+                progress=round(5 + index * 85.0 / max(1, total), 1),
+                message=f"imagegen 生成 {mode}（{index + 1}/{total}）",
+            )
+            db.commit()
+            try:
+                returncode, stdout_lines, stderr_text = run_cli(cmd, timeout=900)
+            except Exception as exc:  # noqa: BLE001 - CLI 无法启动
+                _fail(db, job, f"imagegen 启动失败: {exc}")
+                return
+            if returncode != 0:
+                _fail(
+                    db,
+                    job,
+                    _format_error(
+                        f"imagegen generate --mode {mode}", returncode, stderr_text, stdout_lines
+                    ),
+                )
+                return
+
+    data = concept_files.scan(character.id)
+    if not data.get("portrait"):
+        _fail(db, job, f"imagegen 未产出概念图 portrait.png（outdir={outdir}）")
+        return
+    character.concept_portrait_url = data["portrait"]
+    character.concept_sheet_url = data["sheet"]
+    character.concept_three_view = data["three_view"]
+    character.concept_expressions = data["expressions"]
+    _update(
+        db,
+        job,
+        status="done",
+        progress=100,
+        message=f"概念图生成完成（{','.join(modes)}）",
+        output_url=data["portrait"],
+        cost=0.0,
+        error=None,
+    )
+    db.commit()
+    logger.info("concept 任务完成: job=%s character=%s", job.id, character.id)
+
+
+# --------------------------------------------------------------------------- #
+# h3 任务（概念图/立绘 -> MiniMax H3 动画，ComfyUI 串行 + 长超时）
+# --------------------------------------------------------------------------- #
+def _tool_path(env_name: str, default_rel: str) -> Path:
+    override = os.environ.get(env_name)
+    if override:
+        return Path(override)
+    return config.REPO_ROOT / default_rel
+
+
+def ffmpeg_bin() -> Path:
+    return _tool_path("FFMPEG_BIN", "tools/node_modules/ffmpeg-static/ffmpeg.exe")
+
+
+def ffprobe_bin() -> Path:
+    return _tool_path("FFPROBE_BIN", "tools/node_modules/ffprobe-static/bin/win32/x64/ffprobe.exe")
+
+
+def probe_video_duration(path: str | Path) -> Optional[float]:
+    try:
+        proc = subprocess.run(
+            [
+                str(ffprobe_bin()),
+                "-v",
+                "error",
+                "-show_entries",
+                "format=duration",
+                "-of",
+                "default=nw=1:nk=1",
+                str(path),
+            ],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        return float((proc.stdout or "").strip())
+    except (OSError, ValueError, subprocess.SubprocessError):
+        return None
+
+
+def extract_video_frame(video_path: str | Path, out_path: str | Path, position: float = 0.5) -> bool:
+    """用 ffmpeg 抽取视频中段帧（H3 动画 -> h3_portrait.png）。失败返回 False。"""
+    duration = probe_video_duration(video_path) or 0.0
+    target = Path(out_path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    cmd = [
+        str(ffmpeg_bin()),
+        "-y",
+        "-ss",
+        f"{max(0.0, duration * position):.3f}",
+        "-i",
+        str(video_path),
+        "-frames:v",
+        "1",
+        str(target),
+    ]
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return proc.returncode == 0 and target.is_file() and target.stat().st_size > 0
+
+
+def enqueue_h3_job(
+    db,
+    character: models.Character,
+    image_path: Optional[str] = None,
+    prompt: Optional[str] = None,
+):
+    """入队 H3 动画任务；同一角色已有活跃 H3 任务时复用。返回 (job, created)。"""
+    active = (
+        db.query(models.Job)
+        .filter(
+            models.Job.type == "h3",
+            models.Job.character_id == character.id,
+            models.Job.status.in_(ACTIVE_STATUSES),
+        )
+        .order_by(models.Job.created_at.desc())
+        .first()
+    )
+    if active is not None:
+        return active, False
+    episode = (
+        db.query(models.Episode)
+        .filter(models.Episode.project_id == character.project_id)
+        .order_by(models.Episode.no.asc())
+        .first()
+    )
+    job = models.Job(
+        id=models.new_id("job"),
+        type="h3",
+        status="queued",
+        progress=0.0,
+        message="H3 动画排队中",
+        episode_id=episode.id if episode is not None else None,
+        character_id=character.id,
+        params={"image": str(image_path) if image_path else None, "prompt": prompt},
+    )
+    db.add(job)
+    db.commit()
+    dispatch(job.id)
+    return job, True
+
+
+def run_h3_job(db, job: models.Job) -> None:
+    character = db.get(models.Character, job.character_id) if job.character_id else None
+    if character is None:
+        _fail(db, job, "角色不存在，无法生成 H3 动画")
+        return
+    params = dict(job.params or {})
+    image_path = params.get("image")
+    if not image_path or not Path(str(image_path)).is_file():
+        _fail(db, job, "H3 动画缺少可用输入图片（请先生成概念图/立绘，或用 image 指定）")
+        return
+    prompt = str(params.get("prompt") or "").strip() or (
+        f"{character.name}，原创动漫角色，轻微呼吸与眨眼，镜头缓慢推近，高质量动画"
+    )
+    out_path = config.OUTPUTS_DIR / "h3" / f"{character.id}_h3.mp4"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    _update(db, job, status="running", progress=2, message="等待 ComfyUI 空闲（H3 串行）")
+    db.commit()
+    with GPU_LOCK:
+        _update(db, job, progress=5, message="H3 视频生成中（ComfyUI）")
+        db.commit()
+        cmd = [
+            sys.executable,
+            "integrations/comfyui/run_h3.py",
+            "--image",
+            str(image_path),
+            "--prompt",
+            prompt,
+            "--out",
+            str(out_path),
+            "--width",
+            "768",
+            "--height",
+            "768",
+            "--length",
+            "124",
+        ]
+        try:
+            returncode, stdout_lines, stderr_text = run_cli(cmd, timeout=H3_TIMEOUT_SECONDS)
+        except Exception as exc:  # noqa: BLE001 - CLI 无法启动
+            _fail(db, job, f"run_h3 启动失败: {exc}")
+            return
+
+    if returncode != 0:
+        _fail(db, job, _format_error("run_h3", returncode, stderr_text, stdout_lines))
+        return
+    if not out_path.is_file() or out_path.stat().st_size == 0:
+        _fail(db, job, f"run_h3 未产出视频: {out_path}")
+        return
+
+    video_url = config.media_url(out_path)
+    character.h3_video_url = video_url
+    portrait_path = character_files.character_dir(character.id) / "h3_portrait.png"
+    try:
+        if extract_video_frame(out_path, portrait_path):
+            character.h3_portrait_url = config.media_url(portrait_path)
+    except Exception:  # noqa: BLE001 - 帧提取失败不影响视频结果
+        logger.exception("H3 中段帧提取失败: %s", out_path)
+
+    _update(
+        db,
+        job,
+        status="done",
+        progress=100,
+        message="H3 动画生成完成",
+        output_url=video_url,
+        cost=0.0,
+        error=None,
+    )
+    db.commit()
+    logger.info("h3 任务完成: job=%s character=%s", job.id, character.id)
+
+
+# --------------------------------------------------------------------------- #
+# export 任务（剪映草稿导出：调用 pipeline.capcut）
+# --------------------------------------------------------------------------- #
+def enqueue_export_job(
+    db,
+    episode: models.Episode,
+    manifest: Dict[str, Any],
+    export_type: str = "capcut",
+):
+    """入队导出任务；同一集已有活跃导出任务时复用。返回 (job, created)。"""
+    active = (
+        db.query(models.Job)
+        .filter(
+            models.Job.type == "export",
+            models.Job.episode_id == episode.id,
+            models.Job.status.in_(ACTIVE_STATUSES),
+        )
+        .order_by(models.Job.created_at.desc())
+        .first()
+    )
+    if active is not None:
+        return active, False
+    name = str(manifest.get("name") or f"造片局_EP{int(episode.no or 1):03d}")
+    job = models.Job(
+        id=models.new_id("job"),
+        type="export",
+        status="queued",
+        progress=0.0,
+        message="导出排队中",
+        episode_id=episode.id,
+        character_id=None,
+        params={
+            "manifest": manifest,
+            "name": name,
+            "export_type": export_type,
+        },
+    )
+    db.add(job)
+    db.commit()
+    dispatch(job.id)
+    return job, True
+
+
+def run_export_job(db, job: models.Job) -> None:
+    params = dict(job.params or {})
+    manifest = dict(params.get("manifest") or {})
+    name = str(params.get("name") or manifest.get("name") or "造片局_EP001")
+    if not manifest:
+        _fail(db, job, "导出清单为空，无法导出")
+        return
+    _update(db, job, status="running", progress=5, message=f"准备导出剪映草稿 {name}")
+    db.commit()
+
+    config.JOBS_TMP_DIR.mkdir(parents=True, exist_ok=True)
+    manifest_path = config.JOBS_TMP_DIR / f"{job.id}_export_manifest.json"
+    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+    outdir = config.OUTPUTS_DIR / "exports"
+    outdir.mkdir(parents=True, exist_ok=True)
+
+    cmd = [
+        sys.executable,
+        "-m",
+        "pipeline.capcut",
+        "export",
+        "--manifest",
+        str(manifest_path),
+        "--outdir",
+        str(outdir),
+        "--name",
+        name,
+        "--copy-media",
+    ]
+    _update(db, job, progress=10, message="调用 pipeline.capcut export")
+    db.commit()
+    try:
+        returncode, stdout_lines, stderr_text = run_cli(cmd, timeout=600)
+    except Exception as exc:  # noqa: BLE001 - CLI 无法启动
+        _fail(db, job, f"pipeline.capcut 启动失败: {exc}")
+        return
+    if returncode != 0:
+        _fail(
+            db,
+            job,
+            _format_error("pipeline.capcut export", returncode, stderr_text, stdout_lines),
+        )
+        return
+
+    result = _last_json(stdout_lines)
+    expected_dir = outdir / name
+    draft_path: Optional[Path] = None
+    for candidate in (result.get("draft_dir"), result.get("path"), result.get("outdir"), expected_dir):
+        if not candidate:
+            continue
+        path = Path(str(candidate))
+        if not path.is_absolute():
+            path = config.REPO_ROOT / path
+        if path.is_dir():
+            draft_path = path
+            break
+    if draft_path is None:
+        _fail(db, job, f"export 未产出剪映草稿目录（期望 {expected_dir}）")
+        return
+    try:
+        output_url = draft_path.resolve().relative_to(config.REPO_ROOT.resolve()).as_posix()
+    except ValueError:
+        output_url = str(draft_path)
+    _update(
+        db,
+        job,
+        status="done",
+        progress=100,
+        message=f"剪映草稿已导出：{output_url}",
+        output_url=output_url,
+        cost=0.0,
+        error=None,
+    )
+    db.commit()
+    logger.info("export 任务完成: job=%s path=%s", job.id, output_url)
 
 
 # --------------------------------------------------------------------------- #

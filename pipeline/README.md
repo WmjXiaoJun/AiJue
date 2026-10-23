@@ -177,9 +177,42 @@ ComfyUI 适配器（httpx 用 monkeypatch 模拟，不联网）、平台生成�
 | ffprobe | `tools/node_modules/ffprobe-static/.../ffprobe.exe` 或 `FFPROBE_BIN` |
 | 中文字体 | Windows `Deng.ttf`（正文）+ `msyhbd.ttc`（标题/花字），render 时复制到 workdir/fonts |
 | 角色素材（可选） | `outputs/characters/{id}/`（studio3d 角色工坊产出）；缺失时自动回退文字卡 |
+| 剪映草稿导出 | `pyJianYingDraft==0.3.1`（pip 安装，用于生成剪映/CapCut 草稿 JSON）；未装则 capcut 导出会提示安装 |
 | 网络 | 仅 edge-tts 需要；其余全程离线 |
 
 不安装任何重量级依赖（无 torch/CUDA/ComfyUI 硬依赖）。
+
+## 剪映草稿导出（pipeline.capcut）
+
+把成片时间线导出为剪映专业版草稿（基于 pyJianYingDraft 0.3.1）：
+
+```powershell
+# 1) 从 episode + 渲染工作目录自动生成 manifest
+python -m pipeline.capcut build-manifest --episode contract/demo_episode.json `
+    --workdir outputs/demo --out outputs/exports/export_manifest.json
+
+# 2) 导出剪映草稿（--copy-media 把媒体复制进草稿 materials/）
+python -m pipeline.capcut export --manifest outputs/exports/export_manifest.json `
+    --outdir outputs/exports --name 造片局_EP001 --copy-media
+
+# 3) 校验草稿目录
+python -m pipeline.capcut validate --draft-dir outputs/exports/造片局_EP001
+```
+
+- Manifest 结构见 `contract/EXPORT.md`；`build_manifest_from_workdir()`
+  是给后端直接调用的 Python 辅助函数（也可先落 manifest 再调 CLI）。
+- 产物：`draft_content.json`（画布/轨道/片段/素材，时间单位微秒）、`draft_meta_info.json`、
+  `draft_settings`、`draft_virtual_store.json`、`timeline_layout.json`、
+  `materials/`、`subtitles.srt`、`export_manifest.json`、`export_audit.json`、`README.txt`。
+- 轨道：视频（镜头片段顺铺）/ 音频（旁白 narration.wav）/ 文本（字幕由 SRT 导入）。
+- 导入剪映：把草稿文件夹复制到
+  `%LOCALAPPDATA%\JianyingPro\User Data\Projects\com.lveditor.draft\` 后重启剪映，
+  或用剪映「导入草稿」；`subtitles.srt` 也可直接给其它剪辑软件。
+- 兼容性：本机剪映 10.3.0.13901 的草稿 JSON 是加密格式（现有真实草稿的
+  `draft_content.json` 不是明文），本导出器生成的是明文草稿（pyJianYingDraft v5 风格），
+  适合 ≤5.9 等支持明文草稿的版本；10.x 若无法直接识别，需用旧版本导入或用
+  `materials/` + `subtitles.srt` 手动重建。
+- 测试：`python -m pytest pipeline/tests/test_capcut.py -q`（manifest/SRT/草稿 JSON/轨道/素材路径/copy-media）。
 
 ## 已知限制 / 未做
 

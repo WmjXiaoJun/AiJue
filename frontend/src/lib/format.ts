@@ -1,4 +1,5 @@
 // 中文标签与格式化工具（避免散落在各组件里）
+import type { Character, ConceptFiles } from "../types";
 
 export const SHOT_TYPE_LABEL: Record<string, string> = {
   title_card: "片头卡",
@@ -167,6 +168,86 @@ export const FACIAL_HAIR_LABEL: Record<string, string> = {
   goatee: "山羊胡",
   mustache: "八字胡",
 };
+
+export const CONCEPT_STYLE_OPTIONS: { value: string; label: string; desc: string }[] = [
+  { value: "anime", label: "Anime", desc: "日系动漫 · animagine" },
+  { value: "illustrious", label: "Illustrious", desc: "二次元插画质感" },
+  { value: "guoman", label: "Guoman", desc: "国漫 · 新国风" },
+];
+
+export const CONCEPT_STYLE_LABEL: Record<string, string> = {
+  anime: "Anime 日系",
+  illustrious: "Illustrious",
+  guoman: "Guoman 国漫",
+};
+
+export const THREE_VIEW_LABEL: Record<string, string> = {
+  front: "正面",
+  side: "侧面",
+  three_quarter: "四分之三",
+};
+
+export const EXPRESSION_LABEL: Record<string, string> = {
+  neutral: "平静",
+  happy: "开心",
+  surprised: "惊讶",
+  thinking: "思考",
+};
+
+export interface ConceptImageItem {
+  key: string;
+  label: string;
+  url: string;
+  group: "portrait" | "three_view" | "expressions" | "sheet";
+}
+
+/** 将 /concepts 返回的 three_view / expressions 归一化为图片列表（兼容对象或数组） */
+export function conceptImages(concepts: {
+  portrait?: string | null;
+  three_view?: Record<string, string> | string[] | null;
+  expressions?: Record<string, string> | null;
+  sheet?: string | null;
+} | null | undefined): ConceptImageItem[] {
+  if (!concepts) return [];
+  const items: ConceptImageItem[] = [];
+  if (concepts.portrait) items.push({ key: "portrait", label: "概念立绘", url: concepts.portrait, group: "portrait" });
+  const three = concepts.three_view;
+  if (three) {
+    const entries: [string, string][] = Array.isArray(three)
+      ? three.map((url, index) => [String(index), url])
+      : Object.entries(three);
+    entries.forEach(([key, url]) => {
+      if (!url) return;
+      items.push({ key: "three_" + key, label: "三视图 · " + (THREE_VIEW_LABEL[key] || key), url, group: "three_view" });
+    });
+  }
+  if (concepts.expressions) {
+    Object.entries(concepts.expressions).forEach(([key, url]) => {
+      if (!url) return;
+      items.push({ key: "expr_" + key, label: EXPRESSION_LABEL[key] || key, url, group: "expressions" });
+    });
+  }
+  if (concepts.sheet) items.push({ key: "sheet", label: "设定总览", url: concepts.sheet, group: "sheet" });
+  return items;
+}
+
+/** 从 Character（后端已回填 concept_* 字段）构造概念图结构，作为 /concepts 的兜底数据源 */
+export function conceptFromCharacter(character?: Character | null): ConceptFiles | null {
+  if (!character) return null;
+  const hasAny =
+    character.concept_portrait_url ||
+    character.concept_sheet_url ||
+    (character.concept_three_view && Object.keys(character.concept_three_view).length > 0) ||
+    (character.concept_expressions && Object.keys(character.concept_expressions).length > 0);
+  if (!hasAny) return null;
+  return {
+    portrait: character.concept_portrait_url || null,
+    sheet: character.concept_sheet_url || null,
+    three_view: character.concept_three_view || {},
+    expressions: character.concept_expressions || {},
+    meta: null,
+  };
+}
 
 export const VOICE_OPTIONS: { value: string; label: string }[] = [
   { value: "zh-CN-YunxiNeural", label: "云希 · 男声 · 沉稳" },

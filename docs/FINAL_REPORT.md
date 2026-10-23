@@ -157,3 +157,48 @@ FastAPI (8090) ── SQLite
 - pipeline：`python -m pytest pipeline/tests -q` → **25 passed**（含字幕去空格/换行/角色素材/缓存指纹）
 - frontend：`npm run build` 通过（dist 240KB JS / 71KB CSS）
 - 角色/H3 资产与截图均已入库文档。
+## 15. 角色 2.0：文生概念图（SDXL 动漫）
+
+- 模型：**Animagine XL 4.0**（SDXL 动漫，6.94GB，sha256 1d5b43ff…3916 校验通过），ComfyUI 原生 txt2img（28 step / cfg 5.5 / euler_a / 832×1216），12GB 显存可跑，单图约 14–20s。
+- CLI：`python -m imagegen.cli generate --spec contract/characters/laozhou.json --outdir outputs/concepts/laozhou --mode all --style anime --seed 42`；portrait / three_view×3 / 4 表情 / scene / sheet / meta。
+- 实测：3 角色共 **30 张概念图**（laozhou/ali/dawei），画质达到可用的日漫赛璐璐立绘；设定图 1600×900 含三视图+四表情+配色条。
+- 后端：`POST /api/characters/{cid}/concept/generate`（Job type=concept）、`GET /concepts` 懒扫描、`POST /portrait/from-concept` 设为立绘。
+- 前端：角色抽屉「AI 概念图」区（风格/提示词/seed/生成进度/图集/设为立绘/H3 动画），角色卡概念图优先并带「AI 概念图」徽标。
+- 截图：![概念设定图](screenshots/16_concept_sheet_laozhou.png)
+
+## 16. 概念图 → H3 动画（闭环）
+
+- `POST /api/characters/{cid}/h3-animate` → Job(type=h3) → 调 `integrations/comfyui/run_h3.py`（768×768/4step/124 帧/含音轨）→ outputs/h3/{cid}_h3.mp4 + h3_portrait 回填；ComfyUI 串行锁，超时 20 分钟。
+- 已有 3 条 H3 角色镜头 + 本次可用概念图重新生成；前端角色抽屉可直接播放。
+- 截图：![H3 角色镜头](screenshots/11_h3_laozhou.png)
+
+## 17. 成片导出：剪映草稿
+
+- `pipeline/capcut.py`（pyJianYingDraft 0.3.1）：从 manifest 生成剪映专业版草稿 + SRT + 审计；`POST /api/episodes/{eid}/export {"type":"capcut"}` 后台任务。
+- 实测：`outputs/exports/造片局_EP001/` —— 299.000s / 1280×720 / 25fps；**52 视频段 + 1 旁白音频 + 42 字幕文本**；draft_content.json(243KB)+meta+srt+README+audit ok；含 materials/ 自包含媒体。
+- **已知限制**：剪映 10.x 会把草稿 JSON 加密保存，不识别明文草稿（已实测 10.3）；明文草稿适用于 ≤5.9 或按 README 用 materials/ + subtitles.srt 重建；结构本身经 pyJianYingDraft 社区标准校验。
+- 测试：pipeline **34 passed**；backend **75 passed**。
+## 18. 角色 2.0 最终验收（2026-10-24 凌晨）
+
+### 18.1 文生概念图（SDXL 动漫）
+- 模型：Animagine XL 4.0（6,938,434,056 B / sha256 1d5b43ff…3916 校验通过）
+- 35 张产物：3 角色 × {portrait 832×1216, three_view×3 1024², expressions×4, scene, sheet 1600×900} + 3 meta；单图 8–20s（首图含加载 14.2s），--mode all 单角色 205–222s
+- CLI：`python -m imagegen.cli generate --spec contract/characters/<id>.json --outdir outputs/concepts/<id> --mode all --style anime --seed 42`
+- 后端：concept/generate + concepts + portrait/from-concept 真链路均跑通（job done，产物 URL /media/concepts/…）
+- 前端：角色抽屉 AI 概念图区（风格/提示词/seed/进度/图集/设为立绘/H3 动画）实测通过
+- 截图：![概念图图集](screenshots/20_concept_gallery.png) ![生成中](screenshots/19_concept_generating.png) ![设为立绘](screenshots/21_set_portrait.png)
+
+### 18.2 概念图 → H3 动画
+- `POST /api/characters/{cid}/h3-animate` → Job(type=h3) → run_h3.py → outputs/h3/{cid}_h3.mp4（ComfyUI 串行，20 分钟超时）
+- 前端角色抽屉可播放 H3 视频；截图：![H3 动画](screenshots/22_h3_animation.png)
+
+### 18.3 剪映草稿导出
+- `POST /api/episodes/{eid}/export {"type":"capcut"}` → pipeline.capcut.py（pyJianYingDraft 0.3.1）
+- 产物 outputs/exports/造片局_EP001：draft_content.json（canvas 1280×720/25fps/299s；52 视频段 + 1 旁白 + 42 字幕）、draft_meta_info.json、materials/、subtitles.srt、README.txt、audit ok
+- 限制：本机剪映 10.3 加密草稿 JSON，不识别明文草稿；明文格式适用于 ≤5.9 或按 README 用 materials/+srt 重建
+- 截图：![导出成功](screenshots/23_export_success.png)
+
+### 18.4 终态与测试
+- backend pytest：**75 passed**；pipeline pytest：**34 passed**；前端 build 通过（dist 254KB JS/78KB CSS）
+- 服务：http://127.0.0.1:8090（backend/run-detached.ps1 可独立常驻）；ComfyUI 8188 在线
+- 已知：三视图/表情为独立生成（seed 家族相似，非像素级同一脸）；ComfyUI 单 worker 串行；剪映 10.x 加密限制；H3 单条约 2–5 分钟。

@@ -1530,3 +1530,507 @@
   .char-hero-portrait { width: 76px; height: 76px; }
 }
 
+/* ============================================================
+   AI 概念图（contract/CONCEPT.md）/ 剪映导出（contract/EXPORT.md）
+   ============================================================ */
+.char-concept-badge {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 2;
+  height: 21px;
+  padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: rgba(6, 12, 18, 0.72);
+  border: 1px solid rgba(90, 200, 250, 0.45);
+  color: #9fe0ff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 0 18px rgba(90, 200, 250, 0.18);
+}
+
+.concept-chip {
+  color: #9fe0ff !important;
+  border-color: rgba(90, 200, 250, 0.4) !important;
+  background: rgba(90, 200, 250, 0.08) !important;
+}
+
+.concept-studio {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(90, 200, 250, 0.16);
+  background:
+    radial-gradient(120% 80% at 100% 0%, rgba(90, 200, 250, 0.06), transparent 58%),
+    rgba(255, 255, 255, 0.014);
+}
+
+.concept-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.concept-head h4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.concept-head p {
+  margin-top: 4px;
+  color: var(--mute);
+  font-size: 10.5px;
+  line-height: 1.6;
+  max-width: 400px;
+}
+
+.concept-flag {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.14em;
+  color: var(--cyan);
+  border: 1px solid rgba(90, 200, 250, 0.32);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+.concept-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) 66px auto;
+  gap: 6px;
+  align-items: center;
+}
+
+.concept-controls .select {
+  width: 100%;
+  min-width: 0;
+  height: 32px;
+  font-size: 11.5px;
+}
+
+.concept-prompt,
+.concept-seed {
+  height: 32px;
+  font-size: 11.5px;
+  padding: 0 9px;
+}
+
+.concept-tip {
+  color: var(--faint);
+  font-size: 10px;
+  line-height: 1.5;
+  margin-top: -4px;
+}
+
+.concept-job {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 9px 11px;
+  border-radius: 9px;
+  border: 1px solid rgba(245, 197, 24, 0.22);
+  background: rgba(245, 197, 24, 0.045);
+}
+
+.concept-job-done {
+  border-color: rgba(56, 201, 139, 0.26);
+  background: rgba(56, 201, 139, 0.045);
+}
+
+.concept-job-failed {
+  border-color: rgba(255, 96, 96, 0.28);
+  background: rgba(255, 96, 96, 0.05);
+}
+
+.concept-job-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10.5px;
+  color: var(--mute);
+}
+
+.concept-job-id {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--faint);
+}
+
+.concept-job-status {
+  font-weight: 650;
+  color: var(--accent-2);
+}
+
+.concept-job-done .concept-job-status {
+  color: var(--green);
+}
+
+.concept-job-failed .concept-job-status {
+  color: var(--red);
+}
+
+.concept-job-msg {
+  color: var(--faint);
+  font-size: 10.5px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.concept-job-error,
+.export-failed {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  color: #ffb9b9;
+  font-size: 10.5px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.concept-job-error svg,
+.export-failed svg {
+  flex: none;
+  margin-top: 1px;
+}
+
+.concept-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.concept-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.concept-group-title {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  color: var(--faint);
+  text-transform: uppercase;
+}
+
+.concept-grid {
+  display: grid;
+  gap: 7px;
+}
+
+.concept-grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.concept-grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.concept-image {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  min-width: 0;
+}
+
+.concept-image-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  background: #080b10;
+  aspect-ratio: 2 / 3;
+}
+
+.concept-image-lg .concept-image-frame {
+  aspect-ratio: auto;
+  height: 400px;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(90, 200, 250, 0.06), transparent 60%),
+    #070a0f;
+}
+
+.concept-image-lg .concept-image-frame img {
+  object-fit: contain;
+}
+
+/* 立绘 / 设定总览等大图的操作常显，便于发现 */
+.concept-image-lg .concept-image-actions {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.concept-grid .concept-image-frame {
+  aspect-ratio: 1 / 1;
+}
+
+.concept-image-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.concept-image-actions {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  gap: 4px;
+  padding: 18px 5px 5px;
+  background: linear-gradient(180deg, transparent, rgba(4, 6, 9, 0.9));
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.16s var(--ease), transform 0.16s var(--ease);
+}
+
+.concept-image-frame:hover .concept-image-actions,
+.concept-image-frame:focus-within .concept-image-actions {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.concept-action {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 24px;
+  border-radius: 6px;
+  background: rgba(16, 20, 27, 0.9);
+  border: 1px solid var(--line-strong);
+  color: var(--text-dim);
+  font-size: 9.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
+}
+
+.concept-action:hover:not(:disabled) {
+  color: var(--accent-2);
+  border-color: rgba(245, 197, 24, 0.5);
+}
+
+.concept-action-h3 {
+  color: #9fe0ff;
+  border-color: rgba(90, 200, 250, 0.35);
+}
+
+.concept-action-h3:hover:not(:disabled) {
+  color: #d6f2ff;
+  border-color: rgba(90, 200, 250, 0.65);
+}
+
+.concept-action:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.concept-image figcaption {
+  color: var(--faint);
+  font-size: 10px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.concept-h3 {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 11px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.concept-h3-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.concept-h3-head h5 {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 650;
+  color: var(--text-dim);
+}
+
+.concept-h3-status {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.concept-h3-status span {
+  color: var(--faint);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.concept-h3-video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  background: #000;
+}
+
+.concept-h3-hint {
+  color: var(--faint);
+  font-size: 10.5px;
+  line-height: 1.6;
+}
+
+/* ---------- 剪映草稿导出 ---------- */
+.export-panel {
+  padding: 18px 20px 20px;
+}
+
+.export-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.export-desc {
+  max-width: 640px;
+  color: var(--mute);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.export-job {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 14px;
+  padding: 11px 13px;
+  border-radius: 10px;
+  border: 1px solid rgba(245, 197, 24, 0.2);
+  background: rgba(245, 197, 24, 0.04);
+}
+
+.export-job-done {
+  border-color: rgba(56, 201, 139, 0.24);
+  background: rgba(56, 201, 139, 0.04);
+}
+
+.export-job-failed {
+  border-color: rgba(255, 96, 96, 0.26);
+  background: rgba(255, 96, 96, 0.05);
+}
+
+.export-job-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+.export-job-id {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--faint);
+}
+
+.export-result {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: 13px;
+  padding: 13px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line-soft);
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.export-result-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.export-result-row > span {
+  flex: none;
+  width: 78px;
+  color: var(--faint);
+  font-size: 11px;
+}
+
+.export-result-row code {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 9px;
+  border-radius: 7px;
+  border: 1px solid var(--line-soft);
+  background: #080b10;
+  color: var(--accent-2);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.export-copy {
+  flex: none;
+}
+
+.export-steps {
+  margin: 2px 0 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--mute);
+  font-size: 11.5px;
+  line-height: 1.65;
+}
+
+.export-steps code {
+  color: var(--text-dim);
+  font-size: 10.5px;
+}
+
+.export-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--faint);
+  font-size: 10.5px;
+}
+
+@media (max-width: 900px) {
+  .concept-controls {
+    grid-template-columns: 1fr 1fr;
+  }
+  .concept-prompt {
+    grid-column: 1 / -1;
+  }
+  .export-top {
+    flex-direction: column;
+  }
+}
+
+

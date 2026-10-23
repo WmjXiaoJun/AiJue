@@ -48,15 +48,51 @@ def get_db():
         db.close()
 
 
+# 轻量迁移表：老库缺列时自动 ALTER TABLE ADD COLUMN（JSON 列在 SQLite 用 TEXT 存）
+_MIGRATIONS = {
+    "jobs": {
+        "character_id": "VARCHAR(64)",
+    },
+    "characters": {
+        "concept_portrait_url": "VARCHAR(400)",
+        "concept_sheet_url": "VARCHAR(400)",
+        "concept_three_view": "TEXT",
+        "concept_expressions": "TEXT",
+        "h3_video_url": "VARCHAR(400)",
+        "h3_portrait_url": "VARCHAR(400)",
+    },
+}
+
+
 def migrate_columns() -> None:
     """轻量迁移：老库补新增列（SQLite 用 ALTER TABLE ADD COLUMN，可重复执行）。"""
     inspector = inspect(engine)
     tables = set(inspector.get_table_names())
-    if "jobs" in tables:
-        columns = {column["name"] for column in inspector.get_columns("jobs")}
-        if "character_id" not in columns:
-            with engine.begin() as connection:
-                connection.execute(text("ALTER TABLE jobs ADD COLUMN character_id VARCHAR(64)"))
+    for table, columns in _MIGRATIONS.items():
+        if table not in tables:
+            continue
+        existing = {column["name"] for column in inspector.get_columns(table)}
+        missing = {name: ddl for name, ddl in columns.items() if name not in existing}
+        if not missing:
+            continue
+        with engine.begin() as connection:
+            for name, ddl in missing.items():
+                connection.execute(text(f"ALTER TABLE {table} ADD COLUMN {name} {ddl}"))
+    # JSON 列老数据补空对象（避免 None 进 Pydantic Dict 字段）
+    if "characters" in tables:
+        with engine.begin() as connection:
+            connection.execute(
+                text(
+                    "UPDATE characters SET concept_three_view = '{}' "
+                    "WHERE concept_three_view IS NULL"
+                )
+            )
+            connection.execute(
+                text(
+                    "UPDATE characters SET concept_expressions = '{}' "
+                    "WHERE concept_expressions IS NULL"
+                )
+            )
 
 
 def init_db() -> None:

@@ -54,6 +54,10 @@ def ensure_dirs() -> None:
     OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
     JOBS_TMP_DIR.mkdir(parents=True, exist_ok=True)
     (OUTPUTS_DIR / "episodes").mkdir(parents=True, exist_ok=True)
+    (OUTPUTS_DIR / "characters").mkdir(parents=True, exist_ok=True)
+    (OUTPUTS_DIR / "concepts").mkdir(parents=True, exist_ok=True)
+    (OUTPUTS_DIR / "exports").mkdir(parents=True, exist_ok=True)
+    (OUTPUTS_DIR / "h3").mkdir(parents=True, exist_ok=True)
 
 
 def media_url(path: str | Path) -> str:

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { api, errorText, mediaUrl } from "../lib/api";
-import type { Character, CharacterFiles, CharacterSpec, Job } from "../types";
+import type { Character, CharacterFiles, ConceptFiles, CharacterSpec, Job } from "../types";
 import {
   ACCESSORY_LABEL,
   BROW_LABEL,
@@ -18,6 +18,7 @@ import {
   styleFamily,
 } from "../lib/format";
 import { Drawer, Meta, Notice, ProgressBar, StatusBadge } from "./ui";
+import { ConceptStudio } from "./ConceptStudio";
 import { IconExternal, IconImage, IconRefresh, IconSpark, IconVideo } from "./icons";
 
 interface Props {
@@ -25,6 +26,12 @@ interface Props {
   job: Job | null;
   onClose: () => void;
   onRegenerate: (character: Character) => void;
+  concept?: ConceptFiles | null;
+  conceptSupported: boolean;
+  conceptError: string | null;
+  onRefreshConcepts: () => Promise<void> | void;
+  /** 刷新角色列表（概念图设为立绘 / H3 回填后卡片同步） */
+  onCharacterChanged: () => void;
 }
 
 const EXPRESSIONS: { key: string; label: string }[] = [
@@ -34,7 +41,17 @@ const EXPRESSIONS: { key: string; label: string }[] = [
   { key: "thinking", label: "思考" },
 ];
 
-export function CharacterDrawer({ character, job, onClose, onRegenerate }: Props) {
+export function CharacterDrawer({
+  character,
+  job,
+  onClose,
+  onRegenerate,
+  concept,
+  conceptSupported,
+  conceptError,
+  onRefreshConcepts,
+  onCharacterChanged,
+}: Props) {
   const [files, setFiles] = useState<CharacterFiles | null>(null);
   const [filesError, setFilesError] = useState<string | null>(null);
 
@@ -104,6 +121,11 @@ export function CharacterDrawer({ character, job, onClose, onRegenerate }: Props
                     {styleFamily(style)} · {CHARACTER_STYLE_LABEL[style] || style}
                   </span>
                 ))}
+                {concept?.portrait && (
+                  <span className="char-style-chip concept-chip" title="当前角色卡优先使用 AI 概念图">
+                    AI 概念图
+                  </span>
+                )}
               </div>
               <div className="char-hero-voice">声线 {character.voice || "未分配"}</div>
             </div>
@@ -126,8 +148,19 @@ export function CharacterDrawer({ character, job, onClose, onRegenerate }: Props
             <Notice tone="warn">角色素材接口暂不可用：{filesError}（生成完成后会自动出现）</Notice>
           )}
 
+          <div className="detail-block">
+            <ConceptStudio
+              character={character}
+              concept={concept}
+              supported={conceptSupported}
+              error={conceptError}
+              onRefreshConcepts={onRefreshConcepts}
+              onCharacterChanged={onCharacterChanged}
+            />
+          </div>
+
           <section className="detail-block">
-            <h4>角色设定三视图</h4>
+            <h4>Blender 设定三视图</h4>
             {sheet ? (
               <div className="char-sheet-wrap">
                 <img className="char-sheet" src={mediaUrl(sheet)} alt={character.name + " 三视图"} loading="lazy" />

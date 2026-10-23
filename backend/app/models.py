@@ -224,6 +224,15 @@ class Character(Base):
     status = Column(String(16), nullable=False, default="pending")
     created_at = Column(DateTime, nullable=False, default=utcnow)
 
+    # AI 概念图（imagegen/SDXL，outputs/concepts/{cid}/）
+    concept_portrait_url = Column(String(400), nullable=True)
+    concept_sheet_url = Column(String(400), nullable=True)
+    concept_three_view = Column("concept_three_view", JSON, nullable=False, default=dict)
+    concept_expressions = Column("concept_expressions", JSON, nullable=False, default=dict)
+    # H3 动画（integrations/comfyui/run_h3.py，outputs/h3/{cid}_h3.mp4）
+    h3_video_url = Column(String(400), nullable=True)
+    h3_portrait_url = Column(String(400), nullable=True)
+
     project = relationship("Project", back_populates="characters")
 
 
