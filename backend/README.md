@@ -52,6 +52,7 @@ scripts/dev.ps1 是前台调试入口；需要后台常驻时用 run-detached.ps
         comfyui.py   ComfyUI（MiniMax H3）适配器，httpx 可注入 mock
         character_files.py  角色产物扫描（outputs/characters/{cid}/ -> URL）
         concept_files.py    概念图产物扫描（outputs/concepts/{cid}/ -> URL）
+        script_parser.py    台本 -> 分镜解析（contract/SCRIPT_FORMAT.md）
         workflows/   ComfyUI 工作流模板示例
         main.py      FastAPI 应用与全部 /api 端点（含角色工坊）
       run.ps1        启动脚本
@@ -66,10 +67,13 @@ scripts/dev.ps1 是前台调试入口；需要后台常驻时用 run-detached.ps
 
   （cwd = 仓库根；mock 模式追加 --mock）成功后写 ShotVersion、回填 Shot.selected_version_id，
   Job 状态 done；失败则 Job.failed + error，镜头 failed。
-- render 任务：POST /api/episodes/{eid}/render。后台线程执行
+- render 任务：POST /api/episodes/{eid}/render。后台线程先把**实际集**从 DB 序列化为
+  backend/data/jobs/{job_id}_episode.json（episode/assets/shots/segments，对齐
+  contract/demo_episode.json 结构），再执行
 
-      python -m pipeline.cli render --episode contract/demo_episode.json --workdir outputs/episodes/{eid} --out outputs/episodes/{eid}/final.mp4
+      python -m pipeline.cli render --episode backend/data/jobs/{job_id}_episode.json --workdir outputs/episodes/{eid} --out outputs/episodes/{eid}/final.mp4
 
+  因此任意集（如 ep_002）渲的是自己的镜头，不会误用 demo 的 52 镜头。
   stdout 中 PROGRESS <0-100> <message> 行会实时更新 Job.progress / Episode.progress；
   成功后 Episode.render_url = /media/episodes/{eid}/final.mp4。
 - CLI 不存在或报错：任务标记 failed 并记录 error，不会让 API 进程崩溃。
@@ -78,6 +82,28 @@ scripts/dev.ps1 是前台调试入口；需要后台常驻时用 run-detached.ps
 - demo 无需 Redis/Celery，任务为进程内守护线程。服务启动时会把上一个进程遗留的
   queued/running 任务标记 failed（error 注明「服务重启，任务中断，可点重试」），
   避免前端出现永远转圈的幽灵任务；用户可在任务中心点重试重新入队。
+
+## 台本驱动分镜（contract/SCRIPT_FORMAT.md）
+
+- Episode 新增 script（TEXT，默认空；老库启动自动 ALTER TABLE episodes ADD COLUMN script）。
+- 剧集：POST /api/projects/{pid}/episodes {title?, target_duration?, copy_assets_from?, no_copy_assets?}
+  -> 创建下一集（no 自增，status=draft，继承项目 aspect/画幅/时长）；PATCH /api/episodes/{eid} 支持 script。
+  资产继承：默认从项目「最新一集」复制全部资产（role/type/name/title/persona/voice/images 等，
+  角色名可被台本解析匹配）；copy_assets_from 可指定同项目源集；no_copy_assets=true 关闭复制。
+- 台本规则（script_parser.py）：
+  * [开场] / 【正片】 段落标记，不单独成镜；缺省归入「正片」；
+  * 「名字：台词」/「名字: 台词」对白，名字对资产/角色 name/title 做包含匹配，
+    未知说话人 speaker 置空、保留原文名字（渲染端回退 host 音色）；
+  * 整行（）/() -> reaction 镜头，visual=括号内动作、speaker 沿用上一个说话人；
+  * 无冒号行 -> 主持人旁白（speaker=host 资产）；
+  * 自动片头 title_card + 片尾 end_card（各 3.5s）；
+  * 单镜时长 clamp(1.2 + 台字字数*0.13, 2.5, 8.0)；
+  * 镜头 type 使用 pipeline 兼容值：host_to_camera / shot_reverse / reaction / title_card / end_card。
+- POST /api/episodes/{eid}/storyboard/generate {force?: false}：
+  有镜头且未 force 返回 {created:0}；否则按 script 解析生成（script 为空回退旧模板骨架）；
+  force=true 时先删除旧镜头（含版本）再重建。
+- POST /api/episodes/{eid}/shots {type?, line?, duration?, speaker_name?, visual?} 追加镜头；
+  DELETE /api/shots/{sid} 删除并重排 no（shots_total 同步刷新）。
 
 ## 角色工坊（Character Studio，contract/CHARACTER.md）
 
@@ -212,7 +238,8 @@ portrait_url,sheet_url,turntable_url,expressions,status,created_at}
 不污染开发库、不真连 ComfyUI / Blender。覆盖：contract/API.md 全部端点、
 角色工坊 CRUD/资产联动/files/生成任务（tests/test_characters.py）、
 概念图/H3/剪映导出（tests/test_concept.py）、H3 provider 分派与 settings/key 掩码
-（tests/test_h3_provider.py）、ComfyUI 适配器 mock。
+（tests/test_h3_provider.py）、台本解析/分镜生成/镜头增删/集创建/render 序列化
+（tests/test_script.py）、ComfyUI 适配器 mock。
 
 ## ComfyUI 适配器
 

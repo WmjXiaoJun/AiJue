@@ -10,6 +10,8 @@ export const SHOT_TYPE_LABEL: Record<string, string> = {
   b_roll: "空镜素材",
   meme_card: "花字卡",
   end_card: "片尾卡",
+  talking_head: "对白镜头",
+  narration: "旁白",
 };
 
 export const SHOT_TYPE_SHORT: Record<string, string> = {
@@ -21,6 +23,8 @@ export const SHOT_TYPE_SHORT: Record<string, string> = {
   b_roll: "空镜",
   meme_card: "花字",
   end_card: "片尾",
+  talking_head: "对白",
+  narration: "旁白",
 };
 
 export const SHOT_STATUS_LABEL: Record<string, string> = {
@@ -299,6 +303,8 @@ export const TYPE_ACCENT: Record<string, string> = {
   b_roll: "#8B7CF6",
   meme_card: "#FF9F43",
   end_card: "#C89B3C",
+  talking_head: "#FFD84D",
+  narration: "#8B7CF6",
 };
 
 export const PACKAGING_LABEL: Record<string, string> = {

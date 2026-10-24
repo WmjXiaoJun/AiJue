@@ -518,12 +518,98 @@ def run_shot_job(db, job: models.Job) -> None:
 # --------------------------------------------------------------------------- #
 # render 任务
 # --------------------------------------------------------------------------- #
-def _episode_arg(episode: models.Episode) -> str:
-    """render CLI 使用 contract/demo_episode.json（demo 固定输入）。"""
-    try:
-        return str(config.DEMO_EPISODE_PATH.relative_to(config.REPO_ROOT)).replace("\\", "/")
-    except ValueError:
-        return str(config.DEMO_EPISODE_PATH).replace("\\", "/")
+def _serialize_episode(db, episode: models.Episode, job: models.Job) -> Path:
+    """把 DB 里的实际集序列化成 pipeline render 需要的 episode JSON。
+
+    结构对齐 contract/demo_episode.json（episode/assets/shots/segments），
+    保证任意集（如 ep_002）渲染时不会误用 demo 的 52 镜头。
+    """
+    assets = (
+        db.query(models.Asset)
+        .filter(models.Asset.episode_id == episode.id)
+        .order_by(models.Asset.created_at.asc())
+        .all()
+    )
+    shots = (
+        db.query(models.Shot)
+        .filter(models.Shot.episode_id == episode.id)
+        .order_by(models.Shot.no.asc())
+        .all()
+    )
+    shot_payload = []
+    for shot in shots:
+        shot_payload.append(
+            {
+                "id": shot.id,
+                "episode_id": shot.episode_id,
+                "segment": shot.segment_id,
+                "segment_id": shot.segment_id,
+                "no": shot.no,
+                "type": shot.type,
+                "duration": shot.duration,
+                "speaker": shot.speaker,
+                "speaker_name": shot.speaker_name,
+                "line": shot.line,
+                "visual": shot.visual,
+                "lower_third": shot.lower_third,
+                "punchline": shot.punchline,
+                "sfx": shot.sfx,
+                "mood": shot.mood,
+                "title": shot.title,
+                "subtitle": shot.subtitle,
+            }
+        )
+    project = db.get(models.Project, episode.project_id)
+    data: Dict[str, Any] = {
+        "episode": {
+            "id": episode.id,
+            "no": episode.no,
+            "title": episode.title,
+            "target_duration": episode.target_duration,
+            "aspect": episode.aspect,
+            "resolution": episode.resolution,
+            "fps": episode.fps,
+            "status": episode.status,
+            "packaging": episode.packaging or {},
+        },
+        "assets": [
+            {
+                "id": asset.id,
+                "episode_id": asset.episode_id,
+                "role": asset.role,
+                "type": asset.type,
+                "name": asset.name,
+                "title": asset.title,
+                "persona": asset.persona,
+                "voice": asset.voice,
+                "accent_color": asset.accent_color,
+                "images": list(asset.images or []),
+                "locked": asset.locked,
+            }
+            for asset in assets
+        ],
+        "shots": shot_payload,
+        "total_duration": round(sum(float(shot.duration or 0.0) for shot in shots), 3),
+    }
+    if project is not None:
+        data["project"] = {
+            "id": project.id,
+            "name": project.name,
+            "format_id": project.format_id,
+            "aspect": project.aspect,
+        }
+        format_path = config.FORMATS_DIR / f"{project.format_id}.json"
+        if format_path.is_file():
+            try:
+                fmt = json.loads(format_path.read_text(encoding="utf-8"))
+                data["segments"] = fmt.get("segments") or []
+            except (OSError, json.JSONDecodeError):
+                logger.warning("读取格式模板失败: %s", format_path)
+
+    config.JOBS_TMP_DIR.mkdir(parents=True, exist_ok=True)
+    episode_path = config.JOBS_TMP_DIR / f"{job.id}_episode.json"
+    episode_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    return episode_path
 
 
 def run_render_job(db, job: models.Job) -> None:
@@ -544,13 +630,14 @@ def run_render_job(db, job: models.Job) -> None:
     episode.progress = max(float(episode.progress or 0.0), 1.0)
     db.commit()
 
+    episode_spec_path = _serialize_episode(db, episode, job)
     cmd = [
         sys.executable,
         "-m",
         "pipeline.cli",
         "render",
         "--episode",
-        _episode_arg(episode),
+        str(episode_spec_path),
         "--workdir",
         str(rel_workdir).replace("\\", "/"),
         "--out",

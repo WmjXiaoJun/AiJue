@@ -23,6 +23,27 @@ from . import characters, config, fonts, utils
 LOG = logging.getLogger("pipeline")
 
 CHARACTER_SHOT_TYPES = ("host_to_camera", "shot_reverse", "reaction", "guest_intro")
+
+# 台本→分镜契约（contract/SCRIPT_FORMAT.md）的 Shot.type 与现有类型的兼容映射：
+# - talking_head（对白）/ narration（旁白/独白）按主持人说话镜头处理
+# - 其余 unknown 保持原样（走文字卡兜底，向后兼容）
+SHOT_TYPE_ALIASES = {
+    "talking_head": "host_to_camera",
+    "dialogue": "host_to_camera",
+    "interview": "host_to_camera",
+    "narration": "host_to_camera",
+    "voiceover": "host_to_camera",
+    "monologue": "host_to_camera",
+    "reverse": "shot_reverse",
+}
+
+
+def normalize_shot_type(value) -> str:
+    """把台本生成的新镜头类型归一化到现有视觉类型（空类型默认 host_to_camera）。"""
+    key = str(value or "").strip().lower()
+    if not key:
+        return "host_to_camera"
+    return SHOT_TYPE_ALIASES.get(key, key)
 CARD_MONTAGE_TYPES = ("title_card", "end_card")
 PIP_TYPES = ("meme_card", "b_roll")
 
@@ -126,7 +147,7 @@ class _ShotCtx:
         self.dur = duration
         self.fps = fps
         self.texts = _TextFiles(scratch, utils.safe_slug(self.shot.get("id") or "shot", 12))
-        self.type = str(self.shot.get("type") or "host_to_camera")
+        self.type = normalize_shot_type(self.shot.get("type"))
         self.speaker_id = self.shot.get("speaker") or ""
         self.speaker = self._asset(self.speaker_id)
         self.speaker_name = str(self.shot.get("speaker_name") or self.speaker.get("name") or "")

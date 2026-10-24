@@ -15,11 +15,12 @@ import {
   IconBoard,
   IconChevronLeft,
   IconFilm,
+  IconPlus,
   IconScript,
   IconSpark,
   IconUsers,
 } from "./icons";
-import { Notice, ProgressBar, Spinner, StatusBadge } from "./ui";
+import { Field, Modal, Notice, ProgressBar, Spinner, StatusBadge } from "./ui";
 import type { TabKey } from "../App";
 import type { TabBaseProps } from "./tabs/types";
 
@@ -34,14 +35,28 @@ const TABS: { key: TabKey; label: string; en: string; icon: (props: { size?: num
 interface Props {
   project: Project;
   episode: Episode;
+  episodes: Episode[];
   tab: TabKey;
   offline: boolean;
   onTabChange: (tab: TabKey) => void;
   onBack: () => void;
   onStats: (stats: { activeJobs: number; cost: number }) => void;
+  onSwitchEpisode: (eid: string) => void;
+  onCreateEpisode: (body: { title?: string; target_duration?: number }) => Promise<Episode | null>;
 }
 
-export function Workspace({ project, episode: initialEpisode, tab, offline, onTabChange, onBack, onStats }: Props) {
+export function Workspace({
+  project,
+  episode: initialEpisode,
+  episodes,
+  tab,
+  offline,
+  onTabChange,
+  onBack,
+  onStats,
+  onSwitchEpisode,
+  onCreateEpisode,
+}: Props) {
   const notify = useToast();
   const [episode, setEpisode] = useState<Episode>(initialEpisode);
   const [shots, setShots] = useState<Shot[] | null>(null);
@@ -54,6 +69,24 @@ export function Workspace({ project, episode: initialEpisode, tab, offline, onTa
   const [loadError, setLoadError] = useState<string | null>(null);
   const [lastSync, setLastSync] = useState<number | null>(null);
   const [selectedShotId, setSelectedShotId] = useState<string | null>(null);
+  const [newEpisodeOpen, setNewEpisodeOpen] = useState(false);
+  const [newEpisodeTitle, setNewEpisodeTitle] = useState("");
+  const [newEpisodeDuration, setNewEpisodeDuration] = useState("296");
+  const [creatingEpisode, setCreatingEpisode] = useState(false);
+
+  const handleCreateEpisode = async () => {
+    setCreatingEpisode(true);
+    try {
+      const duration = Number(newEpisodeDuration);
+      const created = await onCreateEpisode({
+        title: newEpisodeTitle.trim() || undefined,
+        target_duration: Number.isFinite(duration) && duration >= 10 ? Math.round(duration) : undefined,
+      });
+      if (created) setNewEpisodeOpen(false);
+    } finally {
+      setCreatingEpisode(false);
+    }
+  };
 
   const eid = initialEpisode.id;
   const statsRef = useRef(onStats);
@@ -221,6 +254,31 @@ export function Workspace({ project, episode: initialEpisode, tab, offline, onTa
             <h2 className="ws-title">{episode.title}</h2>
             <StatusBadge status={episode.status} kind="episode" />
             <span className="ws-format">{templateLabel(project.format_id)}</span>
+            <div className="ws-episode-switch">
+              <select
+                className="select ws-episode-select"
+                value={episode.id}
+                onChange={(event) => onSwitchEpisode(event.target.value)}
+                title="切换剧集"
+              >
+                {(episodes.length ? episodes : [episode]).map((item) => (
+                  <option key={item.id} value={item.id}>
+                    第 {String(item.no || 1).padStart(3, "0")} 期 · {item.title}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={() => {
+                  setNewEpisodeTitle("");
+                  setNewEpisodeDuration(String(episode.target_duration || 296));
+                  setNewEpisodeOpen(true);
+                }}
+              >
+                <IconPlus size={14} /> 新建剧集
+              </button>
+            </div>
           </div>
           <div className="ws-meta">
             <span>第 {String(episode.no || 1).padStart(3, "0")} 期</span>
@@ -323,6 +381,45 @@ export function Workspace({ project, episode: initialEpisode, tab, offline, onTa
           </>
         )}
       </div>
+
+      <Modal
+        open={newEpisodeOpen}
+        onClose={() => setNewEpisodeOpen(false)}
+        title="新建剧集"
+        subtitle="创建后自动切换到新剧集，台本 / 分镜从空开始"
+        size="sm"
+        footer={
+          <>
+            <button type="button" className="btn btn-ghost" onClick={() => setNewEpisodeOpen(false)} disabled={creatingEpisode}>
+              取消
+            </button>
+            <button type="button" className="btn btn-primary" onClick={() => void handleCreateEpisode()} disabled={creatingEpisode}>
+              {creatingEpisode ? <Spinner size={14} /> : <IconPlus size={15} />}
+              {creatingEpisode ? "创建中…" : "创建并切换"}
+            </button>
+          </>
+        }
+      >
+        <div className="form-stack">
+          <Field label="剧集标题" hint="留空则由后端自动命名">
+            <input
+              className="input"
+              value={newEpisodeTitle}
+              onChange={(event) => setNewEpisodeTitle(event.target.value)}
+              placeholder="留空自动命名"
+              maxLength={40}
+            />
+          </Field>
+          <Field label="目标时长（秒）" hint="60–90 秒适合快速验证；完整圆桌约 296 秒">
+            <input
+              className="input"
+              value={newEpisodeDuration}
+              onChange={(event) => setNewEpisodeDuration(event.target.value.replace(/[^0-9]/g, ""))}
+              inputMode="numeric"
+            />
+          </Field>
+        </div>
+      </Modal>
 
       <ShotDrawer
         shot={selectedShot}

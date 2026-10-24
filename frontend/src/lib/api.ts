@@ -10,10 +10,12 @@ import type {
   Health,
   Job,
   NewAsset,
+  NewShot,
   Project,
   Settings,
   Shot,
   ShotVersion,
+  StoryboardResult,
 } from "../types";
 
 const RAW_BASE = (import.meta.env.VITE_API_BASE || "").trim();
@@ -85,9 +87,11 @@ export const api = {
   createProject: (body: { name: string; format_id: string; aspect?: string }) =>
     request<Project>("/projects", { method: "POST", body: JSON.stringify(body) }),
   episodes: (pid: string) => request<Episode[]>("/projects/" + pid + "/episodes"),
+  createEpisode: (pid: string, body: { title?: string; target_duration?: number } = {}) =>
+    request<Episode>("/projects/" + pid + "/episodes", { method: "POST", body: JSON.stringify(body) }),
 
   episode: (eid: string) => request<Episode>("/episodes/" + eid),
-  patchEpisode: (eid: string, body: { title?: string; target_duration?: number }) =>
+  patchEpisode: (eid: string, body: { title?: string; target_duration?: number; script?: string }) =>
     request<Episode>("/episodes/" + eid, { method: "PATCH", body: JSON.stringify(body) }),
 
   assets: (eid: string) => request<Asset[]>("/episodes/" + eid + "/assets"),
@@ -97,6 +101,9 @@ export const api = {
     request<Asset>("/assets/" + aid, { method: "PATCH", body: JSON.stringify(body) }),
 
   shots: (eid: string) => request<Shot[]>("/episodes/" + eid + "/shots"),
+  createShot: (eid: string, body: NewShot) =>
+    request<Shot>("/episodes/" + eid + "/shots", { method: "POST", body: JSON.stringify(body) }),
+  deleteShot: (sid: string) => request<{ ok?: boolean } | void>("/shots/" + sid, { method: "DELETE" }),
   patchShot: (sid: string, body: { line?: string; duration?: number; status?: string; visual?: string; punchline?: string }) =>
     request<Shot>("/shots/" + sid, { method: "PATCH", body: JSON.stringify(body) }),
   generateShot: (sid: string, params?: Record<string, unknown>) =>
@@ -105,8 +112,11 @@ export const api = {
   selectVersion: (sid: string, vid: string) =>
     request<Shot>("/shots/" + sid + "/versions/" + vid + "/select", { method: "POST", body: "{}" }),
 
-  generateStoryboard: (eid: string) =>
-    request<{ created: number }>("/episodes/" + eid + "/storyboard/generate", { method: "POST", body: "{}" }),
+  generateStoryboard: (eid: string, force = false) =>
+    request<StoryboardResult>("/episodes/" + eid + "/storyboard/generate", {
+      method: "POST",
+      body: JSON.stringify({ force }),
+    }),
   render: (eid: string) => request<Job>("/episodes/" + eid + "/render", { method: "POST", body: "{}" }),
 
   jobs: (params: { episode_id?: string; type?: string; status?: string } = {}) =>

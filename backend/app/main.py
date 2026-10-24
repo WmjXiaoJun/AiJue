@@ -25,13 +25,23 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from . import character_files, concept_files, config, jobs, models, schemas, seed
+from . import character_files, concept_files, config, jobs, models, schemas, script_parser, seed
 from .db import SessionLocal, get_db, init_db
 
 logger = logging.getLogger(__name__)
 
 VERSION = config.VERSION
 SHOT_STATUSES = {"pending", "queued", "generating", "ready", "failed"}
+SHOT_TYPES = {
+    "title_card",
+    "host_to_camera",
+    "guest_intro",
+    "shot_reverse",
+    "reaction",
+    "b_roll",
+    "meme_card",
+    "end_card",
+}
 ASSET_ROLES = {"host", "guest"}
 ASSET_TYPES = {"character", "scene", "prop", "style"}
 STYLE_PRESETS = {"3d_toon", "3d_cel", "2d_cel", "2d_paint", "anime", "guoman"}
@@ -282,6 +292,96 @@ def _create_skeleton_shots(db: Session, episode: models.Episode) -> int:
 
 
 # --------------------------------------------------------------------------- #
+# 台本 -> 分镜（contract/SCRIPT_FORMAT.md）
+# --------------------------------------------------------------------------- #
+def _episode_character_assets(db: Session, episode: models.Episode):
+    return (
+        db.query(models.Asset)
+        .filter(
+            models.Asset.episode_id == episode.id,
+            models.Asset.type == "character",
+        )
+        .order_by(models.Asset.created_at.asc())
+        .all()
+    )
+
+
+def _episode_characters(db: Session, episode: models.Episode):
+    return (
+        db.query(models.Character)
+        .filter(models.Character.project_id == episode.project_id)
+        .order_by(models.Character.created_at.asc())
+        .all()
+    )
+
+
+def _build_script_shots(db: Session, episode: models.Episode, script: str) -> int:
+    """按台本解析生成镜头（不 commit；调用方负责统计/提交）。"""
+    assets = _episode_character_assets(db, episode)
+    characters = _episode_characters(db, episode)
+    payloads = script_parser.build_shots(episode.title, script, assets, characters)
+    for payload in payloads:
+        db.add(models.Shot(id=models.new_id("s"), episode_id=episode.id, **payload))
+    db.flush()
+    return len(payloads)
+
+
+def _delete_all_shots(db: Session, episode_id: str) -> int:
+    shots = db.query(models.Shot).filter(models.Shot.episode_id == episode_id).all()
+    for shot in shots:
+        db.delete(shot)
+    db.flush()
+    return len(shots)
+
+
+def _reindex_shots(db: Session, episode_id: str) -> None:
+    """按当前顺序重排 no 为 1..N（删除/追加后调用）。"""
+    shots = (
+        db.query(models.Shot)
+        .filter(models.Shot.episode_id == episode_id)
+        .order_by(models.Shot.no.asc(), models.Shot.id.asc())
+        .all()
+    )
+    for index, shot in enumerate(shots, start=1):
+        if shot.no != index:
+            shot.no = index
+    db.flush()
+
+
+def _refresh_episode_shot_stats(db: Session, episode: models.Episode) -> None:
+    jobs._refresh_episode_stats(db, episode)
+
+
+def _copy_episode_assets(
+    db: Session, source_episode: models.Episode, target_episode: models.Episode
+) -> int:
+    """把源集资产复制到目标集（角色 name/title/persona/voice/images 等一并复制）。"""
+    source_assets = (
+        db.query(models.Asset)
+        .filter(models.Asset.episode_id == source_episode.id)
+        .order_by(models.Asset.created_at.asc())
+        .all()
+    )
+    for asset in source_assets:
+        db.add(
+            models.Asset(
+                id=models.new_id("asset"),
+                episode_id=target_episode.id,
+                role=asset.role,
+                type=asset.type,
+                name=asset.name,
+                title=asset.title,
+                persona=asset.persona,
+                voice=asset.voice,
+                accent_color=asset.accent_color,
+                images=list(asset.images or []),
+                locked=asset.locked,
+            )
+        )
+    return len(source_assets)
+
+
+# --------------------------------------------------------------------------- #
 # 基础
 # --------------------------------------------------------------------------- #
 @router.get("/health", response_model=schemas.HealthOut)
@@ -358,6 +458,79 @@ def list_project_episodes(pid: str, db: Session = Depends(get_db)):
     if changed:
         db.commit()
     return episodes
+
+
+@router.post("/projects/{pid}/episodes", response_model=schemas.EpisodeOut)
+def create_episode(
+    pid: str,
+    payload: Optional[schemas.EpisodeCreate] = None,
+    db: Session = Depends(get_db),
+):
+    """创建下一集（no 自增，draft，默认继承项目画幅/时长）。"""
+    project = _get_or_404(db, models.Project, pid, "项目")
+    setting = seed.get_settings(db)
+    fmt = _load_format(project.format_id)
+    max_no = (
+        db.query(func.max(models.Episode.no))
+        .filter(models.Episode.project_id == pid)
+        .scalar()
+        or 0
+    )
+    no = int(max_no) + 1
+    last = (
+        db.query(models.Episode)
+        .filter(models.Episode.project_id == pid)
+        .order_by(models.Episode.no.desc())
+        .first()
+    )
+    target_duration = (
+        int(payload.target_duration)
+        if payload is not None and payload.target_duration
+        else int(
+            (last.target_duration if last is not None else None)
+            or fmt.get("target_duration")
+            or 296
+        )
+    )
+    title = (
+        payload.title.strip()
+        if payload is not None and payload.title and payload.title.strip()
+        else f"{project.name} · 第 {no} 期"
+    )
+    no_copy_assets = bool(payload.no_copy_assets) if payload is not None else False
+    copy_from = payload.copy_assets_from if payload is not None else None
+    source_episode: Optional[models.Episode] = None
+    if not no_copy_assets:
+        if copy_from:
+            source_episode = _get_or_404(db, models.Episode, copy_from, "源集")
+            if source_episode.project_id != pid:
+                raise HTTPException(status_code=400, detail="copy_assets_from 必须是同一项目下的集")
+        else:
+            source_episode = last
+
+    episode = models.Episode(
+        id=models.new_id("ep"),
+        project_id=pid,
+        no=no,
+        title=title,
+        target_duration=target_duration,
+        status="draft",
+        progress=0.0,
+        shots_total=0,
+        shots_done=0,
+        cost=0.0,
+        aspect=project.aspect,
+        resolution=(last.resolution if last is not None else setting.resolution) or "1280x720",
+        fps=int((last.fps if last is not None else setting.fps) or 25),
+        packaging=fmt.get("packaging") or {},
+        script="",
+    )
+    db.add(episode)
+    db.flush()
+    if source_episode is not None:
+        _copy_episode_assets(db, source_episode, episode)
+    db.commit()
+    return episode
 
 
 @router.get("/episodes/{eid}", response_model=schemas.EpisodeOut)
@@ -951,6 +1124,88 @@ def patch_shot(sid: str, payload: schemas.ShotUpdate, db: Session = Depends(get_
     return shot
 
 
+@router.post("/episodes/{eid}/shots", response_model=schemas.ShotOut)
+def append_shot(
+    eid: str,
+    payload: Optional[schemas.ShotCreateRequest] = None,
+    db: Session = Depends(get_db),
+):
+    """追加一个镜头（no 顺延，必要时重排）。"""
+    episode = _get_or_404(db, models.Episode, eid, "集")
+    data = payload.model_dump(exclude_unset=True) if payload is not None else {}
+    shot_type = str(data.get("type") or "host_to_camera")
+    if shot_type not in SHOT_TYPES:
+        raise HTTPException(status_code=400, detail=f"type 只能是 {sorted(SHOT_TYPES)}")
+    line = str(data.get("line") or "")
+    visual = str(data.get("visual") or "")
+    speaker_name = str(data.get("speaker_name") or "").strip()
+    duration = data.get("duration")
+    if duration is None:
+        duration = script_parser.clamp_duration(line or visual)
+    duration = max(0.5, min(60.0, float(duration)))
+    speaker_id = None
+    display_name = speaker_name
+    if speaker_name:
+        speaker_id, display_name = script_parser.match_speaker(
+            speaker_name,
+            _episode_character_assets(db, episode),
+            _episode_characters(db, episode),
+        )
+    max_no = (
+        db.query(func.max(models.Shot.no))
+        .filter(models.Shot.episode_id == eid)
+        .scalar()
+        or 0
+    )
+    shot = models.Shot(
+        id=models.new_id("s"),
+        episode_id=eid,
+        segment_id="custom",
+        no=int(max_no) + 1,
+        type=shot_type,
+        duration=round(float(duration), 2),
+        speaker=speaker_id,
+        speaker_name=display_name or speaker_name,
+        line=line,
+        visual=visual,
+        lower_third=None,
+        punchline="",
+        sfx="",
+        mood="",
+        status="pending",
+        selected_version_id=None,
+        title=None,
+        subtitle=None,
+    )
+    db.add(shot)
+    db.flush()
+    _reindex_shots(db, eid)
+    _refresh_episode_shot_stats(db, episode)
+    db.commit()
+    return shot
+
+
+@router.delete("/shots/{sid}", response_model=schemas.ShotDeleteResult)
+def delete_shot(sid: str, db: Session = Depends(get_db)):
+    """删除镜头并重排剩余镜头 no。"""
+    shot = _get_or_404(db, models.Shot, sid, "镜头")
+    episode_id = shot.episode_id
+    db.delete(shot)
+    db.flush()
+    _reindex_shots(db, episode_id)
+    episode = db.get(models.Episode, episode_id)
+    if episode is not None:
+        _refresh_episode_shot_stats(db, episode)
+    db.commit()
+    total = (
+        db.query(func.count(models.Shot.id))
+        .filter(models.Shot.episode_id == episode_id)
+        .scalar()
+        or 0
+    )
+    return {"ok": True, "deleted": sid, "shots_total": int(total)}
+
+
 @router.post("/shots/{sid}/generate", response_model=schemas.JobOut)
 def generate_shot(
     sid: str,
@@ -994,12 +1249,30 @@ def select_shot_version(sid: str, vid: str, db: Session = Depends(get_db)):
 # 分镜 / 渲染
 # --------------------------------------------------------------------------- #
 @router.post("/episodes/{eid}/storyboard/generate", response_model=schemas.StoryboardResult)
-def generate_storyboard(eid: str, db: Session = Depends(get_db)):
+def generate_storyboard(
+    eid: str,
+    payload: Optional[schemas.StoryboardGenerateRequest] = None,
+    db: Session = Depends(get_db),
+):
+    """台本 -> 分镜；script 为空时回退旧模板骨架。force=true 时重建。"""
     episode = _get_or_404(db, models.Episode, eid, "集")
+    force = bool(payload.force) if payload is not None else False
     existing = db.query(models.Shot).filter(models.Shot.episode_id == eid).count()
-    if existing:
+    if existing and not force:
         return {"created": 0}
-    return {"created": _create_skeleton_shots(db, episode)}
+    if existing and force:
+        _delete_all_shots(db, eid)
+    script = str(episode.script or "")
+    if script.strip():
+        created = _build_script_shots(db, episode, script)
+    else:
+        created = _create_skeleton_shots(db, episode)
+    episode.shots_done = 0
+    episode.shots_total = created
+    episode.progress = 0.0
+    _refresh_episode_shot_stats(db, episode)
+    db.commit()
+    return {"created": created}
 
 
 @router.post("/episodes/{eid}/render", response_model=schemas.JobOut)

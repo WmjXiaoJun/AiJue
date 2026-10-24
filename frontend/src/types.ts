@@ -25,7 +25,36 @@ export interface Episode {
   shots_done: number;
   cost: number;
   render_url?: string | null;
+  /** 台本（contract/SCRIPT_FORMAT.md），空字符串表示未填 */
+  script?: string | null;
+  aspect?: string | null;
+  resolution?: string | null;
+  fps?: number | null;
   created_at: string;
+}
+
+/** 台本 → 分镜 生成结果（后端可选返回 segments 摘要） */
+export interface StoryboardSegmentSummary {
+  segment_id?: string;
+  name?: string;
+  count?: number;
+  duration?: number;
+}
+
+export interface StoryboardResult {
+  created: number;
+  segments?: StoryboardSegmentSummary[] | Record<string, number>;
+  total_duration?: number;
+}
+
+export interface NewShot {
+  type?: string;
+  line?: string;
+  duration?: number;
+  speaker?: string;
+  speaker_name?: string;
+  visual?: string;
+  punchline?: string;
 }
 
 export interface Asset {

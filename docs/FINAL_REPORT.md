@@ -258,3 +258,23 @@ FastAPI (8090) ── SQLite
 - 冒烟：SDXL 概念图 14s；IP-Adapter 一致性 3 视图 38.4s；本地 H3 i2v 119s（768×768/5.167s/含音轨）；1,442 节点可用；8090/8188 均 200。
 - 提示：KJNodes triton 可选缺失（不影响）；回滚 tag pre-update-20261024（核心+4 节点）。
 - 详见 docs/COMFYUI_UPGRADE_2026-10-24.md。
+## 22. 台本驱动闭环（产品化，2026-10-24 晚）
+- 背景：此前分镜是格式模板骨架（lines 为空），用户台本进不来；本轮补齐「写台本 → 生成分镜 → 渲染成片」自服务链路。
+- 后端：Episode.script（含 SQLite 迁移）；POST /projects/{pid}/episodes 新建剧集；PATCH /episodes 保存台本；POST /storyboard/generate {force} 从台本解析分镜（对白/旁白/括号动作 reaction/未知说话人回退/自动片头片尾/时长 clamp）；POST /episodes/{eid}/shots 追加、DELETE /shots/{sid} 删除重排；render 改为序列化实际集（不再硬编码 demo JSON）。
+- 台本格式契约：contract/SCRIPT_FORMAT.md。
+- E2E：demo 项目第 2 集 ep_e1015494fa（title「AI 做的综艺，观众看得出来吗？」，Lead 定稿 434 字台本）→ 21 分镜（title 1 / host 6 / reverse 11 / reaction 2 / end 1），storyboard 总时长 75.95s → 渲染 job_3591291c37 done 24s。
+  - 成片：outputs/episodes/ep_e1015494fa/final.mp4，10,406,670 B，75.95s / 1280×720 / 25fps / 1898 帧 / h264+aac；blackdetect 0；17/17 台词 TTS 音色与资产一致；21/21 字幕与分镜一致；21/21 镜头角色覆盖。
+  - 抽帧：outputs/episodes/ep_e1015494fa/frames_verify/（laozhou/ali/dawei/characters_sheet/title/end + verify.json）。
+- 前端：编剧间台本编辑（读写/保存/示例/从台本生成分镜）、新建剧集、分镜添加/删除/编辑；截图 docs/screenshots/32_script_editor.png、33_script_storyboard.png。
+- 测试：backend 96 passed（新增 tests/test_script.py）；pipeline 40 passed（新增台本 type 映射回归）。
+### 22.1 前端与全链路截图
+- 台本编辑+保存：docs/screenshots/32_script_editor.png
+- 从台本生成分镜（20 镜 / 63.7s，分段摘要）：docs/screenshots/33_script_storyboard.png
+- 分镜增删（二次确认+镜号重排）：docs/screenshots/34_shot_edit.png
+- 新建剧集：docs/screenshots/35_create_episode.png
+- 说明：新建剧集默认继承项目最新一集的角色资产（backend 支持 copy_assets_from/no_copy_assets），保证新集可直接渲染。
+### 22.2 新建剧集资产继承与 ep_003 全链路
+- POST /projects/{pid}/episodes 默认从项目最新一集继承角色资产（copy_assets_from/no_copy_assets 可选；跨项目 400）；台本解析的 speaker 绑定到新集自己的资产（不再指向源集）。
+- ep_003（ep_e6a182d7d1「AI 剪辑师会抢活吗？」）：补 3 资产 + 台本 force 重建 20 镜/63.7s → 渲染 job_e94dc161bb done 28s → outputs/episodes/ep_e6a182d7d1/final.mp4（8,701,439 B）63.7s / 1280×720 / 25fps / 1592 帧 / blackdetect 0 / 16/16 TTS 音色 / 20/20 字幕 / 20/20 角色画面。
+- 三集产物：ep_001 299s / ep_002 75.95s / ep_003 63.7s，均 API 渲染 + 自动验收。
+- 测试：backend 101 passed（新增资产继承用例）；pipeline 40 passed。

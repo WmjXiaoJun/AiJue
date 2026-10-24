@@ -47,6 +47,7 @@ function Shell() {
   const [offline, setOffline] = useState(false);
   const [booting, setBooting] = useState(true);
   const [view, setView] = useState<ViewState>({ mode: "projects" });
+  const [episodes, setEpisodes] = useState<Episode[] | null>(null);
   const [tab, setTab] = useState<TabKey>("script");
   const [modal, setModal] = useState<null | "settings" | "templates" | "newProject">(null);
   const [taskStats, setTaskStats] = useState<{ activeJobs: number; cost: number }>({ activeJobs: 0, cost: 0 });
@@ -75,6 +76,7 @@ function Shell() {
         if (route.eid) {
           const episode = await api.episode(route.eid);
           const project = list.find((item) => item.id === episode.project_id) || (await api.project(episode.project_id));
+          setEpisodes(await api.episodes(project.id));
           setView({ mode: "workspace", project, episode });
           setTab(route.tab);
         }
@@ -120,6 +122,7 @@ function Shell() {
         const episode = await api.episode(eid);
         const project =
           projects?.find((item) => item.id === episode.project_id) || (await api.project(episode.project_id));
+        setEpisodes(await api.episodes(project.id));
         setView({ mode: "workspace", project, episode });
         setTab(nextTab);
         setTaskStats({ activeJobs: 0, cost: episode.cost || 0 });
@@ -159,12 +162,54 @@ function Shell() {
           return;
         }
         const episode = episodes.find((item) => item.no === 1) || episodes[0];
+        setEpisodes(episodes);
         setView({ mode: "workspace", project, episode });
         setTab("script");
         setTaskStats({ activeJobs: 0, cost: episode.cost || 0 });
         window.location.hash = hashFor(episode.id, "script");
       } catch (err) {
         notify(errorText(err), "error");
+      }
+    },
+    [notify]
+  );
+
+  /** 切换剧集（同一项目内） */
+  const switchEpisode = useCallback(
+    async (eid: string) => {
+      const current = viewRef.current;
+      if (current.mode !== "workspace" || current.episode.id === eid) return;
+      try {
+        const episode = await api.episode(eid);
+        setEpisodes(await api.episodes(current.project.id));
+        setView({ mode: "workspace", project: current.project, episode });
+        setTab("script");
+        setTaskStats({ activeJobs: 0, cost: episode.cost || 0 });
+        window.location.hash = hashFor(eid, "script");
+      } catch (err) {
+        notify("切换剧集失败：" + errorText(err), "error");
+      }
+    },
+    [notify]
+  );
+
+  /** 新建剧集并切换过去 */
+  const createEpisode = useCallback(
+    async (body: { title?: string; target_duration?: number }): Promise<Episode | null> => {
+      const current = viewRef.current;
+      if (current.mode !== "workspace") return null;
+      try {
+        const episode = await api.createEpisode(current.project.id, body);
+        setEpisodes(await api.episodes(current.project.id));
+        setView({ mode: "workspace", project: current.project, episode });
+        setTab("script");
+        setTaskStats({ activeJobs: 0, cost: episode.cost || 0 });
+        window.location.hash = hashFor(episode.id, "script");
+        notify("已创建第 " + String(episode.no || 1).padStart(3, "0") + " 期，可开始写台本", "success");
+        return episode;
+      } catch (err) {
+        notify("新建剧集失败：" + errorText(err), "error");
+        return null;
       }
     },
     [notify]
@@ -181,6 +226,7 @@ function Shell() {
 
   const goHome = useCallback(() => {
     setView({ mode: "projects" });
+    setEpisodes(null);
     setTab("script");
     setTaskStats({ activeJobs: 0, cost: 0 });
     if (window.location.hash !== "#/projects") window.location.hash = "#/projects";
@@ -297,11 +343,14 @@ function Shell() {
               key={view.episode.id}
               project={view.project}
               episode={view.episode}
+              episodes={episodes || [view.episode]}
               tab={tab}
               offline={offline}
               onTabChange={changeTab}
               onBack={goHome}
               onStats={handleSynced}
+              onSwitchEpisode={switchEpisode}
+              onCreateEpisode={createEpisode}
             />
           )}
         </main>

@@ -82,6 +82,8 @@ class Episode(Base):
     resolution = Column(String(32), nullable=False, default="1280x720")
     fps = Column(Integer, nullable=False, default=25)
     packaging = Column(JSON, nullable=True)
+    # 用户台本（contract/SCRIPT_FORMAT.md，台本驱动分镜）
+    script = Column(Text, nullable=False, default="")
 
     project = relationship("Project", back_populates="episodes")
     assets = relationship(

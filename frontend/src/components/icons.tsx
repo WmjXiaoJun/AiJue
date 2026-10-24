@@ -200,6 +200,22 @@ export const IconCopy = make(
   </>
 );
 
+export const IconTrash = make(
+  <>
+    <path d="M4 6.5h16" />
+    <path d="M9 6.5V4.8A1.3 1.3 0 0110.3 3.5h3.4A1.3 1.3 0 0115 4.8v1.7" />
+    <path d="M6 6.5l.8 13a1.5 1.5 0 001.5 1.4h7.4a1.5 1.5 0 001.5-1.4l.8-13" />
+    <path d="M10 10.5v6M14 10.5v6" />
+  </>
+);
+
+export const IconEdit = make(
+  <>
+    <path d="M4 20h4.2L20 8.2a2 2 0 00-2.8-2.8L5.4 17.2 4 20z" />
+    <path d="M13.5 6.5l3.9 3.9" />
+  </>
+);
+
 export const IconFolder = make(
   <>
     <path d="M3.5 6.5A1.5 1.5 0 015 5h4.2l2 2.5H19a1.5 1.5 0 011.5 1.5V18a1.5 1.5 0 01-1.5 1.5H5A1.5 1.5 0 013.5 18V6.5z" />

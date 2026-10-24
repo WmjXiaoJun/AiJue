@@ -48,11 +48,21 @@ class EpisodeOut(ORMModel):
     aspect: str = "16:9"
     resolution: str = "1280x720"
     fps: int = 25
+    script: str = ""
+
+
+class EpisodeCreate(BaseModel):
+    title: Optional[str] = None
+    target_duration: Optional[int] = Field(default=None, ge=1)
+    # 资产继承：默认从项目最新一集复制；可指定源集或关闭
+    copy_assets_from: Optional[str] = None
+    no_copy_assets: bool = False
 
 
 class EpisodeUpdate(BaseModel):
     title: Optional[str] = None
     target_duration: Optional[int] = Field(default=None, ge=1)
+    script: Optional[str] = None
 
 
 # ---------------- Asset ----------------
@@ -303,6 +313,24 @@ class HealthOut(BaseModel):
 
 class StoryboardResult(BaseModel):
     created: int
+
+
+class StoryboardGenerateRequest(BaseModel):
+    force: bool = False
+
+
+class ShotCreateRequest(BaseModel):
+    type: Optional[str] = None
+    line: Optional[str] = None
+    duration: Optional[float] = Field(default=None, ge=0.5, le=60)
+    speaker_name: Optional[str] = None
+    visual: Optional[str] = None
+
+
+class ShotDeleteResult(BaseModel):
+    ok: bool = True
+    deleted: str
+    shots_total: int
 
 
 class CostItem(BaseModel):

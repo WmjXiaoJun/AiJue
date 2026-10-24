@@ -62,6 +62,9 @@ _MIGRATIONS = {
         "h3_portrait_url": "VARCHAR(400)",
         "h3_metaso_url": "VARCHAR(400)",
     },
+    "episodes": {
+        "script": "TEXT NOT NULL DEFAULT ''",
+    },
     "settings": {
         "h3_provider": "VARCHAR(16) NOT NULL DEFAULT 'local'",
         "metaso_base_url": "VARCHAR(300) NOT NULL DEFAULT 'https://metaso.cn/api/minimax'",
@@ -99,6 +102,12 @@ def migrate_columns() -> None:
                     "UPDATE characters SET concept_expressions = '{}' "
                     "WHERE concept_expressions IS NULL"
                 )
+            )
+    # 台本列老数据兜底
+    if "episodes" in tables:
+        with engine.begin() as connection:
+            connection.execute(
+                text("UPDATE episodes SET script = '' WHERE script IS NULL")
             )
     # 设置表新增列老数据兜底
     if "settings" in tables:

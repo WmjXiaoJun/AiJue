@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { api, errorText, mediaUrl } from "../../lib/api";
-import type { Character, Job, Shot } from "../../types";
+import type { Character, Job, NewShot, Shot } from "../../types";
 import {
   CHARACTER_STYLE_LABEL,
   SHOT_STATUS_LABEL,
@@ -16,7 +16,8 @@ import { useToast } from "../Toast";
 import type { TabBaseProps } from "./types";
 import { EmptyState, ProgressBar, SectionHead, Spinner, StatusBadge } from "../ui";
 import { CharacterAvatar } from "../CharacterAvatar";
-import { IconBoard, IconCheck, IconGrid, IconSpark, IconTable } from "../icons";
+import { ShotFormModal } from "../ShotFormModal";
+import { IconBoard, IconCheck, IconEdit, IconGrid, IconPlus, IconSpark, IconTable, IconTrash } from "../icons";
 
 interface Props extends TabBaseProps {
   jobByShot: Map<string, Job>;
@@ -33,7 +34,7 @@ const STATUS_FILTERS = [
   { key: "failed", label: "失败" },
 ];
 
-export function Storyboard({ assets, shots, jobByShot, characters, onChanged, onOpenShot }: Props) {
+export function Storyboard({ episode, assets, shots, jobByShot, characters, onChanged, onOpenShot }: Props) {
   const notify = useToast();
   const [viewMode, setViewMode] = useState<ViewMode>("table");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -41,6 +42,9 @@ export function Storyboard({ assets, shots, jobByShot, characters, onChanged, on
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [batchBusy, setBatchBusy] = useState(false);
   const [batchProgress, setBatchProgress] = useState({ done: 0, total: 0 });
+  const [showCreate, setShowCreate] = useState(false);
+  const [editingShot, setEditingShot] = useState<Shot | null>(null);
+  const [formBusy, setFormBusy] = useState(false);
 
   const assetMap = useMemo(() => new Map(assets.map((asset) => [asset.id, asset])), [assets]);
   const types = useMemo(() => Array.from(new Set(shots.map((shot) => shot.type))), [shots]);
@@ -148,6 +152,47 @@ export function Storyboard({ assets, shots, jobByShot, characters, onChanged, on
 
   const selectedCount = selected.size;
 
+  const submitCreate = async (body: NewShot) => {
+    setFormBusy(true);
+    try {
+      await api.createShot(episode.id, body);
+      notify("已添加镜头", "success");
+      setShowCreate(false);
+      onChanged();
+    } finally {
+      setFormBusy(false);
+    }
+  };
+
+  const submitEdit = async (body: NewShot) => {
+    if (!editingShot) return;
+    setFormBusy(true);
+    try {
+      await api.patchShot(editingShot.id, {
+        line: body.line,
+        duration: body.duration,
+        visual: body.visual,
+        punchline: body.punchline,
+      });
+      notify("镜头已更新", "success");
+      setEditingShot(null);
+      onChanged();
+    } finally {
+      setFormBusy(false);
+    }
+  };
+
+  const handleDelete = async (shot: Shot) => {
+    if (!window.confirm("删除镜头 #" + String(shot.no).padStart(3, "0") + "？删除后序号会自动重排。")) return;
+    try {
+      await api.deleteShot(shot.id);
+      notify("已删除镜头", "success");
+      onChanged();
+    } catch (err) {
+      notify("删除失败：" + errorText(err), "error");
+    }
+  };
+
   return (
     <div className="storyboard-view">
       <div className="sb-toolbar">
@@ -178,6 +223,9 @@ export function Storyboard({ assets, shots, jobByShot, characters, onChanged, on
               </option>
             ))}
           </select>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={() => setShowCreate(true)} title="手动添加镜头">
+            <IconPlus size={14} /> 添加镜头
+          </button>
           <div className="view-toggle">
             <button
               type="button"
@@ -222,7 +270,12 @@ export function Storyboard({ assets, shots, jobByShot, characters, onChanged, on
         <EmptyState
           icon={<IconBoard size={26} />}
           title="分镜台为空"
-          hint="先到编剧间点击「生成分镜」，把台本拆成镜头。"
+          hint="到编剧间点击「从台本生成分镜」，或手动添加一个镜头。"
+          action={
+            <button type="button" className="btn btn-outline" onClick={() => setShowCreate(true)}>
+              <IconPlus size={15} /> 添加镜头
+            </button>
+          }
         />
       ) : viewMode === "table" ? (
         <div className="sb-table-wrap panel">
@@ -236,6 +289,7 @@ export function Storyboard({ assets, shots, jobByShot, characters, onChanged, on
                 <th className="col-speaker">说话人</th>
                 <th className="col-line">台词 / 画面</th>
                 <th className="col-status">状态</th>
+                <th className="col-actions" />
               </tr>
             </thead>
             <tbody>
@@ -281,6 +335,26 @@ export function Storyboard({ assets, shots, jobByShot, characters, onChanged, on
                       {job && (job.status === "running" || job.status === "queued") && (
                         <ProgressBar value={job.progress} size="sm" label={Math.round(job.progress || 0) + "%"} />
                       )}
+                    </td>
+                    <td className="col-actions" onClick={(event) => event.stopPropagation()}>
+                      <span className="row-actions">
+                        <button
+                          type="button"
+                          className="row-action"
+                          title="编辑台词 / 时长"
+                          onClick={() => setEditingShot(shot)}
+                        >
+                          <IconEdit size={13} />
+                        </button>
+                        <button
+                          type="button"
+                          className="row-action row-action-danger"
+                          title="删除镜头"
+                          onClick={() => void handleDelete(shot)}
+                        >
+                          <IconTrash size={13} />
+                        </button>
+                      </span>
                     </td>
                   </tr>
                 );
@@ -358,12 +432,38 @@ export function Storyboard({ assets, shots, jobByShot, characters, onChanged, on
                     <i />
                     <span>{SHOT_TYPE_SHORT[shot.type] || shot.type}</span>
                   </div>
+                  <div className="shot-card-actions" onClick={(event) => event.stopPropagation()}>
+                    <button type="button" className="row-action" title="编辑台词 / 时长" onClick={() => setEditingShot(shot)}>
+                      <IconEdit size={12} /> 编辑
+                    </button>
+                    <button type="button" className="row-action row-action-danger" title="删除镜头" onClick={() => void handleDelete(shot)}>
+                      <IconTrash size={12} /> 删除
+                    </button>
+                  </div>
                 </div>
               </article>
             );
           })}
         </div>
       )}
+
+      <ShotFormModal
+        open={showCreate}
+        mode="create"
+        assets={assets}
+        busy={formBusy}
+        onClose={() => setShowCreate(false)}
+        onSubmit={submitCreate}
+      />
+      <ShotFormModal
+        open={!!editingShot}
+        mode="edit"
+        shot={editingShot}
+        assets={assets}
+        busy={formBusy}
+        onClose={() => setEditingShot(null)}
+        onSubmit={submitEdit}
+      />
     </div>
   );
 }

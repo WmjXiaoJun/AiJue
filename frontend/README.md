@@ -37,9 +37,9 @@ Vite + React 18 + TypeScript 的深色影棚风制片工作台。无 UI 框架�
 - `TopBar`：当前集面包屑、任务中心（进行中任务数）、费用、设置
 - `ProjectList`：项目卡片（封面渐变 / 期数 / 预算消耗 / 进入工作台）、新建项目
 - `Workspace`：剧集头部 + 五步 tab（本轮询 episode / jobs / shots，2s）
-  - 编剧间：按 segment 分组台词，节目模式/目标时长，生成分镜
+  - 编剧间：台本编辑器（读写 episode.script、保存/脏标记/未保存提示、示例一键填入）+ 从台本生成分镜 + 按段落分组的台词预览
   - 资产库：角色工坊（原创角色卡 / 详情抽屉 / 新建角色）+ 固定资产（主持/嘉宾/场景卡，声音、人设、锁定）
-  - 分镜台：表格/宫格切换、筛选、多选批量生成、点击打开右侧详情抽屉
+  - 分镜台：表格/宫格切换、筛选、多选批量生成、添加镜头 / 编辑台词时长 / 删除镜头（二次确认）、点击打开右侧详情抽屉
   - 生成台：任务列表（类型/状态/进度/费用/错误/重试）+ 镜头版本视频、选用
   - 成片房：渲染成片、进度、`<video>` 成片、费用汇总、包装配置
 - `ShotDrawer`：镜头详情 + 版本列表（`<video>` 预览 / 选用 / 生成新版本）
@@ -57,6 +57,11 @@ Vite + React 18 + TypeScript 的深色影棚风制片工作台。无 UI 框架�
   H3 动画播放使用 cache-bust 重新拉取最新概念图驱动视频；抽屉立绘优先 `Character.portrait_url`（后端切到 SDXL 概念立绘后自动生效）。
 - 成片导出（contract/EXPORT.md）：成片房「交付导出」面板 → `POST /episodes/{eid}/export {type:"capcut"}` → 轮询任务，
   展示产物路径、复制剪映草稿目录（`%LOCALAPPDATA%\JianyingPro\User Data\Projects\com.lveditor.draft`）与导入步骤。
+- 台本驱动（contract/SCRIPT_FORMAT.md）：编剧间台本 textarea 读写 `episode.script`（进入加载、脏标记、未保存离开提示），
+  保存 `PATCH /episodes/{eid} {script}`；空台本展示示例格式并支持一键填入；「从台本生成分镜」在有镜头时二次确认并以
+  `{force:true}` 覆盖，完成后展示 created 数与分段摘要并刷新分镜。剧集头部支持切换剧集 / 新建剧集
+  （`POST /projects/{pid}/episodes` 后自动切换）。分镜台支持添加镜头（`POST /episodes/{eid}/shots`：类型/说话人/台词/时长/画面）、
+  编辑台词时长（现有 `PATCH /shots/{sid}`）与删除镜头（`DELETE /shots/{sid}`，二次确认，后端自动重排镜号）。
 
 ## 数据与容错
 

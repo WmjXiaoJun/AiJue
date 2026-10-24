@@ -486,6 +486,39 @@ def test_fingerprint_includes_concept(tmp_path):
     assert fp1 and fp2 and fp1 != fp2
 
 
+def test_shot_type_aliases():
+    # 台本契约里的新类型映射到现有视觉类型
+    assert mock_shot.normalize_shot_type("talking_head") == "host_to_camera"
+    assert mock_shot.normalize_shot_type("Narration") == "host_to_camera"
+    assert mock_shot.normalize_shot_type("dialogue") == "host_to_camera"
+    assert mock_shot.normalize_shot_type("reaction") == "reaction"
+    assert mock_shot.normalize_shot_type("shot_reverse") == "shot_reverse"
+    assert mock_shot.normalize_shot_type("") == "host_to_camera"
+    assert mock_shot.normalize_shot_type("custom_visual") == "custom_visual"
+
+
+def test_shot_ctx_normalizes_script_types(tmp_path):
+    still = _write(tmp_path / "h3.png")
+    char = {"id": "laozhou", "name": "老周", "title": "主持人",
+            "accent_color": "#F5C518", "portrait": None,
+            "h3_video": None, "h3_portrait": still}
+    base = {"id": "s1", "duration": 5, "speaker": "host",
+            "speaker_name": "老周", "visual": "演播厅",
+            "line": "今天聊一个话题。"}
+    for stype in ("talking_head", "narration"):
+        ctx = mock_shot._ShotCtx(dict(base, type=stype), [], tmp_path, FONT_STUB,
+                                 1280, 720, 5.0, 25, char_map={"host": char})
+        assert ctx.type == "host_to_camera"
+        assert ctx.char_mode is True
+        assert ctx.compose() is not None
+    # 未知类型保持原样，不误判为角色画面（仍可走文字卡）
+    ctx2 = mock_shot._ShotCtx(dict(base, type="custom_visual"), [], tmp_path,
+                              FONT_STUB, 1280, 720, 5.0, 25,
+                              char_map={"host": char})
+    assert ctx2.type == "custom_visual"
+    assert ctx2.char_mode is False
+
+
 def test_shot_ctx_concept_media(tmp_path):
     portrait = tmp_path / "concept.png"
     portrait.write_bytes(b"x" * 2000)
