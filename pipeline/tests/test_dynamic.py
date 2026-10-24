@@ -209,9 +209,11 @@ def test_plan_for_shot_and_prompt():
     plan = sg.plan_for_shot({"type": "host_to_camera", "no": 2})
     assert plan["size"] == "Close-up" and plan["angle"] == "low-angle"
     prompt = sg.build_h3_prompt(plan, "audio_ref")
-    assert "One continuous Close-up shot" in prompt
-    assert "low-angle angle" in prompt and "low camera height" in prompt
-    assert "slow dolly-in" in prompt and "no pan, no zoom" in prompt
+    assert "One continuous close-up (head and shoulders) shot" in prompt
+    assert "low angle, looking slightly up" in prompt
+    assert "below eye-level (low camera position) camera height" in prompt
+    assert "slow dolly-in toward the face (translation only, no zoom)" in prompt
+    assert "only this movement, no zoom/pan mix" in prompt
     assert "Purpose: explain" in prompt
     assert "no text, no watermark" in prompt.lower()
     # shot.shot_plan 优先
@@ -221,6 +223,7 @@ def test_plan_for_shot_and_prompt():
                                             "light": "low-key practical"}})
     assert plan2["size"] == "Extreme Close-up"
     prompt2 = sg.build_h3_prompt(plan2, "fl2v")
+    assert "extreme close-up (face only)" in prompt2
     assert "zero camera movement" in prompt2
     assert "first frame" in prompt2 and "last frame" in prompt2
     for word in ("cinematic", "moody", "epic"):

@@ -353,3 +353,22 @@ FastAPI (8090) ── SQLite
 - 参考 OpenMontage 的 reviewer/checkpoint 与 edit-director Quality Gate 思路：先机械门禁（技术规格/黑帧/覆盖），再人审（情绪/节奏）。
 - 实测：ep_001 动态版、ep_002 动态版 QC ok=true（299s/75.95s，blackdetect 0，字幕/说话人/镜头数全过）；16 个模板验证片 QC 16/16 ok=true，报告落在各模板目录 qc_report.json。
 - 用法：python -m pipeline.qc --video <mp4> --episode-json <episode.json> --out <report.json>；可直接接入成片房渲染后的自动检查。
+## 29. H3 镜头语言可控性实测（OpenMontage ShotPlan → H3，2026-10-25）
+- 同一角色/音频/seed 下测 4 组 ShotPlan，证据 outputs/h3/shotplan_tests/（4 条 768×768×5.17s + compare_shotplan.png + compare_metrics.json + CONCLUSION.md）。
+
+| 组 | ShotPlan | 实测效果 | 量化（肤色占比 t0.5→2.58→4.72s） |
+|---|---|---|---|
+| A | medium / eye-level / static | ✅ 中景半身，构图稳定 | 15.3%→15.7%→15.9%（+0.6pp） |
+| B | close-up / low-angle / slow dolly-in | ✅ 特写 + 明显推近（低角度弱） | 17.5%→23.3%→30.3%（+12.8pp） |
+| C | wide / high-angle / slow push-in | ✅ 广角全身+影棚环境再推到中景（高角度弱） | 7.5%→8.1%→10.6% |
+| D | extreme close-up / static | ✅ 大特写充满画面 | 41.7%→41.4%→41.9%（稳定） |
+
+- 可控：景别（medium/close-up/大特写/**wide 可突破参考图半身构图，H3 自补全身+影棚环境**）、推近 dolly-in/push-in、static 锁构图、身份/画风稳定、口型开合+眨眼。
+- 弱控/不可控：low/high angle 几乎无效（需换俯/仰拍首帧）；横移/摇镜/升降不执行（默认轻微推近）；wide 环境由模型自编、与其他镜头不连续（建议单独首帧再 i2v）；大特写裁切位置由模型定（需精确时先 crop 首帧）；static 仍有轻微呼吸/头部微动。
+- 结论：ShotPlan 注入能实现「景别 + 推拉」的镜头语言差异化，角度需靠首帧构图；已把结论落到 contract/SHOT_PLAN_INJECTION.md 与 pipeline 实现。
+## 30. ShotPlan 注入 H3 动态镜头（镜头级差异化，2026-10-25）
+- 实现：pipeline/dynamic.py 为每镜生成 ShotPlan（优先 shot.shot_plan，否则 shot_grammar.plan_for_type(type, no%3)），按 OpenMontage 5-aspect 公式拼 prompt（身份锚点 + 景别/角度/高度/光线 + 运镜 + 目的），经 --prompt-file 传给 run_h3_ref；audio_ref/fl2v 都注入；meta 记录 plan/prompt_file/ref_strategy/h3_gen。
+- 参考图策略：close-up/reaction 从概念角色裁脸部特写（ref_strategy=face-closeup），medium 用画窗构图；H3 生成尺寸 audio_ref 1024×576、fl2v 768²。
+- 8 镜演示：outputs/shots_plan_demo/demo_final.mp4（43.76s / 1280×720 / 7.34MB / 10 镜：7 audio_ref + 1 fl2v + 2 卡）；QC ok=true；抽帧 docs/screenshots/52_shotplan_demo_sheet.png 可见 host 中近景/guest 特写/大特写/广角环境等景别差异。
+- H3 可控性实测（task-37）：景别（medium/close-up/extreme close-up/**wide 可突破参考图构图**）、dolly-in/push-in、static、身份锁定 = 可控；low/high angle、横移/摇镜、wide 环境连续性 = 弱控（需换首/尾帧构图解决）。详见 docs/H3_SHOTPLAN_FINDINGS.md 与 docs/screenshots/51_h3_shotplan_control.png。
+- 后续：将 ShotPlan 应用于 ep_001/002 全动态重渲（镜头差异化版）；按镜头关系选转场；wide 镜头单独首帧；接 lip-sync 精修。

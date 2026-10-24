@@ -107,22 +107,60 @@ SUBJECT_ANCHOR = (
     "anime cel-shaded art style."
 )
 
-# 运镜只能选一类（translation/rotation/lens/hybrid/stillness），禁止混用
+# 景别映射：采用 h3-comfy task-37 实测有效的描述（含构图范围）
+SIZE_PROMPTS = {
+    "Medium": "medium (waist-up)",
+    "Medium Close-up": "medium close-up (chest-up)",
+    "Close-up": "close-up (head and shoulders)",
+    "Extreme Close-up": "extreme close-up (face only)",
+    "Full": "full shot (full body)",
+    "Wide": "wide establishing shot, full body and studio space visible",
+    "Wide / Establishing": "wide establishing shot, full body and studio space visible",
+}
+
+# 机位角度：H3 对角度只有弱控制（task-37 结论），仍写入 prompt 供模型参考
+ANGLE_PROMPTS = {
+    "eye-level": "eye-level angle",
+    "low-angle": "low angle, looking slightly up at the subject, below eye-level",
+    "high-angle": "high angle, looking slightly down at the subject, above eye-level",
+    "over-the-shoulder": "over-the-shoulder angle",
+    "POV": "POV angle",
+}
+
+# 运镜只能选一类（translation/rotation/lens/hybrid/stillness），禁止混用；
+# task-37 实测 only 推近有效，其余类型记录为限制。
 MOVEMENT_PROMPTS = {
-    "static": "stillness: zero camera movement",
-    "slow dolly-in": "translation: slow dolly-in; no pan, no zoom",
-    "slow push-in": "translation: slow push-in; no pan, no zoom",
-    "static / micro-pan": "rotation: very slow micro-pan; no dolly, no zoom",
-    "pan": "rotation: slow pan; no dolly, no zoom",
-    "truck": "translation: slow truck; no pan, no zoom",
-    "zoom": "lens: slow zoom; no dolly, no pan",
-    "rack focus": "lens: slow rack focus; no dolly, no pan",
+    "static": "static camera, locked-off, zero camera movement",
+    "slow dolly-in": "slow dolly-in toward the face (translation only, no zoom)",
+    "slow push-in": "slow push-in (translation only, no zoom)",
+    "static / micro-pan": "very slow micro-pan (rotation only, no dolly, no zoom)",
+    "pan": "very slow pan (rotation only, no dolly, no zoom)",
+    "truck": "slow truck (translation only, no pan, no zoom)",
+    "zoom": "slow zoom (lens only, no dolly, no pan)",
+    "rack focus": "slow rack focus (lens only, no dolly, no pan)",
 }
 
 _ANGLE_HEIGHT = {
     "low-angle": "low", "high-angle": "high", "eye-level": "eye-level",
     "over-the-shoulder": "eye-level", "POV": "eye-level",
 }
+
+
+def _size_phrase(plan: dict) -> str:
+    size = str(plan.get("size") or "Medium Close-up")
+    return SIZE_PROMPTS.get(size, size)
+
+
+def _angle_phrase(plan: dict) -> str:
+    angle = str(plan.get("angle") or "eye-level")
+    return ANGLE_PROMPTS.get(angle, f"{angle} angle")
+
+
+def _height_phrase(plan: dict) -> str:
+    height = _height_for(plan)
+    return {"low": "below eye-level (low camera position)",
+            "high": "above eye-level (high camera position)",
+            "eye-level": "eye-level"}.get(height, height)
 
 
 def _height_for(plan: dict) -> str:
@@ -160,26 +198,28 @@ def plan_for_shot(shot: dict, index: int = 0) -> dict:
 def build_h3_prompt(plan: dict, mode: str = "audio_ref") -> str:
     """按 5-aspect 公式拼 H3 prompt（身份锚点 + 景别/角度/高度/光线 + 运镜 + 目的）。"""
     plan = plan or {}
-    size = str(plan.get("size") or "Medium Close-up")
-    angle = str(plan.get("angle") or "eye-level")
-    height = _height_for(plan)
+    size = _size_phrase(plan)
+    angle = _angle_phrase(plan)
+    height = _height_phrase(plan)
     light = str(plan.get("light") or "key + rim")
     movement = _movement_phrase(plan)
     purpose = str(plan.get("purpose") or "dialogue")
     if mode == "fl2v":
         action = (f"Starting from the first frame and ending at the last frame, "
-                  f"Subject 1 performs a continuous {size} shot, {angle} angle, "
+                  f"Subject 1 performs a continuous {size} shot, {angle}, "
                   f"{height} camera height, in a dark studio with {light}, with "
-                  f"camera movement {movement}. Subtle body movement, head turn and "
-                  f"expression change only; keep identity, framing and lighting "
-                  f"consistent from the first frame to the last frame.")
+                  f"camera movement {movement} (only this movement, no zoom/pan "
+                  f"mix). Subtle body movement, head turn and expression change "
+                  f"only; keep identity, framing and lighting consistent from the "
+                  f"first frame to the last frame.")
         motion = ("React naturally with subtle body and facial movement. "
                   "No text, no watermark.")
         soundscape = "overall_soundscape: quiet studio room tone, subtle cloth movement."
     else:
-        action = (f"One continuous {size} shot, {angle} angle, {height} camera "
+        action = (f"One continuous {size} shot, {angle}, {height} camera "
                   f"height, of Subject 1 speaking directly to the camera in a dark "
-                  f"studio with {light}. Camera: {movement}.")
+                  f"studio with {light}. Camera: {movement} (only this movement, "
+                  f"no zoom/pan mix).")
         motion = ("Lips move naturally in sync with the reference speech audio; subtle "
                   "blinking, eyebrow movement and small head nods. Keep identity, hair, "
                   "outfit and lighting consistent with the reference image; only the "

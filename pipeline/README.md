@@ -311,6 +311,37 @@ python -m pipeline.cli render --episode <episode.json> --workdir <dir> --out fin
 - 测试：`python -m pytest pipeline/tests/test_dynamic.py -q`（每镜 TTS wav/xfade 时长保持/
   whoosh 音轨/动态缓存与模式/无 CLI 回退/动态模式端到端）。
 
+## ShotPlan 注入（contract/SHOT_PLAN_INJECTION.md）
+
+动态镜头不再用统一中性 prompt：每镜取 ShotPlan（`pipeline/shot_grammar.py`）注入 H3，产生
+差异化景别/机位/运镜：
+
+- **来源**：优先 `shot.shot_plan`；否则 `shot_grammar.plan_for_type(type, variant=shot.no%3)`。
+  字段：size/angle/height/movement/light/purpose/transition。
+- **Prompt 组装**（`shot_grammar.build_h3_prompt`）：5-aspect 公式 =
+  subject_definitions（身份锚点）+ summary（景别/角度/高度/光线 + 运镜 + 目的 + 口型/微动作 +
+  no text/watermark）+ overall_soundscape + non_diegetic_music。运镜只选一类
+  （translation/rotation/lens/stillness），禁止 zoom/pan 混用；fl2v 额外写“从首帧到末帧的运镜 +
+  身份/构图稳定”。
+- **H3 CLI**：`run_h3_ref.py --prompt-file <workdir>/dynamic/prompts/{sid}.txt`（fl2v/audio_ref 都注入）。
+- **参考图构图**：close-up/reaction 从角色画窗再裁脸部特写（`face-closeup`）；medium 用画窗
+  （`window-medium`）；wide/full H3 ref2va 不支持拉远，记录 `wide-limitation(window-fallback)`；
+  b_roll 用中心方形。meta 记录 plan/prompt/ref_image/ref_strategy。
+- **可控性结论（h3-comfy task-37 实测，同角色/同音频/同 seed）**：
+  - ✅ 景别（medium / close-up / extreme close-up / wide establishing 可生成全身+环境）、
+    推近（slow dolly-in / slow push-in 有明显效果）、static（锁定构图）、身份/画风/口型稳定；
+  - ⚠️ 低/高机位角度只有弱暗示（想真正俯仰需换首帧构图）；横移/摇镜/升降/变焦基本不按指令；
+    wide 会引入模型自编环境（与其他镜头可能不连续）；极端特写裁切位置由模型决定。
+  - 因此 pipeline prompt 采用 task-37 建议措辞：size 用 `medium (waist-up)` /
+    `close-up (head and shoulders)` / `extreme close-up (face only)` /
+    `wide establishing shot, full body and studio space visible`；movement 用
+    `slow dolly-in toward the face (translation only, no zoom)` / `static camera, locked-off,
+    zero camera movement`。
+- **验收 demo**：`outputs/shots_plan_demo/`（ep_002 选 8 镜 host/guest/reaction + 片头/片尾，
+  43.77s；相邻镜头景别/角度不同；demo_final.mp4 + clip.mp4 + frames/ + verify.json）。
+- 测试：`pipeline/tests/test_dynamic.py` 覆盖 plan 来源/fallback、prompt 5-aspect 内容、
+  shot_plan 覆盖、fl2v 首尾帧描述、meta plan/prompt/ref 记录。
+
 ## 已知限制 / 未做
 
 - **画面 = 原创角色立绘 + 程序化演播厅合成**：角色来自角色工坊 `outputs/characters/` 的
