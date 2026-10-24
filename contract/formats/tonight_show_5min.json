@@ -1,0 +1,78 @@
+{
+  "id": "tonight_show_5min",
+  "name": "美式深夜秀 · 5 分钟",
+  "aspect": "16:9",
+  "target_duration": 312,
+  "packaging": {
+    "intro": "logo_sting",
+    "outro": "end_card",
+    "lower_third_style": "zaopianju_yellow",
+    "transition": "hard_cut",
+    "bgm": "talk_light",
+    "subtitle_style": "variety"
+  },
+  "segments": [
+    {
+      "id": "open",
+      "name": "片头",
+      "duration": 6,
+      "pattern": [
+        "title_card"
+      ]
+    },
+    {
+      "id": "monologue",
+      "name": "开场独白",
+      "duration": 50,
+      "pattern": [
+        "host_to_camera",
+        "reaction",
+        "meme_card",
+        "b_roll"
+      ]
+    },
+    {
+      "id": "guest_entrance",
+      "name": "嘉宾登场",
+      "duration": 38,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction"
+      ]
+    },
+    {
+      "id": "interview",
+      "name": "明星访谈",
+      "duration": 90,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "b_roll",
+        "meme_card"
+      ]
+    },
+    {
+      "id": "game",
+      "name": "互动游戏 / 音乐表演",
+      "duration": 80,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "b_roll"
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "道别与预告",
+      "duration": 48,
+      "pattern": [
+        "host_to_camera",
+        "reaction",
+        "end_card"
+      ]
+    }
+  ]
+}

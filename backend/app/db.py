@@ -83,6 +83,12 @@ _MIGRATIONS = {
         "localize_langs": "TEXT",
         "localize_translator": "VARCHAR(16)",
         "localize_voices": "TEXT",
+        "upload_post_username": "VARCHAR(120)",
+        "upload_post_enabled": "BOOLEAN NOT NULL DEFAULT 0",
+        "upload_post_platforms": "TEXT",
+        "upload_post_youtube_privacy_status": "VARCHAR(16)",
+        "upload_post_youtube_made_for_kids": "BOOLEAN NOT NULL DEFAULT 0",
+        "publish_brand_title": "VARCHAR(200)",
     },
 }
 
@@ -167,6 +173,37 @@ def migrate_columns() -> None:
                 text(
                     "UPDATE settings SET localize_voices = '{}' "
                     "WHERE localize_voices IS NULL OR localize_voices = ''"
+                )
+            )
+            connection.execute(
+                text("UPDATE settings SET upload_post_username = '' WHERE upload_post_username IS NULL")
+            )
+            connection.execute(
+                text("UPDATE settings SET upload_post_enabled = 0 WHERE upload_post_enabled IS NULL")
+            )
+            connection.execute(
+                text(
+                    "UPDATE settings SET upload_post_platforms = '"
+                    + '["youtube","tiktok","instagram"]'
+                    + "' WHERE upload_post_platforms IS NULL OR upload_post_platforms = ''"
+                )
+            )
+            connection.execute(
+                text(
+                    "UPDATE settings SET upload_post_youtube_privacy_status = 'unlisted' "
+                    "WHERE upload_post_youtube_privacy_status IS NULL OR upload_post_youtube_privacy_status = ''"
+                )
+            )
+            connection.execute(
+                text(
+                    "UPDATE settings SET upload_post_youtube_made_for_kids = 0 "
+                    "WHERE upload_post_youtube_made_for_kids IS NULL"
+                )
+            )
+            connection.execute(
+                text(
+                    "UPDATE settings SET publish_brand_title = '造片局 · AI微综艺' "
+                    "WHERE publish_brand_title IS NULL OR publish_brand_title = ''"
                 )
             )
 

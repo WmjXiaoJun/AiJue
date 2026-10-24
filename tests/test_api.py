@@ -420,6 +420,13 @@ def test_settings_get_and_patch(client):
         "localize_langs",
         "localize_translator",
         "localize_voices",
+        "upload_post_username",
+        "upload_post_enabled",
+        "upload_post_platforms",
+        "upload_post_youtube_privacy_status",
+        "upload_post_youtube_made_for_kids",
+        "publish_brand_title",
+        "upload_post_api_key_configured",
     }
     try:
         response = client.patch(

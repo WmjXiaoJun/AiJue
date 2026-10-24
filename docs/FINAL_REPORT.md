@@ -319,3 +319,18 @@ FastAPI (8090) ── SQLite
 - H3 ref2va 输出为全画幅角色（与静态版的右侧演播厅画窗构图不同），已用 ASS 补品牌/名字条/状态；如需保持原画窗构图需二次合成或改 H3 参考图策略。
 - 目前每镜用同一中性 prompt，尚未按景别/情绪做运镜差异化（下一步可按 shot type 注入景别/机位/prompt）。
 - 口型由 TTS 音轨驱动，仍可能有轻微不同步；如需更精细可加 LatentSync/Wav2Lip 二次对齐。
+## 25. 一键发布（海外平台）v1（2026-10-25）
+- 参考 MoneyPrinterTurbo 的 Upload-Post 集成方式，实现「成片后一键发布到 YouTube / TikTok / Instagram」。
+- 新增 publish/：upload_post.py（/api/upload 表单、YouTube 额外字段、/api/uploadposts/status 轮询、失败不自动重试）+ cli.py（--video/--title/--description/--hashtags/--platforms/--username/--privacy/--dry-run；key 仅环境变量 UPLOAD_POST_API_KEY）。
+- 后端：PublishRecord 表；GET /api/publish/config；PATCH /api/settings upload_post_*（api_key 只写 publish.env、GET 只返回是否配置）；POST /api/episodes/{eid}/publish（lang/version 选片；元数据优先 localized/{lang}/meta.json.publish，否则品牌默认「造片局 · AI微综艺」+#造片局 #AI微综艺 #Zaopianju #AIVariety #AIGenerated）；GET publishes 列表/详情；Job type=publish。
+- 安全：key 不进 cmd/job JSON/日志；同参数活跃任务复用防重复；失败不自动重试；dry-run 做时长（TikTok≤10min）、大小、配置、横屏预检并返回 warnings/errors。
+- 实测：ep_002 英文版 dry-run job done「发布预检完成」；未配置正式发布正确 400；测试 backend **130 passed**。真实上传待用户提供 Upload-Post 凭据后验证。
+- 文档：docs/PUBLISHING.md（注册 upload-post.com → 连接三平台 → 取 Key/username → Settings 填写 → 预检/发布 → 限制/合规/排查）。
+
+## 26. 综艺模板库（国内外参考 + 历史综艺，2026-10-25）
+- 新增 15 个格式模板（contract/formats/*.json，均为 16:9、300–360s、受支持 shot pattern）：
+  - 国外：tonight_show（美式深夜秀）/ snl_sketch（SNL式小品）/ taskmaster（任务大师）/ traitors（叛徒圆桌）/ shark_tank（创智赢家）/ masked_singer（蒙面唱将）/ hot_ones（辣访谈）
+  - 国内：qipashuo（奇葩辩论）/ standup（脱口秀大会）/ slow_life（慢生活）/ mystery（推理现场）/ national_treasure（国宝守护）/ classics（典籍对话）
+  - 历史（用户点名）：history_talk（历史夜话：主持+历史人物 AI 分身圆桌，348s）/ history_mystery（历史悬案：情景再现+线索推演+投票，359s）
+- 参考文档 docs/VARIETY_REFERENCES.md：15 个模板逐条给参考节目/国家平台/模式核心/可借鉴点/我们的差异/来源链接，附「历史综艺为什么适合 AI 微综艺」论证。
+- 前端模板选择器已同步 16 个模板（含原 roundtable_5min）；实测 POST /projects {format_id:history_talk_5min} + storyboard/generate → 6 个骨架镜头/348s；示例项目「造片局 · 历史夜话（示例）」已建。

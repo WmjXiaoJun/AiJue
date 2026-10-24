@@ -100,7 +100,12 @@ def _compose_static_clips(shots: list, assets: list, episode: dict,
     平台生成台的 shots 可能是旧素材/旧风格（例如 chibi 版），H3 动态需以
     当前概念角色构图为参考，才能保证 3 个角色身份正确。
     """
-    from . import mock_shot
+    from . import fonts, mock_shot
+    # 先串行准备好字体，避免 6 个合成线程并发复制字体文件竞态
+    try:
+        fonts.ensure_fonts(workdir)
+    except Exception as exc:  # noqa: BLE001
+        LOG.warning("参考构图字体准备失败: %s", exc)
     comp_dir = utils.ensure_dir(workdir / "dynamic" / "_static")
     out: dict[str, Path] = {}
 
@@ -147,9 +152,8 @@ def _first_frames(shots: list, comp_clips: dict, workdir: Path) -> dict[str, Pat
         out = frames_dir / f"{sid}_first.png"
         if not _valid(clip, 2000):
             continue
-        if _valid(out, 1000):
-            frames[sid] = out
-        elif _extract_frame(clip, out):
+        # 每轮都从参考构图重新抽帧，避免复用旧的平台/chibi 首帧
+        if _extract_frame(clip, out):
             frames[sid] = out
     return frames
 
@@ -169,9 +173,6 @@ def _char_refs(shots: list, frames: dict, workdir: Path, width: int,
         if full is None:
             continue
         out = ref_dir / f"{sid}_ref.png"
-        if _valid(out, 1000):
-            refs[sid] = out
-            continue
         typ = str(shot.get("type") or "")
         fg = max(256, int(height * 0.91))
         if typ == "b_roll":
@@ -246,15 +247,24 @@ def _digest(shot: dict, mode: str, first: Path, last: Path | None,
     parts = [DYNAMIC_VERSION, json.dumps(shot, sort_keys=True, ensure_ascii=False),
              mode, str(cli), str(cli.stat().st_mtime) if cli.exists() else "",
              str(width), str(height), f"{H3_GEN_W}x{H3_GEN_H}", str(fps), str(seed)]
-    for p in (first, last, audio):
+    # 参考图/首尾帧用内容尺寸即可（每次渲染会重抽/重裁，mtime 不稳定）；
+    # 音频/台词变化用 size+mtime 判断。
+    for p in (first, last):
         if p is None:
             parts.append("-")
             continue
         try:
-            st = Path(p).stat()
-            parts.append(f"{Path(p).name}:{st.st_size}:{st.st_mtime_ns}")
+            parts.append(f"{Path(p).name}:{Path(p).stat().st_size}")
         except OSError:
             parts.append(f"{p}:missing")
+    if audio is None:
+        parts.append("-")
+    else:
+        try:
+            st = Path(audio).stat()
+            parts.append(f"{Path(audio).name}:{st.st_size}:{st.st_mtime_ns}")
+        except OSError:
+            parts.append(f"{audio}:missing")
     return utils.sha1_text(*parts)
 
 

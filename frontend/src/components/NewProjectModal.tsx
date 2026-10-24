@@ -71,7 +71,7 @@ export function NewProjectModal({ open, onClose, onCreated }: Props) {
             autoFocus
           />
         </Field>
-        <Field label="节目模式" hint="MVP 只提供「横屏 AI 圆桌 · 5 分钟」">
+        <Field label="节目模式" hint={"共 " + TEMPLATES.length + " 种节目模式，来自 contract/formats/*.json"}>
           <div className="template-pick-list">
             {TEMPLATES.map((item) => (
               <button

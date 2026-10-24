@@ -204,6 +204,16 @@ class SettingsOut(ORMModel):
     localize_langs: List[str] = Field(default_factory=lambda: ["en", "es"])
     localize_translator: str = "ollama"  # ollama 默认；nllb 兜底；mock 测试
     localize_voices: Dict[str, Any] = Field(default_factory=dict)
+    # 一键发布 Upload-Post（contract/PUBLISHING.md）
+    upload_post_username: str = ""
+    upload_post_enabled: bool = False
+    upload_post_platforms: List[str] = Field(
+        default_factory=lambda: ["youtube", "tiktok", "instagram"]
+    )
+    upload_post_youtube_privacy_status: str = "unlisted"
+    upload_post_youtube_made_for_kids: bool = False
+    publish_brand_title: str = "造片局 · AI微综艺"
+    upload_post_api_key_configured: bool = False  # 只读，不回传明文 key
 
 
 class SettingsUpdate(BaseModel):
@@ -225,6 +235,14 @@ class SettingsUpdate(BaseModel):
     localize_langs: Optional[List[str]] = None
     localize_translator: Optional[str] = None
     localize_voices: Optional[Dict[str, Any]] = None
+    # 一键发布 Upload-Post（api_key 写 backend/data/publish.env，不落 DB/不回传）
+    upload_post_api_key: Optional[str] = None
+    upload_post_username: Optional[str] = None
+    upload_post_enabled: Optional[bool] = None
+    upload_post_platforms: Optional[List[str]] = None
+    upload_post_youtube_privacy_status: Optional[str] = None
+    upload_post_youtube_made_for_kids: Optional[bool] = None
+    publish_brand_title: Optional[str] = None
 
 
 # ---------------- Character（角色工坊） ----------------
@@ -328,6 +346,52 @@ class EpisodeExportRequest(BaseModel):
     type: str = "capcut"
     # 可选导出名（默认 造片局_EPxxx）；测试/演示可用独立 name 避免覆盖 canonical 草稿
     name: Optional[str] = None
+
+
+# ---------------- 一键发布（contract/PUBLISHING.md） ----------------
+class PublishRecordOut(ORMModel):
+    id: str
+    episode_id: str
+    platforms: List[str] = Field(default_factory=list)
+    lang: str = "zh"
+    video_url: Optional[str] = None
+    title: str = ""
+    status: str
+    request_id: Optional[str] = None
+    meta: Dict[str, Any] = Field(default_factory=dict)
+    error: Optional[str] = None
+    created_at: datetime
+
+    @field_validator("meta", mode="before")
+    @classmethod
+    def _meta_none_to_dict(cls, value):
+        return value or {}
+
+    @field_validator("platforms", mode="before")
+    @classmethod
+    def _platforms_none_to_list(cls, value):
+        return value or []
+
+
+class PublishRequest(BaseModel):
+    platforms: Optional[List[str]] = None
+    lang: Optional[str] = None  # zh/en/es/ja/ko/pt
+    title: Optional[str] = None
+    description: Optional[str] = None
+    hashtags: Optional[List[str]] = None
+    privacy: Optional[str] = None  # public|unlisted|private（YouTube）
+    dry_run: bool = False
+    version: Optional[str] = None  # final|dynamic
+
+
+class PublishConfigOut(BaseModel):
+    configured: bool = False
+    username_masked: str = ""
+    enabled: bool = False
+    platforms: List[str] = Field(default_factory=list)
+    youtube_privacy: str = "unlisted"
+    limits: Dict[str, Any] = Field(default_factory=dict)
+    brand: Dict[str, Any] = Field(default_factory=dict)
 
 
 # ---------------- 多语种本地化（contract/LOCALIZATION.md） ----------------

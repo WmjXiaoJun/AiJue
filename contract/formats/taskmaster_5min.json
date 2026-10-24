@@ -1,0 +1,78 @@
+{
+  "id": "taskmaster_5min",
+  "name": "任务大师 · 5 分钟",
+  "aspect": "16:9",
+  "target_duration": 311,
+  "packaging": {
+    "intro": "logo_sting",
+    "outro": "end_card",
+    "lower_third_style": "zaopianju_yellow",
+    "transition": "hard_cut",
+    "bgm": "talk_light",
+    "subtitle_style": "variety"
+  },
+  "segments": [
+    {
+      "id": "open",
+      "name": "片头",
+      "duration": 6,
+      "pattern": [
+        "title_card"
+      ]
+    },
+    {
+      "id": "rules",
+      "name": "主持人念任务",
+      "duration": 40,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "meme_card"
+      ]
+    },
+    {
+      "id": "task1",
+      "name": "任务一 · 居家挑战",
+      "duration": 90,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "b_roll"
+      ]
+    },
+    {
+      "id": "task2",
+      "name": "任务二 · 限时整活",
+      "duration": 85,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "b_roll",
+        "meme_card"
+      ]
+    },
+    {
+      "id": "scoring",
+      "name": "评分与吐槽",
+      "duration": 50,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "meme_card"
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "结尾",
+      "duration": 40,
+      "pattern": [
+        "host_to_camera",
+        "end_card"
+      ]
+    }
+  ]
+}

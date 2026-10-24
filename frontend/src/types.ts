@@ -296,6 +296,52 @@ export interface Settings {
   h3_provider?: string;
   /** MetaSo 云端 API Key 是否已配置（只读） */
   metaso_key_configured?: boolean;
+  /** 海外发布（Upload-Post） */
+  upload_post_username?: string;
+  upload_post_enabled?: boolean;
+  upload_post_platforms?: string[];
+  upload_post_youtube_privacy_status?: string;
+  upload_post_youtube_made_for_kids?: boolean;
+  /** Upload-Post API Key 是否已配置（只读，GET 不回传明文） */
+  upload_post_api_key_configured?: boolean;
+  /** 只写：PATCH 时传空串表示清除，GET 永不返回 */
+  upload_post_api_key?: string;
+}
+
+/** 一键发布（海外）contract/PUBLISHING.md */
+export interface PublishConfig {
+  configured: boolean;
+  username_masked?: string | null;
+  enabled: boolean;
+  platforms: string[];
+  youtube_privacy?: string;
+  limits?: Record<string, unknown>;
+}
+
+export interface PublishRecord {
+  id: string;
+  episode_id: string;
+  platforms: string[];
+  lang?: string | null;
+  video_url?: string | null;
+  title?: string;
+  status: string;
+  request_id?: string | null;
+  meta?: Record<string, unknown> | null;
+  error?: string | null;
+  created_at: string;
+  updated_at?: string | null;
+}
+
+export interface PublishRequest {
+  platforms?: string[];
+  lang?: string;
+  title?: string;
+  description?: string;
+  hashtags?: string[];
+  privacy?: string;
+  dry_run?: boolean;
+  version?: "final" | "dynamic";
 }
 
 export interface NewAsset {

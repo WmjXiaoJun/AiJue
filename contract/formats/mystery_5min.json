@@ -1,0 +1,67 @@
+{
+  "id": "mystery_5min",
+  "name": "推理现场 · 5 分钟",
+  "aspect": "16:9",
+  "target_duration": 316,
+  "packaging": {
+    "intro": "logo_sting",
+    "outro": "end_card",
+    "lower_third_style": "zaopianju_yellow",
+    "transition": "hard_cut",
+    "bgm": "talk_light",
+    "subtitle_style": "variety"
+  },
+  "segments": [
+    {
+      "id": "open",
+      "name": "片头",
+      "duration": 6,
+      "pattern": [
+        "title_card"
+      ]
+    },
+    {
+      "id": "case",
+      "name": "案件背景 · 情景再现",
+      "duration": 50,
+      "pattern": [
+        "host_to_camera",
+        "b_roll",
+        "meme_card"
+      ]
+    },
+    {
+      "id": "clues",
+      "name": "搜证与线索",
+      "duration": 85,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "b_roll",
+        "meme_card"
+      ]
+    },
+    {
+      "id": "reasoning",
+      "name": "集中推理",
+      "duration": 95,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "meme_card"
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "投票与揭晓",
+      "duration": 80,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "end_card"
+      ]
+    }
+  ]
+}

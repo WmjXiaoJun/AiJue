@@ -32,6 +32,7 @@ H3_TIMEOUT_SECONDS = 20 * 60  # 本地 H3 长任务超时（契约要求 >= 15 �
 METASO_TIMEOUT_SECONDS = 300  # MetaSo 云端测试 provider 超时（实测单条 ~23-25s）
 LOCALIZE_TIMEOUT_SECONDS = 1800  # 多语种本地化（翻译 + TTS + 混音 + 编码）
 DYNAMIC_TIMEOUT_SECONDS = 1800  # 全动态镜头（H3 动态/口型生成）
+PUBLISH_TIMEOUT_SECONDS = 3900  # 上传 + 后台状态轮询（CLI 内部状态超时 3600s）
 
 
 def utcnow():
@@ -46,6 +47,7 @@ def run_cli(
     cwd: Optional[str | Path] = None,
     on_line: Optional[Callable[[str], None]] = None,
     timeout: Optional[float] = None,
+    env_overrides: Optional[Dict[str, str]] = None,
 ) -> Tuple[int, List[str], str]:
     """执行 CLI，实时回调 stdout 行。
 
@@ -56,6 +58,11 @@ def run_cli(
     env = dict(os.environ)
     env.setdefault("PYTHONIOENCODING", "utf-8")
     env.setdefault("PYTHONUNBUFFERED", "1")
+    # 敏感值（如 Upload-Post key）只通过环境变量传给子进程，不写进 cmd/spec/日志
+    if env_overrides:
+        for name, value in env_overrides.items():
+            if value:
+                env[str(name)] = str(value)
     stdout_lines: List[str] = []
     stderr_lines: List[str] = []
 
@@ -272,6 +279,8 @@ def run_job(job_id: str) -> None:
                 run_export_job(db, job)
             elif job.type == "localize":
                 run_localize_job(db, job)
+            elif job.type == "publish":
+                run_publish_job(db, job)
             else:
                 _fail(db, job, f"未知任务类型: {job.type}")
     except Exception as exc:  # noqa: BLE001 - 后台线程必须兜底
@@ -305,6 +314,12 @@ def _mark_failed_isolated(job_id: str, exc: Exception) -> None:
                     loc = db.get(models.Localization, loc_id) if loc_id else None
                     if loc is not None:
                         loc.status = "failed"
+                if job.type == "publish":
+                    pub_id = (job.params or {}).get("publish_id")
+                    pub_record = db.get(models.PublishRecord, pub_id) if pub_id else None
+                    if pub_record is not None:
+                        pub_record.status = "failed"
+                        pub_record.error = str(exc)[:2000]
                 db.commit()
     except Exception:  # noqa: BLE001
         logger.exception("任务失败状态写回失败: %s", job_id)
@@ -1769,6 +1784,189 @@ def run_export_job(db, job: models.Job) -> None:
     )
     db.commit()
     logger.info("export 任务完成: job=%s path=%s", job.id, output_url)
+
+
+# --------------------------------------------------------------------------- #
+# publish 任务（一键发布 Upload-Post，contract/PUBLISHING.md）
+# --------------------------------------------------------------------------- #
+def enqueue_publish_job(db, episode: models.Episode, record: models.PublishRecord, params: Dict[str, Any]):
+    """入队发布任务；同一集同参数已活跃任务复用（防重复点击造成重复发布）。"""
+    active = None
+    for candidate in (
+        db.query(models.Job)
+        .filter(
+            models.Job.episode_id == episode.id,
+            models.Job.type == "publish",
+            models.Job.status.in_(ACTIVE_STATUSES),
+        )
+        .order_by(models.Job.created_at.desc())
+        .all()
+    ):
+        cand = candidate.params or {}
+        if (
+            bool(cand.get("dry_run")) == bool(params.get("dry_run"))
+            and cand.get("lang") == params.get("lang")
+            and cand.get("version") == params.get("version")
+            and list(cand.get("platforms") or []) == list(params.get("platforms") or [])
+        ):
+            active = candidate
+            break
+    if active is not None:
+        return active, False
+    job = models.Job(
+        id=models.new_id("job"),
+        type="publish",
+        status="queued",
+        progress=0.0,
+        message="发布排队中" if not params.get("dry_run") else "发布预检排队中",
+        episode_id=episode.id,
+        shot_id=None,
+        params=params,
+    )
+    db.add(job)
+    db.commit()
+    dispatch(job.id)
+    return job, True
+
+
+def run_publish_job(db, job: models.Job) -> None:
+    params = dict(job.params or {})
+    record = db.get(models.PublishRecord, params.get("publish_id")) if params.get("publish_id") else None
+    episode = db.get(models.Episode, job.episode_id) if job.episode_id else None
+    if record is None or episode is None:
+        _update(db, job, status="failed", error="发布记录或集不存在", message="发布记录或集不存在")
+        db.commit()
+        return
+    dry_run = bool(params.get("dry_run"))
+    video_rel = str(params.get("video_rel") or "").strip()
+    video_path = config.OUTPUTS_DIR / Path(video_rel) if video_rel else config.OUTPUTS_DIR / "missing.mp4"
+    if not video_path.is_file():
+        message = f"待发布视频不存在: {video_path}"
+        record.status = "failed"
+        record.error = message
+        _update(db, job, status="failed", error=message, message=message[:200])
+        db.commit()
+        return
+
+    setting = seed.get_settings(db)
+    api_key = config.publish_key() or ""
+    meta = dict(record.meta or {})
+    platforms = list(record.platforms or [])
+    if not platforms:
+        message = "至少选择一个发布平台"
+        record.status = "failed"
+        record.error = message
+        _update(db, job, status="failed", error=message, message=message[:200])
+        db.commit()
+        return
+    if not dry_run and not (api_key and setting.upload_post_username and setting.upload_post_enabled):
+        message = "Upload-Post 未配置或未启用：需要 API Key + username 且 upload_post_enabled=true"
+        record.status = "failed"
+        record.error = message
+        _update(db, job, status="failed", error=message, message=message[:200])
+        db.commit()
+        return
+
+    record.status = "prechecking" if dry_run else "publishing"
+    _update(
+        db,
+        job,
+        status="running",
+        progress=5,
+        message="发布预检中" if dry_run else "上传中（Upload-Post）",
+    )
+    db.commit()
+
+    hashtags = [str(tag) for tag in (meta.get("hashtags") or []) if str(tag).strip()]
+    description = str(meta.get("description") or "")
+    privacy = str(meta.get("privacy") or setting.upload_post_youtube_privacy_status or "unlisted")
+    cmd = [
+        sys.executable,
+        "-m",
+        "publish.cli",
+        "--video",
+        str(video_path),
+        "--title",
+        record.title or episode.title,
+        "--platforms",
+        ",".join(platforms),
+        "--username",
+        setting.upload_post_username or "",
+        "--privacy",
+        privacy,
+        "--lang",
+        record.lang or "zh",
+    ]
+    if description:
+        cmd += ["--description", description]
+    if hashtags:
+        cmd += ["--hashtags", " ".join(hashtags)]
+    if setting.upload_post_youtube_made_for_kids:
+        cmd.append("--youtube-made-for-kids")
+    if dry_run:
+        cmd.append("--dry-run")
+    env_overrides = {"UPLOAD_POST_API_KEY": api_key} if api_key else None
+    try:
+        returncode, stdout_lines, stderr_text = run_cli(
+            cmd, timeout=PUBLISH_TIMEOUT_SECONDS, env_overrides=env_overrides
+        )
+    except Exception as exc:  # noqa: BLE001 - CLI 无法启动
+        message = f"publish.cli 启动失败: {exc}"
+        record.status = "failed"
+        record.error = message
+        _update(db, job, status="failed", error=message, message=message[:200])
+        db.commit()
+        return
+
+    result = _last_json(stdout_lines)
+    result.pop("api_key", None)
+    result.pop("UPLOAD_POST_API_KEY", None)
+    record.request_id = str(result.get("request_id") or record.request_id or "") or None
+    record_meta = dict(record.meta or {})
+    record_meta.update(
+        {
+            "dry_run": dry_run,
+            "duration": result.get("duration"),
+            "size_mb": result.get("size_mb"),
+            "warnings": result.get("warnings") or [],
+            "errors": result.get("errors") or [],
+            "configured": result.get("configured"),
+            "results": result.get("results"),
+            "version": params.get("version"),
+        }
+    )
+    record.meta = record_meta
+    if returncode != 0 or not result.get("ok"):
+        message = str(result.get("error") or "").strip() or _format_error(
+            "publish.cli", returncode, stderr_text, stdout_lines
+        )
+        record.status = "failed"
+        record.error = message[:2000]
+        _update(db, job, status="failed", error=message, message=message[:200])
+        db.commit()
+        logger.warning("publish 任务失败: job=%s record=%s err=%s", job.id, record.id, message[:300])
+        return
+
+    record.status = "prechecked" if dry_run else "published"
+    record.error = None
+    _update(
+        db,
+        job,
+        status="done",
+        progress=100,
+        message="发布预检完成" if dry_run else "发布完成",
+        output_url=record.video_url,
+        cost=0.0,
+        error=None,
+    )
+    db.commit()
+    logger.info(
+        "publish 任务完成: job=%s record=%s dry_run=%s request_id=%s",
+        job.id,
+        record.id,
+        dry_run,
+        record.request_id,
+    )
 
 
 # --------------------------------------------------------------------------- #

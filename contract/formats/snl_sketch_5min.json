@@ -1,0 +1,67 @@
+{
+  "id": "snl_sketch_5min",
+  "name": "SNL 式小品 · 5 分钟",
+  "aspect": "16:9",
+  "target_duration": 301,
+  "packaging": {
+    "intro": "logo_sting",
+    "outro": "end_card",
+    "lower_third_style": "zaopianju_yellow",
+    "transition": "hard_cut",
+    "bgm": "talk_light",
+    "subtitle_style": "variety"
+  },
+  "segments": [
+    {
+      "id": "open",
+      "name": "片头",
+      "duration": 6,
+      "pattern": [
+        "title_card"
+      ]
+    },
+    {
+      "id": "monologue",
+      "name": "开场主持词",
+      "duration": 30,
+      "pattern": [
+        "host_to_camera",
+        "reaction"
+      ]
+    },
+    {
+      "id": "sketch1",
+      "name": "小品一 · 办公室荒诞",
+      "duration": 110,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "meme_card",
+        "b_roll"
+      ]
+    },
+    {
+      "id": "sketch2",
+      "name": "小品二 · 新闻播报恶搞",
+      "duration": 100,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "meme_card",
+        "b_roll"
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "谢幕与下周预告",
+      "duration": 55,
+      "pattern": [
+        "host_to_camera",
+        "reaction",
+        "end_card"
+      ]
+    }
+  ]
+}

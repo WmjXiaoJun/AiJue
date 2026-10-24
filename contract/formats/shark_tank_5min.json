@@ -1,0 +1,67 @@
+{
+  "id": "shark_tank_5min",
+  "name": "创智赢家 · 5 分钟",
+  "aspect": "16:9",
+  "target_duration": 306,
+  "packaging": {
+    "intro": "logo_sting",
+    "outro": "end_card",
+    "lower_third_style": "zaopianju_yellow",
+    "transition": "hard_cut",
+    "bgm": "talk_light",
+    "subtitle_style": "variety"
+  },
+  "segments": [
+    {
+      "id": "open",
+      "name": "片头",
+      "duration": 6,
+      "pattern": [
+        "title_card"
+      ]
+    },
+    {
+      "id": "pitch",
+      "name": "电梯路演",
+      "duration": 50,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "b_roll",
+        "reaction"
+      ]
+    },
+    {
+      "id": "grill",
+      "name": "投资人质询",
+      "duration": 85,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "meme_card"
+      ]
+    },
+    {
+      "id": "negotiation",
+      "name": "出价谈判",
+      "duration": 95,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "meme_card"
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "成交 / 离场",
+      "duration": 70,
+      "pattern": [
+        "host_to_camera",
+        "reaction",
+        "end_card"
+      ]
+    }
+  ]
+}

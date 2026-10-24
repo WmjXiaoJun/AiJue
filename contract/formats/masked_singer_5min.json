@@ -1,0 +1,66 @@
+{
+  "id": "masked_singer_5min",
+  "name": "蒙面唱将 · 5 分钟",
+  "aspect": "16:9",
+  "target_duration": 306,
+  "packaging": {
+    "intro": "logo_sting",
+    "outro": "end_card",
+    "lower_third_style": "zaopianju_yellow",
+    "transition": "hard_cut",
+    "bgm": "talk_light",
+    "subtitle_style": "variety"
+  },
+  "segments": [
+    {
+      "id": "open",
+      "name": "片头",
+      "duration": 6,
+      "pattern": [
+        "title_card"
+      ]
+    },
+    {
+      "id": "rules",
+      "name": "主持人介绍规则",
+      "duration": 42,
+      "pattern": [
+        "host_to_camera",
+        "meme_card",
+        "reaction"
+      ]
+    },
+    {
+      "id": "performance",
+      "name": "面具舞台表演",
+      "duration": 100,
+      "pattern": [
+        "host_to_camera",
+        "b_roll",
+        "reaction",
+        "meme_card"
+      ]
+    },
+    {
+      "id": "guessing",
+      "name": "猜评团推理",
+      "duration": 88,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "meme_card"
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "揭面时刻",
+      "duration": 70,
+      "pattern": [
+        "host_to_camera",
+        "reaction",
+        "end_card"
+      ]
+    }
+  ]
+}

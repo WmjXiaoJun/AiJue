@@ -3,7 +3,7 @@ import { ApiError, API_BASE, api, errorText } from "../lib/api";
 import type { Health, Settings } from "../types";
 import { useToast } from "./Toast";
 import { Field, Modal, Notice, Spinner } from "./ui";
-import { IconRefresh } from "./icons";
+import { IconCheck, IconRefresh } from "./icons";
 
 interface Props {
   open: boolean;
@@ -21,6 +21,34 @@ interface FormState {
   comfyui_url: string;
   workflow_template: string;
 }
+
+interface PublishForm {
+  apiKey: string;
+  keyDirty: boolean;
+  username: string;
+  enabled: boolean;
+  platforms: string[];
+  privacy: string;
+  madeForKids: boolean;
+  configured: boolean;
+}
+
+const EMPTY_PUBLISH: PublishForm = {
+  apiKey: "",
+  keyDirty: false,
+  username: "",
+  enabled: true,
+  platforms: ["youtube", "tiktok", "instagram"],
+  privacy: "unlisted",
+  madeForKids: false,
+  configured: false,
+};
+
+const UPLOAD_PLATFORM_OPTIONS = [
+  { id: "youtube", label: "YouTube" },
+  { id: "tiktok", label: "TikTok" },
+  { id: "instagram", label: "Instagram" },
+];
 
 const EMPTY_FORM: FormState = {
   generation_mode: "mock",
@@ -55,6 +83,8 @@ export function SettingsModal({ open, onClose, health }: Props) {
   const [voiceMap, setVoiceMap] = useState<Record<string, string> | null>(null);
   const [metasoKeyConfigured, setMetasoKeyConfigured] = useState<boolean | null>(null);
   const [h3ProviderSupported, setH3ProviderSupported] = useState(true);
+  const [publish, setPublish] = useState<PublishForm>(EMPTY_PUBLISH);
+  const [publishSupported, setPublishSupported] = useState(true);
 
   const load = async () => {
     setLoading(true);
@@ -65,6 +95,24 @@ export function SettingsModal({ open, onClose, health }: Props) {
       setVoiceMap(settings.voice_map || null);
       setMetasoKeyConfigured(typeof settings.metaso_key_configured === "boolean" ? settings.metaso_key_configured : null);
       setH3ProviderSupported(typeof settings.h3_provider === "string");
+      const hasPublishConfig =
+        typeof settings.upload_post_username === "string" ||
+        typeof settings.upload_post_api_key_configured === "boolean" ||
+        Array.isArray(settings.upload_post_platforms);
+      setPublishSupported(hasPublishConfig);
+      setPublish({
+        apiKey: "",
+        keyDirty: false,
+        username: settings.upload_post_username || "",
+        enabled: settings.upload_post_enabled !== false,
+        platforms:
+          Array.isArray(settings.upload_post_platforms) && settings.upload_post_platforms.length
+            ? settings.upload_post_platforms
+            : ["youtube", "tiktok", "instagram"],
+        privacy: settings.upload_post_youtube_privacy_status || "unlisted",
+        madeForKids: !!settings.upload_post_youtube_made_for_kids,
+        configured: !!settings.upload_post_api_key_configured,
+      });
     } catch (err) {
       setError(errorText(err));
     } finally {
@@ -90,14 +138,23 @@ export function SettingsModal({ open, onClose, health }: Props) {
       comfyui_url: form.comfyui_url,
       workflow_template: form.workflow_template,
     };
+    const publishPatch: Partial<Settings> = {
+      upload_post_username: publish.username.trim(),
+      upload_post_enabled: publish.enabled,
+      upload_post_platforms: publish.platforms,
+      upload_post_youtube_privacy_status: publish.privacy,
+      upload_post_youtube_made_for_kids: publish.madeForKids,
+    };
+    // api_key 只在用户修改时提交；空串表示清除（GET 永不返回明文）
+    if (publish.keyDirty) publishPatch.upload_post_api_key = publish.apiKey;
     try {
       let next: Settings;
       try {
-        next = await api.patchSettings({ ...base, h3_provider: form.h3_provider });
+        next = await api.patchSettings({ ...base, h3_provider: form.h3_provider, ...publishPatch });
       } catch (err) {
         // 后端暂未支持 h3_provider 时回退保存其它设置
         if (err instanceof ApiError && (err.status === 422 || err.status === 400)) {
-          next = await api.patchSettings(base);
+          next = await api.patchSettings({ ...base, ...publishPatch });
           setH3ProviderSupported(false);
           notify("后端暂不支持 H3 生成方式切换，已保存其它设置", "info");
         } else {
@@ -107,7 +164,19 @@ export function SettingsModal({ open, onClose, health }: Props) {
       setForm(toForm(next));
       setVoiceMap(next.voice_map || null);
       if (typeof next.metaso_key_configured === "boolean") setMetasoKeyConfigured(next.metaso_key_configured);
-      if (typeof next.h3_provider === "string") {
+      if (typeof next.upload_post_api_key_configured === "boolean") {
+        setPublishSupported(true);
+        setPublish((prev) => ({
+          ...prev,
+          apiKey: "",
+          keyDirty: false,
+          configured: !!next.upload_post_api_key_configured,
+        }));
+        notify(
+          "设置已保存 · 海外发布" + (next.upload_post_api_key_configured ? "（Upload-Post 已配置）" : "（Upload-Post 未配置）"),
+          "success"
+        );
+      } else if (typeof next.h3_provider === "string") {
         setH3ProviderSupported(true);
         notify("设置已保存 · H3 " + (next.h3_provider === "metaso" ? "云端测试（MetaSo）" : "本地 ComfyUI"), "success");
       } else {
@@ -240,6 +309,126 @@ export function SettingsModal({ open, onClose, health }: Props) {
           )}
           {!h3ProviderSupported && (
             <span className="field-hint">当前后端尚未支持 h3_provider 字段（等后端更新）；保存时会自动忽略该字段并提示。</span>
+          )}
+        </div>
+
+        <div className="field publish-settings">
+          <span className="field-label">
+            海外发布（Upload-Post）
+            <span className={"publish-settings-status " + (publish.configured ? "ok" : "warn")}>
+              {publish.configured ? "已配置" : "未配置"}
+            </span>
+          </span>
+          <p className="field-hint publish-settings-hint">
+            在{" "}
+            <a href="https://upload-post.com" target="_blank" rel="noreferrer">
+              upload-post.com
+            </a>{" "}
+            注册并连接 YouTube / TikTok / Instagram 后，填入 API Key 与 username。Key 只写不读，GET /settings 不返回明文。
+          </p>
+          <div className="publish-settings-grid">
+            <Field
+              label="Upload-Post API Key"
+              hint={publish.configured ? "已配置（不回显）；留空保持不变" : "从 upload-post 控制台复制"}
+            >
+              <div className="publish-key-row">
+                <input
+                  className="input"
+                  type="password"
+                  value={publish.apiKey}
+                  placeholder={publish.configured ? "••••••••（已配置）" : "粘贴 API Key"}
+                  autoComplete="new-password"
+                  onChange={(event) =>
+                    setPublish((prev) => ({ ...prev, apiKey: event.target.value, keyDirty: true }))
+                  }
+                />
+                {publish.configured && (
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => {
+                      if (!window.confirm("清除已保存的 Upload-Post API Key？")) return;
+                      setPublish((prev) => ({ ...prev, apiKey: "", keyDirty: true, configured: false }));
+                    }}
+                  >
+                    清除
+                  </button>
+                )}
+              </div>
+            </Field>
+            <Field label="Username" hint="upload-post 的 profile 用户名">
+              <input
+                className="input"
+                value={publish.username}
+                placeholder="例如：zaopianju"
+                onChange={(event) => setPublish((prev) => ({ ...prev, username: event.target.value }))}
+              />
+            </Field>
+          </div>
+
+          <div className="publish-settings-row">
+            <label className="check">
+              <input
+                type="checkbox"
+                checked={publish.enabled}
+                onChange={(event) => setPublish((prev) => ({ ...prev, enabled: event.target.checked }))}
+              />
+              <span className="check-box">{publish.enabled && <IconCheck size={12} />}</span>
+              <span>启用海外发布</span>
+            </label>
+            <label className="check">
+              <input
+                type="checkbox"
+                checked={publish.madeForKids}
+                onChange={(event) => setPublish((prev) => ({ ...prev, madeForKids: event.target.checked }))}
+              />
+              <span className="check-box">{publish.madeForKids && <IconCheck size={12} />}</span>
+              <span>YouTube：made for kids</span>
+            </label>
+          </div>
+
+          <div className="publish-settings-platforms">
+            <span className="publish-label">默认发布平台</span>
+            {UPLOAD_PLATFORM_OPTIONS.map((platform) => {
+              const active = publish.platforms.includes(platform.id);
+              return (
+                <button
+                  key={platform.id}
+                  type="button"
+                  className={"publish-platform-chip" + (active ? " active" : "")}
+                  onClick={() =>
+                    setPublish((prev) => ({
+                      ...prev,
+                      platforms: active
+                        ? prev.platforms.filter((item) => item !== platform.id)
+                        : [...prev.platforms, platform.id],
+                    }))
+                  }
+                >
+                  {active && <IconCheck size={11} />} {platform.label}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="form-grid">
+            <Field label="YouTube 可见性" hint="默认 unlisted 先审后公开">
+              <select
+                className="select"
+                value={publish.privacy}
+                onChange={(event) => setPublish((prev) => ({ ...prev, privacy: event.target.value }))}
+              >
+                <option value="unlisted">unlisted · 不公开（推荐）</option>
+                <option value="public">public · 公开</option>
+                <option value="private">private · 仅自己可见</option>
+              </select>
+            </Field>
+          </div>
+
+          {!publishSupported && (
+            <span className="field-hint">
+              当前后端尚未支持 upload_post_* 字段（等 task-33）；保存会自动忽略这些字段并提示。
+            </span>
           )}
         </div>
 

@@ -48,6 +48,26 @@ STYLE_PRESETS = {"3d_toon", "3d_cel", "2d_cel", "2d_paint", "anime", "guoman"}
 DEFAULT_STYLE = "3d_toon"
 # 多语种本地化支持语言（MVP en/es，另支持 ja/ko/pt；fr/de/ar 预留）
 SUPPORTED_LANGS = ["en", "es", "ja", "ko", "pt"]
+# 一键发布（contract/PUBLISHING.md）
+PUBLISH_PLATFORMS = ["youtube", "tiktok", "instagram"]
+PUBLISH_LANGS = ["zh", "en", "es", "ja", "ko", "pt"]
+DEFAULT_PUBLISH_HASHTAGS = ["#造片局", "#AI微综艺", "#Zaopianju", "#AIVariety", "#AIGenerated"]
+PUBLISH_LIMITS = {
+    "youtube": {
+        "max_duration_seconds": None,
+        "title_max": 100,
+        "description_max": 5000,
+        "note": "长视频支持；建议先用 unlisted 审后公开",
+    },
+    "tiktok": {
+        "max_duration_seconds": 600,
+        "note": "单个视频 ≤10 分钟；需 TikTok 账号已在 upload-post 授权",
+    },
+    "instagram": {
+        "max_duration_seconds": 900,
+        "note": "Reels 建议 ≤15 分钟；竖屏 9:16 最佳，横屏会加黑边",
+    },
+}
 
 # 导入即建表 + 播种（幂等），保证直接 uvicorn 启动即可用
 init_db()
@@ -93,6 +113,16 @@ def _recover_stale_jobs() -> None:
                 localization = db.get(models.Localization, loc_id) if loc_id else None
                 if localization is not None and localization.status in ("draft", "rendering"):
                     localization.status = "failed"
+            if job.type == "publish":
+                pub_id = (job.params or {}).get("publish_id")
+                pub_record = db.get(models.PublishRecord, pub_id) if pub_id else None
+                if pub_record is not None and pub_record.status in (
+                    "queued",
+                    "prechecking",
+                    "publishing",
+                ):
+                    pub_record.status = "failed"
+                    pub_record.error = "服务重启，发布任务中断；结果不确定，请先核对 request_id 再决定是否重新发布"
         db.commit()
         logger.warning("启动恢复：%d 个未完成任务已标记 failed（可重试）", len(stale))
 
@@ -1431,8 +1461,228 @@ def get_job(jid: str, db: Session = Depends(get_db)):
 @router.post("/jobs/{jid}/retry", response_model=schemas.JobOut)
 def retry_job(jid: str, db: Session = Depends(get_db)):
     job = _get_or_404(db, models.Job, jid, "任务")
+    if job.type == "publish":
+        raise HTTPException(
+            status_code=400,
+            detail="发布任务失败不自动重试（避免重复发布）；请先核对 request_id，再重新发起发布",
+        )
     job, _created = jobs.retry_job(db, job)
     return job
+
+
+# --------------------------------------------------------------------------- #
+# 一键发布（contract/PUBLISHING.md）
+# --------------------------------------------------------------------------- #
+def _publish_video_candidates(episode: models.Episode, lang: str, version: str) -> List[Path]:
+    base = config.OUTPUTS_DIR / "episodes" / episode.id
+    candidates: List[Path] = []
+    if lang and lang != "zh":
+        candidates.append(base / "localized" / lang / "final.mp4")
+    if version == "dynamic":
+        candidates.append(base / "final_dynamic.mp4")
+    candidates.append(base / "final.mp4")
+    deduped: List[Path] = []
+    for candidate in candidates:
+        if candidate not in deduped:
+            deduped.append(candidate)
+    return deduped
+
+
+def _localized_publish_meta(episode: models.Episode, lang: str) -> Dict[str, Any]:
+    if not lang or lang == "zh":
+        return {}
+    path = config.OUTPUTS_DIR / "episodes" / episode.id / "localized" / lang / "meta.json"
+    if not path.is_file():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    if not isinstance(data, dict):
+        return {}
+    publish = data.get("publish")
+    if isinstance(publish, dict):
+        return publish
+    return data
+
+
+def _normalize_hashtags(raw: Any) -> List[str]:
+    if raw is None:
+        return []
+    if isinstance(raw, str):
+        parts = [part.strip() for part in raw.replace(",", " ").split() if part.strip()]
+    else:
+        parts = [str(part).strip() for part in raw if str(part).strip()]
+    tags: List[str] = []
+    for tag in parts:
+        if not tag.startswith("#"):
+            tag = "#" + tag
+        if tag not in tags:
+            tags.append(tag)
+    return tags
+
+
+def _mask_username(username: str) -> str:
+    text = (username or "").strip()
+    if not text:
+        return ""
+    if len(text) <= 2:
+        return "*" * len(text)
+    return text[:2] + "***"
+
+
+@router.get("/publish/config", response_model=schemas.PublishConfigOut)
+def publish_config(db: Session = Depends(get_db)):
+    setting = seed.get_settings(db)
+    api_key = config.publish_key()
+    username = setting.upload_post_username or ""
+    configured = bool(api_key and username and setting.upload_post_enabled)
+    return {
+        "configured": configured,
+        "username_masked": _mask_username(username),
+        "enabled": bool(setting.upload_post_enabled),
+        "platforms": list(setting.upload_post_platforms or PUBLISH_PLATFORMS),
+        "youtube_privacy": setting.upload_post_youtube_privacy_status or "unlisted",
+        "limits": PUBLISH_LIMITS,
+        "brand": {
+            "title": setting.publish_brand_title or "造片局 · AI微综艺",
+            "hashtags": DEFAULT_PUBLISH_HASHTAGS,
+        },
+    }
+
+
+@router.post("/episodes/{eid}/publish", response_model=schemas.JobOut)
+def publish_episode(
+    eid: str,
+    payload: Optional[schemas.PublishRequest] = None,
+    db: Session = Depends(get_db),
+):
+    episode = _get_or_404(db, models.Episode, eid, "集")
+    setting = seed.get_settings(db)
+    body = payload or schemas.PublishRequest()
+
+    platforms: List[str] = []
+    raw_platforms = body.platforms if body.platforms is not None else (setting.upload_post_platforms or PUBLISH_PLATFORMS)
+    for item in raw_platforms or []:
+        platform = str(item).strip().lower()
+        if not platform:
+            continue
+        if platform not in PUBLISH_PLATFORMS:
+            raise HTTPException(
+                status_code=400,
+                detail=f"不支持的平台: {platform}；可选 {PUBLISH_PLATFORMS}",
+            )
+        if platform not in platforms:
+            platforms.append(platform)
+    if not platforms:
+        raise HTTPException(status_code=400, detail="至少选择一个发布平台")
+
+    lang = str(body.lang or "zh").strip().lower()
+    if lang not in PUBLISH_LANGS:
+        raise HTTPException(status_code=400, detail=f"不支持的语言: {lang}；可选 {PUBLISH_LANGS}")
+    version = str(body.version or "final").strip().lower()
+    if version not in ("final", "dynamic"):
+        raise HTTPException(status_code=400, detail="version 只能是 final 或 dynamic")
+    privacy = str(body.privacy or setting.upload_post_youtube_privacy_status or "unlisted").strip().lower()
+    if privacy not in ("public", "unlisted", "private"):
+        raise HTTPException(status_code=400, detail="privacy 只能是 public / unlisted / private")
+
+    video_path = next(
+        (candidate for candidate in _publish_video_candidates(episode, lang, version) if candidate.is_file()),
+        None,
+    )
+    if video_path is None:
+        expected = _publish_video_candidates(episode, lang, version)
+        raise HTTPException(
+            status_code=400,
+            detail="待发布视频不存在（请先渲染"
+            + ("动态版" if version == "dynamic" else "")
+            + f"）：{expected[0]}",
+        )
+
+    api_key = config.publish_key()
+    configured = bool(api_key and setting.upload_post_username and setting.upload_post_enabled)
+    if not body.dry_run and not configured:
+        raise HTTPException(
+            status_code=400,
+            detail="Upload-Post 未配置或未启用：需要 API Key + username，且 upload_post_enabled=true",
+        )
+
+    publish_meta = _localized_publish_meta(episode, lang)
+    title = (
+        str(body.title).strip()
+        if body.title and str(body.title).strip()
+        else str(publish_meta.get("title") or episode.title or setting.publish_brand_title)
+    )
+    description = (
+        str(body.description).strip()
+        if body.description is not None and str(body.description).strip()
+        else str(
+            publish_meta.get("description")
+            or f"{setting.publish_brand_title}｜第 {episode.no} 期：{episode.title}（AI 生成内容）"
+        )
+    )
+    if body.hashtags is not None:
+        hashtags = _normalize_hashtags(body.hashtags)
+        if not hashtags:
+            hashtags = _normalize_hashtags(DEFAULT_PUBLISH_HASHTAGS)
+    else:
+        hashtags = _normalize_hashtags(
+            publish_meta.get("hashtags") or DEFAULT_PUBLISH_HASHTAGS
+        )
+
+    record = models.PublishRecord(
+        id=models.new_id("pub"),
+        episode_id=episode.id,
+        platforms=platforms,
+        lang=lang,
+        video_url=config.media_url(video_path),
+        title=title,
+        status="queued",
+        request_id=None,
+        meta={
+            "description": description,
+            "hashtags": hashtags,
+            "privacy": privacy,
+            "dry_run": bool(body.dry_run),
+            "version": version,
+            "video_rel": str(video_path.relative_to(config.OUTPUTS_DIR).as_posix()),
+        },
+        error=None,
+    )
+    db.add(record)
+    db.flush()
+    job, _created = jobs.enqueue_publish_job(
+        db,
+        episode,
+        record,
+        {
+            "publish_id": record.id,
+            "dry_run": bool(body.dry_run),
+            "platforms": platforms,
+            "lang": lang,
+            "version": version,
+            "video_rel": str(video_path.relative_to(config.OUTPUTS_DIR).as_posix()),
+        },
+    )
+    db.commit()
+    return job
+
+
+@router.get("/episodes/{eid}/publishes", response_model=List[schemas.PublishRecordOut])
+def list_episode_publishes(eid: str, db: Session = Depends(get_db)):
+    _get_or_404(db, models.Episode, eid, "集")
+    return (
+        db.query(models.PublishRecord)
+        .filter(models.PublishRecord.episode_id == eid)
+        .order_by(models.PublishRecord.created_at.desc())
+        .all()
+    )
+
+
+@router.get("/publishes/{pid}", response_model=schemas.PublishRecordOut)
+def get_publish_record(pid: str, db: Session = Depends(get_db)):
+    return _get_or_404(db, models.PublishRecord, pid, "发布记录")
 
 
 # --------------------------------------------------------------------------- #
@@ -1472,8 +1722,9 @@ def get_settings(db: Session = Depends(get_db)):
 def patch_settings(payload: schemas.SettingsUpdate, db: Session = Depends(get_db)):
     setting = seed.get_settings(db)
     changes = payload.model_dump(exclude_unset=True)
-    # metaso_key 不落 DB、不回传：写入/清除 backend/data/metaso.env
+    # metaso_key / upload_post_api_key 不落 DB、不回传：分别写入 env 文件
     metaso_key = changes.pop("metaso_key", None)
+    upload_post_api_key = changes.pop("upload_post_api_key", None)
     if changes.get("generation_mode") is not None and changes["generation_mode"] not in ("mock", "comfyui"):
         raise HTTPException(status_code=400, detail="generation_mode 只能是 mock 或 comfyui")
     provider = changes.get("h3_provider")
@@ -1514,11 +1765,46 @@ def patch_settings(payload: schemas.SettingsUpdate, db: Session = Depends(get_db
                 detail="localize_translator 只能是 ollama / nllb / mock（ollama 默认，nllb 兜底）",
             )
         changes["localize_translator"] = translator
+    # 一键发布 Upload-Post
+    if changes.get("upload_post_platforms") is not None:
+        publish_platforms: List[str] = []
+        for item in changes["upload_post_platforms"] or []:
+            platform = str(item).strip().lower()
+            if not platform:
+                continue
+            if platform not in PUBLISH_PLATFORMS:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"不支持的平台: {platform}；可选 {PUBLISH_PLATFORMS}",
+                )
+            if platform not in publish_platforms:
+                publish_platforms.append(platform)
+        if not publish_platforms:
+            raise HTTPException(status_code=400, detail="upload_post_platforms 不能为空")
+        changes["upload_post_platforms"] = publish_platforms
+    youtube_privacy = changes.get("upload_post_youtube_privacy_status")
+    if youtube_privacy is not None:
+        youtube_privacy = str(youtube_privacy).strip().lower()
+        if youtube_privacy not in ("public", "unlisted", "private"):
+            raise HTTPException(
+                status_code=400,
+                detail="upload_post_youtube_privacy_status 只能是 public / unlisted / private",
+            )
+        changes["upload_post_youtube_privacy_status"] = youtube_privacy
+    if changes.get("upload_post_username") is not None:
+        changes["upload_post_username"] = str(changes["upload_post_username"]).strip()
+    if changes.get("publish_brand_title") is not None:
+        brand_title = str(changes["publish_brand_title"]).strip()
+        if not brand_title:
+            raise HTTPException(status_code=400, detail="publish_brand_title 不能为空")
+        changes["publish_brand_title"] = brand_title
     for key, value in changes.items():
         if value is not None:
             setattr(setting, key, value)
     if metaso_key is not None:
         config.save_metaso_key(str(metaso_key))
+    if upload_post_api_key is not None:
+        config.save_publish_key(str(upload_post_api_key))
     db.commit()
     db.refresh(setting)
     return setting

@@ -1,0 +1,67 @@
+{
+  "id": "hot_ones_5min",
+  "name": "辣访谈 · 5 分钟",
+  "aspect": "16:9",
+  "target_duration": 306,
+  "packaging": {
+    "intro": "logo_sting",
+    "outro": "end_card",
+    "lower_third_style": "zaopianju_yellow",
+    "transition": "hard_cut",
+    "bgm": "talk_light",
+    "subtitle_style": "variety"
+  },
+  "segments": [
+    {
+      "id": "open",
+      "name": "片头",
+      "duration": 6,
+      "pattern": [
+        "title_card"
+      ]
+    },
+    {
+      "id": "setup",
+      "name": "辣度规则介绍",
+      "duration": 42,
+      "pattern": [
+        "host_to_camera",
+        "b_roll",
+        "meme_card"
+      ]
+    },
+    {
+      "id": "interview",
+      "name": "边吃边聊",
+      "duration": 95,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "meme_card"
+      ]
+    },
+    {
+      "id": "spicy",
+      "name": "越来越辣的问题",
+      "duration": 95,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "meme_card",
+        "b_roll"
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "收尾 · 最后一口",
+      "duration": 68,
+      "pattern": [
+        "host_to_camera",
+        "reaction",
+        "end_card"
+      ]
+    }
+  ]
+}

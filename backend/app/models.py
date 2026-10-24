@@ -107,6 +107,13 @@ class Episode(Base):
         lazy="selectin",
         order_by="Localization.created_at",
     )
+    publishes = relationship(
+        "PublishRecord",
+        back_populates="episode",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+        order_by="PublishRecord.created_at",
+    )
 
     @property
     def shots_url(self) -> str:
@@ -238,6 +245,29 @@ class Localization(Base):
     episode = relationship("Episode", back_populates="localizations")
 
 
+class PublishRecord(Base):
+    """一键发布记录（contract/PUBLISHING.md）。"""
+
+    __tablename__ = "publish_records"
+
+    id = Column(String(64), primary_key=True)
+    episode_id = Column(
+        String(64), ForeignKey("episodes.id", ondelete="CASCADE"), nullable=False
+    )
+    platforms = Column(JSON, nullable=False, default=list)
+    lang = Column(String(8), nullable=False, default="zh")
+    video_url = Column(String(400), nullable=True)
+    title = Column(String(300), nullable=False, default="")
+    status = Column(String(16), nullable=False, default="queued")  # queued|prechecking|publishing|prechecked|published|failed
+    request_id = Column(String(120), nullable=True)
+    # 契约字段名 meta（DB 列名 meta_json）
+    meta = Column("meta_json", JSON, nullable=False, default=dict)
+    error = Column(Text, nullable=True)
+    created_at = Column(DateTime, nullable=False, default=utcnow)
+
+    episode = relationship("Episode", back_populates="publishes")
+
+
 class Character(Base):
     """原创动漫角色（角色工坊产物，字段与 contract/CHARACTER.md 对齐）。"""
 
@@ -301,6 +331,15 @@ class Setting(Base):
     localize_langs = Column(JSON, nullable=False, default=lambda: ["en", "es"])
     localize_translator = Column(String(16), nullable=False, default="ollama")  # ollama|nllb|mock
     localize_voices = Column(JSON, nullable=False, default=dict)
+    # 一键发布 Upload-Post（key 存 backend/data/publish.env，不落 DB）
+    upload_post_username = Column(String(120), nullable=False, default="")
+    upload_post_enabled = Column(Boolean, nullable=False, default=False)
+    upload_post_platforms = Column(
+        JSON, nullable=False, default=lambda: ["youtube", "tiktok", "instagram"]
+    )
+    upload_post_youtube_privacy_status = Column(String(16), nullable=False, default="unlisted")
+    upload_post_youtube_made_for_kids = Column(Boolean, nullable=False, default=False)
+    publish_brand_title = Column(String(200), nullable=False, default="造片局 · AI微综艺")
     updated_at = Column(DateTime, nullable=False, default=utcnow, onupdate=utcnow)
 
     @property
@@ -309,3 +348,10 @@ class Setting(Base):
         from . import config
 
         return config.metaso_key_configured()
+
+    @property
+    def upload_post_api_key_configured(self) -> bool:
+        """只读：是否已配置 Upload-Post key（不回传明文）。"""
+        from . import config
+
+        return config.publish_key_configured()

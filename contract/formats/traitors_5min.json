@@ -1,0 +1,67 @@
+{
+  "id": "traitors_5min",
+  "name": "叛徒 · 圆桌 · 5 分钟",
+  "aspect": "16:9",
+  "target_duration": 312,
+  "packaging": {
+    "intro": "logo_sting",
+    "outro": "end_card",
+    "lower_third_style": "zaopianju_yellow",
+    "transition": "hard_cut",
+    "bgm": "talk_light",
+    "subtitle_style": "variety"
+  },
+  "segments": [
+    {
+      "id": "open",
+      "name": "片头",
+      "duration": 6,
+      "pattern": [
+        "title_card"
+      ]
+    },
+    {
+      "id": "host_intro",
+      "name": "主持人开场 · 规则与城堡",
+      "duration": 48,
+      "pattern": [
+        "host_to_camera",
+        "b_roll",
+        "meme_card"
+      ]
+    },
+    {
+      "id": "roundtable",
+      "name": "圆桌互相试探",
+      "duration": 100,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "meme_card"
+      ]
+    },
+    {
+      "id": "banishment",
+      "name": "投票放逐",
+      "duration": 88,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "meme_card"
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "身份揭晓",
+      "duration": 70,
+      "pattern": [
+        "host_to_camera",
+        "reaction",
+        "b_roll",
+        "end_card"
+      ]
+    }
+  ]
+}

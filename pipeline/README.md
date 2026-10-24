@@ -284,10 +284,13 @@ python -m pipeline.cli render --episode <episode.json> --workdir <dir> --out fin
 
 - **每镜 TTS wav**：渲染时把镜头音轨导出为 `audio/shot_{sid}.wav`（H3 音驱动输入），
   `narration.wav` 仍保留用于成片混音。
-- **动态镜头**：`pipeline/dynamic.py` 从静态合成 clip 抽首帧 → 有台词镜头走 H3
-  `audio_ref`（首帧 + 该镜 TTS wav），无台词镜头走 `fl2v`（首帧 + 下一镜首帧作尾帧，
-  match cut 连续性）；输出 `dynamic/{sid}.mp4`（静音 H3 原声，成片使用 TTS 音轨），
-  per-shot 缓存（shot/首尾帧/音频/参数 hash）；片头/片尾/花字卡保持静态。
+- **动态镜头**：`pipeline/dynamic.py` 不再复用平台 `shots/` 片段（ep_001 平台片段是旧
+  chibi 素材、角色不对），而是用当前概念角色/现有合成函数重新生成参考构图 `dynamic/_static/`，
+  抽首帧后把右侧角色窗口裁成 H3 参考图 `dynamic/refs/`（避免整帧背景/多角色干扰身份）。
+  有台词镜头走 H3 `audio_ref`（角色参考图 + 该镜 TTS wav，生成 1024×576 16:9），无台词镜头走
+  `fl2v`（参考图 + 下一镜参考图作尾帧，768²，match cut 连续性）；输出 `dynamic/{sid}.mp4`
+  （静音 H3 原声，成片使用 TTS 音轨），per-shot 缓存 dyn-v2（shot/参考图/音频/参数 hash）；
+  片头/片尾/花字卡用新参考构图（静态）。
 - H3 ref CLI 约定：`integrations/comfyui/run_h3_ref.py`（可用 `H3_DYNAMIC_CLI` 或
   `--h3-ref-cli` 覆盖）：
   `--mode audio_ref|fl2v --image first.png [--last-frame last.png] [--audio shot.wav] --out out.mp4 --duration/--width/--height/--fps/--seed`。
@@ -298,9 +301,10 @@ python -m pipeline.cli render --episode <episode.json> --workdir <dir> --out fin
   左上品牌、右上镜头标签、左下名字条（LIVE/角色名/身份），字幕沿用原样式；静态片头/片尾卡保持原包装。
 - 失败回退：`--dynamic-fallback-static` 时某镜 H3 失败自动用静态 clip 并在 manifest/meta 标注
   `static-fallback`（正式验收要求 0 个 fallback）。
-- 实测（ep_002，21 镜）：75.95s / 1280×720 / 1898 帧 / blackdetect=0；17 audio_ref + 2 fl2v
-  （19/19 非卡片镜头动态，0 fallback）+ 2 静态卡；19/19 clip 动作与嘴部区域帧差明显；
-  xfade fade 0.3s × 20 转场 + 全片 whoosh；ep_001（52 镜）同法生成。
+- 实测（ep_002 v2，21 镜）：75.95s / 1280×720 / 1898 帧 / blackdetect=0；17 audio_ref + 2 fl2v
+  （19/19 非卡片镜头动态，0 fallback）+ 2 静态卡；3 角色身份正确（老周/阿栗/大魏，H3 中性 prompt +
+  角色参考图裁剪）、19/19 clip 动作与嘴部区域帧差明显；xfade fade 0.3s × 20 转场 + 全片 whoosh。
+  ep_001（52 镜/299s，44 动态 + 8 静态卡）同法生成。
 - 测试：`python -m pytest pipeline/tests/test_dynamic.py -q`（每镜 TTS wav/xfade 时长保持/
   whoosh 音轨/动态缓存与模式/无 CLI 回退/动态模式端到端）。
 

@@ -1,0 +1,78 @@
+{
+  "id": "history_talk_5min",
+  "name": "历史夜话 · 5 分钟",
+  "aspect": "16:9",
+  "target_duration": 348,
+  "packaging": {
+    "intro": "logo_sting",
+    "outro": "end_card",
+    "lower_third_style": "zaopianju_yellow",
+    "transition": "hard_cut",
+    "bgm": "talk_light",
+    "subtitle_style": "variety"
+  },
+  "segments": [
+    {
+      "id": "open",
+      "name": "片头",
+      "duration": 6,
+      "pattern": [
+        "title_card"
+      ]
+    },
+    {
+      "id": "host_open",
+      "name": "主持人开场",
+      "duration": 42,
+      "pattern": [
+        "host_to_camera",
+        "meme_card",
+        "b_roll"
+      ]
+    },
+    {
+      "id": "figure_a",
+      "name": "历史人物 A 自述",
+      "duration": 70,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "b_roll"
+      ]
+    },
+    {
+      "id": "figure_b",
+      "name": "历史人物 B 反驳",
+      "duration": 70,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "meme_card"
+      ]
+    },
+    {
+      "id": "roundtable",
+      "name": "三人圆桌 · 跨时空辩论",
+      "duration": 95,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "meme_card",
+        "b_roll"
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "主持人收束与结尾",
+      "duration": 65,
+      "pattern": [
+        "host_to_camera",
+        "reaction",
+        "end_card"
+      ]
+    }
+  ]
+}

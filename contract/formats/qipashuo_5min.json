@@ -1,0 +1,67 @@
+{
+  "id": "qipashuo_5min",
+  "name": "奇葩辩论 · 5 分钟",
+  "aspect": "16:9",
+  "target_duration": 306,
+  "packaging": {
+    "intro": "logo_sting",
+    "outro": "end_card",
+    "lower_third_style": "zaopianju_yellow",
+    "transition": "hard_cut",
+    "bgm": "talk_light",
+    "subtitle_style": "variety"
+  },
+  "segments": [
+    {
+      "id": "open",
+      "name": "片头",
+      "duration": 6,
+      "pattern": [
+        "title_card"
+      ]
+    },
+    {
+      "id": "topic",
+      "name": "主持人开题",
+      "duration": 45,
+      "pattern": [
+        "host_to_camera",
+        "meme_card"
+      ]
+    },
+    {
+      "id": "opening",
+      "name": "正反方开杠",
+      "duration": 95,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "meme_card"
+      ]
+    },
+    {
+      "id": "free_debate",
+      "name": "自由辩论",
+      "duration": 95,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "meme_card",
+        "b_roll"
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "结辩与结尾",
+      "duration": 65,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "end_card"
+      ]
+    }
+  ]
+}

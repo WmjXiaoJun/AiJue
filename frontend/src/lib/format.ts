@@ -46,6 +46,13 @@ export const JOB_STATUS_LABEL: Record<string, string> = {
 export const JOB_TYPE_LABEL: Record<string, string> = {
   shot: "镜头生成",
   render: "成片渲染",
+  localize: "多语种本地化",
+  publish: "海外发布",
+  export: "剪映导出",
+  h3: "H3 动画",
+  concept: "AI 概念图",
+  character: "角色生成",
+  tts: "配音 TTS",
 };
 
 export const EPISODE_STATUS_LABEL: Record<string, string> = {

@@ -1,0 +1,65 @@
+{
+  "id": "slow_life_5min",
+  "name": "慢生活 · 5 分钟",
+  "aspect": "16:9",
+  "target_duration": 306,
+  "packaging": {
+    "intro": "logo_sting",
+    "outro": "end_card",
+    "lower_third_style": "zaopianju_yellow",
+    "transition": "hard_cut",
+    "bgm": "talk_light",
+    "subtitle_style": "variety"
+  },
+  "segments": [
+    {
+      "id": "open",
+      "name": "片头",
+      "duration": 6,
+      "pattern": [
+        "title_card"
+      ]
+    },
+    {
+      "id": "scene",
+      "name": "空镜与旁白",
+      "duration": 50,
+      "pattern": [
+        "b_roll",
+        "host_to_camera"
+      ]
+    },
+    {
+      "id": "cooking",
+      "name": "做饭日常",
+      "duration": 90,
+      "pattern": [
+        "host_to_camera",
+        "b_roll",
+        "reaction",
+        "meme_card"
+      ]
+    },
+    {
+      "id": "evening",
+      "name": "围炉夜话",
+      "duration": 95,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "b_roll"
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "结尾",
+      "duration": 65,
+      "pattern": [
+        "host_to_camera",
+        "reaction",
+        "end_card"
+      ]
+    }
+  ]
+}

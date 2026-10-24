@@ -57,6 +57,12 @@ Vite + React 18 + TypeScript 的深色影棚风制片工作台。无 UI 框架�
   H3 动画播放使用 cache-bust 重新拉取最新概念图驱动视频；抽屉立绘优先 `Character.portrait_url`（后端切到 SDXL 概念立绘后自动生效）。
 - 成片导出（contract/EXPORT.md）：成片房「交付导出」面板 → `POST /episodes/{eid}/export {type:"capcut"}` → 轮询任务，
   展示产物路径、复制剪映草稿目录（`%LOCALAPPDATA%\JianyingPro\User Data\Projects\com.lveditor.draft`）与导入步骤。
+- 一键发布（海外）（contract/PUBLISHING.md）：成片房「一键发布（海外）」面板 — 品牌「造片局 · AI微综艺」，
+  平台多选（YouTube / TikTok / Instagram，含时长/尺寸限制提示）、语言版本（中文 + EN/ES/JA/KO/PT，预填 localized meta.publish）、
+  final/dynamic 版本、标题/描述/Hashtags 可编辑、YouTube 可见性；「预检」走 `dry_run=true` 只做本地校验（不联网），
+  「发布」需先配置 Upload-Post 并二次确认；发布记录展示平台 / 状态 / request_id / 错误 / 时间 / 预检 warnings。
+  未配置时展示 upload-post.com 注册引导且发布按钮禁用，不伪造成功。Settings 新增「海外发布（Upload-Post）」：
+  API Key（密码、只写不读、已配置占位/清除）、username、启用开关、默认平台、YouTube 可见性 / made-for-kids。
 - 多语种出海（contract/LOCALIZATION.md）：成片房「多语种出海版本」面板 — 语言多选（EN/ES/JA/KO/PT，默认 EN+ES），
   `POST /episodes/{eid}/localize {langs}` 每语言一个 Job，任务进行中 2.5s 轮询 `GET /episodes/{eid}/localizations`；
   每语言卡片支持视频播放、下载 mp4 / srt、展开发布元数据（title / description / hashtags 一键复制）与失败重试。

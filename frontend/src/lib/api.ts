@@ -11,6 +11,9 @@ import type {
   Job,
   Localization,
   NewAsset,
+  PublishConfig,
+  PublishRecord,
+  PublishRequest,
   NewShot,
   Project,
   Settings,
@@ -242,6 +245,13 @@ export const api = {
   },
   localizations: (eid: string) => request<Localization[]>("/episodes/" + eid + "/localizations"),
   localization: (lid: string) => request<Localization>("/localizations/" + lid),
+
+  /** 海外发布（contract/PUBLISHING.md） */
+  publishConfig: () => request<PublishConfig>("/publish/config"),
+  publishEpisode: (eid: string, body: PublishRequest) =>
+    request<Job>("/episodes/" + eid + "/publish", { method: "POST", body: JSON.stringify(body) }),
+  publishes: (eid: string) => request<PublishRecord[]>("/episodes/" + eid + "/publishes"),
+  publish: (id: string) => request<PublishRecord>("/publishes/" + id),
 
   settings: () => request<Settings>("/settings"),
   patchSettings: (body: Partial<Settings>) =>

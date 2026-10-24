@@ -56,6 +56,12 @@ def ensure_defaults(db) -> Setting:
             localize_langs=["en", "es"],
             localize_translator="ollama",
             localize_voices={},
+            upload_post_username="",
+            upload_post_enabled=False,
+            upload_post_platforms=["youtube", "tiktok", "instagram"],
+            upload_post_youtube_privacy_status="unlisted",
+            upload_post_youtube_made_for_kids=False,
+            publish_brand_title="造片局 · AI微综艺",
         )
         db.add(setting)
         db.commit()
@@ -73,6 +79,12 @@ def ensure_defaults(db) -> Setting:
             "localize_langs": ["en", "es"],
             "localize_translator": "ollama",
             "localize_voices": {},
+            "upload_post_username": "",
+            "upload_post_enabled": False,
+            "upload_post_platforms": ["youtube", "tiktok", "instagram"],
+            "upload_post_youtube_privacy_status": "unlisted",
+            "upload_post_youtube_made_for_kids": False,
+            "publish_brand_title": "造片局 · AI微综艺",
         }
         for field, value in defaults.items():
             current = getattr(setting, field)

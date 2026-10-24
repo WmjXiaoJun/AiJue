@@ -1,0 +1,78 @@
+{
+  "id": "history_mystery_5min",
+  "name": "历史悬案 · 5 分钟",
+  "aspect": "16:9",
+  "target_duration": 359,
+  "packaging": {
+    "intro": "logo_sting",
+    "outro": "end_card",
+    "lower_third_style": "zaopianju_yellow",
+    "transition": "hard_cut",
+    "bgm": "talk_light",
+    "subtitle_style": "variety"
+  },
+  "segments": [
+    {
+      "id": "open",
+      "name": "片头",
+      "duration": 6,
+      "pattern": [
+        "title_card"
+      ]
+    },
+    {
+      "id": "case",
+      "name": "悬案背景 · 情景再现",
+      "duration": 48,
+      "pattern": [
+        "host_to_camera",
+        "b_roll",
+        "meme_card"
+      ]
+    },
+    {
+      "id": "clue1",
+      "name": "线索一 · 史料比对",
+      "duration": 80,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "b_roll",
+        "meme_card"
+      ]
+    },
+    {
+      "id": "clue2",
+      "name": "线索二 · 人物动机",
+      "duration": 80,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "b_roll"
+      ]
+    },
+    {
+      "id": "deduction",
+      "name": "推演与质疑",
+      "duration": 75,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "meme_card"
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "投票与揭晓",
+      "duration": 70,
+      "pattern": [
+        "host_to_camera",
+        "reaction",
+        "meme_card",
+        "end_card"
+      ]
+    }
+  ]
+}

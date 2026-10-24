@@ -1,0 +1,66 @@
+{
+  "id": "national_treasure_5min",
+  "name": "国宝守护 · 5 分钟",
+  "aspect": "16:9",
+  "target_duration": 306,
+  "packaging": {
+    "intro": "logo_sting",
+    "outro": "end_card",
+    "lower_third_style": "zaopianju_yellow",
+    "transition": "hard_cut",
+    "bgm": "talk_light",
+    "subtitle_style": "variety"
+  },
+  "segments": [
+    {
+      "id": "open",
+      "name": "片头",
+      "duration": 6,
+      "pattern": [
+        "title_card"
+      ]
+    },
+    {
+      "id": "opening",
+      "name": "讲解员开场",
+      "duration": 45,
+      "pattern": [
+        "host_to_camera",
+        "b_roll",
+        "meme_card"
+      ]
+    },
+    {
+      "id": "legend",
+      "name": "前世传奇 · 情景剧",
+      "duration": 100,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "b_roll"
+      ]
+    },
+    {
+      "id": "story",
+      "name": "今生故事 · 守护人",
+      "duration": 85,
+      "pattern": [
+        "host_to_camera",
+        "shot_reverse",
+        "reaction",
+        "b_roll"
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "结尾",
+      "duration": 70,
+      "pattern": [
+        "host_to_camera",
+        "reaction",
+        "end_card"
+      ]
+    }
+  ]
+}

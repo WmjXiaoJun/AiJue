@@ -1,0 +1,66 @@
+{
+  "id": "standup_5min",
+  "name": "脱口秀大会 · 5 分钟",
+  "aspect": "16:9",
+  "target_duration": 306,
+  "packaging": {
+    "intro": "logo_sting",
+    "outro": "end_card",
+    "lower_third_style": "zaopianju_yellow",
+    "transition": "hard_cut",
+    "bgm": "talk_light",
+    "subtitle_style": "variety"
+  },
+  "segments": [
+    {
+      "id": "open",
+      "name": "片头",
+      "duration": 6,
+      "pattern": [
+        "title_card"
+      ]
+    },
+    {
+      "id": "warmup",
+      "name": "主持人热场",
+      "duration": 40,
+      "pattern": [
+        "host_to_camera",
+        "reaction",
+        "meme_card"
+      ]
+    },
+    {
+      "id": "set1",
+      "name": "选手段子一",
+      "duration": 95,
+      "pattern": [
+        "host_to_camera",
+        "b_roll",
+        "reaction",
+        "meme_card"
+      ]
+    },
+    {
+      "id": "set2",
+      "name": "段子二 · 互动",
+      "duration": 100,
+      "pattern": [
+        "host_to_camera",
+        "b_roll",
+        "reaction",
+        "meme_card"
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "投票与结尾",
+      "duration": 65,
+      "pattern": [
+        "host_to_camera",
+        "reaction",
+        "end_card"
+      ]
+    }
+  ]
+}
