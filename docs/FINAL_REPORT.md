@@ -278,3 +278,14 @@ FastAPI (8090) ── SQLite
 - ep_003（ep_e6a182d7d1「AI 剪辑师会抢活吗？」）：补 3 资产 + 台本 force 重建 20 镜/63.7s → 渲染 job_e94dc161bb done 28s → outputs/episodes/ep_e6a182d7d1/final.mp4（8,701,439 B）63.7s / 1280×720 / 25fps / 1592 帧 / blackdetect 0 / 16/16 TTS 音色 / 20/20 字幕 / 20/20 角色画面。
 - 三集产物：ep_001 299s / ep_002 75.95s / ep_003 63.7s，均 API 渲染 + 自动验收。
 - 测试：backend 101 passed（新增资产继承用例）；pipeline 40 passed。
+## 23. 多语种本地化（出海）v1（2026-10-24 晚）
+- 目标：同一成片一键产出多语配音+字幕版本（不改画面），优先 en/es，支持 ja/ko/pt；契约 contract/LOCALIZATION.md。
+- 翻译：本机 Ollama **qwen2.5:7b**（默认 provider=ollama；回退 NLLB-200-600M；mock 可测）；人名罗马化 Zhou/Ali/Dawei，品牌固定 Zaopianju，术语表约束；19 条对白约 5.5s，66 条约 12s。
+- 配音：edge-tts 多语音色（en-Guy/Aria/Jenny、es-Alvaro/Elvira/Dalia、ja/ko/pt 同表），每镜 atempo 0.85–1.25 拟合原镜头时长，混音 loudnorm 与中文版一致。
+- 字幕/包装：目标语 ASS（字体/行宽按语言）、srt 软字幕、片头/片尾/名字条/段落标签本地化；发布元数据 title/description/hashtags。
+- 后端：Localization 表 + POST /episodes/{eid}/localize + GET localizations、Job(type=localize)、Settings localize_langs/localize_translator/localize_voices（含 --voices-json 传参）；110 passed。
+- pipeline：pipeline/localize.py（本地化 episode manifest 重生成 per-lang clips + 多语 TTS + 目标语 ASS/SRT + 合成 + meta），pipeline tests **52 passed**。
+- 前端：成片房「多语种出海版本」面板（EN/ES/JA/KO/PT 多选、进度、播放、下载 mp4/srt、发布元数据复制、失败重试）；截图 37/38。
+- 实测（最终版）：ep_002 EN 75.95s/10.5MB、ES 75.95s/10.7MB；ep_001 EN 299.00s/34.3MB（41 条 TTS、44 条字幕、blackdetect 0）；画面包装全目标语、无中文残留；翻译 19 条≈5.5s、66 条≈12s、120 条约 22s。
+  - 包装本地化已修复并复验：左上品牌 ZAOPIANJU · AI MICRO-VARIETY、右上镜头标签、名字条、片头片尾全部目标语，画面无中文残留；复验 3 个版本时长/blackdetect 0/字幕数 21/21/44 全过。
+  - 截图：37_multilang_generating.png、38_multilang_en_play.png、39_ep001_en_title.png、40_ep001_en_mid.png、41_ep002_en_mid.png。

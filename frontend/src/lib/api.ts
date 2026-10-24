@@ -9,6 +9,7 @@ import type {
   Episode,
   Health,
   Job,
+  Localization,
   NewAsset,
   NewShot,
   Project,
@@ -207,6 +208,20 @@ export const api = {
   },
   exportEpisode: (eid: string, type = "capcut") =>
     request<Job>("/episodes/" + eid + "/export", { method: "POST", body: JSON.stringify({ type }) }),
+
+  /** 生成多语种出海版本：每语言一个 Job（兼容返回 Job[] / {jobs:[...]} / 单个 Job） */
+  localizeEpisode: async (eid: string, langs: string[]): Promise<Job[]> => {
+    const res = await request<Job | Job[] | { jobs?: Job[]; created?: number }>(
+      "/episodes/" + eid + "/localize",
+      { method: "POST", body: JSON.stringify({ langs }) }
+    );
+    if (Array.isArray(res)) return res;
+    if (res && Array.isArray((res as { jobs?: Job[] }).jobs)) return (res as { jobs: Job[] }).jobs;
+    if (res && typeof (res as Job).id === "string") return [res as Job];
+    return [];
+  },
+  localizations: (eid: string) => request<Localization[]>("/episodes/" + eid + "/localizations"),
+  localization: (lid: string) => request<Localization>("/localizations/" + lid),
 
   settings: () => request<Settings>("/settings"),
   patchSettings: (body: Partial<Settings>) =>

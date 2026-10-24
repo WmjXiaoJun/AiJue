@@ -28,7 +28,7 @@ LOG = logging.getLogger("pipeline")
 
 CLIP_WORKERS = 6
 AUDIO_WORKERS = 8
-CLIP_VERSION = "mock-v12-concepts"
+CLIP_VERSION = "mock-v13-l10n"
 TTS_LEAD_IN = 0.15
 BGM_DURATION = 32.0
 
@@ -126,7 +126,8 @@ def _normalize_external_clip(src: Path, dst: Path, width: int, height: int,
 def ensure_clip(shot: dict, assets: list, episode: dict, workdir: Path,
                 width: int, height: int, fps: int, force: bool = False,
                 char_map: dict | None = None, char_fp: str = "",
-                h3_dir: Path | None = None) -> dict:
+                h3_dir: Path | None = None,
+                locale: dict | None = None) -> dict:
     """返回 {"id","path","duration","reused","source","character","elapsed"}。
 
     片段来源优先级：clips/ 缓存 -> <workdir>/shots/<sid>.mp4 平台片段
@@ -227,7 +228,7 @@ def ensure_clip(shot: dict, assets: list, episode: dict, workdir: Path,
     t0 = time.time()
     result = mock_shot.generate_mock_clip(
         spec, clip_path, workdir, resolution=f"{width}x{height}", fps=fps,
-        char_map=char_map,
+        char_map=char_map, locale=locale,
     )
     elapsed = round(time.time() - t0, 2)
     utils.write_json(meta_path, {

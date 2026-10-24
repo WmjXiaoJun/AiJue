@@ -194,7 +194,8 @@ python -m pytest pipeline/tests -q
 覆盖：ASS 时间/颜色/事件生成、mock 片段 filter 构建（8 种镜头类型）、TTS vtt 格式、
 ComfyUI 适配器（httpx 用 monkeypatch 模拟，不联网）、平台生成台片段校验与复用、标准化失败回退、
 角色素材发现/3D→2D 优先级/角色映射/表情选择/角色素材指纹缓存失效、
-SDXL 概念图发现与第 3 优先级/竖构图顶部安全边裁切/概念表情/概念素材指纹失效。
+SDXL 概念图发现与第 3 优先级/竖构图顶部安全边裁切/概念表情/概念素材指纹失效、
+多语种本地化（翻译/人名罗马化/术语固定/目标语 ASS/时长拟合/voice 选择/本地化 clips 无中文）。
 
 ## 依赖
 
@@ -241,6 +242,34 @@ python -m pipeline.capcut validate --draft-dir outputs/exports/造片局_EP001
   适合 ≤5.9 等支持明文草稿的版本；10.x 若无法直接识别，需用旧版本导入或用
   `materials/` + `subtitles.srt` 手动重建。
 - 测试：`python -m pytest pipeline/tests/test_capcut.py -q`（manifest/SRT/草稿 JSON/轨道/素材路径/copy-media）。
+
+## 多语种本地化（pipeline.localize）
+
+同一部成片一键产出多语种配音 + 字幕版本（不改画面素材，只本地化文字包装）：
+
+```powershell
+python -m pipeline.localize --episode-json backend/data/jobs/<job>_episode.json `
+    --lang en --outdir outputs/episodes/{eid}/localized/en `
+    --translator ollama [--voices-json voices.json] [--force-translate]
+```
+
+- 翻译：默认 `ollama`（本机 qwen2.5:7b，约 5-9s/集），可 `--translator nllb`（ComfyUI venv）
+  或 `mock`（测试）；人名先罗马化（Zhou/Ali/Dawei），品牌/片头/片尾/段落用
+  `localize/terms.py` 固定映射，不交给模型；翻译失败回退原文并在 meta 标注。
+- **目标语画面重生成（关键）**：不复用中文 clips（品牌角标/镜头标签/名字条/片头片尾会残留中文），
+  而是用本地化后的 episode manifest 调 `mock_shot` 重新生成每条 clip（角色/H3/概念图素材不变，
+  只替换包装文字），per-lang 缓存；`pipeline/mock_shot.py` 的文案支持 `locale` 覆盖（默认中文，向后兼容）。
+- 配音：`localize/terms.py` 的 `VOICES` 多语种音色（en/es/ja/ko/pt，settings/`--voices-json` 可覆盖）；
+  每镜 TTS 用 atempo(1.0~1.25) 拟合镜头时长，不足补静音，拼 narration.wav，时长与中文版一致（±0.2s）。
+- 字幕/包装：目标语 ASS（字体/行宽按 `terms.FONTS` / `terms.WRAP_WIDTH`，自适应字号避免出画）
+  + `subtitles.srt`；片头标题、片尾 CTA、名字条、镜头标签、段落标签全部译文。
+- 产物：`final.mp4`（1280x720/25fps）+ `narration.wav` + `subtitles.srt` + `units.json` + `translations.json` + `meta.json`
+  （meta 含 lang/时长/翻译模型/耗时/发布元数据 title/description/hashtags）。
+- 实测：ep_002 en/es 75.95s（=中文版）、ep_001 en 299s；均 blackdetect=0、字幕/画面无中文、
+  名字条/品牌/镜头标签全英文；单语种首次渲染约 25-50s（ep_002 21 镜）到 2 分钟级（ep_001 52 镜），
+  全缓存复用约 8-25s。
+- 测试：`python -m pytest pipeline/tests/test_localize.py -q`（翻译/术语/人名罗马化/目标语 ASS/
+  时长拟合/voice 选择/本地化 manifest/重生成文案无中文/失败回退）。
 
 ## 已知限制 / 未做
 

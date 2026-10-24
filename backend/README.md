@@ -198,6 +198,37 @@ portrait_url,sheet_url,turntable_url,expressions,status,created_at}
 - PATCH 支持上述字段与可选 metaso_key：key 写入 backend/data/metaso.env（空字符串清除），
   读取优先级 METASO_API_KEY 环境变量 > backend/data/metaso.env。生产默认 local，
   metaso 仅用于测试/快速迭代（成片仍优先使用本地 H3）。
+- 多语种本地化：localize_langs（默认 ["en","es"]）、localize_translator（ollama 默认，本机
+  qwen2.5:7b | nllb 兜底 | mock 测试）、localize_voices（JSON，按语言覆盖音色，可空）。
+
+## 多语种本地化（contract/LOCALIZATION.md）
+
+同一成片一键产出多语配音 + 字幕版本（不改画面）。支持 en（主发）/ es / ja / ko / pt。
+
+数据与端点：
+
+- Localization 表：{id, episode_id, lang, status(draft/rendering/ready/failed),
+  video_url, srt_url, meta, created_at}（episode_id+lang 唯一；Episode.localizations 关系）。
+- POST /api/episodes/{eid}/localize {langs?:["en","es"]} -> 每语言一个 Job(type=localize)，
+  langs 缺省用 settings.localize_langs；语言去重、非法语言 400。
+- GET  /api/episodes/{eid}/localizations -> Localization[]
+- GET  /api/localizations/{lid} -> Localization
+
+后台任务：按语言调用（cwd = 仓库根，先把实际集序列化为 backend/data/jobs/{job}_episode.json）：
+
+    python -m pipeline.localize --episode-json <job_episode.json> --lang en \
+      --outdir outputs/episodes/{eid}/localized/en --translator ollama|nllb|mock \
+      [--voices-json <backend/data/jobs/{job}_localize_voices.json>]
+
+  默认 translator=ollama（Ollama qwen2.5:7b 本地翻译），nllb 兜底、mock 仅测试；
+  settings.localize_voices 非空时额外传 --voices-json（JSON 音色覆盖），为空则不传。
+
+- 产物（pipeline.localize 负责）：outputs/episodes/{eid}/localized/{lang}/final.mp4 /
+  subtitles.srt / translations.json / meta.json。
+- 成功后回填 Localization.video_url=/media/episodes/{eid}/localized/{lang}/final.mp4、
+  srt_url=/media/.../subtitles.srt、meta（读 meta.json），Job.output_url 同 video_url；
+  失败 Job.failed + error，Localization.status=failed 且 meta.error 记录原因，不崩。
+- 子进程超时 1800s；pipeline.localize 由 media-render 实现，未就绪时任务会 failed 并保留可读错误。
 
 ## 成片导出（contract/EXPORT.md：剪映草稿）
 
@@ -239,7 +270,8 @@ portrait_url,sheet_url,turntable_url,expressions,status,created_at}
 角色工坊 CRUD/资产联动/files/生成任务（tests/test_characters.py）、
 概念图/H3/剪映导出（tests/test_concept.py）、H3 provider 分派与 settings/key 掩码
 （tests/test_h3_provider.py）、台本解析/分镜生成/镜头增删/集创建/render 序列化
-（tests/test_script.py）、ComfyUI 适配器 mock。
+（tests/test_script.py）、多语种本地化 enqueue/回填/失败/settings（tests/test_localization.py）、
+ComfyUI 适配器 mock。
 
 ## ComfyUI 适配器
 

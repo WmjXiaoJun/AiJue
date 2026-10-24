@@ -16,6 +16,7 @@
 - 快速测试：integrations/metaso（MetaSo 云端 MiniMax H3 API，5s 约 23–25s，测试用，可切换）
 - 图像生成：imagegen（SDXL 动漫 Animagine XL 4.0，文生角色概念图/三视图/表情 + **IP-Adapter 一致性三视图/表情**）
 - 导出：pipeline/capcut.py（pyJianYingDraft，剪映草稿 52 段）
+- 多语种出海：localize/（Ollama qwen2.5:7b 翻译 + NLLB 回退）+ pipeline/localize.py（多语 TTS/字幕/包装），成片房一键出 EN/ES/JA/KO/PT 版本
 - 流水线：ffmpeg 合成 + edge-tts 中文配音 + ASS 字幕/花字 + 片头片尾 + BGM，CLI 可独立运行
 
 ## 快速开始（Windows）

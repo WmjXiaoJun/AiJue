@@ -57,6 +57,10 @@ Vite + React 18 + TypeScript 的深色影棚风制片工作台。无 UI 框架�
   H3 动画播放使用 cache-bust 重新拉取最新概念图驱动视频；抽屉立绘优先 `Character.portrait_url`（后端切到 SDXL 概念立绘后自动生效）。
 - 成片导出（contract/EXPORT.md）：成片房「交付导出」面板 → `POST /episodes/{eid}/export {type:"capcut"}` → 轮询任务，
   展示产物路径、复制剪映草稿目录（`%LOCALAPPDATA%\JianyingPro\User Data\Projects\com.lveditor.draft`）与导入步骤。
+- 多语种出海（contract/LOCALIZATION.md）：成片房「多语种出海版本」面板 — 语言多选（EN/ES/JA/KO/PT，默认 EN+ES），
+  `POST /episodes/{eid}/localize {langs}` 每语言一个 Job，任务进行中 2.5s 轮询 `GET /episodes/{eid}/localizations`；
+  每语言卡片支持视频播放、下载 mp4 / srt、展开发布元数据（title / description / hashtags 一键复制）与失败重试。
+  中文原版保留在上方「成片渲染」，多语版本为同画面 + 目标语配音/字幕（localized/{lang}/final.mp4 + subtitles.srt）。
 - 台本驱动（contract/SCRIPT_FORMAT.md）：编剧间台本 textarea 读写 `episode.script`（进入加载、脏标记、未保存离开提示），
   保存 `PATCH /episodes/{eid} {script}`；空台本展示示例格式并支持一键填入；「从台本生成分镜」在有镜头时二次确认并以
   `{force:true}` 覆盖，完成后展示 created 数与分段摘要并刷新分镜。剧集头部支持切换剧集 / 新建剧集

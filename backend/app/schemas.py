@@ -183,6 +183,10 @@ class SettingsOut(ORMModel):
     metaso_resolution: str = "768P"
     metaso_duration: int = 5
     metaso_key_configured: bool = False  # 只读，不回传明文 key
+    # 多语种本地化（contract/LOCALIZATION.md）
+    localize_langs: List[str] = Field(default_factory=lambda: ["en", "es"])
+    localize_translator: str = "ollama"  # ollama 默认；nllb 兜底；mock 测试
+    localize_voices: Dict[str, Any] = Field(default_factory=dict)
 
 
 class SettingsUpdate(BaseModel):
@@ -200,6 +204,10 @@ class SettingsUpdate(BaseModel):
     metaso_duration: Optional[int] = Field(default=None, ge=4, le=15)
     # 写入 backend/data/metaso.env（不落 DB、不回传）；空字符串表示清除
     metaso_key: Optional[str] = None
+    # 多语种本地化
+    localize_langs: Optional[List[str]] = None
+    localize_translator: Optional[str] = None
+    localize_voices: Optional[Dict[str, Any]] = None
 
 
 # ---------------- Character（角色工坊） ----------------
@@ -303,6 +311,28 @@ class EpisodeExportRequest(BaseModel):
     type: str = "capcut"
     # 可选导出名（默认 造片局_EPxxx）；测试/演示可用独立 name 避免覆盖 canonical 草稿
     name: Optional[str] = None
+
+
+# ---------------- 多语种本地化（contract/LOCALIZATION.md） ----------------
+class LocalizationOut(ORMModel):
+    id: str
+    episode_id: str
+    lang: str
+    status: str
+    video_url: Optional[str] = None
+    srt_url: Optional[str] = None
+    meta: Dict[str, Any] = Field(default_factory=dict)
+    created_at: datetime
+
+    @field_validator("meta", mode="before")
+    @classmethod
+    def _meta_none_to_dict(cls, value):
+        return value or {}
+
+
+class LocalizeRequest(BaseModel):
+    # 不传时使用 settings.localize_langs（默认 ["en","es"]）
+    langs: Optional[List[str]] = None
 
 
 class HealthOut(BaseModel):

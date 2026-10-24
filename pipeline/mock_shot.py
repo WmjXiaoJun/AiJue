@@ -48,6 +48,40 @@ CARD_MONTAGE_TYPES = ("title_card", "end_card")
 PIP_TYPES = ("meme_card", "b_roll")
 
 
+# 镜头内烘焙文案的多语种覆盖（默认中文，向后兼容）；本地化重生成 clips 时传入译文
+DEFAULT_LOCALE = {
+    "brand_line": "造片局 · AI 微综艺",
+    "brand_short": "造片局",
+    "title_top": "造片局 出品  ·  EP.{no:03d}",
+    "episode_label": "第 {no:03d} 期",
+    "live": "● LIVE  虚拟演播厅 A",
+    "speaking": "发言中",
+    "status_line": "● {name}  ·  {role}  ·  {speaking}",
+    "status_line2": "● {speaking}  ·  {role}",
+    "reaction_label": "REACTION · 表情特写",
+    "reaction_label2": "REACTION · 特写",
+    "reaction_role": "反应镜头",
+    "guest_intro_label": "嘉宾介绍",
+    "host_role": "主持人",
+    "guest_role": "嘉宾",
+    "end_brand": "造片局",
+    "end_tagline": "AI 微综艺",
+    "meme_tag": "花字  MEME",
+    "meme_punch": "花字",
+    "broll_scene": "剪辑机房 · 服务器指示灯",
+}
+
+
+def _loc_value(locale: dict | None, key: str, **kwargs) -> str:
+    text = str((locale or {}).get(key) or DEFAULT_LOCALE.get(key) or "")
+    if not kwargs:
+        return text
+    try:
+        return text.format(**kwargs)
+    except (KeyError, IndexError, ValueError):
+        return text
+
+
 def _hex_to_ff(color: str, default: str = "0xF5C518") -> str:
     """#RRGGBB -> 0xRRGGBB。"""
     c = (color or "").strip()
@@ -136,8 +170,11 @@ def _role_text(asset: dict) -> str:
 class _ShotCtx:
     def __init__(self, shot: dict, assets: list, scratch: Path, font_info: dict,
                  width: int, height: int, duration: float, fps: int,
-                 char_map: dict | None = None) -> None:
+                 char_map: dict | None = None, locale: dict | None = None) -> None:
         self.shot = shot or {}
+        self.locale = dict(DEFAULT_LOCALE)
+        self.locale.update(locale or {})
+        self._names = dict((locale or {}).get("names") or {})
         self.assets = [a for a in (assets or []) if isinstance(a, dict)]
         self.scratch = scratch
         self.font_body = font_info["body"]["file"]
@@ -147,6 +184,8 @@ class _ShotCtx:
         self.dur = duration
         self.fps = fps
         self.texts = _TextFiles(scratch, utils.safe_slug(self.shot.get("id") or "shot", 12))
+        self._t = lambda key, **kw: _loc_value(self.locale, key, **kw)
+        self._name = lambda value: self._names.get(str(value or ""), str(value or ""))
         self.type = normalize_shot_type(self.shot.get("type"))
         self.speaker_id = self.shot.get("speaker") or ""
         self.speaker = self._asset(self.speaker_id)
@@ -202,7 +241,7 @@ class _ShotCtx:
         self.cutout_active = False
         self.pip_char = None
         if self.type in PIP_TYPES and self.cast:
-            host = next((c for c in self.cast if "主持" in str(c.get("title") or "")), self.cast[0])
+            host = next((c for c in self.cast if c.get("role") == "host"), self.cast[0])
             self.pip_char = host
 
     # ---- 小工具 ----------------------------------------------------------
@@ -221,7 +260,7 @@ class _ShotCtx:
     def _brand(self, parts: list, opacity: str = "white@0.72") -> None:
         accent = config.ACCENT_HOST
         parts.append(_box(46, 32, 6, 30, accent))
-        parts.append(_dt(self.texts.put(f"造片局 · AI 微综艺", "brand"),
+        parts.append(_dt(self.texts.put(self._t("brand_line"), "brand"),
                          size=26, color=opacity, x=64, y=35,
                          font=self.font_body, border=1, border_color="black@0.35"))
 
@@ -553,11 +592,12 @@ class _ShotCtx:
         title = str(self.shot.get("title") or self.shot.get("subtitle")
                     or config.BRAND_NAME)
         ep_no = int(self.shot.get("episode_no") or 1)
-        parts.append(_dt(self.texts.put(f"造片局 出品  ·  EP.{ep_no:03d}", "top"),
+        parts.append(_dt(self.texts.put(self._t("title_top", no=ep_no), "top"),
                          size=27, color="white@0.72", x=46, y=32,
                          font=self.font_body, border=1, border_color="black@0.5"))
         parts.append(_box(46, 68, 300, 3, "0xFFFFFF@0.3"))
-        size = _fit_size(title, 88, [(8, 1.0), (12, 0.88), (17, 0.74), (99, 0.62)])
+        # 宽感知字号：拉丁/译文标题可能远长于中文，按字数估算保证不出画
+        size = max(22, min(88, int(1120 / (0.62 * max(1, len(title))))))
         parts.append(_dt(self.texts.put(title, "title"), size=size,
                          color="white", x="(w-tw)/2", y="(h-th)/2-64",
                          font=self.font_display, border=5, border_color="black@0.85",
@@ -568,23 +608,23 @@ class _ShotCtx:
 
     def _build_end_card(self, parts: list) -> None:
         accent = config.ACCENT_HOST
-        parts.append(_dt(self.texts.put(config.BRAND_NAME, "brandname"),
+        parts.append(_dt(self.texts.put(self._t("end_brand"), "brandname"),
                          size=132, color="white", x="(w-tw)/2", y="(h-th)/2-96",
                          font=self.font_display, border=4, border_color="black@0.6",
                          shadow=(0, 6, "black@0.5"),
                          alpha="min(1,max(0,t/0.55))"))
         parts.append(_box("(iw-460)/2", 470, 460, 5, accent))
-        parts.append(_dt(self.texts.put(config.BRAND_TAGLINE, "tagline"),
+        parts.append(_dt(self.texts.put(self._t("end_tagline"), "tagline"),
                          size=48, color=accent, x="(w-tw)/2", y=496,
                          font=self.font_body, border=2, border_color="black@0.5"))
-        parts.append(_dt(self.texts.put("第 001 期", "next"),
+        parts.append(_dt(self.texts.put(self._t("episode_label", no=int(self.shot.get("episode_no") or 1)), "next"),
                          size=28, color="white@0.6", x="(w-tw)/2", y=572,
                          font=self.font_body, alpha="min(1,max(0,(t-0.5)/0.6))"))
 
     def _build_host_to_camera(self, parts: list) -> None:
         accent = self._char_accent(self.character) if self.char_mode else self.accent
-        name = self.speaker_name or "主持人"
-        role = _role_text(self.speaker) if self.speaker else "主持人"
+        name = self._name(self.speaker_name) or self._t("host_role")
+        role = _role_text(self.speaker) if self.speaker else self._t("host_role")
         if not self.char_mode:
             if name:
                 parts.append(_dt(self.texts.put(name, "wm"), size=300,
@@ -604,20 +644,20 @@ class _ShotCtx:
                          alpha="min(1,max(0,(t-0.3)/0.4))"))
         if self.char_mode:
             # 右侧角色面板的对侧小引语，强化综艺包装
-            parts.append(_dt(self.texts.put("● LIVE  虚拟演播厅 A", "live"),
+            parts.append(_dt(self.texts.put(self._t("live"), "live"),
                              size=22, color="white@0.42", x=62, y=448,
                              font=self.font_body, border=1,
                              border_color="black@0.35"))
 
     def _build_shot_reverse(self, parts: list) -> None:
         accent = self._char_accent(self.character) if self.char_mode else self.accent
-        name = self.speaker_name or "嘉宾"
-        role = _role_text(self.speaker) if self.speaker else "嘉宾"
+        name = self._name(self.speaker_name) or self._t("guest_role")
+        role = _role_text(self.speaker) if self.speaker else self._t("guest_role")
         self._brand(parts)
         self._caption(parts)
         if self.char_mode:
             # 顶部发言状态 + 左下角当前说话人名字条（逐镜头按 shot.speaker_name 绑定）
-            parts.append(_dt(self.texts.put(f"● {name}  ·  {role}  ·  发言中", "status"),
+            parts.append(_dt(self.texts.put(self._t("status_line", name=name, role=role, speaking=self._t("speaking")), "status"),
                              size=30, color=accent, x="(w-tw)/2", y=92,
                              font=self.font_display, border=3,
                              border_color="black@0.75",
@@ -638,7 +678,7 @@ class _ShotCtx:
                          font=self.font_display, border=5,
                          border_color="black@0.8", shadow=(0, 4, "black@0.55"),
                          alpha="min(1,max(0,t/0.35))"))
-        parts.append(_dt(self.texts.put(f"● 发言中  ·  {role}", "status"),
+        parts.append(_dt(self.texts.put(self._t("status_line2", role=role, speaking=self._t("speaking")), "status"),
                          size=29, color="white@0.85", x="(w-tw)/2", y="(h/2)+18",
                          font=self.font_body, border=2, border_color="black@0.6",
                          alpha="min(1,max(0,(t-0.25)/0.4))"))
@@ -674,11 +714,11 @@ class _ShotCtx:
 
     def _build_reaction(self, parts: list) -> None:
         accent = self._char_accent(self.character) if self.char_mode else self.accent
-        name = self.speaker_name or "嘉宾"
+        name = self._name(self.speaker_name) or self._t("guest_role")
         self._brand(parts)
         self._caption(parts, left=True, y=238) if self.char_mode else self._caption(parts)
         if self.char_mode:
-            parts.append(_dt(self.texts.put("REACTION · 表情特写", "label"), size=38,
+            parts.append(_dt(self.texts.put(self._t("reaction_label"), "label"), size=38,
                              color="white@0.55", x=64, y=148,
                              font=self.font_display, border=2,
                              border_color="black@0.5",
@@ -688,11 +728,11 @@ class _ShotCtx:
                              x=66, y="h-th-160",
                              font=self.font_display, border=3,
                              border_color="black@0.75", shadow=(0, 3, "black@0.5")))
-            parts.append(_dt(self.texts.put("反应镜头", "role"), size=24,
+            parts.append(_dt(self.texts.put(self._t("reaction_role"), "role"), size=24,
                              color="white@0.5", x=68, y="h-th-92",
                              font=self.font_body))
             return
-        parts.append(_dt(self.texts.put("REACTION · 特写", "label"), size=40,
+        parts.append(_dt(self.texts.put(self._t("reaction_label2"), "label"), size=40,
                          color="white@0.5", x="(w-tw)/2", y="(h-th)/2-10",
                          font=self.font_body, border=2,
                          border_color="black@0.5",
@@ -701,7 +741,7 @@ class _ShotCtx:
                          x="w-tw-70", y="h-th-150",
                          font=self.font_display, border=3,
                          border_color="black@0.75", shadow=(0, 3, "black@0.5")))
-        parts.append(_dt(self.texts.put("反应镜头", "role"), size=24,
+        parts.append(_dt(self.texts.put(self._t("reaction_role"), "role"), size=24,
                          color="white@0.5", x="w-tw-68", y="h-th-84",
                          font=self.font_body))
 
@@ -716,7 +756,7 @@ class _ShotCtx:
                          border_color="black@0.45",
                          alpha="min(1,max(0,t/0.4))"))
         parts.append(_box(84, 372, 110, 4, cy))
-        scene = _shorten(self.shot.get("visual") or "剪辑机房 · 服务器指示灯", 30)
+        scene = _shorten(self.shot.get("visual") or self._t("broll_scene"), 30)
         parts.append(_dt(self.texts.put(scene, "scene"), size=38,
                          color="white@0.72", x=84, y=394,
                          font=self.font_body, border=2,
@@ -730,12 +770,12 @@ class _ShotCtx:
 
     def _build_meme_card(self, parts: list) -> None:
         accent = config.ACCENT_HOST
-        punch = str(self.shot.get("punchline") or self.shot.get("subtitle") or "花字")
+        punch = str(self.shot.get("punchline") or self.shot.get("subtitle") or self._t("meme_punch"))
         parts.append(_box(46, 32, 6, 30, accent))
-        parts.append(_dt(self.texts.put("花字  MEME", "tag"), size=26,
+        parts.append(_dt(self.texts.put(self._t("meme_tag"), "tag"), size=26,
                          color="white@0.42", x=64, y=35,
                          font=self.font_body, border=1, border_color="black@0.3"))
-        parts.append(_dt(self.texts.put("造片局", "wm"), size=26,
+        parts.append(_dt(self.texts.put(self._t("brand_short"), "wm"), size=26,
                          color="white@0.4", x="w-tw-46", y="h-th-42",
                          font=self.font_body))
         top_y = 168 if len(punch) <= 8 else 128
@@ -750,12 +790,12 @@ class _ShotCtx:
 
     def _build_guest_intro(self, parts: list) -> None:
         accent = self._char_accent(self.character) if self.char_mode else self.accent
-        name = self.speaker_name or str(self.speaker.get("name") or "嘉宾")
+        name = self._name(self.speaker_name) or self._name(str(self.speaker.get("name") or "")) or self._t("guest_role")
         role = _role_text(self.speaker) if self.speaker else "嘉宾"
         self._brand(parts)
         self._caption(parts, left=self.char_mode)
         if self.char_mode:
-            parts.append(_dt(self.texts.put("嘉宾介绍", "label"), size=32,
+            parts.append(_dt(self.texts.put(self._t("guest_intro_label"), "label"), size=32,
                              color="white@0.55", x=70, y=170,
                              font=self.font_body, border=1,
                              border_color="black@0.4"))
@@ -769,7 +809,7 @@ class _ShotCtx:
                              font=self.font_body, border=2,
                              border_color="black@0.5"))
             return
-        parts.append(_dt(self.texts.put("嘉宾介绍", "label"), size=30,
+        parts.append(_dt(self.texts.put(self._t("guest_intro_label"), "label"), size=30,
                          color="white@0.5", x="(w-tw)/2", y="(h-th)/2-150",
                          font=self.font_body, border=1, border_color="black@0.4"))
         parts.append(_dt(self.texts.put(name, "name"), size=110, color=accent,
@@ -826,7 +866,8 @@ def _base_source(ctx: _ShotCtx) -> str:
 def generate_mock_clip(spec: dict, out_path, scratch_dir,
                        resolution: str | None = None,
                        fps: int | None = None,
-                       char_map: dict | None = None) -> dict:
+                       char_map: dict | None = None,
+                       locale: dict | None = None) -> dict:
     """按 contract 的 shot_spec.json 生成一个 mock 片段。
 
     char_map: {asset_id: char_assets}，由 characters.resolve_for_assets 构建；
@@ -847,7 +888,8 @@ def generate_mock_clip(spec: dict, out_path, scratch_dir,
     if char_map is None:
         char_map = characters.resolve_for_assets(assets)
     ctx = _ShotCtx(shot, assets, scratch, font_info, width, height,
-                   duration, fps, char_map=char_map)
+                   duration, fps, char_map=char_map,
+                   locale=locale if locale is not None else spec.get("locale"))
     vf = ctx.build()
     src = _base_source(ctx)
     compose = ctx.compose()

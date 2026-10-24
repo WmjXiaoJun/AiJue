@@ -200,6 +200,14 @@ export const IconCopy = make(
   </>
 );
 
+export const IconGlobe = make(
+  <>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="M3.5 12h17" />
+    <path d="M12 3.5c2.3 2.4 3.5 5.3 3.5 8.5S14.3 18.1 12 20.5C9.7 18.1 8.5 15.2 8.5 12S9.7 5.9 12 3.5z" />
+  </>
+);
+
 export const IconTrash = make(
   <>
     <path d="M4 6.5h16" />

@@ -12,3 +12,5 @@ frontend/node_modules/
 # MetaSo test key (do not commit)
 backend/data/metaso.env
 integrations/metaso/.env
+# local model weights (do not commit)
+localize/models/

@@ -30,6 +30,7 @@ _ERR_LIMIT = 2000
 GPU_LOCK = threading.Lock()
 H3_TIMEOUT_SECONDS = 20 * 60  # 本地 H3 长任务超时（契约要求 >= 15 分钟）
 METASO_TIMEOUT_SECONDS = 300  # MetaSo 云端测试 provider 超时（实测单条 ~23-25s）
+LOCALIZE_TIMEOUT_SECONDS = 1800  # 多语种本地化（翻译 + TTS + 混音 + 编码）
 
 
 def utcnow():
@@ -165,6 +166,7 @@ def _fail(
     shot: Optional[models.Shot] = None,
     episode: Optional[models.Episode] = None,
     character: Optional[models.Character] = None,
+    localization: Optional[models.Localization] = None,
 ) -> None:
     message = (error or "任务失败").strip() or "任务失败"
     _update(db, job, status="failed", error=message, message=message[:200])
@@ -174,6 +176,11 @@ def _fail(
         episode.status = "failed"
     if character is not None:
         character.status = "failed"
+    if localization is not None:
+        localization.status = "failed"
+        meta = dict(localization.meta or {})
+        meta["error"] = message
+        localization.meta = meta
     db.commit()
     logger.warning("任务 %s 失败: %s", job.id, message[:300])
 
@@ -259,6 +266,8 @@ def run_job(job_id: str) -> None:
                 run_h3_job(db, job)
             elif job.type == "export":
                 run_export_job(db, job)
+            elif job.type == "localize":
+                run_localize_job(db, job)
             else:
                 _fail(db, job, f"未知任务类型: {job.type}")
     except Exception as exc:  # noqa: BLE001 - 后台线程必须兜底
@@ -284,6 +293,11 @@ def _mark_failed_isolated(job_id: str, exc: Exception) -> None:
                     character = db.get(models.Character, job.character_id)
                     if character is not None:
                         character.status = "failed"
+                if job.type == "localize":
+                    loc_id = (job.params or {}).get("localization_id")
+                    loc = db.get(models.Localization, loc_id) if loc_id else None
+                    if loc is not None:
+                        loc.status = "failed"
                 db.commit()
     except Exception:  # noqa: BLE001
         logger.exception("任务失败状态写回失败: %s", job_id)
@@ -1298,6 +1312,172 @@ def run_metaso_h3_job(
 
 
 # --------------------------------------------------------------------------- #
+# localize 任务（多语种本地化：调用 pipeline.localize）
+# --------------------------------------------------------------------------- #
+def enqueue_localize_job(db, episode: models.Episode, lang: str):
+    """入队单语言本地化任务；同一集同语言已有活跃任务时复用。返回 (job, created)。"""
+    lang = str(lang or "").strip().lower()
+    if not lang:
+        raise ValueError("lang 不能为空")
+    active = None
+    for candidate in (
+        db.query(models.Job)
+        .filter(
+            models.Job.type == "localize",
+            models.Job.episode_id == episode.id,
+            models.Job.status.in_(ACTIVE_STATUSES),
+        )
+        .order_by(models.Job.created_at.desc())
+        .all()
+    ):
+        if str((candidate.params or {}).get("lang") or "").strip().lower() == lang:
+            active = candidate
+            break
+    localization = (
+        db.query(models.Localization)
+        .filter(
+            models.Localization.episode_id == episode.id,
+            models.Localization.lang == lang,
+        )
+        .first()
+    )
+    if localization is None:
+        localization = models.Localization(
+            id=models.new_id("loc"),
+            episode_id=episode.id,
+            lang=lang,
+            status="draft",
+            meta={},
+        )
+        db.add(localization)
+        db.flush()
+    else:
+        localization.status = "draft"
+    if active is not None:
+        return active, False
+    job = models.Job(
+        id=models.new_id("job"),
+        type="localize",
+        status="queued",
+        progress=0.0,
+        message=f"本地化排队中（{lang}）",
+        episode_id=episode.id,
+        params={"lang": lang, "localization_id": localization.id},
+    )
+    db.add(job)
+    db.commit()
+    dispatch(job.id)
+    return job, True
+
+
+def run_localize_job(db, job: models.Job) -> None:
+    episode = db.get(models.Episode, job.episode_id) if job.episode_id else None
+    params = dict(job.params or {})
+    lang = str(params.get("lang") or "").strip().lower()
+    localization = (
+        db.get(models.Localization, params.get("localization_id"))
+        if params.get("localization_id")
+        else None
+    )
+    if localization is None and episode is not None and lang:
+        localization = (
+            db.query(models.Localization)
+            .filter(
+                models.Localization.episode_id == episode.id,
+                models.Localization.lang == lang,
+            )
+            .first()
+        )
+    if episode is None or localization is None or not lang:
+        _fail(db, job, "本地化任务缺少集/语言/版本记录")
+        return
+
+    setting = seed.get_settings(db)
+    # 默认 Ollama qwen2.5:7b；NLLB 兜底；mock 仅测试
+    translator = str(setting.localize_translator or "ollama").strip().lower()
+    if translator not in ("ollama", "nllb", "mock"):
+        translator = "ollama"
+
+    outdir = config.OUTPUTS_DIR / "episodes" / episode.id / "localized" / lang
+    outdir.mkdir(parents=True, exist_ok=True)
+    episode_json = _serialize_episode(db, episode, job)
+
+    _update(db, job, status="running", progress=3, message=f"本地化处理中（{lang}）")
+    localization.status = "rendering"
+    db.commit()
+
+    cmd = [
+        sys.executable,
+        "-m",
+        "pipeline.localize",
+        "--episode-json",
+        str(episode_json),
+        "--lang",
+        lang,
+        "--outdir",
+        str(outdir),
+        "--translator",
+        translator,
+    ]
+    voices = setting.localize_voices or {}
+    if isinstance(voices, dict) and voices:
+        config.JOBS_TMP_DIR.mkdir(parents=True, exist_ok=True)
+        voices_path = config.JOBS_TMP_DIR / f"{job.id}_localize_voices.json"
+        voices_path.write_text(
+            json.dumps(voices, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+        cmd += ["--voices-json", str(voices_path)]
+    try:
+        returncode, stdout_lines, stderr_text = run_cli(cmd, timeout=LOCALIZE_TIMEOUT_SECONDS)
+    except Exception as exc:  # noqa: BLE001 - CLI 无法启动
+        _fail(db, job, f"pipeline.localize 启动失败: {exc}", localization=localization)
+        return
+    if returncode != 0:
+        _fail(
+            db,
+            job,
+            _format_error("pipeline.localize", returncode, stderr_text, stdout_lines),
+            localization=localization,
+        )
+        return
+
+    final_path = outdir / "final.mp4"
+    if not final_path.is_file() or final_path.stat().st_size == 0:
+        _fail(
+            db,
+            job,
+            f"pipeline.localize 未产出 final.mp4（outdir={outdir}）",
+            localization=localization,
+        )
+        return
+    meta: Dict[str, Any] = {}
+    meta_path = outdir / "meta.json"
+    if meta_path.is_file():
+        try:
+            meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            meta = {}
+    srt_path = outdir / "subtitles.srt"
+    video_url = config.media_url(final_path)
+    localization.status = "ready"
+    localization.video_url = video_url
+    localization.srt_url = config.media_url(srt_path) if srt_path.is_file() else None
+    localization.meta = meta if isinstance(meta, dict) else {}
+    _update(
+        db,
+        job,
+        status="done",
+        progress=100,
+        message=f"本地化完成（{lang}）",
+        output_url=video_url,
+        cost=0.0,
+        error=None,
+    )
+    db.commit()
+    logger.info("localize 任务完成: job=%s episode=%s lang=%s", job.id, episode.id, lang)
+
+
+# --------------------------------------------------------------------------- #
 # export 任务（剪映草稿导出：调用 pipeline.capcut）
 # --------------------------------------------------------------------------- #
 def enqueue_export_job(
@@ -1505,6 +1685,11 @@ def retry_job(db, job: models.Job):
         character = db.get(models.Character, job.character_id)
         if character is not None:
             character.status = "generating"
+    if job.type == "localize":
+        loc_id = (job.params or {}).get("localization_id")
+        loc = db.get(models.Localization, loc_id) if loc_id else None
+        if loc is not None:
+            loc.status = "draft"
     db.commit()
     dispatch(job.id)
     return job, True

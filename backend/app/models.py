@@ -15,6 +15,7 @@ from sqlalchemy import (
     JSON,
     String,
     Text,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
 
@@ -98,6 +99,13 @@ class Episode(Base):
         cascade="all, delete-orphan",
         lazy="selectin",
         order_by="Shot.no",
+    )
+    localizations = relationship(
+        "Localization",
+        back_populates="episode",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+        order_by="Localization.created_at",
     )
 
     @property
@@ -198,6 +206,29 @@ class Job(Base):
     updated_at = Column(DateTime, nullable=False, default=utcnow, onupdate=utcnow)
 
 
+class Localization(Base):
+    """多语种本地化版本（contract/LOCALIZATION.md）。"""
+
+    __tablename__ = "localizations"
+    __table_args__ = (
+        UniqueConstraint("episode_id", "lang", name="uq_localization_episode_lang"),
+    )
+
+    id = Column(String(64), primary_key=True)
+    episode_id = Column(
+        String(64), ForeignKey("episodes.id", ondelete="CASCADE"), nullable=False
+    )
+    lang = Column(String(8), nullable=False)
+    status = Column(String(16), nullable=False, default="draft")  # draft/queued/rendering/ready/failed
+    video_url = Column(String(400), nullable=True)
+    srt_url = Column(String(400), nullable=True)
+    # 契约字段名 meta（DB 列名 meta_json）
+    meta = Column("meta_json", JSON, nullable=False, default=dict)
+    created_at = Column(DateTime, nullable=False, default=utcnow)
+
+    episode = relationship("Episode", back_populates="localizations")
+
+
 class Character(Base):
     """原创动漫角色（角色工坊产物，字段与 contract/CHARACTER.md 对齐）。"""
 
@@ -257,6 +288,10 @@ class Setting(Base):
     metaso_base_url = Column(String(300), nullable=False, default="https://metaso.cn/api/minimax")
     metaso_resolution = Column(String(16), nullable=False, default="768P")
     metaso_duration = Column(Integer, nullable=False, default=5)
+    # 多语种本地化（contract/LOCALIZATION.md）
+    localize_langs = Column(JSON, nullable=False, default=lambda: ["en", "es"])
+    localize_translator = Column(String(16), nullable=False, default="ollama")  # ollama|nllb|mock
+    localize_voices = Column(JSON, nullable=False, default=dict)
     updated_at = Column(DateTime, nullable=False, default=utcnow, onupdate=utcnow)
 
     @property

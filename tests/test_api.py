@@ -417,6 +417,9 @@ def test_settings_get_and_patch(client):
         "metaso_resolution",
         "metaso_duration",
         "metaso_key_configured",
+        "localize_langs",
+        "localize_translator",
+        "localize_voices",
     }
     try:
         response = client.patch(

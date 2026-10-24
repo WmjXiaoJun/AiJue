@@ -53,6 +53,9 @@ def ensure_defaults(db) -> Setting:
             metaso_base_url="https://metaso.cn/api/minimax",
             metaso_resolution="768P",
             metaso_duration=5,
+            localize_langs=["en", "es"],
+            localize_translator="ollama",
+            localize_voices={},
         )
         db.add(setting)
         db.commit()
@@ -67,6 +70,9 @@ def ensure_defaults(db) -> Setting:
             "metaso_base_url": "https://metaso.cn/api/minimax",
             "metaso_resolution": "768P",
             "metaso_duration": 5,
+            "localize_langs": ["en", "es"],
+            "localize_translator": "ollama",
+            "localize_voices": {},
         }
         for field, value in defaults.items():
             current = getattr(setting, field)

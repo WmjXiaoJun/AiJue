@@ -70,6 +70,9 @@ _MIGRATIONS = {
         "metaso_base_url": "VARCHAR(300) NOT NULL DEFAULT 'https://metaso.cn/api/minimax'",
         "metaso_resolution": "VARCHAR(16) NOT NULL DEFAULT '768P'",
         "metaso_duration": "INTEGER NOT NULL DEFAULT 5",
+        "localize_langs": "TEXT",
+        "localize_translator": "VARCHAR(16)",
+        "localize_voices": "TEXT",
     },
 }
 
@@ -126,6 +129,24 @@ def migrate_columns() -> None:
             )
             connection.execute(
                 text("UPDATE settings SET metaso_duration = 5 WHERE metaso_duration IS NULL")
+            )
+            connection.execute(
+                text(
+                    "UPDATE settings SET localize_langs = '[\"en\",\"es\"]' "
+                    "WHERE localize_langs IS NULL OR localize_langs = ''"
+                )
+            )
+            connection.execute(
+                text(
+                    "UPDATE settings SET localize_translator = 'ollama' "
+                    "WHERE localize_translator IS NULL OR localize_translator = ''"
+                )
+            )
+            connection.execute(
+                text(
+                    "UPDATE settings SET localize_voices = '{}' "
+                    "WHERE localize_voices IS NULL OR localize_voices = ''"
+                )
             )
 
 

@@ -47,6 +47,33 @@ export interface StoryboardResult {
   total_duration?: number;
 }
 
+/** 多语种出海版本（contract/LOCALIZATION.md） */
+export interface LocalizationMeta {
+  title?: string;
+  description?: string;
+  hashtags?: string[] | string;
+  duration_s?: number;
+  /** pipeline 产出的 meta.json 字段 */
+  duration?: number;
+  lang?: string;
+  translator?: string | { provider?: string; model?: string } | null;
+  publish?: { title?: string; description?: string; hashtags?: string[] | string } | Record<string, unknown> | null;
+  [key: string]: unknown;
+}
+
+export interface Localization {
+  id: string;
+  episode_id: string;
+  lang: string;
+  /** draft | queued | rendering | ready | failed */
+  status: string;
+  video_url?: string | null;
+  srt_url?: string | null;
+  meta?: LocalizationMeta | null;
+  created_at: string;
+  updated_at?: string | null;
+}
+
 export interface NewShot {
   type?: string;
   line?: string;

@@ -46,6 +46,8 @@ ASSET_ROLES = {"host", "guest"}
 ASSET_TYPES = {"character", "scene", "prop", "style"}
 STYLE_PRESETS = {"3d_toon", "3d_cel", "2d_cel", "2d_paint", "anime", "guoman"}
 DEFAULT_STYLE = "3d_toon"
+# 多语种本地化支持语言（MVP en/es，另支持 ja/ko/pt；fr/de/ar 预留）
+SUPPORTED_LANGS = ["en", "es", "ja", "ko", "pt"]
 
 # 导入即建表 + 播种（幂等），保证直接 uvicorn 启动即可用
 init_db()
@@ -82,6 +84,11 @@ def _recover_stale_jobs() -> None:
                 character = db.get(models.Character, job.character_id)
                 if character is not None and character.status == "generating":
                     character.status = "failed"
+            if job.type == "localize":
+                loc_id = (job.params or {}).get("localization_id")
+                localization = db.get(models.Localization, loc_id) if loc_id else None
+                if localization is not None and localization.status in ("draft", "rendering"):
+                    localization.status = "failed"
         db.commit()
         logger.warning("启动恢复：%d 个未完成任务已标记 failed（可重试）", len(stale))
 
@@ -1098,6 +1105,60 @@ def export_episode(
 
 
 # --------------------------------------------------------------------------- #
+# 多语种本地化（contract/LOCALIZATION.md）
+# --------------------------------------------------------------------------- #
+@router.post("/episodes/{eid}/localize", response_model=List[schemas.JobOut])
+def localize_episode(
+    eid: str,
+    payload: Optional[schemas.LocalizeRequest] = None,
+    db: Session = Depends(get_db),
+):
+    """按语言入队本地化任务；langs 缺省用 settings.localize_langs。"""
+    episode = _get_or_404(db, models.Episode, eid, "集")
+    setting = seed.get_settings(db)
+    raw_langs = (
+        payload.langs
+        if payload is not None and payload.langs is not None
+        else (setting.localize_langs or ["en", "es"])
+    )
+    langs: List[str] = []
+    for item in raw_langs or []:
+        lang = str(item).strip().lower()
+        if not lang:
+            continue
+        if lang not in SUPPORTED_LANGS:
+            raise HTTPException(
+                status_code=400,
+                detail=f"不支持的语言: {lang}；可选 {SUPPORTED_LANGS}",
+            )
+        if lang not in langs:
+            langs.append(lang)
+    if not langs:
+        raise HTTPException(status_code=400, detail="至少需要一个语言（如 en/es）")
+    jobs_out: List[models.Job] = []
+    for lang in langs:
+        job, _created = jobs.enqueue_localize_job(db, episode, lang)
+        jobs_out.append(job)
+    return jobs_out
+
+
+@router.get("/episodes/{eid}/localizations", response_model=List[schemas.LocalizationOut])
+def list_episode_localizations(eid: str, db: Session = Depends(get_db)):
+    _get_or_404(db, models.Episode, eid, "集")
+    return (
+        db.query(models.Localization)
+        .filter(models.Localization.episode_id == eid)
+        .order_by(models.Localization.created_at.asc())
+        .all()
+    )
+
+
+@router.get("/localizations/{lid}", response_model=schemas.LocalizationOut)
+def get_localization(lid: str, db: Session = Depends(get_db)):
+    return _get_or_404(db, models.Localization, lid, "本地化版本")
+
+
+# --------------------------------------------------------------------------- #
 # 镜头 / 版本
 # --------------------------------------------------------------------------- #
 @router.get("/episodes/{eid}/shots", response_model=List[schemas.ShotOut])
@@ -1372,6 +1433,32 @@ def patch_settings(payload: schemas.SettingsUpdate, db: Session = Depends(get_db
     base_url = changes.get("metaso_base_url")
     if base_url is not None and str(base_url).strip() and not str(base_url).lower().startswith(("http://", "https://")):
         raise HTTPException(status_code=400, detail="metaso_base_url 必须是 http(s) URL")
+    # 多语种本地化设置
+    if changes.get("localize_langs") is not None:
+        normalized_langs: List[str] = []
+        for item in changes["localize_langs"] or []:
+            lang = str(item).strip().lower()
+            if not lang:
+                continue
+            if lang not in SUPPORTED_LANGS:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"不支持的语言: {lang}；可选 {SUPPORTED_LANGS}",
+                )
+            if lang not in normalized_langs:
+                normalized_langs.append(lang)
+        if not normalized_langs:
+            raise HTTPException(status_code=400, detail="localize_langs 不能为空")
+        changes["localize_langs"] = normalized_langs
+    translator = changes.get("localize_translator")
+    if translator is not None:
+        translator = str(translator).strip().lower()
+        if translator not in ("ollama", "nllb", "mock"):
+            raise HTTPException(
+                status_code=400,
+                detail="localize_translator 只能是 ollama / nllb / mock（ollama 默认，nllb 兜底）",
+            )
+        changes["localize_translator"] = translator
     for key, value in changes.items():
         if value is not None:
             setattr(setting, key, value)

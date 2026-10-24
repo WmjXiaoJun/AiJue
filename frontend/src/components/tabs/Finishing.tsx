@@ -27,6 +27,7 @@ import {
 } from "../icons";
 import { TEMPLATES } from "../../lib/templates";
 import { CharacterAvatar } from "../CharacterAvatar";
+import { LocalizationPanel } from "../LocalizationPanel";
 
 interface Props extends TabBaseProps {
   jobs: Job[];
@@ -63,6 +64,7 @@ const BY_TYPE_LABEL: Record<string, string> = {
   concept: "AI 概念图",
   h3: "H3 动画",
   export: "剪映导出",
+  localize: "多语种本地化",
   tts: "配音 TTS",
   llm: "文本生成",
   other: "其他",
@@ -206,6 +208,8 @@ export function Finishing({ episode, jobs, characters, onChanged }: Props) {
             </div>
           )}
         </section>
+
+        <LocalizationPanel episodeId={episode.id} jobs={jobs} hasFinal={!!finalUrl} onChanged={onChanged} />
 
         <section className="panel export-panel">
           <SectionHead
