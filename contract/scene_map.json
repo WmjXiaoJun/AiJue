@@ -1,0 +1,87 @@
+{
+  "history_talk": {
+    "plate": "history_study",
+    "camera": "slow push-in",
+    "3d": null
+  },
+  "tonight_show": {
+    "plate": "late_night_desk",
+    "camera": "slow push-in",
+    "3d": "3d_studio_wide"
+  },
+  "roundtable": {
+    "plate": "roundtable_studio",
+    "camera": "static / micro-pan",
+    "3d": null
+  },
+  "taskmaster": {
+    "plate": "taskmaster_stage",
+    "camera": "slow dolly-in",
+    "3d": null
+  },
+  "qipashuo": {
+    "plate": "debate_hall",
+    "camera": "static / micro-pan",
+    "3d": null
+  },
+  "mystery": {
+    "plate": "mystery_room",
+    "camera": "slow push-in",
+    "3d": null
+  },
+  "history_mystery": {
+    "plate": "mystery_room",
+    "camera": "slow push-in",
+    "3d": null
+  },
+  "national_treasure": {
+    "plate": "treasure_museum",
+    "camera": "slow push-in",
+    "3d": null
+  },
+  "slow_life": {
+    "plate": "kitchen_warm",
+    "camera": "slow dolly-in",
+    "3d": null
+  },
+  "masked_singer": {
+    "plate": "stage_music",
+    "camera": "slow push-in",
+    "3d": "3d_stage_pan"
+  },
+  "standup": {
+    "plate": "stage_music",
+    "camera": "slow push-in",
+    "3d": "3d_stage_pan"
+  },
+  "hot_ones": {
+    "plate": "talk_show_sofa",
+    "camera": "static / micro-pan",
+    "3d": null
+  },
+  "traitors": {
+    "plate": "roundtable_studio",
+    "camera": "slow push-in",
+    "3d": null
+  },
+  "classics": {
+    "plate": "history_study",
+    "camera": "slow push-in",
+    "3d": null
+  },
+  "snl": {
+    "plate": "stage_music",
+    "camera": "slow push-in",
+    "3d": "3d_stage_pan"
+  },
+  "shark_tank": {
+    "plate": "late_night_desk",
+    "camera": "slow push-in",
+    "3d": "3d_studio_host"
+  },
+  "snl_sketch": {
+    "plate": "stage_music",
+    "camera": "slow push-in",
+    "3d": "3d_stage_pan"
+  }
+}

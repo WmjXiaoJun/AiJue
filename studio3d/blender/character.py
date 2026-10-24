@@ -58,7 +58,8 @@ class Character:
         self.nose_z = self.z_h - 0.27 * self.R
         self.eye_age = max(0.78, 1.0 - 0.006 * max(0.0, float(self.ap.get("age", 30)) - 25.0))
         self.shoulder_z = 0.745 * self.H
-        self.outline_mat = make_outline_mat(self.pal["outline"])
+        self.mkey = "_" + str(spec.get("id") or "char")
+        self.outline_mat = make_outline_mat(self.pal["outline"], suffix=self.mkey)
 
     # ---------------- materials ----------------
     def M(self, key, flat=False, grad=None):
@@ -67,7 +68,8 @@ class Character:
             ck = ("grad", hexcol, grad)
             if ck not in self.mat_cache:
                 self.mat_cache[ck] = make_gradient("grad_" + hexcol.replace("#", ""),
-                                                   grad[0], grad[1], "Z")
+                                                   grad[0], grad[1], "Z",
+                                                   suffix=self.mkey)
             return self.mat_cache[ck]
         kind = self.cfg["kind"]
         bands = self.cfg["bands"]
@@ -75,12 +77,12 @@ class Character:
         if ck in self.mat_cache:
             return self.mat_cache[ck]
         if flat or kind == "flat":
-            m = make_flat("flat_" + hexcol.replace("#", ""), hexcol)
+            m = make_flat("flat_" + hexcol.replace("#", ""), hexcol, suffix=self.mkey)
         elif kind == "paint":
-            m = make_paint("paint_" + hexcol.replace("#", ""), hexcol)
+            m = make_paint("paint_" + hexcol.replace("#", ""), hexcol, suffix=self.mkey)
         else:
             m = make_toon("toon_" + hexcol.replace("#", "") + "_" + str(bands),
-                          hexcol, bands, kind)
+                          hexcol, bands, kind, suffix=self.mkey)
         self.mat_cache[ck] = m
         return m
 

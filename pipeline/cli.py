@@ -138,6 +138,10 @@ def build_parser() -> argparse.ArgumentParser:
                           help="xfade 转场预设")
     p_render.add_argument("--transition-duration", type=float, default=0.30,
                           help="xfade 转场时长（秒，建议 0.2-0.4）")
+    p_render.add_argument("--scenes", action="store_true", default=False,
+                          help="场景模式：先用 contract/scene_map.json 合成 2D 绘景+角色分层镜头再渲染")
+    p_render.add_argument("--scene-template", default=None,
+                          help="scene_map 模板 id（默认取 episode.format_id/id）")
     p_render.set_defaults(func=cmd_render)
     return parser
 

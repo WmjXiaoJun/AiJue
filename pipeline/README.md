@@ -342,6 +342,35 @@ python -m pipeline.cli render --episode <episode.json> --workdir <dir> --out fin
 - 测试：`pipeline/tests/test_dynamic.py` 覆盖 plan 来源/fallback、prompt 5-aspect 内容、
   shot_plan 覆盖、fl2v 首尾帧描述、meta plan/prompt/ref 记录。
 
+## 场景合成（pipeline/scenes.py，contract/SCENES.md）
+
+把镜头从「渐变底板 + 角色贴片」升级为真实场景空间：2D 绘景 2.5D 视差 + 全身角色分层 + 3D 片段。
+
+- **资产**：2D 绘景 `outputs/scene_plates/{scene}.png`（SDXL，15 张，无人物/文字）；
+  全身透明角色 `outputs/characters/{id}/cutout_full/front.png`（1024×1536 RGBA，优先）；
+  3D 场景片段 `outputs/3d_scenes/{id}.mp4`（character-3d 产出：wide/host/stage_pan）。
+- **映射**：`contract/scene_map.json` → `{template: {plate, 3d?, camera}}`，覆盖 16 个模板
+  （history_talk→history_study、tonight_show→late_night_desk+3d_studio_wide、roundtable→roundtable_studio、
+  taskmaster→taskmaster_stage、qipashuo→debate_hall、mystery→mystery_room、national_treasure→treasure_museum、
+  slow_life→kitchen_warm、masked_singer/standup/snl→stage_music、hot_ones→talk_show_sofa、traitors→roundtable_studio、
+  classics→history_study、shark_tank→late_night_desk 等）；无映射时回退 mock。
+- **合成规则**（`pipeline/scenes.py`）：
+  - 背景按 ShotPlan movement 做 zoompan 推/移（slow push-in / dolly-in / micro-pan/static），
+    全身角色以不同速率叠加（视差），可选 3D 片段作为背景（tonight_show 的 b_roll/部分 host 镜头）；
+  - 统一用 `outputs/characters/{id}/cutout_full/front.png`（全身透明）；按景别缩放全身：
+    Medium≈0.55H、Medium Close-up≈0.45H、Wide≈0.32H，脚底锚定地平线 y≈0.86H；Close/Extreme 把全身图放大
+    （身高≈0.92-1.02H）让身体延伸出下画框，只保留头到胸口，头顶距画面顶 6-13%、头部直径≈0.12-0.18H
+    （不超过 1/4H）；按 host 右/guest 左或右站位，脚下画柔和椭圆投影；
+  - 角色层轻微降亮/暖色 + 场景 vignette/前景压暗，减少贴片感；卡片镜头在绘景上烘焙标题/落版字。
+- **CLI**：与 render 同一条命令，加 `--scenes`（可选 `--scene-template <id>`）：
+  `python -m pipeline.cli render --episode <ep> --workdir <dir> --out <mp4> --scenes --scene-template history_talk`
+  （场景镜头写入 `<workdir>/shots/{sid}.mp4`，render 复用后统一加字幕/转场/BGM）。
+- **demo**：`scripts/render_scene_demos.py` 按 16 个格式模板各出 30-40s 场景验证片：
+  `outputs/scene_demos/{template}.mp4` + `{template}/frames/`（逐镜抽帧 + contact sheet）+ `verify.json`；
+  history_talk/tonight_show 为 2D/3D 混用主验收片，其余模板批量升级。
+- **测试**：`python -m pytest pipeline/tests/test_scenes.py -q`（scene_map 覆盖/全身分层/景别缩放/脚底锚定/
+  投影/相机运动/卡片烘焙/逐镜输出）。
+
 ## 已知限制 / 未做
 
 - **画面 = 原创角色立绘 + 程序化演播厅合成**：角色来自角色工坊 `outputs/characters/` 的

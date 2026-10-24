@@ -812,6 +812,19 @@ def run_render(args) -> int:
         h3_dir = Path(h3_env) if h3_env \
             else (config.REPO_ROOT / "outputs" / "h3")
 
+    # ---- 0.5) 场景合成（可选：2D 绘景 + 角色分层 + 视差）----
+    scene_info = None
+    if getattr(args, "scenes", False):
+        from . import scenes as scenes_mod
+        prog(1.5, "场景合成（2D 绘景 + 角色分层 + 视差）")
+        scene_info = scenes_mod.compose_episode(
+            data, workdir,
+            template_id=getattr(args, "scene_template", None),
+            width=width, height=height, fps=fps, force=True)
+        LOG.info("场景模式: template=%s plate=%s 3d=%s",
+                 scene_info.get("template_id"), scene_info.get("plate"),
+                 scene_info.get("three_d") or "none")
+
     # ---- 1) 镜头片段 ---------------------------------------------------
     prog(2, "生成/复用镜头片段")
     clip_results: dict[str, dict] = {}
@@ -929,9 +942,17 @@ def run_render(args) -> int:
     prog(71, "生成字幕/花字轨")
     timings = []
     cursor = 0.0
+    scene_cards = set((scene_info or {}).get("card_sids") or [])
     for shot in shots:
         dur = _shot_duration(shot)
-        timings.append({"shot": shot, "start": cursor, "end": cursor + dur,
+        ass_shot = shot
+        if scene_cards and _shot_id(shot) in scene_cards:
+            # 场景模式卡片文字已烘焙进画面，避免 ASS 重复叠加
+            ass_shot = dict(shot)
+            ass_shot["line"] = ""
+            ass_shot["subtitle"] = ""
+            ass_shot["punchline"] = ""
+        timings.append({"shot": ass_shot, "start": cursor, "end": cursor + dur,
                         "duration": dur})
         cursor += dur
     segments = data.get("segments") or episode.get("segments") or []
@@ -998,6 +1019,11 @@ def run_render(args) -> int:
                        "duration": transition_duration,
                        "xfade": transition_mode == "xfade",
                        "whoosh": transition_whoosh is not None},
+        "scenes": ({"template": scene_info.get("template_id"),
+                    "plate": scene_info.get("plate"),
+                    "three_d": scene_info.get("three_d") or "",
+                    "card_sids": len(scene_info.get("card_sids") or [])}
+                   if scene_info else None),
         "workdir": str(workdir),
     }
     utils.write_json(workdir / "manifest.json", summary)

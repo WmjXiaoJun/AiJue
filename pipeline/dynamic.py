@@ -190,7 +190,11 @@ def _char_refs(shots: list, frames: dict, workdir: Path, width: int,
             y = max(0, (height - size_px) // 2)
             vf = f"crop={size_px}:{size_px}:{x}:{y},scale=768:768"
             strategies[sid] = "center-square"
-        elif ("Close" in size) or purpose in ("emotion", "reaction"):
+        elif ("Close" in size) or (purpose in ("emotion", "reaction")
+                                  and size not in ("Medium", "Medium Close-up",
+                                                   "Full", "Wide")):
+            # 景别以 ShotPlan 为准；reaction 的变体若排到 Medium 则用中景画窗，
+            # 避免 ref 特写把画面拉得比 plan 更近（QC 复核 plan/画面一致）
             face = max(256, int(fg * 0.78))
             x = win_x + max(0, (fg - face) // 2)
             y = win_y + max(0, int(fg * 0.02))

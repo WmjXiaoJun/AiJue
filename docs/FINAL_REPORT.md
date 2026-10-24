@@ -372,3 +372,12 @@ FastAPI (8090) ── SQLite
 - 8 镜演示：outputs/shots_plan_demo/demo_final.mp4（43.76s / 1280×720 / 7.34MB / 10 镜：7 audio_ref + 1 fl2v + 2 卡）；QC ok=true；抽帧 docs/screenshots/52_shotplan_demo_sheet.png 可见 host 中近景/guest 特写/大特写/广角环境等景别差异。
 - H3 可控性实测（task-37）：景别（medium/close-up/extreme close-up/**wide 可突破参考图构图**）、dolly-in/push-in、static、身份锁定 = 可控；low/high angle、横移/摇镜、wide 环境连续性 = 弱控（需换首/尾帧构图解决）。详见 docs/H3_SHOTPLAN_FINDINGS.md 与 docs/screenshots/51_h3_shotplan_control.png。
 - 后续：将 ShotPlan 应用于 ep_001/002 全动态重渲（镜头差异化版）；按镜头关系选转场；wide 镜头单独首帧；接 lip-sync 精修。
+## 31. 场景升级：2D 绘景 + 真实 3D 场景（OpenMontage 全量沿用，2026-10-25）
+- 用户反馈「全是平面、没有 3D/2D 场景」→ 本轮补齐：
+  - **2D 场景绘景 12 张**（SDXL/Animagine，1280×720，无人物）：深夜秀办公桌/圆桌演播厅/任务舞台/历史书房/辩论台/推理现场/国宝展厅/暖色厨房/彩虹舞台/访谈沙发/街头夜景/历史课堂；另 3 张 3D 渲染风 plate（3d_roundtable/3d_stage/3d_study）。
+  - **真实 3D 场景 3 条**（Blender 5.0 EEVEE 程序化）：3d_studio_wide（横移全景 5s）、3d_studio_host（缓推特写 5s）、3d_stage_pan（摇镜升镜 6s）；含舞台/圆桌/主持台/弧形 LED 屏/灯架/地面反射 + 3D 卡通角色 + 相机动画；1280×720/25fps，单条渲染 32-35s。
+  - **全身透明角色 cutout**：laozhou/ali/dawei 每人 front + three_quarter（1024×1536 RGBA，脚底贴边、无阴影，pixels_per_meter≈886.7）。
+  - **场景合成 pipeline/scenes.py**：背景 plate + 全身 cutout 分层，按 ShotPlan 景别缩放/站位/脚底锚定地面/柔和投影/2.5D 视差与相机运动；contract/scene_map.json 模板→场景映射。
+- 交付：**16 个模板全部出 2D 场景版 demo**（outputs/scene_demos/{template}.mp4，各 30-45s）+ 场景巡礼 outputs/scene_demos/scene_showcase.mp4（77.48s，含 16 个 2D 场景片段 + 3D 场景章节）；抽帧 docs/screenshots/55_all_scene_templates_sheet.png、56_scene_v2_check.png。
+- 实现参考：OpenMontage 的 scene/asset 制作、b-roll planning、3d-world-generation、video-gen-prompting、image-gen 等 skills；整体方法映射见 docs/OPENMONTAGE_PRODUCTION.md。
+- 已知限制：场景 demo 的角色是**3D 卡通全身 cutout**（与 2D 绘景画风有差异；下一步做 2D动漫全身 cutout/统一渲染风格）；H3 动态镜头仍是全画幅特写，尚未与场景合成融合（下一步：场景首帧 + 角色分层驱动 H3）。

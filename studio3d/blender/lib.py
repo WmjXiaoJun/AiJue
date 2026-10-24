@@ -30,8 +30,8 @@ def new_mat(name):
     return mat
 
 
-def make_flat(name, hexcol, strength=1.0, alpha=1.0):
-    mat = new_mat(name)
+def make_flat(name, hexcol, strength=1.0, alpha=1.0, suffix=""):
+    mat = new_mat(name + suffix)
     nt = mat.node_tree
     out = nt.nodes.new("ShaderNodeOutputMaterial")
     em = nt.nodes.new("ShaderNodeEmission")
@@ -55,8 +55,8 @@ def make_flat(name, hexcol, strength=1.0, alpha=1.0):
     return mat
 
 
-def make_gradient(name, hex_dark, hex_light, axis="Z"):
-    mat = new_mat(name)
+def make_gradient(name, hex_dark, hex_light, axis="Z", suffix=""):
+    mat = new_mat(name + suffix)
     nt = mat.node_tree
     out = nt.nodes.new("ShaderNodeOutputMaterial")
     em = nt.nodes.new("ShaderNodeEmission")
@@ -97,8 +97,8 @@ TOON_BANDS = {
 }
 
 
-def make_toon(name, hexcol, bands=3, kind="toon"):
-    mat = new_mat(name)
+def make_toon(name, hexcol, bands=3, kind="toon", suffix=""):
+    mat = new_mat(name + suffix)
     nt = mat.node_tree
     out = nt.nodes.new("ShaderNodeOutputMaterial")
     em = nt.nodes.new("ShaderNodeEmission")
@@ -145,8 +145,8 @@ def make_toon(name, hexcol, bands=3, kind="toon"):
     return mat
 
 
-def make_paint(name, hexcol):
-    mat = new_mat(name)
+def make_paint(name, hexcol, suffix=""):
+    mat = new_mat(name + suffix)
     nt = mat.node_tree
     out = nt.nodes.new("ShaderNodeOutputMaterial")
     em = nt.nodes.new("ShaderNodeEmission")
@@ -169,8 +169,8 @@ def lighten_hex(h, f):
     return lighten(h, f)
 
 
-def make_outline_mat(darkhex="#101218", backface=True):
-    mat = new_mat("outline_" + darkhex.replace("#", ""))
+def make_outline_mat(darkhex="#101218", backface=True, suffix=""):
+    mat = new_mat("outline_" + darkhex.replace("#", "") + suffix)
     nt = mat.node_tree
     out = nt.nodes.new("ShaderNodeOutputMaterial")
     em = nt.nodes.new("ShaderNodeEmission")

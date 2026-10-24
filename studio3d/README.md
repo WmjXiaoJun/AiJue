@@ -80,6 +80,64 @@ studio3d/
 | 单角色单风格全量 | 15-45s |
 | laozhou 双风格全量（验收命令） | ~45s |
 
+
+## 3D 演播厅场景镜头（scene 子命令）
+
+在角色生成之外，studio3d 还能渲染一段**风格化 3D 演播厅**镜头：圆桌 + 主持台 + 弧形 LED 背景屏 +
+灯架/灯具 + 高光舞台地面（EEVEE 屏幕空间光线追踪反射），并把 laozhou / ali / dawei 三个程序化角色
+摆到桌后/主持台后（用桌子裙边遮住下半身，呈现"入座"效果），配三点柔光 + 相机动画。
+
+```bash
+# 渲染三条镜头：横移全景 / 缓推特写 / 摇镜换角度
+python -m studio3d.cli scene --outdir outputs/3d_scenes \
+    --shots 3d_studio_wide,3d_studio_host,3d_stage_pan --fps 25 --size 1280x720
+```
+
+产物：
+```
+outputs/3d_scenes/
+  3d_studio_wide.mp4    1280x720 / 25fps / 5s  横移全景（左→右 dolly，露出主持台、圆桌、背景屏）
+  3d_studio_host.mp4    1280x720 / 25fps / 5s  缓推特写（55mm→69mm push-in 老周）
+  3d_stage_pan.mp4      1280x720 / 25fps / 6s  摇镜/升镜（-24°→+20° 环绕圆桌 + 0.95m 升镜）
+  previews/*.png        每条镜头抽帧静帧
+  frames/<shot>/        逐帧 PNG 序列（可重新编码）
+  meta.json             镜头列表/时长/帧数/单条渲染耗时/编码耗时
+```
+
+实现要点：
+- 场景元素全部程序化（`blender/scene.py`）：舞台平台+发光边环、圆桌（含桌裙/桌卡/水杯）、
+  主持台（含发光 logo 文字）、弧形 LED 屏（品牌字 + 光环 logo + 灯带）、桁架+灯具、
+  前景监视器与话筒架（提供视差纵深）、侧墙霓虹。
+- 角色复用 `character.py` 的 `Character` 构建器；每个角色材质名带角色后缀，避免同名材质互相覆盖。
+- 着色沿用 3d_toon / 3d_cel 色带材质；地面为 Principled 高光材质 + EEVEE raytracing 反射。
+- 相机运动在 Python 里按帧解析计算（不用关键帧），逐帧渲染 PNG，最后由 ffmpeg 编码 H.264。
+- 分辨率 1280x720、20 TAA samples，实测约 0.23-0.26s/帧（RTX 3080 Ti，含屏幕空间反射），
+  单条镜头渲染 30-35s，3 条共 400 帧约 98s；ffmpeg 编码每条 2-5s。
+
+
+## 全身透明 cutout（2D 场景合成用）
+
+为分层合成（背景 plate + 角色 + 视差）提供**全身站立透明立绘**：正交相机、透明背景、无地面阴影，
+脚底精确贴图片底边（实测 bottom_gap = 0 像素），合成侧按底边对齐地面线即可。
+
+```bash
+python -m studio3d.cli cutout --root outputs/characters \
+    --characters laozhou,ali,dawei --styles 3d_toon,3d_toon,3d_cel --size 1024x1536
+```
+
+产物：
+```
+outputs/characters/{id}/cutout_full/
+  front.png            1024x1536 RGBA 正面全身站立（透明，脚底贴底边）
+  three_quarter.png    1024x1536 RGBA 3/4 角度（可选）
+  meta.json            size/bbox/ortho_scale/pixels_per_meter/alpha/ground_shadow=false/verify
+```
+
+实现：复用 `render.py --only fullbody` —— 构建角色后先夹取所有 mesh 的世界包围盒，
+正交相机垂直范围 = bbox 高 × 1.02，画面底边 = bbox 最低点（脚底），因此与分辨率无关、脚底永远贴边；
+`meta.json` 里的 `pixels_per_meter`（本机 1024x1536 时约 886.7 px/m）可用于合成侧统一角色与场景比例。
+单角色 2 个角度约 1.4-1.6s（含 Blender 启动），不改变原 `create` 行为。
+
 ## 说明与取舍
 - 程序化风格化建模：角色为**原创**动漫化造型，不追求写实；同一 spec 永远生成同一角色（确定性）。
 - turntable 默认 48 帧 @24fps = 2s（在渲染预算内保证质量；契约示例为 4s，需要时可调大帧数重跑）。

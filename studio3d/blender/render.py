@@ -33,7 +33,8 @@ def parse_args():
     else:
         argv = []
     d = {"spec": "", "outdir": "", "style": "3d_toon", "only": "portrait",
-         "base": "512", "frames": "48", "fps": "24"}
+         "base": "512", "frames": "48", "fps": "24",
+         "fullsize": "1024x1536", "angles": "front,three_quarter"}
     i = 0
     while i < len(argv) - 1:
         d[argv[i].lstrip("-")] = argv[i + 1]
@@ -236,6 +237,56 @@ def main():
             renders.append({"name": "expr_" + expr, "path": path, "secs": round(secs, 2)})
         ch.build_face("neutral")
 
+    fullbody_meta = None
+    if "fullbody" in only:
+        # full-body standing cutout: orthographic, transparent, feet flush with the image bottom
+        ch.build_outlines(0.0042 * cfg["outline"])
+        root.rotation_euler[2] = 0.0
+        bpy.context.view_layer.update()
+        pts = []
+        for ob in coll.objects:
+            if ob.type != "MESH":
+                continue
+            mw = ob.matrix_world
+            for corner in ob.bound_box:
+                pts.append(mw @ Vector((corner[0], corner[1], corner[2])))
+        minx = min(p.x for p in pts)
+        maxx = max(p.x for p in pts)
+        minz = min(p.z for p in pts)
+        maxz = max(p.z for p in pts)
+        cx = (minx + maxx) * 0.5
+        span_v = (maxz - minz) * 1.02
+        res = str(args.get("fullsize", "1024x1536")).lower().split("x")
+        rx, ry = int(res[0]), int(res[1])
+        ortho = span_v if ry >= rx else span_v * (rx / float(ry))
+        cam.data.type = "ORTHO"
+        cam.data.ortho_scale = ortho
+        cz = minz + span_v * 0.5
+        aim(cam, (cx, -4.0, cz), (cx, 0.0, cz))
+        outdir_full = os.path.join(outdir, "cutout_full")
+        os.makedirs(outdir_full, exist_ok=True)
+        angles = [("front", 0.0)]
+        if "three_quarter" in str(args.get("angles", "front,three_quarter")):
+            angles.append(("three_quarter", 0.32))
+        for aname, rot in angles:
+            root.rotation_euler[2] = rot
+            bpy.context.view_layer.update()
+            path = os.path.join(outdir_full, aname + ".png")
+            secs = render_to(sc, path, rx, ry)
+            renders.append({"name": "fullbody_" + aname, "path": path,
+                            "secs": round(secs, 2)})
+        root.rotation_euler[2] = 0.0
+        fullbody_meta = {
+            "size": [rx, ry],
+            "bbox": [round(minx, 4), round(maxx, 4), round(minz, 4), round(maxz, 4)],
+            "ortho_scale": round(ortho, 4),
+            "span_v": round(span_v, 4),
+            "pixels_per_meter": round(ry / span_v, 2),
+            "angles": [a[0] for a in angles],
+            "feet_at_bottom": True,
+            "ground_shadow": False,
+        }
+
     if "sheet" in only:
         ch.build_outlines(0.0040 * cfg["outline"])
         set_lights_body(key, fill, rim, acc, R, ch.H)
@@ -275,9 +326,12 @@ def main():
 
     print("RENDERS " + json.dumps(renders))
     print("BLENDER_SEC " + str(round(time.time() - t_start, 2)))
-    print("SUMMARY " + json.dumps({"ok": True, "style": style_name, "outdir": outdir,
-                                   "renders": renders,
-                                   "elapsed": round(time.time() - t_start, 2)}))
+    summary = {"ok": True, "style": style_name, "outdir": outdir,
+               "renders": renders,
+               "elapsed": round(time.time() - t_start, 2)}
+    if fullbody_meta is not None:
+        summary["fullbody"] = fullbody_meta
+    print("SUMMARY " + json.dumps(summary))
 
 
 if __name__ == "__main__":
