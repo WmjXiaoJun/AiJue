@@ -381,3 +381,8 @@ FastAPI (8090) ── SQLite
 - 交付：**16 个模板全部出 2D 场景版 demo**（outputs/scene_demos/{template}.mp4，各 30-45s）+ 场景巡礼 outputs/scene_demos/scene_showcase.mp4（77.48s，含 16 个 2D 场景片段 + 3D 场景章节）；抽帧 docs/screenshots/55_all_scene_templates_sheet.png、56_scene_v2_check.png。
 - 实现参考：OpenMontage 的 scene/asset 制作、b-roll planning、3d-world-generation、video-gen-prompting、image-gen 等 skills；整体方法映射见 docs/OPENMONTAGE_PRODUCTION.md。
 - 已知限制：场景 demo 的角色是**3D 卡通全身 cutout**（与 2D 绘景画风有差异；下一步做 2D动漫全身 cutout/统一渲染风格）；H3 动态镜头仍是全画幅特写，尚未与场景合成融合（下一步：场景首帧 + 角色分层驱动 H3）。
+### 31.1 场景合成最终验收（task-40 完成）
+- 108/108 角色镜头统一用全身透明 cutout（char_mode=full，0 个 bust/漂浮大头）；Medium≈0.55H / MediumClose≈0.45H / Wide≈0.32H / Close 用全身图放大 0.92-1.02H（头顶距顶 6-13%，头部直径 0.12-0.18H），脚底锚定地平线 y≈0.86H，柔和椭圆投影 + 左右站位 + 场景 2.5D 视差/相机运动 + 光照染色。
+- scene_map 覆盖 16 模板；tonight_show/masked_singer/snl/standup/shark_tank 混用真实 3D Blender 片段；16 个 scene demo 全部重跑（history_talk 35.4s、tonight_show 35.6s，blackdetect=0、相机运动 PSNR 17-24）；抽样帧 outputs/scene_demos/qc_4templates.png，逐模板 frames/verify.json。
+- tests：pipeline 63 passed（新增 test_scenes.py：scene_map/全身分层/景别缩放/脚底锚定/投影/相机运动/卡片烘焙/逐镜输出）。
+- 场景巡礼已重建：outputs/scene_demos/scene_showcase.mp4（16 个 2D 场景片段 + 3D 章节，~77s）。
