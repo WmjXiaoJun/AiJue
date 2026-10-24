@@ -253,3 +253,8 @@ FastAPI (8090) ── SQLite
 - 安全：key 只在 backend/data/metaso.env / 环境变量；GET /settings 不含明文；仓库仅 .env.example。
 - 测试：backend **83 passed**（新增 h3 provider 用例）、pipeline 38 passed。
 - 默认策略：生产成片仍 local；metaso 仅测试/快速迭代，产物独立存放。
+## 21. ComfyUI 本地升级（2026-10-24）
+- 0.39.0 → 0.42.0（116 commits），前端包 1.57.1、模板 0.11.96；自定义节点全部更新（KJNodes/LTXVideo/VHS/rgthree），LTXVideo 依赖补齐；模型全部在位。
+- 冒烟：SDXL 概念图 14s；IP-Adapter 一致性 3 视图 38.4s；本地 H3 i2v 119s（768×768/5.167s/含音轨）；1,442 节点可用；8090/8188 均 200。
+- 提示：KJNodes triton 可选缺失（不影响）；回滚 tag pre-update-20261024（核心+4 节点）。
+- 详见 docs/COMFYUI_UPGRADE_2026-10-24.md。
