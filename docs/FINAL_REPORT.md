@@ -209,7 +209,8 @@ FastAPI (8090) ── SQLite
 - 安装 ComfyUI_IPAdapter_plus（cubiq）；模型：ip-adapter-plus_sdxl_vit-h（847,517,512 B，sha256 3f5062b8…e6581 ✓）+ CLIP-ViT-H-14（3,944,552,236 B，sha256 036e6e2b…b18d ✓）。
 - imagegen 新增 --ref / --ip-adapter-strength（默认 0.65）/ --ip-adapter-end-at（0.85）；工作流 SDXL + IPAdapterUnifiedLoader + IPAdapterAdvanced（weight_type=linear）。
 - 实测：3 角色 × 7 张（三视图 3 + 表情 4）= 21 张 consistent 图，1024×1024，单图 11–13s（模型驻留后），seed 42，无 OOM。
-- 效果：脸型/发色/服装一致；IP-Adapter 会带入立绘的背景风格（深色+accents），三视图偏半身特写而非白底全身——已知取舍，可降 weight/加负向背景词继续调。
+- 三视图采用低 weight（0.35/end 0.90）+ 背景负向词重跑，最终为**白底/单人全身**、发色服装与 portrait 一致；表情保留 weight 0.65 版本。
+- 效果：脸型/发色/服装一致；IP-Adapter 仍可能带入立绘的光效风格（表情图上更明显），属已知取舍。
 - 截图：![一致性图集](screenshots/25_consistent_gallery.png)
 
 ### 19.2 概念图驱动 H3（覆盖旧版本）
@@ -219,12 +220,12 @@ FastAPI (8090) ── SQLite
 ### 19.3 成片升级（SDXL 概念角色）
 - pipeline 素材优先级按 CONSISTENCY.md 落地：H3 视频 → h3 中段帧 → concepts/{id}/portrait.png（832×1216 竖构图裁胸像 + 右侧画窗 + Ken Burns）→ Blender cutout → 2D → 文字卡。
 - outputs/demo/final.mp4：299.000s / 1280×720 / 25fps / 34,719,840 B（33.1MiB）/ blackdetect 0 条 / 52/52 角色画面 / H3 3/3 概念图驱动；冷渲 50.9s。
-- 平台 outputs/episodes/ep_001/final.mp4：299.000s / 27,288,915 B（同一优先级重渲）。
+- 平台 outputs/episodes/ep_001/final.mp4：299.000s / 27,288,915 B / mtime 09:14:55（同一优先级重渲，/media 200）。
 - 修复：角色镜头重复人名条（ASS 不再输出 Lower，51→49 事件）、字幕基线恢复 655。
 - 截图：![成片角色抽帧](screenshots/28_final_characters_sheet.png) ![角色卡](screenshots/26_character_cards_sdxl.png) ![H3 概念驱动](screenshots/27_h3_concept.png)
 
 ### 19.4 测试与状态
 - pipeline：38 passed（新增概念素材优先级/竖构图裁切/概念表情/指纹/人名条去重）
-- backend：75 passed（终态以最新复跑为准）；frontend build 通过
+- backend：**76 passed**（新增 consistent 懒扫描 + from-concept 简写路径）；pipeline 38 passed；frontend build 通过（dist 257KB JS/78KB CSS）
 - 服务：8090 常驻（run-detached）；ComfyUI 8188 在线（IP-Adapter 节点已加载）
 - 已知：三视图风格受 IP-Adapter 背景影响；H3 串行 2–5 分钟/条；剪映 10.x 加密草稿限制仍在。

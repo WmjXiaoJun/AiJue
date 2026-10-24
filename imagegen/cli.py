@@ -97,6 +97,9 @@ def build_plan(args, spec: dict) -> list:
     if args.mode in ("scene", "all"):
         add("scene", "scene.png", "scene", extra_seed=n)
         n += 1
+    if getattr(args, "views", None):
+        want = {v.strip() for v in str(args.views).split(",") if v.strip()}
+        jobs = [j for j in jobs if j["tag"] in want]
     return jobs
 
 
@@ -423,6 +426,8 @@ def build_parser() -> argparse.ArgumentParser:
                        help="IPAdapter weight_type（linear/ease in/ease out/style transfer/composition）")
     p_gen.add_argument("--negative-extra", default="",
                        help="追加 negative tag（逗号分隔，给一致性模式压背景/风格漂移用）")
+    p_gen.add_argument("--views", default=None,
+                       help="只生成指定视图（逗号分隔，如 side / front,side），配合 --mode three_view")
     add_common(p_gen)
     p_gen.set_defaults(func=cmd_generate)
 

@@ -272,11 +272,24 @@ def test_portrait_from_concept(client):
     media = client.get(expected)
     assert media.status_code == 200
 
+    # 前端简写：相对概念图目录的文件名（如 portrait.png）也应可用
+    shorthand = client.post(
+        f"/api/characters/{character['id']}/portrait/from-concept",
+        json={"path": "portrait.png"},
+    )
+    assert shorthand.status_code == 200, shorthand.text
+    assert shorthand.json()["portrait_url"] == expected
+
     bad = client.post(
         f"/api/characters/{character['id']}/portrait/from-concept",
         json={"path": "/media/concepts/not_exists/portrait.png"},
     )
     assert bad.status_code == 400
+    bad_shorthand = client.post(
+        f"/api/characters/{character['id']}/portrait/from-concept",
+        json={"path": "not_exists.png"},
+    )
+    assert bad_shorthand.status_code == 400
     assert client.post("/api/characters/not_exists/portrait/from-concept", json={"path": "x"}).status_code == 404
 
 

@@ -13,7 +13,7 @@
 - 后端：FastAPI + SQLite，任务后台线程，角色工坊 API，ComfyUI(MiniMax H3) 适配器 + mock provider
 - 角色：studio3d（Blender 程序化 3D/2D）+ studio2d（Pillow 2D）+ **imagegen（SDXL 动漫 AI 概念图，30 张）**
 - 真实生成：integrations/comfyui（本机 MiniMax H3 int8 + 4step turbo，768²/5.17s 动漫镜头）
-- 图像生成：imagegen（SDXL 动漫 Animagine XL 4.0，文生角色概念图/三视图/表情）
+- 图像生成：imagegen（SDXL 动漫 Animagine XL 4.0，文生角色概念图/三视图/表情 + **IP-Adapter 一致性三视图/表情**）
 - 导出：pipeline/capcut.py（pyJianYingDraft，剪映草稿 52 段）
 - 流水线：ffmpeg 合成 + edge-tts 中文配音 + ASS 字幕/花字 + 片头片尾 + BGM，CLI 可独立运行
 

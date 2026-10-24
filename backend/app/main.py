@@ -827,9 +827,21 @@ def set_portrait_from_concept(
     character = _get_or_404(db, models.Character, cid, "角色")
     source = _resolve_output_file(payload.path)
     if source is None:
+        # 兼容前端简写：相对概念图目录的路径（如 "portrait.png"、
+        # "consistent/three_view/front.png"），也接受 outputs/concepts/{cid}/ 相对路径。
+        compact = str(payload.path or "").strip()
+        if compact and not compact.lower().startswith(("http://", "https://", "data:")):
+            candidate = concept_files.concept_dir(character.id) / compact
+            source = _resolve_output_file(str(candidate))
+            if source is None:
+                source = _resolve_output_file(str(config.OUTPUTS_DIR / compact))
+    if source is None:
         raise HTTPException(
             status_code=400,
-            detail="path 必须是 outputs 下存在的图片路径（也接受 /media/... URL）",
+            detail=(
+                "path 必须是 outputs 下存在的图片：/media/... URL、"
+                "outputs/... 相对路径，或相对概念图目录的文件名（如 portrait.png）"
+            ),
         )
     if source.suffix.lower() not in (".png", ".jpg", ".jpeg", ".webp"):
         raise HTTPException(status_code=400, detail="仅支持 png/jpg/webp 图片")

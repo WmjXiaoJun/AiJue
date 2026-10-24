@@ -65,6 +65,88 @@ python -m imagegen.cli generate --spec contract/characters/dawei.json  --outdir 
 | sheet.png（Pillow 合成，不占 GPU） | 1600x900 | ~0.5s | - |
 | `--mode all` 单角色（9 图 + sheet） | - | ~205-222s | - |
 
+## 0.3 IP-Adapter 一致性（task-16，2026-10-24，RTX 3080 Ti 12GB）
+
+| 项目 | 实测 |
+|---|---|
+| 自定义节点 | `ComfyUI_IPAdapter_plus`（cubiq，`git clone --depth 1`；**仓库无 requirements.txt、基础 IP-Adapter 不需要 insightface**，只有 FaceID 节点才需要） |
+| IP-Adapter 模型 | `models/ipadapter/ip-adapter-plus_sdxl_vit-h.safetensors` 847,517,512 B，sha256 `3f5062b8400c94b7159665b21ba5c62acdcd7682262743d7f2aefedef00e6581` ✓ |
+| CLIP Vision | `models/clip_vision/CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors` 3,944,552,236 B，sha256 `036e6e2bd49697511f4f8b8cb5ee465f93025f7a69a145eadeb9a881ace9b18d` ✓ |
+| 产物 | 3 角色 × 7 图 = **21 张**：`outputs/concepts/{id}/consistent/`（three_view 3 + expressions 4 + meta.json） |
+| 工作流 | SDXL txt2img + `IPAdapterUnifiedLoader`(preset) + `IPAdapterAdvanced`(weight / start_at / end_at / weight_type) |
+| 表情参数（最终） | weight **0.65** / end_at **0.85** / preset `PLUS (high strength)` / weight_type linear / seed 42 |
+| 三视图参数（最终） | weight **0.35** / end_at **0.90** / weight_type **style transfer** + `--negative-extra` 压火苗/拼贴；side 单独用干净 front.png 当 ref（weight 0.6/linear/end 0.85） |
+| 耗时 | 单图 GPU **~11-13s**（模型驻留后；首图含加载 ~40s）；3 个 CLI 并行提交时 `gen_sec` 含排队，平均 ~31s |
+| 显存 | 峰值 **11.66GB / 12GB**（CLIPVision 1.2GB + SDXL 4.9GB 动态换载），**无 OOM** |
+
+效果与取舍（重要）：
+
+- **weight 0.65 / end 0.85**：脸型/发色/服装/配色一致性最好（同一张脸），但会把 portrait 的「深色底 + 角色 accent 色火焰」
+  风格一起带进三视图 → 三视图变成半身特写+火焰背景。这个特性对 **表情图** 正好（表情本来就该是半身close-up）；
+- **weight 0.35 / style transfer**：弱化风格迁移后三视图恢复「白底单人全身」，同时保持发色/服装/配色一致；
+- **side 视角**容易生成「大头+小全身」拼贴，因此 side 单独用**干净的 front.png 当 ref**重跑（weight 0.6/linear），得到干净的侧身全身；
+- 结论：**expressions 用强权重 0.65；three_view 用弱权重 0.35/style transfer，side 用 front-ref 修补**。
+
+## 0.4 IP-Adapter 安装（一次性）
+
+```powershell
+# 1) 自定义节点（无 requirements.txt）
+cd D:\BaiduSyncdisk\wmj_work\XJ\ComfyUI\custom_nodes
+git clone --depth 1 https://github.com/cubiq/ComfyUI_IPAdapter_plus.git
+
+# 2) 模型（多连接下载器，带 sha256 校验）
+python imagegen/tools/download_model.py --url https://huggingface.co/h94/IP-Adapter/resolve/main/sdxl_models/ip-adapter-plus_sdxl_vit-h.safetensors --out "<ComfyUI>/models/ipadapter/ip-adapter-plus_sdxl_vit-h.safetensors" --sha256 3f5062b8400c94b7159665b21ba5c62acdcd7682262743d7f2aefedef00e6581 --connections 16 --chunk-mb 16
+python imagegen/tools/download_model.py --url https://huggingface.co/laion/CLIP-ViT-H-14-laion2B-s32B-b79K/resolve/main/model.safetensors --out "<ComfyUI>/models/clip_vision/CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors" --sha256 036e6e2bd49697511f4f8b8cb5ee465f93025f7a69a145eadeb9a881ace9b18d --connections 16 --chunk-mb 16
+
+# 3) 重启 ComfyUI（脚本在 integrations/comfyui/，PYTHONUTF8 已内置）
+powershell -ExecutionPolicy Bypass -File integrations/comfyui/stop_comfyui.ps1
+powershell -ExecutionPolicy Bypass -File integrations/comfyui/start_comfyui.ps1
+
+# 4) 自检：nodes_ready / model_bytes / clip_vision_bytes
+python -m imagegen.cli check
+```
+
+> 注意：`start/stop_comfyui.ps1` 含中文，Windows PowerShell 5.1 需要 **UTF-8 BOM** 才能正确解析
+> （无 BOM 会 parse error，导致 stop 失效）；仓库里这两个脚本已加 BOM 并修正进程匹配（按 ComfyUI 路径 + main.py）。
+
+## 2.1 一致性模式（`--ref` + IP-Adapter）
+
+```powershell
+# 一致性三视图（最终推荐参数：白底全身 + 脸/发色/服装一致）
+python -m imagegen.cli generate --spec contract/characters/laozhou.json ^
+  --mode three_view --ref outputs/concepts/laozhou/portrait.png ^
+  --outdir outputs/concepts/laozhou/consistent --seed 42 ^
+  --ip-adapter-strength 0.35 --ip-adapter-end-at 0.90 --ip-adapter-weight-type "style transfer" ^
+  --negative-extra "flames, fire, energy, abstract background, collage, close-up"
+
+# 一致性表情（强权重，close-up 一致脸）
+python -m imagegen.cli generate --spec contract/characters/laozhou.json ^
+  --mode expressions --ref outputs/concepts/laozhou/portrait.png ^
+  --outdir outputs/concepts/laozhou/consistent --seed 42 ^
+  --ip-adapter-strength 0.65 --ip-adapter-end-at 0.85
+
+# 只补 side 视角（用干净 front 当 ref，避免大头拼贴）
+python -m imagegen.cli generate --spec contract/characters/laozhou.json ^
+  --mode three_view --views side --ref outputs/concepts/laozhou/consistent/three_view/front.png ^
+  --outdir outputs/concepts/laozhou/consistent --seed 44 ^
+  --ip-adapter-strength 0.6 --ip-adapter-end-at 0.85
+```
+
+一致性参数：
+
+| 参数 | 默认 | 说明 |
+|---|---|---|
+| `--ref` | 空 | 参考图（通常 portrait.png）；给了就启用 IP-Adapter 工作流 |
+| `--ip-adapter-strength` | 0.65 | IPAdapter weight（0.3-0.8；越高越像但风格/构图也会被参考图带偏） |
+| `--ip-adapter-end-at` | 0.85 | 在第几步停止注入（0.5-0.9） |
+| `--ip-adapter-preset` | `PLUS (high strength)` | IPAdapterUnifiedLoader preset（SDXL 用 PLUS） |
+| `--ip-adapter-weight-type` | linear | `linear / ease in / ease out / style transfer / composition` |
+| `--negative-extra` | 空 | 追加 negative（一致性模式下压参考图带来的火苗/拼贴） |
+| `--views` | 全部 | 只跑指定视角（`side` / `front,three_quarter`） |
+
+产物：`consistent/three_view/{front,side,three_quarter}.png`、`consistent/expressions/{neutral,happy,surprised,thinking}.png`、
+`consistent/meta.json`（含 `ip_adapter` 参数与每张图的 ref/seed/gen_sec/prompt）。
+
 ## 1. 前置
 
 - 依赖：Python 3.11、Pillow（仓库已装 11.3.0）、本机 ComfyUI 与 Animagine checkpoint；
@@ -167,8 +249,9 @@ python integrations/comfyui/run_h3.py ^
 1. **ComfyUI 单 worker 串行**：多张图逐张排队提交，一次 CLI 调用内顺序执行；不要多进程抢同一队列。
 2. **首图慢**：首个 prompt 需加载 6.9GB SDXL（约 20-40s，视磁盘），之后同 checkpoint 复用显存，单图约 15-25s。
 3. **显存**：SDXL 1024² / 832x1216 在 12GB 上可跑；与 H3 工作流切换时 ComfyUI 会自动卸载/加载模型，可能多花 30-60s。
-4. **一致性**：三视图/表情各自独立生成，同 seed 家族 + 相同角色 tag 能较高相似，但不保证像素级同一张脸；
-   要强一致建议「概念图 → 图生图 / IP-Adapter」二次加工（后续可扩展）。
+4. **一致性**：已实现 IP-Adapter 一致性模式（`--ref`，见 §2.1）。经验：expressions 用 weight 0.65 脸最一致；
+   three_view 用 0.35/style transfer 才能保住白底全身构图；side 用干净 front 当 ref 修。IP-Adapter 会连带传递参考图
+   的底色/风格（如 accent 色火焰），必要时用 `--negative-extra` 压制。
 5. **风格漂移**：negative 已含 `realistic`；要更厚涂/国漫用 `--style guoman` 或 `--prompt-extra` 追加风格词。
 6. **离线可复现**：模型文件本地；固定 seed + 参数同机可复现，跨 GPU/驱动可能有细微差异。
 
@@ -190,4 +273,18 @@ python imagegen/tools/download_model.py ^
 ```powershell
 python imagegen/tools/rebuild_meta.py --spec contract/characters/laozhou.json --outdir outputs/concepts/laozhou
 ```
+
+## 9. 一致性产物复现（3 角色）
+
+```powershell
+# 表情（强权重，3 角色）
+foreach ($id in @("laozhou","ali","dawei")) {
+  python -m imagegen.cli generate --spec "contract/characters/$id.json" --mode three_view --ref "outputs/concepts/$id/portrait.png" --outdir "outputs/concepts/$id/consistent" --seed 42 --ip-adapter-strength 0.35 --ip-adapter-end-at 0.90 --ip-adapter-weight-type "style transfer" --negative-extra "flames, fire, energy, abstract background, collage, close-up"
+  python -m imagegen.cli generate --spec "contract/characters/$id.json" --mode expressions --ref "outputs/concepts/$id/portrait.png" --outdir "outputs/concepts/$id/consistent" --seed 42 --ip-adapter-strength 0.65 --ip-adapter-end-at 0.85
+  python -m imagegen.cli generate --spec "contract/characters/$id.json" --mode three_view --views side --ref "outputs/concepts/$id/consistent/three_view/front.png" --outdir "outputs/concepts/$id/consistent" --seed 44 --ip-adapter-strength 0.6 --ip-adapter-end-at 0.85
+}
+```
+
+产物：`outputs/concepts/{id}/consistent/`（three_view 3 + expressions 4 + meta.json），
+并被后端 `GET /api/characters/{cid}/concepts` 以 `consistent` 字段透传。
 
