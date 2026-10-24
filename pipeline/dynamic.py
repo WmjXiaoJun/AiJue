@@ -178,13 +178,7 @@ def _char_refs(shots: list, frames: dict, workdir: Path, width: int,
             full = frames.get(sid)
             if full is None:
                 continue
-            out = ref_dir / f"{sid}_ref_scene.png"
-            utils.ffmpeg(["-y", "-hide_banner", "-loglevel", "error",
-                          "-i", str(full),
-                          "-vf", "scale=768:768:force_original_aspect_ratio=decrease,"
-                                 "pad=768:768:(ow-iw)/2:(oh-ih)/2:color=black",
-                          str(out)])
-            refs[sid] = out if _valid(out, 1000) else full
+            refs[sid] = full
             strategies[sid] = "scene-full"
         return refs, strategies
     for shot in shots:
@@ -381,7 +375,8 @@ def ensure_dynamic_clips(episode: dict, shots: list, assets: list, workdir: Path
         audio = audio if _valid(audio, 500) else None
         mode = "audio_ref" if (line and audio is not None) else "fl2v"
         plan = plans.get(sid) or shot_grammar.plan_for_shot(shot, i)
-        prompt = shot_grammar.build_h3_prompt(plan, mode)
+        prompt = shot_grammar.build_h3_prompt(
+            plan, mode, scene_description=os.environ.get("SCENE_DESC") or None)
         prompt_path = prompts_dir / f"{sid}.txt"
         utils.write_text(prompt_path, prompt + "\n")
         out = dynamic_dir / f"{sid}.mp4"

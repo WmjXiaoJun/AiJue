@@ -195,9 +195,18 @@ def plan_for_shot(shot: dict, index: int = 0) -> dict:
     return plan
 
 
-def build_h3_prompt(plan: dict, mode: str = "audio_ref") -> str:
-    """按 5-aspect 公式拼 H3 prompt（身份锚点 + 景别/角度/高度/光线 + 运镜 + 目的）。"""
+def build_h3_prompt(plan: dict, mode: str = "audio_ref",
+                    scene_description: str | None = None) -> str:
+    """按 5-aspect 公式拼 H3 prompt（身份锚点 + 景别/角度/高度/光线 + 运镜 + 目的）。
+
+    scene_description: 场景模式下传入场景描述，让 H3 保留 2D 绘景环境（不再默认 dark studio）。
+    """
     plan = plan or {}
+    scene = scene_description or "a dark studio"
+    keep_scene = ("" if not scene_description else
+                  " Keep the entire background, furniture, props, lighting and the "
+                  "character's position and scale exactly as in the reference image; "
+                  "do not change or move the background.")
     size = _size_phrase(plan)
     angle = _angle_phrase(plan)
     height = _height_phrase(plan)
@@ -207,19 +216,19 @@ def build_h3_prompt(plan: dict, mode: str = "audio_ref") -> str:
     if mode == "fl2v":
         action = (f"Starting from the first frame and ending at the last frame, "
                   f"Subject 1 performs a continuous {size} shot, {angle}, "
-                  f"{height} camera height, in a dark studio with {light}, with "
+                  f"{height} camera height, in {scene} with {light}, with "
                   f"camera movement {movement} (only this movement, no zoom/pan "
                   f"mix). Subtle body movement, head turn and expression change "
                   f"only; keep identity, framing and lighting consistent from the "
-                  f"first frame to the last frame.")
+                  f"first frame to the last frame." + keep_scene)
         motion = ("React naturally with subtle body and facial movement. "
                   "No text, no watermark.")
         soundscape = "overall_soundscape: quiet studio room tone, subtle cloth movement."
     else:
         action = (f"One continuous {size} shot, {angle}, {height} camera "
-                  f"height, of Subject 1 speaking directly to the camera in a dark "
-                  f"studio with {light}. Camera: {movement} (only this movement, "
-                  f"no zoom/pan mix).")
+                  f"height, of Subject 1 speaking directly to the camera in {scene} "
+                  f"with {light}. Camera: {movement} (only this movement, "
+                  f"no zoom/pan mix)." + keep_scene)
         motion = ("Lips move naturally in sync with the reference speech audio; subtle "
                   "blinking, eyebrow movement and small head nods. Keep identity, hair, "
                   "outfit and lighting consistent with the reference image; only the "

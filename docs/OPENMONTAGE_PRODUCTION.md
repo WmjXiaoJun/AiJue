@@ -24,8 +24,8 @@
 | cinematic（画幅/镜头时长/音频分层/反主观形容词） | ✅ | 模板镜头时长/包装；音频分层待补 ambience |
 | b-roll-planning（空镜/素材决策/POV） | ✅ 部分 | b_roll 镜头类型 + scene plates 空镜 |
 | image-gen-usage（图像生成/风格/一致性） | ✅ | imagegen/SDXL、角色概念图、2D 场景绘景 |
-| 3d-world-generation（3D 世界/空间） | 🚧 本轮 | studio3d.scene：Blender 3D 演播厅 + 相机动画 |
-| animation-pipeline / hyperframes | 参考 | 镜头级 2.5D 视差/相机运动（pipeline/scenes.py） |
+| 3d-world-generation（3D 世界/空间） | ❌ 已按用户要求停用 | 改为 2D 绘景 + 2D cutout + H3 动态（不再使用 Blender） |
+| animation-pipeline / hyperframes | ✅ H3 驱动 | 镜头级 2.5D 视差/相机运动（pipeline/scenes.py）；动态镜头 H3 audio_ref/i2v（保留场景） |
 | long-form / short-form / storytelling | ✅ 部分 | 5-10 分钟模板 / 竖屏短片扩展位；模板节奏 |
 | sound-design / bgm | ✅ 部分 | BGM/转场 whoosh/响度；ambience/Foley 待补 |
 | subtitle-sync | ✅ | ASS/SRT + 多语字幕；词级对齐待补 |
@@ -39,7 +39,7 @@
 ## 4. 本轮场景制作（解决“全是平面”问题）
 - pipeline/scenes.py：2D 绘景 plate + RGBA 角色 cutout 分层 + 2.5D 视差/相机运动（background/foreground 不同速率），景别/机位沿用 ShotPlan；
 - outputs/scene_plates/：12 张 2D 动漫场景绘景（深夜秀/圆桌厅/历史书房/辩论场/案发现场/国宝厅/厨房/舞台/访谈沙发/街头/课堂）+ 3 张 3D 渲染风；
-- outputs/3d_scenes/：Blender 真实 3D 演播厅（圆桌/主持台/灯架/角色）+ 相机横移/推近/摇镜 3 条；
+- ~~outputs/3d_scenes/~~：已停用（用户要求不用 Blender），改为 H3 生成带场景的动态镜头；
 - contract/scene_map.json：模板→场景映射；render 支持 scenes 模式；history_talk/tonight_show 等出场景版 demo（30-45s），逐步替换全部模板的平面底。
 
 ## 5. 继续沿用（下一轮）

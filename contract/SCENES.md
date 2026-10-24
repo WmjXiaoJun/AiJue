@@ -25,3 +25,9 @@ contract/scene_map.json：{template_id: {"plate": "history_study", "3d": optiona
 - tonight_show：用 3D 场景片段（wide/host/stage_pan）+ 2D 绘景混合，出 30-45s demo；
 - 抽帧可见 3D 场景纵深/灯光/相机运动与 2D 绘景环境，不再是纯渐变底；
 - QC 通过；模板验证片可批量升级（至少 6 个模板）。
+
+
+## 变更（2026-10-25 用户指示）
+- 停用 Blender/3D 场景：不再使用 outputs/3d_scenes，不再使用 cutout_full；pipeline/scenes.py 已停用 three_d 背景。
+- 角色 cutout 改为 SDXL 全身立绘去白底（outputs/characters/{id}/cutout_2d/front.png，scripts/make_2d_cutouts.py）。
+- 动态镜头全部交给 H3：场景合成帧作为参考（SCENE_DYNAMIC_FULL_REF=1 + 场景描述 prompt），H3 i2v/audio_ref 生成带场景的动态镜头；静态场景镜头由 2D 绘景+cutout 合成（无 Blender）。

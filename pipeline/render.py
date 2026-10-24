@@ -825,6 +825,14 @@ def run_render(args) -> int:
                  scene_info.get("template_id"), scene_info.get("plate"))
         # 场景模式下 H3 参考图使用整帧（保留 2D 绘景环境，不再裁脸部/画窗）
         os.environ["SCENE_DYNAMIC_FULL_REF"] = "1"
+        try:
+            _descs = json.loads((config.REPO_ROOT / "contract" / "scene_descriptions.json").read_text(encoding="utf-8"))
+            _plate = str(scene_info.get("plate_name") or scene_info.get("plate") or "")
+            _plate = Path(_plate).stem if _plate else ""
+            os.environ["SCENE_DESC"] = str(_descs.get(_plate) or "")
+            LOG.info("场景描述: %s -> %s", _plate, os.environ["SCENE_DESC"][:60])
+        except Exception as _exc:  # noqa: BLE001
+            LOG.warning("加载场景描述失败: %s", _exc)
 
     # ---- 1) 镜头片段 ---------------------------------------------------
     prog(2, "生成/复用镜头片段")

@@ -54,16 +54,6 @@ for i, n in enumerate(names):
     out = OUT / ("2d_%02d_%s.mp4" % (i, n))
     labeled(p, out, labels.get(n, n), ss=5.0, t=4.0)
     if out.exists(): segs.append(str(out))
-# 3D section title
-title_png = OUT / "3d_title.png"
-text_card(title_png, "真实 3D 场景", "Blender EEVEE · 演播厅 / 圆桌 / 相机动画")
-title_mp4 = OUT / "50_3d_title.mp4"; still_card(title_png, title_mp4, 1.8); segs.append(str(title_mp4))
-for i, (n, lab) in enumerate([("3d_studio_wide","3D 横移全景"),("3d_studio_host","3D 缓推特写"),("3d_stage_pan","3D 摇镜升镜")]):
-    p = D3 / (n + ".mp4")
-    if not p.exists(): continue
-    out = OUT / ("3d_%02d_%s.mp4" % (i, n))
-    labeled(p, out, lab, ss=0.5, t=4.5)
-    if out.exists(): segs.append(str(out))
 # concat
 lst = OUT / "concat.txt"
 lst.write_text("\n".join("file '%s'" % s.replace("\\", "/") for s in segs) + "\n", encoding="utf-8")

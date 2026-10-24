@@ -394,3 +394,8 @@ FastAPI (8090) ── SQLite
   - audio_ref 以场景合成帧为参考：H3 保留图书馆环境 + 角色说话口型/推近（tmp/h3_scene_audio.mp4，1280x704）；
   - 已加 SCENE_DYNAMIC_FULL_REF 模式：场景版动态镜头用整帧场景合成画面作 H3 参考（不再裁脸部），让 H3 动态镜头带 2D 场景环境；
 - 3D Blender 产物（outputs/3d_scenes、studio3d scene.py）保留为归档，不再进入成片流程。
+### 32.1 H3 场景融合验证 + 完整 5 分钟场景版（2026-10-25）
+- 16 个 scene demo 已用「2D 动漫全身 cutout（SDXL 去白底）+ 2D 绘景」重渲，pipeline 已停用 Blender/3D；场景巡礼重建为 2D-only（outputs/scene_demos/scene_showcase.mp4，18 段）。
+- H3 场景融合：新增 SCENE_DYNAMIC_FULL_REF + contract/scene_descriptions.json；H3 参考图取「2D 绘景+2D 角色」整帧，prompt 带场景描述并要求保留背景；3 镜测试（final_fusion3.mp4）与 8 镜 demo（outputs/history_full/h3_scene_demo.mp4，46.72s，7 个 H3 audio_ref 镜头）均保留书房场景 + 角色口型/微动作，不再出现 Blender 3D/白底棚拍。
+- 完整 5 分钟历史夜话场景版：outputs/history_full/final.mp4（286.04s / 1280×720 / 27MB / 53 镜 / 51 条 TTS / 2D 绘景 + 2D 角色 / blackdetect 0 / QC ok，字幕 55 条）。
+- 全 H3 版 5 分钟成片正在后台渲染：outputs/history_full/final_h3.mp4（51 个 dialogue 镜头全 H3 audio_ref，预计 2-3h；完成后可直接对比）。
