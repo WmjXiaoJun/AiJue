@@ -412,6 +412,11 @@ def test_settings_get_and_patch(client):
         "tts_provider",
         "voice_map",
         "h3_price_per_second",
+        "h3_provider",
+        "metaso_base_url",
+        "metaso_resolution",
+        "metaso_duration",
+        "metaso_key_configured",
     }
     try:
         response = client.patch(

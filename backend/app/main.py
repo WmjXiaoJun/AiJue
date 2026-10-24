@@ -1083,11 +1083,27 @@ def get_settings(db: Session = Depends(get_db)):
 def patch_settings(payload: schemas.SettingsUpdate, db: Session = Depends(get_db)):
     setting = seed.get_settings(db)
     changes = payload.model_dump(exclude_unset=True)
+    # metaso_key 不落 DB、不回传：写入/清除 backend/data/metaso.env
+    metaso_key = changes.pop("metaso_key", None)
     if changes.get("generation_mode") is not None and changes["generation_mode"] not in ("mock", "comfyui"):
         raise HTTPException(status_code=400, detail="generation_mode 只能是 mock 或 comfyui")
+    provider = changes.get("h3_provider")
+    if provider is not None and provider not in ("local", "metaso"):
+        raise HTTPException(status_code=400, detail="h3_provider 只能是 local 或 metaso（metaso 为测试 provider）")
+    resolution = changes.get("metaso_resolution")
+    if resolution is not None and resolution not in ("768P", "2K"):
+        raise HTTPException(status_code=400, detail="metaso_resolution 只能是 768P 或 2K")
+    duration = changes.get("metaso_duration")
+    if duration is not None and not (4 <= int(duration) <= 15):
+        raise HTTPException(status_code=400, detail="metaso_duration 必须在 4-15 秒之间")
+    base_url = changes.get("metaso_base_url")
+    if base_url is not None and str(base_url).strip() and not str(base_url).lower().startswith(("http://", "https://")):
+        raise HTTPException(status_code=400, detail="metaso_base_url 必须是 http(s) URL")
     for key, value in changes.items():
         if value is not None:
             setattr(setting, key, value)
+    if metaso_key is not None:
+        config.save_metaso_key(str(metaso_key))
     db.commit()
     db.refresh(setting)
     return setting

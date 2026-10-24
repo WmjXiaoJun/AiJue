@@ -9,3 +9,6 @@ frontend/dist/
 frontend/node_modules/
 .pytest_cache/
 *.log
+# MetaSo test key (do not commit)
+backend/data/metaso.env
+integrations/metaso/.env

@@ -149,7 +149,29 @@ portrait_url,sheet_url,turntable_url,expressions,status,created_at}
   ComfyUI 串行锁内执行，子进程超时 20 分钟（>= 契约 15 分钟）；成功后回填
   Character.h3_video_url 与 h3_portrait_url（ffmpeg 抽中段帧到 outputs/characters/{cid}/h3_portrait.png，
   run_h3.py 自带 _fmid.png 侧车帧也会被懒扫描识别）。
+- H3 provider 分派（settings.h3_provider，默认 local）：
+  * local：上方 run_h3.py，产物 outputs/h3/{cid}_h3.mp4，回填 h3_video_url / h3_portrait_url；
+  * metaso（MetaSo 云端测试 provider）：后台调用
+
+        python -m integrations.metaso.h3 --image <角色立绘/概念图路径> --prompt "..." \
+          --out outputs/h3/{cid}_h3_metaso.mp4 --resolution 768P --duration 5 \
+          --base-url https://metaso.cn/api/minimax
+
+    产物不覆盖本地 {cid}_h3.mp4；成功后回填 Character.h3_metaso_url，Job.output_url =
+    /media/h3/{cid}_h3_metaso.mp4，Job.cost 取 CLI 的 est_cost_cny（768P×5s ≈ 0.45 元），
+    子进程超时 300s（实测单条 5s/768P 约 23-25s）。
 - CLI 未就绪 / 失败时 Job.failed + error（含 stderr 摘要），不拖垮 API 进程。
+
+## 设置（GET/PATCH /api/settings）
+
+- 通用：generation_mode / comfyui_url / workflow_template / resolution / fps / tts_provider /
+  voice_map / h3_price_per_second。
+- H3 provider（角色 2.2）：h3_provider（local 默认 | metaso 云端测试）、metaso_base_url
+  （默认 https://metaso.cn/api/minimax）、metaso_resolution（768P 默认 | 2K）、metaso_duration
+  （4-15 秒，默认 5）、metaso_key_configured（只读 bool，不回传明文 key）。
+- PATCH 支持上述字段与可选 metaso_key：key 写入 backend/data/metaso.env（空字符串清除），
+  读取优先级 METASO_API_KEY 环境变量 > backend/data/metaso.env。生产默认 local，
+  metaso 仅用于测试/快速迭代（成片仍优先使用本地 H3）。
 
 ## 成片导出（contract/EXPORT.md：剪映草稿）
 
@@ -177,6 +199,7 @@ portrait_url,sheet_url,turntable_url,expressions,status,created_at}
 - ZAOPIANJU_OUTPUTS_DIR   产物目录（默认 outputs）
 - ZAOPIANJU_FRONTEND_DIST 前端构建产物目录（默认 frontend/dist）
 - ZAOPIANJU_JOBS_AUTORUN  设为 0 时任务只入队不执行（测试用）
+- METASO_API_KEY          MetaSo 云端测试 provider 的 Key（优先于 backend/data/metaso.env）
 
 ## 测试
 
@@ -188,7 +211,8 @@ portrait_url,sheet_url,turntable_url,expressions,status,created_at}
 通过注入假的 pipeline / studio3d / imagegen / run_h3 / capcut CLI 验证各类任务成功与失败路径，
 不污染开发库、不真连 ComfyUI / Blender。覆盖：contract/API.md 全部端点、
 角色工坊 CRUD/资产联动/files/生成任务（tests/test_characters.py）、
-概念图/H3/剪映导出（tests/test_concept.py）、ComfyUI 适配器 mock。
+概念图/H3/剪映导出（tests/test_concept.py）、H3 provider 分派与 settings/key 掩码
+（tests/test_h3_provider.py）、ComfyUI 适配器 mock。
 
 ## ComfyUI 适配器
 

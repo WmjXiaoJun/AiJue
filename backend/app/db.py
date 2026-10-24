@@ -60,6 +60,13 @@ _MIGRATIONS = {
         "concept_expressions": "TEXT",
         "h3_video_url": "VARCHAR(400)",
         "h3_portrait_url": "VARCHAR(400)",
+        "h3_metaso_url": "VARCHAR(400)",
+    },
+    "settings": {
+        "h3_provider": "VARCHAR(16) NOT NULL DEFAULT 'local'",
+        "metaso_base_url": "VARCHAR(300) NOT NULL DEFAULT 'https://metaso.cn/api/minimax'",
+        "metaso_resolution": "VARCHAR(16) NOT NULL DEFAULT '768P'",
+        "metaso_duration": "INTEGER NOT NULL DEFAULT 5",
     },
 }
 
@@ -92,6 +99,24 @@ def migrate_columns() -> None:
                     "UPDATE characters SET concept_expressions = '{}' "
                     "WHERE concept_expressions IS NULL"
                 )
+            )
+    # 设置表新增列老数据兜底
+    if "settings" in tables:
+        with engine.begin() as connection:
+            connection.execute(
+                text("UPDATE settings SET h3_provider = 'local' WHERE h3_provider IS NULL OR h3_provider = ''")
+            )
+            connection.execute(
+                text(
+                    "UPDATE settings SET metaso_base_url = 'https://metaso.cn/api/minimax' "
+                    "WHERE metaso_base_url IS NULL OR metaso_base_url = ''"
+                )
+            )
+            connection.execute(
+                text("UPDATE settings SET metaso_resolution = '768P' WHERE metaso_resolution IS NULL OR metaso_resolution = ''")
+            )
+            connection.execute(
+                text("UPDATE settings SET metaso_duration = 5 WHERE metaso_duration IS NULL")
             )
 
 

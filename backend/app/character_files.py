@@ -45,6 +45,7 @@ def scan(character_id: str) -> Dict[str, Any]:
         "turntable": None,
         "h3_portrait": None,
         "h3_video": None,
+        "h3_metaso_video": None,
         "expressions": {},
         "meta": {},
     }
@@ -73,6 +74,9 @@ def scan(character_id: str) -> Dict[str, Any]:
         h3_video = config.OUTPUTS_DIR / "h3" / f"{character_id}_h3.mp4"
         if h3_video.is_file() and h3_video.stat().st_size > 0:
             result["h3_video"] = config.media_url(h3_video)
+        h3_metaso = config.OUTPUTS_DIR / "h3" / f"{character_id}_h3_metaso.mp4"
+        if h3_metaso.is_file() and h3_metaso.stat().st_size > 0:
+            result["h3_metaso_video"] = config.media_url(h3_metaso)
     except OSError:
         pass
     for name in EXPRESSION_NAMES:
@@ -109,7 +113,11 @@ def apply(character) -> bool:
         if url and getattr(character, field) != url:
             setattr(character, field, url)
             changed = True
-    for key, field in (("h3_portrait", "h3_portrait_url"), ("h3_video", "h3_video_url")):
+    for key, field in (
+        ("h3_portrait", "h3_portrait_url"),
+        ("h3_video", "h3_video_url"),
+        ("h3_metaso_video", "h3_metaso_url"),
+    ):
         url = data.get(key)
         if url and getattr(character, field) != url:
             setattr(character, field, url)

@@ -49,13 +49,32 @@ def ensure_defaults(db) -> Setting:
             tts_provider="edge-tts",
             voice_map=dict(DEFAULT_VOICE_MAP),
             h3_price_per_second=0.09,
+            h3_provider="local",
+            metaso_base_url="https://metaso.cn/api/minimax",
+            metaso_resolution="768P",
+            metaso_duration=5,
         )
         db.add(setting)
         db.commit()
         db.refresh(setting)
-    elif not setting.voice_map:
-        setting.voice_map = dict(DEFAULT_VOICE_MAP)
-        db.commit()
+    else:
+        changed = False
+        if not setting.voice_map:
+            setting.voice_map = dict(DEFAULT_VOICE_MAP)
+            changed = True
+        defaults = {
+            "h3_provider": "local",
+            "metaso_base_url": "https://metaso.cn/api/minimax",
+            "metaso_resolution": "768P",
+            "metaso_duration": 5,
+        }
+        for field, value in defaults.items():
+            current = getattr(setting, field)
+            if current is None or (isinstance(current, str) and not current.strip()):
+                setattr(setting, field, value)
+                changed = True
+        if changed:
+            db.commit()
     return setting
 
 

@@ -229,3 +229,27 @@ FastAPI (8090) ── SQLite
 - backend：**76 passed**（新增 consistent 懒扫描 + from-concept 简写路径）；pipeline 38 passed；frontend build 通过（dist 257KB JS/78KB CSS）
 - 服务：8090 常驻（run-detached）；ComfyUI 8188 在线（IP-Adapter 节点已加载）
 - 已知：三视图风格受 IP-Adapter 背景影响；H3 串行 2–5 分钟/条；剪映 10.x 加密草稿限制仍在。
+## 20. H3 双 Provider：本地 ComfyUI（生产）+ MetaSo 云端（测试）
+
+- 背景：本机 H3 单条 5s 镜头约 116–223s；为快速测试/迭代，接入用户提供的 MetaSo 云端 MiniMax H3 API（同模型同规格）。
+- 实测（2026-10-24）：
+  - t2v 5s/768P 16:9：16.2s 完成；
+  - i2v 5s/768P（概念图驱动）：上传<1s + 创建 1–3s + 生成 ~21s + 下载 <1s，合计 23–25s/条；
+  - 3 角色：laozhou 24.6s / ali 23.5s / dawei 24.3s；输出 768×1120（跟随立绘比例）/ 5.175s / h264+aac；
+  - 价格 0.09 元/秒（5s≈0.45 元），2K 0.15 元/秒。
+- 集成：integrations/metaso/h3.py（CLI）+ README；协议 /v1/files/upload → mm_file://、/v2/video_generation、/v2/query/video_generation/{id}；Key 存本地 backend/data/metaso.env（gitignore），仓库仅 .env.example。
+- 策略：**默认 provider=local**（生产成片仍本机生成）；metaso 仅测试用，产物单独 outputs/h3/metaso/ 或 {id}_h3_metaso.mp4，不覆盖本地 H3；Settings 可切换 provider。
+- 对比图：![本地 vs MetaSo](screenshots/29_metaso_compare.png)
+
+### 20.1 测试产物
+- outputs/h3/metaso/{laozhou,ali,dawei}_metaso.mp4（各 5.175s/768×1120/含音轨）与 .meta.json（task_id/timeline/预估费用/ffprobe）
+- outputs/h3/metaso/compare_local_vs_metaso.png（3 角色本地 vs 云端抽帧对比）
+### 20.2 平台集成与端到端验收（2026-10-24）
+- Settings 新增：h3_provider（local 默认 | metaso）、metaso_base_url、metaso_resolution（768P/2K）、metaso_duration（4-15）、metaso_key_configured（只读布尔，明文不回传）；PATCH 可写入/清除 key 到 backend/data/metaso.env。
+- 真实端到端：
+  - MetaSo：PATCH provider=metaso → POST /characters/laozhou/h3-animate → job_3f1c019e9d **done 24.1s** → outputs/h3/laozhou_h3_metaso.mp4（4,584,847B / 768×1120 / 5.175s / h264+aac），h3_metaso_url 回填，/media 200；本地 laozhou_h3.mp4 前后 sha1 一致（未被覆盖）。
+  - local：job_bc80c07273 done **120.1s** → h3_video_url/h3_portrait_url 回填；与本机 ComfyUI 行为一致。
+- 前端：设置弹窗「H3 生成方式」双选项（本地·生产 ↔ MetaSo 云端·测试）、Key 已配置状态、¥0.09/秒 · 5s≈¥0.45 提示；角色抽屉按钮与播放器显示 provider 徽标（云端测试·MetaSo）。实测 UI 切 provider → 云端 H3 job 24s done → 抽屉播放 ali_h3_metaso.mp4；随后恢复 provider=local。
+- 安全：key 只在 backend/data/metaso.env / 环境变量；GET /settings 不含明文；仓库仅 .env.example。
+- 测试：backend **83 passed**（新增 h3 provider 用例）、pipeline 38 passed。
+- 默认策略：生产成片仍 local；metaso 仅测试/快速迭代，产物独立存放。

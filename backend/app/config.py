@@ -45,6 +45,7 @@ JOBS_AUTORUN = os.environ.get("ZAOPIANJU_JOBS_AUTORUN", "1").strip().lower() not
 
 API_PREFIX = "/api"
 MEDIA_URL_PREFIX = "/media"
+METASO_ENV_PATH = DATA_DIR / "metaso.env"
 
 
 def ensure_dirs() -> None:
@@ -58,6 +59,68 @@ def ensure_dirs() -> None:
     (OUTPUTS_DIR / "concepts").mkdir(parents=True, exist_ok=True)
     (OUTPUTS_DIR / "exports").mkdir(parents=True, exist_ok=True)
     (OUTPUTS_DIR / "h3").mkdir(parents=True, exist_ok=True)
+
+
+def metaso_key() -> str | None:
+    """读取 MetaSo API Key：环境变量 METASO_API_KEY 优先，其次 backend/data/metaso.env。"""
+    value = (os.environ.get("METASO_API_KEY") or "").strip()
+    if value:
+        return value
+    path = METASO_ENV_PATH
+    if not path.is_file():
+        return None
+    try:
+        for line in path.read_text(encoding="utf-8").splitlines():
+            text = line.strip()
+            if not text or text.startswith("#") or "=" not in text:
+                continue
+            name, _, raw = text.partition("=")
+            if name.strip().upper() in ("METASO_API_KEY", "KEY", "TOKEN"):
+                candidate = raw.strip().strip('"').strip("'")
+                if candidate:
+                    return candidate
+    except OSError:
+        return None
+    return None
+
+
+def metaso_key_configured() -> bool:
+    return bool(metaso_key())
+
+
+def save_metaso_key(raw: str | None) -> bool:
+    """把 MetaSo key 写入/清除 backend/data/metaso.env（保留其它行），返回是否已配置。"""
+    value = (raw or "").strip()
+    path = METASO_ENV_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lines = []
+    if path.is_file():
+        try:
+            lines = path.read_text(encoding="utf-8").splitlines()
+        except OSError:
+            lines = []
+    output = []
+    replaced = False
+    for line in lines:
+        text = line.strip()
+        name = text.partition("=")[0].strip().upper() if "=" in text else ""
+        if name in ("METASO_API_KEY", "KEY", "TOKEN"):
+            if value and not replaced:
+                output.append("METASO_API_KEY=" + value)
+                replaced = True
+            continue
+        output.append(line)
+    if value and not replaced:
+        output.append("METASO_API_KEY=" + value)
+    payload = "\n".join(output).strip()
+    try:
+        if payload:
+            path.write_text(payload + "\n", encoding="utf-8")
+        elif path.is_file():
+            path.unlink()
+    except OSError:
+        return bool(value)
+    return bool(value)
 
 
 def media_url(path: str | Path) -> str:

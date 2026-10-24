@@ -167,6 +167,12 @@ class SettingsOut(ORMModel):
     tts_provider: str
     voice_map: Dict[str, str] = Field(default_factory=dict)
     h3_price_per_second: float
+    # H3 provider（local 默认 / metaso 云端测试）
+    h3_provider: str = "local"
+    metaso_base_url: str = "https://metaso.cn/api/minimax"
+    metaso_resolution: str = "768P"
+    metaso_duration: int = 5
+    metaso_key_configured: bool = False  # 只读，不回传明文 key
 
 
 class SettingsUpdate(BaseModel):
@@ -178,6 +184,12 @@ class SettingsUpdate(BaseModel):
     tts_provider: Optional[str] = None
     voice_map: Optional[Dict[str, str]] = None
     h3_price_per_second: Optional[float] = Field(default=None, ge=0)
+    h3_provider: Optional[str] = None
+    metaso_base_url: Optional[str] = None
+    metaso_resolution: Optional[str] = None
+    metaso_duration: Optional[int] = Field(default=None, ge=4, le=15)
+    # 写入 backend/data/metaso.env（不落 DB、不回传）；空字符串表示清除
+    metaso_key: Optional[str] = None
 
 
 # ---------------- Character（角色工坊） ----------------
@@ -205,6 +217,7 @@ class CharacterOut(ORMModel):
     concept_expressions: Dict[str, str] = Field(default_factory=dict)
     h3_video_url: Optional[str] = None
     h3_portrait_url: Optional[str] = None
+    h3_metaso_url: Optional[str] = None
 
     @field_validator("concept_three_view", "concept_expressions", mode="before")
     @classmethod

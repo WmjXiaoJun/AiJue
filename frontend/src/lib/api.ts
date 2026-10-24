@@ -170,18 +170,28 @@ export const api = {
   },
   h3Animate: async (
     cid: string,
-    body: { image?: string; prompt?: string } = {},
+    body: { image?: string; prompt?: string; provider?: string } = {},
     fallbackImage?: string
   ): Promise<Job> => {
+    const post = (payload: Record<string, unknown>) =>
+      request<Job>("/characters/" + cid + "/h3-animate", { method: "POST", body: JSON.stringify(payload) });
     try {
-      return await request<Job>("/characters/" + cid + "/h3-animate", { method: "POST", body: JSON.stringify(body) });
+      return await post(body);
     } catch (err) {
-      if (fallbackImage && body.image && err instanceof ApiError && (err.status === 400 || err.status === 422)) {
-        return request<Job>("/characters/" + cid + "/h3-animate", {
-          method: "POST",
-          body: JSON.stringify({ ...body, image: fallbackImage }),
-        });
+      const retryable = err instanceof ApiError && (err.status === 400 || err.status === 422);
+      if (!retryable) throw err;
+      // 1) 后端未支持 body 覆盖 provider → 去掉 provider 重试（仅用 settings）
+      if (body.provider) {
+        const { provider: _omit, ...rest } = body;
+        try {
+          return await post(rest);
+        } catch (inner) {
+          if (!(inner instanceof ApiError) || !fallbackImage || !rest.image) throw inner;
+          return post({ ...rest, image: fallbackImage });
+        }
       }
+      // 2) 路径格式不兼容 → 换 /media URL 重试
+      if (fallbackImage && body.image) return post({ ...body, image: fallbackImage });
       throw err;
     }
   },

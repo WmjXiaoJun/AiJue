@@ -19,3 +19,9 @@
 - SDXL 概念图三视图/表情用 IP-Adapter（plus_sdxl_vit-h + CLIP-ViT-H）条件化，解决换脸问题。
 - H3 动画改为概念图驱动（覆盖 outputs/h3/{id}_h3.mp4），成片优先用概念图/H3 新素材。
 - 模型下载走 imagegen/tools/download_model.py 多连接；ComfyUI 单 worker 串行。
+## 2026-10-24 H3 双 Provider（用户指示）
+- 用户提供 MetaSo 云端 MiniMax H3 API（测试用），要求更快的 H3 用它，其余仍本地生成。
+- 结论：默认 provider=local（本机 ComfyUI，生产成片）；新增 provider=metaso（测试/快速迭代），产物单独写 outputs/h3/metaso/ 或 {id}_h3_metaso.mp4，不覆盖本地 H3。
+- 实测：MetaSo i2v 5s/768P 单条约 23-25s（vs 本地 116-223s），约 6-10 倍快；0.09 元/秒（5s 约 0.45 元）。
+- Key 仅存 backend/data/metaso.env（gitignore），仓库只保留 .env.example。
+- API 协议：POST /v1/files/upload → mm_file://；POST /v2/video_generation {model,content,resolution,duration,ratio?}；GET /v2/query/video_generation/{task_id}。

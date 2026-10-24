@@ -28,7 +28,8 @@ ACTIVE_STATUSES = ("queued", "running")
 _ERR_LIMIT = 2000
 # ComfyUI 串行锁：concept（SDXL）与 h3（MiniMax H3）共用本机显卡，必须排队执行
 GPU_LOCK = threading.Lock()
-H3_TIMEOUT_SECONDS = 20 * 60  # H3 长任务超时（契约要求 >= 15 分钟）
+H3_TIMEOUT_SECONDS = 20 * 60  # 本地 H3 长任务超时（契约要求 >= 15 分钟）
+METASO_TIMEOUT_SECONDS = 300  # MetaSo 云端测试 provider 超时（实测单条 ~23-25s）
 
 
 def utcnow():
@@ -1022,15 +1023,23 @@ def enqueue_h3_job(
         .order_by(models.Episode.no.asc())
         .first()
     )
+    setting = seed.get_settings(db)
+    provider = str(setting.h3_provider or "local").strip().lower()
+    if provider not in ("local", "metaso"):
+        provider = "local"
     job = models.Job(
         id=models.new_id("job"),
         type="h3",
         status="queued",
         progress=0.0,
-        message="H3 动画排队中",
+        message=f"H3 动画排队中（{provider}）",
         episode_id=episode.id if episode is not None else None,
         character_id=character.id,
-        params={"image": str(image_path) if image_path else None, "prompt": prompt},
+        params={
+            "image": str(image_path) if image_path else None,
+            "prompt": prompt,
+            "provider": provider,
+        },
     )
     db.add(job)
     db.commit()
@@ -1051,6 +1060,10 @@ def run_h3_job(db, job: models.Job) -> None:
     prompt = str(params.get("prompt") or "").strip() or (
         f"{character.name}，原创动漫角色，轻微呼吸与眨眼，镜头缓慢推近，高质量动画"
     )
+    provider = str(params.get("provider") or "local").strip().lower()
+    if provider == "metaso":
+        run_metaso_h3_job(db, job, character, str(image_path), prompt)
+        return
     out_path = config.OUTPUTS_DIR / "h3" / f"{character.id}_h3.mp4"
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -1109,6 +1122,92 @@ def run_h3_job(db, job: models.Job) -> None:
     )
     db.commit()
     logger.info("h3 任务完成: job=%s character=%s", job.id, character.id)
+
+
+def run_metaso_h3_job(
+    db,
+    job: models.Job,
+    character: models.Character,
+    image_path: str,
+    prompt: str,
+) -> None:
+    """MetaSo 云端 H3（测试 provider）：输出 outputs/h3/{cid}_h3_metaso.mp4，不覆盖本地版本。"""
+    setting = seed.get_settings(db)
+    resolution = str(setting.metaso_resolution or "768P").strip() or "768P"
+    if resolution not in ("768P", "2K"):
+        resolution = "768P"
+    try:
+        duration = int(setting.metaso_duration or 5)
+    except (TypeError, ValueError):
+        duration = 5
+    duration = max(4, min(15, duration))
+    base_url = str(setting.metaso_base_url or "").strip() or "https://metaso.cn/api/minimax"
+
+    out_path = config.OUTPUTS_DIR / "h3" / f"{character.id}_h3_metaso.mp4"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    cmd = [
+        sys.executable,
+        "-m",
+        "integrations.metaso.h3",
+        "--image",
+        image_path,
+        "--prompt",
+        prompt,
+        "--out",
+        str(out_path),
+        "--resolution",
+        resolution,
+        "--duration",
+        str(duration),
+        "--base-url",
+        base_url,
+    ]
+    _update(db, job, status="running", progress=3, message="MetaSo 云端 H3 生成中")
+    db.commit()
+    try:
+        returncode, stdout_lines, stderr_text = run_cli(cmd, timeout=METASO_TIMEOUT_SECONDS)
+    except Exception as exc:  # noqa: BLE001 - CLI 无法启动
+        _fail(db, job, f"integrations.metaso.h3 启动失败: {exc}")
+        return
+    if returncode != 0:
+        _fail(
+            db,
+            job,
+            _format_error("integrations.metaso.h3", returncode, stderr_text, stdout_lines),
+        )
+        return
+    if not out_path.is_file() or out_path.stat().st_size == 0:
+        _fail(db, job, f"MetaSo 未产出视频: {out_path}")
+        return
+
+    url = config.media_url(out_path)
+    character.h3_metaso_url = url
+    result = _last_json(stdout_lines) or {}
+    cost = 0.0
+    try:
+        cost = round(
+            float(
+                result.get("cost")
+                or result.get("estimated_cost")
+                or result.get("est_cost_cny")
+                or 0.0
+            ),
+            4,
+        )
+    except (TypeError, ValueError):
+        cost = 0.0
+    _update(
+        db,
+        job,
+        status="done",
+        progress=100,
+        message="H3 云端动画生成完成（MetaSo）",
+        output_url=url,
+        cost=cost,
+        error=None,
+    )
+    db.commit()
+    logger.info("metaso h3 任务完成: job=%s character=%s url=%s", job.id, character.id, url)
 
 
 # --------------------------------------------------------------------------- #

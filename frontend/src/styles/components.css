@@ -1705,3 +1705,120 @@
   .char-grid { grid-template-columns: 1fr; }
 }
 
+/* ---------- 设置 · H3 生成方式 ---------- */
+.h3-provider-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.h3-provider-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #0d1017;
+  text-align: left;
+  transition: border-color 0.15s var(--ease), background 0.15s var(--ease);
+}
+
+.h3-provider-option:hover {
+  border-color: var(--line-strong);
+}
+
+.h3-provider-option.active {
+  border-color: rgba(245, 197, 24, 0.5);
+  background: rgba(245, 197, 24, 0.055);
+}
+
+.h3-provider-emoji {
+  font-size: 17px;
+  line-height: 1;
+  flex: none;
+}
+
+.h3-provider-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.h3-provider-main b {
+  font-size: 12.5px;
+  font-weight: 650;
+}
+
+.h3-provider-main em {
+  font-style: normal;
+  font-size: 10.5px;
+  color: var(--mute);
+}
+
+.h3-provider-tag {
+  flex: none;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.h3-provider-tag-local {
+  color: var(--green);
+  border-color: rgba(56, 201, 139, 0.32);
+  background: rgba(56, 201, 139, 0.07);
+}
+
+.h3-provider-tag-cloud {
+  color: var(--cyan);
+  border-color: rgba(90, 200, 250, 0.42);
+  background: rgba(90, 200, 250, 0.09);
+}
+
+.h3-provider-meta {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+  color: var(--faint);
+  font-size: 10.5px;
+}
+
+.h3-provider-meta i {
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.h3-provider-meta b.ok {
+  color: var(--green);
+}
+
+.h3-provider-meta b.warn {
+  color: var(--red);
+}
+
+.h3-provider-meta b.pending {
+  color: var(--orange);
+}
+
+.h3-provider-note {
+  color: var(--faint);
+  font-size: 10.5px;
+  line-height: 1.6;
+}
+
+@media (max-width: 700px) {
+  .h3-provider-options {
+    grid-template-columns: 1fr;
+  }
+}
+
+

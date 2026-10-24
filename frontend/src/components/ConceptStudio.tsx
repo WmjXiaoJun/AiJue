@@ -110,6 +110,11 @@ export function ConceptStudio({ character, concept, supported, error, onRefreshC
   const [refreshing, setRefreshing] = useState(false);
   const [consistentMode, setConsistentMode] = useState<"checking" | "api" | "fixed" | "none">("checking");
   const [h3Version, setH3Version] = useState(() => Date.now());
+  const [h3Provider, setH3Provider] = useState<"local" | "metaso">("local");
+  const [h3ProviderReady, setH3ProviderReady] = useState(false);
+  const [metasoConfigured, setMetasoConfigured] = useState<boolean | null>(null);
+  const [h3IsCloud, setH3IsCloud] = useState(false);
+  const [h3SubmitProvider, setH3SubmitProvider] = useState<"local" | "metaso" | null>(null);
 
   const images = useMemo(() => conceptImages(concept), [concept]);
   const groups = useMemo(
@@ -209,9 +214,18 @@ export function ConceptStudio({ character, concept, supported, error, onRefreshC
         if (!alive) return;
         setH3Job(job);
         if (job.status === "done") {
-          setH3Url(mediaUrl(job.output_url || "/media/h3/" + character.id + "_h3.mp4"));
+          const jobProvider =
+            (typeof job.params?.provider === "string" && job.params.provider) ||
+            h3SubmitProvider ||
+            h3Provider;
+          const cloud = jobProvider === "metaso";
+          const expected = cloud
+            ? "/media/h3/" + character.id + "_h3_metaso.mp4"
+            : "/media/h3/" + character.id + "_h3.mp4";
+          setH3Url(mediaUrl(job.output_url || expected));
+          setH3IsCloud(cloud);
           setH3Version(Date.now());
-          notify("H3 角色动画生成完成", "success");
+          notify(cloud ? "H3 云端测试动画生成完成" : "H3 角色动画生成完成", "success");
           onCharacterChanged();
         } else if (job.status === "failed" || job.status === "canceled") {
           notify("H3 动画生成失败：" + (job.error || job.message || "未知原因"), "error");
@@ -226,12 +240,40 @@ export function ConceptStudio({ character, concept, supported, error, onRefreshC
       alive = false;
       window.clearInterval(timer);
     };
-  }, [h3Job?.id, h3Job?.status, notify, character.id, onCharacterChanged]);
+  }, [h3Job?.id, h3Job?.status, notify, character.id, onCharacterChanged, h3Provider, h3SubmitProvider]);
 
-  // 角色上已回填 H3 视频时直接展示
+  // 读取 Settings 的 H3 provider（本地 ComfyUI / MetaSo 云端测试）
   useEffect(() => {
-    if (character.h3_video_url && !h3Url) setH3Url(mediaUrl(character.h3_video_url));
-  }, [character.h3_video_url, h3Url]);
+    let alive = true;
+    api
+      .settings()
+      .then((settings) => {
+        if (!alive) return;
+        setH3Provider(settings.h3_provider === "metaso" ? "metaso" : "local");
+        setMetasoConfigured(typeof settings.metaso_key_configured === "boolean" ? settings.metaso_key_configured : null);
+        setH3ProviderReady(true);
+      })
+      .catch(() => {
+        if (!alive) return;
+        setH3Provider("local");
+        setH3ProviderReady(true);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [character.id]);
+
+  // 角色上已回填 H3 视频时按当前 provider 展示对应产物（云端优先 h3_metaso_url）
+  useEffect(() => {
+    if (!h3ProviderReady || h3Url) return;
+    if (h3Provider === "metaso" && character.h3_metaso_url) {
+      setH3Url(mediaUrl(character.h3_metaso_url));
+      setH3IsCloud(true);
+    } else if (character.h3_video_url) {
+      setH3Url(mediaUrl(character.h3_video_url));
+      setH3IsCloud(false);
+    }
+  }, [h3ProviderReady, h3Provider, character.h3_video_url, character.h3_metaso_url, h3Url]);
 
   const handleGenerate = async () => {
     setGenerating(true);
@@ -286,7 +328,7 @@ export function ConceptStudio({ character, concept, supported, error, onRefreshC
     setActionBusy("h3:" + (image ? image.key : "portrait"));
     setActionError(null);
     try {
-      const body: { image?: string; prompt?: string } = {};
+      const body: { image?: string; prompt?: string; provider?: string } = { provider: h3Provider };
       let fallback: string | undefined;
       if (image) {
         const target = conceptTargetPath(image.url, character.id);
@@ -295,8 +337,12 @@ export function ConceptStudio({ character, concept, supported, error, onRefreshC
       }
       if (promptExtra.trim()) body.prompt = promptExtra.trim();
       const job = await api.h3Animate(character.id, body, fallback);
+      setH3SubmitProvider(h3Provider);
       setH3Job(job);
-      notify("H3 动画任务已提交", "success");
+      notify(
+        h3Provider === "metaso" ? "H3 云端测试任务已提交（MetaSo）" : "H3 本地动画任务已提交",
+        "success"
+      );
     } catch (err) {
       const message = errorText(err);
       setActionError("H3 动画提交失败：" + message);
@@ -478,12 +524,30 @@ export function ConceptStudio({ character, concept, supported, error, onRefreshC
         <div className="concept-h3-head">
           <h5>
             <IconVideo size={14} /> H3 角色动画
+            <span className={"h3-provider-pill " + (h3Provider === "metaso" ? "is-cloud" : "is-local")}>
+              {h3Provider === "metaso" ? "云端测试 · MetaSo" : "本地 ComfyUI"}
+            </span>
           </h5>
-          <button type="button" className="btn btn-ghost btn-sm" onClick={() => void handleH3()} disabled={!!actionBusy || h3Running}>
+          <button
+            type="button"
+            className={"btn btn-sm " + (h3Provider === "metaso" ? "btn-outline" : "btn-ghost")}
+            onClick={() => void handleH3()}
+            disabled={!!actionBusy || h3Running}
+            title={h3Provider === "metaso" ? "MetaSo 云端测试（计费，约 25s/条）" : "本地 ComfyUI 生成（生产）"}
+          >
             {h3Running ? <Spinner size={12} /> : <IconPlay size={12} />}
-            {h3Running ? "生成中…" : "用当前立绘生成"}
+            {h3Running ? "生成中…" : "H3 动画 · " + (h3Provider === "metaso" ? "云端测试" : "本地")}
           </button>
         </div>
+        {h3Provider === "metaso" && (
+          <div className="h3-provider-hint">
+            <span>云端测试计费 ¥0.09/秒 · 5s ≈ ¥0.45</span>
+            <i />
+            <span className={metasoConfigured === null ? "pending" : metasoConfigured ? "ok" : "warn"}>
+              MetaSo Key {metasoConfigured === null ? "状态未知" : metasoConfigured ? "已配置" : "未配置"}
+            </span>
+          </div>
+        )}
         {h3Job && (h3Running || h3Job.status === "failed") && (
           <div className="concept-h3-status">
             <ProgressBar
@@ -495,15 +559,23 @@ export function ConceptStudio({ character, concept, supported, error, onRefreshC
           </div>
         )}
         {h3Url ? (
-          <video
-            className="concept-h3-video"
-            src={h3Url + (h3Url.includes("?") ? "&" : "?") + "v=" + h3Version}
-            controls
-            playsInline
-            preload="metadata"
-          />
+          <div className={"concept-h3-video-wrap" + (h3IsCloud ? " is-cloud" : "")}>
+            <video
+              className="concept-h3-video"
+              src={h3Url + (h3Url.includes("?") ? "&" : "?") + "v=" + h3Version}
+              controls
+              playsInline
+              preload="metadata"
+            />
+            {h3IsCloud && <span className="h3-cloud-badge">云端测试 · MetaSo</span>}
+          </div>
         ) : (
-          !h3Job && <p className="concept-h3-hint">选择上方的概念图点击「H3 动画」，或直接用当前立绘生成 5 秒角色动态。</p>
+          !h3Job && (
+            <p className="concept-h3-hint">
+              选择上方的概念图点击「H3 动画」，或直接用当前立绘生成 5 秒角色动态。
+              {h3Provider === "metaso" ? " 当前为云端测试 provider，产物为测试视频。" : " 当前为本地 ComfyUI 生产 provider。"}
+            </p>
+          )
         )}
       </div>
     </section>

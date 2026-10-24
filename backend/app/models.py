@@ -232,6 +232,8 @@ class Character(Base):
     # H3 动画（integrations/comfyui/run_h3.py，outputs/h3/{cid}_h3.mp4）
     h3_video_url = Column(String(400), nullable=True)
     h3_portrait_url = Column(String(400), nullable=True)
+    # MetaSo 云端 H3（测试 provider，outputs/h3/{cid}_h3_metaso.mp4）
+    h3_metaso_url = Column(String(400), nullable=True)
 
     project = relationship("Project", back_populates="characters")
 
@@ -248,4 +250,16 @@ class Setting(Base):
     tts_provider = Column(String(32), nullable=False, default="edge-tts")
     voice_map = Column(JSON, nullable=False, default=dict)
     h3_price_per_second = Column(Float, nullable=False, default=0.09)
+    # H3 云端 provider（测试用 MetaSo；默认 local 走本机 ComfyUI）
+    h3_provider = Column(String(16), nullable=False, default="local")
+    metaso_base_url = Column(String(300), nullable=False, default="https://metaso.cn/api/minimax")
+    metaso_resolution = Column(String(16), nullable=False, default="768P")
+    metaso_duration = Column(Integer, nullable=False, default=5)
     updated_at = Column(DateTime, nullable=False, default=utcnow, onupdate=utcnow)
+
+    @property
+    def metaso_key_configured(self) -> bool:
+        """只读：是否已配置 MetaSo key（不回传明文）。"""
+        from . import config
+
+        return config.metaso_key_configured()

@@ -96,6 +96,7 @@ export interface Job {
   output_url?: string | null;
   cost?: number;
   error?: string | null;
+  params?: Record<string, unknown> | null;
   created_at: string;
   updated_at?: string;
 }
@@ -178,6 +179,8 @@ export interface Character {
   concept_expressions?: Record<string, string> | null;
   h3_video_url?: string | null;
   h3_portrait_url?: string | null;
+  /** MetaSo 云端测试产物（测试用，不替代本地生产视频） */
+  h3_metaso_url?: string | null;
   status: string;
   created_at: string;
 }
@@ -223,6 +226,10 @@ export interface Settings {
   tts_provider: string;
   voice_map?: Record<string, string> | null;
   h3_price_per_second: number;
+  /** H3 生成方式：local（本地 ComfyUI，生产）/ metaso（MetaSo 云端，测试） */
+  h3_provider?: string;
+  /** MetaSo 云端 API Key 是否已配置（只读） */
+  metaso_key_configured?: boolean;
 }
 
 export interface NewAsset {
