@@ -15,7 +15,8 @@
 - 真实生成：integrations/comfyui（本机 MiniMax H3 int8 + 4step turbo，768²/5.17s 动漫镜头；生产默认）
 - 全动态成片：pipeline/dynamic.py（H3 音驱动口型 ref2va + 首尾帧 fl2v + xfade 转场 + whoosh），静帧只用于片头尾/花字
 - 一键发布：publish/ + Upload-Post（YouTube/TikTok/Instagram），成片房预检/发布/记录
-- 模板库：16 个综艺模板（美式深夜秀/SNL/任务大师/叛徒/创智赢家/蒙面唱将/辣访谈/奇葩辩论/脱口秀/慢生活/推理/国宝/典籍 + 历史夜话/历史悬案），见 docs/VARIETY_REFERENCES.md
+- 模板库：16 个综艺模板（美式深夜秀/SNL/任务大师/叛徒/创智赢家/蒙面唱将/辣访谈/奇葩辩论/脱口秀/慢生活/推理/国宝/典籍 + 历史夜话/历史悬案），见 docs/VARIETY_REFERENCES.md；每个模板有镜头级验证片（outputs/template_demos），汇总见 outputs/template_demos/template_showcase.mp4
+- 镜头级方法：参考 OpenMontage（12 pipelines/700+ skills）落地 shot grammar + 转场决策树，见 contract/SHOT_GRAMMAR.md 与 docs/OPENMONTAGE_NOTES.md
 - 快速测试：integrations/metaso（MetaSo 云端 MiniMax H3 API，5s 约 23–25s，测试用，可切换）
 - 图像生成：imagegen（SDXL 动漫 Animagine XL 4.0，文生角色概念图/三视图/表情 + **IP-Adapter 一致性三视图/表情**）
 - 导出：pipeline/capcut.py（pyJianYingDraft，剪映草稿 52 段）

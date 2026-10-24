@@ -304,7 +304,10 @@ python -m pipeline.cli render --episode <episode.json> --workdir <dir> --out fin
 - 实测（ep_002 v2，21 镜）：75.95s / 1280×720 / 1898 帧 / blackdetect=0；17 audio_ref + 2 fl2v
   （19/19 非卡片镜头动态，0 fallback）+ 2 静态卡；3 角色身份正确（老周/阿栗/大魏，H3 中性 prompt +
   角色参考图裁剪）、19/19 clip 动作与嘴部区域帧差明显；xfade fade 0.3s × 20 转场 + 全片 whoosh。
-  ep_001（52 镜/299s，44 动态 + 8 静态卡）同法生成。
+- 实测（ep_001 v2，52 镜/299.0s，44 动态 + 8 静态卡）：41 audio_ref + 3 fl2v，0 fallback，
+  blackdetect=0、7475 帧；44/44 clip 动作 & 嘴部区域帧差明显；3 角色身份正确（老周/阿栗/大魏）；
+  xfade fade 0.3s × 51 转场 + 全片 whoosh；H3 生成耗时约 112 分钟（1024×576 audio_ref / 768² fl2v）。
+  注：ep_001 平台 `shots/` 片段是旧 chibi 素材，动态版已用概念角色重新合成参考图，不受影响。
 - 测试：`python -m pytest pipeline/tests/test_dynamic.py -q`（每镜 TTS wav/xfade 时长保持/
   whoosh 音轨/动态缓存与模式/无 CLI 回退/动态模式端到端）。
 

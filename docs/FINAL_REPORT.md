@@ -334,3 +334,17 @@ FastAPI (8090) ── SQLite
   - 历史（用户点名）：history_talk（历史夜话：主持+历史人物 AI 分身圆桌，348s）/ history_mystery（历史悬案：情景再现+线索推演+投票，359s）
 - 参考文档 docs/VARIETY_REFERENCES.md：15 个模板逐条给参考节目/国家平台/模式核心/可借鉴点/我们的差异/来源链接，附「历史综艺为什么适合 AI 微综艺」论证。
 - 前端模板选择器已同步 16 个模板（含原 roundtable_5min）；实测 POST /projects {format_id:history_talk_5min} + storyboard/generate → 6 个骨架镜头/348s；示例项目「造片局 · 历史夜话（示例）」已建。
+### 24.4 ep_001 全动态成片（已交付，2026-10-25）
+- outputs/episodes/ep_001/final_dynamic.mp4：**299.0s / 1280×720 / 25fps / 7475 帧 / 43,143,749 B / blackdetect 0**；
+- 动态覆盖 **44/52**（41 个 audio_ref 音驱动口型 + 3 个 fl2v 首尾帧，8 个静态卡：片头/片尾/6 花字卡），0 static-fallback；44/44 动态 clip 帧差与嘴部区域帧差明显；
+- xfade fade 0.30s × 51 转场 + 全片 whoosh；3 角色身份正确（老周/阿栗/大魏）；H3 生成耗时 111m35s；
+- 抽帧：outputs/dynamic_frames/ep001_v2_characters_sheet.png、ep001_v2_fl2v_matchcut_sheet.png、ep001_v2_transition_sheet.png；verify_dynamic.json；
+- 说明：平台静态 shots 仍是旧 chibi 素材，动态版用概念角色重建参考图；静态版如需更新需另跑。
+
+## 27. OpenMontage 镜头级参考与 16 个模板验证片（2026-10-25）
+- 参考仓库：calesthio/OpenMontage（12 条 pipeline、100+ tools、700+ agent skill/制作知识）；重点读 video-gen-prompting（镜头/机位/运镜/光线/身份锚定/5-aspect 公式）、video-stitching（转场决策树/时长/音频/质检）、cinematic（画幅/镜头时长/音频分层/反主观形容词）、broll-planning、edit-director、pipeline_defs。详见 docs/OPENMONTAGE_NOTES.md。
+- 落地：contract/SHOT_GRAMMAR.md（镜头级字段与规范）、pipeline/shot_grammar.py（TYPE_PLANS / TRANSITION_RULES / 景别机位运镜标签）、scripts/render_template_demos.py（模板 → 镜头级验证片）、scripts/make_template_showcase.py（汇总巡礼）。
+- 16 个模板验证片：outputs/template_demos/{format_id}/{format_id}.mp4，每支 27–37s，含 TTS/字幕/名字条/xfade/景别·机位·运镜标签（top-right）；
+- 模板巡礼：outputs/template_demos/template_showcase.mp4（66.2s，含每模板 4s 精选 + 标题）；contact sheet：docs/screenshots/48_templates_contact_sheet.png；
+- 验证结果：16/16 渲染成功（时长/角色/字幕/xfade 抽查通过），manifest：outputs/template_demos/manifest.json。
+- 后续（继续大批参考 OpenMontage）：ShotPlan 注入 H3 ref2va/fl2v prompt；按镜头关系选择转场（同场景 hard cut / 话题切换 crossfade / 段落 fade black）；reviewer/checkpoint 质检门；音频分层（ambience/Foley）；字幕同步/口型精修 skills。
