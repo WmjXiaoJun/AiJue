@@ -184,12 +184,20 @@ export interface Character {
 
 
 /** 概念图（contract/CONCEPT.md） */
+export interface ConceptConsistent {
+  three_view?: Record<string, string> | string[] | null;
+  expressions?: Record<string, string> | null;
+  meta?: Record<string, unknown> | null;
+}
+
 export interface ConceptFiles {
   portrait?: string | null;
   three_view?: Record<string, string> | string[] | null;
   expressions?: Record<string, string> | null;
   sheet?: string | null;
   meta?: Record<string, unknown> | null;
+  /** IP-Adapter 一致性产物（contract/CONSISTENCY.md）；后端就绪后返回 */
+  consistent?: ConceptConsistent | null;
 }
 
 export interface CharacterFiles {

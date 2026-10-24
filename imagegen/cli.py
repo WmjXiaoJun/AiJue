@@ -32,6 +32,7 @@ from .workflow import (
     DEFAULT_STEPS,
     PORTRAIT_SIZE,
     SQUARE_SIZE,
+    build_ipadapter_workflow,
     build_workflow,
     validate_workflow,
 )
@@ -115,14 +116,30 @@ def generate_one(job, spec, args, object_info, outdir, log):
 
     pr = build_prompt(spec, style=args.style, prompt_extra=args.prompt_extra,
                       composition=job["composition"], expression=job["expression"])
+    if getattr(args, "negative_extra", ""):
+        pr["negative"] = pr["negative"] + ", " + args.negative_extra.strip()
     w, h = job["size"]
     prefix = "%s/%s_%s" % (args.subfolder.strip("/\\"), spec["id"], job["tag"])
-    wf = build_workflow(
-        positive=pr["positive"], negative=pr["negative"], width=w, height=h,
-        seed=job["seed"], filename_prefix=prefix, ckpt_name=args.ckpt,
-        steps=args.steps, cfg=args.cfg, sampler_name=args.sampler,
-        scheduler=args.scheduler,
-    )
+    ref_rel = getattr(args, "ref_rel", None)
+    if ref_rel:
+        # 一致性模式：SDXL txt2img + IP-Adapter（参考图锁脸/发色/服装）
+        wf = build_ipadapter_workflow(
+            positive=pr["positive"], negative=pr["negative"], ref_image=ref_rel,
+            width=w, height=h, seed=job["seed"], filename_prefix=prefix,
+            ckpt_name=args.ckpt, steps=args.steps, cfg=args.cfg,
+            sampler_name=args.sampler, scheduler=args.scheduler,
+            ipadapter_preset=args.ip_adapter_preset,
+            ipadapter_weight=args.ip_adapter_strength,
+            ipadapter_end=args.ip_adapter_end_at,
+            ipadapter_weight_type=args.ip_adapter_weight_type,
+        )
+    else:
+        wf = build_workflow(
+            positive=pr["positive"], negative=pr["negative"], width=w, height=h,
+            seed=job["seed"], filename_prefix=prefix, ckpt_name=args.ckpt,
+            steps=args.steps, cfg=args.cfg, sampler_name=args.sampler,
+            scheduler=args.scheduler,
+        )
     for warn in validate_workflow(wf, object_info):
         log("[warn] " + warn)
 
@@ -131,7 +148,7 @@ def generate_one(job, spec, args, object_info, outdir, log):
         return {"tag": job["tag"], "path": None, "seed": job["seed"],
                 "width": w, "height": h, "dry_run": True, "gen_sec": 0.0,
                 "prompt": pr["positive"], "negative": pr["negative"],
-                "workflow": wf}
+                "ref": getattr(args, "ref", None), "workflow": wf}
 
     t0 = time.time()
     pid = comfy.submit(args.server, wf, log)
@@ -149,10 +166,16 @@ def generate_one(job, spec, args, object_info, outdir, log):
     if (iw, ih) != (w, h):
         log("[warn] 产物尺寸 %dx%d 与请求 %dx%d 不一致" % (iw, ih, w, h))
     log("[done] %-16s %4.1fs  %dx%d  seed=%d" % (job["tag"], gen_sec, iw, ih, job["seed"]))
-    return {"tag": job["tag"], "path": dest, "seed": job["seed"],
-            "width": iw, "height": ih, "gen_sec": gen_sec,
-            "prompt": pr["positive"], "negative": pr["negative"],
-            "composition": job["composition"], "expression": job["expression"]}
+    rec = {"tag": job["tag"], "path": dest, "seed": job["seed"],
+           "width": iw, "height": ih, "gen_sec": gen_sec,
+           "prompt": pr["positive"], "negative": pr["negative"],
+           "composition": job["composition"], "expression": job["expression"]}
+    if ref_rel:
+        rec["ref"] = args.ref
+        rec["ip_adapter"] = {"preset": args.ip_adapter_preset,
+                             "weight": args.ip_adapter_strength,
+                             "start_at": 0.0, "end_at": args.ip_adapter_end_at}
+    return rec
 
 
 def collect_files(outdir, spec_id):
@@ -194,7 +217,12 @@ def collect_files(outdir, spec_id):
 def cmd_check(args):
     comfy.ensure_comfy(args.server, args.comfy_root, not args.no_start, print)
     stats = comfy.http_json(args.server.rstrip("/") + "/system_stats")
-    ckpts = comfy.get_checkpoints(args.server)
+    object_info = comfy.fetch_object_info(args.server)
+    ckpts = comfy.get_checkpoints(args.server, object_info)
+
+    def _file_len(path):
+        return os.path.getsize(path) if os.path.isfile(path) else 0
+
     info = {
         "ok": args.ckpt in ckpts,
         "server": args.server,
@@ -203,7 +231,21 @@ def cmd_check(args):
         "checkpoint": args.ckpt,
         "checkpoint_ready": args.ckpt in ckpts,
         "checkpoints": ckpts,
+        "ipadapter": {
+            "nodes_ready": ("IPAdapterUnifiedLoader" in object_info and
+                            "IPAdapterAdvanced" in object_info),
+            "model": "models/ipadapter/ip-adapter-plus_sdxl_vit-h.safetensors",
+            "model_bytes": _file_len(os.path.join(
+                args.comfy_root, "models", "ipadapter",
+                "ip-adapter-plus_sdxl_vit-h.safetensors")),
+            "clip_vision": "models/clip_vision/CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors",
+            "clip_vision_bytes": _file_len(os.path.join(
+                args.comfy_root, "models", "clip_vision",
+                "CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors")),
+        },
     }
+    if not info["ipadapter"]["nodes_ready"]:
+        info["ok"] = False
     print(json.dumps(info, ensure_ascii=False))
     return 0 if info["ok"] else 1
 
@@ -234,6 +276,15 @@ def cmd_generate(args):
         ckpts = comfy.get_checkpoints(args.server, object_info)
         if args.ckpt not in ckpts:
             print("[warn] checkpoint 不在列表里: %s（现有: %s）" % (args.ckpt, ckpts[:10]))
+        # 一致性模式：先把参考图（通常是 portrait.png）拷进 ComfyUI/input
+        if getattr(args, "ref", None):
+            ref_name = "%s_ref_%s" % (spec_id, os.path.basename(args.ref))
+            args.ref_rel = comfy.copy_input_image(
+                args.comfy_root, args.ref, subfolder=args.subfolder.strip("/\\"),
+                name=ref_name, log=print)
+            print("[consistency] IP-Adapter 参考图: %s (weight=%.2f end_at=%.2f preset=%s)"
+                  % (args.ref, args.ip_adapter_strength, args.ip_adapter_end_at,
+                     args.ip_adapter_preset))
         plan = build_plan(args, spec)
         if not plan and args.mode not in ("sheet", "all"):
             raise SystemExit("没有需要生成的图（mode=%s）" % args.mode)
@@ -299,6 +350,19 @@ def cmd_generate(args):
             "files": summary["files"],
             "images": [{k: v for k, v in img.items() if k not in ("workflow",)} for img in summary["_merged_images"]],
         }
+        if getattr(args, "ref", None):
+            meta["ip_adapter"] = {
+                "enabled": True,
+                "ref": os.path.abspath(args.ref),
+                "ref_comfy_input": getattr(args, "ref_rel", None),
+                "preset": args.ip_adapter_preset,
+                "weight": args.ip_adapter_strength,
+                "weight_type": args.ip_adapter_weight_type,
+                "start_at": 0.0,
+                "end_at": args.ip_adapter_end_at,
+                "ckpt": args.ckpt,
+            }
+            summary["ip_adapter"] = meta["ip_adapter"]
         if not args.dry_run:
             meta_path = os.path.join(outdir, "meta.json")
             with open(meta_path, "w", encoding="utf-8") as f:
@@ -346,6 +410,19 @@ def build_parser() -> argparse.ArgumentParser:
     p_gen.add_argument("--timeout", type=float, default=300.0, help="单图等待超时秒数（首图含模型加载）")
     p_gen.add_argument("--skip-existing", action="store_true", help="已存在的图跳过（断点续跑）")
     p_gen.add_argument("--dry-run", action="store_true", help="只打印 prompt/workflow，不提交")
+    # ---- 角色一致性（IP-Adapter）----
+    p_gen.add_argument("--ref", default=None,
+                       help="参考图（通常 outputs/concepts/<id>/portrait.png）；给了就启用 IP-Adapter 一致性模式")
+    p_gen.add_argument("--ip-adapter-strength", type=float, default=0.65,
+                       help="IPAdapter weight（推荐 0.6-0.8，默认 0.65）")
+    p_gen.add_argument("--ip-adapter-end-at", type=float, default=0.85,
+                       help="IPAdapter end_at（默认 0.85，越大越锁脸但可能僵）")
+    p_gen.add_argument("--ip-adapter-preset", default="PLUS (high strength)",
+                       help="IPAdapterUnifiedLoader preset（默认 PLUS (high strength)）")
+    p_gen.add_argument("--ip-adapter-weight-type", default="linear",
+                       help="IPAdapter weight_type（linear/ease in/ease out/style transfer/composition）")
+    p_gen.add_argument("--negative-extra", default="",
+                       help="追加 negative tag（逗号分隔，给一致性模式压背景/风格漂移用）")
     add_common(p_gen)
     p_gen.set_defaults(func=cmd_generate)
 

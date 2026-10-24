@@ -80,7 +80,18 @@ stdout 协议：渲染过程中持续打印 `PROGRESS <0-100> <message>`，最�
 
 ## 角色画面接入（角色工坊）
 
-素材目录（`CHARACTERS_DIR` 可覆盖，默认 `outputs/characters/`，由 studio3d 角色工坊产出）：
+角色素材来自两处（都可用环境变量覆盖根目录）：
+
+```
+outputs/concepts/{id}/            # SDXL 概念图（imagegen，CONCEPTS_DIR 可覆盖）
+├─ portrait.png                   # 832x1216 竖构图概念立绘
+├─ expressions/{neutral,happy,surprised,thinking}.png
+├─ three_view/{front,side,three_quarter}.png / sheet.png / meta.json
+
+outputs/characters/{id}/          # 角色工坊（studio3d/studio2d，CHARACTERS_DIR 可覆盖）
+```
+
+角色工坊素材目录明细（`CHARACTERS_DIR` 可覆盖，默认 `outputs/characters/`，由 studio3d 角色工坊产出）：
 
 ```
 outputs/characters/{id}/
@@ -96,8 +107,22 @@ outputs/characters/{id}/
 └─ style_<name>/...                # 多风格输出（按 contract 的 style.primary 优选）
 ```
 
-- **素材优先级**：3D 透明 `cutout/` → 3D 根目录 → `2d/` → `style_<name>/` → 文字卡兜底；
-  表情/转面逐文件独立回退（例如 3D 只有 portrait、2D 有 expressions 也能混用）。
+- **素材优先级**（contract/CONSISTENCY.md）：
+  ① `outputs/h3/{id}_h3.mp4`（概念图驱动的 H3 视频）→
+  ② `outputs/characters/{id}/h3_portrait.png`（H3 中段帧）→
+  ③ **`outputs/concepts/{id}/portrait.png`（SDXL 概念立绘，832x1216 竖构图）** →
+  ④ `outputs/characters/{id}/cutout/portrait.png`（Blender 透明抠像）→
+  ⑤ `2d/portrait.png`（2D 平涂）→ ⑥ 文字卡兜底。
+  表情/转面逐文件独立回退（例如 H3 中段帧缺失、概念图存在时直接用概念立绘）。
+- **概念立绘构图**：832x1216 竖图按「顶部安全边 ≈2%」裁成方形胸像后放入右侧 1/3 画窗
+  （节目背景 + 细描边 + Ken Burns 缓推），避免竖构图直接 cover 裁切把头部裁掉；
+  reaction 镜头优先选用 `concepts/{id}/expressions/` 中按 mood/台词匹配的概念表情。
+- **H3 概念图驱动（实测）**：三人的 H3 视频 / 中段帧均由 `outputs/concepts/{id}/portrait.png`
+  （laozhou/ali/dawei）经 ComfyUI H3 生成后覆盖 `outputs/h3/` 与
+  `outputs/characters/{id}/h3_portrait.png`；成片里 52 个角色镜头全部来自
+  SDXL 概念角色（H3 视频 22 个说话镜头 + H3 中段帧 30 个其它镜头，另有片头/片尾/小窗使用 H3 中段帧）。
+- **人名条不重复**：角色镜头的人名条由片段内绘制（跟随说话人），ASS 对 `char_shot_ids`
+  不再输出 Lower 事件，避免与字幕/名字条叠字；旁白字幕基线保持 `\pos(640,655)`。
 - **角色映射**：`shot.speaker`（host/guest_a/...）→ `episode.assets` 里的角色资产 →
   按 `character_id` / 资产 id / 角色名 依次匹配 `outputs/characters/{id}/`，无需改 episode.json。
 - **镜头用法**：host_to_camera / reaction / shot_reverse / guest_intro 用对应角色立绘；
@@ -111,13 +136,14 @@ outputs/characters/{id}/
   happy / surprised / thinking，默认 neutral。
 ### H3 真实动漫镜头（自动优先）
 
-ComfyUI MiniMax H3 生成的真实动漫镜头会**自动优先于 Blender 生图**：
+ComfyUI MiniMax H3 生成的真实动漫镜头（由 SDXL 概念图驱动）会**自动优先于其它立绘**：
 
 | 产物 | 路径 | 用途 |
 |---|---|---|
 | H3 视频 | `outputs/h3/{id}_h3.mp4`（也支持 `{id}.mp4` / `{id}*.mp4`） | host_to_camera 说话镜头：右侧 1/3「H3 画窗」+ 节目背景，按镜头时长裁剪/慢放（≤1.8x） |
 | H3 中段帧 | `outputs/characters/{id}/h3_portrait.png`（也支持 `outputs/h3/{id}_h3_fmid.png`） | 其余角色镜头：画窗 + Ken Burns 缓推（1.0→1.12 慢推） |
-| Blender 立绘 | `outputs/characters/{id}/cutout/portrait.png` / `portrait.png` | H3 缺失时兜底 |
+| SDXL 概念立绘 | `outputs/concepts/{id}/portrait.png`（832x1216 竖图） | H3 素材缺失时：顶部安全边裁胸像 + 画窗 + Ken Burns |
+| Blender 立绘 | `outputs/characters/{id}/cutout/portrait.png` / `portrait.png` | 兜底 |
 
 - H3 视频 768x768/24fps 直接全屏 cover 会把脸放大失真，因此采用「节目背景 + 右侧画窗」构图；
 - `H3_DIR` 可覆盖 H3 素材目录；H3 文件变化会通过角色素材指纹自动失效镜头片段缓存。
@@ -151,11 +177,12 @@ ComfyUI MiniMax H3 生成的真实动漫镜头会**自动优先于 Blender 生�
 | **平台片段复用（52 镜头，生成台已有 shots/）** | **39.2s** | 52 片段直接 copy（不 mock）+ 缓存 TTS + 音轨 + 编码 |
 | --limit 3 平台片段复用 | 7.5s | 3 片段 copy + 2 条 TTS + 编码 |
 | --limit 2 调试渲染 | 4.5s | 含 2 片段 + 1 条 TTS |
-
 | **角色版整片（H3 + 角色立绘 + Blender 兜底，52 镜头）** | **54-61s** | 52 角色画面 + 缓存音轨 + 编码 |
+| **SDL 概念角色版整片（H3 概念图驱动，52 镜头全新生成）** | **50.9s** | 52 角色画面 + 缓存音轨 + BGM + 编码 |
 | 角色版整片（全缓存复用） | 34.1s | 只剩 concat + 编码 |
 
-产物实测（角色版）：299.000s / 1280x720 / 25fps / 30.2MB / 7475 帧 / 角色画面镜头 52/52 /
+产物实测（SDXL 概念角色版）：299.000s / 1280x720 / 25fps / 34,719,840 B（33.1 MiB）/
+7475 帧 / 角色画面镜头 52/52 / H3 概念图驱动 3/3（laozhou/ali/dawei 源=`outputs/concepts/{id}/portrait.png`）/
 blackdetect(d=0.01) = 0 条。远低于「整片 ≤15 分钟」要求。
 
 ## 测试
@@ -166,7 +193,8 @@ python -m pytest pipeline/tests -q
 
 覆盖：ASS 时间/颜色/事件生成、mock 片段 filter 构建（8 种镜头类型）、TTS vtt 格式、
 ComfyUI 适配器（httpx 用 monkeypatch 模拟，不联网）、平台生成台片段校验与复用、标准化失败回退、
-角色素材发现/3D→2D 优先级/角色映射/表情选择/角色素材指纹缓存失效。
+角色素材发现/3D→2D 优先级/角色映射/表情选择/角色素材指纹缓存失效、
+SDXL 概念图发现与第 3 优先级/竖构图顶部安全边裁切/概念表情/概念素材指纹失效。
 
 ## 依赖
 
@@ -176,7 +204,7 @@ ComfyUI 适配器（httpx 用 monkeypatch 模拟，不联网）、平台生成�
 | ffmpeg 6.1.1 | 优先 `tools/node_modules/ffmpeg-static/ffmpeg.exe`，其次 `FFMPEG_BIN` / PATH；需 libx264、libass、freetype、lavfi |
 | ffprobe | `tools/node_modules/ffprobe-static/.../ffprobe.exe` 或 `FFPROBE_BIN` |
 | 中文字体 | Windows `Deng.ttf`（正文）+ `msyhbd.ttc`（标题/花字），render 时复制到 workdir/fonts |
-| 角色素材（可选） | `outputs/characters/{id}/`（studio3d 角色工坊产出）；缺失时自动回退文字卡 |
+| 角色素材（可选） | `outputs/h3/` + `outputs/characters/{id}/` + `outputs/concepts/{id}/`；缺失时自动回退文字卡 |
 | 剪映草稿导出 | `pyJianYingDraft==0.3.1`（pip 安装，用于生成剪映/CapCut 草稿 JSON）；未装则 capcut 导出会提示安装 |
 | 网络 | 仅 edge-tts 需要；其余全程离线 |
 

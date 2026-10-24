@@ -106,6 +106,23 @@ def fetch_images(rec: dict) -> list:
     return out
 
 
+def copy_input_image(comfy_root: str, src: str, subfolder: str = "zaopianju_concepts",
+                     name: str = None, log=print) -> str:
+    """把参考图拷到 ComfyUI/input/<subfolder>/，返回相对 input 的正斜杠路径（LoadImage 用）。"""
+    src = os.path.abspath(src)
+    if not os.path.isfile(src):
+        raise FileNotFoundError("参考图不存在: %s" % src)
+    sub = subfolder.strip("/\\")
+    dst_dir = os.path.join(comfy_root, "input", sub)
+    os.makedirs(dst_dir, exist_ok=True)
+    name = name or os.path.basename(src)
+    dst = os.path.join(dst_dir, name)
+    shutil.copyfile(src, dst)
+    rel = "%s/%s" % (sub, name)
+    log("[ref] %s -> ComfyUI/input/%s" % (src, rel))
+    return rel
+
+
 def save_image(server: str, comfy_root: str, item: dict, dest: str, log=print) -> str:
     """把 ComfyUI 产出图落到 dest（优先直接读 output 目录，其次 /view 下载）。"""
     os.makedirs(os.path.dirname(os.path.abspath(dest)), exist_ok=True)

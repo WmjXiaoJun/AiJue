@@ -69,6 +69,17 @@ def test_ass_events_demo_episode():
     assert max(e[1] for e in events) <= sum(s["duration"] for s in data["shots"]) + 0.01
 
 
+def test_ass_skips_lower_third_for_character_shots():
+    data = _demo()
+    timings = _timings(data["shots"])
+    events = ass_builder.build_events(data, timings, data["assets"],
+                                      char_shot_ids={"s006", "s008"})
+    assert [e for e in events if e[3] == "Lower"] == []
+    # 不传 char_shot_ids 时仍输出人名条（非角色画面兜底）
+    events2 = ass_builder.build_events(data, timings, data["assets"])
+    assert any(e[3] == "Lower" for e in events2)
+
+
 def test_ass_build_writes_file(tmp_path):
     data = _demo()
     timings = _timings(data["shots"])
@@ -441,3 +452,65 @@ def test_shot_ctx_reaction_expression_and_fallback(tmp_path):
     # visual 未出现角色名 -> 兜底主持人（cast[0]），仍应进入角色画面
     assert ctx.char_mode is True
     assert ctx.compose() is not None
+
+
+# ---------------------------------------------- SDXL 概念图（第 3 优先级）----
+def test_characters_concept_discovery(tmp_path):
+    chars_root = tmp_path / "characters"
+    concepts = tmp_path / "concepts"
+    _write(chars_root / "laozhou" / "cutout" / "portrait.png")
+    _write(concepts / "laozhou" / "portrait.png", b"c" * 2000)
+    _write(concepts / "laozhou" / "expressions" / "neutral.png")
+    _write(concepts / "newbie" / "portrait.png", b"n" * 2000)
+    (concepts / "newbie" / "meta.json").write_text(
+        json.dumps({"name": "新人"}), encoding="utf-8")
+    chars = characters.discover(chars_root, concepts_root_dir=concepts)
+    assert chars["laozhou"]["concept_portrait"].is_file()
+    assert "neutral" in chars["laozhou"]["concept_expressions"]
+    # 只有概念图、没有角色工坊目录的角色也应被发现
+    assert "newbie" in chars
+    assert chars["newbie"]["name"] == "新人"
+    assert chars["newbie"]["concept_portrait"] is not None
+    # 自定义 root 且未显式给 concepts 时不合并（测试隔离）
+    chars2 = characters.discover(chars_root)
+    assert "newbie" not in chars2
+    assert not chars2["laozhou"].get("concept_portrait")
+
+
+def test_fingerprint_includes_concept(tmp_path):
+    portrait = tmp_path / "concept.png"
+    portrait.write_bytes(b"a" * 1000)
+    fp1 = characters.fingerprint({"host": {"id": "x", "concept_portrait": portrait}})
+    portrait.write_bytes(b"b" * 2000)
+    fp2 = characters.fingerprint({"host": {"id": "x", "concept_portrait": portrait}})
+    assert fp1 and fp2 and fp1 != fp2
+
+
+def test_shot_ctx_concept_media(tmp_path):
+    portrait = tmp_path / "concept.png"
+    portrait.write_bytes(b"x" * 2000)
+    char = {
+        "id": "x", "name": "老周", "title": "主持人",
+        "accent_color": "#F5C518", "portrait": None,
+        "h3_video": None, "h3_portrait": None,
+        "concept_portrait": portrait,
+        "concept_expressions": {"neutral": portrait},
+    }
+    shot = {"id": "s1", "type": "host_to_camera", "duration": 6,
+            "speaker": "host", "speaker_name": "老周", "visual": "演播厅"}
+    ctx = mock_shot._ShotCtx(shot, [], tmp_path, FONT_STUB, 1280, 720, 6.0, 25,
+                             char_map={"host": char})
+    assert ctx.media and ctx.media["kind"] == "concept_still"
+    plan = ctx.compose()
+    assert plan is not None
+    joined = ";".join(plan["filters"])
+    # 竖构图概念图按顶部安全边裁切 + 右侧画窗 overlay
+    assert "min(ih-655,ih*0.02)" in joined
+    assert "overlay=" in joined
+    assert "drawtext=" in ctx.build()
+    # reaction 用概念表情，仍走概念立绘画窗
+    shot2 = dict(shot, id="s2", type="reaction", line="……有点东西")
+    ctx2 = mock_shot._ShotCtx(shot2, [], tmp_path, FONT_STUB, 1280, 720, 4.0, 25,
+                              char_map={"host": char})
+    assert ctx2.media["kind"] == "concept_still"
+    assert ctx2.compose() is not None

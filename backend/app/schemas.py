@@ -263,6 +263,8 @@ class ConceptFilesOut(BaseModel):
     expressions: Dict[str, str] = Field(default_factory=dict)
     sheet: Optional[str] = None
     meta: Dict[str, Any] = Field(default_factory=dict)
+    # IP-Adapter 一致性产物（contract/CONSISTENCY.md）：{three_view, expressions, meta}
+    consistent: Dict[str, Any] = Field(default_factory=dict)
 
 
 class PortraitFromConceptRequest(BaseModel):

@@ -1605,6 +1605,27 @@
   padding: 1px 5px;
 }
 
+.concept-flag-consistent {
+  color: #c3b5ff;
+  border-color: rgba(167, 139, 250, 0.45);
+  background: rgba(167, 139, 250, 0.08);
+}
+
+.concept-group-consistent .concept-group-title {
+  color: #c3b5ff;
+}
+
+.concept-consistent-tag {
+  margin-left: 6px;
+  padding: 0 5px;
+  border-radius: 4px;
+  border: 1px solid rgba(167, 139, 250, 0.4);
+  background: rgba(167, 139, 250, 0.08);
+  font-size: 8.5px;
+  letter-spacing: 0.06em;
+  color: #c3b5ff;
+}
+
 .concept-controls {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) 66px auto;

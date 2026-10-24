@@ -51,6 +51,10 @@ Vite + React 18 + TypeScript 的深色影棚风制片工作台。无 UI 框架�
   → `POST /characters/{cid}/concept/generate`（1.6s 轮询 Job）→ 图集（立绘 / 三视图 / 四表情 / 设定总览），每图可
   「设为角色立绘」（`POST /portrait/from-concept`）与「用此图生成 H3 动画」（`POST /h3-animate`，完成后播放 `/media/h3/...`）。
   角色卡优先展示 `GET /characters/{cid}/concepts` 的 portrait（带「AI 概念图」徽标），否则回落 Blender portrait。
+- IP-Adapter 一致性（contract/CONSISTENCY.md）：概念图区优先 `/concepts.consistent` 的 three_view / expressions，
+  渲染为「一致性三视图 / 一致性表情（IP-Adapter）」分组；若接口暂不返回 consistent，则按固定路径
+  `/media/concepts/{cid}/consistent/meta.json` 探测一次（失败自动回退原始图集，不伪造素材）；刷新按钮可重新探测。
+  H3 动画播放使用 cache-bust 重新拉取最新概念图驱动视频；抽屉立绘优先 `Character.portrait_url`（后端切到 SDXL 概念立绘后自动生效）。
 - 成片导出（contract/EXPORT.md）：成片房「交付导出」面板 → `POST /episodes/{eid}/export {type:"capcut"}` → 轮询任务，
   展示产物路径、复制剪映草稿目录（`%LOCALAPPDATA%\JianyingPro\User Data\Projects\com.lveditor.draft`）与导入步骤。
 

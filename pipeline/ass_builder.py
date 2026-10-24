@@ -140,11 +140,13 @@ def build_events(episode: dict, timings: list, assets: list,
                 s_end = max(s_start + 0.6, end - 0.10)
                 sub_style = "SubChar" if str(shot.get("id")) in char_shot_ids else "Sub"
                 lines = [_esc(part) for part in wrap_subtitle(body)]
-                sub_text = (r"{\an2\pos(640,596)\fad(110,90)}" + r"\N".join(lines))
+                sub_text = (r"{\an2\pos(640,655)\fad(110,90)}" + r"\N".join(lines))
                 events.append((s_start, s_end, 4, sub_style, sub_text))
 
         # ---- 人名条（lower_third）----
-        if isinstance(lower, dict) and lower.get("name"):
+        # 角色画面镜头里片段已绘制当前说话人名字条，跳过 ASS 人名条避免重复/叠字
+        if isinstance(lower, dict) and lower.get("name") \
+                and str(shot.get("id")) not in char_shot_ids:
             name = str(lower.get("name") or "").strip()
             title = str(lower.get("title") or "").strip()
             color = ass_color(accents.get(shot.get("speaker"), config.ACCENT_DEFAULT))

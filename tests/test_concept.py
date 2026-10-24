@@ -121,6 +121,37 @@ def test_concept_lazy_scan(client):
     assert base.is_dir()
 
 
+def test_character_concepts_consistent_scan(client):
+    """contract/CONSISTENCY.md：consistent/three_view、consistent/expressions 懒扫描。"""
+    _project, _episode, character = _new_character(client)
+    base = _write_concept_outputs(character["id"])
+    consistent = base / "consistent"
+    (consistent / "three_view").mkdir(parents=True, exist_ok=True)
+    (consistent / "expressions").mkdir(parents=True, exist_ok=True)
+    for name in ("front", "side", "three_quarter"):
+        (consistent / "three_view" / f"{name}.png").write_bytes(b"consistent-view")
+    for name in ("neutral", "happy", "surprised", "thinking"):
+        (consistent / "expressions" / f"{name}.png").write_bytes(b"consistent-expr")
+    (consistent / "meta.json").write_text(
+        json.dumps({"mode": "three_view", "ip_adapter_strength": 0.65, "ref": "portrait.png"}),
+        encoding="utf-8",
+    )
+
+    data = client.get(f"/api/characters/{character['id']}/concepts").json()
+    assert set(data["consistent"]["three_view"]) == {"front", "side", "three_quarter"}
+    assert set(data["consistent"]["expressions"]) == {"neutral", "happy", "surprised", "thinking"}
+    assert data["consistent"]["meta"]["ip_adapter_strength"] == 0.65
+    assert data["consistent"]["three_view"]["front"] == (
+        f"/media/concepts/{character['id']}/consistent/three_view/front.png"
+    )
+    # 概念图常规字段仍然齐全
+    assert data["portrait"] == f"/media/concepts/{character['id']}/portrait.png"
+
+    # 未生成 consistent 的角色返回空结构而不是报错
+    empty = client.get("/api/characters/laozhou/concepts").json()["consistent"]
+    assert empty == {"three_view": {}, "expressions": {}, "meta": {}}
+
+
 def _fake_imagegen(calls, fail_mode=None):
     def fake_run_cli(cmd, cwd=None, on_line=None, timeout=None):
         calls.append(list(cmd))

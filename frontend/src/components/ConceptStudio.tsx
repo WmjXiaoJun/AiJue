@@ -3,6 +3,8 @@ import { api, errorText, mediaUrl } from "../lib/api";
 import type { Character, ConceptFiles, Job } from "../types";
 import {
   CONCEPT_STYLE_OPTIONS,
+  EXPRESSION_LABEL,
+  THREE_VIEW_LABEL,
   conceptImages,
   fmtTime,
   isActiveJob,
@@ -19,6 +21,61 @@ interface Props {
   error: string | null;
   onRefreshConcepts: () => Promise<void> | void;
   onCharacterChanged: () => void;
+}
+
+/** 一致性产物探测缓存（避免每次打开抽屉都发 404 HEAD） */
+const consistentProbeCache = new Map<string, "available" | "missing">();
+
+const CONSISTENT_THREE_VIEW_KEYS = ["front", "side", "three_quarter"];
+const CONSISTENT_EXPRESSION_KEYS = ["neutral", "happy", "surprised", "thinking"];
+
+function buildConsistentItems(
+  cid: string,
+  source:
+    | { three_view?: Record<string, string> | string[] | null; expressions?: Record<string, string> | null }
+    | null
+    | undefined,
+  fixedPath: boolean
+): ConceptImageItem[] {
+  const items: ConceptImageItem[] = [];
+  const three: Record<string, string> = {};
+  if (source?.three_view) {
+    if (Array.isArray(source.three_view)) {
+      source.three_view.forEach((url, index) => {
+        const key = CONSISTENT_THREE_VIEW_KEYS[index] || String(index);
+        if (url) three[key] = url;
+      });
+    } else {
+      Object.assign(three, source.three_view);
+    }
+  }
+  CONSISTENT_THREE_VIEW_KEYS.forEach((key) => {
+    const url =
+      three[key] || (fixedPath ? "/media/concepts/" + cid + "/consistent/three_view/" + key + ".png" : "");
+    if (url) {
+      items.push({
+        key: "consistent_three_" + key,
+        label: "一致性三视图 · " + (THREE_VIEW_LABEL[key] || key),
+        url,
+        group: "three_view",
+      });
+    }
+  });
+  const expr: Record<string, string> = {};
+  if (source?.expressions) Object.assign(expr, source.expressions);
+  CONSISTENT_EXPRESSION_KEYS.forEach((key) => {
+    const url =
+      expr[key] || (fixedPath ? "/media/concepts/" + cid + "/consistent/expressions/" + key + ".png" : "");
+    if (url) {
+      items.push({
+        key: "consistent_expr_" + key,
+        label: "一致性表情 · " + (EXPRESSION_LABEL[key] || key),
+        url,
+        group: "expressions",
+      });
+    }
+  });
+  return items;
 }
 
 /**
@@ -51,6 +108,8 @@ export function ConceptStudio({ character, concept, supported, error, onRefreshC
   const [actionBusy, setActionBusy] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [consistentMode, setConsistentMode] = useState<"checking" | "api" | "fixed" | "none">("checking");
+  const [h3Version, setH3Version] = useState(() => Date.now());
 
   const images = useMemo(() => conceptImages(concept), [concept]);
   const groups = useMemo(
@@ -63,6 +122,49 @@ export function ConceptStudio({ character, concept, supported, error, onRefreshC
     [images]
   );
   const hasConcept = images.length > 0;
+
+  // 一致性产物（contract/CONSISTENCY.md）：优先 /concepts.consistent，否则按固定路径探测
+  const consistentApi = useMemo(() => {
+    if (!concept?.consistent) return null;
+    const items = buildConsistentItems(character.id, concept.consistent, false);
+    return items.length ? items : null;
+  }, [concept, character.id]);
+  const hasConsistent = consistentMode === "api" ? !!consistentApi : consistentMode === "fixed";
+  const consistentItems = useMemo(() => {
+    if (!hasConsistent) return [] as ConceptImageItem[];
+    return consistentApi || buildConsistentItems(character.id, null, true);
+  }, [hasConsistent, consistentApi, character.id]);
+  const consistentThree = consistentItems.filter((item) => item.group === "three_view");
+  const consistentExpressions = consistentItems.filter((item) => item.group === "expressions");
+
+  useEffect(() => {
+    setH3Version(Date.now());
+    if (consistentApi) {
+      setConsistentMode("api");
+      return;
+    }
+    const cached = consistentProbeCache.get(character.id);
+    if (cached) {
+      setConsistentMode(cached === "available" ? "fixed" : "none");
+      return;
+    }
+    let alive = true;
+    setConsistentMode("checking");
+    fetch(mediaUrl("/media/concepts/" + character.id + "/consistent/meta.json"), { method: "HEAD" })
+      .then((res) => {
+        if (!alive) return;
+        consistentProbeCache.set(character.id, res.ok ? "available" : "missing");
+        setConsistentMode(res.ok ? "fixed" : "none");
+      })
+      .catch(() => {
+        if (!alive) return;
+        consistentProbeCache.set(character.id, "missing");
+        setConsistentMode("none");
+      });
+    return () => {
+      alive = false;
+    };
+  }, [character.id, consistentApi]);
 
   // 概念图任务轮询（1.6s）
   useEffect(() => {
@@ -77,6 +179,7 @@ export function ConceptStudio({ character, concept, supported, error, onRefreshC
         setConceptJob(job);
         if (job.status === "done") {
           notify("概念图生成完成", "success");
+          setH3Version(Date.now());
           await onRefreshConcepts();
           onCharacterChanged();
         } else if (job.status === "failed" || job.status === "canceled") {
@@ -107,6 +210,7 @@ export function ConceptStudio({ character, concept, supported, error, onRefreshC
         setH3Job(job);
         if (job.status === "done") {
           setH3Url(mediaUrl(job.output_url || "/media/h3/" + character.id + "_h3.mp4"));
+          setH3Version(Date.now());
           notify("H3 角色动画生成完成", "success");
           onCharacterChanged();
         } else if (job.status === "failed" || job.status === "canceled") {
@@ -151,6 +255,8 @@ export function ConceptStudio({ character, concept, supported, error, onRefreshC
 
   const handleRefresh = async () => {
     setRefreshing(true);
+    consistentProbeCache.delete(character.id);
+    setH3Version(Date.now());
     try {
       await onRefreshConcepts();
     } finally {
@@ -240,6 +346,7 @@ export function ConceptStudio({ character, concept, supported, error, onRefreshC
         <div>
           <h4>
             AI 概念图 <span className="concept-flag">CONCEPT STUDIO</span>
+            {hasConsistent && <span className="concept-flag concept-flag-consistent">IP-ADAPTER 一致性</span>}
           </h4>
           <p>ComfyUI + SDXL 动漫模型 · 由角色 spec 生成原创概念立绘 / 三视图 / 表情，可交给 H3 做动画。</p>
         </div>
@@ -285,7 +392,10 @@ export function ConceptStudio({ character, concept, supported, error, onRefreshC
       </div>
 
       {hasConcept && (
-        <p className="concept-tip">悬停图片可出现「设为立绘 / H3 动画」操作；立绘与设定总览的大图按钮常显。</p>
+        <p className="concept-tip">
+          悬停图片可出现「设为立绘 / H3 动画」操作；立绘与设定总览的大图按钮常显。
+          {hasConsistent ? " 三视图/表情已使用 IP-Adapter 一致性版本。" : ""}
+        </p>
       )}
 
       {conceptJob && (
@@ -325,18 +435,36 @@ export function ConceptStudio({ character, concept, supported, error, onRefreshC
       ) : (
         <div className="concept-gallery">
           {groups.portrait.map((image) => renderImage(image, "lg"))}
-          {groups.three_view.length > 0 && (
+          {consistentThree.length > 0 ? (
+            <div className="concept-group concept-group-consistent">
+              <div className="concept-group-title">
+                一致性三视图 <span className="concept-consistent-tag">IP-Adapter</span>
+              </div>
+              <div className="concept-grid concept-grid-3">
+                {consistentThree.map((image) => renderImage(image, "md"))}
+              </div>
+            </div>
+          ) : groups.three_view.length > 0 ? (
             <div className="concept-group">
               <div className="concept-group-title">三视图</div>
               <div className="concept-grid concept-grid-3">{groups.three_view.map((image) => renderImage(image, "md"))}</div>
             </div>
-          )}
-          {groups.expressions.length > 0 && (
+          ) : null}
+          {consistentExpressions.length > 0 ? (
+            <div className="concept-group concept-group-consistent">
+              <div className="concept-group-title">
+                一致性表情 <span className="concept-consistent-tag">IP-Adapter</span>
+              </div>
+              <div className="concept-grid concept-grid-4">
+                {consistentExpressions.map((image) => renderImage(image, "md"))}
+              </div>
+            </div>
+          ) : groups.expressions.length > 0 ? (
             <div className="concept-group">
               <div className="concept-group-title">表情</div>
               <div className="concept-grid concept-grid-4">{groups.expressions.map((image) => renderImage(image, "md"))}</div>
             </div>
-          )}
+          ) : null}
           {groups.sheet.length > 0 && (
             <div className="concept-group">
               <div className="concept-group-title">设定总览</div>
@@ -367,7 +495,13 @@ export function ConceptStudio({ character, concept, supported, error, onRefreshC
           </div>
         )}
         {h3Url ? (
-          <video className="concept-h3-video" src={h3Url} controls playsInline preload="metadata" />
+          <video
+            className="concept-h3-video"
+            src={h3Url + (h3Url.includes("?") ? "&" : "?") + "v=" + h3Version}
+            controls
+            playsInline
+            preload="metadata"
+          />
         ) : (
           !h3Job && <p className="concept-h3-hint">选择上方的概念图点击「H3 动画」，或直接用当前立绘生成 5 秒角色动态。</p>
         )}

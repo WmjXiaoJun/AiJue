@@ -15,3 +15,7 @@
 - 角色资产要能直接用于资产库/分镜台/成片渲染，成片里不允许出现真人素材；
 - 环境已确认：Blender 5.0.1 无头渲染可用；本机 ComfyUI（D:\BaiduSyncdisk\wmj_work\XJ\ComfyUI）内含 MiniMax H3 int8 模型与 4step turbo LoRA，可尝试真实 H3 生成（RTX 3080 Ti 12GB）。
 - 交付追加：角色工坊前后端 + studio3d Blender 生成器 + 3 个演示角色 + 用角色画面重渲的样例成片 +（尽力）H3 真实动漫镜头。
+## 2026-10-24 角色 2.1（一致性）
+- SDXL 概念图三视图/表情用 IP-Adapter（plus_sdxl_vit-h + CLIP-ViT-H）条件化，解决换脸问题。
+- H3 动画改为概念图驱动（覆盖 outputs/h3/{id}_h3.mp4），成片优先用概念图/H3 新素材。
+- 模型下载走 imagegen/tools/download_model.py 多连接；ComfyUI 单 worker 串行。

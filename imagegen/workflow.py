@@ -82,6 +82,61 @@ def build_workflow(positive: str,
     }
 
 
+
+
+def build_ipadapter_workflow(positive: str,
+                             negative: str,
+                             ref_image: str,
+                             width: int = 1024,
+                             height: int = 1024,
+                             seed: int = 42,
+                             filename_prefix: str = "imagegen/consistent",
+                             ckpt_name: str = DEFAULT_CKPT,
+                             steps: int = DEFAULT_STEPS,
+                             cfg: float = DEFAULT_CFG,
+                             sampler_name: str = DEFAULT_SAMPLER,
+                             scheduler: str = DEFAULT_SCHEDULER,
+                             ipadapter_preset: str = "PLUS (high strength)",
+                             ipadapter_weight: float = 0.65,
+                             ipadapter_start: float = 0.0,
+                             ipadapter_end: float = 0.85,
+                             ipadapter_weight_type: str = "linear",
+                             ipadapter_combine_embeds: str = "concat",
+                             ipadapter_embeds_scaling: str = "V only") -> dict:
+    """SDXL txt2img + IP-Adapter（角色一致性）。
+
+    ref_image 是相对 ComfyUI/input 的路径（如 "zaopianju_concepts/laozhou_ref.png"），
+    由调用方先拷贝进去；IPAdapterUnifiedLoader 会按 preset 自动挑 ipadapter + clip_vision。
+    节点 id：
+      1 ckpt  2 pos  3 neg  4 latent  5 KSampler  6 VAEDecode  7 SaveImage
+      8 IPAdapterUnifiedLoader  9 IPAdapterAdvanced  10 LoadImage(ref)
+    """
+    if width % 8 or height % 8:
+        raise ValueError("SDXL 宽高必须是 8 的倍数: %dx%d" % (width, height))
+    return {
+        "1": {"class_type": "CheckpointLoaderSimple", "inputs": {"ckpt_name": ckpt_name}},
+        "2": {"class_type": "CLIPTextEncode", "inputs": {"text": positive, "clip": ["1", 1]}},
+        "3": {"class_type": "CLIPTextEncode", "inputs": {"text": negative, "clip": ["1", 1]}},
+        "4": {"class_type": "EmptyLatentImage",
+              "inputs": {"width": int(width), "height": int(height), "batch_size": 1}},
+        "5": {"class_type": "KSampler",
+              "inputs": {"model": ["9", 0], "positive": ["2", 0], "negative": ["3", 0],
+                         "latent_image": ["4", 0], "seed": int(seed), "steps": int(steps),
+                         "cfg": float(cfg), "sampler_name": sampler_name,
+                         "scheduler": scheduler, "denoise": 1.0}},
+        "6": {"class_type": "VAEDecode", "inputs": {"samples": ["5", 0], "vae": ["1", 2]}},
+        "7": {"class_type": "SaveImage", "inputs": {"images": ["6", 0], "filename_prefix": filename_prefix}},
+        "8": {"class_type": "IPAdapterUnifiedLoader",
+              "inputs": {"model": ["1", 0], "preset": ipadapter_preset}},
+        "9": {"class_type": "IPAdapterAdvanced",
+              "inputs": {"model": ["8", 0], "ipadapter": ["8", 1], "image": ["10", 0],
+                         "weight": float(ipadapter_weight), "weight_type": ipadapter_weight_type,
+                         "start_at": float(ipadapter_start), "end_at": float(ipadapter_end),
+                         "combine_embeds": ipadapter_combine_embeds,
+                         "embeds_scaling": ipadapter_embeds_scaling}},
+        "10": {"class_type": "LoadImage", "inputs": {"image": ref_image}},
+    }
+
 # 每个 input 期望的连线类型（用于本地轻量校验，避免不必要的 400）
 _LINK_TYPES = {
     ("CLIPTextEncode", "clip"): "CLIP",
@@ -102,6 +157,10 @@ _REQUIRED = {
                  "sampler_name", "scheduler", "denoise"],
     "VAEDecode": ["samples", "vae"],
     "SaveImage": ["images", "filename_prefix"],
+    "LoadImage": ["image"],
+    "IPAdapterUnifiedLoader": ["model", "preset"],
+    "IPAdapterAdvanced": ["model", "ipadapter", "image", "weight", "weight_type",
+                          "start_at", "end_at"],
 }
 
 

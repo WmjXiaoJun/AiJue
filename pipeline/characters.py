@@ -8,6 +8,14 @@
 - style_<name>/ 子目录：若存在，优先使用 contract/characters/{cid}.json 里
   style.primary 对应的风格目录，其次字典序第一个。
 
+另外合并 SDXL 概念图 outputs/concepts/{cid}/（可用 CONCEPTS_DIR 覆盖）：
+- portrait.png               832x1216 竖构图概念立绘（SDXL / IP-Adapter 一致性）
+- expressions/*.png          概念表情
+- three_view/*.png、sheet.png、meta.json（选修）
+
+成片素材优先级（contract/CONSISTENCY.md）：
+h3 视频 > h3 中段帧 > 概念立绘 > Blender cutout > 2D > 文字卡。
+
 把 episode.assets 里的角色资产（host / guest_a / ...）映射到角色素材，
 供 mock_shot 合成「角色画面」镜头；素材缺失时调用方回退文字卡视觉。
 """
@@ -23,6 +31,7 @@ LOG = logging.getLogger("pipeline")
 
 EXPRESSIONS = ("neutral", "happy", "surprised", "thinking")
 CHARACTERS_SUBDIR = "characters"
+CONCEPTS_SUBDIR = "concepts"
 _ALPHA_CACHE: dict[tuple[str, int, int], bool] = {}
 
 
@@ -50,6 +59,41 @@ def _valid(path: Path | None) -> bool:
         return path is not None and Path(path).is_file() and Path(path).stat().st_size > 512
     except OSError:
         return False
+
+
+def concepts_root() -> Path:
+    """SDXL 概念图目录（默认 outputs/concepts/，可用 CONCEPTS_DIR 覆盖）。
+
+    概念图由 imagegen 生成：portrait.png（832x1216 竖构图）、
+    expressions/*.png、three_view/*.png、sheet.png、meta.json。
+    """
+    env = os.environ.get("CONCEPTS_DIR")
+    if env:
+        return Path(env)
+    return config.REPO_ROOT / "outputs" / CONCEPTS_SUBDIR
+
+
+def _find_concept_assets(cid: str, root: Path | str | None = None) -> dict:
+    """读取 outputs/concepts/{cid}/ 下的 SDXL 概念图素材。"""
+    base = Path(root) if root else concepts_root()
+    cdir = base / cid
+    if not cdir.is_dir():
+        return {}
+    portrait = _first_valid(cdir / "portrait.png")
+    expressions: dict[str, Path] = {}
+    for name in EXPRESSIONS:
+        found = _first_valid(cdir / "expressions" / f"{name}.png")
+        if found:
+            expressions[name] = found
+    meta = utils.read_json(cdir / "meta.json") or {}
+    if portrait is None and not expressions:
+        return {}
+    return {
+        "concept_dir": cdir,
+        "concept_portrait": portrait,
+        "concept_expressions": expressions,
+        "concept_meta": meta,
+    }
 
 
 def h3_dir() -> Path:
@@ -118,13 +162,68 @@ def _first_valid(*paths: Path | None) -> Path | None:
     return None
 
 
-def discover(root: Path | str | None = None) -> dict[str, dict]:
-    """返回 {character_id: char_assets}；目录不存在或为空时返回 {}。"""
+def discover(root: Path | str | None = None,
+             concepts_root_dir: Path | str | None = None) -> dict[str, dict]:
+    """返回 {character_id: char_assets}；目录不存在或为空时返回 {}。
+
+    root: 角色工坊目录（默认 outputs/characters/）
+    concepts_root_dir: SDXL 概念图目录；None 时在 root 为默认目录的情况下自动合并
+        outputs/concepts/（测试传入自定义 root 时默认不合并，保证隔离）。
+    """
     root_path = Path(root) if root else default_root()
     specs = load_specs()
     result: dict[str, dict] = {}
     if not root_path.is_dir():
-        return result
+        result = {}
+    else:
+        _scan_character_dir(root_path, specs, result)
+    # ---- 合并 SDXL 概念图（新优先级第 3 档）----
+    croot = Path(concepts_root_dir) if concepts_root_dir is not None else (
+        concepts_root() if root is None else None)
+    if croot is not None and croot.is_dir():
+        for cdir in sorted(croot.iterdir()):
+            if not cdir.is_dir():
+                continue
+            cid = cdir.name
+            concept = _find_concept_assets(cid, croot)
+            if not concept:
+                continue
+            if cid in result:
+                result[cid].update(concept)
+            else:
+                spec = specs.get(cid) or {}
+                meta = concept.get("concept_meta") or {}
+                name = str(meta.get("name") or spec.get("name") or cid)
+                title = str(meta.get("title") or spec.get("title") or "")
+                accent = str(meta.get("accent_color") or spec.get("accent_color")
+                             or config.ACCENT_DEFAULT)
+                entry = {
+                    "id": cid,
+                    "name": name,
+                    "title": title,
+                    "accent_color": accent,
+                    "style": None,
+                    "visual_style": "concept",
+                    "basis": "concepts",
+                    "dir": cdir,
+                    "portrait": None,
+                    "turntable": None,
+                    "expressions": {},
+                    "h3_video": _find_h3_video(cid),
+                    "h3_portrait": _find_h3_portrait(cdir, cid),
+                }
+                entry.update(concept)
+                result[cid] = entry
+            result[cid]["concept_portrait"] = concept.get("concept_portrait")
+            result[cid]["concept_expressions"] = concept.get("concept_expressions") or {}
+            LOG.info("合并 SDXL 概念图: %s concept_portrait=%s expressions=%d",
+                     cid, bool(concept.get("concept_portrait")),
+                     len(concept.get("concept_expressions") or {}))
+    return result
+
+
+def _scan_character_dir(root_path: Path, specs: dict, result: dict) -> None:
+    """扫描角色工坊目录，填充 result（供 discover 调用）。"""
     for cdir in sorted(root_path.iterdir()):
         if not cdir.is_dir():
             continue
@@ -208,7 +307,6 @@ def discover(root: Path | str | None = None) -> dict[str, dict]:
                  "expressions=%d h3_video=%s h3_portrait=%s",
                  cid, name, primary, basis or "根目录", bool(portrait),
                  bool(turntable), len(expressions), bool(h3_video), bool(h3_portrait))
-    return result
 
 
 def resolve_for_assets(assets: list, chars: dict | None = None) -> dict[str, dict]:
@@ -262,10 +360,12 @@ def fingerprint(char_map: dict) -> str:
             continue
         seen.add(key)
         paths: list[Path] = []
-        for key in ("portrait", "turntable", "h3_video", "h3_portrait"):
+        for key in ("portrait", "turntable", "h3_video", "h3_portrait",
+                    "concept_portrait"):
             if char.get(key):
                 paths.append(char[key])
         paths.extend((char.get("expressions") or {}).values())
+        paths.extend((char.get("concept_expressions") or {}).values())
         for path in paths:
             try:
                 st = Path(path).stat()

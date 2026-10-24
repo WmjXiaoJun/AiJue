@@ -123,7 +123,10 @@ portrait_url,sheet_url,turntable_url,expressions,status,created_at}
   body {modes?:["portrait","three_view","expressions","scene"], style?:anime|illustrious|guoman,
         prompt_extra?, seed?} -> Job(type=concept)
 - GET  /api/characters/{cid}/concepts -> {portrait, three_view:{front,side,three_quarter},
-        expressions:{neutral,happy,surprised,thinking}, sheet, meta}
+        expressions:{neutral,happy,surprised,thinking}, sheet, meta,
+        consistent:{three_view, expressions, meta}}
+  consistent 为 IP-Adapter 一致性产物（contract/CONSISTENCY.md，outputs/concepts/{cid}/consistent/），
+  尚未生成时返回空结构；概念图常规字段直接来自 outputs/concepts/{cid}/。
 - POST /api/characters/{cid}/portrait/from-concept {path} -> Character
 - POST /api/characters/{cid}/h3-animate {image?, prompt?} -> Job(type=h3)
 

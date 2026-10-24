@@ -203,3 +203,28 @@ FastAPI (8090) ── SQLite
 - backend pytest：**75 passed**；pipeline pytest：**34 passed**；前端 build 通过（dist 254KB JS/78KB CSS）
 - 服务：http://127.0.0.1:8090（backend/run-detached.ps1 可独立常驻）；ComfyUI 8188 在线
 - 已知：三视图/表情为独立生成（seed 家族相似，非像素级同一脸）；ComfyUI 单 worker 串行；剪映 10.x 加密限制；H3 单条约 2–5 分钟。
+## 19. 角色 2.1：IP-Adapter 一致性 + 概念图驱动成片（2026-10-24 早）
+
+### 19.1 IP-Adapter 一致性
+- 安装 ComfyUI_IPAdapter_plus（cubiq）；模型：ip-adapter-plus_sdxl_vit-h（847,517,512 B，sha256 3f5062b8…e6581 ✓）+ CLIP-ViT-H-14（3,944,552,236 B，sha256 036e6e2b…b18d ✓）。
+- imagegen 新增 --ref / --ip-adapter-strength（默认 0.65）/ --ip-adapter-end-at（0.85）；工作流 SDXL + IPAdapterUnifiedLoader + IPAdapterAdvanced（weight_type=linear）。
+- 实测：3 角色 × 7 张（三视图 3 + 表情 4）= 21 张 consistent 图，1024×1024，单图 11–13s（模型驻留后），seed 42，无 OOM。
+- 效果：脸型/发色/服装一致；IP-Adapter 会带入立绘的背景风格（深色+accents），三视图偏半身特写而非白底全身——已知取舍，可降 weight/加负向背景词继续调。
+- 截图：![一致性图集](screenshots/25_consistent_gallery.png)
+
+### 19.2 概念图驱动 H3（覆盖旧版本）
+- laozhou/ali/dawei 三条 H3 全部用 outputs/concepts/{id}/portrait.png 驱动重生成：768×768 / 5.167s / 124 帧 / 含音轨；耗时 116–223s/条；中段帧回填 h3_portrait。
+- 旧版保留 {id}_h3_prev.mp4；Character.h3_video_url 指向新文件。
+
+### 19.3 成片升级（SDXL 概念角色）
+- pipeline 素材优先级按 CONSISTENCY.md 落地：H3 视频 → h3 中段帧 → concepts/{id}/portrait.png（832×1216 竖构图裁胸像 + 右侧画窗 + Ken Burns）→ Blender cutout → 2D → 文字卡。
+- outputs/demo/final.mp4：299.000s / 1280×720 / 25fps / 34,719,840 B（33.1MiB）/ blackdetect 0 条 / 52/52 角色画面 / H3 3/3 概念图驱动；冷渲 50.9s。
+- 平台 outputs/episodes/ep_001/final.mp4：299.000s / 27,288,915 B（同一优先级重渲）。
+- 修复：角色镜头重复人名条（ASS 不再输出 Lower，51→49 事件）、字幕基线恢复 655。
+- 截图：![成片角色抽帧](screenshots/28_final_characters_sheet.png) ![角色卡](screenshots/26_character_cards_sdxl.png) ![H3 概念驱动](screenshots/27_h3_concept.png)
+
+### 19.4 测试与状态
+- pipeline：38 passed（新增概念素材优先级/竖构图裁切/概念表情/指纹/人名条去重）
+- backend：75 passed（终态以最新复跑为准）；frontend build 通过
+- 服务：8090 常驻（run-detached）；ComfyUI 8188 在线（IP-Adapter 节点已加载）
+- 已知：三视图风格受 IP-Adapter 背景影响；H3 串行 2–5 分钟/条；剪映 10.x 加密草稿限制仍在。

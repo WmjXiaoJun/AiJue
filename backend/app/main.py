@@ -814,6 +814,7 @@ def get_character_concepts(cid: str, db: Session = Depends(get_db)):
         "expressions": dict(character.concept_expressions or data.get("expressions") or {}),
         "sheet": character.concept_sheet_url,
         "meta": data.get("meta") or {},
+        "consistent": data.get("consistent") or {"three_view": {}, "expressions": {}, "meta": {}},
     }
 
 

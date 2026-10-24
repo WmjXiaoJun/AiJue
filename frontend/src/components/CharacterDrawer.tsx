@@ -83,7 +83,8 @@ export function CharacterDrawer({
   const busy = !!job && isActiveJob(job);
   const progress = job ? Math.max(0, Math.min(100, job.progress || 0)) : 0;
 
-  const portrait = files?.portrait || character?.portrait_url;
+  // 立绘优先用 Character.portrait_url（后端切到 SDXL 概念立绘后自动生效），再回落 Blender 素材
+  const portrait = character?.portrait_url || files?.portrait;
   const sheet = files?.sheet || character?.sheet_url;
   const turntable = files?.turntable || character?.turntable_url;
   const expressions = files?.expressions || character?.expressions || null;

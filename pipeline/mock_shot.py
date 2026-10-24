@@ -143,7 +143,8 @@ class _ShotCtx:
         self.char_map = char_map or {}
         self.character = self.char_map.get(str(self.speaker_id)) or {}
         self.cast = [c for c in characters.order_cast(self.char_map)
-                     if c.get("portrait") or c.get("h3_portrait")]
+                     if c.get("portrait") or c.get("h3_portrait")
+                     or c.get("concept_portrait")]
         # 无 speaker 的角色镜头（如 reaction 冷笑）：按画面/台词里出现的角色名推断，兜底用主持人
         if not self.character and self.cast:
             hint = " ".join(str(self.shot.get(k) or "") for k in (
@@ -158,7 +159,8 @@ class _ShotCtx:
             self.character = self.cast[0]
         if self.character and not self.speaker_name:
             self.speaker_name = str(self.character.get("name") or "")
-        # 真实 H3 素材优先：host_to_camera 用 H3 视频，其余角色镜头用 H3 中段帧 Ken Burns
+        # 素材优先级（contract/CONSISTENCY.md）：
+        # h3 视频 > h3 中段帧 > SDXL 概念立绘 > Blender cutout > 2D > 文字卡
         self.media = None
         if self.character:
             if self.type == "host_to_camera" and self.character.get("h3_video"):
@@ -168,6 +170,10 @@ class _ShotCtx:
                     and self.character.get("h3_portrait"):
                 self.media = {"kind": "h3_still",
                               "path": self.character["h3_portrait"]}
+            elif self.type in CHARACTER_SHOT_TYPES \
+                    and self.character.get("concept_portrait"):
+                self.media = {"kind": "concept_still",
+                              "path": self.character["concept_portrait"]}
         self.char_mode = (bool(self.character.get("portrait"))
                           or self.media is not None) \
             and self.type in CHARACTER_SHOT_TYPES
@@ -277,17 +283,25 @@ class _ShotCtx:
         return height, x, y
 
     def _h3_layout(self, inputs: list, filters: list, idx: int,
-                   accent: str, ratio: float, ken_burns: bool) -> str:
-        """H3 素材构图：节目背景 + 右侧 1/3 的 H3 胸像画窗（细描边 + Ken Burns）。
+                   accent: str, ratio: float, ken_burns: bool,
+                   top_crop: bool = False) -> str:
+        """素材构图：节目背景 + 右侧 1/3 的胸像画窗（细描边 + Ken Burns）。
 
         768x768 的 H3 素材直接 cover 裁切会把脸放大到失真，这里保留完整构图，
         以「画窗」形式叠在节目背景右侧，人物按统一胸像规格（高≈91%、底部对齐）。
+        top_crop=True 用于 832x1216 竖构图概念图：优先保留画面顶部（头部），
+        只裁掉下半身，顶部安全边约 2%。
         """
         fg_h, fg_x, fg_y = self._bust_geometry()
         stretch = f",setpts=PTS*{ratio:.4f}" if ratio > 1.02 else ""
+        if top_crop:
+            crop_expr = (f"{fg_h}:{fg_h}:(iw-{fg_h})/2:"
+                         f"'min(ih-{fg_h},ih*0.02)'")
+        else:
+            crop_expr = f"{fg_h}:{fg_h}"
         fg = (
             f"[{idx}:v]scale={fg_h}:{fg_h}:force_original_aspect_ratio=increase,"
-            f"crop={fg_h}:{fg_h},setsar=1{stretch},fps={self.fps}"
+            f"crop={crop_expr},setsar=1{stretch},fps={self.fps}"
         )
         if ken_burns:
             frames = max(2, int(round(self.dur * self.fps)))
@@ -327,6 +341,33 @@ class _ShotCtx:
         filters: list = []
         idx = self._add_image(inputs, src)
         self._h3_layout(inputs, filters, idx, accent, 1.0, ken_burns=True)
+        return {"inputs": inputs, "filters": filters, "label": "base"}
+
+    def _compose_concept_still(self) -> dict | None:
+        """SDXL 概念立绘（832x1216 竖构图）：右侧胸像画窗 + Ken Burns。
+
+        竖构图顶部保留头部（安全边约 2%），只裁下半身，避免头部被裁切；
+        reaction 镜头优先用概念表情图。
+        """
+        char = self.character
+        src = self.media["path"]
+        if self.type == "reaction":
+            exprs = char.get("concept_expressions") or {}
+            if exprs:
+                picked = characters.choose_expression(
+                    {"portrait": char.get("concept_portrait"),
+                     "expressions": exprs},
+                    text=(self.shot.get("line") or self.shot.get("subtitle") or ""),
+                    mood=str(self.shot.get("mood") or ""),
+                )
+                if picked:
+                    src = picked
+        accent = self._char_accent(char)
+        inputs: list = []
+        filters: list = []
+        idx = self._add_image(inputs, src)
+        self._h3_layout(inputs, filters, idx, accent, 1.0, ken_burns=True,
+                        top_crop=True)
         return {"inputs": inputs, "filters": filters, "label": "base"}
 
     def _compose_host_to_camera(self) -> dict | None:
@@ -399,8 +440,9 @@ class _ShotCtx:
         return {"inputs": inputs, "filters": filters, "label": "base"}
 
     def _preferred_still(self, char: dict):
-        """角色静帧：H3 中段帧优先，其次 Blender 立绘。"""
-        return char.get("h3_portrait") or char.get("portrait")
+        """角色静帧：H3 中段帧 > SDXL 概念立绘 > Blender 立绘。"""
+        return (char.get("h3_portrait") or char.get("concept_portrait")
+                or char.get("portrait"))
 
     def _compose_cast_montage(self) -> dict | None:
         cast = [c for c in self.cast if self._preferred_still(c)][:3]
@@ -457,8 +499,11 @@ class _ShotCtx:
     def compose(self) -> dict | None:
         """返回角色合成方案；无素材/该镜头不用角色画面时返回 None。"""
         if self.media is not None:
-            if self.media["kind"] == "h3_video":
+            kind = self.media["kind"]
+            if kind == "h3_video":
                 return self._compose_h3_video()
+            if kind == "concept_still":
+                return self._compose_concept_still()
             return self._compose_h3_still()
         if self.char_mode:
             handler = getattr(self, "_compose_" + self.type, None)

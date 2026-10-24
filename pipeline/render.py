@@ -28,7 +28,7 @@ LOG = logging.getLogger("pipeline")
 
 CLIP_WORKERS = 6
 AUDIO_WORKERS = 8
-CLIP_VERSION = "mock-v10-bust"
+CLIP_VERSION = "mock-v12-concepts"
 TTS_LEAD_IN = 0.15
 BGM_DURATION = 32.0
 

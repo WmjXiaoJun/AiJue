@@ -64,7 +64,7 @@
         0
       ],
       "width": 768,
-      "prompt": "原创动漫角色老周对着镜头自然地说话，轻微点头，眨眼，胸腹呼吸起伏，暖黄演播厅灯光，动漫赛璐璐质感",
+      "prompt": "integrated_multimodal_description: [Shot 1] Anime-style medium close-up of the same young man shown in the first frame, standing in a dark studio with a warm golden rim light. He looks directly at the camera and speaks naturally: his lips move, eyebrows lift slightly, he gives one small confident nod and blinks. Keep his black swept hair, big dark eyes, navy suit with yellow tie, and the cel-shaded 3D-toon look exactly the same as in the first frame. The camera holds steady with a very slow push-in; subtle hair and collar movement; clean anime line art, filmic studio lighting, no text, no watermark.\n\noverall_soundscape: Quiet studio room tone with a soft breath and a faint cloth rustle in stereo ambience.\n\nnon_diegetic_music: N/A",
       "height": 768,
       "length": 124
     }

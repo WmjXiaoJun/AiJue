@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   启动本机 ComfyUI（MiniMax H3）后台服务，日志写入 integrations/comfyui/logs/。
 .DESCRIPTION
