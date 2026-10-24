@@ -171,6 +171,22 @@ def _char_refs(shots: list, frames: dict, workdir: Path, width: int,
     strategies: dict[str, str] = {}
     plans = plans or {}
     ref_dir = utils.ensure_dir(workdir / "dynamic" / "refs")
+    # 场景模式：直接使用「2D 绘景 + 角色」整帧作为参考，保留环境
+    if os.environ.get("SCENE_DYNAMIC_FULL_REF") == "1":
+        for shot in shots:
+            sid = _sid(shot)
+            full = frames.get(sid)
+            if full is None:
+                continue
+            out = ref_dir / f"{sid}_ref_scene.png"
+            utils.ffmpeg(["-y", "-hide_banner", "-loglevel", "error",
+                          "-i", str(full),
+                          "-vf", "scale=768:768:force_original_aspect_ratio=decrease,"
+                                 "pad=768:768:(ow-iw)/2:(oh-ih)/2:color=black",
+                          str(out)])
+            refs[sid] = out if _valid(out, 1000) else full
+            strategies[sid] = "scene-full"
+        return refs, strategies
     for shot in shots:
         sid = _sid(shot)
         full = frames.get(sid)

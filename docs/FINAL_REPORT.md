@@ -386,3 +386,11 @@ FastAPI (8090) ── SQLite
 - scene_map 覆盖 16 模板；tonight_show/masked_singer/snl/standup/shark_tank 混用真实 3D Blender 片段；16 个 scene demo 全部重跑（history_talk 35.4s、tonight_show 35.6s，blackdetect=0、相机运动 PSNR 17-24）；抽样帧 outputs/scene_demos/qc_4templates.png，逐模板 frames/verify.json。
 - tests：pipeline 63 passed（新增 test_scenes.py：scene_map/全身分层/景别缩放/脚底锚定/投影/相机运动/卡片烘焙/逐镜输出）。
 - 场景巡礼已重建：outputs/scene_demos/scene_showcase.mp4（16 个 2D 场景片段 + 3D 章节，~77s）。
+## 32. 停用 Blender/3D 场景，改由 H3 驱动全部动态（2026-10-25 用户指示）
+- 用户明确：不再使用 Blender，全部用 H3。已从 pipeline 移除 3D 场景依赖：pipeline/scenes.py 停用 three_d 背景；scene_map 不再含 3D 片段；16 个模板 scene demo 已用「2D 绘景 + 2D 动漫全身 cutout」重渲（outputs/scene_demos，2D-only）。
+- 角色改为 SDXL 全身图去白底得到 2D 动漫透明 cutout（outputs/characters/{id}/cutout_2d/front.png，脚本 scripts/make_2d_cutouts.py），不再使用 Blender cutout_full。
+- H3 场景融合验证：
+  - i2v（fl2v 首尾帧）以「2D 绘景 + 角色」合成帧为输入：H3 保留书房背景/烛光/角色，产生闪烁/呼吸/轻微运动（tmp/h3_scene_i2v.mp4）；
+  - audio_ref 以场景合成帧为参考：H3 保留图书馆环境 + 角色说话口型/推近（tmp/h3_scene_audio.mp4，1280x704）；
+  - 已加 SCENE_DYNAMIC_FULL_REF 模式：场景版动态镜头用整帧场景合成画面作 H3 参考（不再裁脸部），让 H3 动态镜头带 2D 场景环境；
+- 3D Blender 产物（outputs/3d_scenes、studio3d scene.py）保留为归档，不再进入成片流程。

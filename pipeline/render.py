@@ -821,9 +821,10 @@ def run_render(args) -> int:
             data, workdir,
             template_id=getattr(args, "scene_template", None),
             width=width, height=height, fps=fps, force=True)
-        LOG.info("场景模式: template=%s plate=%s 3d=%s",
-                 scene_info.get("template_id"), scene_info.get("plate"),
-                 scene_info.get("three_d") or "none")
+        LOG.info("场景模式: template=%s plate=%s",
+                 scene_info.get("template_id"), scene_info.get("plate"))
+        # 场景模式下 H3 参考图使用整帧（保留 2D 绘景环境，不再裁脸部/画窗）
+        os.environ["SCENE_DYNAMIC_FULL_REF"] = "1"
 
     # ---- 1) 镜头片段 ---------------------------------------------------
     prog(2, "生成/复用镜头片段")

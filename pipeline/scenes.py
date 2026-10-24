@@ -98,7 +98,7 @@ def _asset_character(asset: dict | None) -> str:
 
 def cutout_path(char_id: str) -> Path | None:
     """优先全身透明 PNG（1024x1536），回退头肩 cutout。"""
-    for rel in ("cutout_full/front.png", "cutout/portrait.png",
+    for rel in ("cutout_2d/front.png", "cutout_full/front.png", "cutout/portrait.png",
                 "2d/portrait.png", "portrait.png"):
         p = CHARS_DIR / char_id / rel
         if p.is_file() and p.stat().st_size > 5000:
@@ -107,7 +107,7 @@ def cutout_path(char_id: str) -> Path | None:
 
 
 def _is_full_body(path: Path | None) -> bool:
-    return bool(path and "cutout_full" in str(path).replace("\\", "/"))
+    return bool(path and ("cutout_full" in str(path).replace("\\", "/") or "cutout_2d" in str(path).replace("\\", "/")))
 
 
 def _plan(shot: dict, index: int) -> dict:
@@ -357,7 +357,8 @@ def compose_episode(data: dict, workdir: Path, template_id: str | None = None,
     if not plate.is_file():
         raise RuntimeError(f"缺少场景 plate: {scene.get('plate')}")
     bg_video = None
-    if scene.get("3d"):
+    # 用户要求：不再使用 Blender/3D 场景，全部改用 2D 绘景 + 角色分层（H3 负责动态）
+    if False and scene.get("3d"):
         p = THREED_DIR / f"{scene['3d']}.mp4"
         if p.is_file():
             bg_video = p
