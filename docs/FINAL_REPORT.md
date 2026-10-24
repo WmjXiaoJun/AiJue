@@ -399,3 +399,9 @@ FastAPI (8090) ── SQLite
 - H3 场景融合：新增 SCENE_DYNAMIC_FULL_REF + contract/scene_descriptions.json；H3 参考图取「2D 绘景+2D 角色」整帧，prompt 带场景描述并要求保留背景；3 镜测试（final_fusion3.mp4）与 8 镜 demo（outputs/history_full/h3_scene_demo.mp4，46.72s，7 个 H3 audio_ref 镜头）均保留书房场景 + 角色口型/微动作，不再出现 Blender 3D/白底棚拍。
 - 完整 5 分钟历史夜话场景版：outputs/history_full/final.mp4（286.04s / 1280×720 / 27MB / 53 镜 / 51 条 TTS / 2D 绘景 + 2D 角色 / blackdetect 0 / QC ok，字幕 55 条）。
 - 全 H3 版 5 分钟成片正在后台渲染：outputs/history_full/final_h3.mp4（51 个 dialogue 镜头全 H3 audio_ref，预计 2-3h；完成后可直接对比）。
+### 32.2 全 H3 版 5 分钟成片（2026-10-25 完成）
+- outputs/history_full/final_h3.mp4：286.04s / 1280×720 / 25fps / 7151 帧 / 55.09MB / 51 个 H3 audio_ref 镜头 + 2 静态卡（片头/片尾）/ blackdetect 0 / QC ok；
+- 全部对话镜头由 H3 生成：参考图=「2D 绘景 + 2D 动漫角色」场景合成整帧，prompt 带 contract/scene_descriptions.json 场景描述并要求保留背景；H3 输出自带书房环境/烛光/角色口型，不再有 Blender/3D。
+- 2D 合成版对比：outputs/history_full/final.mp4（286.04s/27MB，2D cutout 贴图+视差）；对比抽帧 docs/screenshots/66_compare_2d_vs_h3.png。
+- 全 H3 版观感明显更好：角色更大、场景更完整、光影/景别有电影感；字幕/名牌/BGM/转场正常。
+- 下一步：16 个模板如需全 H3 版，按模板批量跑（每模板约 30-60 分钟，取决于镜头数）。
