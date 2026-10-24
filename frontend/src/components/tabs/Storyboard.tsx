@@ -9,6 +9,7 @@ import {
   TYPE_ACCENT,
   characterStyles,
   fmtShotDuration,
+  isShotDynamic,
   segmentName,
   styleFamily,
 } from "../../lib/format";
@@ -17,7 +18,8 @@ import type { TabBaseProps } from "./types";
 import { EmptyState, ProgressBar, SectionHead, Spinner, StatusBadge } from "../ui";
 import { CharacterAvatar } from "../CharacterAvatar";
 import { ShotFormModal } from "../ShotFormModal";
-import { IconBoard, IconCheck, IconEdit, IconGrid, IconPlus, IconSpark, IconTable, IconTrash } from "../icons";
+import { ShotFrames } from "../ShotFrames";
+import { IconBoard, IconCheck, IconEdit, IconGrid, IconPlus, IconSpark, IconTable, IconTrash, IconVideo } from "../icons";
 
 interface Props extends TabBaseProps {
   jobByShot: Map<string, Job>;
@@ -45,6 +47,8 @@ export function Storyboard({ episode, assets, shots, jobByShot, characters, onCh
   const [showCreate, setShowCreate] = useState(false);
   const [editingShot, setEditingShot] = useState<Shot | null>(null);
   const [formBusy, setFormBusy] = useState(false);
+  const [dynBatchBusy, setDynBatchBusy] = useState(false);
+  const [dynBusyShot, setDynBusyShot] = useState<string | null>(null);
 
   const assetMap = useMemo(() => new Map(assets.map((asset) => [asset.id, asset])), [assets]);
   const types = useMemo(() => Array.from(new Set(shots.map((shot) => shot.type))), [shots]);
@@ -152,6 +156,45 @@ export function Storyboard({ episode, assets, shots, jobByShot, characters, onCh
 
   const selectedCount = selected.size;
 
+  const dynamicCount = useMemo(() => shots.filter((shot) => isShotDynamic(shot)).length, [shots]);
+
+  const handleBatchDynamic = async () => {
+    if (!shots.length) return;
+    const confirmed = window.confirm(
+      "将为全部 " + shots.length + " 个镜头生成 H3 动态版本（口型 / 首尾帧），可能耗时较长，是否继续？"
+    );
+    if (!confirmed) return;
+    setDynBatchBusy(true);
+    try {
+      const result = await api.generateAllDynamic(episode.id);
+      const count =
+        typeof result?.created === "number"
+          ? result.created
+          : Array.isArray(result?.jobs)
+            ? result.jobs.length
+            : undefined;
+      notify("已提交全部动态生成" + (count ? "（" + count + " 个镜头）" : ""), "success");
+      onChanged();
+    } catch (err) {
+      notify("批量动态生成失败：" + errorText(err), "error");
+    } finally {
+      setDynBatchBusy(false);
+    }
+  };
+
+  const handleDynamic = async (shot: Shot) => {
+    setDynBusyShot(shot.id);
+    try {
+      await api.generateDynamicShot(shot.id);
+      notify("已提交镜头 #" + String(shot.no).padStart(3, "0") + " 的动态生成", "success");
+      onChanged();
+    } catch (err) {
+      notify("动态生成失败：" + errorText(err), "error");
+    } finally {
+      setDynBusyShot(null);
+    }
+  };
+
   const submitCreate = async (body: NewShot) => {
     setFormBusy(true);
     try {
@@ -201,6 +244,9 @@ export function Storyboard({ episode, assets, shots, jobByShot, characters, onCh
           <span className="sb-count">
             共 <b>{filtered.length}</b> / {shots.length} 镜
           </span>
+          <span className="sb-count sb-dyn-count">
+            动态 <b>{dynamicCount}</b> / {shots.length}
+          </span>
         </div>
         <div className="sb-toolbar-right">
           <div className="filter-tabs">
@@ -223,6 +269,16 @@ export function Storyboard({ episode, assets, shots, jobByShot, characters, onCh
               </option>
             ))}
           </select>
+          <button
+            type="button"
+            className="btn btn-outline btn-sm"
+            onClick={() => void handleBatchDynamic()}
+            disabled={dynBatchBusy || shots.length === 0}
+            title="为全部镜头生成 H3 动态版本（口型 / 首尾帧）"
+          >
+            {dynBatchBusy ? <Spinner size={13} /> : <IconVideo size={14} />}
+            {dynBatchBusy ? "提交中…" : "生成全部动态"}
+          </button>
           <button type="button" className="btn btn-ghost btn-sm" onClick={() => setShowCreate(true)} title="手动添加镜头">
             <IconPlus size={14} /> 添加镜头
           </button>
@@ -315,6 +371,12 @@ export function Storyboard({ episode, assets, shots, jobByShot, characters, onCh
                       <span className="type-chip" style={{ "--chip": accent } as CSSProperties}>
                         {SHOT_TYPE_SHORT[shot.type] || SHOT_TYPE_LABEL[shot.type] || shot.type}
                       </span>
+                      <span
+                        className={"dyn-badge dyn-badge-sm" + (isShotDynamic(shot) ? " active" : "")}
+                        title={isShotDynamic(shot) ? "已生成 H3 动态版本" : "尚未生成动态版本（静态回退）"}
+                      >
+                        动态
+                      </span>
                     </td>
                     <td className="col-dur">{fmtShotDuration(shot.duration)}</td>
                     <td className="col-speaker">
@@ -338,6 +400,15 @@ export function Storyboard({ episode, assets, shots, jobByShot, characters, onCh
                     </td>
                     <td className="col-actions" onClick={(event) => event.stopPropagation()}>
                       <span className="row-actions">
+                        <button
+                          type="button"
+                          className="row-action row-action-dyn"
+                          title="生成该镜头的 H3 动态版本"
+                          disabled={dynBusyShot === shot.id}
+                          onClick={() => void handleDynamic(shot)}
+                        >
+                          {dynBusyShot === shot.id ? <Spinner size={12} /> : <IconSpark size={13} />}
+                        </button>
                         <button
                           type="button"
                           className="row-action"
@@ -399,6 +470,12 @@ export function Storyboard({ episode, assets, shots, jobByShot, characters, onCh
                     />
                   )}
                   <span className="shot-thumb-type">{SHOT_TYPE_LABEL[shot.type] || shot.type}</span>
+                  <span
+                    className={"dyn-badge dyn-badge-thumb" + (isShotDynamic(shot) ? " active" : "")}
+                    title={isShotDynamic(shot) ? "已生成 H3 动态版本" : "尚未生成动态版本（静态回退）"}
+                  >
+                    动态
+                  </span>
                   <span className="shot-thumb-no">#{String(shot.no).padStart(3, "0")}</span>
                   <label className="check check-only shot-check" onClick={(event) => event.stopPropagation()}>
                     <input type="checkbox" checked={checked} onChange={() => toggleOne(shot)} />
@@ -432,7 +509,19 @@ export function Storyboard({ episode, assets, shots, jobByShot, characters, onCh
                     <i />
                     <span>{SHOT_TYPE_SHORT[shot.type] || shot.type}</span>
                   </div>
+                  <div className="shot-card-frames">
+                    <ShotFrames shot={shot} compact />
+                  </div>
                   <div className="shot-card-actions" onClick={(event) => event.stopPropagation()}>
+                    <button
+                      type="button"
+                      className="row-action row-action-dyn"
+                      title="生成该镜头的 H3 动态版本"
+                      disabled={dynBusyShot === shot.id}
+                      onClick={() => void handleDynamic(shot)}
+                    >
+                      {dynBusyShot === shot.id ? <Spinner size={12} /> : <IconSpark size={12} />} 动态
+                    </button>
                     <button type="button" className="row-action" title="编辑台词 / 时长" onClick={() => setEditingShot(shot)}>
                       <IconEdit size={12} /> 编辑
                     </button>

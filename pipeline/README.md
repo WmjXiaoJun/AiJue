@@ -195,7 +195,8 @@ python -m pytest pipeline/tests -q
 ComfyUI 适配器（httpx 用 monkeypatch 模拟，不联网）、平台生成台片段校验与复用、标准化失败回退、
 角色素材发现/3D→2D 优先级/角色映射/表情选择/角色素材指纹缓存失效、
 SDXL 概念图发现与第 3 优先级/竖构图顶部安全边裁切/概念表情/概念素材指纹失效、
-多语种本地化（翻译/人名罗马化/术语固定/目标语 ASS/时长拟合/voice 选择/本地化 clips 无中文）。
+多语种本地化（翻译/人名罗马化/术语固定/目标语 ASS/时长拟合/voice 选择/本地化 clips 无中文）、
+全动态镜头（每镜 TTS wav/xfade 转场 whoosh/动态缓存与回退/H3 音驱动框架）。
 
 ## 依赖
 
@@ -270,6 +271,38 @@ python -m pipeline.localize --episode-json backend/data/jobs/<job>_episode.json 
   全缓存复用约 8-25s。
 - 测试：`python -m pytest pipeline/tests/test_localize.py -q`（翻译/术语/人名罗马化/目标语 ASS/
   时长拟合/voice 选择/本地化 manifest/重生成文案无中文/失败回退）。
+
+## 全动态镜头（pipeline.dynamic，contract/DYNAMIC_SHOTS.md）
+
+说话镜头用 H3 音驱动口型（ref2va）/首尾帧（fl2v）替换静帧，镜头间用 xfade 转场 + whoosh：
+
+```powershell
+python -m pipeline.cli render --episode <episode.json> --workdir <dir> --out final_dynamic.mp4 `
+    --dynamic [--dynamic-fallback-static] --transitions xfade `
+    --transition-style fade --transition-duration 0.3
+```
+
+- **每镜 TTS wav**：渲染时把镜头音轨导出为 `audio/shot_{sid}.wav`（H3 音驱动输入），
+  `narration.wav` 仍保留用于成片混音。
+- **动态镜头**：`pipeline/dynamic.py` 从静态合成 clip 抽首帧 → 有台词镜头走 H3
+  `audio_ref`（首帧 + 该镜 TTS wav），无台词镜头走 `fl2v`（首帧 + 下一镜首帧作尾帧，
+  match cut 连续性）；输出 `dynamic/{sid}.mp4`（静音 H3 原声，成片使用 TTS 音轨），
+  per-shot 缓存（shot/首尾帧/音频/参数 hash）；片头/片尾/花字卡保持静态。
+- H3 ref CLI 约定：`integrations/comfyui/run_h3_ref.py`（可用 `H3_DYNAMIC_CLI` 或
+  `--h3-ref-cli` 覆盖）：
+  `--mode audio_ref|fl2v --image first.png [--last-frame last.png] [--audio shot.wav] --out out.mp4 --duration/--width/--height/--fps/--seed`。
+- **转场**：`concat_video_xfade` 保留总时长（每镜头部冻结 transition 时长供重叠），
+  18 个 ffmpeg xfade 预设可配（fade/dissolve/wipe/slide/smooth/circle/radial/pixelize/hblur/…），
+  默认 0.30s；按转场时间点生成 whoosh 音效轨（混入 loudnorm 前的人声/BGM 混音）。
+- **包装**：H3 ref2va 输出全画幅角色（不再带静态版的演播厅画窗），因此动态镜头由 ASS 补画
+  左上品牌、右上镜头标签、左下名字条（LIVE/角色名/身份），字幕沿用原样式；静态片头/片尾卡保持原包装。
+- 失败回退：`--dynamic-fallback-static` 时某镜 H3 失败自动用静态 clip 并在 manifest/meta 标注
+  `static-fallback`（正式验收要求 0 个 fallback）。
+- 实测（ep_002，21 镜）：75.95s / 1280×720 / 1898 帧 / blackdetect=0；17 audio_ref + 2 fl2v
+  （19/19 非卡片镜头动态，0 fallback）+ 2 静态卡；19/19 clip 动作与嘴部区域帧差明显；
+  xfade fade 0.3s × 20 转场 + 全片 whoosh；ep_001（52 镜）同法生成。
+- 测试：`python -m pytest pipeline/tests/test_dynamic.py -q`（每镜 TTS wav/xfade 时长保持/
+  whoosh 音轨/动态缓存与模式/无 CLI 回退/动态模式端到端）。
 
 ## 已知限制 / 未做
 

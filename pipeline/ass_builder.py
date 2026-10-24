@@ -79,13 +79,17 @@ def _accent_map(assets: list) -> dict:
 
 
 def build_events(episode: dict, timings: list, assets: list,
-                 char_shot_ids: set[str] | None = None) -> list[tuple]:
+                 char_shot_ids: set[str] | None = None,
+                 dynamic_shot_ids: set[str] | None = None) -> list[tuple]:
     """返回 [(start, end, layer, style, text)]。
 
     char_shot_ids: 使用角色画面的镜头 id 集合；这些镜头的字幕用 SubChar 样式
     （右移避开左下名字条、最大宽度约 62%）。
+    dynamic_shot_ids: 动态（H3 全画幅）镜头集合；因为 H3 成片不再带
+    节目包装，这里补画左上品牌、右上镜头标签、左下名字条，保持与静态版一致的包装。
     """
     char_shot_ids = char_shot_ids or set()
+    dynamic_shot_ids = dynamic_shot_ids or set()
     events: list[tuple] = []
     accents = _accent_map(assets)
     segment_names = {}
@@ -159,13 +163,60 @@ def build_events(episode: dict, timings: list, assets: list,
                    + r",0,360)\3c" + color + "&}")
             events.append((lt_start, lt_end, 5, "Lower", tag + _esc(label)))
 
+    # ---- 动态镜头包装（H3 全画幅画面：补品牌角标/镜头标签/名字条）----
+    asset_by_id = {str(a.get("id")): a for a in (assets or []) if isinstance(a, dict)}
+    for item in timings:
+        shot = item["shot"]
+        sid = str(shot.get("id") or "")
+        if sid not in dynamic_shot_ids:
+            continue
+        typ = str(shot.get("type") or "")
+        if typ in ("title_card", "end_card", "meme_card"):
+            continue
+        start = float(item["start"])
+        end = float(item["end"])
+        t0 = start + 0.10
+        t1 = max(t0 + 0.5, end - 0.08)
+        # 品牌角标（左上）
+        events.append((t0, t1, 3, "Brand",
+                       r"{\an7\pos(46,30)\fad(120,120)}" + _esc("造片局 · AI 微综艺")))
+        # 镜头标签（右上）
+        visual = str(shot.get("visual") or "").strip()
+        if visual:
+            label = visual if len(visual) <= 26 else visual[:25] + "…"
+            events.append((t0, t1, 3, "Brand",
+                           r"{\an9\pos(1234,26)\fad(120,120)}" + _esc(label)))
+        # 名字条（左下）
+        speaker = str(shot.get("speaker") or "")
+        asset = asset_by_id.get(speaker) or {}
+        name = str(shot.get("speaker_name") or asset.get("name") or "").strip()
+        role = str(asset.get("title") or
+                   ("主持人" if asset.get("role") == "host" else "嘉宾")).strip()
+        if name:
+            accent = ass_color(accents.get(speaker, config.ACCENT_DEFAULT))
+            events.append((t0, t1, 5, "SubChar",
+                           r"{\an7\pos(62,496)\p1\bord0\shad0\c" + accent + "&}"
+                           r"m 0 0 l 8 0 l 8 96 l 0 96{\p0}"))
+            events.append((t0, t1, 6, "SubChar",
+                           r"{\an7\pos(86,498)\fs48\b1\c" + accent + "&}"
+                           + _esc(name)))
+            if role:
+                events.append((t0, t1, 6, "SubChar",
+                               r"{\an7\pos(88,558)\fs27\b0\c&H00FFFFFF&\alpha&H20&}"
+                               + _esc(role)))
+            if asset.get("role") == "host":
+                events.append((t0, t1, 3, "SubChar",
+                               r"{\an7\pos(62,448)\fs22\c&H00FFFFFF&\alpha&H40&}"
+                               + _esc("● LIVE  虚拟演播厅 A")))
+
     events.sort(key=lambda e: (e[0], e[2]))
     return events
 
 
 def build_ass(episode: dict, timings: list, assets: list, fonts: dict,
               out_path, width: int = 1280, height: int = 720,
-              char_shot_ids: set[str] | None = None) -> dict:
+              char_shot_ids: set[str] | None = None,
+              dynamic_shot_ids: set[str] | None = None) -> dict:
     """生成全局 ASS 文件，返回统计信息。"""
     template_path = config.TEMPLATES_DIR / "subtitle_variety.ass"
     try:
@@ -181,7 +232,8 @@ def build_ass(episode: dict, timings: list, assets: list, fonts: dict,
         header = header.replace("PlayResY: 720", f"PlayResY: {height}")
 
     events = build_events(episode or {}, timings, assets or [],
-                          char_shot_ids=char_shot_ids)
+                          char_shot_ids=char_shot_ids,
+                          dynamic_shot_ids=dynamic_shot_ids)
     lines = []
     for start, end, layer, style, text in events:
         lines.append(

@@ -6,6 +6,7 @@ import {
 } from "../lib/format";
 import { Drawer, Avatar, Meta, StatusBadge } from "./ui";
 import { ShotVersions } from "./ShotVersions";
+import { ShotDynamicSection } from "./ShotDynamicSection";
 import { IconUser } from "./icons";
 
 interface Props {
@@ -96,6 +97,8 @@ export function ShotDrawer({ shot, assets, onClose, onChanged }: Props) {
               )}
             </div>
           </section>
+
+          <ShotDynamicSection shot={shot} onChanged={onChanged} />
 
           <section className="detail-block detail-block-last">
             <ShotVersions shot={shot} onChanged={onChanged} />

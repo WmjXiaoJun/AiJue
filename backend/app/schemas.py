@@ -120,6 +120,12 @@ class ShotOut(ORMModel):
     title: Optional[str] = None
     subtitle: Optional[str] = None
     video_url: Optional[str] = None
+    # 全动态分镜（contract/DYNAMIC_SHOTS.md）
+    first_frame_url: Optional[str] = None
+    last_frame_url: Optional[str] = None
+    h3_video_url: Optional[str] = None
+    dynamic_mode: Optional[str] = None
+    dynamic_status: str = "none"
 
 
 class ShotUpdate(BaseModel):
@@ -128,10 +134,20 @@ class ShotUpdate(BaseModel):
     status: Optional[str] = None
     visual: Optional[str] = None
     punchline: Optional[str] = None
+    # 首尾帧来源（可选；/media/... URL 或 outputs 下路径）
+    first_frame_url: Optional[str] = None
+    last_frame_url: Optional[str] = None
 
 
 class ShotGenerateRequest(BaseModel):
+    # mode 缺省=静态 gen-shot；mode="dynamic" 走全动态镜头任务
+    mode: Optional[str] = None
     params: Dict[str, Any] = Field(default_factory=dict)
+
+
+class DynamicGenerateRequest(BaseModel):
+    shot_ids: Optional[List[str]] = None
+    all: bool = True
 
 
 class ShotVersionOut(ORMModel):
@@ -139,6 +155,7 @@ class ShotVersionOut(ORMModel):
     shot_id: str
     version: int
     status: str
+    kind: str = "clip"
     video_url: Optional[str] = None
     thumb_url: Optional[str] = None
     cost: float

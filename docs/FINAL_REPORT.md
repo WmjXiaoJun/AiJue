@@ -289,3 +289,33 @@ FastAPI (8090) ── SQLite
 - 实测（最终版）：ep_002 EN 75.95s/10.5MB、ES 75.95s/10.7MB；ep_001 EN 299.00s/34.3MB（41 条 TTS、44 条字幕、blackdetect 0）；画面包装全目标语、无中文残留；翻译 19 条≈5.5s、66 条≈12s、120 条约 22s。
   - 包装本地化已修复并复验：左上品牌 ZAOPIANJU · AI MICRO-VARIETY、右上镜头标签、名字条、片头片尾全部目标语，画面无中文残留；复验 3 个版本时长/blackdetect 0/字幕数 21/21/44 全过。
   - 截图：37_multilang_generating.png、38_multilang_en_play.png、39_ep001_en_title.png、40_ep001_en_mid.png、41_ep002_en_mid.png。
+## 24. 成片 3.0：全动态镜头（口型 / 首尾帧 / 转场，2026-10-24 深夜）
+
+### 24.1 用户反馈与根因
+- 反馈：成片里只有一个人有嘴形和动作，其它角色都是静的；还要求注意首尾帧、镜头与转镜。
+- 根因：旧版 ep_001 全片只用了 3 条 H3 镜头（每角色 1 条），其余 49 镜是静帧 + Ken Burns；且早期 H3 默认 prompt 写的是「42 岁男主持人」，会把非主持人角色也生成成男主持（已修）。
+
+### 24.2 技术方案（本轮实现）
+- 逐镜动态化：pipeline/dynamic.py 为每个镜头生成动态 clip；静帧只保留片头/片尾/花字卡。
+- 说话镜头：H3 05_ref2va（ref_image=该镜静态首帧 + ref_audio=该镜 TTS wav）→ 口型跟随 TTS；输出静音后改用原 TTS 音轨。
+- 反应/动作镜头：H3 04_i2v_fl2v（first_frame=该镜首帧，last_frame=下一镜首帧，match cut 连续）→ 首尾帧可控动作。
+- 转场：xfade（18 个预设，默认 fade 0.3s）+ whoosh 音效轨；不再全硬切静帧。
+- 每镜 TTS 单独导出 audio/shot_{sid}.wav；dynamic cache（shot/首尾帧/音频/CLI 版本 hash）；失败可回退 static。
+- H3 动态 CLI：integrations/comfyui/run_h3_ref.py（audio_ref / fl2v，中性 prompt 保持参考图角色身份）；ComfyUI 工作流 04/05 直接复用。
+- 参考库对照见 docs/REFERENCES.md（ArcReel 交互/资产先行、OpenMontage pipeline/质检、Toonflow 工作流形态；H3 节点直接用）。
+
+### 24.3 验收（ep_002，21 镜）
+- outputs/episodes/ep_e1015494fa/final_dynamic.mp4：75.95s / 1280×720 / 25fps / 11,752,877 B / blackdetect 0。
+- 动态覆盖：17 个 audio_ref（音驱动口型）+ 2 个 fl2v（首尾帧）+ 2 个片头片尾卡；19/19 非卡片镜头动态，无 static-fallback。
+- 3 角色身份正确（老周/阿栗/大魏抽帧核对），字幕与台词对齐，名字条/品牌/镜头标签由 ASS 补画；xfade 转场 20 处 + whoosh 生效。
+- 测试：pipeline 58 passed；backend 116 passed；frontend build 通过。
+- 抽帧：docs/screenshots/43_dynamic_ep002_sheet.png（t=2/10/14/22/40/65s）。
+
+### 24.4 ep_001（299s 主片）
+- 已后台启动全片动态渲染：52 镜中 44 个动态镜头（41 台词 + 反应/动作），输出 outputs/episodes/ep_001/final_dynamic.mp4；H3 单镜约 2–3.5 分钟，预计 2.5–3 小时完成（本轮结束时仍在渲染）。
+- 完成后按同标准验收：299s / blackdetect 0 / 44 动态覆盖 / 3 角色口型 / 转场 / 首尾帧连续。
+
+### 24.5 已知限制
+- H3 ref2va 输出为全画幅角色（与静态版的右侧演播厅画窗构图不同），已用 ASS 补品牌/名字条/状态；如需保持原画窗构图需二次合成或改 H3 参考图策略。
+- 目前每镜用同一中性 prompt，尚未按景别/情绪做运镜差异化（下一步可按 shot type 注入景别/机位/prompt）。
+- 口型由 TTS 音轨驱动，仍可能有轻微不同步；如需更精细可加 LatentSync/Wav2Lip 二次对齐。

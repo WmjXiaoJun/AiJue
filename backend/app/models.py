@@ -154,6 +154,13 @@ class Shot(Base):
     title = Column(String(300), nullable=True)
     subtitle = Column(String(400), nullable=True)
 
+    # 全动态分镜（contract/DYNAMIC_SHOTS.md）
+    first_frame_url = Column(String(400), nullable=True)
+    last_frame_url = Column(String(400), nullable=True)
+    h3_video_url = Column(String(400), nullable=True)
+    dynamic_mode = Column(String(32), nullable=True)  # audio_ref / fl2v / i2v / mock
+    dynamic_status = Column(String(16), nullable=False, default="none")  # none|queued|generating|ready|failed
+
     episode = relationship("Episode", back_populates="shots")
     versions = relationship(
         "ShotVersion",
@@ -178,6 +185,8 @@ class ShotVersion(Base):
     shot_id = Column(String(64), ForeignKey("shots.id", ondelete="CASCADE"), nullable=False)
     version = Column(Integer, nullable=False, default=1)
     status = Column(String(32), nullable=False, default="ready")
+    # 版本类型：clip=静态/普通片段，dynamic=H3 动态镜头
+    kind = Column(String(16), nullable=False, default="clip")
     video_url = Column(String(400), nullable=True)
     thumb_url = Column(String(400), nullable=True)
     cost = Column(Float, nullable=False, default=0.0)

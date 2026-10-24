@@ -13,6 +13,7 @@
 - 后端：FastAPI + SQLite，任务后台线程，角色工坊 API，ComfyUI(MiniMax H3) 适配器 + mock provider
 - 角色：studio3d（Blender 程序化 3D/2D）+ studio2d（Pillow 2D）+ **imagegen（SDXL 动漫 AI 概念图，30 张）**
 - 真实生成：integrations/comfyui（本机 MiniMax H3 int8 + 4step turbo，768²/5.17s 动漫镜头；生产默认）
+- 全动态成片：pipeline/dynamic.py（H3 音驱动口型 ref2va + 首尾帧 fl2v + xfade 转场 + whoosh），静帧只用于片头尾/花字
 - 快速测试：integrations/metaso（MetaSo 云端 MiniMax H3 API，5s 约 23–25s，测试用，可切换）
 - 图像生成：imagegen（SDXL 动漫 Animagine XL 4.0，文生角色概念图/三视图/表情 + **IP-Adapter 一致性三视图/表情**）
 - 导出：pipeline/capcut.py（pyJianYingDraft，剪映草稿 52 段）

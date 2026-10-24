@@ -877,6 +877,9 @@ def generate_mock_clip(spec: dict, out_path, scratch_dir,
     shot = dict(spec.get("shot") or {})
     assets = list(spec.get("assets") or [])
     episode = dict(spec.get("episode") or {})
+    # 集号传播（片头/片尾的 EP.xxx 文案；localize 已按集号写入 shot）
+    if not shot.get("episode_no") and episode.get("no"):
+        shot["episode_no"] = int(episode.get("no"))
     res = resolution or episode.get("resolution") or config.RESOLUTION
     width, height = utils.parse_resolution(res)
     fps = int(fps or episode.get("fps") or config.FPS)

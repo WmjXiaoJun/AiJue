@@ -293,6 +293,42 @@ export const VERSION_STATUS_LABEL: Record<string, string> = {
   failed: "失败",
 };
 
+/** 动态镜头版本类型（contract/DYNAMIC_SHOTS.md） */
+export const VERSION_KIND_LABEL: Record<string, string> = {
+  audio_ref: "口型动态",
+  ref2va: "口型动态",
+  fl2v: "首尾帧动态",
+  i2v: "图生视频",
+  h3: "H3 动态",
+  dynamic: "动态",
+  static: "静态",
+};
+
+export function versionKind(version: { kind?: string | null; params?: Record<string, unknown> | null }): string {
+  const raw =
+    version.kind ||
+    (typeof version.params?.mode === "string" ? version.params.mode : "") ||
+    (typeof version.params?.kind === "string" ? version.params.kind : "") ||
+    "";
+  return raw.toLowerCase();
+}
+
+export function versionKindLabel(version: { kind?: string | null; params?: Record<string, unknown> | null }): string {
+  const kind = versionKind(version);
+  return VERSION_KIND_LABEL[kind] || (kind ? kind : "静态");
+}
+
+/** 镜头是否已具备动态版本（H3 视频或动态生成模式） */
+export function isShotDynamic(shot: {
+  h3_video_url?: string | null;
+  dynamic_ready?: boolean | null;
+  generate_mode?: string | null;
+}): boolean {
+  if (shot.h3_video_url || shot.dynamic_ready) return true;
+  const mode = String(shot.generate_mode || "").toLowerCase();
+  return mode !== "" && mode !== "static" && mode !== "mock";
+}
+
 /** 镜头类型的主色（分镜宫格 / 时间线等使用） */
 export const TYPE_ACCENT: Record<string, string> = {
   title_card: "#F5C518",

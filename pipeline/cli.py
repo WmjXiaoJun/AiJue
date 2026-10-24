@@ -125,6 +125,19 @@ def build_parser() -> argparse.ArgumentParser:
     p_render.add_argument("--force", action="store_true", help="忽略缓存重新生成")
     p_render.add_argument("--use-h3", action="store_true", default=False,
                           help="尝试用 outputs/h3/<sid>.mp4 的真实 H3 镜头替换对应镜头（默认关）")
+    p_render.add_argument("--dynamic", action="store_true", default=False,
+                          help="动态镜头模式：每镜调 H3 ref CLI 生成音驱动/首尾帧动态 clip")
+    p_render.add_argument("--dynamic-fallback-static", action="store_true", default=False,
+                          help="H3 CLI 不可用时回退静态 clips（调试用）")
+    p_render.add_argument("--h3-ref-cli", default=None,
+                          help="H3 动态 CLI 路径（默认 integrations/comfyui/run_h3_ref.py）")
+    p_render.add_argument("--transitions", default="cut", choices=["cut", "xfade"],
+                          help="镜头拼接方式：cut 硬切（默认）/ xfade 转场")
+    p_render.add_argument("--transition-style", default="fade",
+                          choices=sorted(__import__("pipeline.render", fromlist=["TRANSITION_PRESETS"]).TRANSITION_PRESETS),
+                          help="xfade 转场预设")
+    p_render.add_argument("--transition-duration", type=float, default=0.30,
+                          help="xfade 转场时长（秒，建议 0.2-0.4）")
     p_render.set_defaults(func=cmd_render)
     return parser
 

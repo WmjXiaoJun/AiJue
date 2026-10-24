@@ -65,6 +65,16 @@ _MIGRATIONS = {
     "episodes": {
         "script": "TEXT NOT NULL DEFAULT ''",
     },
+    "shots": {
+        "first_frame_url": "VARCHAR(400)",
+        "last_frame_url": "VARCHAR(400)",
+        "h3_video_url": "VARCHAR(400)",
+        "dynamic_mode": "VARCHAR(32)",
+        "dynamic_status": "VARCHAR(16) NOT NULL DEFAULT 'none'",
+    },
+    "shot_versions": {
+        "kind": "VARCHAR(16) NOT NULL DEFAULT 'clip'",
+    },
     "settings": {
         "h3_provider": "VARCHAR(16) NOT NULL DEFAULT 'local'",
         "metaso_base_url": "VARCHAR(300) NOT NULL DEFAULT 'https://metaso.cn/api/minimax'",
@@ -105,6 +115,17 @@ def migrate_columns() -> None:
                     "UPDATE characters SET concept_expressions = '{}' "
                     "WHERE concept_expressions IS NULL"
                 )
+            )
+    # 动态镜头列老数据兜底
+    if "shots" in tables:
+        with engine.begin() as connection:
+            connection.execute(
+                text("UPDATE shots SET dynamic_status = 'none' WHERE dynamic_status IS NULL OR dynamic_status = ''")
+            )
+    if "shot_versions" in tables:
+        with engine.begin() as connection:
+            connection.execute(
+                text("UPDATE shot_versions SET kind = 'clip' WHERE kind IS NULL OR kind = ''")
             )
     # 台本列老数据兜底
     if "episodes" in tables:

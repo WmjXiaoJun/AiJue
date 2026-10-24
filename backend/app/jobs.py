@@ -31,6 +31,7 @@ GPU_LOCK = threading.Lock()
 H3_TIMEOUT_SECONDS = 20 * 60  # 本地 H3 长任务超时（契约要求 >= 15 分钟）
 METASO_TIMEOUT_SECONDS = 300  # MetaSo 云端测试 provider 超时（实测单条 ~23-25s）
 LOCALIZE_TIMEOUT_SECONDS = 1800  # 多语种本地化（翻译 + TTS + 混音 + 编码）
+DYNAMIC_TIMEOUT_SECONDS = 1800  # 全动态镜头（H3 动态/口型生成）
 
 
 def utcnow():
@@ -255,7 +256,10 @@ def run_job(job_id: str) -> None:
             if job.status in ("done", "failed", "canceled"):
                 return
             if job.type == "shot":
-                run_shot_job(db, job)
+                if str((job.params or {}).get("mode") or "").strip().lower() == "dynamic":
+                    run_dynamic_shot_job(db, job)
+                else:
+                    run_shot_job(db, job)
             elif job.type == "render":
                 run_render_job(db, job)
             elif job.type == "character":
@@ -284,7 +288,10 @@ def _mark_failed_isolated(job_id: str, exc: Exception) -> None:
                 if job.type == "shot" and job.shot_id:
                     shot = db.get(models.Shot, job.shot_id)
                     if shot is not None:
-                        shot.status = "failed"
+                        if str((job.params or {}).get("mode") or "").strip().lower() == "dynamic":
+                            shot.dynamic_status = "failed"
+                        else:
+                            shot.status = "failed"
                 if job.type == "render" and job.episode_id:
                     episode = db.get(models.Episode, job.episode_id)
                     if episode is not None:
@@ -326,6 +333,12 @@ def _shot_payload(shot: models.Shot) -> Dict[str, Any]:
         "selected_version_id": shot.selected_version_id,
         "title": shot.title,
         "subtitle": shot.subtitle,
+        # 全动态分镜（contract/DYNAMIC_SHOTS.md）
+        "first_frame_url": shot.first_frame_url,
+        "last_frame_url": shot.last_frame_url,
+        "h3_video_url": shot.h3_video_url,
+        "dynamic_mode": shot.dynamic_mode,
+        "dynamic_status": shot.dynamic_status,
     }
 
 
@@ -717,6 +730,167 @@ def run_render_job(db, job: models.Job) -> None:
     episode.progress = 100.0
     db.commit()
     logger.info("render 任务完成: job=%s episode=%s path=%s", job.id, episode.id, out_path)
+
+
+# --------------------------------------------------------------------------- #
+# 动态镜头任务（contract/DYNAMIC_SHOTS.md；media 的 dynamic CLI 就绪后替换占位）
+# --------------------------------------------------------------------------- #
+def _dynamic_cli_cmd(spec_path: Path, out_path: Path) -> List[str]:
+    """动态镜头 CLI 占位。
+
+    TODO(task-31): media-render 的 dynamic CLI 名称/参数确定后，只改这一个函数。
+    占位约定：python -m pipeline.dynamic --spec <json> --out <mp4>
+    """
+    return [
+        sys.executable,
+        "-m",
+        "pipeline.dynamic",
+        "--spec",
+        str(spec_path),
+        "--out",
+        str(out_path),
+    ]
+
+
+def _build_dynamic_spec(db, shot: models.Shot, episode: models.Episode, params, setting) -> Dict[str, Any]:
+    setting_mode = (setting.generation_mode or "mock").strip().lower()
+    if setting_mode not in ("mock", "comfyui"):
+        setting_mode = "mock"
+    spec = _build_shot_spec(db, shot, episode, setting_mode, params, setting)
+    spec["mode"] = "dynamic"
+    spec["dynamic"] = {
+        "first_frame_url": shot.first_frame_url,
+        "last_frame_url": shot.last_frame_url,
+        "speaker": shot.speaker,
+        "speaker_name": shot.speaker_name,
+        "line": shot.line,
+        "duration": shot.duration,
+        "params": params,
+    }
+    return spec
+
+
+def run_dynamic_shot_job(db, job: models.Job) -> None:
+    shot = db.get(models.Shot, job.shot_id) if job.shot_id else None
+    if shot is None:
+        _fail(db, job, "镜头不存在，无法生成动态版")
+        return
+    episode = db.get(models.Episode, shot.episode_id)
+    if episode is None:
+        _fail(db, job, "镜头所属集不存在")
+        return
+
+    setting = seed.get_settings(db)
+    params = dict(job.params or {})
+    dynamic_mode = str(params.get("dynamic_mode") or "").strip() or None
+    setting_mode = (setting.generation_mode or "mock").strip().lower()
+    if setting_mode not in ("mock", "comfyui"):
+        setting_mode = "mock"
+
+    _update(db, job, status="running", progress=3, message=f"准备动态镜头 {shot.id}")
+    shot.dynamic_status = "generating"
+    db.commit()
+
+    spec = _build_dynamic_spec(db, shot, episode, params, setting)
+    config.JOBS_TMP_DIR.mkdir(parents=True, exist_ok=True)
+    spec_path = config.JOBS_TMP_DIR / f"{job.id}_dynamic.json"
+    spec_path.write_text(json.dumps(spec, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    out_path = config.OUTPUTS_DIR / "episodes" / episode.id / "shots" / f"{shot.id}_dynamic.mp4"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    cmd = _dynamic_cli_cmd(spec_path, out_path)
+
+    _update(db, job, progress=10, message="调用 pipeline dynamic（占位）")
+    db.commit()
+    try:
+        returncode, stdout_lines, stderr_text = run_cli(
+            cmd, timeout=DYNAMIC_TIMEOUT_SECONDS
+        )
+    except Exception as exc:  # noqa: BLE001 - CLI 无法启动
+        shot.dynamic_status = "failed"
+        _fail(db, job, f"dynamic CLI 启动失败: {exc}")
+        return
+    if returncode != 0:
+        shot.dynamic_status = "failed"
+        _fail(
+            db,
+            job,
+            _format_error("pipeline.dynamic", returncode, stderr_text, stdout_lines),
+        )
+        return
+
+    result = _last_json(stdout_lines)
+    actual_path = out_path
+    if not actual_path.exists():
+        reported = result.get("path")
+        if reported:
+            candidate = Path(str(reported))
+            if not candidate.is_absolute():
+                candidate = config.REPO_ROOT / candidate
+            if candidate.exists():
+                actual_path = candidate
+    if not actual_path.exists():
+        shot.dynamic_status = "failed"
+        _fail(
+            db,
+            job,
+            f"dynamic CLI 未产出视频文件: {out_path}"
+            "（占位 CLI 待 media 接入，见 jobs._dynamic_cli_cmd / pipeline.dynamic）",
+        )
+        return
+
+    duration = float(result.get("duration") or shot.duration or 0.0)
+    provider = str(result.get("provider") or "pipeline.dynamic")
+    resolved_mode = str(result.get("dynamic_mode") or dynamic_mode or "audio_ref")
+    if setting_mode == "mock":
+        cost = 0.0
+    else:
+        cost = round(float(setting.h3_price_per_second or 0.0) * duration, 4)
+
+    latest = (
+        db.query(func.max(models.ShotVersion.version))
+        .filter(models.ShotVersion.shot_id == shot.id)
+        .scalar()
+        or 0
+    )
+    version = models.ShotVersion(
+        id=models.new_id("sv"),
+        shot_id=shot.id,
+        version=int(latest) + 1,
+        status="ready",
+        kind="dynamic",
+        video_url=config.media_url(actual_path),
+        thumb_url=None,
+        cost=cost,
+        params={
+            "provider": provider,
+            "mode": "dynamic",
+            "dynamic_mode": resolved_mode,
+            "duration": duration,
+            "params": params,
+        },
+    )
+    db.add(version)
+    db.flush()
+
+    # 保留静态版本作为回退/对比：不改 selected_version_id，动态版单独回填 h3_video_url
+    shot.h3_video_url = version.video_url
+    shot.dynamic_mode = resolved_mode
+    shot.dynamic_status = "ready"
+    _update(
+        db,
+        job,
+        status="done",
+        progress=100,
+        message=f"镜头 {shot.id} 动态版生成完成（{resolved_mode}）",
+        output_url=version.video_url,
+        cost=cost,
+        error=None,
+    )
+    db.commit()
+    logger.info(
+        "dynamic shot 任务完成: job=%s shot=%s version=%s", job.id, shot.id, version.id
+    )
 
 
 # --------------------------------------------------------------------------- #
@@ -1601,8 +1775,9 @@ def run_export_job(db, job: models.Job) -> None:
 # 入队 / 重试
 # --------------------------------------------------------------------------- #
 def enqueue_shot_job(db, shot: models.Shot, params: Optional[Dict[str, Any]] = None):
-    """入队 shot 任务；同一镜头已有排队/运行任务时复用。返回 (job, created)。"""
-    active = (
+    """入队静态 shot 任务；同一镜头已有静态排队/运行任务时复用。返回 (job, created)。"""
+    active = None
+    for candidate in (
         db.query(models.Job)
         .filter(
             models.Job.shot_id == shot.id,
@@ -1610,8 +1785,11 @@ def enqueue_shot_job(db, shot: models.Shot, params: Optional[Dict[str, Any]] = N
             models.Job.status.in_(ACTIVE_STATUSES),
         )
         .order_by(models.Job.created_at.desc())
-        .first()
-    )
+        .all()
+    ):
+        if str((candidate.params or {}).get("mode") or "").strip().lower() != "dynamic":
+            active = candidate
+            break
     if active is not None:
         return active, False
 
@@ -1627,6 +1805,46 @@ def enqueue_shot_job(db, shot: models.Shot, params: Optional[Dict[str, Any]] = N
     )
     db.add(job)
     shot.status = "queued"
+    db.commit()
+    dispatch(job.id)
+    return job, True
+
+
+def enqueue_dynamic_shot_job(
+    db, shot: models.Shot, params: Optional[Dict[str, Any]] = None
+):
+    """入队动态镜头任务；同一镜头已有动态排队/运行任务时复用。返回 (job, created)。"""
+    active = None
+    for candidate in (
+        db.query(models.Job)
+        .filter(
+            models.Job.shot_id == shot.id,
+            models.Job.type == "shot",
+            models.Job.status.in_(ACTIVE_STATUSES),
+        )
+        .order_by(models.Job.created_at.desc())
+        .all()
+    ):
+        if str((candidate.params or {}).get("mode") or "").strip().lower() == "dynamic":
+            active = candidate
+            break
+    if active is not None:
+        return active, False
+
+    job_params = dict(params or {})
+    job_params["mode"] = "dynamic"
+    job = models.Job(
+        id=models.new_id("job"),
+        type="shot",
+        status="queued",
+        progress=0.0,
+        message="动态镜头排队中",
+        episode_id=shot.episode_id,
+        shot_id=shot.id,
+        params=job_params,
+    )
+    db.add(job)
+    shot.dynamic_status = "queued"
     db.commit()
     dispatch(job.id)
     return job, True
@@ -1676,7 +1894,10 @@ def retry_job(db, job: models.Job):
     if job.type == "shot" and job.shot_id:
         shot = db.get(models.Shot, job.shot_id)
         if shot is not None:
-            shot.status = "queued"
+            if str((job.params or {}).get("mode") or "").strip().lower() == "dynamic":
+                shot.dynamic_status = "queued"
+            else:
+                shot.status = "queued"
     if job.type == "render" and job.episode_id:
         episode = db.get(models.Episode, job.episode_id)
         if episode is not None:

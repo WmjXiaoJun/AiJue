@@ -29,6 +29,21 @@ LOG = logging.getLogger("pipeline")
 CLIP_WORKERS = 6
 AUDIO_WORKERS = 8
 CLIP_VERSION = "mock-v13-l10n"
+
+# ---- 动态镜头 / 转场（contract/DYNAMIC_SHOTS.md）----
+# xfade 预设（ffmpeg 6.1 支持；10+ 可配置），默认 0.30s
+TRANSITION_PRESETS = {
+    "fade": "fade", "dissolve": "dissolve", "fadeblack": "fadeblack",
+    "fadewhite": "fadewhite", "wipeleft": "wipeleft", "wiperight": "wiperight",
+    "slideleft": "slideleft", "slideright": "slideright",
+    "smoothleft": "smoothleft", "smoothright": "smoothright",
+    "circleopen": "circleopen", "circleclose": "circleclose",
+    "radial": "radial", "pixelize": "pixelize", "hblur": "hblur",
+    "diagtl": "diagtl", "diagbr": "diagbr", "zoomin": "zoomin",
+}
+TRANSITION_DURATION = 0.30
+TRANSITION_WHOOSH_VOLUME = 0.55
+DYNAMIC_STATIC_TYPES = ("title_card", "end_card", "meme_card")
 TTS_LEAD_IN = 0.15
 BGM_DURATION = 32.0
 
@@ -221,6 +236,8 @@ def ensure_clip(shot: dict, assets: list, episode: dict, workdir: Path,
             "aspect": (episode.get("aspect") or "16:9"),
             "resolution": f"{width}x{height}",
             "fps": fps,
+            "no": episode.get("no"),
+            "title": episode.get("title"),
         },
         "mode": "mock",
         "params": {},
@@ -414,8 +431,16 @@ def build_shot_audio(shot: dict, tts_info: dict, duration: float, workdir: Path,
 # Stage 4/6: 拼接
 # --------------------------------------------------------------------------
 def concat_video(shots: list, workdir: Path, fps: int,
-                 total_duration: float) -> Path:
-    lines = [f"file 'clips/{_shot_id(shot)}.mp4'" for shot in shots]
+                 total_duration: float,
+                 clip_paths: dict | None = None) -> Path:
+    if clip_paths:
+        lines = []
+        for shot in shots:
+            sid = _shot_id(shot)
+            path = Path(clip_paths.get(sid) or (workdir / "clips" / f"{sid}.mp4")).resolve()
+            lines.append("file '" + str(path).replace("'", "'\\''") + "'")
+    else:
+        lines = [f"file 'clips/{_shot_id(shot)}.mp4'" for shot in shots]
     utils.write_text(workdir / "concat_video.txt", "\n".join(lines) + "\n")
     out = workdir / "video_raw.mp4"
     utils.ffmpeg([
@@ -452,6 +477,117 @@ def concat_audio(shots: list, workdir: Path, total_duration: float) -> Path:
         "-i", str(raw), "-af", "apad", "-t", f"{total_duration:.3f}",
         "-ar", str(config.SAMPLE_RATE), "-ac", "2", "-c:a", "pcm_s16le", str(out),
     ], cwd=workdir)
+    return out
+
+
+def export_shot_tts_audio(shots: list, workdir: Path) -> dict:
+    """把每镜音轨导出为 audio/shot_{sid}.wav（H3 音驱动口型输入），保留 narration.wav。"""
+    src_dir = workdir / "audio"
+    out: dict[str, str] = {}
+    for shot in shots or []:
+        sid = _shot_id(shot)
+        src = src_dir / f"{sid}.wav"
+        if not _valid_file(src, 100):
+            continue
+        dst = src_dir / f"shot_{sid}.wav"
+        try:
+            if not _valid_file(dst, 100) or dst.stat().st_size != src.stat().st_size:
+                try:
+                    os.link(src, dst)
+                except OSError:
+                    shutil.copyfile(src, dst)
+        except OSError as exc:  # noqa: BLE001
+            LOG.warning("导出每镜 TTS 失败 %s: %s", sid, exc)
+            continue
+        out[sid] = str(dst)
+    return out
+
+
+def build_transition_sfx(workdir: Path, times: list[float], whoosh: Path | None,
+                         total_duration: float,
+                         volume: float = TRANSITION_WHOOSH_VOLUME) -> Path | None:
+    """按转场时间点把 whoosh 音效铺成一条转场音轨（叠加到成片音频）。"""
+    if not times or not whoosh or not _valid_file(whoosh, 512):
+        return None
+    n = len(times)
+    out = utils.ensure_dir(workdir / "sfx") / "transitions.wav"
+    fc = [f"[0:a]asplit={n}" + "".join(f"[w{i}]" for i in range(n))]
+    for i, sec in enumerate(times):
+        ms = max(0, int(round(float(sec) * 1000)))
+        fc.append(f"[w{i}]adelay={ms}|{ms}[d{i}]")
+    # 用整段静音作为基底，保证转场音轨严格等于成片时长
+    fc.append("[1:a]volume=0[base]")
+    fc.append("[base]" + "".join(f"[d{i}]" for i in range(n))
+              + f"amix=inputs={n + 1}:duration=first:normalize=0,"
+                f"volume={volume},aresample={config.SAMPLE_RATE},"
+                f"atrim=0:{total_duration:.3f}[tsx]")
+    try:
+        utils.ffmpeg(["-i", str(whoosh),
+                      "-f", "lavfi", "-i",
+                      f"anullsrc=r={config.SAMPLE_RATE}:cl=stereo:d={total_duration:.3f}",
+                      "-filter_complex", ";".join(fc),
+                      "-map", "[tsx]", "-t", f"{total_duration:.3f}",
+                      "-ar", str(config.SAMPLE_RATE), "-ac", "2",
+                      "-c:a", "pcm_s16le", str(out)])
+        return out
+    except Exception as exc:  # noqa: BLE001
+        LOG.warning("转场 whoosh 生成失败（将不加转场音效）: %s", exc)
+        return None
+
+
+def concat_video_xfade(shots: list, clip_paths: dict, workdir: Path, fps: int,
+                       width: int, height: int, total_duration: float,
+                       transition: str = "fade",
+                       transition_duration: float = TRANSITION_DURATION,
+                       prog=None) -> Path:
+    """用 xfade 拼接镜头（保留总时长；每镜头部冻结 transition_duration 供转场重叠）。"""
+    if len(shots) < 2:
+        return concat_video(shots, workdir, fps, total_duration)
+    style = TRANSITION_PRESETS.get(str(transition or "fade"), str(transition or "fade"))
+    durations = [max(0.5, _shot_duration(s)) for s in shots]
+    td = max(0.0, min(float(transition_duration), 0.8, min(durations) * 0.5))
+    out = workdir / "video_raw.mp4"
+    inputs: list[str] = []
+    fc: list[str] = []
+    for i, shot in enumerate(shots):
+        sid = _shot_id(shot)
+        src = clip_paths.get(sid)
+        if src is None:
+            src = workdir / "clips" / f"{sid}.mp4"
+        inputs += ["-i", str(Path(src).resolve())]
+        d = durations[i]
+        fc.append(
+            f"[{i}:v]fps={fps},"
+            f"scale={width}:{height}:force_original_aspect_ratio=increase,"
+            f"crop={width}:{height},setsar=1,"
+            f"trim=0:{d:.3f},setpts=PTS-STARTPTS,"
+            f"tpad=start_mode=clone:start_duration={td:.3f}[v{i}]"
+        )
+    prev = "v0"
+    cum = durations[0]
+    for i in range(1, len(shots)):
+        label = f"x{i}"
+        fc.append(f"[{prev}][v{i}]xfade=transition={style}:"
+                  f"duration={td:.3f}:offset={cum:.3f}[{label}]")
+        prev = label
+        cum += durations[i]
+        if prog is not None:
+            prog(68 + 2.0 * (i + 1) / max(1, len(shots) - 1), f"转场拼接 {i + 1}/{len(shots)}")
+    fc.append(f"[{prev}]trim=0:{total_duration:.3f},setpts=PTS-STARTPTS,"
+              f"format=yuv420p[v]")
+    args = inputs + [
+        "-filter_complex", ";".join(fc),
+        "-map", "[v]", "-an",
+        "-c:v", "libx264", "-preset", config.X264_PRESET,
+        "-crf", config.X264_CRF, "-pix_fmt", "yuv420p",
+        "-r", str(fps), str(out),
+    ]
+    utils.ffmpeg(args, cwd=workdir)
+    dur = utils.probe_duration(out)
+    if abs(dur - total_duration) > 0.6:
+        LOG.warning("xfade 时长偏差 %.2fs（期望 %.2fs）", dur - total_duration, total_duration)
+    LOG.info("xfade 拼接完成: %.2fs（%s %.2fs，%d 镜头）",
+             dur, style, td, len(shots))
     return out
 
 
@@ -567,29 +703,47 @@ def _run_ffmpeg_progress(args: list, cwd: Path, prog, pct0: float, pct1: float,
 
 def final_encode(workdir: Path, out: Path, total_duration: float, fps: int,
                  width: int, height: int, bgm: Path | None, has_ass: bool,
-                 prog, pct0: float, pct1: float) -> None:
+                 prog, pct0: float, pct1: float,
+                 transition_sfx: Path | None = None) -> None:
     inputs = ["-i", "video_raw.mp4", "-i", "audio/narration.wav"]
     fc: list[str] = []
     if has_ass:
         fc.append("[0:v]ass=filename=final.ass:fontsdir=fonts[v]")
     else:
         fc.append("[0:v]null[v]")
+    next_idx = 2
+    bgm_idx = None
+    tsx_idx = None
     if bgm is not None:
         inputs += ["-stream_loop", "-1", "-i", str(bgm)]
-        fc.append("[1:a]volume=1.0[nar]")
+        bgm_idx = next_idx
+        next_idx += 1
+    if transition_sfx is not None:
+        inputs += ["-i", str(transition_sfx)]
+        tsx_idx = next_idx
+        next_idx += 1
+    if bgm_idx is None and tsx_idx is None:
         fc.append(
-            f"[2:a]volume={config.BGM_VOLUME},atrim=0:{total_duration:.3f},"
-            f"afade=t=in:st=0:d=2,"
-            f"afade=t=out:st={max(0.0, total_duration - 4.0):.3f}:d=4[bg]"
-        )
-        fc.append(
-            "[nar][bg]amix=inputs=2:duration=first:normalize=0,"
+            "[1:a]volume=1.0,"
             f"loudnorm=I={config.LUFS_TARGET}:TP=-1.5:LRA=11,"
             f"aresample={config.SAMPLE_RATE}[a]"
         )
     else:
+        fc.append("[1:a]volume=1.0[nar]")
+        parts = ["[nar]"]
+        if bgm_idx is not None:
+            fc.append(
+                f"[{bgm_idx}:a]volume={config.BGM_VOLUME},"
+                f"atrim=0:{total_duration:.3f},"
+                f"afade=t=in:st=0:d=2,"
+                f"afade=t=out:st={max(0.0, total_duration - 4.0):.3f}:d=4[bg]"
+            )
+            parts.append("[bg]")
+        if tsx_idx is not None:
+            fc.append(f"[{tsx_idx}:a]volume=0.85,atrim=0:{total_duration:.3f}[tsx]")
+            parts.append("[tsx]")
         fc.append(
-            "[1:a]volume=1.0,"
+            "".join(parts) + f"amix=inputs={len(parts)}:duration=first:normalize=0,"
             f"loudnorm=I={config.LUFS_TARGET}:TP=-1.5:LRA=11,"
             f"aresample={config.SAMPLE_RATE}[a]"
         )
@@ -718,9 +872,57 @@ def run_render(args) -> int:
     audio_reused = sum(1 for r in audio_results.values() if r.get("reused"))
     LOG.info("镜头音轨: %d 个（复用 %d）", len(audio_results), audio_reused)
 
-    # ---- 4) 拼接视频 ---------------------------------------------------
-    prog(68, "拼接视频片段")
-    video_raw = concat_video(shots, workdir, fps, total_duration)
+    # ---- 3.5) 每镜 TTS wav（供 H3 音驱动口型）----
+    shot_tts_map = export_shot_tts_audio(shots, workdir)
+    LOG.info("每镜 TTS wav: %d 条（audio/shot_{{sid}}.wav）", len(shot_tts_map))
+
+    # ---- 4) 动态镜头（可选）----
+    dynamic_results: dict[str, dict] = {}
+    dyn_summary = {"shots": 0, "modes": {}, "reused": 0, "dynamic": 0}
+    use_dynamic = bool(getattr(args, "dynamic", False))
+    if use_dynamic:
+        from . import dynamic as dynamic_mod
+        prog(65, "生成动态镜头（H3 音驱动 / 首尾帧）")
+        dynamic_results = dynamic_mod.ensure_dynamic_clips(
+            data, shots, assets, workdir, width, height, fps,
+            char_map=char_map, tts_map=shot_tts_map, force=force,
+            cli=getattr(args, "h3_ref_cli", None),
+            fallback_static=bool(getattr(args, "dynamic_fallback_static", False)),
+            progress=prog,
+        )
+        dyn_summary = dynamic_mod.dynamic_summary(dynamic_results)
+        LOG.info("动态镜头: %s", dyn_summary)
+
+    clip_paths: dict[str, Path] = {}
+    for shot in shots:
+        sid = _shot_id(shot)
+        info = dynamic_results.get(sid)
+        clip_paths[sid] = (Path(info["path"]) if info and info.get("path")
+                           else (workdir / "clips" / f"{sid}.mp4"))
+
+    # ---- 4.5) 拼接视频（硬切 / xfade 转场）----
+    transition_mode = str(getattr(args, "transitions", "cut") or "cut")
+    transition_style = str(getattr(args, "transition_style", "fade") or "fade")
+    transition_duration = float(getattr(args, "transition_duration", 0.0)
+                                or TRANSITION_DURATION)
+    transition_whoosh = None
+    if transition_mode == "xfade":
+        prog(68, "xfade 转场拼接")
+        transition_times: list[float] = []
+        cum = 0.0
+        for shot in shots[:-1]:
+            cum += _shot_duration(shot)
+            transition_times.append(round(cum, 3))
+        video_raw = concat_video_xfade(shots, clip_paths, workdir, fps, width, height,
+                                       total_duration, transition=transition_style,
+                                       transition_duration=transition_duration,
+                                       prog=prog)
+        transition_whoosh = build_transition_sfx(
+            workdir, transition_times, sfx.get("whoosh"), total_duration)
+    else:
+        prog(68, "拼接视频片段")
+        video_raw = concat_video(shots, workdir, fps, total_duration,
+                                 clip_paths=clip_paths)
     LOG.info("video_raw: %s (%.2fs)", video_raw, utils.probe_duration(video_raw))
 
     # ---- 5) ASS --------------------------------------------------------
@@ -737,10 +939,13 @@ def run_render(args) -> int:
     ass_episode["segments"] = segments
     char_shot_ids = {sid for sid, res in clip_results.items()
                      if res.get("character")}
+    dynamic_shot_ids = {sid for sid, info in dynamic_results.items()
+                        if str(info.get("mode") or "") in ("audio_ref", "fl2v")}
     ass_info = ass_builder.build_ass(
         ass_episode, timings, assets, font_info,
         workdir / "final.ass", width=width, height=height,
         char_shot_ids=char_shot_ids,
+        dynamic_shot_ids=dynamic_shot_ids,
     )
 
     # ---- 6) 拼接音轨 ---------------------------------------------------
@@ -758,7 +963,8 @@ def run_render(args) -> int:
     prog(78, "编码成片（烧字幕 + 混音 + loudnorm）")
     final_encode(workdir, out, total_duration, fps, width, height,
                  bgm_path, has_ass=ass_info["events"] > 0,
-                 prog=prog, pct0=78, pct1=99)
+                 prog=prog, pct0=78, pct1=99,
+                 transition_sfx=transition_whoosh)
 
     # ---- 校验与摘要 ----------------------------------------------------
     info = utils.probe_video(out)
@@ -786,6 +992,12 @@ def run_render(args) -> int:
         "audio_reused": audio_reused,
         "bgm": bgm_path is not None,
         "ass_events": ass_info["events"],
+        "shot_tts_wavs": len(shot_tts_map),
+        "dynamic": dyn_summary,
+        "transition": {"mode": transition_mode, "style": transition_style,
+                       "duration": transition_duration,
+                       "xfade": transition_mode == "xfade",
+                       "whoosh": transition_whoosh is not None},
         "workdir": str(workdir),
     }
     utils.write_json(workdir / "manifest.json", summary)

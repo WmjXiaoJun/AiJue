@@ -124,6 +124,14 @@ export interface Shot {
   selected_version_id?: string | null;
   /** 后端在镜头就绪后回填当前选用版本的视频地址 */
   video_url?: string | null;
+  /** 动态镜头（contract/DYNAMIC_SHOTS.md）：H3 动态版本 / 首尾帧 / 生成模式 */
+  h3_video_url?: string | null;
+  first_frame_url?: string | null;
+  last_frame_url?: string | null;
+  first_frame?: string | null;
+  last_frame?: string | null;
+  generate_mode?: string | null;
+  dynamic_ready?: boolean | null;
   title?: string;
   subtitle?: string;
 }
@@ -137,6 +145,8 @@ export interface ShotVersion {
   thumb_url?: string | null;
   cost?: number;
   params?: Record<string, unknown> | null;
+  /** 版本类型：audio_ref（口型动态）/ fl2v / i2v / dynamic / static */
+  kind?: string | null;
   created_at: string;
 }
 

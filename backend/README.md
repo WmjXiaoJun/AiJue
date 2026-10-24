@@ -201,6 +201,25 @@ portrait_url,sheet_url,turntable_url,expressions,status,created_at}
 - 多语种本地化：localize_langs（默认 ["en","es"]）、localize_translator（ollama 默认，本机
   qwen2.5:7b | nllb 兜底 | mock 测试）、localize_voices（JSON，按语言覆盖音色，可空）。
 
+## 全动态分镜（contract/DYNAMIC_SHOTS.md）
+
+- Shot 新增字段：first_frame_url / last_frame_url / h3_video_url / dynamic_mode
+  （audio_ref|fl2v|i2v|mock）/ dynamic_status（none|queued|generating|ready|failed）；
+  ShotVersion 新增 kind（clip|dynamic）。老库启动自动 ALTER TABLE 迁移并回填默认值。
+- PATCH /api/shots/{sid} 支持设置 first_frame_url / last_frame_url（首尾帧来源，可选）。
+- POST /api/shots/{sid}/generate {mode?}：mode 缺省/static 仍走原 gen-shot；mode="dynamic"
+  走动态镜头任务；非法 mode 400。静态/动态任务互不复用（各自 active 去重）。
+- POST /api/episodes/{eid}/shots/generate-dynamic {shot_ids?|all:true}：批量逐镜入队
+  Job(type=shot, params.mode=dynamic)，返回 Job[]；重复调用复用已有动态任务。
+- 动态任务：序列化 spec（含首尾帧/角色/TTS 信息）到 backend/data/jobs/{job}_dynamic.json，
+  调用占位 CLI（media 的 dynamic CLI 确定后只需替换 jobs._dynamic_cli_cmd 一处）：
+  python -m pipeline.dynamic --spec <json> --out outputs/episodes/{eid}/shots/{sid}_dynamic.mp4
+  注：media 当前提供的是整片动态（pipeline.cli render --dynamic），单镜 dynamic CLI 待其
+  提供/确认；未接入前动态任务会 failed 并给出可读提示，不影响静态 gen-shot 与渲染主流程。
+- 成功：写 ShotVersion(kind=dynamic, params.mode=dynamic/dynamic_mode) 并回填
+  Shot.h3_video_url / dynamic_mode / dynamic_status=ready；不改 selected_version_id，
+  保留静态版本作回退/对比。失败：Job.failed + error，Shot.dynamic_status=failed，不崩。
+
 ## 多语种本地化（contract/LOCALIZATION.md）
 
 同一成片一键产出多语配音 + 字幕版本（不改画面）。支持 en（主发）/ es / ja / ko / pt。
@@ -270,8 +289,8 @@ portrait_url,sheet_url,turntable_url,expressions,status,created_at}
 角色工坊 CRUD/资产联动/files/生成任务（tests/test_characters.py）、
 概念图/H3/剪映导出（tests/test_concept.py）、H3 provider 分派与 settings/key 掩码
 （tests/test_h3_provider.py）、台本解析/分镜生成/镜头增删/集创建/render 序列化
-（tests/test_script.py）、多语种本地化 enqueue/回填/失败/settings（tests/test_localization.py）、
-ComfyUI 适配器 mock。
+（tests/test_script.py）、多语种本地化 enqueue/回填/失败/settings（tests/test_localization.py）、全动态分镜字段/单镜 dynamic/失败/批量/首尾帧 PATCH
+（tests/test_dynamic.py）、ComfyUI 适配器 mock。
 
 ## ComfyUI 适配器
 

@@ -109,6 +109,26 @@ export const api = {
     request<Shot>("/shots/" + sid, { method: "PATCH", body: JSON.stringify(body) }),
   generateShot: (sid: string, params?: Record<string, unknown>) =>
     request<Job>("/shots/" + sid + "/generate", { method: "POST", body: JSON.stringify({ params: params ?? {} }) }),
+  /** 生成单个镜头的 H3 动态版本：{mode:"dynamic"}；后端仅接受 params 时自动回退 */
+  generateDynamicShot: async (sid: string): Promise<Job> => {
+    const post = (payload: Record<string, unknown>) =>
+      request<Job>("/shots/" + sid + "/generate", { method: "POST", body: JSON.stringify(payload) });
+    try {
+      return await post({ mode: "dynamic", params: { mode: "dynamic" } });
+    } catch (err) {
+      if (err instanceof ApiError && (err.status === 422 || err.status === 400)) {
+        return post({ params: { mode: "dynamic" } });
+      }
+      throw err;
+    }
+  },
+  /** 批量生成全部镜头动态版本 */
+  generateAllDynamic: async (eid: string): Promise<{ created?: number; jobs?: Job[]; count?: number }> => {
+    return request<{ created?: number; jobs?: Job[]; count?: number }>(
+      "/episodes/" + eid + "/shots/generate-dynamic",
+      { method: "POST", body: "{}" }
+    );
+  },
   versions: (sid: string) => request<ShotVersion[]>("/shots/" + sid + "/versions"),
   selectVersion: (sid: string, vid: string) =>
     request<Shot>("/shots/" + sid + "/versions/" + vid + "/select", { method: "POST", body: "{}" }),

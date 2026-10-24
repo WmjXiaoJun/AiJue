@@ -72,10 +72,14 @@ def _recover_stale_jobs() -> None:
             job.error = "服务重启，任务中断，可点重试"
             job.message = "服务重启，任务中断"
             job.updated_at = models.utcnow()
-            if job.shot_id:
+            if job.type == "shot" and job.shot_id:
                 shot = db.get(models.Shot, job.shot_id)
-                if shot is not None and shot.status in ("queued", "generating"):
-                    shot.status = "failed"
+                if shot is not None:
+                    if str((job.params or {}).get("mode") or "").strip().lower() == "dynamic":
+                        if shot.dynamic_status in ("queued", "generating"):
+                            shot.dynamic_status = "failed"
+                    elif shot.status in ("queued", "generating"):
+                        shot.status = "failed"
             if job.type == "render" and job.episode_id:
                 episode = db.get(models.Episode, job.episode_id)
                 if episode is not None and episode.status == "rendering":
@@ -1274,9 +1278,60 @@ def generate_shot(
     db: Session = Depends(get_db),
 ):
     shot = _get_or_404(db, models.Shot, sid, "镜头")
-    params = payload.params if payload else {}
+    params = dict(payload.params) if payload is not None else {}
+    mode = str(payload.mode or "").strip().lower() if payload is not None else ""
+    if mode not in ("", "static", "dynamic"):
+        raise HTTPException(status_code=400, detail="mode 只能是 static 或 dynamic")
+    if mode == "dynamic":
+        job, _created = jobs.enqueue_dynamic_shot_job(db, shot, params)
+        return job
     job, _created = jobs.enqueue_shot_job(db, shot, params)
     return job
+
+
+@router.post(
+    "/episodes/{eid}/shots/generate-dynamic", response_model=List[schemas.JobOut]
+)
+def generate_dynamic_shots(
+    eid: str,
+    payload: Optional[schemas.DynamicGenerateRequest] = None,
+    db: Session = Depends(get_db),
+):
+    """批量生成动态版：shot_ids 指定镜头，否则 all=true 生成全部分镜。"""
+    _get_or_404(db, models.Episode, eid, "集")
+    shots = (
+        db.query(models.Shot)
+        .filter(models.Shot.episode_id == eid)
+        .order_by(models.Shot.no.asc())
+        .all()
+    )
+    if not shots:
+        raise HTTPException(status_code=400, detail="该集还没有镜头，请先生成分镜")
+    if payload is not None and payload.shot_ids:
+        by_id = {shot.id: shot for shot in shots}
+        missing = [sid for sid in payload.shot_ids if sid not in by_id]
+        if missing:
+            raise HTTPException(
+                status_code=400, detail=f"镜头不存在或不属于该集: {missing}"
+            )
+        selected = []
+        seen = set()
+        for sid in payload.shot_ids:
+            if sid in seen:
+                continue
+            seen.add(sid)
+            selected.append(by_id[sid])
+    else:
+        if payload is not None and not payload.all:
+            raise HTTPException(
+                status_code=400, detail="shot_ids 为空时 all 必须为 true"
+            )
+        selected = shots
+    jobs_out: List[models.Job] = []
+    for shot in selected:
+        job, _created = jobs.enqueue_dynamic_shot_job(db, shot, {})
+        jobs_out.append(job)
+    return jobs_out
 
 
 @router.get("/shots/{sid}/versions", response_model=List[schemas.ShotVersionOut])
