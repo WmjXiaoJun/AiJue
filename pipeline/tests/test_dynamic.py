@@ -53,6 +53,8 @@ ap.add_argument("--mode", required=True)
 ap.add_argument("--image", required=True)
 ap.add_argument("--last-frame", default=None)
 ap.add_argument("--audio", default=None)
+ap.add_argument("--prompt-file", default=None)
+ap.add_argument("--prompt", default=None)
 ap.add_argument("--out", required=True)
 ap.add_argument("--duration", type=float, default=1.0)
 ap.add_argument("--width", type=int, default=320)
@@ -135,6 +137,10 @@ def test_dynamic_ensure_fake_cli(tmp_path):
         assert meta["mode"] == results[sid]["mode"]
         assert meta["first_frame"] and Path(meta["first_frame"]).is_file()
         assert meta["last_frame"] and Path(meta["last_frame"]).is_file()
+        assert meta.get("plan") and meta["plan"].get("size")
+        assert meta.get("prompt", "").startswith("subject_definitions:")
+        assert meta.get("ref_strategy")
+        assert Path(meta["prompt_file"]).is_file()
     # 二次调用命中缓存
     again = dynamic.ensure_dynamic_clips(
         ep, shots, ep["assets"], work, 1280, 720, 25,
@@ -195,3 +201,28 @@ def test_render_dynamic_mode_fake(tmp_path):
     assert manifest["shot_tts_wavs"] >= 1
     for sid in ("s002", "s003"):
         assert (work / "audio" / f"shot_{sid}.wav").is_file()
+
+
+# ------------------------------------------------------- ShotPlan prompt ----
+def test_plan_for_shot_and_prompt():
+    from pipeline import shot_grammar as sg
+    plan = sg.plan_for_shot({"type": "host_to_camera", "no": 2})
+    assert plan["size"] == "Close-up" and plan["angle"] == "low-angle"
+    prompt = sg.build_h3_prompt(plan, "audio_ref")
+    assert "One continuous Close-up shot" in prompt
+    assert "low-angle angle" in prompt and "low camera height" in prompt
+    assert "slow dolly-in" in prompt and "no pan, no zoom" in prompt
+    assert "Purpose: explain" in prompt
+    assert "no text, no watermark" in prompt.lower()
+    # shot.shot_plan 优先
+    plan2 = sg.plan_for_shot({"type": "reaction",
+                              "shot_plan": {"size": "Extreme Close-up",
+                                            "movement": "static",
+                                            "light": "low-key practical"}})
+    assert plan2["size"] == "Extreme Close-up"
+    prompt2 = sg.build_h3_prompt(plan2, "fl2v")
+    assert "zero camera movement" in prompt2
+    assert "first frame" in prompt2 and "last frame" in prompt2
+    for word in ("cinematic", "moody", "epic"):
+        assert word not in prompt2.lower()
+

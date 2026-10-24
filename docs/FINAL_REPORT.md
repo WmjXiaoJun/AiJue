@@ -348,3 +348,8 @@ FastAPI (8090) ── SQLite
 - 模板巡礼：outputs/template_demos/template_showcase.mp4（66.2s，含每模板 4s 精选 + 标题）；contact sheet：docs/screenshots/48_templates_contact_sheet.png；
 - 验证结果：16/16 渲染成功（时长/角色/字幕/xfade 抽查通过），manifest：outputs/template_demos/manifest.json。
 - 后续（继续大批参考 OpenMontage）：ShotPlan 注入 H3 ref2va/fl2v prompt；按镜头关系选择转场（同场景 hard cut / 话题切换 crossfade / 段落 fade black）；reviewer/checkpoint 质检门；音频分层（ambience/Foley）；字幕同步/口型精修 skills。
+## 28. 质检门（OpenMontage reviewer/checkpoint 落地，2026-10-25）
+- 新增 pipeline/qc.py：对成片自动跑质检并输出 JSON 报告：时长（vs 分镜总长/目标）、分辨率/帧率/编码、音频轨、blackdetect、字幕覆盖率、镜头数/片头片尾卡、说话人集合、manifest（dynamic/transition）。
+- 参考 OpenMontage 的 reviewer/checkpoint 与 edit-director Quality Gate 思路：先机械门禁（技术规格/黑帧/覆盖），再人审（情绪/节奏）。
+- 实测：ep_001 动态版、ep_002 动态版 QC ok=true（299s/75.95s，blackdetect 0，字幕/说话人/镜头数全过）；16 个模板验证片 QC 16/16 ok=true，报告落在各模板目录 qc_report.json。
+- 用法：python -m pipeline.qc --video <mp4> --episode-json <episode.json> --out <report.json>；可直接接入成片房渲染后的自动检查。

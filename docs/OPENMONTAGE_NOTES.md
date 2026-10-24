@@ -29,3 +29,7 @@
 4. 音频分层：ambience/Foley 轨、音乐 turn 与静音设计；
 5. 口型精修参考其 lip-sync-usage；字幕同步参考 subtitle-sync；
 6. 模板骨架生成按 plan_segment() 展开为多镜头（当前模板仍一 segment 一镜）。
+## 已进一步落地（2026-10-25）
+- pipeline/qc.py：技术质检门（时长/规格/黑帧/字幕覆盖/镜头数/说话人/manifest），对应 OpenMontage reviewer + edit-director quality gate；ep_001/002 动态版与 16 个模板验证片全部通过。
+- scripts/render_template_demos.py + scripts/make_template_showcase.py：镜头级验证片与巡礼视频（16/16）。
+- 进行中：ShotPlan 注入 H3 动态镜头（contract/SHOT_PLAN_INJECTION.md），使景别/机位/运镜差异化；h3-comfy 正在实测 H3 对镜头 prompt 的可控性。

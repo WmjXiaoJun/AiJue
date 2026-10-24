@@ -97,3 +97,106 @@ def label(p: dict) -> str:
         CAMERA_LABELS.get(p.get("movement"), p.get("movement")),
     )
     return text.strip(" ·")
+
+# --------------------------------------------------------------------------
+# ShotPlan → H3 prompt（contract/SHOT_PLAN_INJECTION.md）
+# --------------------------------------------------------------------------
+SUBJECT_ANCHOR = (
+    "subject_definitions: Subject 1 is the character in the reference image, "
+    "preserving their exact face, hairstyle, hair color, outfit, age and "
+    "anime cel-shaded art style."
+)
+
+# 运镜只能选一类（translation/rotation/lens/hybrid/stillness），禁止混用
+MOVEMENT_PROMPTS = {
+    "static": "stillness: zero camera movement",
+    "slow dolly-in": "translation: slow dolly-in; no pan, no zoom",
+    "slow push-in": "translation: slow push-in; no pan, no zoom",
+    "static / micro-pan": "rotation: very slow micro-pan; no dolly, no zoom",
+    "pan": "rotation: slow pan; no dolly, no zoom",
+    "truck": "translation: slow truck; no pan, no zoom",
+    "zoom": "lens: slow zoom; no dolly, no pan",
+    "rack focus": "lens: slow rack focus; no dolly, no pan",
+}
+
+_ANGLE_HEIGHT = {
+    "low-angle": "low", "high-angle": "high", "eye-level": "eye-level",
+    "over-the-shoulder": "eye-level", "POV": "eye-level",
+}
+
+
+def _height_for(plan: dict) -> str:
+    if plan.get("height"):
+        return str(plan["height"])
+    return _ANGLE_HEIGHT.get(str(plan.get("angle") or ""), "eye-level")
+
+
+def _movement_phrase(plan: dict) -> str:
+    movement = str(plan.get("movement") or "static").strip()
+    return MOVEMENT_PROMPTS.get(
+        movement, f"{movement} (single movement class only; no zoom/pan mix)")
+
+
+def plan_for_shot(shot: dict, index: int = 0) -> dict:
+    """取镜头 plan：优先 shot.shot_plan，否则 plan_for_type(type, no % 3)。"""
+    shot = shot or {}
+    override = shot.get("shot_plan")
+    if isinstance(override, dict) and override:
+        plan = plan_for_type(str(shot.get("type") or ""))
+        plan.update({k: v for k, v in override.items() if v not in (None, "")})
+        plan["source"] = "shot.shot_plan"
+        plan["type"] = shot.get("type")
+        return plan
+    no = shot.get("no")
+    try:
+        variant = int(no) % 3 if no not in (None, "") else (int(index) + 1) % 3
+    except (TypeError, ValueError):
+        variant = (int(index) + 1) % 3
+    plan = plan_for_type(str(shot.get("type") or ""), variant=variant)
+    plan["source"] = "shot_grammar.plan_for_type"
+    return plan
+
+
+def build_h3_prompt(plan: dict, mode: str = "audio_ref") -> str:
+    """按 5-aspect 公式拼 H3 prompt（身份锚点 + 景别/角度/高度/光线 + 运镜 + 目的）。"""
+    plan = plan or {}
+    size = str(plan.get("size") or "Medium Close-up")
+    angle = str(plan.get("angle") or "eye-level")
+    height = _height_for(plan)
+    light = str(plan.get("light") or "key + rim")
+    movement = _movement_phrase(plan)
+    purpose = str(plan.get("purpose") or "dialogue")
+    if mode == "fl2v":
+        action = (f"Starting from the first frame and ending at the last frame, "
+                  f"Subject 1 performs a continuous {size} shot, {angle} angle, "
+                  f"{height} camera height, in a dark studio with {light}, with "
+                  f"camera movement {movement}. Subtle body movement, head turn and "
+                  f"expression change only; keep identity, framing and lighting "
+                  f"consistent from the first frame to the last frame.")
+        motion = ("React naturally with subtle body and facial movement. "
+                  "No text, no watermark.")
+        soundscape = "overall_soundscape: quiet studio room tone, subtle cloth movement."
+    else:
+        action = (f"One continuous {size} shot, {angle} angle, {height} camera "
+                  f"height, of Subject 1 speaking directly to the camera in a dark "
+                  f"studio with {light}. Camera: {movement}.")
+        motion = ("Lips move naturally in sync with the reference speech audio; subtle "
+                  "blinking, eyebrow movement and small head nods. Keep identity, hair, "
+                  "outfit and lighting consistent with the reference image; only the "
+                  "mouth, eyes and head move subtly. No text, no watermark.")
+        soundscape = ("overall_soundscape: the same spoken sentence, close-mic voice, "
+                      "quiet studio room tone.")
+    return "\n\n".join([
+        SUBJECT_ANCHOR,
+        f"summary: {action} Purpose: {purpose}. {motion}",
+        soundscape,
+        "non_diegetic_music: N/A",
+    ])
+
+
+def plan_label(plan: dict) -> str:
+    """给 demo 抽帧/QC 用的简短计划标签。"""
+    return "%s / %s / %s / %s" % (
+        plan.get("size") or "-", plan.get("angle") or "-",
+        _height_for(plan), plan.get("movement") or "-")
+

@@ -26,7 +26,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-from . import config, utils
+from . import config, shot_grammar, utils
 
 LOG = logging.getLogger("pipeline")
 
@@ -159,13 +159,17 @@ def _first_frames(shots: list, comp_clips: dict, workdir: Path) -> dict[str, Pat
 
 
 def _char_refs(shots: list, frames: dict, workdir: Path, width: int,
-               height: int) -> dict[str, Path]:
-    """把静态合成首帧裁成「角色特写参考图」（768²），避免 H3 把整块节目背景当参考。
+               height: int, plans: dict | None = None) -> tuple[dict, dict]:
+    """按 ShotPlan 景别裁 H3 参考图（768²），返回 ({sid: ref}, {sid: 策略})。
 
-    静态 mock 构图中角色窗口在右侧 1/3：高度≈画面 91%、底部对齐、右边距 50。
-    b_roll 之类没有角色窗口的镜头取画面中心方形。
+    - close-up / reaction：从角色画窗再裁脸部特写（更近的构图）；
+    - medium：角色画窗（现有构图）；
+    - wide/full：H3 ref2va 不支持拉远，记录限制并回退中景画窗；
+    - b_roll：画面中心方形。
     """
     refs: dict[str, Path] = {}
+    strategies: dict[str, str] = {}
+    plans = plans or {}
     ref_dir = utils.ensure_dir(workdir / "dynamic" / "refs")
     for shot in shots:
         sid = _sid(shot)
@@ -174,16 +178,30 @@ def _char_refs(shots: list, frames: dict, workdir: Path, width: int,
             continue
         out = ref_dir / f"{sid}_ref.png"
         typ = str(shot.get("type") or "")
+        plan = plans.get(sid) or {}
+        size = str(plan.get("size") or "")
+        purpose = str(plan.get("purpose") or "")
         fg = max(256, int(height * 0.91))
+        win_x = max(0, width - fg - 50)
+        win_y = max(0, height - fg)
         if typ == "b_roll":
-            size = max(256, min(width, height))
-            x = max(0, (width - size) // 2)
-            y = max(0, (height - size) // 2)
-            vf = f"crop={size}:{size}:{x}:{y},scale=768:768"
+            size_px = max(256, min(width, height))
+            x = max(0, (width - size_px) // 2)
+            y = max(0, (height - size_px) // 2)
+            vf = f"crop={size_px}:{size_px}:{x}:{y},scale=768:768"
+            strategies[sid] = "center-square"
+        elif ("Close" in size) or purpose in ("emotion", "reaction"):
+            face = max(256, int(fg * 0.78))
+            x = win_x + max(0, (fg - face) // 2)
+            y = win_y + max(0, int(fg * 0.02))
+            vf = f"crop={face}:{face}:{x}:{y},scale=768:768"
+            strategies[sid] = "face-closeup"
+        elif size in ("Wide", "Wide / Establishing", "Full"):
+            vf = f"crop={fg}:{fg}:{win_x}:{win_y},scale=768:768"
+            strategies[sid] = "wide-limitation(window-fallback)"
         else:
-            x = max(0, width - fg - 50)
-            y = max(0, height - fg)
-            vf = f"crop={fg}:{fg}:{x}:{y},scale=768:768"
+            vf = f"crop={fg}:{fg}:{win_x}:{win_y},scale=768:768"
+            strategies[sid] = "window-medium"
         try:
             utils.ffmpeg(["-y", "-hide_banner", "-loglevel", "error",
                           "-i", str(full), "-vf", vf, str(out)])
@@ -194,13 +212,14 @@ def _char_refs(shots: list, frames: dict, workdir: Path, width: int,
         except Exception as exc:  # noqa: BLE001
             LOG.warning("角色参考图裁剪失败 %s（用整帧）: %s", sid, exc)
             refs[sid] = full
-    return refs
+        strategies.setdefault(sid, "full-frame")
+    return refs, strategies
 
 
 def _call_h3(cli: Path, mode: str, first: Path, last: Path | None,
              audio: Path | None, out: Path, duration: float,
              width: int, height: int, fps: int, seed: int = 42,
-             timeout: int = 1800) -> None:
+             prompt_file: Path | None = None, timeout: int = 1800) -> None:
     if cli.suffix.lower() == ".py":
         cmd = [sys.executable, str(cli)]
     else:
@@ -210,6 +229,8 @@ def _call_h3(cli: Path, mode: str, first: Path, last: Path | None,
         cmd += ["--last-frame", str(last)]
     if audio is not None:
         cmd += ["--audio", str(audio)]
+    if prompt_file is not None:
+        cmd += ["--prompt-file", str(prompt_file)]
     # H3 原生生成尺寸（audio_ref 16:9；fl2v CLI 会强制 768²）
     cmd += ["--duration", f"{duration:.3f}", "--width", str(H3_GEN_W),
             "--height", str(H3_GEN_H), "--fps", str(fps), "--seed", str(seed)]
@@ -297,7 +318,11 @@ def ensure_dynamic_clips(episode: dict, shots: list, assets: list, workdir: Path
     comp_clips = _compose_static_clips(shots, assets, ep, workdir, width, height,
                                        fps, char_map=char_map)
     frames = _first_frames(shots, comp_clips, workdir)
-    refs = _char_refs(shots, frames, workdir, width, height)
+    plans = {_sid(shot): shot_grammar.plan_for_shot(shot, i)
+             for i, shot in enumerate(shots)}
+    refs, ref_strategies = _char_refs(shots, frames, workdir, width, height,
+                                      plans=plans)
+    prompts_dir = utils.ensure_dir(workdir / "dynamic" / "prompts")
     ids = [_sid(s) for s in shots]
     dynamic_dir = utils.ensure_dir(workdir / "dynamic")
     meta_dir = utils.ensure_dir(dynamic_dir / "meta")
@@ -310,7 +335,8 @@ def ensure_dynamic_clips(episode: dict, shots: list, assets: list, workdir: Path
         static_clip = comp_clips.get(sid) or (workdir / "clips" / f"{sid}.mp4")
         if typ in CARD_TYPES:
             results[sid] = {"id": sid, "path": str(static_clip), "mode": "static-card",
-                            "first_frame": "", "last_frame": "", "reused": True}
+                            "first_frame": "", "last_frame": "", "reused": True,
+                            "plan": plans.get(sid)}
             continue
         first = frames.get(sid)
         if first is None:
@@ -334,6 +360,10 @@ def ensure_dynamic_clips(episode: dict, shots: list, assets: list, workdir: Path
             workdir / "audio" / f"shot_{sid}.wav"
         audio = audio if _valid(audio, 500) else None
         mode = "audio_ref" if (line and audio is not None) else "fl2v"
+        plan = plans.get(sid) or shot_grammar.plan_for_shot(shot, i)
+        prompt = shot_grammar.build_h3_prompt(plan, mode)
+        prompt_path = prompts_dir / f"{sid}.txt"
+        utils.write_text(prompt_path, prompt + "\n")
         out = dynamic_dir / f"{sid}.mp4"
         meta_path = meta_dir / f"{sid}.json"
         if cli_path is None:  # fallback_static
@@ -343,21 +373,27 @@ def ensure_dynamic_clips(episode: dict, shots: list, assets: list, workdir: Path
             continue
         digest = _digest(shot, mode, first, last, audio, cli_path,
                          width, height, fps, seed)
-        digest = utils.sha1_text(digest, str(_sid({"id": sid})), "refs")
+        digest = utils.sha1_text(digest, prompt, "shot-plan-v1")
         meta = utils.read_json(meta_path) or {}
         if not force and _valid(out, 5000) and meta.get("hash") == digest:
             results[sid] = {"id": sid, "path": str(out), "mode": meta.get("mode", mode),
                             "first_frame": str(first), "last_frame": str(last),
-                            "ref_image": str(first_ref), "reused": True}
+                            "ref_image": str(first_ref), "plan": meta.get("plan") or plan,
+                            "reused": True}
         else:
             tmp = dynamic_dir / f"{sid}.raw.mp4"
             try:
                 _call_h3(cli_path, mode, first_ref, last, audio, tmp,
-                         _dur(shot), width, height, fps, seed=seed)
+                         _dur(shot), width, height, fps, seed=seed,
+                         prompt_file=prompt_path)
                 _normalize_dynamic(tmp, out, _dur(shot), width, height, fps)
                 utils.write_json(meta_path, {
                     "hash": digest, "mode": mode, "first_frame": str(first),
                     "ref_image": str(first_ref), "last_frame": str(last),
+                    "ref_strategy": ref_strategies.get(sid, "full-frame"),
+                    "plan": plan, "plan_source": plan.get("source"),
+                    "prompt_file": str(prompt_path),
+                    "prompt": prompt,
                     "audio": str(audio) if audio else "",
                     "duration": _dur(shot), "width": width, "height": height,
                     "h3_gen": [H3_GEN_W, H3_GEN_H],
@@ -367,6 +403,7 @@ def ensure_dynamic_clips(episode: dict, shots: list, assets: list, workdir: Path
                 })
                 results[sid] = {"id": sid, "path": str(out), "mode": mode,
                                 "first_frame": str(first), "last_frame": str(last),
+                                "plan": plan, "prompt_file": str(prompt_path),
                                 "reused": False}
             except Exception as exc:  # noqa: BLE001
                 LOG.warning("动态镜头失败 %s（%s）", sid, exc)
