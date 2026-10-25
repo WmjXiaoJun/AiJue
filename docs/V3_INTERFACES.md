@@ -204,3 +204,14 @@ qc_v3.evaluate(*, video, plan, shot_metas, template, subtitles=None, h3_require=
 - 静态只允许片头片尾卡片；任何非卡片静态必须 QC 标记（验收不接受）；
 - 2D 水墨路径：history_talk 用 history_ink_2d + 2D cutout，成片抽帧确认水墨绘景；
 - 16 模板画面/舞台/内容不同：plate+站位+action 集合签名唯一，批报告附 contact sheet。
+
+## 10. 实测决策（2026-10-26 落地版本，覆盖上文相关约定）
+
+1) **正片非卡片镜统一走 `05_ref2va_4step_sla`（audio_ref）**：
+   - 有台词镜 → 该镜 TTS wav 驱动口型；无台词镜（空镜/反应/establishing）→ `audio_wav=None`，h3_comfy 内部生成 1.0s 静音参考音频，meta 记 `audio_silent=true`；
+   - 不再用 04 fl2v 出正片：实测 04 帧锁定会把 stage 的 2D cutout 原样烘进画面（“纸片感”），而 05 会重绘为电影感画面；04 代码路径保留（单测/兜底/未来用），且已实测 1024×576 首尾帧可用（run_h3_ref 不再强制 768²）。
+2) **H3 生成尺寸统一模板 `h3.resolution=1024x576`**（≈768² 像素预算、H3 32 倍数），`normalize_clip` 统一到成片 1280×720/25fps/精确时长；H3 原生 124 帧（~5.17s）为最小长度，demo 单镜统一 5.17s。
+3) **storyboard 语速适配**：长台词按标点切分跨镜，单镜估时 ≤6.6s（5.17s×atempo 上限内），demo 首镜=台本首句、末镜=台本末句，避免 atempo 截断。
+4) **ink/gongbi 风格**：`contract/style_presets.json` 的 history_ink_2d/debate_ink_2d/museum_gold_2d `prompt_prefix` 已强化为传统水墨/工笔描述；H3 ref2va 仍会把线稿首帧重绘为半写实国风动画（模型特性），成片靠 ink 调色 + 包装统一，人审口径见 `docs/V3_ACCEPTANCE.md` §5。
+5) **产物目录**：P2 16 模板在 `outputs/templates_v3/{id}/`；P3 5 分钟版在 `outputs/templates_v3/tonight_show_5min/`（归档目录，不纳入 16 模板终门）；`tonight_show_40s_v1/` 为首版归档。
+6) **终门结果**：16/16 模板通过独立验收，累计 84 个非卡片镜 100% h3=true、84 个全局唯一 prompt_id、blackdetect 合计 0、fallbacks=[]；详见 `docs/V3_ACCEPTANCE.md` 与 `docs/V3_REPORT.md`。

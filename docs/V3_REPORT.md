@@ -61,8 +61,9 @@
 ## 5. P3：重点模板 5 分钟版
 
 - 命令：`python -m pipeline.cli render_v3 --template tonight_show --duration 300 --h3 comfy --force --out outputs/templates_v3/tonight_show_5min/final.mp4 --workdir outputs/templates_v3/tonight_show_5min/work`
-- 规格：59 镜（57 非卡片 H3 + 2 卡片），H3 单镜 5.17s；产物 `outputs/templates_v3/tonight_show_5min/{final.mp4,shots/,frames/,h3_meta.json,qc_report.json}`。
-- 结果：见 `outputs/templates_v3/tonight_show_5min/qc_report.json`（P3 不纳入 P2 16/16 终门，单独抽检）。
+- 实测（2026-10-26 05:38:57 → 07:32:54，**6837.3s ≈ 114 分钟** GPU 串行）：**59 镜（57 非卡片 H3 + 2 卡片）**、成片 **299.19s / 69.0MB / 1280×720 / 25fps / 有音轨**；`h3_coverage=1.0（57/57）`、`prompt_ids=57`、`black_segments=0`、`subtitle_coverage=1.0`、`fallbacks=0`、QC 10 项全绿、`deliverable=true`。
+- 产物：`outputs/templates_v3/tonight_show_5min/{final.mp4,h3_meta.json,qc_report.json,shots/,frames/工作目录}`；QA 抽检脚本 `tmp/qa/check_p3_5min.py`（规格/字幕/BGM/证据链+抽帧人审），结果见 `docs/V3_ACCEPTANCE.md` §10（P3 附属产物，不纳入 P2 16/16 终门）。
+- 整条夜间序列（plate 重生成 → history_talk → 4 chunk 批量 → tonight_show v2 → 5min）`tmp/run_v3_sequence.py` rc=0，`ALL STEPS DONE`。
 
 ## 6. 复现命令
 

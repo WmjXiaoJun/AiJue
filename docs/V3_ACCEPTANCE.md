@@ -1,7 +1,7 @@
 # V3 独立验收报告（qa-verifier）
 
 > 验收口径：`docs/V3_INTERFACES.md` §9（QC 门必须全绿）+ §4（H3 证据链）+ §6（qc_v3 checks）。
-> 生成时间：2026-10-26 05:42（本文件由 `tmp/qa/gen_acceptance_doc.py` 依据真实产物生成，可重复运行）
+> 生成时间：2026-10-26 07:34（本文件由 `tmp/qa/gen_acceptance_doc.py` 依据真实产物生成，可重复运行）
 > 验收人：qa-verifier（独立于 render-dev / h3-dev / stage-dev）；**不启动渲染，只读 outputs/ 与 contract/**。
 
 ## 0. 结论摘要
@@ -17,6 +17,7 @@
 | P1/P2：逐模板 QC 全绿 | ✅ |
 | P1/P2：blackdetect=0 | ✅ |
 | 2D 水墨人审（history_talk 抽帧） | 见 §5（待 Lead 人审定论） |
+| P3：tonight_show_5min（**不纳入 P2 16/16 终门**） | ✅ 抽检通过（见 §10） |
 
 ## 1. 验收命令（可复跑）
 
@@ -150,7 +151,7 @@ QA 观感（最终以 Lead 人审定论）：成片调色后呈“国风/墨调�
 10. **批量报告分 chunk 合并**：Lead 夜间序列按 4 chunk 跑，`batch_report.json` 会合并已有产物（本 chunk 外条目 `status=skipped`/`note=existing_output`），QA 已兼容该字段口径。
 11. **5 分钟版（P3）**：`tonight_show_5min` 为 P3 附属产物，不在 P2 16×30-45s 验收范围，另行人工抽审。
 
-## 8. 最终回归记录（2026-10-26 05:42）
+## 8. 最终回归记录（2026-10-26 07:34）
 
 - `python -m pytest tests -q` → **327 passed / 0 skipped**
 - `python -m pytest pipeline/tests -q` → **143 passed**
@@ -177,3 +178,26 @@ QA 观感（最终以 Lead 人审定论）：成片调色后呈“国风/墨调�
 | 批量报告 | `outputs/templates_v3/batch_report.json` |
 | 运行序列状态 | `outputs/templates_v3/sequence_state.json`、`sequence.log` |
 | 验收测试 | `tests/test_template_v3.py`、`tests/test_v3_acceptance.py` |
+
+## 10. P3 附属产物：tonight_show_5min（**不纳入 P2 16/16 终门**）
+
+> 本节仅记录 P3 抽检结果；P2 终门仍以 §0/§4 的 16/16 为准。P3 产物路径：
+> `outputs/templates_v3/tonight_show_5min/`（`--out .../tonight_show_5min/final.mp4`，不覆盖 P2 的 tonight_show 40s 产物）。
+
+抽检脚本：`tmp/qa/check_p3_5min.py`；机器可读结果：`tmp/qa/p3_5min.json`；结论：**✅ 抽检通过**（failed gates：无）。
+
+| 项 | 结果 |
+|---|---|
+| 成片 | 299.19s / 1280x720 / 25.0fps / audio=True / blackdetect=0 |
+| 计划 | 59 镜（非卡片 57 + 卡片 2），计划 299.19s，Δ+0.0s |
+| H3 覆盖 | 57 镜 h3=true（应=非卡片镜数）；workflow=['05_ref2va_4step_sla'] |
+| prompt_id | 57 个，唯一 57（模板内）；与 40s 版 overlap=0（不同属正常，不做跨版本唯一要求） |
+| seed/ref_image/action | True / True / True |
+| QC | ok=True deliverable=True previs=False fallbacks=0；checks 全绿=True |
+| 字幕 | 对话字幕 75 块；qc 对话镜 22（subtitle_coverage check ok=True）；时间跨度 [2.1, 291.64]；字面墙钟 25/50/75% 采样：0.25=无（非对话镜）(最近 0.5s)、0.5=无（非对话镜）(最近 2.44s)、0.75=无（非对话镜）(最近 0.02s)；对话块分位采样：0.25=✅、0.5=✅、0.75=✅ |
+| 音频/BGM | 音量抽样(dB)：0.05=-44.1、0.25=-46.4、0.5=-20.3、0.75=-19.8、0.95=-44.8；音频流 299.19s / 成片 299.19s；BGM 源文件 ['soft_pad.wav'] |
+| 抽帧（人审） | `D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\p3_5min\frame_0_03pct.jpg`、`D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\p3_5min\frame_1_33pct.jpg`、`D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\p3_5min\frame_2_66pct.jpg`、`D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\p3_5min\frame_3_96pct.jpg` |
+
+说明：本片 59 镜中只有 22 个**对话镜**按设计带台词字幕（其余为反应/B-roll/空镜与卡片），因此「墙钟 25%/50%/75% 处必有字幕」这一字面采样可能落在非对话镜上（报告内给出最近字幕距离）；实际字幕质量以 `qc_report.subtitle_coverage=1.0（22/22 对话镜）` + 对话字幕时间跨度 + 对话块分位采样三点覆盖共同判定。
+
+> **P3 附属产物，不纳入 P2 16/16 终门**；P2 终门以 §0/§4 的 16/16 为准。
