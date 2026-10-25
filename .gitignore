@@ -14,3 +14,5 @@ backend/data/metaso.env
 integrations/metaso/.env
 # local model weights (do not commit)
 localize/models/
+backend/data/*.env
+backend/data/llm.env
