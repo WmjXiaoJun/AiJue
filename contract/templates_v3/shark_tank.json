@@ -1,0 +1,340 @@
+{
+  "id": "shark_tank",
+  "label": "投资路演秀",
+  "style": "cinematic_3d",
+  "aspect": "16:9",
+  "target_duration": 300,
+  "stage": {
+    "type": "3d_set",
+    "plate": "pitch_room__cinematic",
+    "scene_desc": "A modern corporate boardroom at night: a long polished wood table with leather chairs, floor-to-ceiling windows showing a neon city skyline, a large presentation screen glowing on the wall, water glasses and documents on the table.",
+    "layout": {
+      "head": [
+        0.5,
+        0.6
+      ],
+      "investor_left": [
+        0.26,
+        0.64
+      ],
+      "investor_right": [
+        0.74,
+        0.64
+      ],
+      "screen": [
+        0.5,
+        0.22
+      ],
+      "demo_table": [
+        0.5,
+        0.74
+      ],
+      "ground_y": 0.88
+    },
+    "props": [
+      {
+        "id": "pitch_deck",
+        "zone": "screen",
+        "interaction": "click"
+      },
+      {
+        "id": "term_sheet",
+        "zone": "head",
+        "interaction": "handoff"
+      },
+      {
+        "id": "sample_device",
+        "zone": "demo_table",
+        "interaction": "hold"
+      },
+      {
+        "id": "water_glass",
+        "zone": "head",
+        "interaction": "sip"
+      },
+      {
+        "id": "laptop",
+        "zone": "investor_left",
+        "interaction": "type"
+      },
+      {
+        "id": "notepad",
+        "zone": "investor_right",
+        "interaction": "write"
+      }
+    ],
+    "camera_zones": [
+      "front",
+      "head_ots",
+      "investors_ots",
+      "screen_wide",
+      "product_close"
+    ]
+  },
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "block": "head",
+      "props": [
+        "term_sheet"
+      ],
+      "wardrobe": "navy_suit"
+    },
+    {
+      "role": "investor_a",
+      "character": "ali",
+      "block": "investor_left",
+      "props": [
+        "laptop"
+      ],
+      "wardrobe": "grey_blazer"
+    },
+    {
+      "role": "investor_b",
+      "character": "dawei",
+      "block": "investor_right",
+      "props": [
+        "notepad"
+      ],
+      "wardrobe": "charcoal_turtleneck"
+    }
+  ],
+  "action_library": [
+    {
+      "id": "stand_pitch",
+      "h3_prompt": "Subject stands up at the head of the long table and opens the pitch with a confident open-palm gesture",
+      "prop": null
+    },
+    {
+      "id": "click_deck",
+      "h3_prompt": "Subject clicks a remote and the presentation screen behind changes slides",
+      "prop": "pitch_deck"
+    },
+    {
+      "id": "point_screen",
+      "h3_prompt": "Subject turns to the screen and traces a rising revenue curve with one hand",
+      "prop": null
+    },
+    {
+      "id": "hold_sample",
+      "h3_prompt": "Subject lifts a small device from the demo table and holds it up toward the investors",
+      "prop": "sample_device"
+    },
+    {
+      "id": "investor_look",
+      "h3_prompt": "Subject leans forward, jots a number on the notepad and keeps eye contact",
+      "prop": "notepad"
+    },
+    {
+      "id": "type_laptop",
+      "h3_prompt": "Subject types quickly on the laptop and turns the screen toward the presenter",
+      "prop": "laptop"
+    },
+    {
+      "id": "sip_water",
+      "h3_prompt": "Subject picks up a water glass, takes a sip and sets it back on the table",
+      "prop": "water_glass"
+    },
+    {
+      "id": "hand_term_sheet",
+      "h3_prompt": "Subject slides a term sheet across the table to the investors and taps it twice",
+      "prop": "term_sheet"
+    },
+    {
+      "id": "stand_answer",
+      "h3_prompt": "Subject stands, buttons a jacket and answers a hard question with a steady smile",
+      "prop": null
+    }
+  ],
+  "segments": [
+    {
+      "id": "cold_open",
+      "name": "开场",
+      "duration": 45,
+      "beats": [
+        "投资人鱼贯入场",
+        "host 在主位站起开场",
+        "屏幕亮起 BP 首页"
+      ],
+      "shots": [
+        {
+          "intent": "establishing",
+          "size": "Wide",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "stand_pitch",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "front"
+        },
+        {
+          "intent": "host_pitch",
+          "size": "Medium Close-up",
+          "angle": "eye-level",
+          "movement": "slow dolly-in",
+          "action": "point_screen",
+          "props": [],
+          "h3_mode": "audio_ref",
+          "camera_zone": "head_ots"
+        }
+      ]
+    },
+    {
+      "id": "pitch",
+      "name": "路演",
+      "duration": 85,
+      "beats": [
+        "host 点开数据页",
+        "host 举起样品",
+        "投资人交换眼神"
+      ],
+      "shots": [
+        {
+          "intent": "deck_change",
+          "size": "Full",
+          "angle": "eye-level",
+          "movement": "tracking",
+          "action": "click_deck",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "screen_wide"
+        },
+        {
+          "intent": "product_demo",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "hold_sample",
+          "props": [
+            "sample_device"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "product_close"
+        },
+        {
+          "intent": "investor_typing",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "type_laptop",
+          "props": [
+            "laptop"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "investors_ots"
+        }
+      ]
+    },
+    {
+      "id": "qa",
+      "name": "投资人追问",
+      "duration": 100,
+      "beats": [
+        "投资人追问估值",
+        "host 推过 term sheet",
+        "host 喝水稳住节奏"
+      ],
+      "shots": [
+        {
+          "intent": "investor_challenge",
+          "size": "Close-up",
+          "angle": "low-angle",
+          "movement": "static",
+          "action": "investor_look",
+          "props": [
+            "notepad"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "investors_ots"
+        },
+        {
+          "intent": "term_sheet",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "slow orbit",
+          "action": "hand_term_sheet",
+          "props": [
+            "term_sheet"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "head_ots"
+        },
+        {
+          "intent": "host_beats",
+          "size": "Medium Close-up",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "sip_water",
+          "props": [
+            "water_glass"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
+        }
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "收束",
+      "duration": 70,
+      "beats": [
+        "host 合上 BP",
+        "投资人起身握手",
+        "镜头拉远"
+      ],
+      "shots": [
+        {
+          "intent": "host_close",
+          "size": "Full",
+          "angle": "eye-level",
+          "movement": "slow dolly",
+          "action": "stand_answer",
+          "props": [],
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
+        },
+        {
+          "intent": "outro",
+          "size": "Wide",
+          "angle": "high-angle",
+          "movement": "slow pull-out",
+          "action": "stand_pitch",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "front"
+        }
+      ]
+    }
+  ],
+  "camera_language": {
+    "default": "slow dolly-in",
+    "wide": "slow push-in",
+    "reaction": "static",
+    "close": "slow push-in"
+  },
+  "packaging": {
+    "lower_third": "tank_blue_gold",
+    "transition": "fade",
+    "bgm": "corporate_tension",
+    "subtitle_style": "variety"
+  },
+  "audio": {
+    "ambience": "boardroom_room_tone",
+    "sfx": [
+      "slide_click",
+      "pen_scratch",
+      "water_glass",
+      "chair_creak"
+    ]
+  },
+  "h3": {
+    "workflow": "05_ref2va_4step_sla",
+    "duration": [
+      4,
+      8
+    ],
+    "fps": 25,
+    "resolution": "1024x576"
+  }
+}

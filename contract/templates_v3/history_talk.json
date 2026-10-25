@@ -7,17 +7,18 @@
   "stage": {
     "type": "2d_plate",
     "plate": "history_study__ink",
+    "scene_desc": "A Chinese ink-wash scholar's study at night: a low wooden desk with an unrolled bamboo scroll, a candle on a brass stand, an old map on a side table, lattice windows and drifting brush-stroke shadows.",
     "layout": {
       "desk": [
-        0.5,
+        0.33,
         0.62
       ],
       "seat_left": [
-        0.28,
+        0.18,
         0.64
       ],
       "seat_right": [
-        0.72,
+        0.78,
         0.64
       ],
       "candle": [
@@ -97,12 +98,12 @@
   "action_library": [
     {
       "id": "unroll_scroll",
-      "h3_prompt": "Subject unrolls an old bamboo scroll on the desk, candlelight flickering on the paper",
+      "h3_prompt": "Subject unrolls an old bamboo scroll on the desk, candlelight flickering across the paper",
       "prop": "scroll"
     },
     {
       "id": "light_candle",
-      "h3_prompt": "Subject lights a candle with a taper, warm light grows on their face",
+      "h3_prompt": "Subject lights a candle with a taper, warm light growing on their face",
       "prop": "candle"
     },
     {
@@ -112,7 +113,7 @@
     },
     {
       "id": "write_bamboo",
-      "h3_prompt": "Subject picks up a brush and writes on a bamboo slip",
+      "h3_prompt": "Subject picks up a brush and writes a line on a bamboo slip",
       "prop": "bamboo_slips"
     },
     {
@@ -134,6 +135,11 @@
       "id": "sip_tea",
       "h3_prompt": "Subject lifts a tea cup, takes a sip and sets it down",
       "prop": "tea_cup"
+    },
+    {
+      "id": "extinguish_candle",
+      "h3_prompt": "Subject pinches out the candle flame and the study falls into darkness",
+      "prop": "candle"
     }
   ],
   "segments": [
@@ -144,7 +150,7 @@
       "beats": [
         "host 在书案前点烛",
         "host 展开竹简",
-        "介绍两位历史人物"
+        "镜头扫过书案陈设"
       ],
       "shots": [
         {
@@ -176,12 +182,11 @@
     {
       "id": "figure_a",
       "name": "历史人物 A 自述",
-      "duration": 80,
+      "duration": 75,
       "beats": [
         "figure_a 抬头",
-        "figure_a 展开竹简讲述",
-        "host 追问",
-        "figure_a 反应"
+        "figure_a 提笔写字讲述",
+        "host 追问"
       ],
       "shots": [
         {
@@ -203,18 +208,19 @@
           "movement": "static",
           "action": "react_ponder",
           "props": [],
-          "h3_mode": "fl2v"
+          "h3_mode": "fl2v",
+          "camera_zone": "scroll_close"
         }
       ]
     },
     {
       "id": "figure_b",
       "name": "历史人物 B 反驳",
-      "duration": 75,
+      "duration": 70,
       "beats": [
         "figure_b 放下茶杯",
         "figure_b 指向地图反驳",
-        "figure_a 反驳"
+        "figure_a 反应"
       ],
       "shots": [
         {
@@ -238,19 +244,19 @@
           "props": [
             "tea_cup"
           ],
-          "h3_mode": "fl2v"
+          "h3_mode": "fl2v",
+          "camera_zone": "desk_ots"
         }
       ]
     },
     {
       "id": "roundtable",
       "name": "三人跨时空辩论",
-      "duration": 90,
+      "duration": 75,
       "beats": [
-        "host 提出问题",
-        "figure_a 站起",
-        "figure_b 拍案",
-        "三人对视"
+        "host 起身提问",
+        "figure_a 站起作揖",
+        "figure_b 倾身反驳"
       ],
       "shots": [
         {
@@ -261,7 +267,7 @@
           "action": "lean_in",
           "props": [],
           "h3_mode": "fl2v",
-          "camera_zone": "desk_ots"
+          "camera_zone": "wide"
         },
         {
           "intent": "figure_a_stand",
@@ -271,14 +277,14 @@
           "action": "stand_bow",
           "props": [],
           "h3_mode": "audio_ref",
-          "camera_zone": "wide"
+          "camera_zone": "front"
         }
       ]
     },
     {
       "id": "closing",
       "name": "收束",
-      "duration": 45,
+      "duration": 40,
       "beats": [
         "host 总结",
         "吹灭蜡烛",
@@ -290,24 +296,12 @@
           "size": "Medium Close-up",
           "angle": "eye-level",
           "movement": "slow dolly-in",
-          "action": "unroll_scroll",
-          "props": [
-            "scroll"
-          ],
-          "h3_mode": "audio_ref",
-          "camera_zone": "front"
-        },
-        {
-          "intent": "outro",
-          "size": "Wide",
-          "angle": "high-angle",
-          "movement": "slow pull-out",
-          "action": "light_candle",
+          "action": "extinguish_candle",
           "props": [
             "candle"
           ],
-          "h3_mode": "fl2v",
-          "camera_zone": "wide"
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
         }
       ]
     }
@@ -319,17 +313,18 @@
     "close": "slow push-in"
   },
   "packaging": {
-    "lower_third": "zaopianju_yellow",
+    "lower_third": "ink_seal_red",
     "transition": "fade",
     "bgm": "ink_ambient",
     "subtitle_style": "variety"
   },
   "audio": {
-    "ambience": "candle_library_room_tone",
+    "ambience": "candlelit_study_room_tone",
     "sfx": [
       "candle_flicker",
       "paper_unroll",
-      "tea_cup"
+      "tea_cup",
+      "brush_stroke"
     ]
   },
   "h3": {
@@ -339,6 +334,6 @@
       8
     ],
     "fps": 25,
-    "resolution": "1280x704"
+    "resolution": "1024x576"
   }
 }

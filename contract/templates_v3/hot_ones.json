@@ -1,0 +1,309 @@
+{
+  "id": "hot_ones",
+  "label": "辣翅访谈",
+  "style": "warm_talk_3d",
+  "aspect": "16:9",
+  "target_duration": 300,
+  "stage": {
+    "type": "3d_set",
+    "plate": "talk_show_sofa__warmtalk",
+    "scene_desc": "A cozy warm-lit interview nook: two facing caramel leather armchairs, a low wooden side table crowded with spicy chicken wings, a milk glass, sauce bottles and question cards, soft amber lamps and a blurred plant behind.",
+    "layout": {
+      "chair_left": [
+        0.32,
+        0.64
+      ],
+      "chair_right": [
+        0.68,
+        0.64
+      ],
+      "side_table": [
+        0.5,
+        0.72
+      ],
+      "lamp_nook": [
+        0.82,
+        0.4
+      ],
+      "ground_y": 0.88
+    },
+    "props": [
+      {
+        "id": "hot_wing",
+        "zone": "side_table",
+        "interaction": "bite"
+      },
+      {
+        "id": "milk_glass",
+        "zone": "side_table",
+        "interaction": "gulp"
+      },
+      {
+        "id": "sauce_bottle",
+        "zone": "side_table",
+        "interaction": "dip"
+      },
+      {
+        "id": "question_card",
+        "zone": "side_table",
+        "interaction": "read"
+      },
+      {
+        "id": "tissue_box",
+        "zone": "side_table",
+        "interaction": "wipe"
+      }
+    ],
+    "camera_zones": [
+      "front",
+      "two_shot",
+      "chair_ots",
+      "table_close",
+      "warm_wide"
+    ]
+  },
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "block": "chair_left",
+      "props": [
+        "question_card"
+      ],
+      "wardrobe": "olive_shirt"
+    },
+    {
+      "role": "guest",
+      "character": "ali",
+      "block": "chair_right",
+      "props": [
+        "hot_wing"
+      ],
+      "wardrobe": "white_tee"
+    }
+  ],
+  "action_library": [
+    {
+      "id": "read_question",
+      "h3_prompt": "Subject flips open a question card on the side table and reads it with a grin",
+      "prop": "question_card"
+    },
+    {
+      "id": "lean_ask",
+      "h3_prompt": "Subject leans forward in the armchair and fires the next question",
+      "prop": null
+    },
+    {
+      "id": "bite_wing",
+      "h3_prompt": "Subject bites into a spicy chicken wing, hot sauce glistening on the fingers",
+      "prop": "hot_wing"
+    },
+    {
+      "id": "react_burn",
+      "h3_prompt": "Subject squeezes their eyes shut and fans an open mouth after the heat kicks in",
+      "prop": null
+    },
+    {
+      "id": "gulp_milk",
+      "h3_prompt": "Subject grabs the milk glass and gulps it down to cool the burn",
+      "prop": "milk_glass"
+    },
+    {
+      "id": "dip_sauce",
+      "h3_prompt": "Subject dips another wing into the extra-hot sauce bottle without looking",
+      "prop": "sauce_bottle"
+    },
+    {
+      "id": "wipe_sweat",
+      "h3_prompt": "Subject pulls a tissue from the box and dabs sweat off their forehead",
+      "prop": "tissue_box"
+    },
+    {
+      "id": "fan_mouth",
+      "h3_prompt": "Subject waves both hands at their open mouth, laughing through the pain",
+      "prop": null
+    },
+    {
+      "id": "laugh_recover",
+      "h3_prompt": "Subject leans back, laughing, and finally recovers enough to answer",
+      "prop": null
+    }
+  ],
+  "segments": [
+    {
+      "id": "cold_open",
+      "name": "开场",
+      "duration": 40,
+      "beats": [
+        "host 翻开问题卡",
+        "身体前倾发问"
+      ],
+      "shots": [
+        {
+          "intent": "question_open",
+          "size": "Wide",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "read_question",
+          "props": [
+            "question_card"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "warm_wide"
+        },
+        {
+          "intent": "lean_in_ask",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "lean_ask",
+          "props": [],
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
+        }
+      ]
+    },
+    {
+      "id": "heat",
+      "name": "辣度升级",
+      "duration": 110,
+      "beats": [
+        "咬下辣翅",
+        "被辣到眼眶发红",
+        "灌一口牛奶"
+      ],
+      "shots": [
+        {
+          "intent": "first_bite",
+          "size": "Medium Close-up",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "bite_wing",
+          "props": [
+            "hot_wing"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "table_close"
+        },
+        {
+          "intent": "burn_react",
+          "size": "Close-up",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "react_burn",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "chair_ots"
+        },
+        {
+          "intent": "milk_gulp",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "gulp_milk",
+          "props": [
+            "milk_glass"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
+        }
+      ]
+    },
+    {
+      "id": "talk",
+      "name": "边吃边聊",
+      "duration": 90,
+      "beats": [
+        "蘸酱续命",
+        "擦汗回答问题"
+      ],
+      "shots": [
+        {
+          "intent": "sauce_dip",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "dip_sauce",
+          "props": [
+            "sauce_bottle"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "table_close"
+        },
+        {
+          "intent": "sweat_wipe",
+          "size": "Medium Close-up",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "wipe_sweat",
+          "props": [
+            "tissue_box"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "chair_ots"
+        }
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "收束",
+      "duration": 60,
+      "beats": [
+        "扇风降温",
+        "笑到收尾"
+      ],
+      "shots": [
+        {
+          "intent": "fan_fire",
+          "size": "Full",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "fan_mouth",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "two_shot"
+        },
+        {
+          "intent": "laugh_out",
+          "size": "Wide",
+          "angle": "eye-level",
+          "movement": "slow pull-out",
+          "action": "laugh_recover",
+          "props": [],
+          "h3_mode": "audio_ref",
+          "camera_zone": "warm_wide"
+        }
+      ]
+    }
+  ],
+  "camera_language": {
+    "default": "static",
+    "wide": "slow push-in",
+    "reaction": "static",
+    "close": "slow dolly-in"
+  },
+  "packaging": {
+    "lower_third": "warm_amber",
+    "transition": "crossfade",
+    "bgm": "warm_lofi",
+    "subtitle_style": "variety"
+  },
+  "audio": {
+    "ambience": "cozy_studio_room_tone",
+    "sfx": [
+      "crowd_oooh",
+      "glass_clink",
+      "nervous_laugh",
+      "sauce_sizzle"
+    ]
+  },
+  "h3": {
+    "workflow": "05_ref2va_4step_sla",
+    "duration": [
+      4,
+      8
+    ],
+    "fps": 25,
+    "resolution": "1024x576"
+  }
+}

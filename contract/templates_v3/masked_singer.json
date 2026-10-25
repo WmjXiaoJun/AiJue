@@ -1,0 +1,336 @@
+{
+  "id": "masked_singer",
+  "label": "蒙面歌王",
+  "style": "neon_stage_3d",
+  "aspect": "16:9",
+  "target_duration": 300,
+  "stage": {
+    "type": "3d_set",
+    "plate": "stage_music__neon",
+    "scene_desc": "A neon-lit music competition stage: a glossy reflective floor at the center, a masked singer under a single spotlight, a host wing on the left, a judges' desk on the right, sequined curtains and magenta-cyan haze.",
+    "layout": {
+      "stage_center": [
+        0.5,
+        0.58
+      ],
+      "host_wing": [
+        0.16,
+        0.66
+      ],
+      "judge_desk": [
+        0.82,
+        0.66
+      ],
+      "curtain": [
+        0.84,
+        0.32
+      ],
+      "platform": [
+        0.5,
+        0.8
+      ],
+      "ground_y": 0.9
+    },
+    "props": [
+      {
+        "id": "mask",
+        "zone": "stage_center",
+        "interaction": "remove"
+      },
+      {
+        "id": "mic_stand",
+        "zone": "stage_center",
+        "interaction": "grip"
+      },
+      {
+        "id": "scorecard",
+        "zone": "judge_desk",
+        "interaction": "raise"
+      },
+      {
+        "id": "spotlight",
+        "zone": "curtain",
+        "interaction": "sweep"
+      },
+      {
+        "id": "confetti_cannon",
+        "zone": "host_wing",
+        "interaction": "press"
+      }
+    ],
+    "camera_zones": [
+      "front",
+      "stage_wide",
+      "wing_ots",
+      "close_mic",
+      "crane_high"
+    ]
+  },
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "block": "host_wing",
+      "props": [
+        "spotlight"
+      ],
+      "wardrobe": "stage_director_black"
+    },
+    {
+      "role": "singer",
+      "character": "ali",
+      "block": "stage_center",
+      "props": [
+        "mask"
+      ],
+      "wardrobe": "sequin_costume"
+    },
+    {
+      "role": "judge",
+      "character": "dawei",
+      "block": "judge_desk",
+      "props": [
+        "scorecard"
+      ],
+      "wardrobe": "judge_purple"
+    }
+  ],
+  "action_library": [
+    {
+      "id": "walk_to_center",
+      "h3_prompt": "Subject walks out from the wing to the center of the neon stage, heels clicking on the glossy floor",
+      "prop": null
+    },
+    {
+      "id": "take_mask_off",
+      "h3_prompt": "Subject reaches up, unclasps a glittering mask and slowly lowers it from the face",
+      "prop": "mask"
+    },
+    {
+      "id": "hold_mic_sing",
+      "h3_prompt": "Subject grips the microphone stand and sings into it with eyes closed",
+      "prop": "mic_stand"
+    },
+    {
+      "id": "raise_arm_note",
+      "h3_prompt": "Subject raises one arm and holds a long high note while neon light sweeps across the face",
+      "prop": null
+    },
+    {
+      "id": "spin_dance",
+      "h3_prompt": "Subject spins across the stage in a swirl of sequins and stops exactly on the beat",
+      "prop": null
+    },
+    {
+      "id": "host_point_stage",
+      "h3_prompt": "Subject points from the side wing while a spotlight swings onto the singer",
+      "prop": "spotlight"
+    },
+    {
+      "id": "judge_whisper",
+      "h3_prompt": "Subject leans toward the judge beside them and raises a score card",
+      "prop": "scorecard"
+    },
+    {
+      "id": "press_confetti",
+      "h3_prompt": "Subject presses the confetti cannon and gold confetti bursts over the stage",
+      "prop": "confetti_cannon"
+    },
+    {
+      "id": "bow_stage",
+      "h3_prompt": "Subject bows deeply at the front of the stage as the lights dim",
+      "prop": null
+    }
+  ],
+  "segments": [
+    {
+      "id": "performance_open",
+      "name": "开场",
+      "duration": 60,
+      "beats": [
+        "歌手从侧幕走上台中央",
+        "聚光灯亮起",
+        "歌手握麦开唱"
+      ],
+      "shots": [
+        {
+          "intent": "singer_enter",
+          "size": "Wide",
+          "angle": "eye-level",
+          "movement": "crane up",
+          "action": "walk_to_center",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "stage_wide"
+        },
+        {
+          "intent": "singer_open_mic",
+          "size": "Medium Close-up",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "hold_mic_sing",
+          "props": [
+            "mic_stand"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "close_mic"
+        }
+      ]
+    },
+    {
+      "id": "performance",
+      "name": "演唱",
+      "duration": 90,
+      "beats": [
+        "副歌爆发",
+        "歌手转圈甩开披风",
+        "评委交头接耳"
+      ],
+      "shots": [
+        {
+          "intent": "dance_break",
+          "size": "Full",
+          "angle": "eye-level",
+          "movement": "slow orbit",
+          "action": "spin_dance",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "stage_wide"
+        },
+        {
+          "intent": "high_note",
+          "size": "Medium Close-up",
+          "angle": "low-angle",
+          "movement": "slow push-in",
+          "action": "raise_arm_note",
+          "props": [],
+          "h3_mode": "audio_ref",
+          "camera_zone": "close_mic"
+        },
+        {
+          "intent": "judges_react",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "judge_whisper",
+          "props": [
+            "scorecard"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "wing_ots"
+        }
+      ]
+    },
+    {
+      "id": "reveal",
+      "name": "揭面",
+      "duration": 90,
+      "beats": [
+        "host 指向舞台",
+        "歌手摘下面具",
+        "金色彩带爆开"
+      ],
+      "shots": [
+        {
+          "intent": "mask_reveal",
+          "size": "Close-up",
+          "angle": "eye-level",
+          "movement": "slow dolly-in",
+          "action": "take_mask_off",
+          "props": [
+            "mask"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
+        },
+        {
+          "intent": "host_cue",
+          "size": "Medium",
+          "angle": "high-angle",
+          "movement": "whip pan",
+          "action": "host_point_stage",
+          "props": [
+            "spotlight"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "crane_high"
+        },
+        {
+          "intent": "confetti",
+          "size": "Wide",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "press_confetti",
+          "props": [
+            "confetti_cannon"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "stage_wide"
+        }
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "收束",
+      "duration": 60,
+      "beats": [
+        "歌手鞠躬谢幕",
+        "镜头推向摘下的面具"
+      ],
+      "shots": [
+        {
+          "intent": "bow",
+          "size": "Full",
+          "angle": "eye-level",
+          "movement": "slow pull-out",
+          "action": "bow_stage",
+          "props": [],
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
+        },
+        {
+          "intent": "outro",
+          "size": "Medium Close-up",
+          "angle": "eye-level",
+          "movement": "slow dolly-in",
+          "action": "take_mask_off",
+          "props": [
+            "mask"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "close_mic"
+        }
+      ]
+    }
+  ],
+  "camera_language": {
+    "default": "slow push-in",
+    "wide": "crane up",
+    "reaction": "static",
+    "close": "slow push-in"
+  },
+  "packaging": {
+    "lower_third": "neon_magenta",
+    "transition": "fade",
+    "bgm": "stage_ballad",
+    "subtitle_style": "variety"
+  },
+  "audio": {
+    "ambience": "neon_stage_room_tone",
+    "sfx": [
+      "crowd_gasp",
+      "confetti_pop",
+      "mic_feedback",
+      "heels_click"
+    ]
+  },
+  "h3": {
+    "workflow": "05_ref2va_4step_sla",
+    "duration": [
+      4,
+      8
+    ],
+    "fps": 25,
+    "resolution": "1024x576"
+  }
+}

@@ -1,0 +1,323 @@
+{
+  "id": "national_treasure",
+  "label": "国家宝藏",
+  "style": "museum_gold_2d",
+  "aspect": "16:9",
+  "target_duration": 300,
+  "stage": {
+    "type": "2d_plate",
+    "plate": "treasure_museum__gold",
+    "scene_desc": "A rich gold-and-jade museum exhibition hall: a spotlit glass display case in the center, a host spot beside it, a tall light stand, ornate golden wall panels and a polished stone floor.",
+    "layout": {
+      "display_case": [
+        0.5,
+        0.56
+      ],
+      "host_spot": [
+        0.3,
+        0.66
+      ],
+      "guest_spot": [
+        0.7,
+        0.66
+      ],
+      "light_stand": [
+        0.14,
+        0.42
+      ],
+      "ground_y": 0.9
+    },
+    "props": [
+      {
+        "id": "artifact_vase",
+        "zone": "display_case",
+        "interaction": "unveil"
+      },
+      {
+        "id": "magnifier",
+        "zone": "display_case",
+        "interaction": "inspect"
+      },
+      {
+        "id": "spotlight_lamp",
+        "zone": "light_stand",
+        "interaction": "focus"
+      },
+      {
+        "id": "white_gloves",
+        "zone": "host_spot",
+        "interaction": "wear"
+      },
+      {
+        "id": "certificate",
+        "zone": "guest_spot",
+        "interaction": "present"
+      }
+    ],
+    "camera_zones": [
+      "front",
+      "gallery_wide",
+      "case_close",
+      "host_ots",
+      "guest_ots",
+      "overhead_light"
+    ]
+  },
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "block": "host_spot",
+      "props": [
+        "white_gloves"
+      ],
+      "wardrobe": "museum_suit"
+    },
+    {
+      "role": "guest",
+      "character": "ali",
+      "block": "guest_spot",
+      "props": [
+        "certificate"
+      ],
+      "wardrobe": "emerald_gown"
+    },
+    {
+      "role": "narrator",
+      "character": "dawei",
+      "block": "display_case",
+      "props": [
+        "magnifier"
+      ],
+      "wardrobe": "archivist_vest"
+    }
+  ],
+  "action_library": [
+    {
+      "id": "wear_gloves",
+      "h3_prompt": "Subject pulls on white cotton gloves, flexing the fingers",
+      "prop": "white_gloves"
+    },
+    {
+      "id": "unveil_artifact",
+      "h3_prompt": "Subject lifts the cover off the display case, revealing a golden artifact",
+      "prop": "artifact_vase"
+    },
+    {
+      "id": "shine_lamp",
+      "h3_prompt": "Subject angles the spotlight lamp onto the display case",
+      "prop": "spotlight_lamp"
+    },
+    {
+      "id": "inspect_magnifier",
+      "h3_prompt": "Subject leans in with a magnifier and studies the artifact's pattern",
+      "prop": "magnifier"
+    },
+    {
+      "id": "lift_vase",
+      "h3_prompt": "Subject lifts the artifact carefully with both gloved hands",
+      "prop": "artifact_vase"
+    },
+    {
+      "id": "point_detail",
+      "h3_prompt": "Subject points at a detail on the artifact and explains it to the guest",
+      "prop": null
+    },
+    {
+      "id": "present_certificate",
+      "h3_prompt": "Subject presents a framed certificate to the guest",
+      "prop": "certificate"
+    },
+    {
+      "id": "step_back_reveal",
+      "h3_prompt": "Subject steps back so the whole lit display case fills the frame",
+      "prop": null
+    },
+    {
+      "id": "dim_lamp",
+      "h3_prompt": "Subject dims the spotlight until only the glowing artifact remains lit",
+      "prop": "spotlight_lamp"
+    }
+  ],
+  "segments": [
+    {
+      "id": "cold_open",
+      "name": "开场",
+      "duration": 45,
+      "beats": [
+        "打开展柜射灯",
+        "戴上白手套"
+      ],
+      "shots": [
+        {
+          "intent": "lamp_on",
+          "size": "Wide",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "shine_lamp",
+          "props": [
+            "spotlight_lamp"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "gallery_wide"
+        },
+        {
+          "intent": "gloves_on",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "wear_gloves",
+          "props": [
+            "white_gloves"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "host_ots"
+        }
+      ]
+    },
+    {
+      "id": "unveil",
+      "name": "揭宝",
+      "duration": 90,
+      "beats": [
+        "揭开国宝",
+        "举放大镜细看"
+      ],
+      "shots": [
+        {
+          "intent": "unveil_shot",
+          "size": "Full",
+          "angle": "eye-level",
+          "movement": "slow dolly-in",
+          "action": "unveil_artifact",
+          "props": [
+            "artifact_vase"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "case_close"
+        },
+        {
+          "intent": "magnify_shot",
+          "size": "Close-up",
+          "angle": "high-angle",
+          "movement": "static",
+          "action": "inspect_magnifier",
+          "props": [
+            "magnifier"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "case_close"
+        }
+      ]
+    },
+    {
+      "id": "explain",
+      "name": "讲解",
+      "duration": 90,
+      "beats": [
+        "托起器物",
+        "指出纹饰细节",
+        "颁发证书"
+      ],
+      "shots": [
+        {
+          "intent": "lift_shot",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "slow orbit",
+          "action": "lift_vase",
+          "props": [
+            "artifact_vase"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "case_close"
+        },
+        {
+          "intent": "detail_shot",
+          "size": "Medium Close-up",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "point_detail",
+          "props": [],
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
+        },
+        {
+          "intent": "cert_shot",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "present_certificate",
+          "props": [
+            "certificate"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "guest_ots"
+        }
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "收束",
+      "duration": 75,
+      "beats": [
+        "退后看全貌",
+        "灯光收暗"
+      ],
+      "shots": [
+        {
+          "intent": "reveal_shot",
+          "size": "Full",
+          "angle": "eye-level",
+          "movement": "slow pull-out",
+          "action": "step_back_reveal",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "gallery_wide"
+        },
+        {
+          "intent": "dim_end",
+          "size": "Wide",
+          "angle": "high-angle",
+          "movement": "slow pull-out",
+          "action": "dim_lamp",
+          "props": [
+            "spotlight_lamp"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "overhead_light"
+        }
+      ]
+    }
+  ],
+  "camera_language": {
+    "default": "slow push-in",
+    "wide": "slow pull-out",
+    "reaction": "static",
+    "close": "slow push-in"
+  },
+  "packaging": {
+    "lower_third": "gold_jade",
+    "transition": "crossfade",
+    "bgm": "museum_orchestral",
+    "subtitle_style": "variety"
+  },
+  "audio": {
+    "ambience": "museum_hall_room_tone",
+    "sfx": [
+      "glass_lift",
+      "crowd_whisper",
+      "fabric_gloves",
+      "lamp_click"
+    ]
+  },
+  "h3": {
+    "workflow": "04_i2v_fl2v_4step_sla",
+    "duration": [
+      4,
+      8
+    ],
+    "fps": 25,
+    "resolution": "1024x576"
+  }
+}

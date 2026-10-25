@@ -1,0 +1,311 @@
+{
+  "id": "slow_life",
+  "label": "慢生活",
+  "style": "clay_life_3d",
+  "aspect": "16:9",
+  "target_duration": 300,
+  "stage": {
+    "type": "3d_set",
+    "plate": "kitchen_warm__clay",
+    "scene_desc": "A handmade clay-style cozy kitchen: a warm tiled stove with a bubbling wok on the left, a wooden counter with chopped vegetables, a small dining table set for two, a garden door in the background and soft studio light.",
+    "layout": {
+      "stove": [
+        0.28,
+        0.62
+      ],
+      "counter": [
+        0.52,
+        0.64
+      ],
+      "dining_table": [
+        0.76,
+        0.68
+      ],
+      "garden_door": [
+        0.1,
+        0.4
+      ],
+      "ground_y": 0.88
+    },
+    "props": [
+      {
+        "id": "wok",
+        "zone": "stove",
+        "interaction": "stir"
+      },
+      {
+        "id": "vegetables",
+        "zone": "counter",
+        "interaction": "chop"
+      },
+      {
+        "id": "plate",
+        "zone": "dining_table",
+        "interaction": "serve"
+      },
+      {
+        "id": "apron",
+        "zone": "stove",
+        "interaction": "tie"
+      },
+      {
+        "id": "kettle",
+        "zone": "counter",
+        "interaction": "pour"
+      }
+    ],
+    "camera_zones": [
+      "front",
+      "kitchen_wide",
+      "stove_close",
+      "table_ots",
+      "overhead"
+    ]
+  },
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "block": "stove",
+      "props": [
+        "wok"
+      ],
+      "wardrobe": "linen_apron"
+    },
+    {
+      "role": "guest",
+      "character": "ali",
+      "block": "dining_table",
+      "props": [
+        "plate"
+      ],
+      "wardrobe": "clay_sweater"
+    }
+  ],
+  "action_library": [
+    {
+      "id": "tie_apron",
+      "h3_prompt": "Subject ties on a linen apron at the stove and rolls up their sleeves",
+      "prop": "apron"
+    },
+    {
+      "id": "chop_veg",
+      "h3_prompt": "Subject chops vegetables on the counter with a steady clay-mation rhythm",
+      "prop": "vegetables"
+    },
+    {
+      "id": "stir_wok",
+      "h3_prompt": "Subject stirs the wok, steam curling up in the warm kitchen light",
+      "prop": "wok"
+    },
+    {
+      "id": "taste_soup",
+      "h3_prompt": "Subject lifts a spoon, tastes the soup and nods to themselves",
+      "prop": null
+    },
+    {
+      "id": "plate_dish",
+      "h3_prompt": "Subject slides the finished dish onto a plate",
+      "prop": "plate"
+    },
+    {
+      "id": "serve_table",
+      "h3_prompt": "Subject carries the plate to the dining table and sets it down",
+      "prop": "plate"
+    },
+    {
+      "id": "sit_eat",
+      "h3_prompt": "Subject sits down opposite the guest and picks up chopsticks",
+      "prop": null
+    },
+    {
+      "id": "pour_tea",
+      "h3_prompt": "Subject pours tea from the kettle into two small cups",
+      "prop": "kettle"
+    },
+    {
+      "id": "wipe_hands",
+      "h3_prompt": "Subject wipes their hands on the apron and looks around the tidy kitchen",
+      "prop": null
+    }
+  ],
+  "segments": [
+    {
+      "id": "cold_open",
+      "name": "开场",
+      "duration": 45,
+      "beats": [
+        "系上围裙",
+        "备菜开火"
+      ],
+      "shots": [
+        {
+          "intent": "apron_on",
+          "size": "Wide",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "tie_apron",
+          "props": [
+            "apron"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "kitchen_wide"
+        },
+        {
+          "intent": "prep_chop",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "chop_veg",
+          "props": [
+            "vegetables"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "overhead"
+        }
+      ]
+    },
+    {
+      "id": "cook",
+      "name": "做饭",
+      "duration": 100,
+      "beats": [
+        "翻炒锅里",
+        "尝一口汤",
+        "装盘"
+      ],
+      "shots": [
+        {
+          "intent": "wok_stir",
+          "size": "Medium Close-up",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "stir_wok",
+          "props": [
+            "wok"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "stove_close"
+        },
+        {
+          "intent": "taste_soup",
+          "size": "Close-up",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "taste_soup",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "stove_close"
+        },
+        {
+          "intent": "plate_up",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "plate_dish",
+          "props": [
+            "plate"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "table_ots"
+        }
+      ]
+    },
+    {
+      "id": "serve",
+      "name": "上桌",
+      "duration": 90,
+      "beats": [
+        "端菜上桌",
+        "面对面坐下开吃"
+      ],
+      "shots": [
+        {
+          "intent": "serve_dish",
+          "size": "Full",
+          "angle": "eye-level",
+          "movement": "tracking",
+          "action": "serve_table",
+          "props": [
+            "plate"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "kitchen_wide"
+        },
+        {
+          "intent": "sit_down",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "sit_eat",
+          "props": [],
+          "h3_mode": "audio_ref",
+          "camera_zone": "table_ots"
+        }
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "收束",
+      "duration": 65,
+      "beats": [
+        "倒两杯茶",
+        "擦手收尾"
+      ],
+      "shots": [
+        {
+          "intent": "tea_pour",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "pour_tea",
+          "props": [
+            "kettle"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
+        },
+        {
+          "intent": "clean_end",
+          "size": "Wide",
+          "angle": "high-angle",
+          "movement": "slow pull-out",
+          "action": "wipe_hands",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "kitchen_wide"
+        }
+      ]
+    }
+  ],
+  "camera_language": {
+    "default": "static",
+    "wide": "slow push-in",
+    "reaction": "static",
+    "close": "slow push-in"
+  },
+  "packaging": {
+    "lower_third": "clay_pastel",
+    "transition": "crossfade",
+    "bgm": "clay_ukulele",
+    "subtitle_style": "variety"
+  },
+  "audio": {
+    "ambience": "kitchen_room_tone",
+    "sfx": [
+      "sizzle",
+      "knife_chop",
+      "plate_clink",
+      "kettle_whistle"
+    ]
+  },
+  "h3": {
+    "workflow": "04_i2v_fl2v_4step_sla",
+    "duration": [
+      4,
+      7
+    ],
+    "fps": 25,
+    "resolution": "1024x576"
+  }
+}

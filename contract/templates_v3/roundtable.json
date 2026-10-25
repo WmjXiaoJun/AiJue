@@ -1,0 +1,318 @@
+{
+  "id": "roundtable",
+  "label": "圆桌派",
+  "style": "roundtable_3d",
+  "aspect": "16:9",
+  "target_duration": 300,
+  "stage": {
+    "type": "3d_set",
+    "plate": "roundtable_studio__roundtable",
+    "scene_desc": "A circular dark roundtable studio: three leather chairs spaced evenly around a polished circular table, moody desk lamps, a glowing topic board behind, deep shadows and a reflective floor.",
+    "layout": {
+      "seat_a": [
+        0.5,
+        0.42
+      ],
+      "seat_b": [
+        0.26,
+        0.7
+      ],
+      "seat_c": [
+        0.74,
+        0.7
+      ],
+      "hub": [
+        0.5,
+        0.6
+      ],
+      "board": [
+        0.5,
+        0.24
+      ],
+      "ground_y": 0.88
+    },
+    "props": [
+      {
+        "id": "question_card",
+        "zone": "hub",
+        "interaction": "flip"
+      },
+      {
+        "id": "tablet",
+        "zone": "hub",
+        "interaction": "tap"
+      },
+      {
+        "id": "water_glass",
+        "zone": "hub",
+        "interaction": "sip"
+      },
+      {
+        "id": "center_mic",
+        "zone": "hub",
+        "interaction": "adjust"
+      },
+      {
+        "id": "topic_board",
+        "zone": "board",
+        "interaction": "point"
+      }
+    ],
+    "camera_zones": [
+      "front",
+      "high_orbit",
+      "seat_ots",
+      "hub_close"
+    ]
+  },
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "block": "seat_a",
+      "props": [
+        "question_card"
+      ],
+      "wardrobe": "slate_shirt"
+    },
+    {
+      "role": "guest_a",
+      "character": "ali",
+      "block": "seat_b",
+      "props": [
+        "tablet"
+      ],
+      "wardrobe": "knit_sweater"
+    },
+    {
+      "role": "guest_b",
+      "character": "dawei",
+      "block": "seat_c",
+      "props": [
+        "water_glass"
+      ],
+      "wardrobe": "dark_jacket"
+    }
+  ],
+  "action_library": [
+    {
+      "id": "rotate_chair",
+      "h3_prompt": "Subject swivels the chair toward the guest beside them and leans an elbow on the table",
+      "prop": null
+    },
+    {
+      "id": "adjust_mic",
+      "h3_prompt": "Subject pulls the center microphone closer and taps it once",
+      "prop": "center_mic"
+    },
+    {
+      "id": "tap_tablet",
+      "h3_prompt": "Subject taps the tablet on the table and turns it to show a chart",
+      "prop": "tablet"
+    },
+    {
+      "id": "flip_question_card",
+      "h3_prompt": "Subject flips the question card over and reads it with a raised eyebrow",
+      "prop": "question_card"
+    },
+    {
+      "id": "sip_water",
+      "h3_prompt": "Subject lifts a water glass, takes a slow sip and sets it down",
+      "prop": "water_glass"
+    },
+    {
+      "id": "hand_mic",
+      "h3_prompt": "Subject slides the microphone across the table to the guest opposite",
+      "prop": "center_mic"
+    },
+    {
+      "id": "point_board",
+      "h3_prompt": "Subject points at the glowing topic board behind them while making a point",
+      "prop": "topic_board"
+    },
+    {
+      "id": "group_react",
+      "h3_prompt": "Subject looks around the round table, eyebrows up, waiting for someone to answer",
+      "prop": null
+    }
+  ],
+  "segments": [
+    {
+      "id": "cold_open",
+      "name": "开场",
+      "duration": 45,
+      "beats": [
+        "三人围坐圆桌",
+        "host 翻开问题卡"
+      ],
+      "shots": [
+        {
+          "intent": "group_establish",
+          "size": "Wide",
+          "angle": "high-angle",
+          "movement": "slow orbit",
+          "action": "rotate_chair",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "front"
+        },
+        {
+          "intent": "question_flip",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "flip_question_card",
+          "props": [
+            "question_card"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "hub_close"
+        }
+      ]
+    },
+    {
+      "id": "discuss",
+      "name": "对谈",
+      "duration": 110,
+      "beats": [
+        "嘉宾戳平板",
+        "指向话题板",
+        "三人对视"
+      ],
+      "shots": [
+        {
+          "intent": "data_point",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "tap_tablet",
+          "props": [
+            "tablet"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "seat_ots"
+        },
+        {
+          "intent": "board_point",
+          "size": "Medium Close-up",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "point_board",
+          "props": [
+            "topic_board"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "front"
+        },
+        {
+          "intent": "group_beat",
+          "size": "Close-up",
+          "angle": "low-angle",
+          "movement": "static",
+          "action": "group_react",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "seat_ots"
+        }
+      ]
+    },
+    {
+      "id": "pressure",
+      "name": "追问",
+      "duration": 90,
+      "beats": [
+        "host 调整麦克风追问",
+        "递麦给对面嘉宾"
+      ],
+      "shots": [
+        {
+          "intent": "mic_adjust",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "adjust_mic",
+          "props": [
+            "center_mic"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "hub_close"
+        },
+        {
+          "intent": "mic_handoff",
+          "size": "Medium",
+          "angle": "high-angle",
+          "movement": "slow orbit",
+          "action": "hand_mic",
+          "props": [
+            "center_mic"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "high_orbit"
+        }
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "收束",
+      "duration": 55,
+      "beats": [
+        "喝口水收尾",
+        "转向下一位"
+      ],
+      "shots": [
+        {
+          "intent": "water_close",
+          "size": "Medium Close-up",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "sip_water",
+          "props": [
+            "water_glass"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
+        },
+        {
+          "intent": "outro",
+          "size": "Wide",
+          "angle": "high-angle",
+          "movement": "slow pull-out",
+          "action": "rotate_chair",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "high_orbit"
+        }
+      ]
+    }
+  ],
+  "camera_language": {
+    "default": "slow orbit",
+    "wide": "high orbit",
+    "reaction": "static",
+    "close": "slow push-in"
+  },
+  "packaging": {
+    "lower_third": "roundtable_teal",
+    "transition": "fade",
+    "bgm": "roundtable_pulse",
+    "subtitle_style": "variety"
+  },
+  "audio": {
+    "ambience": "roundtable_studio_room_tone",
+    "sfx": [
+      "chair_swivel",
+      "tablet_tap",
+      "glass_clink",
+      "mic_handoff"
+    ]
+  },
+  "h3": {
+    "workflow": "05_ref2va_4step_sla",
+    "duration": [
+      4,
+      8
+    ],
+    "fps": 25,
+    "resolution": "1024x576"
+  }
+}

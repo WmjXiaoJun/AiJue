@@ -1,0 +1,337 @@
+{
+  "id": "taskmaster",
+  "label": "任务大师",
+  "style": "game_show_3d",
+  "aspect": "16:9",
+  "target_duration": 300,
+  "stage": {
+    "type": "3d_set",
+    "plate": "taskmaster_stage__game",
+    "scene_desc": "A brightly lit colorful TV game-show stage: a host podium on the left, a cluttered task zone full of props in the center, a giant countdown timer board on the right and a golden trophy on a dais, glossy candy-colored set pieces.",
+    "layout": {
+      "host_podium": [
+        0.2,
+        0.62
+      ],
+      "task_zone": [
+        0.5,
+        0.68
+      ],
+      "timer_board": [
+        0.82,
+        0.34
+      ],
+      "trophy_dais": [
+        0.8,
+        0.68
+      ],
+      "ground_y": 0.88
+    },
+    "props": [
+      {
+        "id": "task_card",
+        "zone": "task_zone",
+        "interaction": "read"
+      },
+      {
+        "id": "timer_button",
+        "zone": "timer_board",
+        "interaction": "press"
+      },
+      {
+        "id": "trophy",
+        "zone": "trophy_dais",
+        "interaction": "lift"
+      },
+      {
+        "id": "rubber_duck",
+        "zone": "task_zone",
+        "interaction": "grab"
+      },
+      {
+        "id": "scoreboard",
+        "zone": "timer_board",
+        "interaction": "flip"
+      },
+      {
+        "id": "whistle",
+        "zone": "host_podium",
+        "interaction": "blow"
+      }
+    ],
+    "camera_zones": [
+      "front",
+      "task_wide",
+      "host_ots",
+      "timer_close",
+      "overhead"
+    ]
+  },
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "block": "host_podium",
+      "props": [
+        "whistle"
+      ],
+      "wardrobe": "ringmaster_red"
+    },
+    {
+      "role": "contestant_a",
+      "character": "ali",
+      "block": "task_zone",
+      "props": [
+        "task_card"
+      ],
+      "wardrobe": "tracksuit_blue"
+    },
+    {
+      "role": "contestant_b",
+      "character": "dawei",
+      "block": "trophy_dais",
+      "props": [
+        "trophy"
+      ],
+      "wardrobe": "tracksuit_olive"
+    }
+  ],
+  "action_library": [
+    {
+      "id": "read_task_card",
+      "h3_prompt": "Subject stands at the host podium and reads a task card aloud with theatrical relish",
+      "prop": "task_card"
+    },
+    {
+      "id": "grab_prop",
+      "h3_prompt": "Subject scrambles into the task zone and snatches the rubber duck off the table",
+      "prop": "rubber_duck"
+    },
+    {
+      "id": "press_timer",
+      "h3_prompt": "Subject slams a hand on the timer button and the countdown starts",
+      "prop": "timer_button"
+    },
+    {
+      "id": "check_timer",
+      "h3_prompt": "Subject looks up at the giant timer, panicking, while their hands keep working",
+      "prop": "timer_button"
+    },
+    {
+      "id": "lift_trophy",
+      "h3_prompt": "Subject lifts the golden trophy over their head in triumph",
+      "prop": "trophy"
+    },
+    {
+      "id": "blow_whistle",
+      "h3_prompt": "Subject blows a whistle sharply and waves the contestants to stop",
+      "prop": "whistle"
+    },
+    {
+      "id": "celebrate_leap",
+      "h3_prompt": "Subject leaps into the air, arms overhead, celebrating the completed task",
+      "prop": null
+    },
+    {
+      "id": "host_smirk",
+      "h3_prompt": "Subject looks straight into the camera with a dry smirk, arms crossed",
+      "prop": null
+    },
+    {
+      "id": "flip_scoreboard",
+      "h3_prompt": "Subject flips the scoreboard on the wall and steps back",
+      "prop": "scoreboard"
+    }
+  ],
+  "segments": [
+    {
+      "id": "cold_open",
+      "name": "开场",
+      "duration": 40,
+      "beats": [
+        "host 站上主持台",
+        "宣读任务卡",
+        "计时开始"
+      ],
+      "shots": [
+        {
+          "intent": "host_intro",
+          "size": "Wide",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "host_smirk",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "front"
+        },
+        {
+          "intent": "task_read",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "read_task_card",
+          "props": [
+            "task_card"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "host_ots"
+        }
+      ]
+    },
+    {
+      "id": "task",
+      "name": "任务进行中",
+      "duration": 100,
+      "beats": [
+        "嘉宾冲进任务区",
+        "抢道具按计时器",
+        "手忙脚乱看时间"
+      ],
+      "shots": [
+        {
+          "intent": "scramble",
+          "size": "Full",
+          "angle": "high-angle",
+          "movement": "whip pan",
+          "action": "grab_prop",
+          "props": [
+            "rubber_duck"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "task_wide"
+        },
+        {
+          "intent": "timer_press",
+          "size": "Medium Close-up",
+          "angle": "eye-level",
+          "movement": "handheld follow",
+          "action": "press_timer",
+          "props": [
+            "timer_button"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "timer_close"
+        },
+        {
+          "intent": "clock_panic",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "check_timer",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "front"
+        }
+      ]
+    },
+    {
+      "id": "result",
+      "name": "结果",
+      "duration": 100,
+      "beats": [
+        "任务完成庆祝",
+        "举起奖杯",
+        "host 吹哨叫停"
+      ],
+      "shots": [
+        {
+          "intent": "celebration",
+          "size": "Wide",
+          "angle": "eye-level",
+          "movement": "overhead",
+          "action": "celebrate_leap",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "overhead"
+        },
+        {
+          "intent": "trophy_lift",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "lift_trophy",
+          "props": [
+            "trophy"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
+        },
+        {
+          "intent": "whistle_stop",
+          "size": "Close-up",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "blow_whistle",
+          "props": [
+            "whistle"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "host_ots"
+        }
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "收束",
+      "duration": 60,
+      "beats": [
+        "翻记分牌",
+        "镜头拉远收尾"
+      ],
+      "shots": [
+        {
+          "intent": "score_flip",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "flip_scoreboard",
+          "props": [
+            "scoreboard"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
+        },
+        {
+          "intent": "outro",
+          "size": "Wide",
+          "angle": "high-angle",
+          "movement": "crane up",
+          "action": "host_smirk",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "task_wide"
+        }
+      ]
+    }
+  ],
+  "camera_language": {
+    "default": "slow push-in",
+    "wide": "whip pan",
+    "reaction": "static",
+    "close": "snap zoom"
+  },
+  "packaging": {
+    "lower_third": "task_yellow",
+    "transition": "hard_cut",
+    "bgm": "game_show_quirky",
+    "subtitle_style": "variety"
+  },
+  "audio": {
+    "ambience": "studio_game_room_tone",
+    "sfx": [
+      "buzzer",
+      "whistle",
+      "crowd_cheer",
+      "trophy_clink"
+    ]
+  },
+  "h3": {
+    "workflow": "04_i2v_fl2v_4step_sla",
+    "duration": [
+      4,
+      6
+    ],
+    "fps": 25,
+    "resolution": "1024x576"
+  }
+}

@@ -1,0 +1,315 @@
+{
+  "id": "standup",
+  "label": "单口喜剧夜",
+  "style": "retro_standup_2d",
+  "aspect": "16:9",
+  "target_duration": 300,
+  "stage": {
+    "type": "2d_plate",
+    "plate": "stage_music__vhs",
+    "scene_desc": "A retro 1980s stand-up comedy club stage: a brick back wall, a single microphone stand in a warm spotlight, a wooden stool, a red curtain edge and a grainy VHS glow.",
+    "layout": {
+      "mic_spot": [
+        0.5,
+        0.64
+      ],
+      "stool": [
+        0.66,
+        0.68
+      ],
+      "audience_front": [
+        0.5,
+        0.92
+      ],
+      "ground_y": 0.88
+    },
+    "props": [
+      {
+        "id": "mic",
+        "zone": "mic_spot",
+        "interaction": "hold"
+      },
+      {
+        "id": "water_glass",
+        "zone": "stool",
+        "interaction": "sip"
+      },
+      {
+        "id": "note_card",
+        "zone": "mic_spot",
+        "interaction": "check"
+      },
+      {
+        "id": "crowd_sign",
+        "zone": "audience_front",
+        "interaction": "raise"
+      },
+      {
+        "id": "stool_seat",
+        "zone": "stool",
+        "interaction": "sit"
+      }
+    ],
+    "camera_zones": [
+      "front",
+      "wide",
+      "crowd_ots",
+      "mic_close",
+      "vhs_wide"
+    ]
+  },
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "block": "mic_spot",
+      "props": [
+        "mic"
+      ],
+      "wardrobe": "shabby_suit"
+    },
+    {
+      "role": "guest_a",
+      "character": "ali",
+      "block": "stool",
+      "props": [
+        "water_glass"
+      ],
+      "wardrobe": "denim_jacket"
+    },
+    {
+      "role": "heckler",
+      "character": "dawei",
+      "block": "audience_front",
+      "props": [
+        "crowd_sign"
+      ],
+      "wardrobe": "audience_windbreaker"
+    }
+  ],
+  "action_library": [
+    {
+      "id": "walk_to_mic",
+      "h3_prompt": "Subject strolls to the microphone in a shabby suit, checks a crumpled note card and adjusts the stand with a grin",
+      "prop": "note_card"
+    },
+    {
+      "id": "hold_mic_joke",
+      "h3_prompt": "Subject grips the microphone close to the mouth and starts a deadpan joke",
+      "prop": "mic"
+    },
+    {
+      "id": "lean_mic",
+      "h3_prompt": "Subject leans into the microphone, eyes narrowing for the punchline",
+      "prop": null
+    },
+    {
+      "id": "gesture_punchline",
+      "h3_prompt": "Subject throws both arms wide, milking the punchline",
+      "prop": null
+    },
+    {
+      "id": "sip_water",
+      "h3_prompt": "Subject takes a water glass from the stool, sips and sets it down with a clink",
+      "prop": "water_glass"
+    },
+    {
+      "id": "point_heckler",
+      "h3_prompt": "Subject points into the audience and banters with a heckler",
+      "prop": null
+    },
+    {
+      "id": "crowd_laugh",
+      "h3_prompt": "Subject turns toward the audience as a wave of laughter rolls back",
+      "prop": "crowd_sign"
+    },
+    {
+      "id": "sit_stool",
+      "h3_prompt": "Subject hops onto the wooden stool and sits back, holding the mic loosely",
+      "prop": "stool_seat"
+    },
+    {
+      "id": "bow_off",
+      "h3_prompt": "Subject bows awkwardly, steps back from the mic and waves off the stage",
+      "prop": null
+    }
+  ],
+  "segments": [
+    {
+      "id": "cold_open",
+      "name": "开场",
+      "duration": 45,
+      "beats": [
+        "喜剧演员踱步上台",
+        "调整麦克风",
+        "开口第一个段子"
+      ],
+      "shots": [
+        {
+          "intent": "comedian_enter",
+          "size": "Wide",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "walk_to_mic",
+          "props": [
+            "note_card"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "wide"
+        },
+        {
+          "intent": "first_joke",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "hold_mic_joke",
+          "props": [
+            "mic"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
+        }
+      ]
+    },
+    {
+      "id": "routine",
+      "name": "正活",
+      "duration": 110,
+      "beats": [
+        "冷面铺垫",
+        "身体前倾抖包袱",
+        "喝一口水"
+      ],
+      "shots": [
+        {
+          "intent": "setup",
+          "size": "Medium Close-up",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "lean_mic",
+          "props": [],
+          "h3_mode": "audio_ref",
+          "camera_zone": "mic_close"
+        },
+        {
+          "intent": "punchline",
+          "size": "Full",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "gesture_punchline",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "vhs_wide"
+        },
+        {
+          "intent": "water_beat",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "tilt down",
+          "action": "sip_water",
+          "props": [
+            "water_glass"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
+        }
+      ]
+    },
+    {
+      "id": "crowd",
+      "name": "互动",
+      "duration": 90,
+      "beats": [
+        "观众大笑",
+        "演员指着台下起哄的观众"
+      ],
+      "shots": [
+        {
+          "intent": "crowd_react",
+          "size": "Medium Close-up",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "crowd_laugh",
+          "props": [
+            "crowd_sign"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "crowd_ots"
+        },
+        {
+          "intent": "heckler_banter",
+          "size": "Full",
+          "angle": "low-angle",
+          "movement": "slow push-in",
+          "action": "point_heckler",
+          "props": [],
+          "h3_mode": "audio_ref",
+          "camera_zone": "wide"
+        }
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "收束",
+      "duration": 55,
+      "beats": [
+        "坐到高脚凳上",
+        "挥手谢幕下台"
+      ],
+      "shots": [
+        {
+          "intent": "stool_beat",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "slow dolly-in",
+          "action": "sit_stool",
+          "props": [
+            "stool_seat"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
+        },
+        {
+          "intent": "wave_off",
+          "size": "Wide",
+          "angle": "eye-level",
+          "movement": "slow pull-out",
+          "action": "bow_off",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "wide"
+        }
+      ]
+    }
+  ],
+  "camera_language": {
+    "default": "slow push-in",
+    "wide": "static",
+    "reaction": "static",
+    "close": "slow push-in"
+  },
+  "packaging": {
+    "lower_third": "vhs_yellow",
+    "transition": "hard_cut",
+    "bgm": "vhs_jazz",
+    "subtitle_style": "variety"
+  },
+  "audio": {
+    "ambience": "comedy_club_room_tone",
+    "sfx": [
+      "crowd_laugh",
+      "mic_pop",
+      "chair_scrape",
+      "glass_clink"
+    ]
+  },
+  "h3": {
+    "workflow": "05_ref2va_4step_sla",
+    "duration": [
+      4,
+      8
+    ],
+    "fps": 25,
+    "resolution": "1024x576"
+  }
+}

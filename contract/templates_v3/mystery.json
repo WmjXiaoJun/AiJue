@@ -1,0 +1,318 @@
+{
+  "id": "mystery",
+  "label": "推理现场",
+  "style": "noir_mystery_3d",
+  "aspect": "16:9",
+  "target_duration": 300,
+  "stage": {
+    "type": "3d_set",
+    "plate": "mystery_room__noir",
+    "scene_desc": "A film-noir detective's office at night: a cluttered desk with a green lamp and a whisky glass, a chalk body outline on the floor, venetian blinds slicing cold blue light across the room, a wet window with neon reflections and cigarette smoke.",
+    "layout": {
+      "desk_noir": [
+        0.3,
+        0.62
+      ],
+      "body_outline": [
+        0.5,
+        0.74
+      ],
+      "window_noir": [
+        0.8,
+        0.46
+      ],
+      "door_side": [
+        0.12,
+        0.6
+      ],
+      "ground_y": 0.88
+    },
+    "props": [
+      {
+        "id": "flashlight",
+        "zone": "desk_noir",
+        "interaction": "shine"
+      },
+      {
+        "id": "case_file",
+        "zone": "desk_noir",
+        "interaction": "flip"
+      },
+      {
+        "id": "evidence_bag",
+        "zone": "body_outline",
+        "interaction": "bag"
+      },
+      {
+        "id": "whisky_glass",
+        "zone": "desk_noir",
+        "interaction": "pour"
+      },
+      {
+        "id": "blind_cord",
+        "zone": "window_noir",
+        "interaction": "pull"
+      }
+    ],
+    "camera_zones": [
+      "front",
+      "noir_wide",
+      "desk_ots",
+      "window_close",
+      "low_angle"
+    ]
+  },
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "block": "desk_noir",
+      "props": [
+        "flashlight"
+      ],
+      "wardrobe": "trench_coat"
+    },
+    {
+      "role": "suspect",
+      "character": "ali",
+      "block": "door_side",
+      "props": [
+        "case_file"
+      ],
+      "wardrobe": "grey_overcoat"
+    },
+    {
+      "role": "witness",
+      "character": "dawei",
+      "block": "window_noir",
+      "props": [
+        "blind_cord"
+      ],
+      "wardrobe": "dark_scarf"
+    }
+  ],
+  "action_library": [
+    {
+      "id": "shine_flashlight",
+      "h3_prompt": "Subject sweeps a flashlight beam across the dark office",
+      "prop": "flashlight"
+    },
+    {
+      "id": "kneel_body",
+      "h3_prompt": "Subject kneels beside the chalk outline and studies the floor",
+      "prop": null
+    },
+    {
+      "id": "bag_evidence",
+      "h3_prompt": "Subject bags a small piece of evidence into a paper bag",
+      "prop": "evidence_bag"
+    },
+    {
+      "id": "flip_case_file",
+      "h3_prompt": "Subject flips through the case file under the desk lamp",
+      "prop": "case_file"
+    },
+    {
+      "id": "pull_blind",
+      "h3_prompt": "Subject tugs the blind cord; venetian shadows sweep across the room",
+      "prop": "blind_cord"
+    },
+    {
+      "id": "pace_room",
+      "h3_prompt": "Subject paces slowly across the office, thinking out loud",
+      "prop": null
+    },
+    {
+      "id": "confront_point",
+      "h3_prompt": "Subject steps close and points a finger at the suspect",
+      "prop": null
+    },
+    {
+      "id": "pour_drink",
+      "h3_prompt": "Subject pours a shot of whisky into the glass on the desk",
+      "prop": "whisky_glass"
+    },
+    {
+      "id": "sit_desk",
+      "h3_prompt": "Subject sinks into the chair behind the desk and stares into the dark",
+      "prop": null
+    }
+  ],
+  "segments": [
+    {
+      "id": "cold_open",
+      "name": "开场",
+      "duration": 45,
+      "beats": [
+        "手电扫过案发现场",
+        "侦探蹲下查看"
+      ],
+      "shots": [
+        {
+          "intent": "flash_sweep",
+          "size": "Wide",
+          "angle": "low-angle",
+          "movement": "slow push-in",
+          "action": "shine_flashlight",
+          "props": [
+            "flashlight"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "noir_wide"
+        },
+        {
+          "intent": "kneel_floor",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "kneel_body",
+          "props": [],
+          "h3_mode": "audio_ref",
+          "camera_zone": "low_angle"
+        }
+      ]
+    },
+    {
+      "id": "investigate",
+      "name": "查案",
+      "duration": 90,
+      "beats": [
+        "封存证物",
+        "翻看卷宗",
+        "拉下百叶窗"
+      ],
+      "shots": [
+        {
+          "intent": "bag_prop",
+          "size": "Close-up",
+          "angle": "high-angle",
+          "movement": "static",
+          "action": "bag_evidence",
+          "props": [
+            "evidence_bag"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
+        },
+        {
+          "intent": "file_read",
+          "size": "Medium Close-up",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "flip_case_file",
+          "props": [
+            "case_file"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "desk_ots"
+        },
+        {
+          "intent": "blind_pull",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "pull_blind",
+          "props": [
+            "blind_cord"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "window_close"
+        }
+      ]
+    },
+    {
+      "id": "confront",
+      "name": "对峙",
+      "duration": 90,
+      "beats": [
+        "在房间里踱步",
+        "逼近嫌疑人指问"
+      ],
+      "shots": [
+        {
+          "intent": "pace_shot",
+          "size": "Full",
+          "angle": "eye-level",
+          "movement": "tracking",
+          "action": "pace_room",
+          "props": [],
+          "h3_mode": "audio_ref",
+          "camera_zone": "noir_wide"
+        },
+        {
+          "intent": "point_shot",
+          "size": "Medium Close-up",
+          "angle": "low-angle",
+          "movement": "static",
+          "action": "confront_point",
+          "props": [],
+          "h3_mode": "audio_ref",
+          "camera_zone": "noir_wide"
+        }
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "收束",
+      "duration": 75,
+      "beats": [
+        "给自己倒一杯酒",
+        "坐回办公桌前"
+      ],
+      "shots": [
+        {
+          "intent": "pour_shot",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "slow dolly-in",
+          "action": "pour_drink",
+          "props": [
+            "whisky_glass"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "desk_ots"
+        },
+        {
+          "intent": "sit_end",
+          "size": "Wide",
+          "angle": "high-angle",
+          "movement": "slow pull-out",
+          "action": "sit_desk",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "noir_wide"
+        }
+      ]
+    }
+  ],
+  "camera_language": {
+    "default": "slow push-in",
+    "wide": "slow orbit",
+    "reaction": "static",
+    "close": "slow dolly-in"
+  },
+  "packaging": {
+    "lower_third": "noir_blue",
+    "transition": "fade_black",
+    "bgm": "noir_saxophone",
+    "subtitle_style": "variety"
+  },
+  "audio": {
+    "ambience": "rain_on_window_room_tone",
+    "sfx": [
+      "rain",
+      "blind_rattle",
+      "glass_pour",
+      "match_strike"
+    ]
+  },
+  "h3": {
+    "workflow": "04_i2v_fl2v_4step_sla",
+    "duration": [
+      4,
+      8
+    ],
+    "fps": 25,
+    "resolution": "1024x576"
+  }
+}

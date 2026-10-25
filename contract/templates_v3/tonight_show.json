@@ -7,6 +7,7 @@
   "stage": {
     "type": "3d_set",
     "plate": "late_night_desk__cinematic",
+    "scene_desc": "A neon-lit late-night talk show studio: a dark polished wooden desk in the foreground with two black leather chairs behind it, a floor-to-ceiling wall of glowing cyan neon panels, a glossy reflective stage floor, cool teal rim light and warm practical lamps on the desk.",
     "layout": {
       "desk": [
         0.3,
@@ -56,7 +57,8 @@
       "front",
       "desk_swap",
       "sofa_ots",
-      "window_wide"
+      "window_wide",
+      "guest_close"
     ]
   },
   "cast": [
@@ -85,48 +87,53 @@
       "props": [
         "script"
       ],
-      "wardrobe": "dark_suit"
+      "wardrobe": "charcoal_suit"
     }
   ],
   "action_library": [
     {
       "id": "walk_in_desk",
-      "h3_prompt": "Subject walks from the window toward the desk, sits down and puts cue cards on the desk",
+      "h3_prompt": "Subject walks from the window toward the desk, pulls out the chair and sits down while smoothing the suit jacket",
       "prop": null
     },
     {
       "id": "pick_cue_cards",
-      "h3_prompt": "Subject picks up the cue cards from the desk and flips one card",
+      "h3_prompt": "Subject picks up the cue cards from the desk and flips through them while talking to camera",
       "prop": "cue_cards"
     },
     {
+      "id": "walk_to_sofa",
+      "h3_prompt": "Subject walks in from the side of the stage and settles onto the guest sofa, greeting the host",
+      "prop": null
+    },
+    {
+      "id": "turn_to_guest",
+      "h3_prompt": "Subject turns from the camera toward the guest on the sofa and raises an eyebrow",
+      "prop": null
+    },
+    {
       "id": "sip_mug",
-      "h3_prompt": "Subject lifts the coffee mug and takes a sip, then sets it back",
+      "h3_prompt": "Subject lifts the coffee mug, takes a sip and sets it back on the desk",
       "prop": "coffee_mug"
     },
     {
-      "id": "point_window",
-      "h3_prompt": "Subject turns and points toward the city window while talking",
-      "prop": null
-    },
-    {
-      "id": "lean_to_guest",
-      "h3_prompt": "Subject leans toward the guest on the sofa, talking with a smirk",
-      "prop": null
-    },
-    {
       "id": "react_laugh",
-      "h3_prompt": "Subject laughs and slaps the desk lightly",
+      "h3_prompt": "Subject laughs and slaps the desk lightly, then points at the guest",
       "prop": null
     },
     {
       "id": "handoff_script",
-      "h3_prompt": "Subject hands a folded script to the guest beside them",
+      "h3_prompt": "Subject hands a folded script across the desk to the guest beside them",
       "prop": "script"
     },
     {
+      "id": "point_window",
+      "h3_prompt": "Subject turns and points toward the city window while delivering a punchline",
+      "prop": null
+    },
+    {
       "id": "turn_to_camera",
-      "h3_prompt": "Subject turns from the guest back to the camera and delivers the line",
+      "h3_prompt": "Subject turns back to the camera, leans on the desk and delivers the closing line",
       "prop": null
     }
   ],
@@ -137,9 +144,8 @@
       "duration": 35,
       "beats": [
         "host 从窗边走向 desk",
-        "host 拿起 cue cards",
-        "host 看向 guest 席",
-        "host 对着镜头开场"
+        "host 拿起 cue cards 对镜头开场",
+        "host 指向窗外城市夜景"
       ],
       "shots": [
         {
@@ -173,7 +179,7 @@
       "beats": [
         "guest 从侧幕走进",
         "guest 落座沙发",
-        "host 递话筒/打招呼"
+        "host 转向 guest 打招呼"
       ],
       "shots": [
         {
@@ -183,7 +189,7 @@
           "movement": "tracking",
           "action": "walk_to_sofa",
           "props": [],
-          "h3_mode": "i2v",
+          "h3_mode": "fl2v",
           "camera_zone": "sofa_ots"
         },
         {
@@ -199,14 +205,14 @@
       ]
     },
     {
-      "id": "roundtable",
+      "id": "interview",
       "name": "访谈正片",
       "duration": 150,
       "beats": [
         "三人对谈",
-        "道具互动（杯子/稿子）",
-        "反应镜头",
-        "host 抛尖锐问题"
+        "道具互动（咖啡/稿子）",
+        "host 抛尖锐问题",
+        "反应镜头"
       ],
       "shots": [
         {
@@ -219,7 +225,7 @@
             "coffee_mug"
           ],
           "h3_mode": "audio_ref",
-          "camera_zone": "sofa_ots"
+          "camera_zone": "guest_close"
         },
         {
           "intent": "reaction",
@@ -228,7 +234,8 @@
           "movement": "static",
           "action": "react_laugh",
           "props": [],
-          "h3_mode": "fl2v"
+          "h3_mode": "fl2v",
+          "camera_zone": "front"
         },
         {
           "intent": "handoff",
@@ -239,7 +246,8 @@
           "props": [
             "script"
           ],
-          "h3_mode": "audio_ref"
+          "h3_mode": "audio_ref",
+          "camera_zone": "desk_swap"
         }
       ]
     },
@@ -249,8 +257,8 @@
       "duration": 60,
       "beats": [
         "host 总结",
-        "host 起身",
-        "灯暗"
+        "host 目送嘉宾",
+        "镜头拉远收尾"
       ],
       "shots": [
         {
@@ -260,16 +268,18 @@
           "movement": "slow dolly-in",
           "action": "turn_to_camera",
           "props": [],
-          "h3_mode": "audio_ref"
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
         },
         {
           "intent": "outro",
           "size": "Wide",
           "angle": "high-angle",
-          "movement": "static",
-          "action": "stand_desk",
+          "movement": "slow pull-out",
+          "action": "point_window",
           "props": [],
-          "h3_mode": "fl2v"
+          "h3_mode": "fl2v",
+          "camera_zone": "window_wide"
         }
       ]
     }
@@ -287,11 +297,12 @@
     "subtitle_style": "variety"
   },
   "audio": {
-    "ambience": "studio_room_tone",
+    "ambience": "late_night_studio_room_tone",
     "sfx": [
       "cue_card",
       "mug_clink",
-      "laugh"
+      "studio_laugh",
+      "applause"
     ]
   },
   "h3": {
@@ -301,6 +312,6 @@
       8
     ],
     "fps": 25,
-    "resolution": "1280x704"
+    "resolution": "1024x576"
   }
 }

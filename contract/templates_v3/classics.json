@@ -1,0 +1,320 @@
+{
+  "id": "classics",
+  "label": "经典文库",
+  "style": "history_ink_2d",
+  "aspect": "16:9",
+  "target_duration": 300,
+  "stage": {
+    "type": "2d_plate",
+    "plate": "archive_room__ink",
+    "scene_desc": "A muted pastel ink-on-paper interior of an old Chinese archive library: warm parchment-toned walls with two carved doorways, a polished wooden floor, a low wooden desk tray in the foreground holding an ink bowl, a writing brush and a few old scrolls, soft brush-stroke shadows and drifting dust.",
+    "layout": {
+      "study_desk": [
+        0.5,
+        0.62
+      ],
+      "shelf_left": [
+        0.22,
+        0.52
+      ],
+      "shelf_right": [
+        0.78,
+        0.52
+      ],
+      "ladder": [
+        0.86,
+        0.6
+      ],
+      "ground_y": 0.9
+    },
+    "props": [
+      {
+        "id": "ancient_book",
+        "zone": "study_desk",
+        "interaction": "open"
+      },
+      {
+        "id": "brush_ink",
+        "zone": "study_desk",
+        "interaction": "write"
+      },
+      {
+        "id": "candle",
+        "zone": "study_desk",
+        "interaction": "light"
+      },
+      {
+        "id": "bookmark",
+        "zone": "shelf_left",
+        "interaction": "place"
+      },
+      {
+        "id": "rolled_scroll",
+        "zone": "ladder",
+        "interaction": "fetch"
+      }
+    ],
+    "camera_zones": [
+      "front",
+      "archive_wide",
+      "desk_ots",
+      "shelf_close",
+      "high_shelf"
+    ]
+  },
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "block": "study_desk",
+      "props": [
+        "ancient_book"
+      ],
+      "wardrobe": "scholar_robe"
+    },
+    {
+      "role": "reader_a",
+      "character": "ali",
+      "block": "shelf_left",
+      "props": [
+        "bookmark"
+      ],
+      "wardrobe": "reader_blue"
+    },
+    {
+      "role": "reader_b",
+      "character": "dawei",
+      "block": "shelf_right",
+      "props": [
+        "candle"
+      ],
+      "wardrobe": "reader_brown"
+    }
+  ],
+  "action_library": [
+    {
+      "id": "open_book",
+      "h3_prompt": "Subject opens a heavy ancient book on the desk, pages crackling",
+      "prop": "ancient_book"
+    },
+    {
+      "id": "turn_page",
+      "h3_prompt": "Subject turns a brittle page with one finger, leaning close",
+      "prop": null
+    },
+    {
+      "id": "write_annotation",
+      "h3_prompt": "Subject dips a brush and writes a small annotation in the margin",
+      "prop": "brush_ink"
+    },
+    {
+      "id": "climb_ladder",
+      "h3_prompt": "Subject climbs the wooden ladder and pulls a rolled scroll from a high shelf",
+      "prop": "rolled_scroll"
+    },
+    {
+      "id": "light_candle",
+      "h3_prompt": "Subject lights a candle on the desk, warm light growing over the books",
+      "prop": "candle"
+    },
+    {
+      "id": "compare_pages",
+      "h3_prompt": "Subject holds two pages side by side and compares the lines",
+      "prop": null
+    },
+    {
+      "id": "recite_stand",
+      "h3_prompt": "Subject stands and recites the passage from memory, one hand raised",
+      "prop": null
+    },
+    {
+      "id": "hand_book",
+      "h3_prompt": "Subject carries the ancient book to the reader and hands it over",
+      "prop": "ancient_book"
+    },
+    {
+      "id": "extinguish_candle",
+      "h3_prompt": "Subject pinches out the candle and the library goes dark",
+      "prop": "candle"
+    }
+  ],
+  "segments": [
+    {
+      "id": "cold_open",
+      "name": "开场",
+      "duration": 45,
+      "beats": [
+        "点起案头烛火",
+        "展开古书"
+      ],
+      "shots": [
+        {
+          "intent": "candle_lit",
+          "size": "Wide",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "light_candle",
+          "props": [
+            "candle"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "archive_wide"
+        },
+        {
+          "intent": "book_open",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "open_book",
+          "props": [
+            "ancient_book"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "desk_ots"
+        }
+      ]
+    },
+    {
+      "id": "read",
+      "name": "校读",
+      "duration": 90,
+      "beats": [
+        "翻动书页",
+        "比对两卷记载",
+        "提笔批注"
+      ],
+      "shots": [
+        {
+          "intent": "page_turn",
+          "size": "Close-up",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "turn_page",
+          "props": [],
+          "h3_mode": "audio_ref",
+          "camera_zone": "desk_ots"
+        },
+        {
+          "intent": "compare_lines",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "compare_pages",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "front"
+        },
+        {
+          "intent": "margin_write",
+          "size": "Medium Close-up",
+          "angle": "eye-level",
+          "movement": "slow dolly-in",
+          "action": "write_annotation",
+          "props": [
+            "brush_ink"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "desk_ots"
+        }
+      ]
+    },
+    {
+      "id": "fetch",
+      "name": "取卷",
+      "duration": 85,
+      "beats": [
+        "攀梯取卷",
+        "把古书递给读者"
+      ],
+      "shots": [
+        {
+          "intent": "ladder_climb",
+          "size": "Full",
+          "angle": "low-angle",
+          "movement": "tilt up",
+          "action": "climb_ladder",
+          "props": [
+            "rolled_scroll"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "high_shelf"
+        },
+        {
+          "intent": "book_handoff",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "hand_book",
+          "props": [
+            "ancient_book"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "shelf_close"
+        }
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "收束",
+      "duration": 80,
+      "beats": [
+        "起身吟诵",
+        "吹灭烛火"
+      ],
+      "shots": [
+        {
+          "intent": "recite",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "recite_stand",
+          "props": [],
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
+        },
+        {
+          "intent": "dark_library",
+          "size": "Wide",
+          "angle": "eye-level",
+          "movement": "slow pull-out",
+          "action": "extinguish_candle",
+          "props": [
+            "candle"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "archive_wide"
+        }
+      ]
+    }
+  ],
+  "camera_language": {
+    "default": "slow pan",
+    "wide": "slow push-in",
+    "reaction": "static",
+    "close": "slow dolly-in"
+  },
+  "packaging": {
+    "lower_third": "ink_sepia",
+    "transition": "fade",
+    "bgm": "ink_zither_soft",
+    "subtitle_style": "variety"
+  },
+  "audio": {
+    "ambience": "archive_room_tone",
+    "sfx": [
+      "paper_turn",
+      "candle_flicker",
+      "ladder_creak",
+      "brush_stroke"
+    ]
+  },
+  "h3": {
+    "workflow": "05_ref2va_4step_sla",
+    "duration": [
+      4,
+      8
+    ],
+    "fps": 25,
+    "resolution": "1024x576"
+  }
+}

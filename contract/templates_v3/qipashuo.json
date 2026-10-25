@@ -1,0 +1,327 @@
+{
+  "id": "qipashuo",
+  "label": "奇葩说",
+  "style": "debate_ink_2d",
+  "aspect": "16:9",
+  "target_duration": 300,
+  "stage": {
+    "type": "2d_plate",
+    "plate": "debate_hall__debateink",
+    "scene_desc": "A Chinese ink-wash debate hall in a wide panorama: two red lacquer podiums facing each other across a dark stage, tall red lacquer pillars with gold trim, a red calligraphy banner hanging on the back wall, a low moderator's desk in the foreground, gold accents, brush-stroke shadows and a polished wooden floor.",
+    "layout": {
+      "podium_affirm": [
+        0.28,
+        0.64
+      ],
+      "podium_negate": [
+        0.72,
+        0.64
+      ],
+      "center_stage": [
+        0.5,
+        0.62
+      ],
+      "moderator_desk": [
+        0.5,
+        0.82
+      ],
+      "ground_y": 0.9
+    },
+    "props": [
+      {
+        "id": "fan",
+        "zone": "podium_affirm",
+        "interaction": "snap"
+      },
+      {
+        "id": "gavel",
+        "zone": "moderator_desk",
+        "interaction": "strike"
+      },
+      {
+        "id": "bell",
+        "zone": "moderator_desk",
+        "interaction": "ring"
+      },
+      {
+        "id": "banner",
+        "zone": "podium_negate",
+        "interaction": "raise"
+      },
+      {
+        "id": "ink_board",
+        "zone": "center_stage",
+        "interaction": "write"
+      }
+    ],
+    "camera_zones": [
+      "front",
+      "split_wide",
+      "affirmative_ots",
+      "negate_ots",
+      "overhead"
+    ]
+  },
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "block": "moderator_desk",
+      "props": [
+        "gavel"
+      ],
+      "wardrobe": "ink_host_robe"
+    },
+    {
+      "role": "debater_a",
+      "character": "ali",
+      "block": "podium_affirm",
+      "props": [
+        "fan"
+      ],
+      "wardrobe": "red_hanfu"
+    },
+    {
+      "role": "debater_b",
+      "character": "dawei",
+      "block": "podium_negate",
+      "props": [
+        "banner"
+      ],
+      "wardrobe": "blue_hanfu"
+    }
+  ],
+  "action_library": [
+    {
+      "id": "stand_affirm",
+      "h3_prompt": "Subject rises from the podium, sleeves swept back, and opens the affirmative argument",
+      "prop": null
+    },
+    {
+      "id": "strike_desk",
+      "h3_prompt": "Subject strikes the gavel once and calls for order",
+      "prop": "gavel"
+    },
+    {
+      "id": "snap_fan",
+      "h3_prompt": "Subject snaps open a folding fan and states a point behind it",
+      "prop": "fan"
+    },
+    {
+      "id": "raise_banner",
+      "h3_prompt": "Subject hauls a painted banner up beside the podium and shakes it",
+      "prop": "banner"
+    },
+    {
+      "id": "ring_bell",
+      "h3_prompt": "Subject rings the brass bell twice to time the speaker",
+      "prop": "bell"
+    },
+    {
+      "id": "pace_stage",
+      "h3_prompt": "Subject paces a slow arc across the center stage while rebutting",
+      "prop": null
+    },
+    {
+      "id": "retort_point",
+      "h3_prompt": "Subject pivots toward the opposing podium and points a finger at them",
+      "prop": null
+    },
+    {
+      "id": "write_board",
+      "h3_prompt": "Subject strides to the ink board and brushes two characters with one stroke",
+      "prop": "ink_board"
+    },
+    {
+      "id": "sit_back",
+      "h3_prompt": "Subject settles back into the chair, arms folded, satisfied",
+      "prop": null
+    }
+  ],
+  "segments": [
+    {
+      "id": "cold_open",
+      "name": "开场",
+      "duration": 40,
+      "beats": [
+        "正方辩手起身",
+        "主持人敲醒木开场"
+      ],
+      "shots": [
+        {
+          "intent": "affirm_rise",
+          "size": "Wide",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "stand_affirm",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "split_wide"
+        },
+        {
+          "intent": "gavel_open",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "strike_desk",
+          "props": [
+            "gavel"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
+        }
+      ]
+    },
+    {
+      "id": "affirm",
+      "name": "正方陈词",
+      "duration": 70,
+      "beats": [
+        "正方摇扇陈词",
+        "在墨板上写下论点"
+      ],
+      "shots": [
+        {
+          "intent": "fan_speech",
+          "size": "Medium Close-up",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "snap_fan",
+          "props": [
+            "fan"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "affirmative_ots"
+        },
+        {
+          "intent": "ink_argument",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "slow pan",
+          "action": "write_board",
+          "props": [
+            "ink_board"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "overhead"
+        }
+      ]
+    },
+    {
+      "id": "negate",
+      "name": "反方反驳",
+      "duration": 70,
+      "beats": [
+        "反方举旗反驳",
+        "反方指点对方"
+      ],
+      "shots": [
+        {
+          "intent": "banner_rebut",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "raise_banner",
+          "props": [
+            "banner"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "negate_ots"
+        },
+        {
+          "intent": "point_retort",
+          "size": "Close-up",
+          "angle": "low-angle",
+          "movement": "static",
+          "action": "retort_point",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "split_wide"
+        }
+      ]
+    },
+    {
+      "id": "clash",
+      "name": "自由交火",
+      "duration": 70,
+      "beats": [
+        "双方起身交锋",
+        "主持人摇铃"
+      ],
+      "shots": [
+        {
+          "intent": "pace_clash",
+          "size": "Full",
+          "angle": "eye-level",
+          "movement": "tracking",
+          "action": "pace_stage",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "front"
+        },
+        {
+          "intent": "bell_timing",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "ring_bell",
+          "props": [
+            "bell"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
+        }
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "收束",
+      "duration": 50,
+      "beats": [
+        "抱臂坐回席间"
+      ],
+      "shots": [
+        {
+          "intent": "sit_end",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "slow dolly-in",
+          "action": "sit_back",
+          "props": [],
+          "h3_mode": "audio_ref",
+          "camera_zone": "split_wide"
+        }
+      ]
+    }
+  ],
+  "camera_language": {
+    "default": "slow pan",
+    "wide": "static",
+    "reaction": "static",
+    "close": "slow push-in"
+  },
+  "packaging": {
+    "lower_third": "debate_red_gold",
+    "transition": "fade",
+    "bgm": "ink_guqin_tense",
+    "subtitle_style": "variety"
+  },
+  "audio": {
+    "ambience": "debate_hall_room_tone",
+    "sfx": [
+      "gavel_strike",
+      "fan_snap",
+      "bell_ring",
+      "ink_brush"
+    ]
+  },
+  "h3": {
+    "workflow": "05_ref2va_4step_sla",
+    "duration": [
+      4,
+      8
+    ],
+    "fps": 25,
+    "resolution": "1024x576"
+  }
+}

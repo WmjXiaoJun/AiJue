@@ -1,0 +1,320 @@
+{
+  "id": "snl_sketch",
+  "label": "周六夜现场小品",
+  "style": "sketch_3d",
+  "aspect": "16:9",
+  "target_duration": 300,
+  "stage": {
+    "type": "3d_set",
+    "plate": "stage_music__theatre",
+    "scene_desc": "A theatre stage dressed as a shabby living room sitcom set: a false door on the left, a worn sofa in the middle, a pedestal with a vase, red velvet curtains at the sides and a warm spotlight.",
+    "layout": {
+      "door_set": [
+        0.22,
+        0.6
+      ],
+      "couch_set": [
+        0.55,
+        0.64
+      ],
+      "pedestal_set": [
+        0.76,
+        0.62
+      ],
+      "window_set": [
+        0.86,
+        0.44
+      ],
+      "ground_y": 0.88
+    },
+    "props": [
+      {
+        "id": "phone",
+        "zone": "couch_set",
+        "interaction": "answer"
+      },
+      {
+        "id": "umbrella",
+        "zone": "door_set",
+        "interaction": "shake"
+      },
+      {
+        "id": "vase",
+        "zone": "pedestal_set",
+        "interaction": "knock"
+      },
+      {
+        "id": "wig_hat",
+        "zone": "couch_set",
+        "interaction": "put_on"
+      },
+      {
+        "id": "script_page",
+        "zone": "couch_set",
+        "interaction": "read"
+      }
+    ],
+    "camera_zones": [
+      "front",
+      "stage_wide",
+      "couch_ots",
+      "door_close"
+    ]
+  },
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "block": "couch_set",
+      "props": [
+        "phone"
+      ],
+      "wardrobe": "sitcom_cardigan"
+    },
+    {
+      "role": "guest_a",
+      "character": "ali",
+      "block": "door_set",
+      "props": [
+        "umbrella"
+      ],
+      "wardrobe": "raincoat"
+    },
+    {
+      "role": "guest_b",
+      "character": "dawei",
+      "block": "pedestal_set",
+      "props": [
+        "vase"
+      ],
+      "wardrobe": "bow_tie"
+    }
+  ],
+  "action_library": [
+    {
+      "id": "enter_slam_door",
+      "h3_prompt": "Subject bursts through the false door, shakes a wet umbrella and slams the door behind them",
+      "prop": "umbrella"
+    },
+    {
+      "id": "answer_phone",
+      "h3_prompt": "Subject picks up the ringing phone and answers with an exaggerated sitcom voice",
+      "prop": "phone"
+    },
+    {
+      "id": "double_take",
+      "h3_prompt": "Subject freezes, then does a slow double take straight into the camera",
+      "prop": null
+    },
+    {
+      "id": "knock_vase",
+      "h3_prompt": "Subject backs into the pedestal and sends the vase wobbling",
+      "prop": "vase"
+    },
+    {
+      "id": "put_wig",
+      "h3_prompt": "Subject plops a ridiculous wig on their head and strikes a pose",
+      "prop": "wig_hat"
+    },
+    {
+      "id": "deadpan_stare",
+      "h3_prompt": "Subject stands perfectly still, deadpan, while everyone else keeps talking",
+      "prop": null
+    },
+    {
+      "id": "read_script",
+      "h3_prompt": "Subject pulls out a page of script, squints at it and reads the line wrong",
+      "prop": "script_page"
+    },
+    {
+      "id": "exit_door",
+      "h3_prompt": "Subject throws the door open and storms out, umbrella flailing",
+      "prop": "umbrella"
+    },
+    {
+      "id": "freeze_pose",
+      "h3_prompt": "Subject freezes mid-gesture as the stage lights dim for the sketch end",
+      "prop": null
+    }
+  ],
+  "segments": [
+    {
+      "id": "cold_open",
+      "name": "开场",
+      "duration": 40,
+      "beats": [
+        "门被猛地推开",
+        "湿伞甩水",
+        "全场定格"
+      ],
+      "shots": [
+        {
+          "intent": "door_burst",
+          "size": "Wide",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "enter_slam_door",
+          "props": [
+            "umbrella"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "stage_wide"
+        },
+        {
+          "intent": "double_take_shot",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "double_take",
+          "props": [],
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
+        }
+      ]
+    },
+    {
+      "id": "sketch",
+      "name": "小品正活",
+      "duration": 110,
+      "beats": [
+        "接电话",
+        "撞倒花瓶",
+        "戴上假发"
+      ],
+      "shots": [
+        {
+          "intent": "phone_beat",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "answer_phone",
+          "props": [
+            "phone"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "couch_ots"
+        },
+        {
+          "intent": "vase_wobble",
+          "size": "Close-up",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "knock_vase",
+          "props": [
+            "vase"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "door_close"
+        },
+        {
+          "intent": "wig_beat",
+          "size": "Medium Close-up",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "put_wig",
+          "props": [
+            "wig_hat"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
+        }
+      ]
+    },
+    {
+      "id": "twist",
+      "name": "反转",
+      "duration": 90,
+      "beats": [
+        "死鱼眼对视",
+        "照本念台词"
+      ],
+      "shots": [
+        {
+          "intent": "deadpan",
+          "size": "Full",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "deadpan_stare",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "stage_wide"
+        },
+        {
+          "intent": "script_read",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "slow dolly-in",
+          "action": "read_script",
+          "props": [
+            "script_page"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "couch_ots"
+        }
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "收束",
+      "duration": 60,
+      "beats": [
+        "摔门离场",
+        "定格谢幕"
+      ],
+      "shots": [
+        {
+          "intent": "storm_out",
+          "size": "Wide",
+          "angle": "eye-level",
+          "movement": "whip pan",
+          "action": "exit_door",
+          "props": [
+            "umbrella"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "stage_wide"
+        },
+        {
+          "intent": "freeze_end",
+          "size": "Medium",
+          "angle": "high-angle",
+          "movement": "slow pull-out",
+          "action": "freeze_pose",
+          "props": [],
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
+        }
+      ]
+    }
+  ],
+  "camera_language": {
+    "default": "slow dolly",
+    "wide": "static",
+    "reaction": "static",
+    "close": "slow push-in"
+  },
+  "packaging": {
+    "lower_third": "theatre_red",
+    "transition": "fade_black",
+    "bgm": "sketch_comic",
+    "subtitle_style": "variety"
+  },
+  "audio": {
+    "ambience": "theatre_stage_room_tone",
+    "sfx": [
+      "door_slam",
+      "phone_ring",
+      "vase_crash",
+      "audience_laugh"
+    ]
+  },
+  "h3": {
+    "workflow": "05_ref2va_4step_sla",
+    "duration": [
+      4,
+      8
+    ],
+    "fps": 25,
+    "resolution": "1024x576"
+  }
+}

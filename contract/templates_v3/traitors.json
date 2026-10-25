@@ -1,0 +1,325 @@
+{
+  "id": "traitors",
+  "label": "叛徒圆桌",
+  "style": "roundtable_3d",
+  "aspect": "16:9",
+  "target_duration": 300,
+  "stage": {
+    "type": "3d_set",
+    "plate": "castle_hall__roundtable",
+    "scene_desc": "A medieval castle hall at night: a large round wooden table with iron candelabras, high arched windows letting in cold moonlight, hanging banners, a stone fireplace and deep shadows.",
+    "layout": {
+      "seat_n": [
+        0.5,
+        0.46
+      ],
+      "seat_sw": [
+        0.3,
+        0.68
+      ],
+      "seat_se": [
+        0.7,
+        0.68
+      ],
+      "round_table": [
+        0.5,
+        0.62
+      ],
+      "fireplace": [
+        0.12,
+        0.42
+      ],
+      "ground_y": 0.88
+    },
+    "props": [
+      {
+        "id": "goblet",
+        "zone": "round_table",
+        "interaction": "raise"
+      },
+      {
+        "id": "letter",
+        "zone": "round_table",
+        "interaction": "open"
+      },
+      {
+        "id": "vote_slate",
+        "zone": "round_table",
+        "interaction": "write"
+      },
+      {
+        "id": "candelabra",
+        "zone": "round_table",
+        "interaction": "light"
+      },
+      {
+        "id": "portrait",
+        "zone": "fireplace",
+        "interaction": "glance"
+      }
+    ],
+    "camera_zones": [
+      "front",
+      "table_high",
+      "seat_ots",
+      "fireplace_wide",
+      "candelabra_close"
+    ]
+  },
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "block": "seat_n",
+      "props": [
+        "goblet"
+      ],
+      "wardrobe": "black_velvet"
+    },
+    {
+      "role": "faithful",
+      "character": "ali",
+      "block": "seat_sw",
+      "props": [
+        "letter"
+      ],
+      "wardrobe": "tartan_scarf"
+    },
+    {
+      "role": "traitor",
+      "character": "dawei",
+      "block": "seat_se",
+      "props": [
+        "vote_slate"
+      ],
+      "wardrobe": "dark_cloak"
+    }
+  ],
+  "action_library": [
+    {
+      "id": "raise_goblet",
+      "h3_prompt": "Subject raises a goblet toward the others in a mock toast, watching their faces",
+      "prop": "goblet"
+    },
+    {
+      "id": "open_letter",
+      "h3_prompt": "Subject unfolds a sealed letter under the table light and reads it in silence",
+      "prop": "letter"
+    },
+    {
+      "id": "whisper_lean",
+      "h3_prompt": "Subject leans across the table and whispers to the person beside them",
+      "prop": null
+    },
+    {
+      "id": "glance_fireplace",
+      "h3_prompt": "Subject glances toward the fireplace portrait, checking who is watching",
+      "prop": "portrait"
+    },
+    {
+      "id": "accuse_point",
+      "h3_prompt": "Subject points across the round table and accuses someone of lying",
+      "prop": null
+    },
+    {
+      "id": "write_vote",
+      "h3_prompt": "Subject writes a name on the vote slate and slides it forward face down",
+      "prop": "vote_slate"
+    },
+    {
+      "id": "light_candle",
+      "h3_prompt": "Subject lights the candelabra with a spill, shadows crawling up the stone walls",
+      "prop": "candelabra"
+    },
+    {
+      "id": "extinguish_candle",
+      "h3_prompt": "Subject pinches out the candle flame, plunging the round table into darkness",
+      "prop": "candelabra"
+    },
+    {
+      "id": "push_chair_back",
+      "h3_prompt": "Subject pushes the chair back and rises from the table, cloak swinging",
+      "prop": null
+    }
+  ],
+  "segments": [
+    {
+      "id": "cold_open",
+      "name": "开场",
+      "duration": 45,
+      "beats": [
+        "城堡厅烛光亮起",
+        "三人围坐圆桌",
+        "host 举起酒杯"
+      ],
+      "shots": [
+        {
+          "intent": "hall_establish",
+          "size": "Wide",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "light_candle",
+          "props": [
+            "candelabra"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "fireplace_wide"
+        },
+        {
+          "intent": "toast",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "slow orbit",
+          "action": "raise_goblet",
+          "props": [
+            "goblet"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
+        }
+      ]
+    },
+    {
+      "id": "whispers",
+      "name": "密谈",
+      "duration": 100,
+      "beats": [
+        "faithful 展开密信",
+        "traitor 低声道出怀疑",
+        "三人交换眼色偷看壁炉"
+      ],
+      "shots": [
+        {
+          "intent": "secret_letter",
+          "size": "Close-up",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "open_letter",
+          "props": [
+            "letter"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "table_high"
+        },
+        {
+          "intent": "whisper",
+          "size": "Medium Close-up",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "whisper_lean",
+          "props": [],
+          "h3_mode": "audio_ref",
+          "camera_zone": "seat_ots"
+        },
+        {
+          "intent": "side_glance",
+          "size": "Medium",
+          "angle": "low-angle",
+          "movement": "slow push-in",
+          "action": "glance_fireplace",
+          "props": [
+            "portrait"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "seat_ots"
+        }
+      ]
+    },
+    {
+      "id": "roundtable",
+      "name": "圆桌审判",
+      "duration": 100,
+      "beats": [
+        "公开指认",
+        "写下投票",
+        "吹灭烛火压低声响"
+      ],
+      "shots": [
+        {
+          "intent": "accusation",
+          "size": "Wide",
+          "angle": "high-angle",
+          "movement": "slow orbit",
+          "action": "accuse_point",
+          "props": [],
+          "h3_mode": "audio_ref",
+          "camera_zone": "table_high"
+        },
+        {
+          "intent": "vote_write",
+          "size": "Medium Close-up",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "write_vote",
+          "props": [
+            "vote_slate"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "front"
+        },
+        {
+          "intent": "candle_out",
+          "size": "Close-up",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "extinguish_candle",
+          "props": [
+            "candelabra"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "candelabra_close"
+        }
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "收束",
+      "duration": 55,
+      "beats": [
+        "推椅起身离席"
+      ],
+      "shots": [
+        {
+          "intent": "leave_table",
+          "size": "Full",
+          "angle": "eye-level",
+          "movement": "slow pull-out",
+          "action": "push_chair_back",
+          "props": [],
+          "h3_mode": "audio_ref",
+          "camera_zone": "fireplace_wide"
+        }
+      ]
+    }
+  ],
+  "camera_language": {
+    "default": "slow orbit",
+    "wide": "slow push-in",
+    "reaction": "static",
+    "close": "slow push-in"
+  },
+  "packaging": {
+    "lower_third": "castle_gold",
+    "transition": "fade",
+    "bgm": "castle_strings_tense",
+    "subtitle_style": "variety"
+  },
+  "audio": {
+    "ambience": "castle_hall_room_tone",
+    "sfx": [
+      "candle_crackle",
+      "paper_fold",
+      "goblet_clink",
+      "chair_scrape"
+    ]
+  },
+  "h3": {
+    "workflow": "05_ref2va_4step_sla",
+    "duration": [
+      4,
+      8
+    ],
+    "fps": 25,
+    "resolution": "1024x576"
+  }
+}

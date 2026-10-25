@@ -90,6 +90,12 @@ def cmd_render(args: argparse.Namespace) -> int:
     return render_mod.main(args)
 
 
+def cmd_render_v3(args: argparse.Namespace) -> int:
+    """v3 模板渲染：storyboard → stage 首帧 → H3 每镜 → 剪辑/包装 → QC。"""
+    from . import render_v3
+    return render_v3.main(args)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="python -m pipeline.cli",
@@ -147,6 +153,25 @@ def build_parser() -> argparse.ArgumentParser:
     p_render.add_argument("--style-profile", default=None,
                           help="style_v2 风格 profile：auto 按模板映射，或 preset 名/模板 id（contract/style_presets.json）")
     p_render.set_defaults(func=cmd_render)
+
+    p_rv3 = sub.add_parser("render_v3", help="v3 模板渲染（stage 首帧 → H3 每镜 → 成片 + QC）")
+    p_rv3.add_argument("--template", required=True, help="模板 id，如 tonight_show")
+    p_rv3.add_argument("--duration", type=float, default=30.0,
+                       help="目标时长（30-45 demo / 300 五分钟版）")
+    p_rv3.add_argument("--h3", default="comfy", choices=["comfy", "previs"],
+                       help="comfy=每镜真跑 ComfyUI H3；previs=只用 stage 首帧静态 clip（不算交付）")
+    p_rv3.add_argument("--out", default=None,
+                       help="成片路径或输出目录（默认 outputs/templates_v3/{id}/final.mp4）")
+    p_rv3.add_argument("--workdir", default=None,
+                       help="中间产物目录（默认 outputs/templates_v3/{id}/work）")
+    p_rv3.add_argument("--seed", type=int, default=20261026, help="H3 起始 seed")
+    p_rv3.add_argument("--force", action="store_true", help="忽略缓存/复用重新生成")
+    p_rv3.add_argument("--limit", type=int, default=None, help="只渲染前 N 镜（调试用）")
+    p_rv3.add_argument("--fallback-static", action="store_true", default=False,
+                       help="H3 失败镜回退静态并写 fallback 标记（QC 会标红，验收不接受）")
+    p_rv3.add_argument("--width", type=int, default=1280, help="成片宽（默认 1280）")
+    p_rv3.add_argument("--height", type=int, default=720, help="成片高（默认 720）")
+    p_rv3.set_defaults(func=cmd_render_v3)
     return parser
 
 

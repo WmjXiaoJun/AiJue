@@ -95,12 +95,10 @@ def main(argv=None) -> int:
             shutil.copyfile(wav, dst)
             audio_rel = "zaopianju_dynamic/%s" % Path(wav).name
 
-    # fl2v 的 H3 对首尾帧分辨率/对齐敏感：统一 768²（后续 pipeline 会归一化到成片规格）
-    if args.mode == "fl2v":
-        args.width, args.height = 768, 768
-    else:
-        args.width = max(256, (args.width // 32) * 32)
-        args.height = max(256, (args.height // 32) * 32)
+    # 04/05 均支持任意 32 倍数分辨率（实测 16:9 1024x576 首尾帧正常、无拉伸）；
+    # 统一对齐到 32 倍数，保留调用方给定宽高（成片再归一化到 1280×720）
+    args.width = max(256, (args.width // 32) * 32)
+    args.height = max(256, (args.height // 32) * 32)
 
     template = "05_ref2va_4step_sla.json" if args.mode == "audio_ref" else "04_i2v_fl2v_4step_sla.json"
     api, _ = prepare_prompt(
@@ -122,6 +120,8 @@ def main(argv=None) -> int:
     print(json.dumps({
         "ok": True, "mode": args.mode, "out": out, "duration": args.duration,
         "length": length, "seed": args.seed, "gen_sec": res.get("gen_sec"),
+        "workflow": template, "prompt_id": res.get("prompt_id"),
+        "width": args.width, "height": args.height, "fps": args.fps,
         "has_audio": info.get("has_audio"), "probe": info, "sheet": res.get("sheet"),
     }, ensure_ascii=False))
     return 0

@@ -1,0 +1,322 @@
+{
+  "id": "history_mystery",
+  "label": "历史悬案",
+  "style": "history_ink_2d",
+  "aspect": "16:9",
+  "target_duration": 300,
+  "stage": {
+    "type": "2d_plate",
+    "plate": "crime_scene__ink",
+    "scene_desc": "A Chinese ink-wash magistrate's court crime scene at night: a dark judge's desk with a gavel and seal, an evidence table with a covered dagger, cold moonlight through lattice windows, faint red lanterns and brush-stroke shadows.",
+    "layout": {
+      "judge_desk": [
+        0.5,
+        0.55
+      ],
+      "suspect_left": [
+        0.24,
+        0.68
+      ],
+      "witness_right": [
+        0.76,
+        0.68
+      ],
+      "evidence_table": [
+        0.5,
+        0.76
+      ],
+      "lantern": [
+        0.14,
+        0.4
+      ],
+      "ground_y": 0.9
+    },
+    "props": [
+      {
+        "id": "confession_scroll",
+        "zone": "judge_desk",
+        "interaction": "stamp"
+      },
+      {
+        "id": "dagger",
+        "zone": "evidence_table",
+        "interaction": "examine"
+      },
+      {
+        "id": "evidence_cloth",
+        "zone": "evidence_table",
+        "interaction": "uncover"
+      },
+      {
+        "id": "lantern",
+        "zone": "lantern",
+        "interaction": "raise"
+      },
+      {
+        "id": "testimony_note",
+        "zone": "witness_right",
+        "interaction": "hand"
+      }
+    ],
+    "camera_zones": [
+      "front",
+      "hall_wide",
+      "evidence_close",
+      "suspect_ots",
+      "lantern_high"
+    ]
+  },
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "block": "judge_desk",
+      "props": [
+        "confession_scroll"
+      ],
+      "wardrobe": "magistrate_robe"
+    },
+    {
+      "role": "suspect",
+      "character": "ali",
+      "block": "suspect_left",
+      "props": [],
+      "wardrobe": "prisoner_rags"
+    },
+    {
+      "role": "witness",
+      "character": "dawei",
+      "block": "witness_right",
+      "props": [
+        "testimony_note"
+      ],
+      "wardrobe": "witness_robe"
+    }
+  ],
+  "action_library": [
+    {
+      "id": "uncover_evidence",
+      "h3_prompt": "Subject pulls the cloth off the evidence table, revealing a dagger",
+      "prop": "evidence_cloth"
+    },
+    {
+      "id": "inspect_dagger",
+      "h3_prompt": "Subject lifts the dagger close to the lantern and turns it slowly",
+      "prop": "dagger"
+    },
+    {
+      "id": "raise_lantern",
+      "h3_prompt": "Subject raises a paper lantern high, light pushing back the dark hall",
+      "prop": "lantern"
+    },
+    {
+      "id": "stamp_scroll",
+      "h3_prompt": "Subject presses a seal onto the confession scroll with a heavy thud",
+      "prop": "confession_scroll"
+    },
+    {
+      "id": "accuse_point",
+      "h3_prompt": "Subject points across the hall and names the suspect",
+      "prop": null
+    },
+    {
+      "id": "step_back",
+      "h3_prompt": "Subject steps back in fear, hands raised, denying the accusation",
+      "prop": null
+    },
+    {
+      "id": "whisper_witness",
+      "h3_prompt": "Subject leans toward the witness and whispers a question behind one hand",
+      "prop": null
+    },
+    {
+      "id": "bow_confess",
+      "h3_prompt": "Subject kneels and bows low, hands pressed to the floor",
+      "prop": null
+    },
+    {
+      "id": "extinguish_lantern",
+      "h3_prompt": "Subject blows out the lantern and the court falls into darkness",
+      "prop": "lantern"
+    }
+  ],
+  "segments": [
+    {
+      "id": "cold_open",
+      "name": "开场",
+      "duration": 40,
+      "beats": [
+        "提灯照亮公堂",
+        "揭开证物布"
+      ],
+      "shots": [
+        {
+          "intent": "lantern_light",
+          "size": "Wide",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "raise_lantern",
+          "props": [
+            "lantern"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "hall_wide"
+        },
+        {
+          "intent": "cloth_off",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "uncover_evidence",
+          "props": [
+            "evidence_cloth"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "evidence_close"
+        }
+      ]
+    },
+    {
+      "id": "evidence",
+      "name": "验物",
+      "duration": 85,
+      "beats": [
+        "验看凶器",
+        "证人耳语"
+      ],
+      "shots": [
+        {
+          "intent": "dagger_close",
+          "size": "Close-up",
+          "angle": "low-angle",
+          "movement": "slow push-in",
+          "action": "inspect_dagger",
+          "props": [
+            "dagger"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "evidence_close"
+        },
+        {
+          "intent": "witness_whisper",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "whisper_witness",
+          "props": [
+            "testimony_note"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "suspect_ots"
+        }
+      ]
+    },
+    {
+      "id": "interrogation",
+      "name": "审讯",
+      "duration": 90,
+      "beats": [
+        "判官指认",
+        "嫌疑人后退",
+        "嫌疑人跪伏"
+      ],
+      "shots": [
+        {
+          "intent": "judge_accuse",
+          "size": "Medium Close-up",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "accuse_point",
+          "props": [],
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
+        },
+        {
+          "intent": "suspect_back",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "step_back",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "suspect_ots"
+        },
+        {
+          "intent": "kneel_confess",
+          "size": "Close-up",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "bow_confess",
+          "props": [],
+          "h3_mode": "audio_ref",
+          "camera_zone": "lantern_high"
+        }
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "定案",
+      "duration": 85,
+      "beats": [
+        "落印定案",
+        "吹灭提灯"
+      ],
+      "shots": [
+        {
+          "intent": "seal_stamp",
+          "size": "Medium Close-up",
+          "angle": "eye-level",
+          "movement": "slow dolly-in",
+          "action": "stamp_scroll",
+          "props": [
+            "confession_scroll"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
+        },
+        {
+          "intent": "dark_hall",
+          "size": "Wide",
+          "angle": "eye-level",
+          "movement": "slow pull-out",
+          "action": "extinguish_lantern",
+          "props": [
+            "lantern"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "hall_wide"
+        }
+      ]
+    }
+  ],
+  "camera_language": {
+    "default": "slow push-in",
+    "wide": "slow pan",
+    "reaction": "static",
+    "close": "slow dolly-in"
+  },
+  "packaging": {
+    "lower_third": "ink_cold_red",
+    "transition": "fade",
+    "bgm": "ink_suspense",
+    "subtitle_style": "variety"
+  },
+  "audio": {
+    "ambience": "cold_court_room_tone",
+    "sfx": [
+      "paper_rustle",
+      "lantern_flicker",
+      "gavel_tap",
+      "fabric_move"
+    ]
+  },
+  "h3": {
+    "workflow": "05_ref2va_4step_sla",
+    "duration": [
+      4,
+      8
+    ],
+    "fps": 25,
+    "resolution": "1024x576"
+  }
+}
