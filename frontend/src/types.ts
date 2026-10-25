@@ -306,6 +306,73 @@ export interface Settings {
   upload_post_api_key_configured?: boolean;
   /** 只写：PATCH 时传空串表示清除，GET 永不返回 */
   upload_post_api_key?: string;
+  /** AI 模型（LLM）contract/docs/PLAN_V2_STYLE_LLM.md */
+  llm_provider?: string;
+  llm_base_url?: string;
+  llm_model?: string;
+  /** 只读：LLM API Key 是否已配置（不回传明文） */
+  llm_api_key_configured?: boolean;
+  /** 只写：PATCH 时传空串表示清除 */
+  llm_api_key?: string;
+}
+
+/** LLM 配置（GET /api/llm/config） */
+export interface LLMConfig {
+  provider?: string;
+  llm_provider?: string;
+  base_url?: string;
+  llm_base_url?: string;
+  model?: string;
+  llm_model?: string;
+  /** 后端实际字段：是否已配置 API Key（不回传明文） */
+  has_api_key?: boolean;
+  api_key_configured?: boolean;
+  api_key_masked?: string | null;
+  timeout_seconds?: number;
+  supported_providers?: string[];
+  providers?: LLMProviderInfo[];
+  [key: string]: unknown;
+}
+
+export interface LLMProviderInfo {
+  id: string;
+  label?: string;
+  name?: string;
+  requires_key?: boolean;
+  default_base_url?: string;
+  default_model?: string;
+  hint?: string;
+  [key: string]: unknown;
+}
+
+export interface LLMTestResult {
+  ok: boolean;
+  provider?: string;
+  model?: string;
+  latency_ms?: number;
+  elapsed_sec?: number;
+  sample?: string;
+  reply?: string;
+  error?: string | null;
+  [key: string]: unknown;
+}
+
+export interface GenerateScriptRequest {
+  topic: string;
+  template_id?: string;
+  duration?: number;
+  tone?: string;
+}
+
+export interface GenerateScriptResult {
+  script: string;
+  title?: string;
+  segments?: unknown;
+  provider?: string;
+  model?: string;
+  elapsed_sec?: number;
+  warning?: string | null;
+  [key: string]: unknown;
 }
 
 /** 一键发布（海外）contract/PUBLISHING.md */

@@ -704,11 +704,20 @@ def _run_ffmpeg_progress(args: list, cwd: Path, prog, pct0: float, pct1: float,
 def final_encode(workdir: Path, out: Path, total_duration: float, fps: int,
                  width: int, height: int, bgm: Path | None, has_ass: bool,
                  prog, pct0: float, pct1: float,
-                 transition_sfx: Path | None = None) -> None:
+                 transition_sfx: Path | None = None,
+                 grade_filter: str | None = None,
+                 packaging_filter: str | None = None) -> None:
     inputs = ["-i", "video_raw.mp4", "-i", "audio/narration.wav"]
     fc: list[str] = []
+    video_parts: list[str] = []
+    if grade_filter:
+        video_parts.append(grade_filter)
     if has_ass:
-        fc.append("[0:v]ass=filename=final.ass:fontsdir=fonts[v]")
+        video_parts.append("ass=filename=final.ass:fontsdir=fonts")
+    if packaging_filter:
+        video_parts.append(packaging_filter)
+    if video_parts:
+        fc.append("[0:v]" + ",".join(video_parts) + "[v]")
     else:
         fc.append("[0:v]null[v]")
     next_idx = 2
@@ -819,6 +828,18 @@ def run_render(args) -> int:
         override=getattr(args, "style", None))
     LOG.info("风格: %s（%s）", style_name, style_dict.get("label"))
 
+    # ---- 0.4b) style_v2 profile（模板级差异化：plate/cutout/调色/包装/转场）----
+    style_profile = None
+    if getattr(args, "style_profile", None):
+        from . import style_v2
+        style_profile = style_v2.profile_for(
+            data.get("format_id") or episode.get("id") or "",
+            override=getattr(args, "style_profile", None))
+        style_name = style_v2.render_style(style_profile)
+        LOG.info("style_v2: template=%s preset=%s palette=%s transition=%s",
+                 style_profile.get("template"), style_profile.get("preset"),
+                 style_profile.get("palette"), style_profile.get("transition"))
+
     # ---- 0.5) 场景合成（可选：绘景 + 角色分层 + 视差）----
     scene_info = None
     scene_ref_clips: dict[str, Path] = {}
@@ -829,9 +850,11 @@ def run_render(args) -> int:
             data, workdir,
             template_id=getattr(args, "scene_template", None),
             width=width, height=height, fps=fps, force=True,
-            style_name=style_name)
-        LOG.info("场景模式: template=%s plate=%s",
-                 scene_info.get("template_id"), scene_info.get("plate"))
+            style_name=style_name, profile=style_profile)
+        LOG.info("场景模式: template=%s plate=%s style_profile=%s plate_style=%s fallback=%s",
+                 scene_info.get("template_id"), scene_info.get("plate"),
+                 scene_info.get("style_profile"), scene_info.get("plate_style"),
+                 scene_info.get("plate_fallback"))
         # 场景模式下 H3 参考图使用整帧（保留 2D 绘景环境，不再裁脸部/画窗）
         os.environ["SCENE_DYNAMIC_FULL_REF"] = "1"
         try:
@@ -1013,10 +1036,20 @@ def run_render(args) -> int:
 
     # ---- 8) 最终编码 ---------------------------------------------------
     prog(78, "编码成片（烧字幕 + 混音 + loudnorm）")
+    grade_filter = ""
+    packaging_filter = ""
+    if style_profile:
+        from . import style_v2
+        grade_filter = style_v2.grade_filter(style_profile)
+        packaging_filter = style_v2.packaging_filters(
+            style_profile, workdir, width, height,
+            font_info["body"]["file"])
     final_encode(workdir, out, total_duration, fps, width, height,
                  bgm_path, has_ass=ass_info["events"] > 0,
                  prog=prog, pct0=78, pct1=99,
-                 transition_sfx=transition_whoosh)
+                 transition_sfx=transition_whoosh,
+                 grade_filter=grade_filter or None,
+                 packaging_filter=packaging_filter or None)
 
     # ---- 校验与摘要 ----------------------------------------------------
     info = utils.probe_video(out)
@@ -1052,6 +1085,14 @@ def run_render(args) -> int:
                        "whoosh": transition_whoosh is not None},
         "style": {"name": style_name, "label": style_dict.get("label"),
                   "prefix": style_dict.get("prompt_prefix")},
+        "style_profile": ({"preset": style_profile.get("preset"),
+                           "label": style_profile.get("preset_label") or style_profile.get("label"),
+                           "palette": style_profile.get("palette"),
+                           "transition": style_profile.get("transition"),
+                           "character_style": style_profile.get("character_style"),
+                           "prompt_prefix": style_profile.get("prompt_prefix"),
+                           "plate_suffix": style_profile.get("plate_suffix")}
+                          if style_profile else None),
         "scenes": ({"template": scene_info.get("template_id"),
                     "plate": scene_info.get("plate"),
                     "plate_style": scene_info.get("plate_style"),

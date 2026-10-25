@@ -427,6 +427,10 @@ def test_settings_get_and_patch(client):
         "upload_post_youtube_made_for_kids",
         "publish_brand_title",
         "upload_post_api_key_configured",
+        "llm_provider",
+        "llm_base_url",
+        "llm_model",
+        "llm_api_key_configured",
     }
     try:
         response = client.patch(

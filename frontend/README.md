@@ -67,6 +67,11 @@ Vite + React 18 + TypeScript 的深色影棚风制片工作台。无 UI 框架�
   `POST /episodes/{eid}/localize {langs}` 每语言一个 Job，任务进行中 2.5s 轮询 `GET /episodes/{eid}/localizations`；
   每语言卡片支持视频播放、下载 mp4 / srt、展开发布元数据（title / description / hashtags 一键复制）与失败重试。
   中文原版保留在上方「成片渲染」，多语版本为同画面 + 目标语配音/字幕（localized/{lang}/final.mp4 + subtitles.srt）。
+- AI 模型 / LLM（docs/PLAN_V2_STYLE_LLM.md）：设置 →「AI 模型（LLM）」支持 provider（本地 Ollama / OpenAI 兼容 / Mock 关闭）、
+  base_url、model、API Key（密码输入、只写不读、已保存占位/清除）与「测试连接」（POST /api/llm/test）；保存 PATCH /settings 的
+  `llm_provider / llm_base_url / llm_model / llm_api_key`，GET 只返回 `llm_api_key_configured`。编剧间「AI 生成台本」对话框：
+  话题 + 16 模板下拉 + 时长 + 语气 → POST /projects/{pid}/generate-script（Ollama 约 7–30s），生成中 loading / 错误可读、
+  预览台本、复制/重新生成、「采纳写入台本」写入现有编辑器（走既有保存台本流程）。
 - 台本驱动（contract/SCRIPT_FORMAT.md）：编剧间台本 textarea 读写 `episode.script`（进入加载、脏标记、未保存离开提示），
   保存 `PATCH /episodes/{eid} {script}`；空台本展示示例格式并支持一键填入；「从台本生成分镜」在有镜头时二次确认并以
   `{force:true}` 覆盖，完成后展示 created 数与分段摘要并刷新分镜。剧集头部支持切换剧集 / 新建剧集

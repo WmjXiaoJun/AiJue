@@ -2351,6 +2351,233 @@
   }
 }
 
+/* ============================================================
+   AI 模型设置 + 编剧间 AI 生成台本（docs/PLAN_V2_STYLE_LLM.md）
+   ============================================================ */
+.settings-llm .field-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.llm-test-result {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  margin-top: 7px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  font-size: 10.5px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.llm-test-result.is-ok {
+  border-color: rgba(56, 201, 139, 0.3);
+  background: rgba(56, 201, 139, 0.05);
+  color: var(--green);
+}
+
+.llm-test-result.is-error {
+  border-color: rgba(255, 96, 96, 0.26);
+  background: rgba(255, 96, 96, 0.05);
+  color: #ffb4b4;
+}
+
+.script-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ---------- AI 生成台本对话框 ---------- */
+.ai-script-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 13px;
+}
+
+.ai-topic-suggest {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 6px;
+}
+
+.ai-topic-chip {
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px dashed var(--line);
+  background: transparent;
+  color: var(--mute);
+  font-size: 9.5px;
+}
+
+.ai-topic-chip:hover {
+  border-color: rgba(245, 197, 24, 0.4);
+  color: var(--accent-2);
+}
+
+.ai-tone-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ai-tone-chip {
+  padding: 4px 11px;
+  border-radius: 7px;
+  border: 1px solid var(--line);
+  background: #0d1017;
+  color: var(--mute);
+  font-size: 11px;
+}
+
+.ai-tone-chip.active {
+  border-color: rgba(245, 197, 24, 0.5);
+  background: rgba(245, 197, 24, 0.07);
+  color: var(--text);
+}
+
+.ai-script-context {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  color: var(--faint);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+}
+
+.ai-script-context i {
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.ai-script-loading {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 13px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(90, 200, 250, 0.22);
+  background: rgba(90, 200, 250, 0.04);
+  color: var(--cyan);
+}
+
+.ai-script-loading div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ai-script-loading b {
+  font-size: 11.5px;
+}
+
+.ai-script-loading span {
+  color: var(--mute);
+  font-size: 10px;
+}
+
+.ai-script-result {
+  border-radius: 10px;
+  border: 1px solid var(--line-soft);
+  background: rgba(255, 255, 255, 0.014);
+  overflow: hidden;
+}
+
+.ai-script-result-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 13px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.ai-script-result-head > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ai-script-result-head b {
+  font-size: 12px;
+}
+
+.ai-script-result-head span {
+  color: var(--faint);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+}
+
+.ai-script-warning {
+  padding: 2px 7px;
+  border-radius: 5px;
+  border: 1px solid rgba(245, 197, 24, 0.3);
+  background: rgba(245, 197, 24, 0.06);
+  color: var(--accent-2);
+  font-family: var(--font-ui);
+  font-size: 9.5px;
+}
+
+.ai-script-preview {
+  margin: 0;
+  max-height: 300px;
+  overflow: auto;
+  padding: 13px 15px;
+  background: #080b10;
+  color: var(--text-dim);
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  line-height: 1.9;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.ai-script-empty {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 14px;
+  border-radius: 10px;
+  border: 1px dashed var(--line);
+  color: var(--mute);
+}
+
+.ai-script-empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--accent-2);
+  flex: none;
+}
+
+.ai-script-empty b {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--text-dim);
+  font-size: 11.5px;
+}
+
+.ai-script-empty p {
+  margin: 0;
+  font-size: 10.5px;
+  line-height: 1.6;
+}
+
+
 
 
 

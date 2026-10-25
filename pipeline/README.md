@@ -400,6 +400,30 @@ python -m pipeline.cli render --episode <episode.json> --workdir <dir> --out fin
 - **测试**：`pipeline/tests/test_style.py`（模板映射/3D 资产优先与回退/角点 alpha 校验/style prompt 注入/
   场景 meta style 字段）；`pipeline/tests` 全绿。
 
+## 风格系统 v2（模板级差异，docs/PLAN_V2_STYLE_LLM.md + contract/style_presets.json）
+
+16 个模板各自绑定风格 preset（12 种），不再共用 3D/2D 两档：
+
+- **profile**：`pipeline/style_v2.py` 解析 `contract/style_presets.json`：模板 → preset + template_overrides
+  （palette/motion/transition 等覆盖）；render 新增 `--style-profile auto|<preset>|<template>`，
+  `auto` 即按 episode.format_id 自动取。
+- **资产**：plate 优先 `outputs/scene_plates/{scene}{plate_suffix}.png`（如 `stage_music__neon.png`，
+  12 张 task-47 风格 plate 已就绪）；character 按 `character_style` 选 `cutout_3d`/`cutout_2d`；
+  缺失回退 `{scene}_3d.png`/base/2D cutout，并在 scene meta / verify 记录 `plate_fallback` / `cutout_fallback`。
+- **视觉差异**：
+  - palette：15 种 ffmpeg 调色（warm_teal / neon_magenta_cyan / candy_highsat / dark_amber_teal /
+    theatre_red_gold / warm_amber / pastel_earth / noir_blue_amber / vhs_warm / ink_amber / ink_red_gold /
+    ink_cold_red / ink_sepia / gold_jade / cold_blue_gold）在最终编码统一应用；
+  - transition：preset.transition → hard cut / fade / crossfade(dissolve) / fade_black；
+  - packaging：右上风格 tag（CINEMATIC 3D / NEON STAGE / GAME SHOW / ROUNDTABLE / THEATRE / WARM TALK /
+    CLAY STOP-MOTION / NOIR MYSTERY / VHS 1985 / INK HISTORY / INK DEBATE / GOLD JADE）+ accent 条，
+    letterbox（cinematic/noir）、scanlines（VHS）、红幕边（theatre）等；
+  - prompt_prefix：供 H3 动态镜头注入（本轮静态 demo 也写入 verify 供 QC）。
+- **demo**：`scripts/render_style_v2_demos.py` → `outputs/style_demos_v2/{template}.mp4`（16×30-45s）
+  + `frames/contact_sheet.png` + `verify.json` + 总览 `overview_16.png`；短模板自动补 3s 空镜收束。
+- **测试**：`pipeline/tests/test_style_v2.py`（16 模板映射/overrides/调色唯一性/包装/转场/plate 优先级/
+  cutout 优先级/scene meta profile）；pipeline/tests 全绿（73 passed）。
+
 ## 已知限制 / 未做
 
 - **画面 = 原创角色立绘 + 程序化演播厅合成**：角色来自角色工坊 `outputs/characters/` 的

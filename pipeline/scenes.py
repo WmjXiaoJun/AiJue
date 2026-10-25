@@ -21,7 +21,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from . import config, fonts, shot_grammar, style, utils
+from . import config, fonts, shot_grammar, style, style_v2, utils
 
 LOG = __import__("logging").getLogger("pipeline")
 
@@ -202,8 +202,12 @@ def compose_shot(shot: dict, assets: list, workdir: Path, out_path: Path,
                  template_id: str = "", plate: Path | None = None,
                  bg_video: Path | None = None, width: int = 1280,
                  height: int = 720, fps: int = 25, index: int = 0,
-                 force: bool = False, style_name: str = "2d_anime") -> dict:
-    """合成单个镜头片段（背景视差 + 全身角色分层 + 投影/可选 3D 背景/字卡）。"""
+                 force: bool = False, style_name: str = "2d_anime",
+                 profile: dict | None = None) -> dict:
+    """合成单个镜头片段（背景视差 + 全身角色分层 + 投影/可选 3D 背景/字卡）。
+
+    profile: style_v2 风格 profile（优先决定 plate/cutout/调色/包装，调色在 render 阶段应用）。
+    """
     workdir = Path(workdir)
     out_path = Path(out_path)
     duration = max(0.5, float(shot.get("duration") or 4.0))
@@ -216,8 +220,11 @@ def compose_shot(shot: dict, assets: list, workdir: Path, out_path: Path,
             asset = a
             break
     char_id = _asset_character(asset) if asset and typ not in CARD_TYPES and typ != "b_roll" else None
-    if char_id:
-        # 风格系统：3d_anime 优先 cutout_3d/front.png，缺失回退 cutout_full/front.png
+    if char_id and profile:
+        # style_v2：按 profile.character_style 选 cutout_3d/cutout_2d，缺失回退并记录
+        char_png, cutout_style, cutout_fallback = style_v2.cutout_path(profile, char_id)
+    elif char_id:
+        # 风格系统 v1：3d_anime 优先 cutout_3d/front.png，缺失回退 cutout_full
         char_png, cutout_style, cutout_fallback = style.cutout_path(char_id, style_name)
     else:
         char_png, cutout_style, cutout_fallback = None, "none", False
@@ -332,6 +339,9 @@ def compose_shot(shot: dict, assets: list, workdir: Path, out_path: Path,
     return {"id": shot.get("id"), "type": typ, "duration": duration,
             "plan": plan, "scene": template_id,
             "style": style_name,
+            "style_profile": (profile or {}).get("preset") if profile else "",
+            "style_palette": (profile or {}).get("palette") if profile else "",
+            "style_prompt_prefix": (profile or {}).get("prompt_prefix") if profile else "",
             "plate": str(plate) if plate else "",
             "bg_video": str(bg_src) if use_video_bg else "",
             "character": char_id or "", "char_image": str(char_png) if char_png else "",
@@ -346,10 +356,12 @@ def compose_shot(shot: dict, assets: list, workdir: Path, out_path: Path,
 def compose_episode(data: dict, workdir: Path, template_id: str | None = None,
                     width: int = 1280, height: int = 720, fps: int = 25,
                     force: bool = True, scene_map: dict | None = None,
-                    style_name: str | None = None) -> dict:
+                    style_name: str | None = None,
+                    profile: dict | None = None) -> dict:
     """把一集所有镜头合成为场景 clip，写入 <workdir>/shots/{sid}.mp4。
 
     style_name: 覆盖风格（3d_anime / 2d_anime）；默认按 contract/style_map.json 的模板映射。
+    profile: style_v2 风格 profile（优先；决定 plate 后缀/cutout/风格元数据）。
     """
     workdir = Path(workdir)
     shots = list(data.get("shots") or [])
@@ -357,9 +369,15 @@ def compose_episode(data: dict, workdir: Path, template_id: str | None = None,
     episode = data.get("episode") or {}
     template_id = template_id or data.get("format_id") or episode.get("id") or ""
     scene = template_scene(template_id, scene_map)
-    style_name, style_dict = style.resolve(template_id, override=style_name)
-    plate, plate_style, plate_fallback = style.plate_path(
-        str(scene.get("plate") or ""), style_name, style_dict)
+    if profile:
+        style_name = style_v2.render_style(profile)
+        style_dict = {"label": profile.get("preset"), "prompt_prefix": style_v2.prompt_prefix(profile)}
+        plate, plate_style, plate_fallback = style_v2.plate_path(
+            profile, str(scene.get("plate") or ""))
+    else:
+        style_name, style_dict = style.resolve(template_id, override=style_name)
+        plate, plate_style, plate_fallback = style.plate_path(
+            str(scene.get("plate") or ""), style_name, style_dict)
     if not plate.is_file():
         raise RuntimeError(f"缺少场景 plate: {scene.get('plate')}")
     bg_video = None
@@ -375,6 +393,11 @@ def compose_episode(data: dict, workdir: Path, template_id: str | None = None,
     info = {"scene": scene, "template_id": template_id, "plate": str(plate),
             "style": style_name, "style_label": style_dict.get("label"),
             "style_prefix": style_dict.get("prompt_prefix"),
+            "style_profile": (profile or {}).get("preset") if profile else "",
+            "style_palette": (profile or {}).get("palette") if profile else "",
+            "style_transition": (profile or {}).get("transition") if profile else "",
+            "expected_plate": (f"{str(scene.get('plate') or '')}{profile.get('plate_suffix') or ''}.png"
+                               if profile else ""),
             "plate_style": plate_style, "plate_fallback": plate_fallback,
             "three_d": str(bg_video) if bg_video else "", "shots": {},
             "card_sids": []}
@@ -395,13 +418,13 @@ def compose_episode(data: dict, workdir: Path, template_id: str | None = None,
                                          template_id=template_id, plate=plate,
                                          bg_video=bg_video, width=width,
                                          height=height, fps=fps, index=i,
-                                         style_name=style_name)
+                                         style_name=style_name, profile=profile)
             except Exception as exc:  # noqa: BLE001
                 LOG.warning("场景合成失败 %s（回退纯绘景）: %s", sid, exc)
                 shot_info = compose_shot(shot, [], workdir, out, template_id=template_id,
                                          plate=plate, bg_video=bg_video, width=width,
                                          height=height, fps=fps, index=i,
-                                         style_name=style_name)
+                                         style_name=style_name, profile=profile)
             utils.write_json(meta_path, shot_info)
             info["shots"][sid] = shot_info
         if str(shot.get("type")) in CARD_TYPES:

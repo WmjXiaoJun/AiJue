@@ -25,7 +25,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from . import character_files, concept_files, config, jobs, models, schemas, script_parser, seed
+from . import character_files, concept_files, config, jobs, llm, models, schemas, script_parser, seed
 from .db import SessionLocal, get_db, init_db
 
 logger = logging.getLogger(__name__)
@@ -52,6 +52,59 @@ SUPPORTED_LANGS = ["en", "es", "ja", "ko", "pt"]
 PUBLISH_PLATFORMS = ["youtube", "tiktok", "instagram"]
 PUBLISH_LANGS = ["zh", "en", "es", "ja", "ko", "pt"]
 DEFAULT_PUBLISH_HASHTAGS = ["#造片局", "#AI微综艺", "#Zaopianju", "#AIVariety", "#AIGenerated"]
+# LLM 台本生成 JSON Schema（附带 example 供 mock provider 直接使用）
+SCRIPT_JSON_SCHEMA: Dict[str, Any] = {
+    "type": "object",
+    "required": ["title", "segments"],
+    "example": {
+        "title": "AI 会取代综艺导演吗？",
+        "segments": [
+            {
+                "name": "开场",
+                "lines": [
+                    {"speaker": "老周", "text": "今天这期，我们聊一个得罪人的话题。"},
+                    {"speaker": "阿栗", "text": "AI 现在能写台本、能剪片，还能自己找梗。"},
+                ],
+            },
+            {
+                "name": "正片",
+                "lines": [
+                    {"speaker": "大魏", "text": "机器先学会让人笑，再谈取代。"},
+                    {"speaker": "老周", "text": "所以你上一次被 AI 逗笑是什么时候？"},
+                ],
+            },
+            {
+                "name": "结尾",
+                "lines": [{"speaker": "老周", "text": "好，今天先聊到这儿，下期继续拆。"}],
+            },
+        ],
+    },
+    "properties": {
+        "title": {"type": "string"},
+        "segments": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": ["name", "lines"],
+                "properties": {
+                    "name": {"type": "string"},
+                    "lines": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": ["speaker", "text"],
+                            "properties": {
+                                "speaker": {"type": "string"},
+                                "text": {"type": "string"},
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
+}
+
 PUBLISH_LIMITS = {
     "youtube": {
         "max_duration_seconds": None,
@@ -1471,6 +1524,228 @@ def retry_job(jid: str, db: Session = Depends(get_db)):
 
 
 # --------------------------------------------------------------------------- #
+# LLM 内容生成（本地 Ollama / OpenAI 兼容 API / mock）
+# --------------------------------------------------------------------------- #
+def _mask_secret(secret: str) -> str:
+    text = (secret or "").strip()
+    if not text:
+        return ""
+    if len(text) <= 8:
+        return "*" * len(text)
+    return text[:4] + "***" + text[-4:]
+
+
+def _extract_json_object(text: str) -> Dict[str, Any]:
+    raw = (text or "").strip()
+    if raw.startswith("```"):
+        lines = raw.splitlines()
+        if lines and lines[0].strip().startswith("```"):
+            lines = lines[1:]
+        if lines and lines[-1].strip().startswith("```"):
+            lines = lines[:-1]
+        raw = "\n".join(lines).strip()
+    start = raw.find("{")
+    end = raw.rfind("}")
+    if start < 0 or end <= start:
+        raise ValueError("输出中没有 JSON 对象")
+    try:
+        data = json.loads(raw[start : end + 1])
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"JSON 解析失败：{exc.msg}") from exc
+    if not isinstance(data, dict):
+        raise ValueError("JSON 顶层必须是对象")
+    return data
+
+
+def _validate_script_payload(data: Dict[str, Any], topic: str, duration: int) -> Dict[str, Any]:
+    title = str(data.get("title") or topic or "未命名台本").strip() or topic
+    segments_raw = data.get("segments")
+    if not isinstance(segments_raw, list) or not segments_raw:
+        raise ValueError("segments 必须是非空数组")
+    if len(segments_raw) > 12:
+        raise ValueError("segments 段数过多（最多 12 段）")
+    segments: List[Dict[str, Any]] = []
+    for index, segment in enumerate(segments_raw):
+        if not isinstance(segment, dict):
+            raise ValueError(f"第 {index + 1} 段不是对象")
+        name = str(segment.get("name") or "").strip()
+        lines_raw = segment.get("lines")
+        if not isinstance(lines_raw, list) or not lines_raw:
+            raise ValueError(f"第 {index + 1} 段 lines 必须是非空数组")
+        lines: List[Dict[str, str]] = []
+        for line in lines_raw:
+            if not isinstance(line, dict):
+                raise ValueError(f"第 {index + 1} 段存在非法台词")
+            speaker = str(line.get("speaker") or "").strip()
+            text = str(line.get("text") or "").strip()
+            if not speaker or not text:
+                raise ValueError(f"第 {index + 1} 段存在空 speaker/text")
+            lines.append({"speaker": speaker, "text": text})
+        segments.append({"name": name or f"第{index + 1}段", "lines": lines})
+    total_lines = sum(len(segment["lines"]) for segment in segments)
+    if total_lines < 3:
+        raise ValueError("台词总数过少（至少 3 句）")
+    return {"title": title, "segments": segments}
+
+
+def _script_text_from_segments(segments: List[Dict[str, Any]]) -> str:
+    blocks: List[str] = []
+    for segment in segments:
+        block = [f"[{segment['name']}]"]
+        block.extend(
+            f"{line['speaker']}：{line['text']}" for line in segment.get("lines") or []
+        )
+        blocks.append("\n".join(block))
+    return "\n\n".join(blocks) + "\n"
+
+
+def _build_script_prompt(
+    topic: str,
+    duration: int,
+    tone: str,
+    template_spec: Dict[str, Any],
+) -> str:
+    template_name = str(
+        template_spec.get("name") or template_spec.get("title") or ""
+    ).strip()
+    template_desc = str(
+        template_spec.get("description") or template_spec.get("summary") or ""
+    ).strip()
+    lines = [
+        "你是一名中文综艺编剧，为「造片局 · AI微综艺」写一期可直接录制的台本。",
+        f"话题：{topic}",
+        f"目标时长：约 {duration} 秒（约 {max(6, duration // 4)} 句台词）。",
+        f"语气：{tone or '轻松幽默'}。",
+        "固定角色：老周（主持人，稳重吐槽）、阿栗（AI 内容创业者，脑洞大）、大魏（传统综艺导演，冷幽默）。",
+        "结构：必须有「开场」「正片」「结尾」三段；开场抛话题，正片有观点碰撞和至少一次括号动作反应，结尾收束。",
+        "台词要口语化、有梗、可被 TTS 直接朗读；不要舞台说明以外的旁白。",
+    ]
+    if template_name:
+        lines.append(f"参考节目模板：{template_name}。")
+    if template_desc:
+        lines.append(f"模板说明：{template_desc[:400]}")
+    lines.append(
+        "输出 JSON：{\"title\":\"节目标题\",\"segments\":[{\"name\":\"开场\",\"lines\":[{\"speaker\":\"老周\",\"text\":\"台词\"}]}]}。"
+    )
+    return "\n".join(lines)
+
+
+@router.get("/llm/config", response_model=schemas.LLMConfigOut)
+def llm_config():
+    cfg = llm.load_config()
+    return {
+        "provider": cfg.provider,
+        "base_url": cfg.base_url,
+        "model": cfg.model,
+        "has_api_key": bool(cfg.api_key),
+        "api_key_masked": _mask_secret(cfg.api_key),
+        "timeout_seconds": cfg.timeout_seconds,
+        "supported_providers": list(llm.SUPPORTED_PROVIDERS),
+    }
+
+
+@router.get("/llm/providers")
+def llm_providers():
+    return {
+        "providers": [
+            {
+                "id": "ollama",
+                "label": "本地 Ollama",
+                "default_base_url": "http://127.0.0.1:11434",
+                "requires_api_key": False,
+                "default_model": "qwen2.5:7b",
+            },
+            {
+                "id": "openai_compatible",
+                "label": "OpenAI 兼容 API（DeepSeek/OpenAI 等）",
+                "default_base_url": "https://api.openai.com/v1",
+                "requires_api_key": True,
+                "default_model": "gpt-4o-mini",
+            },
+            {
+                "id": "mock",
+                "label": "Mock（测试用，不联网）",
+                "default_base_url": "",
+                "requires_api_key": False,
+                "default_model": "mock",
+            },
+        ]
+    }
+
+
+@router.post("/llm/test", response_model=schemas.LLMTestResult)
+def llm_test(payload: Optional[schemas.LLMTestRequest] = None):
+    provider = payload.provider if payload is not None and payload.provider else None
+    if provider is not None:
+        provider = str(provider).strip().lower()
+        if provider not in llm.SUPPORTED_PROVIDERS:
+            raise HTTPException(
+                status_code=400,
+                detail=f"不支持的 LLM provider: {provider}；可选 {list(llm.SUPPORTED_PROVIDERS)}",
+            )
+    return llm.test_connection(provider)
+
+
+@router.post("/projects/{pid}/generate-script", response_model=schemas.ScriptGenerateResult)
+def generate_script(
+    pid: str,
+    payload: schemas.ScriptGenerateRequest,
+    db: Session = Depends(get_db),
+):
+    project = _get_or_404(db, models.Project, pid, "项目")
+    template_spec: Dict[str, Any] = {}
+    if payload.template_id:
+        template_spec = _load_format(str(payload.template_id))
+        if not template_spec:
+            raise HTTPException(
+                status_code=400, detail=f"模板不存在: {payload.template_id}"
+            )
+    topic = payload.topic.strip()
+    if not topic:
+        raise HTTPException(status_code=400, detail="topic 不能为空")
+    prompt = _build_script_prompt(topic, payload.duration, payload.tone or "轻松幽默", template_spec)
+    last_error = ""
+    for attempt in range(2):
+        attempt_prompt = prompt
+        if attempt == 1:
+            attempt_prompt = (
+                prompt
+                + "\n\n上一次输出不符合要求："
+                + last_error
+                + "\n请重新生成完整 JSON（不要 Markdown 代码块）。"
+            )
+        try:
+            raw = llm.complete(
+                attempt_prompt,
+                json_schema=SCRIPT_JSON_SCHEMA,
+                temperature=0.8 if attempt == 0 else 0.4,
+            )
+        except llm.LLMError as exc:
+            raise HTTPException(status_code=502, detail=f"LLM 调用失败：{exc}") from exc
+        try:
+            data = _extract_json_object(raw)
+            validated = _validate_script_payload(data, topic, payload.duration)
+        except ValueError as exc:
+            last_error = str(exc)[:300]
+            continue
+        script_text = _script_text_from_segments(validated["segments"])
+        cfg = llm.load_config()
+        return {
+            "title": validated["title"],
+            "script": script_text,
+            "segments": validated["segments"],
+            "topic": topic,
+            "provider": cfg.provider,
+            "model": cfg.model,
+            "duration": payload.duration,
+        }
+    raise HTTPException(
+        status_code=502,
+        detail=f"LLM 输出不符合 JSON 结构（已重试一次）：{last_error or '未知原因'}",
+    )
+
+
+# --------------------------------------------------------------------------- #
 # 一键发布（contract/PUBLISHING.md）
 # --------------------------------------------------------------------------- #
 def _publish_video_candidates(episode: models.Episode, lang: str, version: str) -> List[Path]:
@@ -1725,6 +2000,32 @@ def patch_settings(payload: schemas.SettingsUpdate, db: Session = Depends(get_db
     # metaso_key / upload_post_api_key 不落 DB、不回传：分别写入 env 文件
     metaso_key = changes.pop("metaso_key", None)
     upload_post_api_key = changes.pop("upload_post_api_key", None)
+    # LLM 配置写 backend/data/llm.env（api_key 不落 DB、不回传）
+    llm_updates: Dict[str, str] = {}
+    llm_provider = changes.pop("llm_provider", None)
+    if llm_provider is not None:
+        provider = str(llm_provider).strip().lower()
+        if provider not in llm.SUPPORTED_PROVIDERS:
+            raise HTTPException(
+                status_code=400,
+                detail=f"llm_provider 只能是 {list(llm.SUPPORTED_PROVIDERS)}",
+            )
+        llm_updates["LLM_PROVIDER"] = provider
+    llm_base_url = changes.pop("llm_base_url", None)
+    if llm_base_url is not None:
+        base = str(llm_base_url).strip()
+        if base and not base.lower().startswith(("http://", "https://")):
+            raise HTTPException(status_code=400, detail="llm_base_url 必须是 http(s) URL")
+        llm_updates["LLM_BASE_URL"] = base
+    llm_model = changes.pop("llm_model", None)
+    if llm_model is not None:
+        model = str(llm_model).strip()
+        if not model:
+            raise HTTPException(status_code=400, detail="llm_model 不能为空")
+        llm_updates["LLM_MODEL"] = model
+    llm_api_key = changes.pop("llm_api_key", None)
+    if llm_api_key is not None:
+        llm_updates["LLM_API_KEY"] = str(llm_api_key).strip()
     if changes.get("generation_mode") is not None and changes["generation_mode"] not in ("mock", "comfyui"):
         raise HTTPException(status_code=400, detail="generation_mode 只能是 mock 或 comfyui")
     provider = changes.get("h3_provider")
@@ -1805,6 +2106,8 @@ def patch_settings(payload: schemas.SettingsUpdate, db: Session = Depends(get_db
         config.save_metaso_key(str(metaso_key))
     if upload_post_api_key is not None:
         config.save_publish_key(str(upload_post_api_key))
+    if llm_updates:
+        config.save_llm_config(llm_updates)
     db.commit()
     db.refresh(setting)
     return setting

@@ -47,6 +47,8 @@ API_PREFIX = "/api"
 MEDIA_URL_PREFIX = "/media"
 METASO_ENV_PATH = DATA_DIR / "metaso.env"
 PUBLISH_ENV_PATH = DATA_DIR / "publish.env"
+LLM_ENV_PATH = DATA_DIR / "llm.env"
+LLM_ENV_KEYS = ("LLM_PROVIDER", "LLM_BASE_URL", "LLM_MODEL", "LLM_API_KEY")
 
 
 def ensure_dirs() -> None:
@@ -184,6 +186,66 @@ def save_publish_key(raw: str | None) -> bool:
     except OSError:
         return bool(value)
     return bool(value)
+
+
+def llm_file_values() -> dict:
+    """读取 backend/data/llm.env 中的 LLM_*（环境变量优先级由 llm.load_config 处理）。"""
+    path = LLM_ENV_PATH
+    values: dict = {}
+    if not path.is_file():
+        return values
+    try:
+        for line in path.read_text(encoding="utf-8").splitlines():
+            text = line.strip()
+            if not text or text.startswith("#") or "=" not in text:
+                continue
+            name, _, raw = text.partition("=")
+            name = name.strip().upper()
+            if name in LLM_ENV_KEYS:
+                values[name] = raw.strip().strip('"').strip("'")
+    except OSError:
+        return {}
+    return values
+
+
+def save_llm_config(updates: dict) -> None:
+    """把 LLM_* 写入 backend/data/llm.env（保留其它行；空值表示删除该行）。不写日志。"""
+    path = LLM_ENV_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lines = []
+    if path.is_file():
+        try:
+            lines = path.read_text(encoding="utf-8").splitlines()
+        except OSError:
+            lines = []
+    wanted = {str(key).upper(): str(value).strip() for key, value in updates.items() if str(key).upper() in LLM_ENV_KEYS}
+    output = []
+    replaced = set()
+    for line in lines:
+        text = line.strip()
+        name = text.partition("=")[0].strip().upper() if "=" in text else ""
+        if name in wanted:
+            value = wanted[name]
+            if value and name not in replaced:
+                output.append(f"{name}={value}")
+                replaced.add(name)
+            continue
+        output.append(line)
+    for name, value in wanted.items():
+        if value and name not in replaced:
+            output.append(f"{name}={value}")
+    payload = "\n".join(output).strip()
+    try:
+        if payload:
+            path.write_text(payload + "\n", encoding="utf-8")
+            try:
+                path.chmod(0o600)
+            except OSError:
+                pass
+        elif path.is_file():
+            path.unlink()
+    except OSError:
+        pass
 
 
 def media_url(path: str | Path) -> str:

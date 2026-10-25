@@ -144,6 +144,8 @@ def build_parser() -> argparse.ArgumentParser:
                           help="scene_map 模板 id（默认取 episode.format_id/id）")
     p_render.add_argument("--style", default=None, choices=["3d_anime", "2d_anime"],
                           help="覆盖风格（默认按 contract/style_map.json 的模板映射）")
+    p_render.add_argument("--style-profile", default=None,
+                          help="style_v2 风格 profile：auto 按模板映射，或 preset 名/模板 id（contract/style_presets.json）")
     p_render.set_defaults(func=cmd_render)
     return parser
 

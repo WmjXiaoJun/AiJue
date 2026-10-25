@@ -412,3 +412,9 @@ FastAPI (8090) ── SQLite
 - 验证：outputs/h3_style_demos/tonight_show_3d.mp4（32.2s / 8 个 H3 镜头 7 audio_ref+1 fl2v / 0 fallback / 0 blackdetect / ASS 56 / 68 tests passed）；抽帧见 docs/screenshots/67_tonight_show_3d_h3_sheet.png，2D vs 3D 对比 docs/screenshots/68_compare_2d_vs_3d_h3.png；3D plate 总览 docs/screenshots/69_3d_scene_plates.png。
 - 11 个 3d_anime 模板的静态场景 demo 正在批量渲染 outputs/scene_demos_3d/（task-44）；5 个 2d_anime 模板保持 2D 场景。
 - 已知限制：H3 在个别特写会轻微漂移角色形象（3D cutout 参考有限），后续用更多角度/表情参考图和身份锚定 prompt 提升一致性；3D 角色立绘仍是 SDXL 生成（无 Blender）。
+## 34. 规划：模板差异化风格 v2 + LLM 内容生成（2026-10-25）
+- 规划文档：docs/PLAN_V2_STYLE_LLM.md（12 preset + 16 模板独立风格；LLM 本地/API Key；P0-P4 阶段与验收）；契约：contract/style_presets.json、contract/LLM.md。
+- **P1 LLM 已落地**（backend-core）：backend/app/llm.py provider（ollama/openai_compatible/mock）+ 配置/掩码 + GET /api/llm/config、POST /api/llm/test、POST /api/projects/{pid}/generate-script；pytest **146 passed**；实机 Ollama qwen2.5:7b 生成原创 60s 台本（~4.4-7s）。
+- **P1 前端已落地**（frontend-ui）：设置→AI 模型（provider/base_url/model/Key 掩码/测试连接）；编剧间→AI 生成台本（话题/模板/时长/语气→预览→采纳写入编辑器）；build 通过；截图 docs/screenshots/71-73。
+- **P2 风格资产已落地**（h3-comfy）：12 张差异化 1280×720 风格 plate（cinematic/neon/game/roundtable/theatre/warmtalk/clay/noir/vhs/ink/debateink/gold），contact_sheet_styles.png + meta_styles.json。
+- **P3 进行中**（media-render）：pipeline/style_v2 + 16 模板风格 demo 渲染中（outputs/style_demos_v2/，已完成 tonight_show/shark_tank/masked_singer 等，overview 16 张）；完成后补 verify/QC。

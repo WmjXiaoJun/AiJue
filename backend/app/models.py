@@ -355,3 +355,28 @@ class Setting(Base):
         from . import config
 
         return config.publish_key_configured()
+
+    # LLM 配置存在 backend/data/llm.env（环境变量优先），这里只读透出给 SettingsOut
+    @property
+    def llm_provider(self) -> str:
+        from . import llm
+
+        return llm.load_config().provider
+
+    @property
+    def llm_base_url(self) -> str:
+        from . import llm
+
+        return llm.load_config().base_url
+
+    @property
+    def llm_model(self) -> str:
+        from . import llm
+
+        return llm.load_config().model
+
+    @property
+    def llm_api_key_configured(self) -> bool:
+        from . import llm
+
+        return bool(llm.load_config().api_key)

@@ -214,6 +214,11 @@ class SettingsOut(ORMModel):
     upload_post_youtube_made_for_kids: bool = False
     publish_brand_title: str = "造片局 · AI微综艺"
     upload_post_api_key_configured: bool = False  # 只读，不回传明文 key
+    # LLM 内容生成（backend/data/llm.env）
+    llm_provider: str = "ollama"
+    llm_base_url: str = "http://127.0.0.1:11434"
+    llm_model: str = "qwen2.5:7b"
+    llm_api_key_configured: bool = False
 
 
 class SettingsUpdate(BaseModel):
@@ -243,6 +248,11 @@ class SettingsUpdate(BaseModel):
     upload_post_youtube_privacy_status: Optional[str] = None
     upload_post_youtube_made_for_kids: Optional[bool] = None
     publish_brand_title: Optional[str] = None
+    # LLM 内容生成（写 backend/data/llm.env，api_key 不落 DB/不回传）
+    llm_provider: Optional[str] = None
+    llm_base_url: Optional[str] = None
+    llm_model: Optional[str] = None
+    llm_api_key: Optional[str] = None
 
 
 # ---------------- Character（角色工坊） ----------------
@@ -346,6 +356,57 @@ class EpisodeExportRequest(BaseModel):
     type: str = "capcut"
     # 可选导出名（默认 造片局_EPxxx）；测试/演示可用独立 name 避免覆盖 canonical 草稿
     name: Optional[str] = None
+
+
+# ---------------- LLM 内容生成 ----------------
+class LLMConfigOut(BaseModel):
+    provider: str
+    base_url: str
+    model: str
+    has_api_key: bool = False
+    api_key_masked: str = ""
+    timeout_seconds: float = 120.0
+    supported_providers: List[str] = Field(default_factory=list)
+
+
+class LLMTestRequest(BaseModel):
+    provider: Optional[str] = None
+
+
+class LLMTestResult(BaseModel):
+    ok: bool
+    provider: str
+    model: str
+    latency_ms: int = 0
+    reply: Optional[str] = None
+    error: Optional[str] = None
+
+
+class ScriptGenerateRequest(BaseModel):
+    topic: str = Field(min_length=1, max_length=500)
+    template_id: Optional[str] = None
+    duration: int = Field(default=60, ge=15, le=600)
+    tone: Optional[str] = Field(default="轻松幽默", max_length=100)
+
+
+class ScriptLineOut(BaseModel):
+    speaker: str
+    text: str
+
+
+class ScriptSegmentOut(BaseModel):
+    name: str
+    lines: List[ScriptLineOut] = Field(default_factory=list)
+
+
+class ScriptGenerateResult(BaseModel):
+    title: str
+    script: str
+    segments: List[ScriptSegmentOut] = Field(default_factory=list)
+    topic: str
+    provider: str
+    model: str
+    duration: int
 
 
 # ---------------- 一键发布（contract/PUBLISHING.md） ----------------

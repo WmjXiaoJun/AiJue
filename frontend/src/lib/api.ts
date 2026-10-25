@@ -8,7 +8,12 @@ import type {
   CostReport,
   Episode,
   Health,
+  GenerateScriptRequest,
+  GenerateScriptResult,
   Job,
+  LLMConfig,
+  LLMProviderInfo,
+  LLMTestResult,
   Localization,
   NewAsset,
   PublishConfig,
@@ -252,6 +257,42 @@ export const api = {
     request<Job>("/episodes/" + eid + "/publish", { method: "POST", body: JSON.stringify(body) }),
   publishes: (eid: string) => request<PublishRecord[]>("/episodes/" + eid + "/publishes"),
   publish: (id: string) => request<PublishRecord>("/publishes/" + id),
+
+  /** AI 模型（LLM）：本地 Ollama / OpenAI 兼容 / mock */
+  llmConfig: () => request<LLMConfig>("/llm/config"),
+  llmProviders: () => request<LLMProviderInfo[] | { providers?: LLMProviderInfo[] }>("/llm/providers"),
+  llmTest: (body: { provider?: string; base_url?: string; model?: string; api_key?: string } = {}) =>
+    request<LLMTestResult>("/llm/test", { method: "POST", body: JSON.stringify(body) }),
+  /** 编剧间 AI 生成台本（同步返回 script；若后端改为 Job 也兼容轮询） */
+  generateScript: async (pid: string, body: GenerateScriptRequest): Promise<GenerateScriptResult> => {
+    const res = await request<GenerateScriptResult | Job>("/projects/" + pid + "/generate-script", {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+    if (res && typeof (res as GenerateScriptResult).script === "string") return res as GenerateScriptResult;
+    const job = res as Job;
+    if (job && typeof job.id === "string") {
+      let current = job;
+      for (let i = 0; i < 120; i += 1) {
+        if (current.status === "done" || current.status === "failed" || current.status === "canceled") break;
+        await new Promise((resolve) => window.setTimeout(resolve, 1500));
+        current = await request<Job>("/jobs/" + job.id);
+      }
+      const params = (current.params || {}) as Record<string, unknown>;
+      const script =
+        (typeof params.script === "string" && params.script) ||
+        (typeof (current as unknown as { script?: string }).script === "string"
+          ? (current as unknown as { script: string }).script
+          : "");
+      if (script) return { ...(params as Record<string, unknown>), script };
+      throw new Error(
+        current.status === "failed"
+          ? current.error || current.message || "台本生成失败"
+          : "台本生成任务已结束但没有返回 script 字段（等待后端 task-45 明确响应）"
+      );
+    }
+    throw new Error("generate-script 响应格式不符合预期");
+  },
 
   settings: () => request<Settings>("/settings"),
   patchSettings: (body: Partial<Settings>) =>

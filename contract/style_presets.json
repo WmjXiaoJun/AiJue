@@ -1,0 +1,147 @@
+{
+  "version": 1,
+  "presets": {
+    "cinematic_3d": {
+      "label": "3D 电影感",
+      "prompt_prefix": "cinematic 3D anime cel-shaded render, filmic lighting, shallow depth of field, realistic shadows, volumetric light",
+      "palette": "warm_teal",
+      "plate_suffix": "__cinematic",
+      "character_style": "cutout_3d",
+      "motion": "slow dolly-in",
+      "transition": "fade"
+    },
+    "neon_stage_3d": {
+      "label": "霓虹舞台 3D",
+      "prompt_prefix": "cinematic 3D anime stage render, neon rim light, haze, reflective floor, strong backlight",
+      "palette": "neon_magenta_cyan",
+      "plate_suffix": "__neon",
+      "character_style": "cutout_3d",
+      "motion": "slow push-in",
+      "transition": "fade"
+    },
+    "game_show_3d": {
+      "label": "综艺游戏 3D",
+      "prompt_prefix": "stylized 3D cartoon game-show stage, high saturation, hard key light, glossy props",
+      "palette": "candy_highsat",
+      "plate_suffix": "__game",
+      "character_style": "cutout_3d",
+      "motion": "whip pan",
+      "transition": "hard_cut"
+    },
+    "roundtable_3d": {
+      "label": "暗色圆桌 3D",
+      "prompt_prefix": "3D anime dark roundtable studio, moody chiaroscuro, desk lamps, deep shadows",
+      "palette": "dark_amber_teal",
+      "plate_suffix": "__roundtable",
+      "character_style": "cutout_3d",
+      "motion": "slow orbit",
+      "transition": "fade"
+    },
+    "sketch_3d": {
+      "label": "剧院小品 3D",
+      "prompt_prefix": "3D anime theatre stage, red curtains, warm spotlight, dust in the air",
+      "palette": "theatre_red_gold",
+      "plate_suffix": "__theatre",
+      "character_style": "cutout_3d",
+      "motion": "slow dolly",
+      "transition": "fade_black"
+    },
+    "warm_talk_3d": {
+      "label": "暖光访谈 3D",
+      "prompt_prefix": "3D anime cozy interview set, warm soft light, wood textures, gentle bokeh",
+      "palette": "warm_amber",
+      "plate_suffix": "__warmtalk",
+      "character_style": "cutout_3d",
+      "motion": "static",
+      "transition": "crossfade"
+    },
+    "clay_life_3d": {
+      "label": "黏土定格 3D",
+      "prompt_prefix": "stop-motion clay style 3D render, handmade textures, soft studio light, tilt-shift",
+      "palette": "pastel_earth",
+      "plate_suffix": "__clay",
+      "character_style": "cutout_3d",
+      "motion": "static",
+      "transition": "crossfade"
+    },
+    "noir_mystery_3d": {
+      "label": "黑色电影 3D",
+      "prompt_prefix": "film-noir 3D anime render, hard venetian-blind shadows, cold blue, wet reflections",
+      "palette": "noir_blue_amber",
+      "plate_suffix": "__noir",
+      "character_style": "cutout_3d",
+      "motion": "slow push-in",
+      "transition": "fade_black"
+    },
+    "retro_standup_2d": {
+      "label": "复古录像带 2D",
+      "prompt_prefix": "retro 2D anime VHS style, warm yellow cast, grain, scanlines, 1980s TV studio",
+      "palette": "vhs_warm",
+      "plate_suffix": "__vhs",
+      "character_style": "cutout_2d",
+      "motion": "static",
+      "transition": "hard_cut"
+    },
+    "history_ink_2d": {
+      "label": "水墨历史 2D",
+      "prompt_prefix": "Chinese ink-wash 2D anime illustration, paper texture, brush strokes, candlelight",
+      "palette": "ink_amber",
+      "plate_suffix": "__ink",
+      "character_style": "cutout_2d",
+      "motion": "slow pan",
+      "transition": "fade"
+    },
+    "debate_ink_2d": {
+      "label": "国风辩论 2D",
+      "prompt_prefix": "Chinese ink-wash 2D debate hall, red lacquer and gold accents, dramatic brush shadows",
+      "palette": "ink_red_gold",
+      "plate_suffix": "__debateink",
+      "character_style": "cutout_2d",
+      "motion": "slow pan",
+      "transition": "fade"
+    },
+    "museum_gold_2d": {
+      "label": "国宝金彩 2D",
+      "prompt_prefix": "rich 2D anime museum illustration, gold and jade palette, ornate details, dramatic spotlights",
+      "palette": "gold_jade",
+      "plate_suffix": "__gold",
+      "character_style": "cutout_2d",
+      "motion": "slow push-in",
+      "transition": "crossfade"
+    }
+  },
+  "templates": {
+    "tonight_show_5min": "cinematic_3d",
+    "shark_tank_5min": "cinematic_3d",
+    "masked_singer_5min": "neon_stage_3d",
+    "standup_5min": "retro_standup_2d",
+    "taskmaster_5min": "game_show_3d",
+    "traitors_5min": "roundtable_3d",
+    "snl_sketch_5min": "sketch_3d",
+    "roundtable_5min": "roundtable_3d",
+    "hot_ones_5min": "warm_talk_3d",
+    "qipashuo_5min": "debate_ink_2d",
+    "slow_life_5min": "clay_life_3d",
+    "history_talk_5min": "history_ink_2d",
+    "history_mystery_5min": "history_ink_2d",
+    "classics_5min": "history_ink_2d",
+    "national_treasure_5min": "museum_gold_2d",
+    "mystery_5min": "noir_mystery_3d"
+  },
+  "template_overrides": {
+    "shark_tank_5min": {
+      "palette": "cold_blue_gold",
+      "motion": "slow push-in"
+    },
+    "history_mystery_5min": {
+      "palette": "ink_cold_red",
+      "motion": "slow push-in",
+      "transition": "fade_black"
+    },
+    "classics_5min": {
+      "palette": "ink_sepia",
+      "motion": "static"
+    }
+  },
+  "note": "12 基础 preset + 16 模板映射 + 模板级覆盖；资产缺失回退 2D。风格升级按 docs/PLAN_V2_STYLE_LLM.md 执行。"
+}

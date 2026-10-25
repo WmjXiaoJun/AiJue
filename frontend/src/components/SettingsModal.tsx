@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { ApiError, API_BASE, api, errorText } from "../lib/api";
-import type { Health, Settings } from "../types";
+import type { Health, LLMConfig, LLMProviderInfo, LLMTestResult, Settings } from "../types";
 import { useToast } from "./Toast";
 import { Field, Modal, Notice, Spinner } from "./ui";
-import { IconCheck, IconRefresh } from "./icons";
+import { IconAlert, IconCheck, IconRefresh } from "./icons";
 
 interface Props {
   open: boolean;
@@ -50,6 +50,92 @@ const UPLOAD_PLATFORM_OPTIONS = [
   { id: "instagram", label: "Instagram" },
 ];
 
+interface LLMForm {
+  provider: string;
+  baseUrl: string;
+  model: string;
+  apiKey: string;
+  keyDirty: boolean;
+  keyConfigured: boolean;
+  masked: string;
+}
+
+const EMPTY_LLM_FORM: LLMForm = {
+  provider: "ollama",
+  baseUrl: "http://127.0.0.1:11434",
+  model: "qwen2.5:7b",
+  apiKey: "",
+  keyDirty: false,
+  keyConfigured: false,
+  masked: "",
+};
+
+const LLM_FALLBACK_PROVIDERS: LLMProviderInfo[] = [
+  {
+    id: "ollama",
+    label: "本地 Ollama",
+    requires_key: false,
+    default_base_url: "http://127.0.0.1:11434",
+    default_model: "qwen2.5:7b",
+    hint: "本机 Ollama 服务，免费离线",
+  },
+  {
+    id: "openai_compatible",
+    label: "OpenAI 兼容",
+    requires_key: true,
+    default_base_url: "https://api.deepseek.com/v1",
+    default_model: "deepseek-chat",
+    hint: "DeepSeek / OpenAI 等 /v1 兼容端点，需 API Key",
+  },
+  {
+    id: "mock",
+    label: "关闭 / mock",
+    requires_key: false,
+    default_model: "mock",
+    hint: "不调用模型，返回固定文本（仅测试/演示）",
+  },
+];
+
+function strValue(value: unknown): string {
+  return typeof value === "string" ? value : "";
+}
+
+function toLLMForm(config: LLMConfig | null, settings: Settings | null): LLMForm {
+  const provider =
+    strValue(config?.provider) || strValue(config?.llm_provider) || strValue(settings?.llm_provider) || "ollama";
+  const baseUrl =
+    strValue(config?.base_url) ||
+    strValue(config?.llm_base_url) ||
+    strValue(settings?.llm_base_url) ||
+    (provider === "ollama"
+      ? "http://127.0.0.1:11434"
+      : provider === "mock"
+        ? ""
+        : "https://api.openai.com/v1");
+  const model =
+    strValue(config?.model) ||
+    strValue(config?.llm_model) ||
+    strValue(settings?.llm_model) ||
+    (provider === "ollama" ? "qwen2.5:7b" : "");
+  const configured =
+    typeof config?.has_api_key === "boolean"
+      ? config.has_api_key
+      : typeof config?.api_key_configured === "boolean"
+        ? config.api_key_configured
+        : typeof settings?.llm_api_key_configured === "boolean"
+          ? settings.llm_api_key_configured
+          : false;
+  return {
+    provider,
+    baseUrl,
+    model,
+    apiKey: "",
+    keyDirty: false,
+    keyConfigured: configured,
+    masked: strValue(config?.api_key_masked),
+  };
+}
+
 const EMPTY_FORM: FormState = {
   generation_mode: "mock",
   resolution: "1280x720",
@@ -85,6 +171,12 @@ export function SettingsModal({ open, onClose, health }: Props) {
   const [h3ProviderSupported, setH3ProviderSupported] = useState(true);
   const [publish, setPublish] = useState<PublishForm>(EMPTY_PUBLISH);
   const [publishSupported, setPublishSupported] = useState(true);
+  const [llm, setLlm] = useState<LLMForm>(EMPTY_LLM_FORM);
+  const [llmProviders, setLlmProviders] = useState<LLMProviderInfo[]>(LLM_FALLBACK_PROVIDERS);
+  const [llmSupported, setLlmSupported] = useState(true);
+  const [llmTesting, setLlmTesting] = useState(false);
+  const [llmTestResult, setLlmTestResult] = useState<LLMTestResult | null>(null);
+  const [llmTestError, setLlmTestError] = useState<string | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -113,6 +205,33 @@ export function SettingsModal({ open, onClose, health }: Props) {
         madeForKids: !!settings.upload_post_youtube_made_for_kids,
         configured: !!settings.upload_post_api_key_configured,
       });
+
+      // AI 模型：优先 GET /api/llm/config，未就绪时回退 settings.llm_*
+      let llmConfig: LLMConfig | null = null;
+      try {
+        llmConfig = await api.llmConfig();
+        setLlmSupported(true);
+        if (Array.isArray(llmConfig.providers) && llmConfig.providers.length) {
+          setLlmProviders(llmConfig.providers);
+        }
+      } catch {
+        setLlmSupported(false);
+      }
+      if (!llmConfig || !Array.isArray(llmConfig.providers) || !llmConfig.providers.length) {
+        try {
+          const providers = await api.llmProviders();
+          const list = Array.isArray(providers) ? providers : providers.providers || [];
+          if (list.length) {
+            setLlmProviders(list);
+            setLlmSupported(true);
+          }
+        } catch {
+          /* /llm/providers 未就绪：使用内置 provider 列表 */
+        }
+      }
+      setLlm(toLLMForm(llmConfig, settings));
+      setLlmTestResult(null);
+      setLlmTestError(null);
     } catch (err) {
       setError(errorText(err));
     } finally {
@@ -147,16 +266,24 @@ export function SettingsModal({ open, onClose, health }: Props) {
     };
     // api_key 只在用户修改时提交；空串表示清除（GET 永不返回明文）
     if (publish.keyDirty) publishPatch.upload_post_api_key = publish.apiKey;
+
+    const llmPatch: Partial<Settings> = {
+      llm_provider: llm.provider,
+      llm_base_url: llm.baseUrl.trim(),
+      llm_model: llm.model.trim(),
+    };
+    if (llm.keyDirty) llmPatch.llm_api_key = llm.apiKey;
+
     try {
       let next: Settings;
       try {
-        next = await api.patchSettings({ ...base, h3_provider: form.h3_provider, ...publishPatch });
+        next = await api.patchSettings({ ...base, h3_provider: form.h3_provider, ...publishPatch, ...llmPatch });
       } catch (err) {
         // 后端暂未支持 h3_provider 时回退保存其它设置
         if (err instanceof ApiError && (err.status === 422 || err.status === 400)) {
-          next = await api.patchSettings({ ...base, ...publishPatch });
+          next = await api.patchSettings({ ...base, ...publishPatch, ...llmPatch });
           setH3ProviderSupported(false);
-          notify("后端暂不支持 H3 生成方式切换，已保存其它设置", "info");
+          notify("后端暂不支持部分新字段，已保存其它设置", "info");
         } else {
           throw err;
         }
@@ -164,7 +291,20 @@ export function SettingsModal({ open, onClose, health }: Props) {
       setForm(toForm(next));
       setVoiceMap(next.voice_map || null);
       if (typeof next.metaso_key_configured === "boolean") setMetasoKeyConfigured(next.metaso_key_configured);
-      if (typeof next.upload_post_api_key_configured === "boolean") {
+      if (typeof next.llm_provider === "string" || typeof next.llm_api_key_configured === "boolean") {
+        setLlmSupported(true);
+        setLlm((prev) => ({
+          ...prev,
+          apiKey: "",
+          keyDirty: false,
+          keyConfigured:
+            typeof next.llm_api_key_configured === "boolean" ? next.llm_api_key_configured : prev.keyConfigured,
+          provider: typeof next.llm_provider === "string" ? next.llm_provider : prev.provider,
+          baseUrl: strValue(next.llm_base_url) || prev.baseUrl,
+          model: strValue(next.llm_model) || prev.model,
+        }));
+        notify("设置已保存 · AI 模型 " + (llm.provider === "ollama" ? "本地 Ollama" : llm.provider), "success");
+      } else if (typeof next.upload_post_api_key_configured === "boolean") {
         setPublishSupported(true);
         setPublish((prev) => ({
           ...prev,
@@ -186,6 +326,36 @@ export function SettingsModal({ open, onClose, health }: Props) {
       notify(errorText(err), "error");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const testLLM = async () => {
+    setLlmTesting(true);
+    setLlmTestResult(null);
+    setLlmTestError(null);
+    try {
+      const body: { provider?: string; base_url?: string; model?: string; api_key?: string } = {
+        provider: llm.provider,
+        base_url: llm.baseUrl.trim(),
+        model: llm.model.trim(),
+      };
+      if (llm.keyDirty && llm.apiKey) body.api_key = llm.apiKey;
+      const result = await api.llmTest(body);
+      setLlmTestResult(result);
+      setLlm((prev) => ({ ...prev, keyDirty: body.api_key ? false : prev.keyDirty }));
+      if (result.ok) {
+        notify("AI 模型连接成功" + (result.model ? "（" + result.model + "）" : ""), "success");
+      } else {
+        notify("AI 模型连接失败：" + (result.error || "未知原因"), "error");
+      }
+    } catch (err) {
+      if (err instanceof ApiError && (err.status === 404 || err.status === 405)) {
+        setLlmTestError("AI 模型测试接口未就绪（等待后端 task-45：POST /api/llm/test）");
+      } else {
+        setLlmTestError("测试连接失败：" + errorText(err));
+      }
+    } finally {
+      setLlmTesting(false);
     }
   };
 
@@ -428,6 +598,125 @@ export function SettingsModal({ open, onClose, health }: Props) {
           {!publishSupported && (
             <span className="field-hint">
               当前后端尚未支持 upload_post_* 字段（等 task-33）；保存会自动忽略这些字段并提示。
+            </span>
+          )}
+        </div>
+
+        <div className="field settings-llm">
+          <span className="field-label">
+            AI 模型（LLM）
+            <span className={"publish-settings-status " + (llmSupported ? "ok" : "warn")}>
+              {llmSupported ? "接口可用" : "接口未就绪"}
+            </span>
+          </span>
+          <p className="field-hint publish-settings-hint">
+            本地 Ollama（免费离线）或 OpenAI 兼容 API（DeepSeek / OpenAI，需 Key）；用于「AI 生成台本」等 AI 内容。
+            API Key 只写不读，GET 永不返回明文。
+          </p>
+          <div className="form-grid">
+            <Field label="Provider">
+              <select
+                className="select"
+                value={llm.provider}
+                onChange={(event) => {
+                  const id = event.target.value;
+                  const info = llmProviders.find((item) => item.id === id);
+                  setLlm((prev) => ({
+                    ...prev,
+                    provider: id,
+                    baseUrl: id === "mock" ? "" : info?.default_base_url || prev.baseUrl,
+                    model: info?.default_model || prev.model,
+                  }));
+                  setLlmTestResult(null);
+                  setLlmTestError(null);
+                }}
+              >
+                {llmProviders.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.label || item.name || item.id}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field label="模型" hint="本地默认 qwen2.5:7b；API 如 deepseek-chat">
+              <input
+                className="input"
+                value={llm.model}
+                onChange={(event) => setLlm((prev) => ({ ...prev, model: event.target.value }))}
+                placeholder="qwen2.5:7b / deepseek-chat"
+              />
+            </Field>
+          </div>
+          <Field label="Base URL" hint={llm.provider === "ollama" ? "默认 http://127.0.0.1:11434" : "如 https://api.deepseek.com/v1"}>
+            <input
+              className="input"
+              value={llm.baseUrl}
+              onChange={(event) => setLlm((prev) => ({ ...prev, baseUrl: event.target.value }))}
+              placeholder={llm.provider === "ollama" ? "http://127.0.0.1:11434" : "https://api.deepseek.com/v1"}
+              disabled={llm.provider === "mock"}
+            />
+          </Field>
+          <Field
+            label="API Key"
+            hint={
+              llm.keyConfigured
+                ? "已保存（不回显）；留空保持不变"
+                : llm.provider === "ollama"
+                  ? "本地 Ollama 无需 Key"
+                  : "OpenAI 兼容 provider 需要 API Key"
+            }
+          >
+            <div className="publish-key-row">
+              <input
+                className="input"
+                type="password"
+                value={llm.apiKey}
+                placeholder={llm.keyConfigured ? "••••••••（已保存）" : "粘贴 API Key"}
+                autoComplete="new-password"
+                onChange={(event) => setLlm((prev) => ({ ...prev, apiKey: event.target.value, keyDirty: true }))}
+              />
+              {llm.keyConfigured && (
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => {
+                    if (!window.confirm("清除已保存的 LLM API Key？")) return;
+                    setLlm((prev) => ({ ...prev, apiKey: "", keyDirty: true, keyConfigured: false }));
+                  }}
+                >
+                  清除
+                </button>
+              )}
+              <button type="button" className="btn btn-outline btn-sm" onClick={() => void testLLM()} disabled={llmTesting}>
+                {llmTesting ? <Spinner size={13} /> : null}
+                {llmTesting ? "测试中…" : "测试连接"}
+              </button>
+            </div>
+          </Field>
+          {llmTestResult?.ok && (
+            <div className="llm-test-result is-ok">
+              <IconCheck size={13} /> 连接成功
+              {llmTestResult.model ? " · " + llmTestResult.model : ""}
+              {typeof llmTestResult.latency_ms === "number"
+                ? " · " + Math.round(llmTestResult.latency_ms) + "ms"
+                : typeof llmTestResult.elapsed_sec === "number"
+                  ? " · " + llmTestResult.elapsed_sec.toFixed(1) + "s"
+                  : ""}
+            </div>
+          )}
+          {llmTestResult && !llmTestResult.ok && (
+            <div className="llm-test-result is-error">
+              <IconAlert size={13} /> 连接失败：{llmTestResult.error || "未知原因"}
+            </div>
+          )}
+          {llmTestError && (
+            <div className="llm-test-result is-error">
+              <IconAlert size={13} /> {llmTestError}
+            </div>
+          )}
+          {!llmSupported && (
+            <span className="field-hint">
+              当前后端尚未提供 /api/llm/config（等待 task-45）；字段仍会随保存 PATCH 尝试写入 llm_*。
             </span>
           )}
         </div>

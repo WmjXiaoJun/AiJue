@@ -12,6 +12,7 @@ import { useToast } from "../Toast";
 import type { TabBaseProps } from "./types";
 import { Avatar, EmptyState, SectionHead, Spinner } from "../ui";
 import { IconChevronDown, IconScript, IconSpark, IconUser } from "../icons";
+import { AiScriptModal } from "../AiScriptModal";
 
 interface Props extends TabBaseProps {
   onChanged: () => void;
@@ -122,6 +123,7 @@ export function Screenwriting({ project, episode, assets, shots, onChanged, onOp
   const [generating, setGenerating] = useState(false);
   const [result, setResult] = useState<{ created: number; summary: SegmentSummary[]; total: number; fallback: boolean } | null>(null);
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const [aiOpen, setAiOpen] = useState(false);
 
   const dirty = draft !== saved;
   const dirtyRef = useRef(dirty);
@@ -322,9 +324,14 @@ export function Screenwriting({ project, episode, assets, shots, onChanged, onOp
               title="台本编辑"
               en="SCREENPLAY"
               extra={
-                <span className={"script-save-flag" + (dirty ? " is-dirty" : "")}>
-                  {dirty ? "● 有未保存修改" : "已保存"}
-                </span>
+                <div className="script-head-actions">
+                  <span className={"script-save-flag" + (dirty ? " is-dirty" : "")}>
+                    {dirty ? "● 有未保存修改" : "已保存"}
+                  </span>
+                  <button type="button" className="btn btn-outline btn-sm" onClick={() => setAiOpen(true)} title="用 LLM 生成台本">
+                    <IconSpark size={14} /> AI 生成台本
+                  </button>
+                </div>
               }
             />
             <p className="script-editor-tip">
@@ -497,6 +504,18 @@ export function Screenwriting({ project, episode, assets, shots, onChanged, onOp
           </div>
         )}
       </section>
+
+      <AiScriptModal
+        open={aiOpen}
+        project={project}
+        episode={episode}
+        onClose={() => setAiOpen(false)}
+        onAdopt={(script) => {
+          setDraft(script);
+          setResult(null);
+          notify("AI 台本已写入编辑器，保存后生效", "success");
+        }}
+      />
     </div>
   );
 }
