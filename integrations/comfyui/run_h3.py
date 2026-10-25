@@ -7,7 +7,7 @@ MiniMax H3 本地真实生成 CLI（ComfyUI 后端）
 提交 /prompt -> 轮询 /history -> 取回 mp4 -> ffprobe 校验 -> 抽帧 -> 打印 JSON 摘要。
 
 典型用法：
-  python run_h3.py --image tmp/blender_test.png --prompt "integrated_multimodal_description: ..." \
+  python run_h3.py --image tmp/test_input.png --prompt "integrated_multimodal_description: ..." \
       --out outputs/h3/test_001.mp4
   python run_h3.py --image outputs/characters/laozhou/portrait.png --prompt-file tmp/laozhou.txt \
       --out outputs/h3/laozhou_h3.mp4 --width 768 --height 768 --length 124 --seed 20261024

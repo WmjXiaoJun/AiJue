@@ -82,5 +82,5 @@ studio2d/
 
 ## 与其他模块的边界
 
-- 只写 `studio2d/` 与 `outputs/characters/<id>/2d/`；不修改 `studio3d/`、`pipeline/`、`backend/`、`frontend/`、`contract/`、`docs/`。
-- 与 Blender 3D 路线并行：3D 产物在 `outputs/characters/<id>/`（如 `style_3d_toon/`），2D 产物统一收在 `<id>/2d/`，互不覆盖。
+- 只写 `studio2d/` 与 `outputs/characters/<id>/2d/`；不修改 ``、`pipeline/`、`backend/`、`frontend/`、`contract/`、`docs/`。
+- 与 3D 风格资产并行：3D 产物在 `outputs/characters/<id>/`（如 `style_3d_toon/`），2D 产物统一收在 `<id>/2d/`，互不覆盖。

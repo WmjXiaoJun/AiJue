@@ -20,7 +20,7 @@
 | 模型加载 | 每个 prompt 都会重新 staged/offload 一次（日志 `prepared for dynamic VRAM loading`），模型准备 ~25–40s（int8 diffusion 20GB + Qwen3-VL 15GB + VAE 5GB，BaiduSyncdisk 盘）；单条约 2–2.5 分钟 |
 | ffprobe 校验 | duration=5.167s, nb_frames=124, fps=24/1, h264 yuv420p, aac 32000Hz 2ch ✅ |
 
-样片画面：输入是 Blender 立方体静帧，H3 真实生成了缓慢推镜 + 光尘运动的视频（`test_001_fmid.png` 与首帧透视已不同）。首次用 `tmp/blender_test.png` 跑通的记录：`outputs/h3/test_001.mp4` + `test_001.meta.json`。
+样片画面：输入是 SDXL 立方体静帧，H3 真实生成了缓慢推镜 + 光尘运动的视频（`test_001_fmid.png` 与首帧透视已不同）。首次用 `tmp/test_input.png` 跑通的记录：`outputs/h3/test_001.mp4` + `test_001.meta.json`。
 
 ### 角色镜头样片（2026-10-24 00:32–00:38，参数完全一致：768×768 / 4step / length=124 / seed=20261024 / 24fps）
 
@@ -133,7 +133,7 @@ $env:PYTHONUTF8='1'; $env:PYTHONIOENCODING='utf-8'; $env:PYTHONUNBUFFERED='1'
 ```powershell
 # 一条 768p / 4step / 5.17s 的 i2v（服务没开会自动拉起）
 python integrations/comfyui/run_h3.py ^
-  --image tmp/blender_test.png ^
+  --image tmp/test_input.png ^
   --prompt-file integrations/comfyui/prompts/test_001.txt ^
   --out outputs/h3/test_001.mp4 ^
   --width 768 --height 768 --length 124 --seed 20261024 --timeout 900
@@ -257,7 +257,7 @@ python integrations/comfyui/run_h3.py ^
 - 首帧在 `ComfyUI/input/zaopianju/` 里会被命名为 `<输出名>_<原文件名>.png`（如 `laozhou_h3_portrait.png`），
   避免多个角色都叫 `portrait.png` 时互相覆盖（排队/并发时 `LoadImage` 读到别人的图）。
 - 角色 prompt 样例在 `prompts/{id}_h3.txt`：强调「保持首帧脸/发型/服装/配色不变 + 说话/点头/眨眼/推眼镜等微动作 + 动漫赛璐璐风」，
-  H3 会把 Blender 3D-toon 立绘升级成干净的赛璐璐动漫画面（金色/青色/红色轮廓光随角色 accent 色）。
+  H3 会把 AI 概念 立绘升级成干净的赛璐璐动漫画面（金色/青色/红色轮廓光随角色 accent 色）。
 - 中段帧落 `outputs/h3/{id}_h3_fmid.png`，再复制到 `outputs/characters/{id}/h3_portrait.png` 作为角色卡。
 
 - 立绘是方图就 768×768；竖屏可 768×1024（32 对齐）；
@@ -282,7 +282,7 @@ python integrations/comfyui/run_h3.py ^
 # 1) 启动服务
 powershell -ExecutionPolicy Bypass -File integrations/comfyui/start_comfyui.ps1
 # 2) 跑样片（约 2 分钟，含首次模型加载）
-python integrations/comfyui/run_h3.py --image tmp/blender_test.png ^
+python integrations/comfyui/run_h3.py --image tmp/test_input.png ^
   --prompt-file integrations/comfyui/prompts/test_001.txt ^
   --out outputs/h3/test_001.mp4 --width 768 --height 768 --length 124 --seed 20261024
 # 3) 校验

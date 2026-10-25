@@ -10,7 +10,7 @@
 | proposal（方向/分镜提案） | 模板选择 + 从台本生成分镜 | ✅ |
 | script（台本/节拍） | 编剧间台本编辑 + SCRIPT_FORMAT 解析 | ✅ |
 | scene-plan / shot grammar | pipeline/shot_grammar.py + ShotPlan 注入 H3 | ✅ |
-| asset（角色/场景/道具） | 角色工坊（Blender/2D/SDXL + IP-Adapter）；场景：2D 绘景（12 张）+ 3D Blender 场景（3 条）+ 全身透明 cutout + pipeline/scenes.py 合成 | ✅ |
+| asset（角色/场景/道具） | 角色工坊（AI 3D/2D/SDXL + IP-Adapter）；场景：2D 绘景（12 张）+ 3D AI 3D 场景（3 条）+ 全身透明 cutout + pipeline/scenes.py 合成 | ✅ |
 | edit-director（节奏/情绪/转场） | pipeline/render.py xfade/whoosh + edit 原则 | ✅ 部分 |
 | compose（合成/字幕/混音/调色） | pipeline render/localize + ASS/字幕/响度 | ✅ |
 | reviewer/checkpoint（质量门） | pipeline/qc.py + 人工审片 | ✅ |
@@ -24,7 +24,7 @@
 | cinematic（画幅/镜头时长/音频分层/反主观形容词） | ✅ | 模板镜头时长/包装；音频分层待补 ambience |
 | b-roll-planning（空镜/素材决策/POV） | ✅ 部分 | b_roll 镜头类型 + scene plates 空镜 |
 | image-gen-usage（图像生成/风格/一致性） | ✅ | imagegen/SDXL、角色概念图、2D 场景绘景 |
-| 3d-world-generation（3D 世界/空间） | ❌ 已按用户要求停用 | 改为 2D 绘景 + 2D cutout + H3 动态（不再使用 Blender） |
+| 3d-world-generation（3D 世界/空间） | ❌ 已按用户要求停用 | 改为 2D 绘景 + 2D cutout + H3 动态（不再使用 AI 3D） |
 | animation-pipeline / hyperframes | ✅ H3 驱动 | 镜头级 2.5D 视差/相机运动（pipeline/scenes.py）；动态镜头 H3 audio_ref/i2v（保留场景） |
 | long-form / short-form / storytelling | ✅ 部分 | 5-10 分钟模板 / 竖屏短片扩展位；模板节奏 |
 | sound-design / bgm | ✅ 部分 | BGM/转场 whoosh/响度；ambience/Foley 待补 |
@@ -34,12 +34,12 @@
 | scene-detect / video-understand | 待补 | 素材分析/参考视频拆解（后续） |
 
 ## 3. 制作流程（造片局版）
-1. 选模板/新建项目（16 个综艺模板 + 历史夜话/悬案）→ 2. 台本编辑/从台本生成分镜 → 3. 角色工坊（SDXL/Blender/2D + H3 动画）→ 4. 场景资产（2D 绘景 / 3D Blender set）→ 5. 镜头生成（场景合成 + H3 口型动态 + 首尾帧）→ 6. 剪辑/转场/包装/混音 → 7. QC 质检门 → 8. 多语种本地化 → 9. 一键发布（Upload-Post）。
+1. 选模板/新建项目（16 个综艺模板 + 历史夜话/悬案）→ 2. 台本编辑/从台本生成分镜 → 3. 角色工坊（SDXL/AI 3D/2D + H3 动画）→ 4. 场景资产（2D 绘景 / 3D AI 3D set）→ 5. 镜头生成（场景合成 + H3 口型动态 + 首尾帧）→ 6. 剪辑/转场/包装/混音 → 7. QC 质检门 → 8. 多语种本地化 → 9. 一键发布（Upload-Post）。
 
 ## 4. 本轮场景制作（解决“全是平面”问题）
 - pipeline/scenes.py：2D 绘景 plate + RGBA 角色 cutout 分层 + 2.5D 视差/相机运动（background/foreground 不同速率），景别/机位沿用 ShotPlan；
 - outputs/scene_plates/：12 张 2D 动漫场景绘景（深夜秀/圆桌厅/历史书房/辩论场/案发现场/国宝厅/厨房/舞台/访谈沙发/街头/课堂）+ 3 张 3D 渲染风；
-- ~~outputs/3d_scenes/~~：已停用（用户要求不用 Blender），改为 H3 生成带场景的动态镜头；
+- ~~outputs/3d_scenes/~~：已停用（用户要求不用 AI 3D），改为 H3 生成带场景的动态镜头；
 - contract/scene_map.json：模板→场景映射；render 支持 scenes 模式；history_talk/tonight_show 等出场景版 demo（30-45s），逐步替换全部模板的平面底。
 
 ## 5. 继续沿用（下一轮）

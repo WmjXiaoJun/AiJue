@@ -2,7 +2,7 @@
 
 - 3d_anime（默认综艺/舞台类）：场景 plate 用 outputs/scene_plates/{plate}_3d.png，
   角色 cutout 用 outputs/characters/{id}/cutout_3d/front.png；H3 prompt 注入 3D 影感前缀。
-- 2d_anime（历史/文化类）：使用 2D plate + cutout_full；prompt 注入手绘 2D 前缀。
+- 2d_anime（历史/文化类）：使用 2D plate + cutout_2d；prompt 注入手绘 2D 前缀。
 - 资产缺失时自动回退 2D，并在 meta/verify 里记录 fallback。
 """
 from __future__ import annotations
@@ -150,7 +150,7 @@ def cutout_path(char_id: str, style_name: str = "3d_anime",
             # 左上角 alpha 高 = 背景没抠干净（不是透明 cutout），回退 2D 全身
             if alpha is None or alpha <= 32:
                 return p, "3d_anime", False
-    for rel in ("cutout_full/front.png", "cutout/portrait.png",
+    for rel in ("cutout_2d/front.png", "cutout_3d/front.png",
                 "2d/portrait.png", "portrait.png"):
         p = base / char_id / rel
         if p.is_file() and p.stat().st_size > 1000:

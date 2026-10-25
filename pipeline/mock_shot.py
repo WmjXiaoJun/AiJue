@@ -220,7 +220,7 @@ class _ShotCtx:
         if self.character and not self.speaker_name:
             self.speaker_name = str(self.character.get("name") or "")
         # 素材优先级（contract/CONSISTENCY.md）：
-        # h3 视频 > h3 中段帧 > SDXL 概念立绘 > Blender cutout > 2D > 文字卡
+        # h3 视频 > h3 中段帧 > SDXL 概念立绘 > AI cutout > 2D > 文字卡
         self.media = None
         if self.character:
             if self.type == "host_to_camera" and self.character.get("h3_video"):
@@ -500,7 +500,7 @@ class _ShotCtx:
         return {"inputs": inputs, "filters": filters, "label": "base"}
 
     def _preferred_still(self, char: dict):
-        """角色静帧：H3 中段帧 > SDXL 概念立绘 > Blender 立绘。"""
+        """角色静帧：H3 中段帧 > SDXL 概念立绘 > AI cutout。"""
         return (char.get("h3_portrait") or char.get("concept_portrait")
                 or char.get("portrait"))
 

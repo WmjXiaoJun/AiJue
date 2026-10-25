@@ -4,7 +4,7 @@
 - portrait.png                         半身立绘（768x768，深色影棚背景）
 - expressions/{neutral,happy,surprised,thinking}.png
 - turntable.mp4                        360 度转面（720x720 / 4s）
-- meta.json（studio3d 输出，可选）
+- meta.json（AI 概念图输出，可选）
 - style_<name>/ 子目录：若存在，优先使用 contract/characters/{cid}.json 里
   style.primary 对应的风格目录，其次字典序第一个。
 
@@ -14,7 +14,7 @@
 - three_view/*.png、sheet.png、meta.json（选修）
 
 成片素材优先级（contract/CONSISTENCY.md）：
-h3 视频 > h3 中段帧 > 概念立绘 > Blender cutout > 2D > 文字卡。
+h3 视频 > h3 中段帧 > 概念立绘 > AI cutout > 2D > 文字卡。
 
 把 episode.assets 里的角色资产（host / guest_a / ...）映射到角色素材，
 供 mock_shot 合成「角色画面」镜头；素材缺失时调用方回退文字卡视觉。

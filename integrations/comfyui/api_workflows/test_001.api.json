@@ -195,7 +195,7 @@
   "18": {
     "class_type": "LoadImage",
     "inputs": {
-      "image": "zaopianju/blender_test.png"
+      "image": "zaopianju/test_input.png"
     }
   }
 }

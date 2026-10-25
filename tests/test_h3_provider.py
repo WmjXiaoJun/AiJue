@@ -47,7 +47,7 @@ def _give_portrait(character_id):
 
     base = config.OUTPUTS_DIR / "characters" / character_id
     base.mkdir(parents=True, exist_ok=True)
-    (base / "portrait.png").write_bytes(b"portrait-png")
+    (base / "portrait_from_concept.png").write_bytes(b"portrait-png")
 
 
 def _fake_strategy_cli(calls, *, fail=False, error_text="", cost=None):

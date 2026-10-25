@@ -152,7 +152,7 @@ export function NewCharacterModal({ open, projectId, onClose, onSubmitted }: Pro
       open={open}
       onClose={onClose}
       title="新建角色"
-      subtitle="平台原创动漫角色 · 创建后自动触发 Blender 生成：半身像 / 三视图 / 四表情 / 转面视频"
+      subtitle="平台原创动漫角色 · 创建后自动生成 AI 概念图：半身立绘 / 三视图 / 四表情 / H3 动画"
       size="lg"
       footer={
         <>
@@ -260,7 +260,7 @@ export function NewCharacterModal({ open, projectId, onClose, onSubmitted }: Pro
           </Field>
 
           <div className="form-note">
-            <IconSpark size={13} /> 外观预设会写入角色 spec，Blender 生成器按它程序化建模；后续可在角色详情中继续迭代。
+            <IconSpark size={13} /> 外观预设会写入角色 spec，AI 概念图生成器按它绘制角色（SDXL）；后续可在角色详情中继续迭代。
           </div>
 
           <div className="form-subhead">预设外观</div>

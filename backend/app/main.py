@@ -157,10 +157,6 @@ def _recover_stale_jobs() -> None:
                 episode = db.get(models.Episode, job.episode_id)
                 if episode is not None and episode.status == "rendering":
                     episode.status = "failed"
-            if job.type == "character" and job.character_id:
-                character = db.get(models.Character, job.character_id)
-                if character is not None and character.status == "generating":
-                    character.status = "failed"
             if job.type == "localize":
                 loc_id = (job.params or {}).get("localization_id")
                 localization = db.get(models.Localization, loc_id) if loc_id else None
@@ -317,7 +313,7 @@ def _sync_character_asset(db: Session, character: models.Character) -> bool:
 
 
 def _sync_character(db: Session, character: models.Character, commit: bool = True) -> bool:
-    """懒同步：磁盘产物（Blender / 概念图 / H3）-> Character URL/status，并保持 Asset 一致。"""
+    """懒同步：磁盘产物（概念图 / SDXL cutout / H3）-> Character URL/status，并保持 Asset 一致。"""
     changed = character_files.apply(character)
     changed = concept_files.apply(character) or changed
     changed = _sync_character_asset(db, character) or changed
@@ -808,7 +804,6 @@ def create_character(
         spec=spec,
         portrait_url=None,
         sheet_url=None,
-        turntable_url=None,
         expressions={},
         status="pending",
     )
@@ -870,15 +865,18 @@ def generate_character(
     payload: Optional[schemas.CharacterGenerateRequest] = None,
     db: Session = Depends(get_db),
 ):
+    """角色生成：统一走 SDXL 概念图（portrait/three_view/expressions），不再触发外部 3D 生成。"""
     character = _get_or_404(db, models.Character, cid, "角色")
-    styles = payload.styles if payload else []
-    invalid = [style for style in styles if style not in STYLE_PRESETS]
-    if invalid:
-        raise HTTPException(
-            status_code=400,
-            detail=f"不支持的 style: {invalid}；可选 {sorted(STYLE_PRESETS)}",
-        )
-    job, _created = jobs.enqueue_character_job(db, character, styles)
+    character.status = "generating"
+    db.commit()
+    job, _created = jobs.enqueue_concept_job(
+        db,
+        character,
+        modes=["portrait", "three_view", "expressions"],
+        style=None,
+        prompt_extra=None,
+        seed=None,
+    )
     return job
 
 
@@ -886,12 +884,12 @@ def generate_character(
 def get_character_files(cid: str, db: Session = Depends(get_db)):
     character = _get_or_404(db, models.Character, cid, "角色")
     _sync_character(db, character)
-    data = character_files.scan(character.id)
+    data = concept_files.scan(character.id)
     return {
         "portrait": character.portrait_url,
-        "sheet": character.sheet_url,
-        "turntable": character.turntable_url,
-        "expressions": dict(character.expressions or {}),
+        "sheet": character.concept_sheet_url,
+        "turntable": None,
+        "expressions": dict(character.concept_expressions or character.expressions or {}),
         "meta": data.get("meta") or {},
     }
 
@@ -919,7 +917,7 @@ def _resolve_output_file(raw: Any) -> Optional[Path]:
 
 
 def _character_default_image(character: models.Character) -> Optional[Path]:
-    """H3 动画默认输入图：优先概念图立绘，其次 Blender 立绘。"""
+    """H3 动画默认输入图：优先概念图立绘，其次本地立绘（SDXL cutout / 概念图回填）。"""
     for url in (character.concept_portrait_url, character.portrait_url):
         path = _resolve_output_file(url)
         if path is not None:

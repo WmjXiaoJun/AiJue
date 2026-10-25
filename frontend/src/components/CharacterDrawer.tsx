@@ -19,7 +19,7 @@ import {
 } from "../lib/format";
 import { Drawer, Meta, Notice, ProgressBar, StatusBadge } from "./ui";
 import { ConceptStudio } from "./ConceptStudio";
-import { IconExternal, IconImage, IconRefresh, IconSpark, IconVideo } from "./icons";
+import { IconRefresh, IconSpark } from "./icons";
 
 interface Props {
   character: Character | null;
@@ -33,13 +33,6 @@ interface Props {
   /** 刷新角色列表（概念图设为立绘 / H3 回填后卡片同步） */
   onCharacterChanged: () => void;
 }
-
-const EXPRESSIONS: { key: string; label: string }[] = [
-  { key: "neutral", label: "平静" },
-  { key: "happy", label: "开心" },
-  { key: "surprised", label: "惊讶" },
-  { key: "thinking", label: "思考" },
-];
 
 export function CharacterDrawer({
   character,
@@ -83,11 +76,8 @@ export function CharacterDrawer({
   const busy = !!job && isActiveJob(job);
   const progress = job ? Math.max(0, Math.min(100, job.progress || 0)) : 0;
 
-  // 立绘优先用 Character.portrait_url（后端切到 SDXL 概念立绘后自动生效），再回落 Blender 素材
+  // 立绘优先用 Character.portrait_url（SDXL 概念立绘），再回落角色立绘文件
   const portrait = character?.portrait_url || files?.portrait;
-  const sheet = files?.sheet || character?.sheet_url;
-  const turntable = files?.turntable || character?.turntable_url;
-  const expressions = files?.expressions || character?.expressions || null;
   const outfit = appearance.outfit || {};
 
   return (
@@ -135,17 +125,17 @@ export function CharacterDrawer({
           <div className="char-regen-row">
             <button type="button" className="btn btn-primary btn-block" onClick={() => onRegenerate(character)} disabled={busy}>
               {busy ? <IconRefresh size={15} /> : <IconSpark size={15} />}
-              {busy ? "正在重新生成…" : "重新生成角色素材"}
+              {busy ? "正在重新生成…" : "重新生成 AI 概念图"}
             </button>
             {busy && (
               <div className="char-regen-progress">
                 <ProgressBar value={progress} label={Math.round(progress) + "%"} />
-                <span>{job?.message || "Blender 正在渲染半身像 / 三视图 / 表情 / 转面"}</span>
+                <span>{job?.message || "AI 正在生成角色概念图（立绘 / 三视图 / 表情）"}</span>
               </div>
             )}
           </div>
 
-          {(filesError && !portrait && !sheet) && (
+          {(filesError && !portrait && !concept?.portrait) && (
             <Notice tone="warn">角色素材接口暂不可用：{filesError}（生成完成后会自动出现）</Notice>
           )}
 
@@ -159,56 +149,6 @@ export function CharacterDrawer({
               onCharacterChanged={onCharacterChanged}
             />
           </div>
-
-          <section className="detail-block">
-            <h4>Blender 设定三视图</h4>
-            {sheet ? (
-              <div className="char-sheet-wrap">
-                <img className="char-sheet" src={mediaUrl(sheet)} alt={character.name + " 三视图"} loading="lazy" />
-                <a className="char-sheet-open" href={mediaUrl(sheet)} target="_blank" rel="noreferrer">
-                  <IconExternal size={13} /> 查看大图
-                </a>
-              </div>
-            ) : (
-              <div className="char-media-placeholder">
-                <IconImage size={22} />
-                <span>设定图待生成（正面 / 侧面 / 四分之三 + 配色条）</span>
-              </div>
-            )}
-          </section>
-
-          <section className="detail-block">
-            <h4>四表情</h4>
-            <div className="char-expression-grid">
-              {EXPRESSIONS.map((item) => {
-                const url = expressions ? expressions[item.key] : null;
-                return (
-                  <div key={item.key} className="char-expression">
-                    {url ? (
-                      <img src={mediaUrl(url)} alt={character.name + " " + item.label} loading="lazy" />
-                    ) : (
-                      <div className="char-expression-empty">
-                        <IconImage size={16} />
-                      </div>
-                    )}
-                    <span>{item.label}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-
-          <section className="detail-block">
-            <h4>转面预览</h4>
-            {turntable ? (
-              <video className="char-turntable" src={mediaUrl(turntable)} controls muted loop playsInline preload="metadata" />
-            ) : (
-              <div className="char-media-placeholder char-media-placeholder-sm">
-                <IconVideo size={20} />
-                <span>360° 转面视频待生成（720×720 / 4s）</span>
-              </div>
-            )}
-          </section>
 
           <section className="detail-block">
             <h4>基本设定</h4>

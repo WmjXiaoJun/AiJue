@@ -114,7 +114,7 @@ export const CHARACTER_STATUS_LABEL: Record<string, string> = {
 };
 
 export const CHARACTER_STYLE_LABEL: Record<string, string> = {
-  "3d_toon": "3D 卡通",
+  "3d_toon": "3D 卡通（AI）",
   "3d_cel": "3D 赛璐璐",
   "2d_cel": "2D 赛璐璐",
   "2d_paint": "2D 厚涂",
@@ -123,7 +123,7 @@ export const CHARACTER_STYLE_LABEL: Record<string, string> = {
 };
 
 export const CHARACTER_STYLE_DESC: Record<string, string> = {
-  "3d_toon": "Blender 三渲二卡通",
+  "3d_toon": "3D 卡通 · AI 生成",
   "3d_cel": "3D 赛璐璐描边",
   "2d_cel": "2D 平涂赛璐璐",
   "2d_paint": "2D 厚涂质感",

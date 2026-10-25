@@ -37,4 +37,4 @@ POST /api/characters/{cid}/h3-animate {image?:path, prompt?} -> Job(type=h3)   #
 
 ## 5. 前端（角色工坊）
 - 角色详情抽屉新增「AI 概念图」区：风格选择（anime/illustrious/guoman）、额外提示词、生成按钮、任务进度、图集（立绘/三视图/表情）、「设为角色立绘」「用此图生成 H3 动画」。
-- 角色卡优先展示概念图（若存在），否则显示 Blender portrait。
+- 角色卡优先展示概念图（若存在），否则显示 AI 3D portrait。

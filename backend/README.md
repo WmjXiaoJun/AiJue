@@ -108,7 +108,7 @@ scripts/dev.ps1 是前台调试入口；需要后台常驻时用 run-detached.ps
 ## 角色工坊（Character Studio，contract/CHARACTER.md）
 
 Character：{id,project_id,asset_id,name,title,persona,voice,accent_color,style,spec,
-portrait_url,sheet_url,turntable_url,expressions,status,created_at}
+portrait_url,sheet_url,turntable_url(旧字段保留未使用),expressions,status,created_at}
 
 端点（demo 无鉴权）：
 
@@ -116,8 +116,8 @@ portrait_url,sheet_url,turntable_url,expressions,status,created_at}
 - POST  /api/projects/{pid}/characters             创建角色；兼容扁平对象与 {spec:{...}} 包裹
 - GET   /api/characters/{cid}                      角色详情
 - PATCH /api/characters/{cid}                      {name?,title?,persona?,voice?,accent_color?,spec?}
-- POST  /api/characters/{cid}/generate             {styles?:[]} -> Job(type=character)
-- GET   /api/characters/{cid}/files                {portrait,sheet,turntable,expressions,meta}
+- POST  /api/characters/{cid}/generate             -> Job(type=concept，SDXL 概念图)
+- GET   /api/characters/{cid}/files                {portrait,sheet,turntable(恒 None),expressions,meta}
 
 约定：
 
@@ -127,18 +127,19 @@ portrait_url,sheet_url,turntable_url,expressions,status,created_at}
   其 images 指向 /media/characters/{cid}/portrait.png；PATCH 角色会同步资产字段。
 - style.primary 预设：3d_toon / 3d_cel / 2d_cel / 2d_paint / anime / guoman；
   accent_color 必须 #RRGGBB。
-- generate 任务：后台线程执行
+- 角色生成统一走 **SDXL 概念图**：POST /api/characters/{cid}/generate 入队
+  Job(type=concept)，后台对 portrait / three_view / expressions 依次调用
 
-      python -m studio3d.cli create --spec <tmp.json> --outdir outputs/characters/{cid} --styles 3d_toon,2d_cel
+      python -m imagegen.cli generate --spec <tmp.json> --outdir outputs/concepts/{cid} --mode portrait
 
-  （cwd = 仓库根，stdout 最后一行 JSON）。产物约定：
-  portrait.png / sheet.png / turntable.mp4 / expressions/{neutral,happy,surprised,thinking}.png / meta.json。
-  成功后回填 portrait_url 等字段、expressions、status=ready，并同步 Asset.images；失败 exit!=0 或
-  未产出 portrait.png 时 Job.failed + error，角色 status=failed，不拖垮 API 进程。
-- 产物经 /media 静态访问：/media/characters/{cid}/portrait.png 等。
-- GET .../files 与 GET 角色详情都会懒扫描 outputs/characters/{cid}/，即使角色是外部 CLI 直接生成、
-  未经后端任务，也会自动回填 URL/status。状态口径：只要 portrait.png 存在即 status=ready；
-  sheet/turntable 可缺失（前端显示占位），生成中的角色保持 generating。
+  产物落 outputs/concepts/{cid}/（portrait.png / sheet.png / three_view/ / expressions/）；
+  成功后回填 concept_* 字段、status=ready，并同步 Asset.images；失败 Job.failed + error，
+  角色 status=failed，不拖垮 API 进程。
+- 立绘/状态懒同步：概念图回填立绘 outputs/characters/{cid}/portrait_from_concept.png
+  优先，其次 SDXL 2D cutout outputs/characters/{cid}/cutout_2d/front.png，最后概念图
+  /media/concepts/{cid}/portrait.png；有任一中立绘即 status=ready。
+- 旧的本地 portrait.png / sheet.png / turntable.mp4 不再扫描/回填（字段保留仅兼容旧数据），
+  GET .../files 的 turntable 恒为 None；sheet 返回概念图 sheet，expressions 返回概念图表情。
 - jobs 表新增可选 character_id（启动时对老库自动 ALTER TABLE jobs ADD COLUMN character_id）。
 
 ## AI 概念图 / H3 动画（contract/CONCEPT.md）
@@ -284,8 +285,8 @@ portrait_url,sheet_url,turntable_url,expressions,status,created_at}
     python -m pytest tests -q
 
 测试使用临时数据目录并关闭自动任务（ZAOPIANJU_JOBS_AUTORUN=0），
-通过注入假的 pipeline / studio3d / imagegen / run_h3 / capcut CLI 验证各类任务成功与失败路径，
-不污染开发库、不真连 ComfyUI / Blender。覆盖：contract/API.md 全部端点、
+通过注入假的 pipeline / imagegen / run_h3 / capcut CLI 验证各类任务成功与失败路径，
+不污染开发库、不真连 ComfyUI。覆盖：contract/API.md 全部端点、
 角色工坊 CRUD/资产联动/files/生成任务（tests/test_characters.py）、
 概念图/H3/剪映导出（tests/test_concept.py）、H3 provider 分派与 settings/key 掩码
 （tests/test_h3_provider.py）、台本解析/分镜生成/镜头增删/集创建/render 序列化
@@ -315,8 +316,8 @@ ComfyUI 导出的 API 格式 H3 工作流即可。demo 默认 generation_mode=mo
 - 任务为进程内守护线程；同一 episode 的 render 应串行触发（后端会自动复用同集活跃任务）。
   服务重启会把遗留 queued/running 任务标记 failed，用户可 retry。
 - 若前端构建产物 frontend/dist 在服务启动时不存在，需要重启后端才会挂载 /。
-- 角色画面由 studio3d（Blender 程序化建模 + 卡通渲染，外部模块）生成；后端只负责任务编排与
-  产物回填。studio3d 未就绪 / Blender 不可用时，角色任务会 failed 并记录 error，API 与前端不受影响。
+- 角色画面由 imagegen（SDXL 概念图）+ 本地 2D cutout 资产 + H3 动画生成；后端只负责任务编排与
+  产物回填，不再调用外部 3D 角色生成器。
 - 概念图依赖 imagegen + 本机 ComfyUI + SDXL 动漫 checkpoint（animagine-xl-4.0）；checkpoint 损坏/
   未下载完时 imagegen 会报错，后端 Job.failed 记录 ComfyUI execution_error，不影响 API。
 - 剪映导出依赖 pipeline.capcut（pyJianYingDraft）。若 CLI 的 --copy-media 有缺陷（例如先复制素材

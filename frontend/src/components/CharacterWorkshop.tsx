@@ -56,7 +56,7 @@ export function CharacterWorkshop({ characters, concepts, supported, error, onRe
         }
       />
       <p className="char-workshop-sub">
-        平台自主生成的原创动漫人物 · 支持 3D / 2D 多风格（Blender 程序化建模 + 卡通渲染），生成后可直接用于分镜与成片。
+        平台自主生成的原创动漫人物 · 支持 2D / 3D 卡通多风格（AI 概念图 · SDXL 生成），生成后可直接用于分镜与成片。
       </p>
 
       {!supported ? (
@@ -91,7 +91,7 @@ export function CharacterWorkshop({ characters, concepts, supported, error, onRe
         <EmptyState
           icon={<IconUsers size={26} />}
           title="还没有原创角色"
-          hint="创建角色时会自动触发 Blender 生成：半身像、三视图、四表情与转面视频。"
+          hint="创建角色后会自动生成 AI 概念图：半身立绘、三视图、四表情与 H3 动画。"
           action={
             <button type="button" className="btn btn-primary" onClick={onNew}>
               <IconSpark size={15} /> 新建角色
@@ -129,7 +129,7 @@ function CharacterCard({
   const primary = styles[0] || "3d_toon";
   const family = styleFamily(primary);
   const accent = character.accent_color || "#F5C518";
-  // 角色卡优先展示 AI 概念图（Character.concept_portrait_url 或 /concepts.portrait），否则回落 Blender portrait
+  // 角色卡优先展示 AI 概念图（Character.concept_portrait_url 或 /concepts.portrait），否则回落角色立绘
   const conceptPortrait = character.concept_portrait_url || concept?.portrait || null;
   const portrait = conceptPortrait && !conceptFailed ? conceptPortrait : character.portrait_url;
   const generating = character.status === "generating" || character.status === "queued";

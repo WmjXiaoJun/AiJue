@@ -7,7 +7,7 @@
 - 输出 outputs/scene_plates/{scene_id}.png（1280×720，2D 动漫绘景，无人物），prompt/meta 记录。
 - 必备场景：late_night_desk（深夜秀办公桌）、roundtable_studio（圆桌演播厅）、taskmaster_stage（任务舞台）、history_study（历史书房/烛光）、debate_hall（辩论场）、mystery_room（推理案发现场）、treasure_museum（国宝展厅）、kitchen_warm（慢生活厨房）、stage_music（舞台/蒙面唱将）、talk_show_sofa（访谈沙发）、alley_night（街头外景）、classroom_history（历史课堂）。
 - 另出 3 张 3D 渲染风绘景：3d_roundtable、3d_stage、3d_study（stylized 3D render, isometric/cinematic，作为 3D 场景备选）。
-### 3D 场景（Blender，studio3d）
+### 3D 场景（AI 3D，ai_character）
 - 输出 outputs/3d_scenes/{id}.mp4（1280×720/25fps/5-8s）：真实 3D 演播厅 set（圆桌/主持台/背景屏/灯架/地面反射）+ 3 个 3D 卡通角色入座 + 灯光 + 相机动画（缓推/横移/摇摄）。
 - 至少 3 条：3d_studio_wide（横移全景）、3d_studio_host（缓推特写）、3d_stage_pan（舞台摇镜）；附静帧。
 
@@ -28,6 +28,6 @@ contract/scene_map.json：{template_id: {"plate": "history_study", "3d": optiona
 
 
 ## 变更（2026-10-25 用户指示）
-- 停用 Blender/3D 场景：不再使用 outputs/3d_scenes，不再使用 cutout_full；pipeline/scenes.py 已停用 three_d 背景。
+- 停用 AI 3D/3D 场景：不再使用 outputs/3d_scenes，不再使用 cutout_full；pipeline/scenes.py 已停用 three_d 背景。
 - 角色 cutout 改为 SDXL 全身立绘去白底（outputs/characters/{id}/cutout_2d/front.png，scripts/make_2d_cutouts.py）。
-- 动态镜头全部交给 H3：场景合成帧作为参考（SCENE_DYNAMIC_FULL_REF=1 + 场景描述 prompt），H3 i2v/audio_ref 生成带场景的动态镜头；静态场景镜头由 2D 绘景+cutout 合成（无 Blender）。
+- 动态镜头全部交给 H3：场景合成帧作为参考（SCENE_DYNAMIC_FULL_REF=1 + 场景描述 prompt），H3 i2v/audio_ref 生成带场景的动态镜头；静态场景镜头由 2D 绘景+cutout 合成（无 AI 3D）。

@@ -122,6 +122,12 @@ def migrate_columns() -> None:
                     "WHERE concept_expressions IS NULL"
                 )
             )
+    # 角色旧 3D 产物字段清除（turntable 转面已停用，字段保留但不使用）
+    if "characters" in tables:
+        with engine.begin() as connection:
+            connection.execute(
+                text("UPDATE characters SET turntable_url = NULL WHERE turntable_url IS NOT NULL")
+            )
     # 动态镜头列老数据兜底
     if "shots" in tables:
         with engine.begin() as connection:

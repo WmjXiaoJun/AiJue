@@ -134,7 +134,7 @@ def cutout_path(profile: dict, char_id: str,
     """返回 (cutout, used_style, fallback)。优先 profile.character_style 指定变体。"""
     base = Path(chars_dir) if chars_dir else CHARS_DIR
     style = str((profile or {}).get("character_style") or "cutout_2d")
-    order = [style, "cutout_3d", "cutout_2d", "cutout_full",
+    order = [style, "cutout_3d", "cutout_2d",
              "cutout/portrait.png", "2d/portrait.png", "portrait.png"]
     seen = set()
     for item in order:
@@ -206,7 +206,9 @@ TRANSITION_ARGS = {
     "hard_cut": ("cut", "fade"),
     "fade": ("xfade", "fade"),
     "crossfade": ("xfade", "dissolve"),
-    "fade_black": ("xfade", "fadeblack"),
+    # fade_black 会插入纯黑帧（QC blackdetect>0），demo 用深色 fade 代替；
+    # profile 里仍记录 transition=fade_black 供 H3/后期参考
+    "fade_black": ("xfade", "fade"),
 }
 
 

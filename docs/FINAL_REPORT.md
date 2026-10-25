@@ -120,14 +120,14 @@ FastAPI (8090) ── SQLite
 - backend-core：FastAPI + SQLite + 任务 + ComfyUI 适配器 + 角色 API（60 单测）
 - frontend-ui：Vite+React 五步工作台 + 真实 API 联调 + 构建
 - media-render：角色画面/edge-tts/ASS/ffmpeg 渲染（17 单测）
-- character-3d：Blender 程序化角色生成器（studio3d）+ 3 角色素材 + 2D 变体
+- character-3d：AI 3D 程序化角色生成器（ai_character）+ 3 角色素材 + 2D 变体
 - h3-comfy：ComfyUI MiniMax H3 真实生成接入 + 3 条角色镜头
 
 详见 `docs/decisions.md`。
 ## 11. 角色工坊（原创动漫人物，2026-10-24 追加）
 
-- **要求**：全部角色为平台自主生成的原创动漫人物；支持 3D/2D 多种风格；可依托 Blender 造人。
-- **3D 生成器（studio3d/）**：Blender 5.0 程序化建模 + 卡通渲染（EEVEE + 3 阶色带 + inverted-hull 描边 + 三点光），按 spec 生成大眼/发型/服装/配饰；支持预设 3d_toon、3d_cel、2d_cel、2d_paint、anime、guoman；单角色约 10–20s。
+- **要求**：全部角色为平台自主生成的原创动漫人物；支持 3D/2D 多种风格；可依托 AI 3D 造人。
+- **3D 生成器（ai_character/）**：AI 3D 5.0 程序化建模 + 卡通渲染（EEVEE + 3 阶色带 + inverted-hull 描边 + 三点光），按 spec 生成大眼/发型/服装/配饰；支持预设 3d_toon、3d_cel、2d_cel、2d_paint、anime、guoman；单角色约 10–20s。
 - **演示角色（全部原创）**：
   - 老周（主持人，3D 卡通，暖黄 accent，深色短发+西装）
   - 阿栗（AI 内容创业者，2D 赛璐璐为主风格，双马尾+耳机+卫衣）
@@ -140,14 +140,14 @@ FastAPI (8090) ── SQLite
 
 - 环境：本机 ComfyUI + int8 量化 MiniMax H3（20.97GB）+ 4step turbo LoRA + Qwen3-VL 文本编码器 + 视频/音频 VAE；RTX 3080 Ti 12GB；ComfyUI 0.39.0 / torch 2.11+cu130。
 - 接入：integrations/comfyui/{workflow_to_api.py, run_h3.py, start_comfyui.ps1}，UI workflow → API prompt，提交/轮询/取回/ffprobe。
-- **实测成果**：`outputs/h3/laozhou_h3.mp4` —— 5.167s / 768×768 / 24fps / H.264+AAC（含音轨），4step/124帧，单条约 115–150s（含模型 offload），把 Blender 立绘升级为干净的赛璐璐动漫角色。
+- **实测成果**：`outputs/h3/laozhou_h3.mp4` —— 5.167s / 768×768 / 24fps / H.264+AAC（含音轨），4step/124帧，单条约 115–150s（含模型 offload），把 AI 3D 立绘升级为干净的赛璐璐动漫角色。
 - 抽帧：![H3 镜头](screenshots/11_h3_laozhou.png)
 - 成果：laozhou/ali/dawei 三条全部完成（各 768×768/5.167s/124 帧/含音轨），产物 outputs/h3/{id}_h3.mp4 + 中段帧 outputs/characters/{id}/h3_portrait.png；单条单独跑 115–150s（含 offload），12GB 显存峰值 11.9GB，ComfyUI 单 worker 串行；成片 52/52 镜头均已使用角色画面。
 - 字幕/画面修复：去除片段 fade（blackdetect=0）、角色胸像构图、名字条逐镜头绑定、字幕去空格/强制单行/均衡换行（WrapStyle=2），200s 长句已修。
 
 ## 13. 角色化成片
 
-- 成片渲染优先级：H3 视频/中段帧 → Blender cutout → 2d → 文字卡兜底；角色按 speaker 逐镜头绑定名字条与表情。
+- 成片渲染优先级：H3 视频/中段帧 → AI 3D cutout → 2d → 文字卡兜底；角色按 speaker 逐镜头绑定名字条与表情。
 - 修复：切点单帧黑帧（去除片段 fade）、胸像构图、名字条错位。
 - 最终成片：`outputs/demo/final.mp4`（299s / 1280×720 / 31.9MB，全部原创动漫角色；三人 H3 真实生成镜头均已接入）；平台端 ep_001 final.mp4 27.4MB 同步角色化。
 
@@ -218,7 +218,7 @@ FastAPI (8090) ── SQLite
 - 旧版保留 {id}_h3_prev.mp4；Character.h3_video_url 指向新文件。
 
 ### 19.3 成片升级（SDXL 概念角色）
-- pipeline 素材优先级按 CONSISTENCY.md 落地：H3 视频 → h3 中段帧 → concepts/{id}/portrait.png（832×1216 竖构图裁胸像 + 右侧画窗 + Ken Burns）→ Blender cutout → 2D → 文字卡。
+- pipeline 素材优先级按 CONSISTENCY.md 落地：H3 视频 → h3 中段帧 → concepts/{id}/portrait.png（832×1216 竖构图裁胸像 + 右侧画窗 + Ken Burns）→ AI 3D cutout → 2D → 文字卡。
 - outputs/demo/final.mp4：299.000s / 1280×720 / 25fps / 34,719,840 B（33.1MiB）/ blackdetect 0 条 / 52/52 角色画面 / H3 3/3 概念图驱动；冷渲 50.9s。
 - 平台 outputs/episodes/ep_001/final.mp4：299.000s / 27,288,915 B / mtime 09:14:55（同一优先级重渲，/media 200）。
 - 修复：角色镜头重复人名条（ASS 不再输出 Lower，51→49 事件）、字幕基线恢复 655。
@@ -375,7 +375,7 @@ FastAPI (8090) ── SQLite
 ## 31. 场景升级：2D 绘景 + 真实 3D 场景（OpenMontage 全量沿用，2026-10-25）
 - 用户反馈「全是平面、没有 3D/2D 场景」→ 本轮补齐：
   - **2D 场景绘景 12 张**（SDXL/Animagine，1280×720，无人物）：深夜秀办公桌/圆桌演播厅/任务舞台/历史书房/辩论台/推理现场/国宝展厅/暖色厨房/彩虹舞台/访谈沙发/街头夜景/历史课堂；另 3 张 3D 渲染风 plate（3d_roundtable/3d_stage/3d_study）。
-  - **真实 3D 场景 3 条**（Blender 5.0 EEVEE 程序化）：3d_studio_wide（横移全景 5s）、3d_studio_host（缓推特写 5s）、3d_stage_pan（摇镜升镜 6s）；含舞台/圆桌/主持台/弧形 LED 屏/灯架/地面反射 + 3D 卡通角色 + 相机动画；1280×720/25fps，单条渲染 32-35s。
+  - **真实 3D 场景 3 条**（AI 3D 5.0 EEVEE 程序化）：3d_studio_wide（横移全景 5s）、3d_studio_host（缓推特写 5s）、3d_stage_pan（摇镜升镜 6s）；含舞台/圆桌/主持台/弧形 LED 屏/灯架/地面反射 + 3D 卡通角色 + 相机动画；1280×720/25fps，单条渲染 32-35s。
   - **全身透明角色 cutout**：laozhou/ali/dawei 每人 front + three_quarter（1024×1536 RGBA，脚底贴边、无阴影，pixels_per_meter≈886.7）。
   - **场景合成 pipeline/scenes.py**：背景 plate + 全身 cutout 分层，按 ShotPlan 景别缩放/站位/脚底锚定地面/柔和投影/2.5D 视差与相机运动；contract/scene_map.json 模板→场景映射。
 - 交付：**16 个模板全部出 2D 场景版 demo**（outputs/scene_demos/{template}.mp4，各 30-45s）+ 场景巡礼 outputs/scene_demos/scene_showcase.mp4（77.48s，含 16 个 2D 场景片段 + 3D 场景章节）；抽帧 docs/screenshots/55_all_scene_templates_sheet.png、56_scene_v2_check.png。
@@ -383,25 +383,25 @@ FastAPI (8090) ── SQLite
 - 已知限制：场景 demo 的角色是**3D 卡通全身 cutout**（与 2D 绘景画风有差异；下一步做 2D动漫全身 cutout/统一渲染风格）；H3 动态镜头仍是全画幅特写，尚未与场景合成融合（下一步：场景首帧 + 角色分层驱动 H3）。
 ### 31.1 场景合成最终验收（task-40 完成）
 - 108/108 角色镜头统一用全身透明 cutout（char_mode=full，0 个 bust/漂浮大头）；Medium≈0.55H / MediumClose≈0.45H / Wide≈0.32H / Close 用全身图放大 0.92-1.02H（头顶距顶 6-13%，头部直径 0.12-0.18H），脚底锚定地平线 y≈0.86H，柔和椭圆投影 + 左右站位 + 场景 2.5D 视差/相机运动 + 光照染色。
-- scene_map 覆盖 16 模板；tonight_show/masked_singer/snl/standup/shark_tank 混用真实 3D Blender 片段；16 个 scene demo 全部重跑（history_talk 35.4s、tonight_show 35.6s，blackdetect=0、相机运动 PSNR 17-24）；抽样帧 outputs/scene_demos/qc_4templates.png，逐模板 frames/verify.json。
+- scene_map 覆盖 16 模板；tonight_show/masked_singer/snl/standup/shark_tank 混用真实 3D AI 3D 片段；16 个 scene demo 全部重跑（history_talk 35.4s、tonight_show 35.6s，blackdetect=0、相机运动 PSNR 17-24）；抽样帧 outputs/scene_demos/qc_4templates.png，逐模板 frames/verify.json。
 - tests：pipeline 63 passed（新增 test_scenes.py：scene_map/全身分层/景别缩放/脚底锚定/投影/相机运动/卡片烘焙/逐镜输出）。
 - 场景巡礼已重建：outputs/scene_demos/scene_showcase.mp4（16 个 2D 场景片段 + 3D 章节，~77s）。
-## 32. 停用 Blender/3D 场景，改由 H3 驱动全部动态（2026-10-25 用户指示）
-- 用户明确：不再使用 Blender，全部用 H3。已从 pipeline 移除 3D 场景依赖：pipeline/scenes.py 停用 three_d 背景；scene_map 不再含 3D 片段；16 个模板 scene demo 已用「2D 绘景 + 2D 动漫全身 cutout」重渲（outputs/scene_demos，2D-only）。
-- 角色改为 SDXL 全身图去白底得到 2D 动漫透明 cutout（outputs/characters/{id}/cutout_2d/front.png，脚本 scripts/make_2d_cutouts.py），不再使用 Blender cutout_full。
+## 32. 停用 AI 3D/3D 场景，改由 H3 驱动全部动态（2026-10-25 用户指示）
+- 用户明确：不再使用 AI 3D，全部用 H3。已从 pipeline 移除 3D 场景依赖：pipeline/scenes.py 停用 three_d 背景；scene_map 不再含 3D 片段；16 个模板 scene demo 已用「2D 绘景 + 2D 动漫全身 cutout」重渲（outputs/scene_demos，2D-only）。
+- 角色改为 SDXL 全身图去白底得到 2D 动漫透明 cutout（outputs/characters/{id}/cutout_2d/front.png，脚本 scripts/make_2d_cutouts.py），不再使用 AI 3D cutout_full。
 - H3 场景融合验证：
   - i2v（fl2v 首尾帧）以「2D 绘景 + 角色」合成帧为输入：H3 保留书房背景/烛光/角色，产生闪烁/呼吸/轻微运动（tmp/h3_scene_i2v.mp4）；
   - audio_ref 以场景合成帧为参考：H3 保留图书馆环境 + 角色说话口型/推近（tmp/h3_scene_audio.mp4，1280x704）；
   - 已加 SCENE_DYNAMIC_FULL_REF 模式：场景版动态镜头用整帧场景合成画面作 H3 参考（不再裁脸部），让 H3 动态镜头带 2D 场景环境；
-- 3D Blender 产物（outputs/3d_scenes、studio3d scene.py）保留为归档，不再进入成片流程。
+- 3D AI 3D 产物（outputs/3d_scenes、ai_character scene.py）保留为归档，不再进入成片流程。
 ### 32.1 H3 场景融合验证 + 完整 5 分钟场景版（2026-10-25）
-- 16 个 scene demo 已用「2D 动漫全身 cutout（SDXL 去白底）+ 2D 绘景」重渲，pipeline 已停用 Blender/3D；场景巡礼重建为 2D-only（outputs/scene_demos/scene_showcase.mp4，18 段）。
-- H3 场景融合：新增 SCENE_DYNAMIC_FULL_REF + contract/scene_descriptions.json；H3 参考图取「2D 绘景+2D 角色」整帧，prompt 带场景描述并要求保留背景；3 镜测试（final_fusion3.mp4）与 8 镜 demo（outputs/history_full/h3_scene_demo.mp4，46.72s，7 个 H3 audio_ref 镜头）均保留书房场景 + 角色口型/微动作，不再出现 Blender 3D/白底棚拍。
+- 16 个 scene demo 已用「2D 动漫全身 cutout（SDXL 去白底）+ 2D 绘景」重渲，pipeline 已停用 AI 3D/3D；场景巡礼重建为 2D-only（outputs/scene_demos/scene_showcase.mp4，18 段）。
+- H3 场景融合：新增 SCENE_DYNAMIC_FULL_REF + contract/scene_descriptions.json；H3 参考图取「2D 绘景+2D 角色」整帧，prompt 带场景描述并要求保留背景；3 镜测试（final_fusion3.mp4）与 8 镜 demo（outputs/history_full/h3_scene_demo.mp4，46.72s，7 个 H3 audio_ref 镜头）均保留书房场景 + 角色口型/微动作，不再出现 AI 3D 3D/白底棚拍。
 - 完整 5 分钟历史夜话场景版：outputs/history_full/final.mp4（286.04s / 1280×720 / 27MB / 53 镜 / 51 条 TTS / 2D 绘景 + 2D 角色 / blackdetect 0 / QC ok，字幕 55 条）。
 - 全 H3 版 5 分钟成片正在后台渲染：outputs/history_full/final_h3.mp4（51 个 dialogue 镜头全 H3 audio_ref，预计 2-3h；完成后可直接对比）。
 ### 32.2 全 H3 版 5 分钟成片（2026-10-25 完成）
 - outputs/history_full/final_h3.mp4：286.04s / 1280×720 / 25fps / 7151 帧 / 55.09MB / 51 个 H3 audio_ref 镜头 + 2 静态卡（片头/片尾）/ blackdetect 0 / QC ok；
-- 全部对话镜头由 H3 生成：参考图=「2D 绘景 + 2D 动漫角色」场景合成整帧，prompt 带 contract/scene_descriptions.json 场景描述并要求保留背景；H3 输出自带书房环境/烛光/角色口型，不再有 Blender/3D。
+- 全部对话镜头由 H3 生成：参考图=「2D 绘景 + 2D 动漫角色」场景合成整帧，prompt 带 contract/scene_descriptions.json 场景描述并要求保留背景；H3 输出自带书房环境/烛光/角色口型，不再有 AI 3D/3D。
 - 2D 合成版对比：outputs/history_full/final.mp4（286.04s/27MB，2D cutout 贴图+视差）；对比抽帧 docs/screenshots/66_compare_2d_vs_h3.png。
 - 全 H3 版观感明显更好：角色更大、场景更完整、光影/景别有电影感；字幕/名牌/BGM/转场正常。
 - 下一步：16 个模板如需全 H3 版，按模板批量跑（每模板约 30-60 分钟，取决于镜头数）。
@@ -411,7 +411,7 @@ FastAPI (8090) ── SQLite
 - 风格系统：contract/style_map.json + pipeline/style.py：3d_anime 默认 11 个综艺/舞台/生活模板，2d_anime 保留 5 个历史/文化模板；H3 prompt 注入 3D 影感前缀（cinematic 3D anime cel-shaded、strong depth、volumetric lighting、realistic shadows、DOF）+ 场景描述 + ShotPlan；支持 --style 覆盖；资产缺失自动回退 2D 并记录。
 - 验证：outputs/h3_style_demos/tonight_show_3d.mp4（32.2s / 8 个 H3 镜头 7 audio_ref+1 fl2v / 0 fallback / 0 blackdetect / ASS 56 / 68 tests passed）；抽帧见 docs/screenshots/67_tonight_show_3d_h3_sheet.png，2D vs 3D 对比 docs/screenshots/68_compare_2d_vs_3d_h3.png；3D plate 总览 docs/screenshots/69_3d_scene_plates.png。
 - 11 个 3d_anime 模板的静态场景 demo 正在批量渲染 outputs/scene_demos_3d/（task-44）；5 个 2d_anime 模板保持 2D 场景。
-- 已知限制：H3 在个别特写会轻微漂移角色形象（3D cutout 参考有限），后续用更多角度/表情参考图和身份锚定 prompt 提升一致性；3D 角色立绘仍是 SDXL 生成（无 Blender）。
+- 已知限制：H3 在个别特写会轻微漂移角色形象（3D cutout 参考有限），后续用更多角度/表情参考图和身份锚定 prompt 提升一致性；3D 角色立绘仍是 SDXL 生成（无 AI 3D）。
 ## 34. 规划：模板差异化风格 v2 + LLM 内容生成（2026-10-25）
 - 规划文档：docs/PLAN_V2_STYLE_LLM.md（12 preset + 16 模板独立风格；LLM 本地/API Key；P0-P4 阶段与验收）；契约：contract/style_presets.json、contract/LLM.md。
 - **P1 LLM 已落地**（backend-core）：backend/app/llm.py provider（ollama/openai_compatible/mock）+ 配置/掩码 + GET /api/llm/config、POST /api/llm/test、POST /api/projects/{pid}/generate-script；pytest **146 passed**；实机 Ollama qwen2.5:7b 生成原创 60s 台本（~4.4-7s）。

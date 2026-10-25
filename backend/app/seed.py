@@ -288,7 +288,6 @@ def seed_characters(db) -> int:
                 spec=spec,
                 portrait_url=None,
                 sheet_url=None,
-                turntable_url=None,
                 expressions={},
                 status="pending",
             )
@@ -297,7 +296,7 @@ def seed_characters(db) -> int:
         logger.info("播种角色: %s (%s)", character_id, name)
     if created:
         db.commit()
-    # 若 outputs/characters 下已有产物（studio3d 已跑过），回填 URL/status
+    # 若磁盘上已有概念图 / SDXL cutout / H3 产物，回填 URL/status
     changed = False
     for character in db.query(Character).filter(Character.project_id == project.id).all():
         changed = character_files.apply(character) or changed

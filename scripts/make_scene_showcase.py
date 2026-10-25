@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""场景升级展示：16 个 2D 场景模板 demo 精选 + 3D Blender 场景镜头。"""
+"""场景升级展示：16 个 2D 场景模板 demo 精选 + 3D AI 3D 场景镜头。"""
 from __future__ import annotations
 import json, os, subprocess
 from pathlib import Path

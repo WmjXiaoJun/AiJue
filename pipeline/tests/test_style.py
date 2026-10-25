@@ -44,15 +44,15 @@ def test_plate_path_prefers_3d(tmp_path):
 def test_cutout_path_prefers_3d(tmp_path):
     chars = tmp_path / "chars"
     (chars / "laozhou" / "cutout_3d").mkdir(parents=True)
-    (chars / "laozhou" / "cutout_full").mkdir(parents=True)
+    (chars / "laozhou" / "cutout_2d").mkdir(parents=True)
     _transparent_png(chars / "laozhou" / "cutout_3d" / "front.png")
-    _transparent_png(chars / "laozhou" / "cutout_full" / "front.png")
+    _transparent_png(chars / "laozhou" / "cutout_2d" / "front.png")
     p, used, fb = style.cutout_path("laozhou", "3d_anime", chars_dir=chars)
     assert "cutout_3d" in p.as_posix() and used == "3d_anime" and fb is False
     p2, used2, fb2 = style.cutout_path("ali", "3d_anime", chars_dir=chars)
-    assert p2 is None or "cutout_full" in p2.as_posix()
+    assert p2 is None
     p3, used3, _ = style.cutout_path("laozhou", "2d_anime", chars_dir=chars)
-    assert "cutout_full" in p3.as_posix()
+    assert "cutout_2d" in p3.as_posix()
 
 
 def test_prompt_style_injection():

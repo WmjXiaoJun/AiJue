@@ -33,7 +33,7 @@ python integrations/comfyui/run_h3.py --image outputs/concepts/<id>/portrait.png
 1) `outputs/h3/{cid}_h3.mp4`（H3 视频，概念图驱动）
 2) `outputs/characters/{cid}/h3_portrait.png`
 3) `outputs/concepts/{cid}/portrait.png`（SDXL 概念立绘，新）
-4) `outputs/characters/{cid}/cutout/portrait.png`（Blender）
+4) `outputs/characters/{cid}/cutout/portrait.png`（AI 3D）
 5) `outputs/characters/{cid}/2d/portrait.png`
 6) 文字卡兜底
 - 重渲 outputs/demo/final.mp4 与平台 ep_001 final.mp4；验收：299s/1280×720、blackdetect=0、画面全部为 SDXL 概念角色。

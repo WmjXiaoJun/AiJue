@@ -43,14 +43,14 @@ Vite + React 18 + TypeScript 的深色影棚风制片工作台。无 UI 框架�
   - 生成台：任务列表（类型/状态/进度/费用/错误/重试）+ 镜头版本视频、选用
   - 成片房：渲染成片、进度、`<video>` 成片、费用汇总、包装配置
 - `ShotDrawer`：镜头详情 + 版本列表（`<video>` 预览 / 选用 / 生成新版本）
-- 角色工坊（contract/CHARACTER.md）：3D/2D 多风格原创角色；工坊卡片、角色详情抽屉（设定三视图 / 四表情 / 转面视频 / 重新生成）、
-  新建角色弹窗（风格多选 + 外观预设 + 实时预览）。创建 → 自动 `POST /generate` → 轮询 Job → 刷新卡片；
-  分镜台按 `asset_id`/`speaker` 匹配角色头像，成片房展示「角色画风」。
+- 角色工坊（contract/CHARACTER.md）：2D/3D 卡通多风格原创角色（AI 概念图 · SDXL）；工坊卡片、角色详情抽屉
+  （AI 概念图立绘 / 三视图 / 四表情 / H3 动画 / 重新生成）、新建角色弹窗（风格多选 + 外观预设 + 实时预览）。
+  创建 → 自动生成 AI 概念图 → 刷新卡片；分镜台按 `asset_id`/`speaker` 匹配角色头像，成片房展示「角色画风」。
   角色接口未就绪时展示空态 + 提示（不伪造数据、不阻塞其它模块）。
 - AI 概念图（contract/CONCEPT.md）：角色详情抽屉内「AI 概念图」区块 — 风格（anime / illustrious / guoman）+ 额外提示词 + seed
   → `POST /characters/{cid}/concept/generate`（1.6s 轮询 Job）→ 图集（立绘 / 三视图 / 四表情 / 设定总览），每图可
   「设为角色立绘」（`POST /portrait/from-concept`）与「用此图生成 H3 动画」（`POST /h3-animate`，完成后播放 `/media/h3/...`）。
-  角色卡优先展示 `GET /characters/{cid}/concepts` 的 portrait（带「AI 概念图」徽标），否则回落 Blender portrait。
+  角色卡优先展示 `GET /characters/{cid}/concepts` 的 portrait（带「AI 概念图」徽标），否则回落角色立绘。
 - IP-Adapter 一致性（contract/CONSISTENCY.md）：概念图区优先 `/concepts.consistent` 的 three_view / expressions，
   渲染为「一致性三视图 / 一致性表情（IP-Adapter）」分组；若接口暂不返回 consistent，则按固定路径
   `/media/concepts/{cid}/consistent/meta.json` 探测一次（失败自动回退原始图集，不伪造素材）；刷新按钮可重新探测。

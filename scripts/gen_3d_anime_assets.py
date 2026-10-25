@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""3D 动漫风格资产生成（无 Blender，纯 SDXL / ComfyUI）——task-42
+"""3D 动漫风格资产生成（无 AI 3D，纯 SDXL / ComfyUI）——task-42
 
 产出:
   1) 8 张 1280x720 3D 动漫场景 plate: outputs/scene_plates/{id}_3d.png

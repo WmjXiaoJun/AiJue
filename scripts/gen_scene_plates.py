@@ -73,7 +73,7 @@ SCENES = [
     ("classroom_history", "a history classroom with wooden desks and chairs in rows, a large world map on the "
                           "blackboard without text, sunlight through tall windows, chalk dust in the air, empty room"),
     ("3d_roundtable", "stylized 3D render of a modern roundtable TV studio, isometric three-quarter view, "
-                      "blender-eevee cinematic lighting, soft shadows, clean glossy geometry, large LED screen, "
+                      "ai3d-eevee cinematic lighting, soft shadows, clean glossy geometry, large LED screen, "
                       "no people"),
     ("3d_stage", "stylized 3D render of a TV show stage, wide cinematic shot, volumetric stage lighting, "
                  "glossy reflective floor, simple geometric set design, no people"),
@@ -101,7 +101,7 @@ def center_crop_resize(src: str, dst: str):
 
 def scene_prompt(sid: str, desc: str) -> tuple:
     if sid in STYLE_3D:
-        pos = ("masterpiece, best quality, stylized 3D render, blender render, octane render, "
+        pos = ("masterpiece, best quality, stylized 3D render, ai3d render, octane render, "
                "cinematic lighting, 8k, " + desc)
         neg = ("people, human, character, text, watermark, logo, letters, lowres, blurry, deformed, "
                "2d anime, flat illustration")

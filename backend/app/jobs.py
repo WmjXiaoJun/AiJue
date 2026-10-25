@@ -269,8 +269,6 @@ def run_job(job_id: str) -> None:
                     run_shot_job(db, job)
             elif job.type == "render":
                 run_render_job(db, job)
-            elif job.type == "character":
-                run_character_job(db, job)
             elif job.type == "concept":
                 run_concept_job(db, job)
             elif job.type == "h3":
@@ -305,10 +303,6 @@ def _mark_failed_isolated(job_id: str, exc: Exception) -> None:
                     episode = db.get(models.Episode, job.episode_id)
                     if episode is not None:
                         episode.status = "failed"
-                if job.type == "character" and job.character_id:
-                    character = db.get(models.Character, job.character_id)
-                    if character is not None:
-                        character.status = "failed"
                 if job.type == "localize":
                     loc_id = (job.params or {}).get("localization_id")
                     loc = db.get(models.Localization, loc_id) if loc_id else None
@@ -909,163 +903,6 @@ def run_dynamic_shot_job(db, job: models.Job) -> None:
 
 
 # --------------------------------------------------------------------------- #
-# character 任务（角色工坊：调用 studio3d Blender CLI）
-# --------------------------------------------------------------------------- #
-def _character_styles(character: models.Character, styles: Optional[List[str]] = None) -> List[str]:
-    chosen = [str(item).strip() for item in (styles or []) if str(item).strip()]
-    if chosen:
-        return list(dict.fromkeys(chosen))
-    style = character.style or {}
-    if isinstance(style, str):
-        style = {"primary": style}
-    if isinstance(style, dict):
-        variants = [str(item) for item in (style.get("variants") or []) if item]
-        primary = style.get("primary")
-        if primary and str(primary) not in variants:
-            variants.insert(0, str(primary))
-        if variants:
-            return list(dict.fromkeys(variants))
-    return ["3d_toon"]
-
-
-def enqueue_character_job(db, character: models.Character, styles: Optional[List[str]] = None):
-    """入队角色生成任务；同一角色已有排队/运行任务时复用。返回 (job, created)。"""
-    active = (
-        db.query(models.Job)
-        .filter(
-            models.Job.type == "character",
-            models.Job.character_id == character.id,
-            models.Job.status.in_(ACTIVE_STATUSES),
-        )
-        .order_by(models.Job.created_at.desc())
-        .first()
-    )
-    if active is not None:
-        return active, False
-    chosen_styles = _character_styles(character, styles)
-    episode = (
-        db.query(models.Episode)
-        .filter(models.Episode.project_id == character.project_id)
-        .order_by(models.Episode.no.asc())
-        .first()
-    )
-    job = models.Job(
-        id=models.new_id("job"),
-        type="character",
-        status="queued",
-        progress=0.0,
-        message="角色生成排队中",
-        episode_id=episode.id if episode is not None else None,
-        shot_id=None,
-        character_id=character.id,
-        params={"styles": chosen_styles},
-    )
-    db.add(job)
-    character.status = "generating"
-    db.commit()
-    dispatch(job.id)
-    return job, True
-
-
-def run_character_job(db, job: models.Job) -> None:
-    character = db.get(models.Character, job.character_id) if job.character_id else None
-    if character is None:
-        _fail(db, job, "角色不存在，无法生成")
-        return
-
-    styles = _character_styles(character, (job.params or {}).get("styles"))
-    _update(db, job, status="running", progress=3, message=f"准备生成角色 {character.id}")
-    character.status = "generating"
-    db.commit()
-
-    outdir = character_files.character_dir(character.id)
-    outdir.mkdir(parents=True, exist_ok=True)
-    spec = dict(character.spec or {})
-    spec.setdefault("id", character.id)
-    spec.setdefault("name", character.name)
-    spec.setdefault("title", character.title)
-    spec.setdefault("persona", character.persona)
-    spec.setdefault("voice", character.voice)
-    spec.setdefault("accent_color", character.accent_color)
-    if not spec.get("style"):
-        spec["style"] = character.style or {"primary": "3d_toon", "variants": ["3d_toon"]}
-    config.JOBS_TMP_DIR.mkdir(parents=True, exist_ok=True)
-    spec_path = config.JOBS_TMP_DIR / f"{job.id}.json"
-    spec_path.write_text(json.dumps(spec, ensure_ascii=False, indent=2), encoding="utf-8")
-
-    cmd = [
-        sys.executable,
-        "-m",
-        "studio3d.cli",
-        "create",
-        "--spec",
-        str(spec_path),
-        "--outdir",
-        str(outdir),
-        "--styles",
-        ",".join(styles),
-    ]
-    _update(db, job, progress=10, message="调用 studio3d Blender 生成角色")
-    db.commit()
-
-    try:
-        returncode, stdout_lines, stderr_text = run_cli(cmd)
-    except Exception as exc:  # noqa: BLE001 - CLI 无法启动
-        _fail(db, job, f"studio3d 启动失败: {exc}", character=character)
-        return
-
-    if returncode != 0:
-        _fail(
-            db,
-            job,
-            _format_error("studio3d create", returncode, stderr_text, stdout_lines),
-            character=character,
-        )
-        return
-
-    result = _last_json(stdout_lines)
-    if result.get("ok") is False:
-        _fail(
-            db,
-            job,
-            f"studio3d 生成失败: {result.get('error') or result}",
-            character=character,
-        )
-        return
-
-    data = character_files.scan(character.id)
-    if not data.get("portrait"):
-        _fail(
-            db,
-            job,
-            f"studio3d 未产出 portrait.png（outdir={outdir}）",
-            character=character,
-        )
-        return
-
-    character.portrait_url = data["portrait"]
-    character.sheet_url = data["sheet"]
-    character.turntable_url = data["turntable"]
-    character.expressions = data["expressions"]
-    character.status = "ready"
-    asset = db.get(models.Asset, character.asset_id) if character.asset_id else None
-    if asset is not None:
-        asset.images = [data["portrait"]]
-    _update(
-        db,
-        job,
-        status="done",
-        progress=100,
-        message=f"角色 {character.id} 生成完成",
-        output_url=data["portrait"],
-        cost=0.0,
-        error=None,
-    )
-    db.commit()
-    logger.info("character 任务完成: job=%s character=%s", job.id, character.id)
-
-
-# --------------------------------------------------------------------------- #
 # concept 任务（AI 概念图：调用 imagegen CLI，ComfyUI/SDXL）
 # --------------------------------------------------------------------------- #
 CONCEPT_MODES = ("portrait", "three_view", "expressions", "scene", "sheet", "all")
@@ -1191,7 +1028,7 @@ def run_concept_job(db, job: models.Job) -> None:
             try:
                 returncode, stdout_lines, stderr_text = run_cli(cmd, timeout=900)
             except Exception as exc:  # noqa: BLE001 - CLI 无法启动
-                _fail(db, job, f"imagegen 启动失败: {exc}")
+                _fail(db, job, f"imagegen 启动失败: {exc}", character=character)
                 return
             if returncode != 0:
                 _fail(
@@ -1200,17 +1037,24 @@ def run_concept_job(db, job: models.Job) -> None:
                     _format_error(
                         f"imagegen generate --mode {mode}", returncode, stderr_text, stdout_lines
                     ),
+                    character=character,
                 )
                 return
 
     data = concept_files.scan(character.id)
     if not data.get("portrait"):
-        _fail(db, job, f"imagegen 未产出概念图 portrait.png（outdir={outdir}）")
+        _fail(
+            db,
+            job,
+            f"imagegen 未产出概念图 portrait.png（outdir={outdir}）",
+            character=character,
+        )
         return
     character.concept_portrait_url = data["portrait"]
     character.concept_sheet_url = data["sheet"]
     character.concept_three_view = data["three_view"]
     character.concept_expressions = data["expressions"]
+    character.status = "ready"
     _update(
         db,
         job,
@@ -2100,10 +1944,6 @@ def retry_job(db, job: models.Job):
         episode = db.get(models.Episode, job.episode_id)
         if episode is not None:
             episode.status = "rendering"
-    if job.type == "character" and job.character_id:
-        character = db.get(models.Character, job.character_id)
-        if character is not None:
-            character.status = "generating"
     if job.type == "localize":
         loc_id = (job.params or {}).get("localization_id")
         loc = db.get(models.Localization, loc_id) if loc_id else None

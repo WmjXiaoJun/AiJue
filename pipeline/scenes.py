@@ -2,7 +2,7 @@
 
 输入：
   outputs/scene_plates/{scene}.png          SDXL 2D 绘景（1280x720 无人物）
-  outputs/characters/{id}/cutout_full/front.png  全身透明角色（1024x1536，优先）
+  outputs/characters/{id}/cutout_2d|cutout_3d/front.png  SDXL 全身透明角色
   outputs/characters/{id}/cutout/portrait.png    头肩 bust（回退）
   outputs/3d_scenes/{id}.mp4                3D 演播厅片段（tonight_show 混用）
 
@@ -98,8 +98,7 @@ def _asset_character(asset: dict | None) -> str:
 
 def cutout_path(char_id: str) -> Path | None:
     """优先全身透明 PNG（1024x1536），回退头肩 cutout。"""
-    for rel in ("cutout_2d/front.png", "cutout_full/front.png", "cutout/portrait.png",
-                "2d/portrait.png", "portrait.png"):
+    for rel in ("cutout_3d/front.png", "cutout_2d/front.png"):
         p = CHARS_DIR / char_id / rel
         if p.is_file() and p.stat().st_size > 5000:
             return p
@@ -108,7 +107,7 @@ def cutout_path(char_id: str) -> Path | None:
 
 def _is_full_body(path: Path | None) -> bool:
     p = str(path or "").replace("\\", "/")
-    return bool(path and ("cutout_full" in p or "cutout_2d" in p or "cutout_3d" in p))
+    return bool(path and ("cutout_2d" in p or "cutout_3d" in p))
 
 
 def _plan(shot: dict, index: int) -> dict:
@@ -224,7 +223,7 @@ def compose_shot(shot: dict, assets: list, workdir: Path, out_path: Path,
         # style_v2：按 profile.character_style 选 cutout_3d/cutout_2d，缺失回退并记录
         char_png, cutout_style, cutout_fallback = style_v2.cutout_path(profile, char_id)
     elif char_id:
-        # 风格系统 v1：3d_anime 优先 cutout_3d/front.png，缺失回退 cutout_full
+        # 风格系统：3d_anime 优先 cutout_3d/front.png，缺失回退 cutout_2d
         char_png, cutout_style, cutout_fallback = style.cutout_path(char_id, style_name)
     else:
         char_png, cutout_style, cutout_fallback = None, "none", False
@@ -381,7 +380,7 @@ def compose_episode(data: dict, workdir: Path, template_id: str | None = None,
     if not plate.is_file():
         raise RuntimeError(f"缺少场景 plate: {scene.get('plate')}")
     bg_video = None
-    # 用户要求：不再使用 Blender/3D 场景，全部改用绘景 + 角色分层（H3 负责动态立体感）
+    # 场景全部使用 2D 绘景 + AI 角色分层（H3 负责动态立体感）
     if False and scene.get("3d"):
         p = THREED_DIR / f"{scene['3d']}.mp4"
         if p.is_file():

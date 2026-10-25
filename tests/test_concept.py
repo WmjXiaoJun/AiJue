@@ -261,8 +261,8 @@ def test_portrait_from_concept(client):
     assert cutout_copied.is_file()
     assert cutout_copied.read_bytes() == b"cutout-portrait"
 
-    # 角色卡与资产同步；GET 懒同步不会把角色卡改回 Blender portrait
-    (config.OUTPUTS_DIR / "characters" / character["id"] / "portrait.png").write_bytes(b"blender")
+    # 角色卡与资产同步；GET 懒同步不会把角色卡改回旧本地 portrait
+    (config.OUTPUTS_DIR / "characters" / character["id"] / "portrait.png").write_bytes(b"legacy")
     detail = client.get(f"/api/characters/{character['id']}").json()
     assert detail["portrait_url"] == expected
     assets = client.get(f"/api/episodes/{_episode['id']}/assets").json()
@@ -324,7 +324,7 @@ def test_h3_animate_success_with_fake_cli(client, monkeypatch):
     _project, _episode, character = _new_character(client)
     base = config.OUTPUTS_DIR / "characters" / character["id"]
     base.mkdir(parents=True, exist_ok=True)
-    (base / "portrait.png").write_bytes(b"portrait-png")
+    (base / "portrait_from_concept.png").write_bytes(b"portrait-png")
 
     response = client.post(
         f"/api/characters/{character['id']}/h3-animate",
@@ -381,7 +381,7 @@ def test_h3_animate_failure(client, monkeypatch):
     _project, episode, character = _new_character(client)
     base = config.OUTPUTS_DIR / "characters" / character["id"]
     base.mkdir(parents=True, exist_ok=True)
-    (base / "portrait.png").write_bytes(b"portrait-png")
+    (base / "portrait_from_concept.png").write_bytes(b"portrait-png")
     job = client.post(f"/api/characters/{character['id']}/h3-animate", json={}).json()
     calls, timeouts = [], []
     monkeypatch.setattr(jobs, "run_cli", _fake_h3(calls, timeouts, fail=True))

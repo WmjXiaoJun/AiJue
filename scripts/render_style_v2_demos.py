@@ -172,6 +172,7 @@ def main() -> int:
             "preset": profile.get("preset"), "palette": profile.get("palette"),
             "character_style": profile.get("character_style"),
             "transition": profile.get("transition"),
+            "transition_applied": {"mode": trans_mode, "style": trans_style},
             "duration": round(float(info["format"]["duration"]), 2),
             "size_bytes": int(info["format"]["size"]),
             "width": v.get("width"), "height": v.get("height"),

@@ -88,10 +88,10 @@ outputs/concepts/{id}/            # SDXL 概念图（imagegen，CONCEPTS_DIR 可
 ├─ expressions/{neutral,happy,surprised,thinking}.png
 ├─ three_view/{front,side,three_quarter}.png / sheet.png / meta.json
 
-outputs/characters/{id}/          # 角色工坊（studio3d/studio2d，CHARACTERS_DIR 可覆盖）
+outputs/characters/{id}/          # 角色工坊（ai_character/ai_character_2d，CHARACTERS_DIR 可覆盖）
 ```
 
-角色工坊素材目录明细（`CHARACTERS_DIR` 可覆盖，默认 `outputs/characters/`，由 studio3d 角色工坊产出）：
+角色工坊素材目录明细（`CHARACTERS_DIR` 可覆盖，默认 `outputs/characters/`，由 ai_character 角色工坊产出）：
 
 ```
 outputs/characters/{id}/
@@ -111,7 +111,7 @@ outputs/characters/{id}/
   ① `outputs/h3/{id}_h3.mp4`（概念图驱动的 H3 视频）→
   ② `outputs/characters/{id}/h3_portrait.png`（H3 中段帧）→
   ③ **`outputs/concepts/{id}/portrait.png`（SDXL 概念立绘，832x1216 竖构图）** →
-  ④ `outputs/characters/{id}/cutout/portrait.png`（Blender 透明抠像）→
+  ④ `outputs/characters/{id}/cutout/portrait.png`（AI 3D 透明抠像）→
   ⑤ `2d/portrait.png`（2D 平涂）→ ⑥ 文字卡兜底。
   表情/转面逐文件独立回退（例如 H3 中段帧缺失、概念图存在时直接用概念立绘）。
 - **概念立绘构图**：832x1216 竖图按「顶部安全边 ≈2%」裁成方形胸像后放入右侧 1/3 画窗
@@ -143,7 +143,7 @@ ComfyUI MiniMax H3 生成的真实动漫镜头（由 SDXL 概念图驱动）会*
 | H3 视频 | `outputs/h3/{id}_h3.mp4`（也支持 `{id}.mp4` / `{id}*.mp4`） | host_to_camera 说话镜头：右侧 1/3「H3 画窗」+ 节目背景，按镜头时长裁剪/慢放（≤1.8x） |
 | H3 中段帧 | `outputs/characters/{id}/h3_portrait.png`（也支持 `outputs/h3/{id}_h3_fmid.png`） | 其余角色镜头：画窗 + Ken Burns 缓推（1.0→1.12 慢推） |
 | SDXL 概念立绘 | `outputs/concepts/{id}/portrait.png`（832x1216 竖图） | H3 素材缺失时：顶部安全边裁胸像 + 画窗 + Ken Burns |
-| Blender 立绘 | `outputs/characters/{id}/cutout/portrait.png` / `portrait.png` | 兜底 |
+| AI 3D 立绘 | `outputs/characters/{id}/cutout/portrait.png` / `portrait.png` | 兜底 |
 
 - H3 视频 768x768/24fps 直接全屏 cover 会把脸放大失真，因此采用「节目背景 + 右侧画窗」构图；
 - `H3_DIR` 可覆盖 H3 素材目录；H3 文件变化会通过角色素材指纹自动失效镜头片段缓存。
@@ -177,7 +177,7 @@ ComfyUI MiniMax H3 生成的真实动漫镜头（由 SDXL 概念图驱动）会*
 | **平台片段复用（52 镜头，生成台已有 shots/）** | **39.2s** | 52 片段直接 copy（不 mock）+ 缓存 TTS + 音轨 + 编码 |
 | --limit 3 平台片段复用 | 7.5s | 3 片段 copy + 2 条 TTS + 编码 |
 | --limit 2 调试渲染 | 4.5s | 含 2 片段 + 1 条 TTS |
-| **角色版整片（H3 + 角色立绘 + Blender 兜底，52 镜头）** | **54-61s** | 52 角色画面 + 缓存音轨 + 编码 |
+| **角色版整片（H3 + 角色立绘 + AI 3D 兜底，52 镜头）** | **54-61s** | 52 角色画面 + 缓存音轨 + 编码 |
 | **SDL 概念角色版整片（H3 概念图驱动，52 镜头全新生成）** | **50.9s** | 52 角色画面 + 缓存音轨 + BGM + 编码 |
 | 角色版整片（全缓存复用） | 34.1s | 只剩 concat + 编码 |
 
@@ -373,7 +373,7 @@ python -m pipeline.cli render --episode <episode.json> --workdir <dir> --out fin
 
 ## 风格系统（2D / 3D 动漫，contract/style_map.json + docs/STYLE_GUIDE.md）
 
-按模板选择 2D / 3D 动漫风格，H3 成片因此有立体感（无 Blender）：
+按模板选择 2D / 3D 动漫风格，H3 成片因此有立体感（无 AI 3D）：
 
 - **风格映射**：`contract/style_map.json` → 模板 → `3d_anime`（默认综艺/舞台/生活类 11 个）或
   `2d_anime`（历史/文化类 5 个）；`episode.format_id/template` 自动解析，`--style` 可临时覆盖。
@@ -427,14 +427,14 @@ python -m pipeline.cli render --episode <episode.json> --workdir <dir> --out fin
 ## 已知限制 / 未做
 
 - **画面 = 原创角色立绘 + 程序化演播厅合成**：角色来自角色工坊 `outputs/characters/` 的
-  3D/2D 动漫立绘（Blender 卡通渲染/2D 平涂），不是真实拍摄素材；背景/花字/名条由 ffmpeg 程序化绘制。
+  3D/2D 动漫立绘（AI 3D 卡通渲染/2D 平涂），不是真实拍摄素材；背景/花字/名条由 ffmpeg 程序化绘制。
   真实 H3 动漫镜头可选接入：`--use-h3` 会把 `outputs/h3/<sid>.mp4` 替换进对应镜头（默认关，
   demo 未联网实测）。
 - **角色素材缺失时对应镜头回退文字卡**：渲染不中断，但该镜头不是角色画面；日志/JSON 的
   `character_shots` 可核查覆盖率（素材就绪时应为 52）。
 - **2D/3D 混用规则固定为 3D 优先**：如需强制 2D，可把 `2d/` 内容放到角色根目录，
   或用 `CHARACTERS_DIR` 指向纯 2D 素材目录。
-- **角色相关只读素材、不改角色工坊**：pipeline 只扫描 `outputs/characters/`，角色生成/编辑在 studio3d 与后端任务中完成。
+- **角色相关只读素材、不改角色工坊**：pipeline 只扫描 `outputs/characters/`，角色生成/编辑在 ai_character 与后端任务中完成。
 - **TTS 依赖网络**：edge-tts 需访问微软服务；离线时成片无旁白（静音兜底），字幕仍在。
 - **字体依赖 Windows**：默认取 `C:/Windows/Fonts/Deng.ttf` + `msyhbd.ttc`；
   其他平台需装字体并改 `config.FONT_CANDIDATES`。
