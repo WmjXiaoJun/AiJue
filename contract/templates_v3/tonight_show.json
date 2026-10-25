@@ -1,0 +1,306 @@
+{
+  "id": "tonight_show",
+  "label": "美式深夜秀",
+  "style": "cinematic_3d",
+  "aspect": "16:9",
+  "target_duration": 300,
+  "stage": {
+    "type": "3d_set",
+    "plate": "late_night_desk__cinematic",
+    "layout": {
+      "desk": [
+        0.3,
+        0.62
+      ],
+      "sofa": [
+        0.7,
+        0.6
+      ],
+      "window": [
+        0.5,
+        0.18
+      ],
+      "guest_a": [
+        0.63,
+        0.6
+      ],
+      "guest_b": [
+        0.77,
+        0.6
+      ],
+      "ground_y": 0.86
+    },
+    "props": [
+      {
+        "id": "cue_cards",
+        "zone": "desk",
+        "interaction": "pick"
+      },
+      {
+        "id": "coffee_mug",
+        "zone": "desk",
+        "interaction": "sip"
+      },
+      {
+        "id": "monitor",
+        "zone": "desk",
+        "interaction": "look"
+      },
+      {
+        "id": "script",
+        "zone": "sofa",
+        "interaction": "handoff"
+      }
+    ],
+    "camera_zones": [
+      "front",
+      "desk_swap",
+      "sofa_ots",
+      "window_wide"
+    ]
+  },
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "block": "desk",
+      "props": [
+        "cue_cards"
+      ],
+      "wardrobe": "navy_suit"
+    },
+    {
+      "role": "guest_a",
+      "character": "ali",
+      "block": "guest_a",
+      "props": [
+        "coffee_mug"
+      ],
+      "wardrobe": "purple_hoodie"
+    },
+    {
+      "role": "guest_b",
+      "character": "dawei",
+      "block": "guest_b",
+      "props": [
+        "script"
+      ],
+      "wardrobe": "dark_suit"
+    }
+  ],
+  "action_library": [
+    {
+      "id": "walk_in_desk",
+      "h3_prompt": "Subject walks from the window toward the desk, sits down and puts cue cards on the desk",
+      "prop": null
+    },
+    {
+      "id": "pick_cue_cards",
+      "h3_prompt": "Subject picks up the cue cards from the desk and flips one card",
+      "prop": "cue_cards"
+    },
+    {
+      "id": "sip_mug",
+      "h3_prompt": "Subject lifts the coffee mug and takes a sip, then sets it back",
+      "prop": "coffee_mug"
+    },
+    {
+      "id": "point_window",
+      "h3_prompt": "Subject turns and points toward the city window while talking",
+      "prop": null
+    },
+    {
+      "id": "lean_to_guest",
+      "h3_prompt": "Subject leans toward the guest on the sofa, talking with a smirk",
+      "prop": null
+    },
+    {
+      "id": "react_laugh",
+      "h3_prompt": "Subject laughs and slaps the desk lightly",
+      "prop": null
+    },
+    {
+      "id": "handoff_script",
+      "h3_prompt": "Subject hands a folded script to the guest beside them",
+      "prop": "script"
+    },
+    {
+      "id": "turn_to_camera",
+      "h3_prompt": "Subject turns from the guest back to the camera and delivers the line",
+      "prop": null
+    }
+  ],
+  "segments": [
+    {
+      "id": "cold_open",
+      "name": "开场独白",
+      "duration": 35,
+      "beats": [
+        "host 从窗边走向 desk",
+        "host 拿起 cue cards",
+        "host 看向 guest 席",
+        "host 对着镜头开场"
+      ],
+      "shots": [
+        {
+          "intent": "establishing",
+          "size": "Wide",
+          "angle": "eye-level",
+          "movement": "truck left",
+          "action": "walk_in_desk",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "window_wide"
+        },
+        {
+          "intent": "host_dialogue",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "slow dolly-in",
+          "action": "pick_cue_cards",
+          "props": [
+            "cue_cards"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
+        }
+      ]
+    },
+    {
+      "id": "guest_intro",
+      "name": "嘉宾入场",
+      "duration": 55,
+      "beats": [
+        "guest 从侧幕走进",
+        "guest 落座沙发",
+        "host 递话筒/打招呼"
+      ],
+      "shots": [
+        {
+          "intent": "guest_enter",
+          "size": "Full",
+          "angle": "eye-level",
+          "movement": "tracking",
+          "action": "walk_to_sofa",
+          "props": [],
+          "h3_mode": "i2v",
+          "camera_zone": "sofa_ots"
+        },
+        {
+          "intent": "host_guest_reverse",
+          "size": "Medium Close-up",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "turn_to_guest",
+          "props": [],
+          "h3_mode": "audio_ref",
+          "camera_zone": "sofa_ots"
+        }
+      ]
+    },
+    {
+      "id": "roundtable",
+      "name": "访谈正片",
+      "duration": 150,
+      "beats": [
+        "三人对谈",
+        "道具互动（杯子/稿子）",
+        "反应镜头",
+        "host 抛尖锐问题"
+      ],
+      "shots": [
+        {
+          "intent": "dialogue",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "sip_mug",
+          "props": [
+            "coffee_mug"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "sofa_ots"
+        },
+        {
+          "intent": "reaction",
+          "size": "Close-up",
+          "angle": "low-angle",
+          "movement": "static",
+          "action": "react_laugh",
+          "props": [],
+          "h3_mode": "fl2v"
+        },
+        {
+          "intent": "handoff",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "pan",
+          "action": "handoff_script",
+          "props": [
+            "script"
+          ],
+          "h3_mode": "audio_ref"
+        }
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "收束",
+      "duration": 60,
+      "beats": [
+        "host 总结",
+        "host 起身",
+        "灯暗"
+      ],
+      "shots": [
+        {
+          "intent": "host_close",
+          "size": "Medium Close-up",
+          "angle": "eye-level",
+          "movement": "slow dolly-in",
+          "action": "turn_to_camera",
+          "props": [],
+          "h3_mode": "audio_ref"
+        },
+        {
+          "intent": "outro",
+          "size": "Wide",
+          "angle": "high-angle",
+          "movement": "static",
+          "action": "stand_desk",
+          "props": [],
+          "h3_mode": "fl2v"
+        }
+      ]
+    }
+  ],
+  "camera_language": {
+    "default": "slow dolly-in",
+    "wide": "truck left",
+    "reaction": "static",
+    "close": "slow push-in"
+  },
+  "packaging": {
+    "lower_third": "zaopianju_yellow",
+    "transition": "fade",
+    "bgm": "talk_light",
+    "subtitle_style": "variety"
+  },
+  "audio": {
+    "ambience": "studio_room_tone",
+    "sfx": [
+      "cue_card",
+      "mug_clink",
+      "laugh"
+    ]
+  },
+  "h3": {
+    "workflow": "05_ref2va_4step_sla",
+    "duration": [
+      4,
+      8
+    ],
+    "fps": 25,
+    "resolution": "1280x704"
+  }
+}

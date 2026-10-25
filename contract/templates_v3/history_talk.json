@@ -1,0 +1,344 @@
+{
+  "id": "history_talk",
+  "label": "历史夜话",
+  "style": "history_ink_2d",
+  "aspect": "16:9",
+  "target_duration": 300,
+  "stage": {
+    "type": "2d_plate",
+    "plate": "history_study__ink",
+    "layout": {
+      "desk": [
+        0.5,
+        0.62
+      ],
+      "seat_left": [
+        0.28,
+        0.64
+      ],
+      "seat_right": [
+        0.72,
+        0.64
+      ],
+      "candle": [
+        0.18,
+        0.55
+      ],
+      "map_table": [
+        0.5,
+        0.55
+      ],
+      "ground_y": 0.86
+    },
+    "props": [
+      {
+        "id": "scroll",
+        "zone": "desk",
+        "interaction": "unroll"
+      },
+      {
+        "id": "candle",
+        "zone": "candle",
+        "interaction": "light"
+      },
+      {
+        "id": "map",
+        "zone": "map_table",
+        "interaction": "point"
+      },
+      {
+        "id": "bamboo_slips",
+        "zone": "desk",
+        "interaction": "write"
+      },
+      {
+        "id": "tea_cup",
+        "zone": "desk",
+        "interaction": "sip"
+      }
+    ],
+    "camera_zones": [
+      "front",
+      "wide",
+      "desk_ots",
+      "seat_ots",
+      "scroll_close"
+    ]
+  },
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "block": "desk",
+      "props": [
+        "scroll"
+      ],
+      "wardrobe": "scholar_robe"
+    },
+    {
+      "role": "figure_a",
+      "character": "ali",
+      "block": "seat_left",
+      "props": [
+        "bamboo_slips"
+      ],
+      "wardrobe": "qin_robe"
+    },
+    {
+      "role": "figure_b",
+      "character": "dawei",
+      "block": "seat_right",
+      "props": [
+        "tea_cup"
+      ],
+      "wardrobe": "han_robe"
+    }
+  ],
+  "action_library": [
+    {
+      "id": "unroll_scroll",
+      "h3_prompt": "Subject unrolls an old bamboo scroll on the desk, candlelight flickering on the paper",
+      "prop": "scroll"
+    },
+    {
+      "id": "light_candle",
+      "h3_prompt": "Subject lights a candle with a taper, warm light grows on their face",
+      "prop": "candle"
+    },
+    {
+      "id": "point_map",
+      "h3_prompt": "Subject leans over the map and points at a region while speaking",
+      "prop": "map"
+    },
+    {
+      "id": "write_bamboo",
+      "h3_prompt": "Subject picks up a brush and writes on a bamboo slip",
+      "prop": "bamboo_slips"
+    },
+    {
+      "id": "lean_in",
+      "h3_prompt": "Subject leans toward the person opposite, speaking with conviction",
+      "prop": null
+    },
+    {
+      "id": "react_ponder",
+      "h3_prompt": "Subject slowly nods, eyes narrowed, thinking about the point",
+      "prop": null
+    },
+    {
+      "id": "stand_bow",
+      "h3_prompt": "Subject stands and gives a slight bow before sitting back down",
+      "prop": null
+    },
+    {
+      "id": "sip_tea",
+      "h3_prompt": "Subject lifts a tea cup, takes a sip and sets it down",
+      "prop": "tea_cup"
+    }
+  ],
+  "segments": [
+    {
+      "id": "cold_open",
+      "name": "开场",
+      "duration": 40,
+      "beats": [
+        "host 在书案前点烛",
+        "host 展开竹简",
+        "介绍两位历史人物"
+      ],
+      "shots": [
+        {
+          "intent": "establishing",
+          "size": "Wide",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "light_candle",
+          "props": [
+            "candle"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "wide"
+        },
+        {
+          "intent": "host_dialogue",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "slow dolly-in",
+          "action": "unroll_scroll",
+          "props": [
+            "scroll"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
+        }
+      ]
+    },
+    {
+      "id": "figure_a",
+      "name": "历史人物 A 自述",
+      "duration": 80,
+      "beats": [
+        "figure_a 抬头",
+        "figure_a 展开竹简讲述",
+        "host 追问",
+        "figure_a 反应"
+      ],
+      "shots": [
+        {
+          "intent": "figure_a_dialogue",
+          "size": "Medium Close-up",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "write_bamboo",
+          "props": [
+            "bamboo_slips"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "seat_ots"
+        },
+        {
+          "intent": "host_reaction",
+          "size": "Close-up",
+          "angle": "eye-level",
+          "movement": "static",
+          "action": "react_ponder",
+          "props": [],
+          "h3_mode": "fl2v"
+        }
+      ]
+    },
+    {
+      "id": "figure_b",
+      "name": "历史人物 B 反驳",
+      "duration": 75,
+      "beats": [
+        "figure_b 放下茶杯",
+        "figure_b 指向地图反驳",
+        "figure_a 反驳"
+      ],
+      "shots": [
+        {
+          "intent": "figure_b_dialogue",
+          "size": "Medium",
+          "angle": "eye-level",
+          "movement": "slow push-in",
+          "action": "point_map",
+          "props": [
+            "map"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "seat_ots"
+        },
+        {
+          "intent": "figure_a_reaction",
+          "size": "Medium Close-up",
+          "angle": "low-angle",
+          "movement": "static",
+          "action": "sip_tea",
+          "props": [
+            "tea_cup"
+          ],
+          "h3_mode": "fl2v"
+        }
+      ]
+    },
+    {
+      "id": "roundtable",
+      "name": "三人跨时空辩论",
+      "duration": 90,
+      "beats": [
+        "host 提出问题",
+        "figure_a 站起",
+        "figure_b 拍案",
+        "三人对视"
+      ],
+      "shots": [
+        {
+          "intent": "group_dialogue",
+          "size": "Wide",
+          "angle": "eye-level",
+          "movement": "slow pan",
+          "action": "lean_in",
+          "props": [],
+          "h3_mode": "fl2v",
+          "camera_zone": "desk_ots"
+        },
+        {
+          "intent": "figure_a_stand",
+          "size": "Full",
+          "angle": "low-angle",
+          "movement": "slow push-in",
+          "action": "stand_bow",
+          "props": [],
+          "h3_mode": "audio_ref",
+          "camera_zone": "wide"
+        }
+      ]
+    },
+    {
+      "id": "closing",
+      "name": "收束",
+      "duration": 45,
+      "beats": [
+        "host 总结",
+        "吹灭蜡烛",
+        "镜头拉远"
+      ],
+      "shots": [
+        {
+          "intent": "host_close",
+          "size": "Medium Close-up",
+          "angle": "eye-level",
+          "movement": "slow dolly-in",
+          "action": "unroll_scroll",
+          "props": [
+            "scroll"
+          ],
+          "h3_mode": "audio_ref",
+          "camera_zone": "front"
+        },
+        {
+          "intent": "outro",
+          "size": "Wide",
+          "angle": "high-angle",
+          "movement": "slow pull-out",
+          "action": "light_candle",
+          "props": [
+            "candle"
+          ],
+          "h3_mode": "fl2v",
+          "camera_zone": "wide"
+        }
+      ]
+    }
+  ],
+  "camera_language": {
+    "default": "slow dolly-in",
+    "wide": "slow push-in",
+    "reaction": "static",
+    "close": "slow push-in"
+  },
+  "packaging": {
+    "lower_third": "zaopianju_yellow",
+    "transition": "fade",
+    "bgm": "ink_ambient",
+    "subtitle_style": "variety"
+  },
+  "audio": {
+    "ambience": "candle_library_room_tone",
+    "sfx": [
+      "candle_flicker",
+      "paper_unroll",
+      "tea_cup"
+    ]
+  },
+  "h3": {
+    "workflow": "05_ref2va_4step_sla",
+    "duration": [
+      4,
+      8
+    ],
+    "fps": 25,
+    "resolution": "1280x704"
+  }
+}
