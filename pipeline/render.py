@@ -812,15 +812,24 @@ def run_render(args) -> int:
         h3_dir = Path(h3_env) if h3_env \
             else (config.REPO_ROOT / "outputs" / "h3")
 
-    # ---- 0.5) 场景合成（可选：2D 绘景 + 角色分层 + 视差）----
+    # ---- 0.4) 风格系统（contract/style_map.json：2d_anime / 3d_anime）----
+    from . import style as style_mod
+    style_name, style_dict = style_mod.resolve(
+        data.get("format_id") or episode.get("id") or "",
+        override=getattr(args, "style", None))
+    LOG.info("风格: %s（%s）", style_name, style_dict.get("label"))
+
+    # ---- 0.5) 场景合成（可选：绘景 + 角色分层 + 视差）----
     scene_info = None
+    scene_ref_clips: dict[str, Path] = {}
     if getattr(args, "scenes", False):
         from . import scenes as scenes_mod
-        prog(1.5, "场景合成（2D 绘景 + 角色分层 + 视差）")
+        prog(1.5, "场景合成（绘景 + 角色分层 + 视差）")
         scene_info = scenes_mod.compose_episode(
             data, workdir,
             template_id=getattr(args, "scene_template", None),
-            width=width, height=height, fps=fps, force=True)
+            width=width, height=height, fps=fps, force=True,
+            style_name=style_name)
         LOG.info("场景模式: template=%s plate=%s",
                  scene_info.get("template_id"), scene_info.get("plate"))
         # 场景模式下 H3 参考图使用整帧（保留 2D 绘景环境，不再裁脸部/画窗）
@@ -904,6 +913,15 @@ def run_render(args) -> int:
     use_dynamic = bool(getattr(args, "dynamic", False))
     if use_dynamic:
         from . import dynamic as dynamic_mod
+        if scene_info:
+            # 动态参考图 = 场景合成整帧（角色+绘景+灯光），保证 H3 保留场景空间
+            for shot in shots:
+                sid = _shot_id(shot)
+                p = workdir / "shots" / f"{sid}.mp4"
+                if p.is_file():
+                    scene_ref_clips[sid] = p
+        plate_stem = Path(str((scene_info or {}).get("plate") or "")).stem
+        scene_desc = style_mod.scene_description(plate_stem) if plate_stem else None
         prog(65, "生成动态镜头（H3 音驱动 / 首尾帧）")
         dynamic_results = dynamic_mod.ensure_dynamic_clips(
             data, shots, assets, workdir, width, height, fps,
@@ -911,6 +929,10 @@ def run_render(args) -> int:
             cli=getattr(args, "h3_ref_cli", None),
             fallback_static=bool(getattr(args, "dynamic_fallback_static", False)),
             progress=prog,
+            style_name=style_name,
+            template_id=data.get("format_id") or episode.get("id"),
+            ref_clips=scene_ref_clips or None,
+            scene_desc=scene_desc,
         )
         dyn_summary = dynamic_mod.dynamic_summary(dynamic_results)
         LOG.info("动态镜头: %s", dyn_summary)
@@ -1028,8 +1050,12 @@ def run_render(args) -> int:
                        "duration": transition_duration,
                        "xfade": transition_mode == "xfade",
                        "whoosh": transition_whoosh is not None},
+        "style": {"name": style_name, "label": style_dict.get("label"),
+                  "prefix": style_dict.get("prompt_prefix")},
         "scenes": ({"template": scene_info.get("template_id"),
                     "plate": scene_info.get("plate"),
+                    "plate_style": scene_info.get("plate_style"),
+                    "plate_fallback": scene_info.get("plate_fallback"),
                     "three_d": scene_info.get("three_d") or "",
                     "card_sids": len(scene_info.get("card_sids") or [])}
                    if scene_info else None),

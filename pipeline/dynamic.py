@@ -26,7 +26,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-from . import config, shot_grammar, utils
+from . import config, shot_grammar, style as style_mod, utils
 
 LOG = logging.getLogger("pipeline")
 
@@ -310,8 +310,18 @@ def ensure_dynamic_clips(episode: dict, shots: list, assets: list, workdir: Path
                          force: bool = False, cli: str | Path | None = None,
                          fallback_static: bool = False,
                          progress=None, seed: int = 42,
-                         fill_missing_static: bool = True) -> dict:
-    """为每个镜头准备动态 clip；返回 {sid: {path, mode, first_frame, last_frame, reused}}。"""
+                         fill_missing_static: bool = True,
+                         style_name: str | None = None,
+                         template_id: str | None = None,
+                         ref_clips: dict | None = None,
+                         scene_desc: str | None = None) -> dict:
+    """为每个镜头准备动态 clip；返回 {sid: {path, mode, first_frame, last_frame, reused}}。
+
+    style_name/template_id: 风格系统（3d_anime 默认）；写 H3 prompt style prefix。
+    ref_clips: 场景合成整帧（{sid: mp4}）；提供时参考图用整帧（保留玄关/家具/光线），
+    不再裁角色窗口，并把场景描述注入 prompt。
+    scene_desc: H3 prompt 里的场景英文描述。
+    """
     workdir = Path(workdir)
     tts_map = tts_map or {}
     cli_path = resolve_cli(cli)
@@ -322,20 +332,43 @@ def ensure_dynamic_clips(episode: dict, shots: list, assets: list, workdir: Path
             "也可加 --dynamic-fallback-static 先走静态回退")
 
     ep = episode.get("episode") if isinstance(episode.get("episode"), dict) else episode
+    template_id = template_id or episode.get("format_id") or ep.get("id")
+    style_name, style_dict = style_mod.resolve(template_id or "", override=style_name)
+    style_prefix = str((style_dict or {}).get("prompt_prefix") or "")
+    scene_text = scene_desc or ""
     if char_map is None:
         try:
             from . import characters
             char_map = characters.resolve_for_assets(assets)
         except Exception as exc:  # noqa: BLE001
             LOG.warning("角色映射失败（参考构图回退纯文字卡）: %s", exc)
-    # 动态参考构图不复用平台 shots（可能是旧素材/chibi 风格），按当前概念角色重新合成
-    comp_clips = _compose_static_clips(shots, assets, ep, workdir, width, height,
-                                       fps, char_map=char_map)
-    frames = _first_frames(shots, comp_clips, workdir)
-    plans = {_sid(shot): shot_grammar.plan_for_shot(shot, i)
-             for i, shot in enumerate(shots)}
-    refs, ref_strategies = _char_refs(shots, frames, workdir, width, height,
-                                      plans=plans)
+    ref_strategies: dict[str, str] = {}
+    if ref_clips:
+        # 场景模式：参考图 = 场景合成整帧（角色已在场景里），不做角色窗口裁剪
+        frames: dict[str, Path] = {}
+        frames_dir = utils.ensure_dir(workdir / "dynamic" / "frames")
+        for shot in shots:
+            sid = _sid(shot)
+            clip = Path(ref_clips.get(sid) or "")
+            if not clip.is_file():
+                continue
+            out = frames_dir / f"{sid}_scene.png"
+            if _extract_frame(clip, out):
+                frames[sid] = out
+                ref_strategies[sid] = "scene-full-frame"
+        comp_clips = {sid: Path(p) for sid, p in (ref_clips or {}).items()}
+        refs = dict(frames)
+        plans = {_sid(shot): shot_grammar.plan_for_shot(shot, i)
+                 for i, shot in enumerate(shots)}
+    else:
+        # 无场景合成时：按当前概念角色重新合成参考构图 + 角色窗口裁剪
+        comp_clips = _compose_static_clips(shots, assets, ep, workdir, width, height,
+                                           fps, char_map=char_map)
+        frames = _first_frames(shots, comp_clips, workdir)
+        plans = {_sid(shot): shot_grammar.plan_for_shot(shot, i)
+                 for i, shot in enumerate(shots)}
+        refs, ref_strategies = _char_refs(shots, frames, workdir, width, height,
+                                          plans=plans)
     prompts_dir = utils.ensure_dir(workdir / "dynamic" / "prompts")
     ids = [_sid(s) for s in shots]
     dynamic_dir = utils.ensure_dir(workdir / "dynamic")
@@ -376,7 +409,9 @@ def ensure_dynamic_clips(episode: dict, shots: list, assets: list, workdir: Path
         mode = "audio_ref" if (line and audio is not None) else "fl2v"
         plan = plans.get(sid) or shot_grammar.plan_for_shot(shot, i)
         prompt = shot_grammar.build_h3_prompt(
-            plan, mode, scene_description=os.environ.get("SCENE_DESC") or None)
+            plan, mode,
+            scene_description=scene_text or os.environ.get("SCENE_DESC") or None,
+            style_prefix=style_prefix or None)
         prompt_path = prompts_dir / f"{sid}.txt"
         utils.write_text(prompt_path, prompt + "\n")
         out = dynamic_dir / f"{sid}.mp4"
@@ -406,6 +441,8 @@ def ensure_dynamic_clips(episode: dict, shots: list, assets: list, workdir: Path
                     "hash": digest, "mode": mode, "first_frame": str(first),
                     "ref_image": str(first_ref), "last_frame": str(last),
                     "ref_strategy": ref_strategies.get(sid, "full-frame"),
+                    "style": style_name, "style_prefix": style_prefix,
+                    "scene_desc": scene_text,
                     "plan": plan, "plan_source": plan.get("source"),
                     "prompt_file": str(prompt_path),
                     "prompt": prompt,

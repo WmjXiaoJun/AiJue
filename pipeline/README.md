@@ -371,6 +371,35 @@ python -m pipeline.cli render --episode <episode.json> --workdir <dir> --out fin
 - **测试**：`python -m pytest pipeline/tests/test_scenes.py -q`（scene_map 覆盖/全身分层/景别缩放/脚底锚定/
   投影/相机运动/卡片烘焙/逐镜输出）。
 
+## 风格系统（2D / 3D 动漫，contract/style_map.json + docs/STYLE_GUIDE.md）
+
+按模板选择 2D / 3D 动漫风格，H3 成片因此有立体感（无 Blender）：
+
+- **风格映射**：`contract/style_map.json` → 模板 → `3d_anime`（默认综艺/舞台/生活类 11 个）或
+  `2d_anime`（历史/文化类 5 个）；`episode.format_id/template` 自动解析，`--style` 可临时覆盖。
+- **资产选择**（`pipeline/style.py`）：
+  - 3d_anime：场景 plate 优先 `outputs/scene_plates/{plate}_3d.png`，角色优先
+    `outputs/characters/{id}/cutout_3d/front.png`（RGBA 透明；带角点 alpha 校验，抠图不干净自动回退）；
+  - 缺失时回退 2D plate / cutout_full，并在 manifest/scene meta 记录 `plate_fallback`/`cutout_fallback`；
+  - `PIPELINE_SKIP_3D_CUTOUT=1` 可强制 2D 角色（调试/对比用）。
+- **H3 prompt 注入**：`style_map.styles[style].prompt_prefix`（3d_anime：cinematic 3D anime cel-shaded、
+  strong depth、volumetric lighting、realistic shadows、depth of field；2d_anime：hand-drawn cel-shaded）
+  + 场景英文描述（`style.scene_description`）+ ShotPlan + 口型/微动作；fl2v 同样注入。
+- **动态参考图**：场景模式下用 `--scenes` 合成整帧（3D plate + 3D cutout + 投影/视差）作为 H3 参考图，
+  保留环境/家具/光线，不再裁角色窗口。
+- **demo**：`scripts/render_style_demo.py` 生成 tonight_show 3D 版（8 个 H3 镜头 + 片头/片尾，约 32s）：
+  `outputs/h3_style_demos/tonight_show_3d.mp4` + `frames/`（逐镜抽帧/contact sheet）
+  + `compare_2d_3d.png`（history_talk 2D H3 `outputs/history_full/h3_scene_demo.mp4` 对比）+ `verify.json`。
+- **实测（tonight_show 3D H3，8 镜）**：32.2s / 1280×720 / 25fps / 805 帧 / 6.59MB / blackdetect=0；
+  `3d_anime` 风格、plate=`late_night_desk_3d.png`、cutout_3d 三角色全用（0 fallback）；
+  7 audio_ref + 1 fl2v + 2 静态卡；ASS 56 条；8/8 动态 clip 有动作；2D/3D 对比图见
+  `outputs/h3_style_demos/compare_2d_3d.png`。
+- **11 模板 3D 场景 demo（task-44）**：`scripts/render_scene_demos_3d.py` 按 style_map 给 11 个 3d_anime 模板批量出
+  30-36s 静态场景 demo（3D plate + cutout_3d + --style 3d_anime，无 H3）：`outputs/scene_demos_3d/{template}.mp4`
+  + `frames/contact_sheet.png` + `verify.json` + 总览 `overview_3d.png`；5 个 2d_anime 模板保留 `outputs/scene_demos/`。
+- **测试**：`pipeline/tests/test_style.py`（模板映射/3D 资产优先与回退/角点 alpha 校验/style prompt 注入/
+  场景 meta style 字段）；`pipeline/tests` 全绿。
+
 ## 已知限制 / 未做
 
 - **画面 = 原创角色立绘 + 程序化演播厅合成**：角色来自角色工坊 `outputs/characters/` 的

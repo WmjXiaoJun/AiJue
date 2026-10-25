@@ -196,10 +196,12 @@ def plan_for_shot(shot: dict, index: int = 0) -> dict:
 
 
 def build_h3_prompt(plan: dict, mode: str = "audio_ref",
-                    scene_description: str | None = None) -> str:
+                    scene_description: str | None = None,
+                    style_prefix: str | None = None) -> str:
     """按 5-aspect 公式拼 H3 prompt（身份锚点 + 景别/角度/高度/光线 + 运镜 + 目的）。
 
-    scene_description: 场景模式下传入场景描述，让 H3 保留 2D 绘景环境（不再默认 dark studio）。
+    scene_description: 场景模式下传入场景描述，让 H3 保留绘景环境（不再默认 dark studio）。
+    style_prefix: 风格系统前缀（3d_anime / 2d_anime），注入 H3 立体感或手绘质感要求。
     """
     plan = plan or {}
     scene = scene_description or "a dark studio"
@@ -235,12 +237,27 @@ def build_h3_prompt(plan: dict, mode: str = "audio_ref",
                   "mouth, eyes and head move subtly. No text, no watermark.")
         soundscape = ("overall_soundscape: the same spoken sentence, close-mic voice, "
                       "quiet studio room tone.")
-    return "\n\n".join([
+    style_text = str(style_prefix or "").strip()
+    if style_text:
+        low = style_text.lower()
+        if "3d" in low or "three-dimensional" in low:
+            motion += (" The character and scene are clearly three-dimensional cel-shaded "
+                       "anime: strong depth between character and background, volumetric "
+                       "lighting, realistic soft shadows, and a gently blurred background "
+                       "with depth of field; not a flat 2D drawing.")
+        elif "2d" in low:
+            motion += (" Flat 2D hand-drawn cel-shaded anime look: clean line art and "
+                       "painted background layers, consistent with the reference image.")
+    parts = []
+    if style_text:
+        parts.append(f"style: {style_text}")
+    parts += [
         SUBJECT_ANCHOR,
         f"summary: {action} Purpose: {purpose}. {motion}",
         soundscape,
         "non_diegetic_music: N/A",
-    ])
+    ]
+    return "\n\n".join(parts)
 
 
 def plan_label(plan: dict) -> str:

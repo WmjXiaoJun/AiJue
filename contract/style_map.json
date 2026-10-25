@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "styles": {
+    "3d_anime": {
+      "label": "3D 动漫（立体/电影感）",
+      "prompt_prefix": "A cinematic 3D anime cel-shaded render (three-dimensional stylized anime, like a high-end 3D animated film), with strong depth, volumetric lighting, realistic shadows, depth of field and layered foreground/background.",
+      "plate_suffix": "_3d",
+      "is_default": true
+    },
+    "2d_anime": {
+      "label": "2D 动漫（手绘/国风）",
+      "prompt_prefix": "A 2D anime cel-shaded illustration (hand-drawn anime style), clean line art, flat color layers with painted backgrounds.",
+      "plate_suffix": "",
+      "is_default": false
+    }
+  },
+  "templates": {
+    "tonight_show_5min": "3d_anime",
+    "roundtable_5min": "3d_anime",
+    "snl_sketch_5min": "3d_anime",
+    "taskmaster_5min": "3d_anime",
+    "traitors_5min": "3d_anime",
+    "shark_tank_5min": "3d_anime",
+    "masked_singer_5min": "3d_anime",
+    "hot_ones_5min": "3d_anime",
+    "qipashuo_5min": "3d_anime",
+    "standup_5min": "3d_anime",
+    "slow_life_5min": "3d_anime",
+    "history_talk_5min": "2d_anime",
+    "history_mystery_5min": "2d_anime",
+    "classics_5min": "2d_anime",
+    "national_treasure_5min": "2d_anime",
+    "mystery_5min": "2d_anime"
+  },
+  "note": "模板可按需切换风格；2D 国风/历史类保留 2D，综艺/舞台/生活类默认 3D 动漫；contract/style_map.json 可覆盖。"
+}

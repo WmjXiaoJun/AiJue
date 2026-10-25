@@ -405,3 +405,10 @@ FastAPI (8090) ── SQLite
 - 2D 合成版对比：outputs/history_full/final.mp4（286.04s/27MB，2D cutout 贴图+视差）；对比抽帧 docs/screenshots/66_compare_2d_vs_h3.png。
 - 全 H3 版观感明显更好：角色更大、场景更完整、光影/景别有电影感；字幕/名牌/BGM/转场正常。
 - 下一步：16 个模板如需全 H3 版，按模板批量跑（每模板约 30-60 分钟，取决于镜头数）。
+## 33. 3D 动漫风格系统（按模板 2D/3D，2026-10-25）
+- 用户要求：H3 成片要有立体感、真正 3D 动漫风格；保留 3D 选项、按模板定风格。
+- 资产：SDXL 生成 8 张 1280×720 3D 动漫场景 plate（roundtable_studio_3d、stage_music_3d、taskmaster_stage_3d、late_night_desk_3d、talk_show_sofa_3d、kitchen_warm_3d、debate_hall_3d、alley_night_3d，强纵深/体积光/DOF）；三角色 3D 动漫全身立绘（白底）+ 去白底 cutout_3d（透明）。
+- 风格系统：contract/style_map.json + pipeline/style.py：3d_anime 默认 11 个综艺/舞台/生活模板，2d_anime 保留 5 个历史/文化模板；H3 prompt 注入 3D 影感前缀（cinematic 3D anime cel-shaded、strong depth、volumetric lighting、realistic shadows、DOF）+ 场景描述 + ShotPlan；支持 --style 覆盖；资产缺失自动回退 2D 并记录。
+- 验证：outputs/h3_style_demos/tonight_show_3d.mp4（32.2s / 8 个 H3 镜头 7 audio_ref+1 fl2v / 0 fallback / 0 blackdetect / ASS 56 / 68 tests passed）；抽帧见 docs/screenshots/67_tonight_show_3d_h3_sheet.png，2D vs 3D 对比 docs/screenshots/68_compare_2d_vs_3d_h3.png；3D plate 总览 docs/screenshots/69_3d_scene_plates.png。
+- 11 个 3d_anime 模板的静态场景 demo 正在批量渲染 outputs/scene_demos_3d/（task-44）；5 个 2d_anime 模板保持 2D 场景。
+- 已知限制：H3 在个别特写会轻微漂移角色形象（3D cutout 参考有限），后续用更多角度/表情参考图和身份锚定 prompt 提升一致性；3D 角色立绘仍是 SDXL 生成（无 Blender）。

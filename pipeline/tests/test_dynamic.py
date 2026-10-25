@@ -138,7 +138,7 @@ def test_dynamic_ensure_fake_cli(tmp_path):
         assert meta["first_frame"] and Path(meta["first_frame"]).is_file()
         assert meta["last_frame"] and Path(meta["last_frame"]).is_file()
         assert meta.get("plan") and meta["plan"].get("size")
-        assert meta.get("prompt", "").startswith("subject_definitions:")
+        assert meta.get("prompt", "").startswith(("subject_definitions:", "style:"))
         assert meta.get("ref_strategy")
         assert Path(meta["prompt_file"]).is_file()
     # 二次调用命中缓存
