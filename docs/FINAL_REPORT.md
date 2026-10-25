@@ -418,3 +418,9 @@ FastAPI (8090) ── SQLite
 - **P1 前端已落地**（frontend-ui）：设置→AI 模型（provider/base_url/model/Key 掩码/测试连接）；编剧间→AI 生成台本（话题/模板/时长/语气→预览→采纳写入编辑器）；build 通过；截图 docs/screenshots/71-73。
 - **P2 风格资产已落地**（h3-comfy）：12 张差异化 1280×720 风格 plate（cinematic/neon/game/roundtable/theatre/warmtalk/clay/noir/vhs/ink/debateink/gold），contact_sheet_styles.png + meta_styles.json。
 - **P3 进行中**（media-render）：pipeline/style_v2 + 16 模板风格 demo 渲染中（outputs/style_demos_v2/，已完成 tonight_show/shark_tank/masked_singer 等，overview 16 张）；完成后补 verify/QC。
+## 35. 模板差异化风格 v2 完成（16/16，2026-10-25）
+- outputs/style_demos_v2/{16 templates}.mp4（31-36.6s / 1280×720 / 25fps / AAC / blackdetect 0）：12 个风格 preset 映射到 16 模板 + 模板级 palette/transition override；plate 全部命中风格资产（fallback 0）、15 种 palette 生效、包装/转场/后期差异明显；
+- 实现：pipeline/style_v2.py（profile 解析/plate 后缀/cutout/调色/包装/转场/fallback）、render --style-profile auto|preset|template、scripts/render_style_v2_demos.py；pipeline tests 73 passed；
+- 角色资产取舍：静态风格 demo 统一用「干净的 2D 动漫 cutout + 3D/2D 场景 plate」，避免 3D cutout 生成图自带飘带/道具残留；3D 角色镜头由 H3 路径（tonight_show_3d）负责，后续按模板批量出 H3 3D 版；
+- 总览：outputs/style_demos_v2/overview_16.png；明细 results.json/verify.json；
+- 每模板内容目前共用同一段样例对话（风格预览用），后续接 LLM 台本后各模板内容会不同。

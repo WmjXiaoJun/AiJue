@@ -133,7 +133,10 @@ def cutout_path(profile: dict, char_id: str,
                 chars_dir: Path | None = None) -> tuple[Path | None, str, bool]:
     """返回 (cutout, used_style, fallback)。优先 profile.character_style 指定变体。"""
     base = Path(chars_dir) if chars_dir else CHARS_DIR
+    import os
     style = str((profile or {}).get("character_style") or "cutout_2d")
+    if os.environ.get("STYLE_V2_FORCE_2D") == "1":
+        style = "cutout_2d"
     order = [style, "cutout_3d", "cutout_2d",
              "cutout/portrait.png", "2d/portrait.png", "portrait.png"]
     seen = set()

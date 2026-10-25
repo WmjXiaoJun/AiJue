@@ -421,6 +421,11 @@ python -m pipeline.cli render --episode <episode.json> --workdir <dir> --out fin
   - prompt_prefix：供 H3 动态镜头注入（本轮静态 demo 也写入 verify 供 QC）。
 - **demo**：`scripts/render_style_v2_demos.py` → `outputs/style_demos_v2/{template}.mp4`（16×30-45s）
   + `frames/contact_sheet.png` + `verify.json` + 总览 `overview_16.png`；短模板自动补 3s 空镜收束。
+- **实测（task-48，16 模板）**：16/16 demo 时长 31.0-36.6s、1280×720/25fps、blackdetect=0；
+  plate 全部命中 style_v2（`*__{preset}.png`）、0 plate fallback、0 cutout fallback；
+  差异化：cinematic(暖青)/neon(品红青)/game(糖果高饱和)/roundtable(暗琥珀青)/theatre(红金)/
+  warmtalk(暖木)/clay(粉彩大地)/noir(冷蓝黑)/vhs(暖黄)/ink(宣纸)/gold(金青绿)；hard cut/fade/dissolve；
+  `outputs/style_demos_v2/overview_16.png` 16 宫格总览、各 demo `verify.json`。
 - **测试**：`pipeline/tests/test_style_v2.py`（16 模板映射/overrides/调色唯一性/包装/转场/plate 优先级/
   cutout 优先级/scene meta profile）；pipeline/tests 全绿（73 passed）。
 
