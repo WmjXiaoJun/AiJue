@@ -118,7 +118,36 @@ def _ensure_dirs(paths: dict) -> None:
 # 并发保护：同一输出目录同时只允许一个 render_v3（GPU/ffmpeg 会互相覆盖成片）
 # ---------------------------------------------------------------------------
 LOCK_NAME = ".render_v3.lock"
-LOCK_TTL_SEC = 3 * 3600
+LOCK_TTL_SEC = 2 * 3600
+STILL_ACTIVE = 259
+
+
+def pid_alive(pid) -> bool:
+    """进程是否存活（Windows 用 OpenProcess，其他平台 kill(0)）。"""
+    try:
+        pid = int(pid)
+    except (TypeError, ValueError):
+        return False
+    if pid <= 0:
+        return False
+    try:
+        if os.name == "nt":
+            import ctypes
+            kernel32 = ctypes.windll.kernel32
+            handle = kernel32.OpenProcess(0x1000, False, pid)  # QUERY_LIMITED_INFORMATION
+            if not handle:
+                return False
+            try:
+                code = ctypes.c_ulong()
+                if not kernel32.GetExitCodeProcess(handle, ctypes.byref(code)):
+                    return False
+                return code.value == STILL_ACTIVE
+            finally:
+                kernel32.CloseHandle(handle)
+        os.kill(pid, 0)
+        return True
+    except Exception:  # noqa: BLE001
+        return False
 
 
 def lock_target(args) -> Path:
@@ -148,12 +177,16 @@ def _acquire_lock(workdir: Path, template_id: str = "") -> Path:
                 age = now - float(info.get("time") or 0)
             except (TypeError, ValueError):
                 age = LOCK_TTL_SEC + 1
-            if age <= LOCK_TTL_SEC:
+            owner_pid = info.get("pid")
+            stale = age > LOCK_TTL_SEC
+            if not stale and owner_pid is not None and not pid_alive(owner_pid):
+                LOG.warning("清理已退出进程的渲染锁（pid=%s）: %s", owner_pid, lock)
+                stale = True
+            if not stale:
                 raise RenderV3Error(
                     f"另一个 render_v3 正在渲染该输出目录（lock={lock}，"
-                    f"pid={info.get('pid')}，已 {age:.0f}s）；请等它结束，"
+                    f"pid={owner_pid}，已 {age:.0f}s）；请等它结束，"
                     f"或用 --workdir/--out 换独立目录（禁止同目录并发）")
-            LOG.warning("清理过期渲染锁（%.0fs）: %s", age, lock)
             try:
                 lock.unlink()
             except OSError:
@@ -767,12 +800,22 @@ def build_h3_meta(plan: dict, template: dict, shot_metas: dict, mode: str,
     for shot in plan.get("shots") or []:
         sid = str(shot.get("id"))
         meta = dict(shot_metas.get(sid) or {})
-        meta.setdefault("id", sid)
-        meta.setdefault("no", shot.get("no"))
-        meta.setdefault("type", shot.get("type"))
-        meta.setdefault("duration", shot.get("duration"))
-        meta["h3_mode"] = shot.get("h3_mode")
-        meta["line"] = bool(str(shot.get("line") or "").strip())
+        # 契约 §0/§4：每镜 H3 证据必须能对回计划的 shot / segment / role / action
+        meta.update({
+            "id": meta.get("id") or sid,
+            "shot_id": sid,
+            "no": meta.get("no") or shot.get("no"),
+            "type": meta.get("type") or shot.get("type"),
+            "segment_id": shot.get("segment_id"),
+            "segment_name": shot.get("segment_name"),
+            "role": shot.get("role"),
+            "speaker": shot.get("speaker"),
+            "speaker_name": shot.get("speaker_name"),
+            "h3_mode": shot.get("h3_mode"),
+            "action": meta.get("action") or shot.get("action"),
+            "duration": meta.get("duration") or shot.get("duration"),
+            "line": bool(str(shot.get("line") or "").strip()),
+        })
         shots_meta.append(meta)
     bodies = [m for m in shots_meta if not m.get("static_card") and
               not m.get("previs")]

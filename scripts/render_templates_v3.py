@@ -194,6 +194,59 @@ def entry_bad(result: dict, comfy: bool = True) -> bool:
     return False
 
 
+def entry_from_output(tid: str, out_dir: Path, mode: str = "") -> dict | None:
+    """扫描已存在产物目录 → batch 条目（用于分 chunk 批量时合并出完整 batch_report）。"""
+    final = out_dir / "final.mp4"
+    qc = _read_json(out_dir / "qc_report.json")
+    if not (final.is_file() and qc):
+        return None
+    h3_meta = _read_json(out_dir / "h3_meta.json")
+    contact = out_dir / "frames" / "contact_sheet.png"
+    stats = qc.get("stats") if isinstance(qc.get("stats"), dict) else {}
+    return {
+        "id": tid,
+        "mode": mode or ("previs" if qc.get("previs") else "comfy"),
+        "status": "skipped",
+        "note": "existing_output",
+        "ok": bool(qc.get("ok")),
+        "deliverable": bool(qc.get("deliverable")),
+        "previs": bool(qc.get("previs")),
+        "path": str(final),
+        "duration": stats.get("actual_duration"),
+        "resolution": stats.get("resolution"),
+        "shots": stats.get("shots", h3_meta.get("shots_count")),
+        "h3_shots": stats.get("h3_shots", h3_meta.get("h3_shots")),
+        "h3_generated": (h3_meta.get("stats") or {}).get("h3"),
+        "fallbacks": stats.get("fallbacks", 0),
+        "qc_ok": bool(qc.get("ok")),
+        "qc_failed_checks": [k for k, v in (qc.get("checks") or {}).items()
+                             if not v.get("ok")],
+        "subtitle_coverage": stats.get("subtitle_coverage"),
+        "black_segments": stats.get("black_segments"),
+        "contact_sheet": str(contact) if contact.is_file() else "",
+        "qc_report": str(out_dir / "qc_report.json"),
+        "h3_meta": str(out_dir / "h3_meta.json")
+        if (out_dir / "h3_meta.json").is_file() else "",
+        "elapsed_sec": 0.0,
+        "error": "",
+    }
+
+
+def merge_entries(out_root: Path, template_ids: list[str], mode: str,
+                  current: list[dict]) -> list[dict]:
+    """合并：本次批量结果优先，其余模板读已落盘产物（支持分 chunk 跑仍产出完整报告）。"""
+    merged = list(current)
+    have = {str(r.get("id")) for r in merged}
+    for tid in template_ids:
+        if tid in have:
+            continue
+        entry = entry_from_output(tid, out_root / tid, mode)
+        if entry is not None:
+            merged.append(entry)
+    merged.sort(key=lambda r: str(r.get("id")))
+    return merged
+
+
 def load_template_order(template_dir: Path, only: list[str] | None) -> list[dict]:
     templates = template_v3.load_all(template_dir)
     items = []
@@ -272,10 +325,29 @@ def run_batch(args) -> int:
     skipped = [r for r in results if r.get("status") == "skipped"]
     comfy = args.h3 == "comfy"
     failed = [r for r in results if entry_bad(r, comfy)]
+
+    # 合并已落盘产物：支持 Lead 分 chunk 跑（--only）时最终 batch_report 仍覆盖全部模板
+    all_template_ids = [item["id"] for item in load_template_order(template_dir, None)]
+    merged = merge_entries(out_root, all_template_ids, args.h3, results)
+    old_report = _read_json(out_root / "batch_report.json")
+    runs = list(old_report.get("runs") or []) if isinstance(old_report, dict) else []
+    runs.append({
+        "started_at": datetime.now().isoformat(timespec="seconds"),
+        "only": only or [],
+        "total": len(items),
+        "rendered": len(rendered),
+        "skipped": len(skipped),
+        "failed": len(failed),
+        "elapsed_sec": elapsed,
+    })
+    runs = runs[-20:]
+    deliverable_count = sum(1 for r in merged if r.get("deliverable") is True)
+    covered = [r for r in merged if r.get("id") in set(all_template_ids)]
+    coverage_ok = (len(covered) == len(all_template_ids)
+                   and not [r for r in covered if entry_bad(r, comfy)])
     master = ""
     if not args.no_master_sheet:
-        master = build_master_sheet(out_root, results)
-    deliverable_count = sum(1 for r in results if r.get("deliverable") is True)
+        master = build_master_sheet(out_root, merged)
     report = {
         "ok": not failed and len(results) == len(items),
         "h3": args.h3,
@@ -290,11 +362,17 @@ def run_batch(args) -> int:
         "skipped": len(skipped),
         "failed": len(failed),
         "deliverable": deliverable_count,
-        "deliverable_ids": [r.get("id") for r in results
+        "deliverable_ids": [r.get("id") for r in merged
                             if r.get("deliverable") is True],
-        "failed_ids": [r.get("id") for r in failed],
+        "failed_ids": [r.get("id") for r in merged if entry_bad(r, comfy)],
         "contact_sheet": master,
-        "templates": results,
+        "expected_total": len(all_template_ids),
+        "covered_total": len(covered),
+        "coverage_ok": coverage_ok,
+        "missing_ids": [tid for tid in all_template_ids
+                        if tid not in {r.get("id") for r in covered}],
+        "runs": runs,
+        "templates": merged,
     }
     utils.write_json(out_root / "batch_report.json", report)
     summary = {k: v for k, v in report.items() if k != "templates"}
@@ -302,7 +380,7 @@ def run_batch(args) -> int:
                              ("id", "mode", "status", "ok", "deliverable",
                               "duration", "fallbacks", "black_segments",
                               "qc_failed_checks", "contact_sheet")}
-                            for r in results]
+                            for r in merged]
     print(json.dumps(summary, ensure_ascii=False))
     return 0 if report["ok"] else 1
 

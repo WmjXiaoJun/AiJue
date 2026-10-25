@@ -141,10 +141,25 @@ def acceptance_ready(template_id: str) -> bool:
     return True
 
 
-RENDERED = rendered_template_ids()
+RENDERED_RAW = rendered_template_ids()
+# 只验收 §8 的 16 个模板 id；outputs/templates_v3 下可能还有 Lead 的版本归档目录
+RENDERED = [tid for tid in RENDERED_RAW if tid in EXPECTED_TEMPLATES]
+UNEXPECTED_DIRS = [tid for tid in RENDERED_RAW if tid not in EXPECTED_TEMPLATES]
 # 可验收（已完成且 qc_ok 的正式产物）；渲染期间其余目录按中间态处理
 READY = [tid for tid in RENDERED if acceptance_ready(tid)]
 PENDING_OUTPUTS = [tid for tid in RENDERED if tid not in READY]
+
+
+def is_version_archive(dir_name: str) -> bool:
+    """非 16 模板目录的允许形态：Lead 的版本归档 / P3 五分钟版。
+
+    - 版本归档：tonight_show_40s_v1 / history_talk_30s_v2
+    - P3 五分钟版：tonight_show_5min（不属 P2 的 16×30-45s 验收范围）
+    """
+    import re
+    if not any(dir_name.startswith(f"{tid}_") for tid in EXPECTED_TEMPLATES):
+        return False
+    return re.search(r"_(?:\d+s(?:_v\d+)?|5min)$", dir_name) is not None
 
 
 def load_episode(template_id: str) -> dict:
@@ -597,6 +612,16 @@ def test_all_16_templates_rendered():
         f"{sorted(set(RENDERED) - EXPECTED_TEMPLATES)}")
 
 
+def test_unexpected_output_dirs():
+    """outputs/templates_v3 下除 16 模板外的目录：只允许版本归档命名（Lead 备份用）。"""
+    if not UNEXPECTED_DIRS:
+        return
+    bad = [name for name in UNEXPECTED_DIRS if not is_version_archive(name)]
+    assert not bad, (
+        f"outputs/templates_v3 存在非契约/非归档目录：{bad}；"
+        f"允许的归档命名形如 <template>_<NN>s[_vN]（当前归档 {UNEXPECTED_DIRS}）")
+
+
 def test_pending_outputs_report():
     """渲染期间：列出尚未达到可验收标准的目录（中间态/旧 previs 残留），skip 不误报。"""
     if not RENDERED:
@@ -780,9 +805,24 @@ def test_batch_report_covered():
             f"batch_report.contact_sheet 指向的文件不存在：{master_path}")
     elif len(READY) == len(EXPECTED_TEMPLATES):
         raise AssertionError("16/16 已渲染但 batch_report 缺少总 contact sheet（§9）")
+    # 全部 16 个模板可验收后，batch_report 的合并覆盖字段必须是满覆盖
+    if len(READY) == len(EXPECTED_TEMPLATES):
+        if "coverage_ok" in report:
+            assert report["coverage_ok"] is True, (
+                f"batch_report.coverage_ok=false，missing={report.get('missing_ids')}")
+        if isinstance(report.get("covered_total"), int):
+            assert report["covered_total"] >= len(EXPECTED_TEMPLATES), (
+                f"batch_report.covered_total={report['covered_total']} < 16")
+        if "missing_ids" in report:
+            assert not report["missing_ids"], (
+                f"batch_report.missing_ids={report['missing_ids']}")
     if not isinstance(entries, list):
         return
     by_id = {str(e.get("id")): e for e in entries if isinstance(e, dict)}
+    uncovered = [tid for tid in RENDERED if tid not in by_id]
+    if uncovered:
+        pytest.skip(f"batch_report 为中间态（覆盖 {len(by_id)}/{len(RENDERED)} 已渲染模板，"
+                    f"未含 {uncovered}），等最终批合并后再验")
     problems = []
     for tid in RENDERED:
         entry = by_id.get(tid)

@@ -84,7 +84,7 @@
     },
     "history_ink_2d": {
       "label": "水墨历史 2D",
-      "prompt_prefix": "Chinese ink-wash 2D anime illustration, paper texture, brush strokes, candlelight",
+      "prompt_prefix": "traditional Chinese ink-wash painting (shuimo), visible dry-brush strokes and ink bleed, mostly monochrome ink with restrained pale color, rice-paper texture, flat 2D illustration, no 3D shading, no glossy highlights, not modern anime rendering",
       "palette": "ink_amber",
       "plate_suffix": "__ink",
       "character_style": "cutout_2d",
@@ -93,7 +93,7 @@
     },
     "debate_ink_2d": {
       "label": "国风辩论 2D",
-      "prompt_prefix": "Chinese ink-wash 2D debate hall, red lacquer and gold accents, dramatic brush shadows",
+      "prompt_prefix": "traditional Chinese ink-wash painting (shuimo), visible dry-brush strokes and ink bleed, mostly monochrome ink with restrained pale color, rice-paper texture, flat 2D illustration, no 3D shading, no glossy highlights, not modern anime rendering",
       "palette": "ink_red_gold",
       "plate_suffix": "__debateink",
       "character_style": "cutout_2d",
@@ -102,7 +102,7 @@
     },
     "museum_gold_2d": {
       "label": "国宝金彩 2D",
-      "prompt_prefix": "rich 2D anime museum illustration, gold and jade palette, ornate details, dramatic spotlights",
+      "prompt_prefix": "rich traditional Chinese gongbi 2D illustration, fine brush line work, gold-and-jade palette, ornate details, flat 2D painting on silk, no 3D shading, not modern anime rendering",
       "palette": "gold_jade",
       "plate_suffix": "__gold",
       "character_style": "cutout_2d",
@@ -143,5 +143,6 @@
       "motion": "static"
     }
   },
-  "note": "12 基础 preset + 16 模板映射 + 模板级覆盖；资产缺失回退 2D。风格升级按 docs/PLAN_V2_STYLE_LLM.md 执行。"
+  "note": "12 基础 preset + 16 模板映射 + 模板级覆盖；资产缺失回退 2D。风格升级按 docs/PLAN_V2_STYLE_LLM.md 执行。",
+  "note_v3_ink": "2026-10-26: 强化 ink/gongbi style_prefix（H3 ref2va 重绘易丢水墨感）"
 }

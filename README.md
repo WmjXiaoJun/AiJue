@@ -114,3 +114,14 @@ FastAPI · SQLAlchemy · SQLite · Vite · React · TypeScript · FFmpeg 6.1 · 
 - 流水线 CLI：[contract/PIPELINE_CLI.md](contract/PIPELINE_CLI.md)
 - 明早验收指南：[docs/DEMO_GUIDE.md](docs/DEMO_GUIDE.md)
 - 最终报告：[docs/FINAL_REPORT.md](docs/FINAL_REPORT.md)
+
+## Template v3（模板即节目形态，2026-10-26）
+
+> 规划：`docs/PLAN_V3_TEMPLATE_REFACTOR.md`；交付报告：`docs/V3_REPORT.md`；独立验收：`docs/V3_ACCEPTANCE.md`。
+
+- **16 个模板 v3**（`contract/templates_v3/*.json`）：舞台/角色站位/道具/动作库/镜头语言/H3 配置齐全，校验器 `pipeline/template_v3.py` 强制 16/16 通过。
+- **每镜走 ComfyUI H3**：`pipeline/stage.py` 合成舞台首帧 → `pipeline/h3_comfy.py`（05_ref2va 音驱动口型，有台词 TTS / 无台词静音参考）→ `pipeline/render_v3.py` 剪辑/字幕/包装/混音 → `pipeline/qc_v3.py` QC 硬门。
+- **证据链**：每镜 meta 含 `workflow / prompt_id / seed / ref_image / action`；`scripts/verify_h3_evidence.py` 可反查 ComfyUI `/history` 验证 prompt_id 真实存在。
+- **成片**：16 模板各 30-45s 全 H3 demo（累计 84 个 H3 镜头、84 个全局唯一 prompt_id、blackdetect=0）→ `outputs/templates_v3/`；重点模板 5 分钟版 → `outputs/templates_v3/tonight_show_5min/final.mp4`。
+- **复现**：`python -m pipeline.template_v3 --validate contract/templates_v3 --expect 16`；`python scripts/render_templates_v3.py --h3 comfy --duration 30`；`python -m pytest tests/test_v3_acceptance.py -q`。
+- 说明：预演用 `--h3 previs`（静态首帧，QC 标 previs 不交付）；静态只允许片头/片尾卡片。本链路不使用 Blender。

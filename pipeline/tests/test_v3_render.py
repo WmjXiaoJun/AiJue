@@ -14,6 +14,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+import time
 import types
 from pathlib import Path
 
@@ -282,6 +283,23 @@ def test_render_lock_prevents_concurrent(tmp_path):
     render_v3._release_lock(lock2)
 
 
+def test_render_lock_reclaims_dead_pid(tmp_path):
+    """崩溃残留的锁（pid 已退出）应被自动接管，不能卡住今晚批量续跑。"""
+    import subprocess
+    child = subprocess.Popen([sys.executable, "-c", "import sys; sys.exit(0)"],
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    child.wait()
+    dead_pid = child.pid
+    assert not render_v3.pid_alive(dead_pid), "测试进程 pid 不应还存活"
+    workdir = tmp_path / "work"
+    utils.ensure_dir(workdir)
+    utils.write_json(workdir / render_v3.LOCK_NAME,
+                     {"pid": dead_pid, "time": time.time(), "template": "x"})
+    lock = render_v3._acquire_lock(workdir, "tonight_show")
+    assert lock.is_file()
+    render_v3._release_lock(lock)
+
+
 def _load_batch_module():
     import importlib.util
     path = REPO / "scripts" / "render_templates_v3.py"
@@ -324,6 +342,43 @@ def test_batch_resume_requires_delivery(tmp_path):
     utils.write_json(report, {"ok": False, "previs": False,
                               "deliverable": False, "fallbacks": []})
     assert mod.completed(out, require_delivery=True) is False
+
+
+def test_batch_report_merges_existing_outputs(tmp_path):
+    """分 chunk 跑（--only）时 batch_report 要合并已落盘产物，最终覆盖全部模板。"""
+    mod = _load_batch_module()
+    root = tmp_path / "out"
+
+    def fake_output(tid: str, *, previs: bool = False):
+        d = root / tid
+        utils.ensure_dir(d / "frames")
+        (d / "final.mp4").write_bytes(b"0" * 20000)
+        (d / "frames" / "contact_sheet.png").write_bytes(b"png")
+        utils.write_json(d / "qc_report.json", {
+            "ok": True, "previs": previs, "deliverable": not previs,
+            "fallbacks": [], "stats": {"actual_duration": 30.35, "shots": 7,
+                                       "h3_shots": 5, "black_segments": 0,
+                                       "subtitle_coverage": 1.0},
+        })
+        utils.write_json(d / "h3_meta.json", {"shots_count": 7, "h3_shots": 5})
+
+    fake_output("classics")
+    fake_output("history_talk")
+    fake_output("tonight_show_5min")  # 非模板目录，必须忽略
+    current = [{"id": "mystery", "status": "rendered", "ok": True,
+                "deliverable": True, "fallbacks": 0, "mode": "comfy"}]
+    ids = ["classics", "history_talk", "mystery", "tonight_show"]
+    merged = mod.merge_entries(root, ids, "comfy", current)
+    assert [r["id"] for r in merged] == ["classics", "history_talk", "mystery"]
+    by_id = {r["id"]: r for r in merged}
+    # 已落盘产物补出条目（含 qc_ok/contact_sheet/deliverable）
+    assert by_id["classics"]["qc_ok"] is True
+    assert by_id["classics"]["deliverable"] is True
+    assert by_id["classics"]["contact_sheet"].endswith("contact_sheet.png")
+    # 当前跑的结果原样优先，不被覆盖
+    assert by_id["mystery"]["status"] == "rendered"
+    assert len([r for r in mod.merge_entries(root, ids, "comfy", merged)
+                if r["id"] == "mystery"]) == 1
 
 
 def test_storyboard_h3_mode_normalization():
