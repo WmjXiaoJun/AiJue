@@ -102,3 +102,4 @@ python scripts/verify_h3_evidence.py --root outputs/templates_v3
 3. **5 分钟版镜头语义重复**：模板 shots 作为 “镜头意图库” 循环复用，300s 会重复 9 组意图 6 轮；后续需 storyboard_v3 按 beats 展开更多变体 + LLM 台本按模板 beats 生成（当前台本为通用三人聊天体，3 个模板内容偏弱：snl_sketch/hot_ones/slow_life）。
 4. 台本裁切：旧 storyboard 下超长句会被 atempo 上限截断（tonight_show 首版 s001），新 storyboard 已按标点跨镜切分修复。
 5. 性能：GPU 串行 ~10 分钟/30s 模板、~2 小时/5 分钟版；批量 16 模板约 2.5 小时（本夜实测）。
+6. **5 分钟版 meta 的 `audio_silent` 标记（已知小瑕疵，不影响验收）**：本夜 5min 渲染时 render_v3 给无台词镜传的是 5.17s 静音 wav，h3_comfy 将其视为“有音频输入”，故 57 个 meta 中 35 个无台词镜 `audio_silent=false`（音频实际为静音，行为等价）。render_v3 已改为传 `audio_wav=None`（后续重跑 meta 会正确标 `audio_silent=true`）；验收硬门只要求 workflow/prompt_id/seed，本夜 5min 成片 QC 全绿，无需重跑。

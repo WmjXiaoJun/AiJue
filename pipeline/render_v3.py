@@ -609,7 +609,10 @@ def render_shot_clips(plan: dict, template: dict, paths: dict, *, mode: str,
             LOG.warning("%s H3 prompt 构建失败: %s", sid, exc)
             prompt = ""
         raw_out = paths["h3_dir"] / f"{sid}.mp4"
-        audio_wav = tts_map.get(sid) if shot_mode == "audio_ref" else None
+        has_line = bool(str(shot.get("line") or "").strip())
+        # 只有真正有台词的镜才传 TTS wav；无台词镜传 None → h3_comfy 用静音参考
+        # 并标 audio_silent（export_shot_tts_audio 会给所有镜导出静音 wav，不能直接全用）
+        audio_wav = tts_map.get(sid) if (shot_mode == "audio_ref" and has_line) else None
         # Lead 实测决策：无台词镜也走 audio_ref（静音参考 audio_wav=None），不再降 fl2v
         audio_silent = shot_mode == "audio_ref" and not audio_wav
         if audio_silent:
