@@ -260,29 +260,25 @@
       ]
     },
     "brick_wall": {
-      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, brick wall of a comedy club, neon signs, VHS glow, worn stage floor, single spotlight, night atmosphere",
-      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "prompt": "masterpiece, best quality, anime style background, detailed background, scenery, no humans, background plate, cinematic 16:9 widescreen, 1980s late-night comedy club set, low-saturation tungsten light, warm amber and dark wood, VHS-era color grading, subtle magenta and cyan rim light only, video grain, 16:9, brick wall backdrop, warm tungsten light from the left, small dim pink and cyan neon signs, worn stage floor, 80s club atmosphere, warm browns, low saturation neon, no text",
+      "negative": "lowres, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, detailed faces, people, person, foreground character, portrait, close-up, fluorescent green, neon green, hot pink, saturated flat colors, oversaturated, flat vector illustration, poster, giant neon blocks, modern clean, cel shading",
       "tags": [
         "modern",
         "vhs",
-        "brick",
-        "neon",
-        "monologue",
-        "environment",
+        "brick_wall",
+        "low_saturation",
         "no_humans",
         "anime_environment"
       ]
     },
     "cafe_window": {
-      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, cozy cafe by a large window, warm afternoon sunlight, bokeh, wooden shelves, coffee cups on a desk, plants, soft film look",
-      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "prompt": "masterpiece, best quality, anime style background, detailed background, scenery, no humans, background plate, cinematic 16mm film still, warm cream and amber palette, muted warm colors, soft natural light, shallow depth of field, film grain, 16:9 widescreen, cozy cafe interior, big window with warm street bokeh, wooden table by the window, coffee cup, cream and amber tones, morning light, soft film grain, shallow depth of field, no text",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, people, person, foreground character, neon, teal, magenta, vivid green, saturated colors, oversaturated, flat vector illustration, poster, giant color blocks, cel shading",
       "tags": [
         "modern",
         "film",
         "cafe",
-        "window",
-        "cozy",
-        "environment",
+        "warm_palette",
         "no_humans",
         "anime_environment"
       ]
@@ -342,15 +338,13 @@
       ]
     },
     "city_vhs": {
-      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide establishing shot, panoramic, 1980s city street at night, neon signs, skyline, street lamps, wet asphalt reflections, VHS aesthetic, retro",
-      "negative": "lowres, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, detailed faces, foreground people, portrait, close-up",
+      "prompt": "masterpiece, best quality, anime style background, detailed background, scenery, no humans, background plate, cinematic 16:9 widescreen, 1980s late-night comedy club set, low-saturation tungsten light, warm amber and dark wood, VHS-era color grading, subtle magenta and cyan rim light only, video grain, 16:9, 1980s night city street, neon storefronts, wet asphalt reflections, warm street lamps with pink and cyan accents, dark purple sky, distant skyline, low saturation, no text",
+      "negative": "lowres, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, detailed faces, people, person, foreground character, portrait, close-up, fluorescent green, neon green, hot pink, saturated flat colors, oversaturated, flat vector illustration, poster, giant neon blocks, modern clean, cel shading",
       "tags": [
         "modern",
         "vhs",
-        "city",
-        "street",
-        "establishing",
-        "environment",
+        "city_street",
+        "low_saturation",
         "no_humans",
         "anime_environment"
       ]
@@ -409,15 +403,13 @@
       ]
     },
     "comedy_club_vhs": {
-      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, 1980s comedy club stage, brick back wall, neon sign, single microphone stand, wooden stool, warm spotlight, VHS look",
-      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "prompt": "masterpiece, best quality, anime style background, detailed background, scenery, no humans, background plate, cinematic 16:9 widescreen, 1980s late-night comedy club set, low-saturation tungsten light, warm amber and dark wood, VHS-era color grading, subtle magenta and cyan rim light only, video grain, 16:9, brick back wall, small stage, vintage microphone stand, warm tungsten spotlight, dark wood front edge, faded posters, dim magenta and cyan neon rim light, no text",
+      "negative": "lowres, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, detailed faces, people, person, foreground character, portrait, close-up, fluorescent green, neon green, hot pink, saturated flat colors, oversaturated, flat vector illustration, poster, giant neon blocks, modern clean, cel shading",
       "tags": [
         "modern",
         "vhs",
-        "comedy",
-        "club",
-        "stage",
-        "environment",
+        "comedy_club",
+        "low_saturation",
         "no_humans",
         "anime_environment"
       ]
@@ -489,15 +481,13 @@
       ]
     },
     "dressing_room_vhs": {
-      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, 1980s dressing room, vanity mirror with warm bulbs, costume racks, shelves, warm lamp light, VHS look",
-      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "prompt": "masterpiece, best quality, anime style background, detailed background, scenery, no humans, background plate, cinematic 16:9 widescreen, 1980s late-night comedy club set, low-saturation tungsten light, warm amber and dark wood, VHS-era color grading, subtle magenta and cyan rim light only, video grain, 16:9, 1980s dressing room, vanity table with round bulb mirror, warm tungsten light, dark purple and maroon walls, clothes rack, cassette tapes, subtle magenta and cyan rim light, no text",
+      "negative": "lowres, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, detailed faces, people, person, foreground character, portrait, close-up, fluorescent green, neon green, hot pink, saturated flat colors, oversaturated, flat vector illustration, poster, giant neon blocks, modern clean, cel shading",
       "tags": [
         "modern",
         "vhs",
-        "backstage",
-        "dressing",
-        "cozy",
-        "environment",
+        "dressing_room",
+        "low_saturation",
         "no_humans",
         "anime_environment"
       ]
@@ -515,15 +505,13 @@
       ]
     },
     "film_strip": {
-      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, abstract background, no characters, film strip and dust on a warm light background, analog film texture, grain, vignette, transition plate",
-      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "prompt": "masterpiece, best quality, anime style background, detailed background, scenery, no humans, background plate, cinematic 16mm film still, warm cream and amber palette, muted warm colors, soft natural light, shallow depth of field, film grain, 16:9 widescreen, 35mm film strip on cream paper background, sprocket holes, dust and scratches, warm amber gradient, minimal, analog film texture, transition background, no text",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, people, person, foreground character, neon, teal, magenta, vivid green, saturated colors, oversaturated, flat vector illustration, poster, giant color blocks, cel shading",
       "tags": [
         "modern",
         "film",
-        "transition",
-        "title",
         "texture",
-        "environment",
+        "warm_palette",
         "no_humans",
         "anime_environment"
       ]
@@ -595,29 +583,25 @@
       ]
     },
     "interview_sofa": {
-      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, warm interview set, cozy sofa, curtains, bookshelf, soft window light, film look, intimate atmosphere",
-      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "prompt": "masterpiece, best quality, anime style background, detailed background, scenery, no humans, background plate, cinematic 16mm film still, warm cream and amber palette, muted warm colors, soft natural light, shallow depth of field, film grain, 16:9 widescreen, warm interview set, cream wall, two-seat warm brown fabric sofa, large soft window light with sheer curtains, wooden bookshelf on the right, low coffee table in the foreground, amber practical lamp, soft bokeh, cozy interior, no text",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, people, person, foreground character, neon, teal, magenta, vivid green, saturated colors, oversaturated, flat vector illustration, poster, giant color blocks, cel shading",
       "tags": [
         "modern",
         "film",
         "interview",
-        "sofa",
-        "warm",
-        "environment",
+        "warm_palette",
         "no_humans",
         "anime_environment"
       ]
     },
     "kitchen_film": {
-      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, warm film-style kitchen, wooden counter, shelves with jars, steam rising from a pot, window light, cozy homey",
-      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "prompt": "masterpiece, best quality, anime style background, detailed background, scenery, no humans, background plate, cinematic 16mm film still, warm cream and amber palette, muted warm colors, soft natural light, shallow depth of field, film grain, 16:9 widescreen, warm home kitchen, wooden counter, window light from the right, hanging utensils, subtle steam rising, cream amber brown palette, soft practical light, film still, no text",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, people, person, foreground character, neon, teal, magenta, vivid green, saturated colors, oversaturated, flat vector illustration, poster, giant color blocks, cel shading",
       "tags": [
         "modern",
         "film",
         "kitchen",
-        "warm",
-        "life",
-        "environment",
+        "warm_palette",
         "no_humans",
         "anime_environment"
       ]

@@ -3,10 +3,10 @@
   "label": "胶片条",
   "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\scenes\\film_strip.png",
   "png": "film_strip.png",
-  "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, abstract background, no characters, film strip and dust on a warm light background, analog film texture, grain, vignette, transition plate",
-  "raw_prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, abstract background, no characters, film strip and dust on a warm light background, analog film texture, grain, vignette, transition plate",
+  "prompt": "masterpiece, best quality, anime style background, detailed background, scenery, no humans, background plate, cinematic 16mm film still, warm cream and amber palette, muted warm colors, soft natural light, shallow depth of field, film grain, 16:9 widescreen, 35mm film strip on cream paper background, sprocket holes, dust and scratches, warm amber gradient, minimal, analog film texture, transition background, no text",
+  "raw_prompt": "masterpiece, best quality, anime style background, detailed background, scenery, no humans, background plate, cinematic 16mm film still, warm cream and amber palette, muted warm colors, soft natural light, shallow depth of field, film grain, 16:9 widescreen, 35mm film strip on cream paper background, sprocket holes, dust and scratches, warm amber gradient, minimal, analog film texture, transition background, no text",
   "prompt_source": "prompts.json",
-  "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+  "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, people, person, foreground character, neon, teal, magenta, vivid green, saturated colors, oversaturated, flat vector illustration, poster, giant color blocks, cel shading",
   "seed": 20261101,
   "size": [
     1280,
@@ -21,7 +21,7 @@
   "cfg": 5.5,
   "sampler": "euler_ancestral",
   "scheduler": "normal",
-  "prompt_id": "d19bb50b-cb0b-45a7-8a4f-6f622333a07f",
-  "gen_sec": 8.6,
-  "created_at": "2026-10-26 18:29:36"
+  "prompt_id": "f8a3e174-d4d1-4ef6-8aca-e019b9a997bf",
+  "gen_sec": 8.2,
+  "created_at": "2026-10-26 19:51:37"
 }

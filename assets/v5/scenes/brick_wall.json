@@ -3,10 +3,10 @@
   "label": "砖墙霓虹",
   "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\scenes\\brick_wall.png",
   "png": "brick_wall.png",
-  "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, brick wall of a comedy club, neon signs, VHS glow, worn stage floor, single spotlight, night atmosphere",
-  "raw_prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, brick wall of a comedy club, neon signs, VHS glow, worn stage floor, single spotlight, night atmosphere",
+  "prompt": "masterpiece, best quality, anime style background, detailed background, scenery, no humans, background plate, cinematic 16:9 widescreen, 1980s late-night comedy club set, low-saturation tungsten light, warm amber and dark wood, VHS-era color grading, subtle magenta and cyan rim light only, video grain, 16:9, brick wall backdrop, warm tungsten light from the left, small dim pink and cyan neon signs, worn stage floor, 80s club atmosphere, warm browns, low saturation neon, no text",
+  "raw_prompt": "masterpiece, best quality, anime style background, detailed background, scenery, no humans, background plate, cinematic 16:9 widescreen, 1980s late-night comedy club set, low-saturation tungsten light, warm amber and dark wood, VHS-era color grading, subtle magenta and cyan rim light only, video grain, 16:9, brick wall backdrop, warm tungsten light from the left, small dim pink and cyan neon signs, worn stage floor, 80s club atmosphere, warm browns, low saturation neon, no text",
   "prompt_source": "prompts.json",
-  "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+  "negative": "lowres, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, detailed faces, people, person, foreground character, portrait, close-up, fluorescent green, neon green, hot pink, saturated flat colors, oversaturated, flat vector illustration, poster, giant neon blocks, modern clean, cel shading",
   "seed": 20261101,
   "size": [
     1280,
@@ -21,7 +21,7 @@
   "cfg": 5.5,
   "sampler": "euler_ancestral",
   "scheduler": "normal",
-  "prompt_id": "f2d7f629-5e56-4f35-b5dd-c4aef49e9616",
+  "prompt_id": "c5054326-bcb0-49db-9ae5-33ea0affb53a",
   "gen_sec": 8.0,
-  "created_at": "2026-10-26 18:26:44"
+  "created_at": "2026-10-26 19:51:54"
 }

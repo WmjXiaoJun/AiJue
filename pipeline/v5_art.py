@@ -1281,6 +1281,7 @@ def _make_white_reference(portrait: str | Path, dest: str | Path) -> Path | None
 def generate_character_front(character_id: str, outdir: str | Path | None = None,
                              *, ref: str | Path | None = None, seed: int = 43,
                              force: bool = True, prompt_extra: str | None = None,
+                             negative_extra: str | None = None,
                              style: str = "anime", front_retries: int = 3,
                              write_meta: bool = True, log=print) -> dict:
     """用 portrait 作 IP-Adapter 参考，重生成 front（白底全身）→ cutout + meta。
@@ -1312,8 +1313,12 @@ def generate_character_front(character_id: str, outdir: str | Path | None = None
         f"{spec_extra}, full body, front view, standing, arms at sides, "
         f"simple background, white background, plain background")
     front_tags = f"{_front_prompt(raw_front)}, {FRONT_REF_PROMPT}"
+    if prompt_extra:
+        front_tags = f"{front_tags}, {prompt_extra}"
     negative = profile.get("negative") or ""
     front_negative = ", ".join(t for t in (negative, FRONT_NEG_EXTRA, FRONT_REF_NEGATIVE) if t)
+    if negative_extra:
+        front_negative = f"{front_negative}, {negative_extra}"
     base.mkdir(parents=True, exist_ok=True)
     t0 = time.time()
     front = base / "front.png"

@@ -3,10 +3,10 @@
   "label": "VHS 城市街景",
   "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\scenes\\city_vhs.png",
   "png": "city_vhs.png",
-  "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide establishing shot, panoramic, 1980s city street at night, neon signs, skyline, street lamps, wet asphalt reflections, VHS aesthetic, retro",
-  "raw_prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide establishing shot, panoramic, 1980s city street at night, neon signs, skyline, street lamps, wet asphalt reflections, VHS aesthetic, retro",
+  "prompt": "masterpiece, best quality, anime style background, detailed background, scenery, no humans, background plate, cinematic 16:9 widescreen, 1980s late-night comedy club set, low-saturation tungsten light, warm amber and dark wood, VHS-era color grading, subtle magenta and cyan rim light only, video grain, 16:9, 1980s night city street, neon storefronts, wet asphalt reflections, warm street lamps with pink and cyan accents, dark purple sky, distant skyline, low saturation, no text",
+  "raw_prompt": "masterpiece, best quality, anime style background, detailed background, scenery, no humans, background plate, cinematic 16:9 widescreen, 1980s late-night comedy club set, low-saturation tungsten light, warm amber and dark wood, VHS-era color grading, subtle magenta and cyan rim light only, video grain, 16:9, 1980s night city street, neon storefronts, wet asphalt reflections, warm street lamps with pink and cyan accents, dark purple sky, distant skyline, low saturation, no text",
   "prompt_source": "prompts.json",
-  "negative": "lowres, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, detailed faces, foreground people, portrait, close-up",
+  "negative": "lowres, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, detailed faces, people, person, foreground character, portrait, close-up, fluorescent green, neon green, hot pink, saturated flat colors, oversaturated, flat vector illustration, poster, giant neon blocks, modern clean, cel shading",
   "seed": 20261101,
   "size": [
     1280,
@@ -21,7 +21,7 @@
   "cfg": 5.5,
   "sampler": "euler_ancestral",
   "scheduler": "normal",
-  "prompt_id": "c2f16b5e-3d7e-47bd-8856-5be5996b55ed",
-  "gen_sec": 8.2,
-  "created_at": "2026-10-26 18:27:43"
+  "prompt_id": "54260eef-0854-4a78-8888-df63fb2cc073",
+  "gen_sec": 8.0,
+  "created_at": "2026-10-26 19:52:11"
 }

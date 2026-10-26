@@ -117,6 +117,43 @@ Lead 已在 `pipeline/scene_render.py` 接入 plate 模式（`SCENE_ART_DIR`，�
 - prompt 组装：prompts.json 的 prompt 视为完整成品（不再二次加前缀/后缀）；fallback/自动拼才包
   `PROMPT_PREFIX/PROMPT_SUFFIX`。negative 同理优先用 prompts.json 的 negative。
 
+## 5.3 film_interview / vhs_late_show 8 张 plate 配色修正（V5.2 最后一批）
+
+背景：首版 61 张里 `film_interview`（16mm 暖光访谈）与 `vhs_late_show`（80s VHS 深夜秀）两组共 8 张
+场景 plate 为"荧光绿/粉/蓝紫高饱和平涂插画"，与两种风格不 match（render-dev 反例：
+`tmp/v52_art/plate_interview_sofa_raw.png`）。按 Lead 方案 a 重生成 plate（不回退程序化）。
+
+- 更新 `contract/v5/art/prompts.json` 的 8 条 scenes（只动这 8 条，characters 段与其余 53 场景未动）：
+  - film：`warm 16mm film still / cream-amber / soft window light / shallow DOF / muted warm palette / film grain`，
+    negative 压 `neon/teal/magenta/vivid green/saturated/flat vector/poster/cel shading`；
+  - VHS：`1980s late-show / low-saturation tungsten / dark wood/brick / warm amber / magenta+cyan 仅 rim light /
+    VHS-era grading / video grain`，negative 压 `fluorescent green/hot pink/saturated/flat vector/clean modern/cel shading`；
+  - 每场景构图/palette 参考 render-dev 的 `tmp/v52_art/plate_prompts_film_vhs.md`。
+- 重生成命令：`python scripts/gen_v5_scene_art.py --force --only interview_sofa,cafe_window,kitchen_film,film_strip,comedy_club_vhs,brick_wall,dressing_room_vhs,city_vhs --seed 20261101`
+- 结果：**8/8 成功**，70.2s（均 8.8s/张），seed 20261101，prompt_source=prompts.json；
+  8 张 meta 的 `prompt/negative` 与 prompts.json 逐字一致（脚本校验 8/8）；其余 53 张 plate 未动，
+  `assets/v5/scenes/` 仍 **61 PNG + 61 JSON**。
+- 前后对比：`tmp/v52_scene_pilot/sheet_film_vhs_fix.png`（BEFORE/AFTER 双栏 8 组）；
+  `tmp/v52_scene_pilot/film_vhs_before/`（旧 8 张）、`film_vhs_prompts_before.json`（旧 prompt，可回滚）。
+- 风格化预览：`tmp/v52_scene_pilot/sheet_film_vhs_finish.png`（新 plate RAW vs `apply_finish` 后，
+  film_interview / vhs_late_show 两种 finish 均正常，色温/颗粒/VHS rim light 成立）。
+
+| scene | prompt_id | gen_sec |
+|---|---|---|
+| interview_sofa | af4354a5-3a51-4b0e-86a8-0f7e9ddeaee1 | 10.0 |
+| cafe_window | fd49aca8-74b5-458a-9fef-3346eea6159a | 8.3 |
+| kitchen_film | 6c662b13-9f25-4dba-9caa-2b05d7336979 | 8.0 |
+| film_strip | f8a3e174-d4d1-4ef6-8aca-e019b9a997bf | 8.2 |
+| comedy_club_vhs | 40a049e2-fe9e-43c9-8f52-a7cdfc3caed8 | 8.0 |
+| brick_wall | c5054326-bcb0-49db-9ae5-33ea0affb53a | 8.0 |
+| dressing_room_vhs | 856f2a6a-026a-4d7e-bb63-8e0597528d4b | 8.0 |
+| city_vhs | 54260eef-0854-4a78-8888-df63fb2cc073 | 8.0 |
+
+> QA 关注（template-author 复验意见，非阻塞）：AFTER 版内容偏素（brick_wall 接近纯砖墙、
+> comedy_club 只剩空台+话筒），作为背景 plate + 角色/程序化道具叠加够用；finish 后整体偏暗偏柔
+> （尤其 film 组），重渲抽帧时注意角色/字幕对比度。如 QA 需补 set dressing，改对应 prompts 后
+> 按 scene_id 单批 `--force` 重生成即可（~8-10s/张）。
+
 ## 6. 备注 / 已知项
 
 - 历史场景验收点：地图（路线/城池/罗盘）、战场（军旗/军阵）、军帐沙盘、宫殿、藏书楼、博物馆展柜、

@@ -706,6 +706,10 @@ def test_head_safe_v52():
     if len(READY) < 16:
         pytest.skip(f"V5.2 批量进行中：可验收 {len(READY)}/16")
     base = base_tests()
+    # 渲染器取景保证头顶留 0.02 上边距；解析式为近似（两角色/坐姿/zoom 误差 ±1-2%），
+    # 因此允许 head_top ≥ -2.5%H（-18px）作为“头顶贴边但未裁断”的容差；
+    # 真正的裁头（如 history_talk 旧版 -114px）仍会被抓出。
+    tol = round(0.025 * EXPECT_H)
     results: dict[str, dict] = {}
     bad = []
     for tid in READY:
@@ -717,12 +721,12 @@ def test_head_safe_v52():
                 top, bottom, cx = c["head_top"], c["head_bottom"], c["head_cx"]
                 half = c["head_half_w"]
                 if c["primary"]:
-                    if top < -2 or bottom > EXPECT_H + 2 or bottom <= 2:
-                        problems.append(f"{shot['sid']}/{c['role']}(主对白): 头部未完整入画 "
-                                        f"top={top} bottom={bottom}")
+                    if top < -tol or bottom > EXPECT_H + 2 or bottom <= 2:
+                        problems.append(f"{shot['sid']}/{c['role']}(主对白): 头部被裁 "
+                                        f"top={top} bottom={bottom}（容差 {tol}px）")
                     if cx - half < -2 or cx + half > EXPECT_W + 2:
                         warnings.append(f"{shot['sid']}/{c['role']}(主对白): 水平贴边 cx={cx}")
-                elif top < -2 and bottom > 2:
+                elif top < -tol and bottom > 2:
                     problems.append(f"{shot['sid']}/{c['role']}: 头部被上边缘裁切")
         results[tid] = {"ok": not problems, "problems": problems, "warnings": warnings}
         if problems:

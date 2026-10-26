@@ -111,12 +111,15 @@ dist/assets/index-CxDpLa8g.js   369.88 kB │ gzip: 115.17 kB
 
 ### 6.2 页面截图（Chrome headless，8090 托管 dist）
 
+> 截图重拍于 **2026-10-26 19:35（16 部 AI 美术全量重渲、16/16 QC PASS 之后）**：
+> 成片封面为新 AI 场景/角色，角色立绘全部 AI 美术，场景库 plate 为新 AI 绘景。
+
 | 截图 | 内容 |
 |---|---|
-| `tmp/v52_frontend/screenshots/v5_gallery.png` | 成片画廊：16 卡封面/风格/时长/QC/播放/时间线/QC |
+| `tmp/v52_frontend/screenshots/v5_gallery.png` | 成片画廊：16 卡 AI poster/风格/时长/QC/播放/时间线/QC |
 | `tmp/v52_frontend/screenshots/v5_styles.png` | 风格墙：17 风格色板/技法/转场/标签 |
-| `tmp/v52_frontend/screenshots/v5_scenes.png` | 场景库：61 场景（AI plate 已生成部分直接显示）+ 搜索/tag/风格选择 |
-| `tmp/v52_frontend/screenshots/v5_characters.png` | 角色库：立绘/声音锁/voice+seed/试听/改声音/重建锁 |
+| `tmp/v52_frontend/screenshots/v5_scenes.png` | 场景库：61 场景（AI plate）+ 搜索/tag/风格选择 |
+| `tmp/v52_frontend/screenshots/v5_characters.png` | 角色库：AI 立绘/声音锁/voice+seed/试听/改声音/重建锁 |
 | `tmp/v52_frontend/screenshots/v5_render.png` | 渲染面板：模板/时长/force + 任务状态/日志/最近任务 |
 | `tmp/v52_frontend/screenshots/workspace_projects.png` | 回归：原「项目总览」页与 Sidebar 正常（新增 V5 入口） |
 
@@ -130,7 +133,7 @@ dist/assets/index-CxDpLa8g.js   369.88 kB │ gzip: 115.17 kB
 
 ## 7. 已知限制 / 说明
 
-- **美术资产仍在生成**（场景 10+/61、角色 4/24）：缺失的立绘/plate 由 `SmartImage` 回退到程序化 `preview` 或占位；资产落盘后刷新即显示，无需改前端；
+- **美术资产已全量落地**（24 角色立绘 + 61 场景 plate，16 部已用 AI 美术重渲）；`SmartImage` 的三级回退（AI 资产 → 程序化 preview → 占位）保留，用于未来新增角色/场景资产尚未生成时的 404 容错；
 - 场景缩略图首次滚动会调 `/api/v5/preview/scene/<id>`（程序化渲染，约 0.2-0.6s/张），已加 `side preview`/`loading=lazy`；美术 plate 全量后不再需要；
 - `/api/v5/outputs` 默认只返回 catalog 内建模板（16）；自定义示例用「含自定义示例」开关或 `?include_custom=true`；
 - 渲染任务写内存（服务重启后历史 job 丢失，产物文件保留）；单并发是设计约束（GPU/TTS 串行）；
@@ -141,7 +144,7 @@ dist/assets/index-CxDpLa8g.js   369.88 kB │ gzip: 115.17 kB
 - [x] `cd frontend && npm run build` 通过（tsc --noEmit + vite build）
 - [x] `/api/v5/outputs` 16 条、字段齐全（`evidence/outputs.json`）
 - [x] `/media/v5/...` 播放/时间线/QC/封面可访问 + 防路径穿越
-- [x] 页面可浏览：画廊/风格墙/场景库/角色库/渲染（截图 5 张）
+- [x] 页面可浏览：画廊/风格墙/场景库/角色库/渲染（截图 6 张，AI 美术全量重渲后重拍）
 - [x] 声音：读取/试听（依赖 TTS 服务）/改声音 PUT/重建锁按钮
 - [x] 渲染：提交 job → 轮询进度/日志 → 取消；完成自动刷新
 - [x] 原 projects/workspace 页面无回归（截图 + 原有测试）

@@ -471,6 +471,28 @@ def _fit_anchor_in_zone(anchor, rect, *, margin_x=0.06, margin_top=0.10,
     return [round(ax, 4), round(ay, 4)]
 
 
+def _fit_character_in_zone(anchor, rect, char_height: float,
+                           *, top_pad: float = 0.02, bottom_pad: float = 0.02):
+    """让角色（脚点 anchor_y、身高 char_height）完整落在 camera zone 内。
+
+    返回 (adjusted_anchor, adjusted_height)。身高会按可用空间缩小（最小 0.30）。
+    """
+    if not anchor or not rect:
+        return anchor, char_height
+    ax, ay = float(anchor[0]), float(anchor[1])
+    x, y, w, h = [float(v) for v in rect]
+    lo_y, hi_y = y + top_pad, y + h - bottom_pad
+    ay = min(max(ay, lo_y + 0.05), hi_y)
+    available = max(0.30, ay - (y + top_pad))
+    out_h = float(char_height)
+    if out_h > available:
+        out_h = available
+    if out_h < 0.30:
+        out_h = 0.30
+        ay = min(hi_y, y + top_pad + out_h)
+    return [round(ax, 4), round(ay, 4)], round(out_h, 3)
+
+
 def render_shot_clips(plan: dict, catalog: dict, style: dict, paths: dict,
                       prog, force: bool = False) -> dict:
     scene_render = _require("scene_render")
@@ -529,6 +551,7 @@ def render_shot_clips(plan: dict, catalog: dict, style: dict, paths: dict,
             base_ratio = 0.68 if speaking else 0.52
             char_height = max(0.40, min(0.92,
                                          base_ratio * max(0.55, min(1.0, zone_h))))
+            anchor, char_height = _fit_character_in_zone(anchor, zone_rect, char_height)
             chars_spec.append({"char": char, "role": role, "pose": "front",
                                "mouth_timeline": mouth, "anchor": anchor,
                                "scale": float(shot.get("scale") or 1.0),

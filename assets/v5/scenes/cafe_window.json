@@ -3,10 +3,10 @@
   "label": "咖啡馆窗边",
   "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\scenes\\cafe_window.png",
   "png": "cafe_window.png",
-  "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, cozy cafe by a large window, warm afternoon sunlight, bokeh, wooden shelves, coffee cups on a desk, plants, soft film look",
-  "raw_prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, cozy cafe by a large window, warm afternoon sunlight, bokeh, wooden shelves, coffee cups on a desk, plants, soft film look",
+  "prompt": "masterpiece, best quality, anime style background, detailed background, scenery, no humans, background plate, cinematic 16mm film still, warm cream and amber palette, muted warm colors, soft natural light, shallow depth of field, film grain, 16:9 widescreen, cozy cafe interior, big window with warm street bokeh, wooden table by the window, coffee cup, cream and amber tones, morning light, soft film grain, shallow depth of field, no text",
+  "raw_prompt": "masterpiece, best quality, anime style background, detailed background, scenery, no humans, background plate, cinematic 16mm film still, warm cream and amber palette, muted warm colors, soft natural light, shallow depth of field, film grain, 16:9 widescreen, cozy cafe interior, big window with warm street bokeh, wooden table by the window, coffee cup, cream and amber tones, morning light, soft film grain, shallow depth of field, no text",
   "prompt_source": "prompts.json",
-  "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+  "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, people, person, foreground character, neon, teal, magenta, vivid green, saturated colors, oversaturated, flat vector illustration, poster, giant color blocks, cel shading",
   "seed": 20261101,
   "size": [
     1280,
@@ -21,7 +21,7 @@
   "cfg": 5.5,
   "sampler": "euler_ancestral",
   "scheduler": "normal",
-  "prompt_id": "87df521a-95a8-4367-aa7b-fee32dff9058",
-  "gen_sec": 8.0,
-  "created_at": "2026-10-26 18:26:53"
+  "prompt_id": "fd49aca8-74b5-458a-9fef-3346eea6159a",
+  "gen_sec": 8.3,
+  "created_at": "2026-10-26 19:51:20"
 }
