@@ -4,27 +4,27 @@
     "id": "juanwang",
     "pose": "point",
     "source": "imagegen_pose",
-    "created_at": "2026-10-26T21:00:06",
-    "elapsed_sec": 45.5,
-    "seed": 47,
+    "created_at": "2026-10-26T22:13:33",
+    "elapsed_sec": 15.1,
+    "seed": 43,
     "seed_base": 43,
     "ip_adapter": {
-      "strength": 0.22,
-      "end_at": 0.75,
+      "strength": 0.35,
+      "end_at": 0.9,
       "weight_type": "style transfer"
     },
     "bg_mode": "white",
     "ref_used": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\juanwang\\portrait.png",
     "portrait_ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\juanwang\\portrait.png",
-    "prompt_id": "b9ec8c8f-b363-4b45-963f-103273f80ad9",
+    "prompt_id": "4e3103db-4604-4cbb-ad8f-9fefdc110ee3",
     "files": {
       "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\juanwang\\pose_point\\front.png",
       "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\juanwang\\cutout_point.png"
     },
     "sizes": {
       "cutout": [
-        411,
-        992
+        873,
+        943
       ]
     },
     "front_white": {
@@ -46,8 +46,134 @@
             255
           ],
           "mean": 254.9,
-          "spread": 3.0
+          "spread": 2.0
         },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 254.9,
+          "spread": 1.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 255.0,
+          "spread": 1.0
+        }
+      ],
+      "white_ratio": 0.751
+    },
+    "cutout_validation": {
+      "ok": true,
+      "alpha0": 0.63,
+      "visible": 0.37,
+      "corners_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "bbox": [
+        8,
+        8,
+        865,
+        935
+      ],
+      "aspect": 0.926,
+      "bbox_h_ratio": 0.983,
+      "wash": {
+        "removed": false,
+        "color": null,
+        "ratio": 0.0
+      }
+    },
+    "pose_gate": {
+      "ok": true,
+      "reason": "",
+      "aspect": 0.924,
+      "torso_tilt": 0.0,
+      "height_ratio": 0.941,
+      "feet_width_ratio": 0.375
+    },
+    "pose_gate_strict": {
+      "ok": true,
+      "reason": "",
+      "aspect": 0.924,
+      "torso_tilt": 0.0,
+      "height_ratio": 0.941,
+      "feet_width_ratio": 0.375
+    },
+    "face_norm": {
+      "score": 0.679,
+      "estimated": false,
+      "source": "yunet",
+      "bbox": [
+        0.5320733104238259,
+        0.08303287380699893,
+        0.6485681557846507,
+        0.22184517497348885
+      ],
+      "mouth": {
+        "cx": 0.5903550973654066,
+        "cy": 0.19131495227995757,
+        "w": 0.039587628865979385,
+        "h": 0.016489925768822907
+      },
+      "eyes": {
+        "y": 0.1413255567338282,
+        "w": 0.025612829324169528,
+        "cx": [
+          0.562405498281787,
+          0.6183046964490263
+        ]
+      },
+      "skin": "#ffdebb",
+      "lip": "#a0625a",
+      "line": "#08080a",
+      "face_w": 101.66
+    },
+    "prompts": {
+      "front": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, young adult male, black hair, undercut, dark eyes, tired eyes, dark circles, angled eyebrows, white shirt, blue necktie, laptop in hand, coffee cup, anxious hardworking expression, office worker, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference, standing straight upright, feet planted together, torso vertical, body facing viewer, only one arm raised to chest with index finger pointing forward, other arm relaxed at side, no leaning, no stride, no wide stance, static standing gesture, full body",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan, circular background, round backdrop, oval background, colored circle, pastel circle, background circle, sitting, crouching, lying, leaning, running, walking, wide stance, jump, jumping, dynamic pose, torso tilt, slanted body, diagonal composition, action pose, arms spread wide, arms raised high, tilted frame, sideways body, legs apart, upper body only, half body, cropped at waist, close-up, zoomed in, hands in pockets, barefoot, bare feet"
+    }
+  },
+  "updated_at": "2026-10-26T22:13:46",
+  "think": {
+    "id": "juanwang",
+    "pose": "think",
+    "source": "imagegen_pose",
+    "created_at": "2026-10-26T22:13:46",
+    "elapsed_sec": 13.4,
+    "seed": 43,
+    "seed_base": 43,
+    "ip_adapter": {
+      "strength": 0.35,
+      "end_at": 0.9,
+      "weight_type": "style transfer"
+    },
+    "bg_mode": "white",
+    "ref_used": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\juanwang\\portrait.png",
+    "portrait_ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\juanwang\\portrait.png",
+    "prompt_id": "61fb9cd1-dc04-4ddd-8b26-e212010743b2",
+    "files": {
+      "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\juanwang\\pose_think\\front.png",
+      "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\juanwang\\cutout_think.png"
+    },
+    "sizes": {
+      "cutout": [
+        852,
+        942
+      ]
+    },
+    "front_white": {
+      "ok": true,
+      "corners": [
         {
           "rgb": [
             255,
@@ -64,15 +190,33 @@
             255
           ],
           "mean": 255.0,
+          "spread": 2.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 255.0,
+          "spread": 1.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 255.0,
           "spread": 1.0
         }
       ],
-      "white_ratio": 0.883
+      "white_ratio": 0.741
     },
     "cutout_validation": {
       "ok": true,
-      "alpha0": 0.611,
-      "visible": 0.389,
+      "alpha0": 0.608,
+      "visible": 0.392,
       "corners_alpha": [
         0,
         0,
@@ -82,177 +226,65 @@
       "bbox": [
         8,
         8,
-        403,
-        984
+        844,
+        934
       ],
-      "aspect": 0.414,
-      "bbox_h_ratio": 0.984,
+      "aspect": 0.904,
+      "bbox_h_ratio": 0.983,
       "wash": {
         "removed": false,
         "color": null,
         "ratio": 0.0
       }
     },
-    "face_norm": {
-      "score": 0.695,
-      "estimated": false,
-      "source": "yunet",
-      "bbox": [
-        0.3428223844282239,
-        0.06572580645161291,
-        0.5180048661800487,
-        0.17983870967741936
-      ],
-      "mouth": {
-        "cx": 0.4303406326034063,
-        "cy": 0.15474798387096772,
-        "w": 0.059586374695863746,
-        "h": 0.011108870967741935
-      },
-      "eyes": {
-        "y": 0.11366935483870969,
-        "w": 0.03854014598540146,
-        "cx": [
-          0.38829683698296835,
-          0.4724087591240876
-        ]
-      },
-      "skin": "#fcdbb6",
-      "lip": "#a5635c",
-      "line": "#232127",
-      "face_w": 72.02
-    },
-    "prompts": {
-      "front": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, young adult male, black hair, undercut, dark eyes, tired eyes, dark circles, angled eyebrows, white shirt, blue necktie, laptop in hand, coffee cup, anxious hardworking expression, office worker, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference, dynamic gesture, one arm extended to the side, index finger pointing, explaining pose, confident body language, weight on one leg, action pose",
-      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan, circular background, round backdrop, oval background, colored circle, pastel circle, background circle, sitting, upper body only, half body, cropped at waist, close-up, zoomed in, hands in pockets, static stiff pose, barefoot, bare feet"
-    }
-  },
-  "updated_at": "2026-10-26T21:10:09",
-  "think": {
-    "id": "juanwang",
-    "pose": "think",
-    "source": "imagegen_pose",
-    "created_at": "2026-10-26T21:10:09",
-    "elapsed_sec": 13.5,
-    "seed": 43,
-    "seed_base": 43,
-    "ip_adapter": {
-      "strength": 0.35,
-      "end_at": 0.9,
-      "weight_type": "style transfer"
-    },
-    "bg_mode": "white",
-    "ref_used": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\juanwang\\portrait.png",
-    "portrait_ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\juanwang\\portrait.png",
-    "prompt_id": "4789f034-3e0e-41e4-82ef-813f3d1adfc4",
-    "files": {
-      "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\juanwang\\pose_think\\front.png",
-      "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\juanwang\\cutout_think.png"
-    },
-    "sizes": {
-      "cutout": [
-        912,
-        1012
-      ]
-    },
-    "front_white": {
+    "pose_gate": {
       "ok": true,
-      "corners": [
-        {
-          "rgb": [
-            254,
-            254,
-            254
-          ],
-          "mean": 254.2,
-          "spread": 3.0
-        },
-        {
-          "rgb": [
-            255,
-            255,
-            255
-          ],
-          "mean": 254.9,
-          "spread": 2.0
-        },
-        {
-          "rgb": [
-            254,
-            254,
-            255
-          ],
-          "mean": 254.5,
-          "spread": 3.0
-        },
-        {
-          "rgb": [
-            255,
-            255,
-            255
-          ],
-          "mean": 254.9,
-          "spread": 2.0
-        }
-      ],
-      "white_ratio": 0.735
+      "reason": "",
+      "aspect": 0.903,
+      "torso_tilt": 0.0,
+      "height_ratio": 0.94,
+      "feet_width_ratio": 0.371
     },
-    "cutout_validation": {
+    "pose_gate_strict": {
       "ok": true,
-      "alpha0": 0.685,
-      "visible": 0.315,
-      "corners_alpha": [
-        0,
-        0,
-        0,
-        0
-      ],
-      "bbox": [
-        8,
-        8,
-        904,
-        1009
-      ],
-      "aspect": 0.901,
-      "bbox_h_ratio": 0.989,
-      "wash": {
-        "removed": false,
-        "color": null,
-        "ratio": 0.0
-      }
+      "reason": "",
+      "aspect": 0.903,
+      "torso_tilt": 0.0,
+      "height_ratio": 0.94,
+      "feet_width_ratio": 0.371
     },
     "face_norm": {
       "score": 0.45,
       "estimated": false,
       "source": "haar",
       "bbox": [
-        0.3267543859649123,
-        0.16403162055335968,
-        0.41228070175438597,
-        0.24110671936758893
+        0.4694835680751174,
+        0.08280254777070063,
+        0.642018779342723,
+        0.23885350318471338
       ],
       "mouth": {
-        "cx": 0.36951754385964913,
-        "cy": 0.2241501976284585,
-        "w": 0.02907894736842105,
-        "h": 0.011788537549407114
+        "cx": 0.5557511737089202,
+        "cy": 0.20452229299363056,
+        "w": 0.05866197183098591,
+        "h": 0.023874734607218683
       },
       "eyes": {
-        "y": 0.19640316205533595,
-        "w": 0.01881578947368421,
+        "y": 0.148343949044586,
+        "w": 0.03795774647887324,
         "cx": [
-          0.3489912280701754,
-          0.39004385964912286
+          0.5143427230046949,
+          0.5971596244131455
         ]
       },
-      "skin": "#fee6cc",
-      "lip": "#7c514e",
-      "line": "#1b2132",
-      "face_w": 78.0
+      "skin": "#f5dbc4",
+      "lip": "#824b48",
+      "line": "#050506",
+      "face_w": 147.0
     },
     "prompts": {
-      "front": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, young adult male, black hair, undercut, dark eyes, tired eyes, dark circles, angled eyebrows, white shirt, blue necktie, laptop in hand, coffee cup, anxious hardworking expression, office worker, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference, thoughtful pose, one hand on chin, other arm crossed under it, contemplative, head slightly tilted, relaxed stance",
-      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan, circular background, round backdrop, oval background, colored circle, pastel circle, background circle, sitting, upper body only, half body, cropped at waist, close-up, zoomed in, hands in pockets, static stiff pose, barefoot, bare feet"
+      "front": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, young adult male, black hair, undercut, dark eyes, tired eyes, dark circles, angled eyebrows, white shirt, blue necktie, laptop in hand, coffee cup, anxious hardworking expression, office worker, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference, standing straight upright, feet planted together, torso vertical, body facing viewer, one hand on chin with elbow close to body, other arm relaxed, no leaning, no stride, no wide stance, static standing gesture, full body",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan, circular background, round backdrop, oval background, colored circle, pastel circle, background circle, sitting, crouching, lying, leaning, running, walking, wide stance, jump, jumping, dynamic pose, torso tilt, slanted body, diagonal composition, action pose, arms spread wide, arms raised high, tilted frame, sideways body, legs apart, upper body only, half body, cropped at waist, close-up, zoomed in, hands in pockets, barefoot, bare feet"
     }
   }
 }

@@ -97,15 +97,213 @@ POSE_NAMES = ("point", "think")
 # 这两个角色（无脸/机甲）姿态变体收益低，渲染时仍用 front（任务书要求）
 POSE_SKIP_CHARS = frozenset({"mystery_guest", "robot"})
 POSE_PROMPTS = {
-    "point": ("dynamic gesture, one arm extended to the side, index finger pointing, "
-              "explaining pose, confident body language, weight on one leg, action pose"),
-    "think": ("thoughtful pose, one hand on chin, other arm crossed under it, "
-              "contemplative, head slightly tilted, relaxed stance"),
+    "point": ("standing straight upright, feet planted together, torso vertical, "
+              "body facing viewer, only one arm raised to chest with index finger "
+              "pointing forward, other arm relaxed at side, no leaning, no stride, "
+              "no wide stance, static standing gesture, full body"),
+    "think": ("standing straight upright, feet planted together, torso vertical, "
+              "body facing viewer, one hand on chin with elbow close to body, other "
+              "arm relaxed, no leaning, no stride, no wide stance, static standing "
+              "gesture, full body"),
 }
-POSE_NEGATIVE_EXTRA = ("sitting, upper body only, half body, cropped at waist, close-up, "
-                       "zoomed in, hands in pockets, static stiff pose, barefoot, bare feet")
+POSE_NEGATIVE_EXTRA = ("sitting, crouching, lying, leaning, running, walking, "
+                       "wide stance, jump, jumping, dynamic pose, torso tilt, "
+                       "slanted body, diagonal composition, action pose, arms spread wide, "
+                       "arms raised high, tilted frame, sideways body, legs apart, "
+                       "upper body only, half body, cropped at waist, close-up, "
+                       "zoomed in, hands in pockets, barefoot, bare feet")
 # 姿态变体允许更宽的前景占比：伸手/托腮姿态 bbox 会变宽，alpha0 上限放宽到 0.82
 POSE_ALPHA0_RANGE = (0.30, 0.82)
+# V5.5.1 姿态资产质量门（与 motion2d._pose_art_ok 同口径，保证运行时真能用）
+POSE_GATE_ASPECT_RANGE = (0.15, 1.25)   # 绝对 clamp（V5.5.2）
+POSE_GATE_MIN_HEIGHT_RATIO = 0.60       # 相对 front 内容高度比
+POSE_GATE_MAX_TILT_DEG = 16.0            # 躯干带倾角（V5.5.2）
+
+
+def _sprite_content_box(img: Image.Image):
+    try:
+        alpha = img.getchannel("A")
+    except (ValueError, AttributeError):
+        return None
+    bbox = alpha.point(lambda v: 255 if v > 16 else 0).getbbox()
+    if not bbox:
+        return None
+    x0, y0, x1, y1 = bbox
+    if x1 - x0 < 4 or y1 - y0 < 4:
+        return None
+    return (x0, y0, x1, y1)
+
+
+def _sprite_tilt_deg(img: Image.Image) -> float:
+    """主体长轴（最小外接矩形）与竖直方向夹角（度）。"""
+    try:
+        alpha = np.asarray(img.getchannel("A"), dtype=np.uint8)
+    except (ValueError, AttributeError):
+        return 0.0
+    mask = (alpha > 24).astype(np.uint8)
+    if int(mask.sum()) < 100:
+        return 0.0
+    try:
+        import cv2
+    except Exception:  # noqa: BLE001
+        return 0.0
+    try:
+        cnts, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        if not cnts:
+            return 0.0
+        cnt = max(cnts, key=cv2.contourArea)
+        (_c, (rw, rh), ang) = cv2.minAreaRect(cnt)
+        a = float(ang) if rw < rh else float(ang) - 90.0
+        return abs(((a + 45.0) % 90.0) - 45.0)
+    except cv2.error:
+        return 0.0
+
+
+def pose_gate(cutout: Image.Image, front: Image.Image) -> dict:
+    """姿态立绘质量门：bbox aspect / 倾角 / 内容高度比；返回 stats + ok/原因。"""
+    box = _sprite_content_box(cutout)
+    fbox = _sprite_content_box(front)
+    if box is None:
+        return {"ok": False, "reason": "empty", "aspect": None, "tilt": None,
+                "height_ratio": None}
+    if fbox is None:
+        return {"ok": True, "reason": "", "aspect": None, "tilt": None,
+                "height_ratio": None}
+    w = box[2] - box[0]
+    h = box[3] - box[1]
+    fh = max(1, fbox[3] - fbox[1])
+    aspect = w / max(1.0, float(h))
+    height_ratio = h / float(fh)
+    try:
+        from .motion2d import _torso_tilt_deg as _ttd
+        tilt = float(_ttd(cutout))
+    except Exception:
+        tilt = _sprite_tilt_deg(cutout)
+    stats = {"aspect": round(aspect, 3), "tilt": round(tilt, 2),
+             "height_ratio": round(height_ratio, 3)}
+    fw = max(1, fbox[2] - fbox[0])
+    front_aspect = fw / float(fh)
+    lo = max(POSE_GATE_ASPECT_RANGE[0], 0.55 * front_aspect)
+    hi = POSE_GATE_ASPECT_RANGE[1]
+    if not (lo <= aspect <= hi):
+        return {"ok": False, "reason": f"aspect={aspect:.2f} not in [{lo},{hi}]",
+                **stats}
+    if height_ratio < POSE_GATE_MIN_HEIGHT_RATIO:
+        return {"ok": False,
+                "reason": f"height_ratio={height_ratio:.2f}<{POSE_GATE_MIN_HEIGHT_RATIO}",
+                **stats}
+    if tilt > POSE_GATE_MAX_TILT_DEG:
+        return {"ok": False, "reason": f"tilt={tilt:.1f}>6", **stats}
+    return {"ok": True, "reason": "", **stats}
+
+
+# V5.5.3 姿态生成门（候选筛选；运行时 pose_gate 仍是 V5.5.2，最终播放还有 motion2d
+# 归一化/门限兜底）。注意：**不要**再用"绝对严格值"卡生成——
+#  * 长袍/裙摆角色 feet_width 很难 <=0.35（下摆天然宽）；
+#  * 西装/窄身角色正常站立 aspect 只有 0.30-0.39，卡 >=0.42 会误杀。
+# 实测（2026-10-26）：严格值(5°/0.42/0.80/0.35) 下 zhuge/laozhou point 6 seed 全失败、
+# tianmei 仅 1/6；放宽到下述值后可用率显著提升，故定为生成侧口径。
+POSE_GEN_TORSO_TILT_MAX = 8.0
+POSE_GEN_ASPECT_MIN = 0.34
+POSE_GEN_HEIGHT_RATIO_MIN = 0.75
+POSE_GEN_FEET_WIDTH_MAX = 0.45
+
+
+def _feet_width_ratio(cutout: Image.Image) -> float | None:
+    """脚部带（内容框底部 18%）宽度 / 内容高度；判断是否叉腿/大跨步。"""
+    box = _sprite_content_box(cutout)
+    if box is None:
+        return None
+    x0, y0, x1, y1 = box
+    h = y1 - y0
+    if h <= 0:
+        return None
+    band_y0 = int(y1 - max(4, h * 0.12))  # 只取脚踝附近，避免下摆/衣角干扰
+    try:
+        import numpy as np
+        alpha = np.asarray(cutout.getchannel("A"), dtype=np.uint8)
+    except Exception:  # noqa: BLE001
+        return None
+    band = alpha[band_y0:y1, x0:x1]
+    mask = band > 16
+    if not mask.any():
+        return None
+    cols = np.nonzero(mask.any(axis=0))[0]
+    feet_w = int(cols[-1] - cols[0] + 1)
+    return feet_w / float(h)
+
+
+def _bbox_torso_tilt_deg(img: Image.Image) -> float:
+    """按 **content bbox 相对** 的躯干带（中央 60% 宽、15%-85% 高）算长轴倾角。
+
+    raw cutout 是紧裁剪的，若用"整图中央 60%"会切到手臂导致 16-44° 抖动；
+    这里先用 alpha bbox 对齐再取躯干带，更接近 motion2d 运行时（归一化 sprite）口径。
+    """
+    box = _sprite_content_box(img)
+    if box is None:
+        return 0.0
+    x0, y0, x1, y1 = box
+    w, h = x1 - x0, y1 - y0
+    if w < 8 or h < 8:
+        return 0.0
+    region = img.crop((int(x0 + 0.20 * w), int(y0 + 0.15 * h),
+                       int(x0 + 0.80 * w), int(y0 + 0.85 * h)))
+    try:
+        import numpy as np
+        alpha = np.asarray(region.getchannel("A"), dtype=np.uint8)
+    except Exception:  # noqa: BLE001
+        return 0.0
+    mask = (alpha > 24).astype(np.uint8)
+    if int(mask.sum()) < 100:
+        return 0.0
+    try:
+        import cv2
+    except Exception:  # noqa: BLE001
+        return 0.0
+    try:
+        cnts, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        if not cnts:
+            return 0.0
+        cnt = max(cnts, key=cv2.contourArea)
+        (_c, (rw, rh), ang) = cv2.minAreaRect(cnt)
+        a = float(ang) if rw < rh else float(ang) - 90.0
+        return abs(((a + 45.0) % 90.0) - 45.0)
+    except cv2.error:
+        return 0.0
+
+
+def pose_gate_strict(cutout: Image.Image, front: Image.Image | None) -> dict:
+    """生成侧候选门（V5.5.3）：torso≤8° / aspect≥0.34 / hr≥0.75 / feet≤0.45。"""
+    box = _sprite_content_box(cutout)
+    if box is None:
+        return {"ok": False, "reason": "empty"}
+    w = box[2] - box[0]
+    h = box[3] - box[1]
+    aspect = w / max(1.0, float(h))
+    tilt = _bbox_torso_tilt_deg(cutout)
+    feet = _feet_width_ratio(cutout)
+    fbox = _sprite_content_box(front) if front is not None else None
+    fh = max(1, fbox[3] - fbox[1]) if fbox else 0
+    hr = (h / float(fh)) if fh else None
+    stats = {"aspect": round(aspect, 3), "torso_tilt": round(tilt, 2),
+             "height_ratio": round(hr, 3) if hr is not None else None,
+             "feet_width_ratio": round(feet, 3) if feet is not None else None}
+    if aspect < POSE_GEN_ASPECT_MIN:
+        return {"ok": False, "reason": f"aspect={aspect:.2f}<{POSE_GEN_ASPECT_MIN}",
+                **stats}
+    if tilt > POSE_GEN_TORSO_TILT_MAX:
+        return {"ok": False,
+                "reason": f"torso_tilt={tilt:.1f}>{POSE_GEN_TORSO_TILT_MAX:.0f}",
+                **stats}
+    if hr is not None and hr < POSE_GEN_HEIGHT_RATIO_MIN:
+        return {"ok": False,
+                "reason": f"height_ratio={hr:.2f}<{POSE_GEN_HEIGHT_RATIO_MIN}",
+                **stats}
+    if feet is not None and feet > POSE_GEN_FEET_WIDTH_MAX:
+        return {"ok": False,
+                "reason": f"feet_width_ratio={feet:.2f}>{POSE_GEN_FEET_WIDTH_MAX}",
+                **stats}
+    return {"ok": True, "reason": "", **stats}
 
 
 class V5ArtError(RuntimeError):
@@ -1547,13 +1745,14 @@ def character_pose_art(character_id: str, pose: str,
 
 def generate_character_pose(character_id: str, pose: str, *,
                             seed: int = 43, force: bool = False,
+                            ref: str | Path | None = None,
                             log=print) -> dict:
     """生成一个姿态变体（point/think）：portrait 作 IP-Adapter 参考 → 白底全身 → 抠图。
 
     - 产物：`assets/v5/characters/<id>/pose_<pose>/front.png`
       + `<id>/cutout_<pose>.png` + `<id>/pose_meta.json`（不动现有 front/cutout）；
     - 质量门与 front 一致：白底四角/四角透明/alpha0 0.30-0.72/bbox 高>=55%；
-    - 强度回退 0.35→0.25→0.22 + seed 重试（最多 3 次），仍失败抛 V5ArtError。
+    - 强度回退 0.35→0.25→0.22 + seed 重试（最多 4 次）+ 姿态质量门，仍失败抛 V5ArtError。
     """
     cid = str(character_id or "").strip()
     p = str(pose or "").strip().lower()
@@ -1566,7 +1765,9 @@ def generate_character_pose(character_id: str, pose: str, *,
     if cutout_path.is_file() and not force:
         _log(log, f"[skip] {cid}/{p}: 已存在 {cutout_path.name}")
         return character_pose_art(cid, p)
-    ref_path = paths["portrait"]
+    ref_path = Path(ref) if ref else paths["portrait"]
+    if not ref_path.is_absolute():
+        ref_path = REPO / ref_path
     if not ref_path.is_file():
         raise V5ArtError(f"{cid}: 缺少 portrait 参考图 {ref_path}")
     spec_path = _ensure_spec(cid)
@@ -1585,10 +1786,17 @@ def generate_character_pose(character_id: str, pose: str, *,
     pose_dir.mkdir(parents=True, exist_ok=True)
     front_png = pose_dir / "front.png"
     three_front = pose_dir / "three_view" / "front.png"
+    front_cutout_path = base_dir / "cutout.png"
+    front_cutout = None
+    if front_cutout_path.is_file():
+        try:
+            front_cutout = Image.open(front_cutout_path).convert("RGBA")
+        except Exception:  # noqa: BLE001
+            front_cutout = None
     t0 = time.time()
     chosen = None
     errors: list[str] = []
-    for tries in range(1, 4):
+    for tries in range(1, 7):   # 严格门较难：最多 6 个 seed
         strength, end_at = FRONT_REF_SCHEDULE[min(tries - 1, len(FRONT_REF_SCHEDULE) - 1)]
         s = seed + 2 * (tries - 1)
         ref_for_try = ref_path
@@ -1633,13 +1841,23 @@ def generate_character_pose(character_id: str, pose: str, *,
             validation["wash"] = info.get("wash")
             validation["adaptive"] = info.get("adaptive")
             mode = "adaptive"
-        if validation["ok"]:
+        gate = pose_gate_strict(cutout, front_cutout)
+        _log(log, f"[pose-gate-strict] {cid}/{p}: seed={s} gate={gate.get('ok')} "
+                  f"{gate.get('reason')} aspect={gate.get('aspect')} "
+                  f"torso_tilt={gate.get('torso_tilt')} "
+                  f"hr={gate.get('height_ratio')} "
+                  f"feet={gate.get('feet_width_ratio')}")
+        if validation["ok"] and gate.get("ok"):
             chosen = {"cutout": cutout, "validation": validation, "white": white,
                       "mode": mode, "seed": s, "ip": {"strength": strength,
                                                        "end_at": end_at},
                       "ref_used": str(ref_for_try),
-                      "prompt_id": prompt_id}
+                      "prompt_id": prompt_id,
+                      "pose_gate_strict": gate}
             break
+        if validation["ok"]:
+            errors.append(f"seed={s} gate: {gate.get('reason')} {gate}")
+            continue
         errors.append(f"seed={s} validation={validation}")
     if chosen is None:
         raise V5ArtError(f"{cid}/{p}: 姿态生成 3 次均不达标: {errors[-2:]}")
@@ -1660,6 +1878,8 @@ def generate_character_pose(character_id: str, pose: str, *,
         "sizes": {"cutout": list(cutout.size)},
         "front_white": chosen["white"],
         "cutout_validation": chosen["validation"],
+        "pose_gate": chosen.get("pose_gate_strict"),
+        "pose_gate_strict": chosen.get("pose_gate_strict"),
         "face_norm": norm,
         "prompts": {"front": prompt, "negative": negative_all},
     }

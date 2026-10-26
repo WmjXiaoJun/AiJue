@@ -2003,6 +2003,9 @@ def _render_art_character(char_spec: dict, style_spec: dict, size: tuple[int, in
     if mod is None:
         return None
     try:
+        import os as _os
+        if _os.environ.get("MOTION2D_POSE_ART", "").strip().lower() in ("off", "0", "false", "no"):
+            pose = "front"
         return mod.render_art_character(char_spec, style_spec, size, pose, mouth, bool(blink))
     except Exception:  # noqa: BLE001
         return None
@@ -2027,6 +2030,13 @@ def render_character(char, style, size=DEFAULT_SIZE, pose: str = "front",
     pose = str(pose or "front").lower()
     if pose not in POSES:
         pose = "front"
+    # V5.5：生产可关闭姿态资产（MOTION2D_POSE_ART=off），只保留 front + 体态表演
+    try:
+        import os as _os
+        if _os.environ.get("MOTION2D_POSE_ART", "").strip().lower() in ("off", "0", "false", "no"):
+            pose = "front"
+    except Exception:  # noqa: BLE001
+        pass
     mouth = str(mouth or "closed").lower()
     if mouth not in MOUTH_STATES:
         mouth = "closed"

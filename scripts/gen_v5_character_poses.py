@@ -168,12 +168,15 @@ def main(argv=None) -> int:
                                                       force=args.force)
                 meta = info.get("meta") or {}
                 sec = round(time.time() - t0, 1)
+                gate = meta.get("pose_gate_strict") or {}
                 item.update({
                     "status": "ok", "seconds": sec, "size": info.get("size"),
                     "alpha0": (meta.get("cutout_validation") or {}).get("alpha0"),
                     "bg_mode": meta.get("bg_mode"), "seed": meta.get("seed"),
                     "ip": meta.get("ip_adapter"),
                     "prompt_id": meta.get("prompt_id"),
+                    "gate_ok": bool(gate.get("ok")),
+                    "pose_gate_strict": gate,
                     "updated_at": time.strftime("%H:%M:%S"),
                 })
                 ok_n += 1
@@ -211,8 +214,28 @@ def main(argv=None) -> int:
         for p in poses:
             if not (ASSETS / cid / f"cutout_{p}.png").is_file():
                 missing.append(f"{cid}/{p}")
+    gate_items = progress.get("items") or {}
+    gate_pass, gate_failed = [], []
+    for cid in ids:
+        for p in poses:
+            item = gate_items.get(f"{cid}/{p}") or {}
+            if item.get("status") != "ok":
+                gate_failed.append(f"{cid}/{p}")
+                continue
+            if item.get("gate_ok"):
+                gate_pass.append(f"{cid}/{p}")
+            else:
+                gate_failed.append(f"{cid}/{p}")
     summary = {
         "ok": not missing,
+        "not_for_production": True,
+        "note": "V5.5.3 候选素材：生产仍 MOTION2D_POSE_ART=off，待 Lead/用户确认后再启用",
+        "gate_version": "V5.5.3 生成门（torso_tilt<=8°, aspect>=0.34, "
+                        "height_ratio>=0.75, feet_width<=0.45）",
+        "gate_pass_count": len(gate_pass),
+        "gate_fail_count": len(gate_failed),
+        "gate_pass": gate_pass,
+        "gate_failed": gate_failed,
         "expected": total, "assets_ok": total - len(missing),
         "ok_count": ok_n, "fallback": fb_n, "failed": fail_n,
         "missing": missing, "elapsed_sec": elapsed, "seed": args.seed,

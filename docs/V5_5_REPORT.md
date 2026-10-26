@@ -54,3 +54,11 @@
 - **姿态变体资产状态**：48/48 已生成（24 角色 × point/think），但 motion2d V5.5.1 质量门（bbox aspect 0.18-0.85、倾角 ≤6°、内容高 ≥front 0.72）把现有 AI 姿态图判为不合格（imagegen 姿态多为斜向动态构图，倾角 8-20°）→ 运行时自动回退 front + 体态表演，**未出现坏帧**。下一步：用 "upright standing pointing/thinking" prompt 重生成 24×2 姿态后即可启用真实手势立绘（无需改 motion2d/render_v5）。
 - **3D/H3 混合 demo**：`tmp/v55_hybrid/final_h3_demo.mp4`（41-44s，tonight_show 3 个对白镜真 H3 运动 + 其余 2D）；对比图 `tmp/v55_2d_vs_3d.png`；单镜 2-3.2 分钟 GPU。技术链路已跑通；代价是 H3 会重绘细节（偶发多出人物/画风漂），需 prompt/参考调优后再全量 rollout。
 
+## 6. 最终状态（2026-10-26 22:27，安全版）
+
+- **16/16 成片已重渲完成**（`V55_PERFORM=1`、`MOTION2D_POSE_ART=off`）：QC 16/16 PASS，`tests/test_v5_4_acceptance.py` 119 passed；抽帧复核无斜躺/横飞/变形（`tmp/v55_clean_frames.png`）。
+- **角色表演 = 体态级**：说话前倾/放大、重心左右移动、呼吸、偶发点头、首出场 walk_in；姿态切换 `pose_timeline` 机制已实现并在单测/自测中验证，但**生产暂不启用姿态资产**。
+- **姿态资产（48 张 AI point/think）**：V5.5.2 相对门 48/48 可通过，但画面仍是"斜向动态/大跨步"构图（播放像前倾飞扑），因此生产关闭；等待"严格直立"第二版（prompt: standing straight upright, feet planted, only one arm raised, no stride; 生成门 torso≤8°/aspect≥0.34/hr≥0.75/feet≤0.45）后再评估启用。
+- **3D/H3 混合**：`pipeline/h3_v5.py` 模块已交付（`python -m pipeline.h3_v5 --template tonight_show --hero-shots 2`），pilot 成片 `tmp/v55_hybrid/final_h3_demo.mp4`；单镜 2-3.2 分钟 GPU，H3 会重绘细节（需 prompt/参考调优）；按模板 1-2 hero 镜混合成本约 1-1.5 小时 GPU。
+- **重要修复**：`render_v5.assemble` 同步本次 `video_raw.mp4`（此前可能复用上一轮遗留，导致 per-cut 转场未进成片）；16 部已重新验证。
+

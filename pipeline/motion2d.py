@@ -1770,9 +1770,12 @@ def _draw_placeholder_character(char: dict, style: dict, size: tuple[int, int],
 # 立绘几何归一化（V5.5.1：修 AI 姿态资产长宽比/构图差异导致的拉伸/斜躺）
 # --------------------------------------------------------------------------- #
 #: 姿态资产质量门：不合格就回退 front 立绘（只用体态表演，避免"躺着/飞起来"）
-POSE_ART_MIN_ANGLE_COS = math.cos(math.radians(6.0))   # 主体长轴倾角 ≤ 6°
-POSE_ART_ASPECT_RANGE = (0.18, 0.85)                   # bbox 宽/高 合理区间
-POSE_ART_MIN_HEIGHT_RATIO = 0.72                       # 相对 front 的内容高度比
+# V5.5.2：姿态门改为"相对 front 基线"口径（手势剪影会让 minAreaRect 倾斜，
+# 绝对阈值会误杀正常 point/think 姿态；只拦"躺着/横飞/大幅变形"）
+POSE_ART_MAX_TORSO_TILT_DEG = 16.0                     # 躯干带倾角上限
+POSE_ART_ASPECT_REL = (0.55, 1.45)                     # 相对 front aspect 的倍数区间
+POSE_ART_ASPECT_ABS = (0.15, 1.25)                     # 绝对 clamp
+POSE_ART_MIN_HEIGHT_RATIO = 0.60                       # 相对 front 的内容高度比
 #: 表演变换安全上限（防止夸张/异常参数导致整体斜切/旋转）
 PERFORM_MAX_SHEAR = 0.020          # ≈1.15°（Lead 要求 lean 0.5-1.2°）
 PERFORM_SCALE_RANGE = (0.96, 1.06)
@@ -1841,6 +1844,36 @@ def _sprite_tilt_deg(img: Image.Image) -> float:
     return 0.0 if bw <= bh else 45.0
 
 
+def _torso_tilt_deg(img: Image.Image) -> float:
+    """躯干带（中央 60% 宽、高度 15%-85%）的长轴倾角；比整图更不受伸手/道具影响。"""
+    try:
+        alpha = np.asarray(img.getchannel("A"), dtype=np.uint8)
+    except (ValueError, AttributeError):
+        return 0.0
+    h, w = alpha.shape[:2]
+    x0, x1 = int(w * 0.20), int(w * 0.80)
+    y0, y1 = int(h * 0.15), int(h * 0.85)
+    crop = alpha[y0:y1, x0:x1]
+    if crop.size == 0:
+        return 0.0
+    mask = (crop > 24).astype(np.uint8)
+    if mask.sum() < 100:
+        return 0.0
+    if cv2 is not None:
+        try:
+            cnts, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL,
+                                       cv2.CHAIN_APPROX_SIMPLE)
+            if not cnts:
+                return 0.0
+            cnt = max(cnts, key=cv2.contourArea)
+            (_c, (rw, rh), ang) = cv2.minAreaRect(cnt)
+            a = float(ang) if rw < rh else float(ang) - 90.0
+            return abs(((a + 45.0) % 90.0) - 45.0)
+        except cv2.error:  # pragma: no cover
+            pass
+    return 0.0
+
+
 def _pose_art_ok(img: Image.Image, front: Image.Image) -> tuple[bool, str]:
     """姿态资产质量门：构图/倾角与 front 差异过大 → 判定不可用（返回原因）。"""
     box = _sprite_content_box(img)
@@ -1852,16 +1885,21 @@ def _pose_art_ok(img: Image.Image, front: Image.Image) -> tuple[bool, str]:
     w = box[2] - box[0]
     h = box[3] - box[1]
     fh = max(1, fbox[3] - fbox[1])
+    fw = max(1, fbox[2] - fbox[0])
     aspect = w / max(1.0, float(h))
-    lo, hi = POSE_ART_ASPECT_RANGE
+    front_aspect = fw / float(fh)
+    lo = max(POSE_ART_ASPECT_ABS[0], POSE_ART_ASPECT_REL[0] * front_aspect)
+    hi = min(POSE_ART_ASPECT_ABS[1],
+             max(POSE_ART_ASPECT_ABS[1],
+                 POSE_ART_ASPECT_REL[1] * front_aspect))
     if not (lo <= aspect <= hi):
-        return False, f"aspect={aspect:.2f}∉[{lo},{hi}]"
+        return False, f"aspect={aspect:.2f}∉[{lo:.2f},{hi:.2f}]"
     h_ratio = h / float(fh)
     if h_ratio < POSE_ART_MIN_HEIGHT_RATIO:
         return False, f"height_ratio={h_ratio:.2f}<{POSE_ART_MIN_HEIGHT_RATIO}"
-    tilt = _sprite_tilt_deg(img)
-    if tilt > 6.0:
-        return False, f"tilt={tilt:.1f}°>6°"
+    tilt = _torso_tilt_deg(img)
+    if tilt > POSE_ART_MAX_TORSO_TILT_DEG:
+        return False, f"torso_tilt={tilt:.1f}°>{POSE_ART_MAX_TORSO_TILT_DEG:.0f}°"
     return True, ""
 
 
