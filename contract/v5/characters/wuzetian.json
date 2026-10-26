@@ -9,10 +9,8 @@
     "narrator"
   ],
   "voice": {
-    "provider": "breeze",
-    "instruction": "38岁女性，华丽沉稳，中低音，咬字清晰，笑意里带威压",
-    "seed": 20262007,
-    "cfg_scale": 4.1
+    "voice_id": "empress_weiyi",
+    "provider": "breeze"
   },
   "appearance": {
     "gender": "female",
@@ -73,5 +71,10 @@
       "line": 1.0,
       "shade": 0.3
     }
+  },
+  "voice_legacy": {
+    "instruction": "38岁女性，华丽沉稳，中低音，咬字清晰，笑意里带威压",
+    "seed": 20262007,
+    "cfg_scale": 4.1
   }
 }

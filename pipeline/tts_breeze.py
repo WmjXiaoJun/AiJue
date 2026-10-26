@@ -266,7 +266,9 @@ def _to_mix_wav(src: Path, dst: Path, duration: float | None = None) -> dict:
 def synthesize_batch(texts: list[str], role: str, *, out_dir: Path,
                      base: str | None = None, timeout: float = 900.0,
                      cfg_scale: float | None = None, seed: int | None = None,
-                     voice_spec: dict | None = None) -> list[dict]:
+                     voice_spec: dict | None = None,
+                     ref_audio: str | Path | None = None,
+                     ref_text: str = "") -> list[dict]:
     """单角色批量合成：返回 [{index, path(24k mono wav), duration, text}]。"""
     base = (base or DEFAULT_BASE).rstrip("/")
     if not texts:
@@ -286,12 +288,25 @@ def synthesize_batch(texts: list[str], role: str, *, out_dir: Path,
         }
         if voice.get("instruction"):
             data["instruction"] = voice["instruction"]
+        ref_path = Path(ref_audio) if ref_audio else None
+        if ref_path is not None:
+            if not ref_path.is_file():
+                raise BreezeTTSUnavailable(f"voice clone 参考音频不存在: {ref_path}")
+            if not ref_text.strip():
+                raise BreezeTTSUnavailable("voice clone 需要 ref_text（参考音频文本）")
+            data["ref_text"] = ref_text.strip()
         t0 = time.time()
         resp = None
         last_exc = None
         for attempt in range(1, 13):
+            files = None
+            fh = None
+            if ref_path is not None:
+                fh = open(ref_path, "rb")
+                files = {"ref_audio": (ref_path.name, fh, "audio/wav")}
             try:
                 resp = httpx.post(f"{base}/v1/audio/speech/batch", data=data,
+                                  files=files,
                                   timeout=httpx.Timeout(timeout, connect=10.0))
                 if resp.status_code == 409:
                     # 单推理槽忙：等待后重试（最多约 60s）
@@ -304,6 +319,12 @@ def synthesize_batch(texts: list[str], role: str, *, out_dir: Path,
             except Exception as exc:  # noqa: BLE001
                 last_exc = exc
                 raise BreezeTTSUnavailable(f"Breeze TTS batch 请求失败: {exc}") from exc
+            finally:
+                if fh is not None:
+                    try:
+                        fh.close()
+                    except OSError:
+                        pass
         if resp is None:
             raise BreezeTTSUnavailable(f"Breeze TTS batch 始终 409（服务忙）: {base}")
         if resp.status_code != 200:
@@ -354,7 +375,8 @@ def synthesize_batch(texts: list[str], role: str, *, out_dir: Path,
 def synthesize(role_texts: dict[str, list[str]], out_dir: Path, *,
                base: str | None = None, timeout: float = 900.0,
                auto_start: bool = True,
-               voices: dict[str, dict] | None = None) -> list[dict]:
+               voices: dict[str, dict] | None = None,
+               refs: dict[str, tuple] | None = None) -> list[dict]:
     """多角色合成：{role: [texts]} → 扁平结果列表（保持 role 内顺序）。"""
     base = (base or DEFAULT_BASE).rstrip("/")
     if not server_alive(base):
@@ -368,9 +390,12 @@ def synthesize(role_texts: dict[str, list[str]], out_dir: Path, *,
         cleaned = [t for t in (texts or []) if str(t or "").strip()]
         if not cleaned:
             continue
+        ref = (refs or {}).get(role) or (None, "")
+        ref_wav, ref_txt = (ref[0], ref[1]) if isinstance(ref, (tuple, list)) else (None, "")
         results.extend(synthesize_batch(cleaned, role, out_dir=out_dir, base=base,
                                         timeout=timeout,
-                                        voice_spec=(voices or {}).get(role)))
+                                        voice_spec=(voices or {}).get(role),
+                                        ref_audio=ref_wav, ref_text=ref_txt))
     return results
 
 

@@ -9,10 +9,8 @@
     "guest_a"
   ],
   "voice": {
-    "provider": "breeze",
-    "instruction": "35岁男性，平直无起伏的低音，冷幽默停顿感，几乎不带情绪",
-    "seed": 20262020,
-    "cfg_scale": 3.7
+    "voice_id": "cool_male",
+    "provider": "breeze"
   },
   "appearance": {
     "gender": "male",
@@ -68,5 +66,10 @@
     "candy_collage": {
       "line": 1.2
     }
+  },
+  "voice_legacy": {
+    "instruction": "35岁男性，平直无起伏的低音，冷幽默停顿感，几乎不带情绪",
+    "seed": 20262020,
+    "cfg_scale": 3.7
   }
 }

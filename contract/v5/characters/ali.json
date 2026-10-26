@@ -9,10 +9,8 @@
     "expert"
   ],
   "voice": {
-    "provider": "breeze",
-    "instruction": "24岁女性，明亮跳脱，音色偏甜，语速快，带笑意的吐槽感",
-    "seed": 20262014,
-    "cfg_scale": 4.2
+    "voice_id": "legacy_v4_ali",
+    "provider": "breeze"
   },
   "appearance": {
     "gender": "female",
@@ -71,5 +69,10 @@
     "candy_collage": {
       "line": 1.2
     }
+  },
+  "voice_legacy": {
+    "instruction": "24岁女性，明亮跳脱，音色偏甜，语速快，带笑意的吐槽感",
+    "seed": 20262014,
+    "cfg_scale": 4.2
   }
 }

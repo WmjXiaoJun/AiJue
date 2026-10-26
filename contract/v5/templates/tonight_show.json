@@ -65,10 +65,10 @@
       "camera": "pan_left",
       "camera_strength": 0.06,
       "duration": 6.4,
-      "line": "host",
+      "line": "guest_a",
       "text": "我先说结论：会抢走念稿的，抢不走临场反应的。",
       "characters": [
-        "host"
+        "guest_a"
       ],
       "broll": false
     },
@@ -79,11 +79,11 @@
       "camera": "static",
       "camera_strength": 0.06,
       "duration": 6.4,
-      "line": "host",
+      "line": "guest_b",
       "text": "观众要的从来不是正确答案，而是被逗笑的那一下。",
       "characters": [
-        "host",
-        "guest_a"
+        "guest_b",
+        "host"
       ],
       "broll": false
     },
@@ -108,11 +108,11 @@
       "camera": "dolly",
       "camera_strength": 0.1,
       "duration": 6.4,
-      "line": "host",
+      "line": "guest_a",
       "text": "而且它不会累，凌晨三点还能给我写十个开场白。",
       "characters": [
-        "host",
-        "guest_a"
+        "guest_a",
+        "host"
       ],
       "broll": false
     },
@@ -137,11 +137,11 @@
       "camera": "static",
       "camera_strength": 0.06,
       "duration": 6.4,
-      "line": "host",
+      "line": "guest_b",
       "text": "那就让 AI 写稿，让真人负责翻车和救场。",
       "characters": [
-        "host",
-        "guest_a"
+        "guest_b",
+        "host"
       ],
       "broll": false
     },

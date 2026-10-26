@@ -9,10 +9,8 @@
     "narrator"
   ],
   "voice": {
-    "provider": "breeze",
-    "instruction": "19岁女性，软糯怯生生，音量偏小，尾音发虚，说话会停顿",
-    "seed": 20262021,
-    "cfg_scale": 4.3
+    "voice_id": "soft_male",
+    "provider": "breeze"
   },
   "appearance": {
     "gender": "female",
@@ -72,5 +70,10 @@
     "candy_collage": {
       "line": 1.2
     }
+  },
+  "voice_legacy": {
+    "instruction": "19岁女性，软糯怯生生，音量偏小，尾音发虚，说话会停顿",
+    "seed": 20262021,
+    "cfg_scale": 4.3
   }
 }

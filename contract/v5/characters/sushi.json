@@ -9,10 +9,8 @@
     "narrator"
   ],
   "voice": {
-    "provider": "breeze",
-    "instruction": "48岁男性，温润清亮，带笑意，语气松弛幽默，偶尔拖长音",
-    "seed": 20262005,
-    "cfg_scale": 4.0
+    "voice_id": "scholar_wenrun",
+    "provider": "breeze"
   },
   "appearance": {
     "gender": "male",
@@ -73,5 +71,10 @@
       "line": 1.0,
       "shade": 0.3
     }
+  },
+  "voice_legacy": {
+    "instruction": "48岁男性，温润清亮，带笑意，语气松弛幽默，偶尔拖长音",
+    "seed": 20262005,
+    "cfg_scale": 4.0
   }
 }

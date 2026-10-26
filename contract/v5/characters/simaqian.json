@@ -9,10 +9,8 @@
     "figure_a"
   ],
   "voice": {
-    "provider": "breeze",
-    "instruction": "45岁男性，清瘦沉静的中音，略带沙哑，语气克制，字字有据",
-    "seed": 20262012,
-    "cfg_scale": 3.7
+    "voice_id": "historian_kezhi",
+    "provider": "breeze"
   },
   "appearance": {
     "gender": "male",
@@ -73,5 +71,10 @@
       "line": 1.0,
       "shade": 0.3
     }
+  },
+  "voice_legacy": {
+    "instruction": "45岁男性，清瘦沉静的中音，略带沙哑，语气克制，字字有据",
+    "seed": 20262012,
+    "cfg_scale": 3.7
   }
 }

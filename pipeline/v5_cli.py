@@ -428,7 +428,105 @@ def build_parser() -> argparse.ArgumentParser:
     p_preview.add_argument("--size", default=None, help="输出尺寸，如 1280x720")
     _add_root(p_preview)
     p_preview.set_defaults(func=cmd_preview)
+
+    p_voice = sub.add_parser("voice", help="角色固定声音：list/show/preview/lock/set")
+    vsub = p_voice.add_subparsers(dest="voice_action", required=True)
+    vp = vsub.add_parser("list", help="列出声音库预设")
+    _add_root(vp)
+    vp.set_defaults(func=cmd_voice)
+    for action in ("show", "lock", "preview"):
+        vp = vsub.add_parser(action, help=f"{action} 角色声音")
+        vp.add_argument("--character", required=True)
+        _add_root(vp)
+        if action == "lock":
+            vp.add_argument("--force", action="store_true", help="强制重建声音锁")
+        if action == "preview":
+            vp.add_argument("--text", default="", help="试听文本")
+            vp.add_argument("--out", default="", help="输出 wav（默认 tmp/v5_voice/<角色>.wav）")
+        vp.set_defaults(func=cmd_voice)
+    vp = vsub.add_parser("set", help="修改角色声音（写入 custom/characters/<id>.json）")
+    vp.add_argument("--character", required=True)
+    vp.add_argument("--voice-id", default=None, help="引用 voices.json 的 preset id")
+    vp.add_argument("--seed", type=int, default=None)
+    vp.add_argument("--cfg-scale", type=float, default=None)
+    vp.add_argument("--instruction", default=None)
+    vp.add_argument("--ref-audio", default=None, help="自定义参考音频（voice clone）")
+    vp.add_argument("--ref-text", default="", help="参考音频对应文本")
+    _add_root(vp)
+    vp.set_defaults(func=cmd_voice)
     return parser
+
+
+
+def cmd_voice(args) -> int:
+    """角色固定声音：list/show/preview/lock/set。"""
+    from . import v5_voices
+
+    catalog = _load_or_die(getattr(args, "root", None))
+    lib = v5_voices.load_voice_library()
+    action = getattr(args, "voice_action", "")
+    if action == "list":
+        rows = []
+        for pid, spec in sorted((lib.get("presets") or {}).items()):
+            rows.append({"voice_id": pid, "label": spec.get("label"),
+                         "seed": spec.get("seed"), "cfg_scale": spec.get("cfg_scale"),
+                         "tags": spec.get("tags") or []})
+        print(json.dumps({"ok": True, "count": len(rows), "presets": rows},
+                         ensure_ascii=False, indent=2))
+        return 0
+    cid = str(getattr(args, "character", "") or "")
+    if not cid:
+        raise V5Error("需要 --character")
+    chars = catalog.get("characters") or {}
+    if cid not in chars:
+        raise V5Error(f"角色不存在: {cid}（可用: {', '.join(sorted(chars)[:10])} ...）")
+    char = chars[cid]
+    spec = v5_voices.resolve_voice(char, lib)
+    if action == "show":
+        info = v5_voices.lock_info(cid, spec)
+        print(json.dumps({"ok": True, "character": cid, "voice_id": spec["voice_id"],
+                          "seed": spec["seed"], "cfg_scale": spec["cfg_scale"],
+                          "instruction": spec.get("instruction"),
+                          "ref_text": spec.get("ref_text") or "",
+                          "key": spec["key"], "lock": info},
+                         ensure_ascii=False, indent=2))
+        return 0
+    if action == "lock":
+        lock = v5_voices.ensure_voice_lock(char, spec, force=bool(getattr(args, "force", False)))
+        print(json.dumps({"ok": True, "character": cid, "voice_id": spec["voice_id"],
+                          "key": spec["key"], "lock": lock}, ensure_ascii=False, indent=2))
+        return 0
+    if action == "preview":
+        text = str(getattr(args, "text", "") or "").strip() or \
+            f"大家好，我是{char.get('label') or cid}。这是我的固定声音。"
+        out = Path(getattr(args, "out", "") or f"tmp/v5_voice/{cid}.wav")
+        out.parent.mkdir(parents=True, exist_ok=True)
+        res = v5_voices.preview(char, text, out)
+        print(json.dumps({"ok": True, **res}, ensure_ascii=False, indent=2))
+        return 0
+    if action == "set":
+        updates: dict = {}
+        if getattr(args, "voice_id", None):
+            updates["voice_id"] = args.voice_id
+        if getattr(args, "seed", None) is not None:
+            updates["seed"] = int(args.seed)
+        if getattr(args, "cfg_scale", None) is not None:
+            updates["cfg_scale"] = float(args.cfg_scale)
+        if getattr(args, "instruction", None):
+            updates["instruction"] = args.instruction
+        if getattr(args, "ref_audio", None):
+            updates["ref_audio"] = args.ref_audio
+            updates["ref_text"] = args.ref_text or ""
+        if not updates:
+            raise V5Error("voice set 需要至少一个参数（--voice-id/--seed/--instruction/--ref-audio）")
+        path = v5_voices.set_character_voice(cid, updates, catalog=catalog,
+                                             root=getattr(args, "root", None))
+        print(json.dumps({"ok": True, "character": cid, "written": str(path),
+                          "updates": updates,
+                          "next": f"python -m pipeline.v5_cli voice lock --character {cid} --force"},
+                         ensure_ascii=False, indent=2))
+        return 0
+    raise V5Error(f"未知 voice 动作: {action}")
 
 
 def main(argv: list[str] | None = None) -> int:

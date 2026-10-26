@@ -9,10 +9,8 @@
     "guest_a"
   ],
   "voice": {
-    "provider": "breeze",
-    "instruction": "35岁男性，明亮张扬，音色偏高，带酒后的松弛和狂气",
-    "seed": 20262006,
-    "cfg_scale": 4.3
+    "voice_id": "poet_haofang",
+    "provider": "breeze"
   },
   "appearance": {
     "gender": "male",
@@ -73,5 +71,10 @@
       "line": 1.0,
       "shade": 0.3
     }
+  },
+  "voice_legacy": {
+    "instruction": "35岁男性，明亮张扬，音色偏高，带酒后的松弛和狂气",
+    "seed": 20262006,
+    "cfg_scale": 4.3
   }
 }

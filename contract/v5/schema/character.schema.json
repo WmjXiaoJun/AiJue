@@ -4,79 +4,208 @@
   "title": "V5 character（角色 / 外观 / 声音 / 口型）",
   "description": "角色 = 人设 + Breeze Voice Design 声音 + 程序化外观 spec（也可用透明 PNG 立绘覆盖）+ 姿态/口型帧 + 各风格材质覆盖。",
   "type": "object",
-  "required": ["id", "label", "role_pool", "voice", "appearance"],
+  "required": [
+    "id",
+    "label",
+    "role_pool",
+    "voice",
+    "appearance"
+  ],
   "properties": {
-    "id": { "$ref": "#/$defs/id" },
-    "label": { "type": "string", "minLength": 1 },
-    "persona": { "type": "string", "description": "LLM 台本用的人设描述" },
-    "bio": { "type": "string" },
-    "tags": { "type": "array", "items": { "type": "string" } },
+    "id": {
+      "$ref": "#/$defs/id"
+    },
+    "label": {
+      "type": "string",
+      "minLength": 1
+    },
+    "persona": {
+      "type": "string",
+      "description": "LLM 台本用的人设描述"
+    },
+    "bio": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
     "role_pool": {
       "type": "array",
       "minItems": 1,
-      "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]{0,30}$" },
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]{0,30}$"
+      },
       "description": "可承担的模板角色：host / guest / figure_a / narrator / suspect …"
     },
     "voice": {
       "type": "object",
-      "required": ["provider", "instruction"],
+      "required": [
+        "provider"
+      ],
       "properties": {
-        "provider": { "type": "string", "minLength": 1, "description": "TTS provider（breeze / edge / …）" },
+        "provider": {
+          "type": "string",
+          "minLength": 1,
+          "description": "TTS provider（breeze / edge / …）"
+        },
         "instruction": {
           "type": "string",
           "minLength": 1,
           "description": "Breeze Voice Design 音色指令（中文描述年龄/性别/音色/气质）"
         },
-        "seed": { "type": "integer" },
-        "cfg_scale": { "type": "number", "minimum": 0 },
-        "rate": { "type": "string" },
-        "pitch": { "type": "string" },
-        "voice_id": { "type": "string" }
+        "seed": {
+          "type": "integer"
+        },
+        "cfg_scale": {
+          "type": "number",
+          "minimum": 0
+        },
+        "rate": {
+          "type": "string"
+        },
+        "pitch": {
+          "type": "string"
+        },
+        "voice_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "引用 contract/v5/voices.json 的固定声音 preset（推荐；与 V4 legacy 对齐）"
+        },
+        "ref_audio": {
+          "type": "string",
+          "description": "自定义参考音频（voice clone）"
+        },
+        "ref_text": {
+          "type": "string",
+          "description": "参考音频文本（与 ref_audio 配套）"
+        },
+        "notes": {
+          "type": "string"
+        }
       },
-      "additionalProperties": true
+      "additionalProperties": true,
+      "anyOf": [
+        {
+          "required": [
+            "instruction"
+          ]
+        },
+        {
+          "required": [
+            "voice_id"
+          ]
+        }
+      ]
     },
     "appearance": {
       "type": "object",
-      "required": ["gender", "age", "skin", "hair", "hair_style", "eye", "outfit"],
+      "required": [
+        "gender",
+        "age",
+        "skin",
+        "hair",
+        "hair_style",
+        "eye",
+        "outfit"
+      ],
       "properties": {
         "gender": {
           "type": "string",
           "minLength": 1,
           "description": "推荐 male / female / neutral / other；非人类角色可写 robot 等自定义值"
         },
-        "age": { "type": "integer", "minimum": 1, "maximum": 150 },
-        "skin": { "$ref": "#/$defs/hex" },
-        "hair": { "$ref": "#/$defs/hex" },
-        "hair_style": { "type": "string", "minLength": 1 },
-        "eye": { "$ref": "#/$defs/hex" },
-        "eye_style": { "type": "string" },
-        "brow": { "type": "string" },
-        "beard": { "type": "string" },
-        "face_ratio": { "type": "number", "minimum": 0.5, "maximum": 2 },
-        "head_ratio": { "type": "number", "minimum": 0.5, "maximum": 3 },
-        "chibi": { "type": "number", "minimum": 0, "maximum": 1 },
+        "age": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 150
+        },
+        "skin": {
+          "$ref": "#/$defs/hex"
+        },
+        "hair": {
+          "$ref": "#/$defs/hex"
+        },
+        "hair_style": {
+          "type": "string",
+          "minLength": 1
+        },
+        "eye": {
+          "$ref": "#/$defs/hex"
+        },
+        "eye_style": {
+          "type": "string"
+        },
+        "brow": {
+          "type": "string"
+        },
+        "beard": {
+          "type": "string"
+        },
+        "face_ratio": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 2
+        },
+        "head_ratio": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 3
+        },
+        "chibi": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
         "outfit": {
           "type": "object",
-          "required": ["type", "main", "accent"],
+          "required": [
+            "type",
+            "main",
+            "accent"
+          ],
           "properties": {
-            "type": { "type": "string", "minLength": 1, "description": "suit / hoodie / hanfu / robe / armor / dress / labcoat …" },
-            "main": { "$ref": "#/$defs/hex" },
-            "accent": { "$ref": "#/$defs/hex" },
-            "shirt": { "$ref": "#/$defs/hex" },
-            "pants": { "$ref": "#/$defs/hex" },
-            "hat": { "type": "string" },
-            "shoes": { "$ref": "#/$defs/hex" }
+            "type": {
+              "type": "string",
+              "minLength": 1,
+              "description": "suit / hoodie / hanfu / robe / armor / dress / labcoat …"
+            },
+            "main": {
+              "$ref": "#/$defs/hex"
+            },
+            "accent": {
+              "$ref": "#/$defs/hex"
+            },
+            "shirt": {
+              "$ref": "#/$defs/hex"
+            },
+            "pants": {
+              "$ref": "#/$defs/hex"
+            },
+            "hat": {
+              "type": "string"
+            },
+            "shoes": {
+              "$ref": "#/$defs/hex"
+            }
           },
           "additionalProperties": true
         },
         "accessories": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "feather_fan / glasses / headphones / watch / seal …"
         },
         "marks": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "warm_smile / scar_brow / freckles …"
         }
       },
@@ -85,19 +214,27 @@
     "poses": {
       "type": "array",
       "minItems": 1,
-      "items": { "type": "string", "minLength": 1 },
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
       "description": "front / side / back / point / think / surprise / sit …"
     },
     "mouth": {
       "type": "array",
       "minItems": 1,
-      "items": { "type": "string", "minLength": 1 },
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
       "description": "viseme 帧：closed / a / o / e / i / u / m"
     },
     "style_overrides": {
       "type": "object",
       "description": "各风格下的材质/线条覆盖：style_id → {line, shade, palette, …}",
-      "additionalProperties": { "type": "object" }
+      "additionalProperties": {
+        "type": "object"
+      }
     },
     "image": {
       "type": "string",

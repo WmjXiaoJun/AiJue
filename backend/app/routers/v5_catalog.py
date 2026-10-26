@@ -192,3 +192,71 @@ def put_item(kind: str, item_id: str,
             "merged": bool(result.get("merged")),
             "write_mode": write_mode,
             "warnings": result.get("warnings") or []}
+
+
+# ---------------------------------------------------------------------------
+# 角色固定声音（voice library / voice lock）
+# ---------------------------------------------------------------------------
+@router.get("/voices")
+def list_voices() -> dict:
+    """列出声音库预设（contract/v5/voices.json + custom/voices.json）。"""
+    from pipeline import v5_voices
+    lib = v5_voices.load_voice_library()
+    return {"ok": True, "count": len(lib.get("presets") or {}),
+            "presets": [{"voice_id": pid, **{k: spec.get(k) for k in
+                                            ("label", "seed", "cfg_scale", "tags")}}
+                        for pid, spec in sorted((lib.get("presets") or {}).items())]}
+
+
+@router.get("/voice/{character}")
+def get_character_voice(character: str) -> dict:
+    """读取角色当前固定声音（resolved）与声音锁状态。"""
+    from pipeline import v5_voices
+    catalog = _catalog()
+    char = (catalog.get("characters") or {}).get(character)
+    if not char:
+        raise HTTPException(status_code=404, detail=f"角色不存在: {character}")
+    spec = v5_voices.resolve_voice(char, v5_voices.load_voice_library())
+    info = v5_voices.lock_info(character, spec)
+    return {"ok": True, "character": character, "voice_id": spec["voice_id"],
+            "seed": spec["seed"], "cfg_scale": spec["cfg_scale"],
+            "instruction": spec.get("instruction"), "key": spec["key"],
+            "ref_text": spec.get("ref_text") or "", "lock": info}
+
+
+@router.post("/voice/{character}/lock")
+def lock_character_voice(character: str, body: Dict[str, Any] = Body(default={})) -> dict:
+    """生成/重建角色固定声音参考（需要 Breeze TTS 服务；首次会加载模型）。"""
+    from pipeline import v5_voices
+    catalog = _catalog()
+    char = (catalog.get("characters") or {}).get(character)
+    if not char:
+        raise HTTPException(status_code=404, detail=f"角色不存在: {character}")
+    spec = v5_voices.resolve_voice(char, v5_voices.load_voice_library())
+    try:
+        lock = v5_voices.ensure_voice_lock(char, spec, force=bool(body.get("force")))
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(status_code=503, detail=f"声音锁生成失败: {exc}") from exc
+    return {"ok": True, "character": character, "voice_id": spec["voice_id"],
+            "key": spec["key"], "lock": lock}
+
+
+@router.post("/voice/{character}/preview")
+def preview_character_voice(character: str, body: Dict[str, Any] = Body(default={})) -> dict:
+    """试听角色声音（返回 wav 文件）。"""
+    from pipeline import v5_voices
+    catalog = _catalog()
+    char = (catalog.get("characters") or {}).get(character)
+    if not char:
+        raise HTTPException(status_code=404, detail=f"角色不存在: {character}")
+    text = str(body.get("text") or "").strip() or \
+        f"大家好，我是{char.get('label') or character}。这是我的固定声音。"
+    out = v5_voices.REPO / "tmp" / "v5_voice" / f"{character}.wav"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        res = v5_voices.preview(char, text, out)
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(status_code=503, detail=f"试听失败: {exc}") from exc
+    data = out.read_bytes()
+    return {"ok": True, **res, "wav_base64_len": len(data)}
+

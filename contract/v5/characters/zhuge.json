@@ -9,10 +9,8 @@
     "narrator"
   ],
   "voice": {
-    "provider": "breeze",
-    "instruction": "40岁男性，清朗沉稳，略带沙哑的书卷气，语速偏慢，讲究顿挫",
-    "seed": 20262001,
-    "cfg_scale": 4.0
+    "voice_id": "strategist_qinglang",
+    "provider": "breeze"
   },
   "appearance": {
     "gender": "male",
@@ -72,5 +70,10 @@
       "line": 1.0,
       "shade": 0.3
     }
+  },
+  "voice_legacy": {
+    "instruction": "40岁男性，清朗沉稳，略带沙哑的书卷气，语速偏慢，讲究顿挫",
+    "seed": 20262001,
+    "cfg_scale": 4.0
   }
 }

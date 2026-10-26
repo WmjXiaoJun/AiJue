@@ -9,10 +9,8 @@
     "host"
   ],
   "voice": {
-    "provider": "breeze",
-    "instruction": "28岁男性，紧绷急促，语速偏快，带一点亢奋和疲惫",
-    "seed": 20262019,
-    "cfg_scale": 4.0
+    "voice_id": "fast_male",
+    "provider": "breeze"
   },
   "appearance": {
     "gender": "male",
@@ -72,5 +70,10 @@
     "candy_collage": {
       "line": 1.2
     }
+  },
+  "voice_legacy": {
+    "instruction": "28岁男性，紧绷急促，语速偏快，带一点亢奋和疲惫",
+    "seed": 20262019,
+    "cfg_scale": 4.0
   }
 }

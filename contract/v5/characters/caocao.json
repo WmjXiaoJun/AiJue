@@ -9,10 +9,8 @@
     "narrator"
   ],
   "voice": {
-    "provider": "breeze",
-    "instruction": "50岁男性，低沉浑厚，带一点沙哑和压迫感，笑意不达眼底",
-    "seed": 20262002,
-    "cfg_scale": 3.8
+    "voice_id": "emperor_yazhong",
+    "provider": "breeze"
   },
   "appearance": {
     "gender": "male",
@@ -72,5 +70,10 @@
       "line": 1.0,
       "shade": 0.3
     }
+  },
+  "voice_legacy": {
+    "instruction": "50岁男性，低沉浑厚，带一点沙哑和压迫感，笑意不达眼底",
+    "seed": 20262002,
+    "cfg_scale": 3.8
   }
 }

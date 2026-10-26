@@ -9,10 +9,8 @@
     "narrator"
   ],
   "voice": {
-    "provider": "breeze",
-    "instruction": "45岁男性，厚重洪亮，正气凛然，尾音沉稳，带一点傲气",
-    "seed": 20262009,
-    "cfg_scale": 4.0
+    "voice_id": "warrior_houzhong",
+    "provider": "breeze"
   },
   "appearance": {
     "gender": "male",
@@ -73,5 +71,10 @@
       "line": 1.0,
       "shade": 0.3
     }
+  },
+  "voice_legacy": {
+    "instruction": "45岁男性，厚重洪亮，正气凛然，尾音沉稳，带一点傲气",
+    "seed": 20262009,
+    "cfg_scale": 4.0
   }
 }

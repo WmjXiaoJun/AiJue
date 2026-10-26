@@ -19,6 +19,13 @@
   分辨率/fps/duration、V1/A1/S1 轨存在、V1 覆盖时长）；
 - 契约：`validate_catalog()` 0 errors / 0 warnings；counts ≥ styles 16 / scenes 60 /
   characters 24 / props 40 / templates 16 / packs 2（含 custom 时以 catalog.counts 为准）；
+- **角色固定声音（voice lock / voice_fixed）**：
+  ① 每部 `qc_report.checks.voice_fixed` 必须 ok（同角色所有对白镜 voice_key 唯一、对白镜都有 voice_id/key）；
+  ② 从 `work/episode.json` 复核：每个说话角色在所有镜头同一 voice_id/key/seed；voice_id 必须存在于
+     `contract/v5/voices.json`（含 custom 覆盖合并，`pipeline.v5_voices.load_voice_library`）；
+     声音锁参考音频存在：`outputs/v5_voices/<character>/<voice_key>.wav` + `.json`；
+     跨 16 部同角色 voice_id/key/seed 必须一致（跨集音色固定）；
+  ③ 每部至少 2 个不同角色有台词（host + guest，防“只有 host 说话”回归）；
 - 已知问题回归（可自动化的部分）：
   ① 水墨竖排字幕曾把 ASS 绘图指令烧进画面 → 解析 `work/final.ass`：文字型 Dialogue 事件
     不得出现"未加 \\p1 覆盖的 m/l 绘图指令裸文本"；
@@ -53,6 +60,8 @@ OUTPUTS = REPO_ROOT / "outputs" / "templates_v5"
 MATRIX_JSON = REPO_ROOT / "tmp" / "qa" / "v5_style_matrix.json"
 HEAD_WARN_JSON = REPO_ROOT / "tmp" / "qa" / "v5_head_warnings.json"
 HEAD_GATE_JSON = REPO_ROOT / "tmp" / "qa" / "v5_head_gate.json"
+VOICES_JSON = REPO_ROOT / "contract" / "v5" / "voices.json"
+VOICE_LOCKS = REPO_ROOT / "outputs" / "v5_voices"
 EXPECTED = [
     "tonight_show", "shark_tank", "masked_singer", "standup", "taskmaster",
     "traitors", "snl_sketch", "roundtable", "hot_ones", "qipashuo",
@@ -69,8 +78,9 @@ SUB_CONTRAST_MIN = 3.0
 REQUIRED_CHECKS = {
     "duration", "resolution", "fps", "audio", "blackdetect",
     "scene_coverage", "character_coverage", "subtitle_coverage",
-    "style", "fallbacks",
+    "style", "fallbacks", "voice_fixed",
 }
+LEGACY_VOICE_SEEDS = {"laozhou": 20261026, "ali": 20261027, "dawei": 20261028}
 _DRAWING_LEAK = re.compile(r"^[ml]\s+-?\d")
 _OVERRIDE = re.compile(r"\{[^}]*\}")
 
@@ -580,6 +590,195 @@ def test_character_head_safe(tid: str):
 
 
 # ---------------------------------------------------------------------------
+# 5b) 角色固定声音（voice lock / voice_fixed）
+#
+# 用户需求：每个角色的声音必须固定，并且可以在角色下修改。
+# 口径：
+# - 每个说话角色跨镜使用同一 voice_id + voice_key（voice_key 由 provider/voice_id/
+#   seed/instruction/ref_audio/ref_text/cfg_scale 派生，改任一项自动换 key）；
+# - voice_id 必须来自 contract/v5/voices.json（24 preset，支持 custom/voices.json 覆盖）；
+# - 声音锁：outputs/v5_voices/<character>/<voice_key>.wav + .json 存在（同角色跨集一致）；
+# - 每部至少 2 个不同角色有台词（host + guest，回归“只有 host 说话”bug）；
+# - qc_report.checks.voice_fixed 必须 ok。
+# ---------------------------------------------------------------------------
+@functools.lru_cache(maxsize=4)
+def voice_library() -> dict:
+    from pipeline import v5_voices
+    return v5_voices.load_voice_library()
+
+
+def plan_shots(tid: str) -> list[dict]:
+    shots = plan(tid).get("shots") or []
+    return [s for s in shots if isinstance(s, dict)]
+
+
+def speaking_shots(tid: str) -> list[dict]:
+    return [s for s in plan_shots(tid) if str(s.get("line") or "").strip()]
+
+
+def episode_voice_map(tid: str) -> dict[str, dict]:
+    """从 work/episode.json 抽取每个角色的声音信息（跨镜聚合）。"""
+    out: dict[str, dict] = {}
+    for shot in speaking_shots(tid):
+        voice = shot.get("voice") if isinstance(shot.get("voice"), dict) else {}
+        cid = str(voice.get("character") or shot.get("character") or "")
+        key = str(voice.get("voice_key") or "")
+        vid = str(voice.get("voice_id") or "")
+        seed = voice.get("seed")
+        ref = str(voice.get("ref") or "")
+        item = out.setdefault(cid or "<missing>", {"keys": set(), "voice_ids": set(),
+                                                   "seeds": set(), "refs": set(),
+                                                   "lines": 0, "shot_ids": []})
+        item["lines"] += 1
+        item["shot_ids"].append(shot.get("id"))
+        if key:
+            item["keys"].add(key)
+        if vid:
+            item["voice_ids"].add(vid)
+        if seed is not None:
+            item["seeds"].add(seed)
+        if ref:
+            item["refs"].add(ref)
+    return out
+
+
+def meta_voices(tid: str) -> dict[str, dict]:
+    out: dict[str, dict] = {}
+    for item in ((plan(tid).get("meta") or {}).get("voices") or []):
+        if isinstance(item, dict) and item.get("character"):
+            out[str(item["character"])] = item
+    return out
+
+
+@pytest.mark.parametrize("tid", READY)
+def test_voice_fixed(tid: str):
+    report = qc_report(tid)
+    check = (report.get("checks") or {}).get("voice_fixed") or {}
+    stats = report.get("stats") or {}
+    voices = voice_library()
+    presets = voices.get("presets") or {}
+    vmap = episode_voice_map(tid)
+    meta = meta_voices(tid)
+    problems: list[str] = []
+    if check.get("ok") is not True:
+        problems.append(f"qc.checks.voice_fixed 未通过：{check.get('detail')}")
+    if not vmap:
+        problems.append("work/episode.json 无对白镜声音信息")
+    for cid, item in sorted(vmap.items()):
+        if not item["keys"] or len(item["keys"]) > 1:
+            problems.append(f"{cid}: voice_key 不唯一/缺失 {sorted(item['keys'])}"
+                            f"（镜 {item['shot_ids']}）")
+        if not item["voice_ids"] or len(item["voice_ids"]) > 1:
+            problems.append(f"{cid}: voice_id 不唯一/缺失 {sorted(item['voice_ids'])}")
+        if len(item["seeds"]) > 1:
+            problems.append(f"{cid}: seed 不一致 {sorted(item['seeds'])}")
+        for vid in item["voice_ids"]:
+            if vid not in presets:
+                problems.append(f"{cid}: voice_id={vid!r} 不在 contract/v5/voices.json presets")
+        key = sorted(item["keys"])[0] if item["keys"] else ""
+        if cid and key:
+            wav = VOICE_LOCKS / cid / f"{key}.wav"
+            meta_json = VOICE_LOCKS / cid / f"{key}.json"
+            if not (wav.is_file() and wav.stat().st_size > 20 * 1024):
+                problems.append(f"{cid}: 声音锁 wav 缺失/过小 {wav}")
+            if not meta_json.is_file():
+                problems.append(f"{cid}: 声音锁 json 缺失 {meta_json}")
+            mv = meta.get(cid) or {}
+            if mv and str(mv.get("key") or "") != key:
+                problems.append(f"{cid}: meta.voices.key={mv.get('key')!r} != 镜头 key={key}")
+            if mv and str(mv.get("voice_id") or "") != sorted(item["voice_ids"])[0]:
+                problems.append(f"{cid}: meta.voices.voice_id 与镜头不一致")
+    # qc stats.voices 应与 episode 推导一致
+    qc_voices = stats.get("voices") or {}
+    derived = {cid: sorted(item["keys"])[0] for cid, item in vmap.items() if item["keys"]}
+    if qc_voices and qc_voices != derived:
+        problems.append(f"qc.stats.voices={qc_voices} 与 episode 推导 {derived} 不一致")
+    assert not problems, f"{tid}: 固定声音验收失败：\n" + "\n".join(problems)
+
+
+@pytest.mark.parametrize("tid", READY)
+def test_multi_speaker(tid: str):
+    vmap = episode_voice_map(tid)
+    speakers = [cid for cid, item in vmap.items() if item["lines"] > 0]
+    assert len(speakers) >= 2, (
+        f"{tid}: 只有 {len(speakers)} 个角色有台词（{speakers}），要求 ≥2"
+        f"（host+guest；回归“只有 host 说话”bug）")
+
+
+def test_voice_library_contract():
+    voices = voice_library()
+    presets = voices.get("presets") or {}
+    problems = []
+    if len(presets) < 24:
+        problems.append(f"voices.json presets={len(presets)} < 24")
+    for pid, spec in presets.items():
+        if not isinstance(spec, dict):
+            problems.append(f"{pid}: preset 不是 dict")
+            continue
+        if str(spec.get("provider") or "") != "breeze":
+            problems.append(f"{pid}: provider != breeze")
+        if not str(spec.get("instruction") or "").strip():
+            problems.append(f"{pid}: 缺 instruction")
+        if spec.get("seed") is None:
+            problems.append(f"{pid}: 缺 seed")
+    for cid, seed in LEGACY_VOICE_SEEDS.items():
+        preset_id = f"legacy_v4_{cid}"
+        if preset_id not in presets:
+            problems.append(f"缺 V4 兼容 preset {preset_id}")
+        elif int(presets[preset_id].get("seed") or 0) != seed:
+            problems.append(f"{preset_id}: seed != {seed}")
+    # 内置角色 voice.voice_id 必须可解析到 preset（custom 内联音色除外）
+    catalog = v5_catalog.load_catalog()
+    for cid, ch in (catalog.get("characters") or {}).items():
+        voice = ch.get("voice") if isinstance(ch.get("voice"), dict) else {}
+        vid = str(voice.get("voice_id") or "")
+        if vid and vid not in presets:
+            problems.append(f"角色 {cid}: voice_id={vid!r} 不在 presets")
+    try:
+        from pipeline import v5_voices
+        result = v5_voices.validate_library()
+        if result.get("ok") is not True or result.get("errors"):
+            problems.append(f"validate_library 失败：{result.get('errors')}")
+    except Exception as exc:  # noqa: BLE001
+        problems.append(f"validate_library 异常：{exc}")
+    assert not problems, "声音库契约问题：\n" + "\n".join(problems)
+
+
+def test_voice_cross_template_consistency():
+    """跨 16 部：同一角色必须使用同一 voice_id/key/seed（跨集音色固定）。"""
+    ready = [tid for tid in EXPECTED if v5_state(tid) == "ready"]
+    if len(ready) < 16:
+        pytest.skip(f"V5 批量重渲进行中：可验收 {len(ready)}/16")
+    seen: dict[str, dict] = {}
+    problems = []
+    for tid in ready:
+        for cid, item in episode_voice_map(tid).items():
+            entry = seen.setdefault(cid, {"voice_ids": set(), "keys": set(),
+                                          "seeds": set(), "templates": set()})
+            entry["voice_ids"] |= item["voice_ids"]
+            entry["keys"] |= item["keys"]
+            entry["seeds"] |= item["seeds"]
+            entry["templates"].add(tid)
+    for cid, entry in sorted(seen.items()):
+        if len(entry["voice_ids"]) > 1:
+            problems.append(f"{cid}: 跨集 voice_id 不一致 {sorted(entry['voice_ids'])}")
+        if len(entry["keys"]) > 1:
+            problems.append(f"{cid}: 跨集 voice_key 不一致 {sorted(entry['keys'])}")
+        if len(entry["seeds"]) > 1:
+            problems.append(f"{cid}: 跨集 seed 不一致 {sorted(entry['seeds'])}")
+    summary = {cid: {"voice_id": sorted(e["voice_ids"])[0] if e["voice_ids"] else "",
+                     "key": sorted(e["keys"])[0] if e["keys"] else "",
+                     "seed": sorted(e["seeds"])[0] if e["seeds"] else None,
+                     "templates": sorted(e["templates"])}
+               for cid, e in seen.items()}
+    out = REPO_ROOT / "tmp" / "qa" / "v5_voice_consistency.json"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(summary, ensure_ascii=False, indent=1), encoding="utf-8")
+    assert seen, "没有任何角色声音信息"
+    assert not problems, "跨集声音一致性问题：\n" + "\n".join(problems)
+
+
+# ---------------------------------------------------------------------------
 # 6) 已知问题回归：水墨竖排字幕 / 字幕对比度
 # ---------------------------------------------------------------------------
 def _parse_ass_styles(path: Path) -> dict[str, dict]:
@@ -728,6 +927,10 @@ def test_all_16_v5_ready():
             problems.append(f"{tid}: 缺 timeline.json")
         if not (tdir(tid) / "style_report.json").is_file():
             problems.append(f"{tid}: 缺 style_report.json")
+        speakers = [cid for cid, item in episode_voice_map(tid).items()
+                    if item["lines"] > 0]
+        if len(speakers) < 2:
+            problems.append(f"{tid}: 台词角色数 {len(speakers)} <2（{speakers}）")
     batch = read_json(OUTPUTS / "batch_report_v5.json", {}) or {}
     if batch:
         if batch.get("ok") is not True:

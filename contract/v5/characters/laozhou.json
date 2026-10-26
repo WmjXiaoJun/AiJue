@@ -8,10 +8,8 @@
     "narrator"
   ],
   "voice": {
-    "provider": "breeze",
-    "instruction": "42岁男性，成熟磁性，略带鼻音，半开玩笑的调侃语气，节奏稳",
-    "seed": 20262013,
-    "cfg_scale": 4.0
+    "voice_id": "legacy_v4_laozhou",
+    "provider": "breeze"
   },
   "appearance": {
     "gender": "male",
@@ -71,5 +69,10 @@
     "candy_collage": {
       "line": 1.2
     }
+  },
+  "voice_legacy": {
+    "instruction": "42岁男性，成熟磁性，略带鼻音，半开玩笑的调侃语气，节奏稳",
+    "seed": 20262013,
+    "cfg_scale": 4.0
   }
 }

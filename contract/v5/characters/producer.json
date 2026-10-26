@@ -9,10 +9,8 @@
     "narrator"
   ],
   "voice": {
-    "provider": "breeze",
-    "instruction": "32岁女性，干练清晰，中音偏实，语速快，命令句多，带掌控感",
-    "seed": 20262022,
-    "cfg_scale": 4.0
+    "voice_id": "steady_male",
+    "provider": "breeze"
   },
   "appearance": {
     "gender": "female",
@@ -69,5 +67,10 @@
     "candy_collage": {
       "line": 1.2
     }
+  },
+  "voice_legacy": {
+    "instruction": "32岁女性，干练清晰，中音偏实，语速快，命令句多，带掌控感",
+    "seed": 20262022,
+    "cfg_scale": 4.0
   }
 }

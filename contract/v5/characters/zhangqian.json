@@ -9,10 +9,8 @@
     "narrator"
   ],
   "voice": {
-    "provider": "breeze",
-    "instruction": "40岁男性，风尘仆仆的温厚中音，带笑意，像讲故事一样娓娓道来",
-    "seed": 20262010,
-    "cfg_scale": 3.9
+    "voice_id": "envoy_jianyi",
+    "provider": "breeze"
   },
   "appearance": {
     "gender": "male",
@@ -70,5 +68,10 @@
       "line": 1.0,
       "shade": 0.3
     }
+  },
+  "voice_legacy": {
+    "instruction": "40岁男性，风尘仆仆的温厚中音，带笑意，像讲故事一样娓娓道来",
+    "seed": 20262010,
+    "cfg_scale": 3.9
   }
 }

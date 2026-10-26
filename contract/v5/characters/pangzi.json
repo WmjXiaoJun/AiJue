@@ -9,10 +9,8 @@
     "host"
   ],
   "voice": {
-    "provider": "breeze",
-    "instruction": "30岁男性，圆润温和，笑眯眯的，语速慢，带咀嚼般的松弛感",
-    "seed": 20262018,
-    "cfg_scale": 4.1
+    "voice_id": "warm_male",
+    "provider": "breeze"
   },
   "appearance": {
     "gender": "male",
@@ -72,5 +70,10 @@
     "candy_collage": {
       "line": 1.2
     }
+  },
+  "voice_legacy": {
+    "instruction": "30岁男性，圆润温和，笑眯眯的，语速慢，带咀嚼般的松弛感",
+    "seed": 20262018,
+    "cfg_scale": 4.1
   }
 }

@@ -221,6 +221,28 @@ def evaluate(*, video: Path, plan: dict, qc_extra: dict | None = None,
                       if dialog else "无对话镜")
         checks["subtitle_coverage"] = _check(sub_ok, sub_detail, missing=missing)
 
+    # 角色声音固定：同角色所有对白镜必须用同一 voice_key，且对白镜都有 voice_id
+    voice_shots = [s2 for s2 in body_shots if s2.get("line")]
+    voice_map: dict[str, set] = {}
+    missing_voice: list[str] = []
+    for s2 in voice_shots:
+        v = s2.get("voice") if isinstance(s2.get("voice"), dict) else {}
+        cid = str(v.get("character") or s2.get("character") or "")
+        key = str(v.get("voice_key") or "")
+        if not cid or not key:
+            missing_voice.append(s2.get("id"))
+            continue
+        voice_map.setdefault(cid, set()).add(key)
+    inconsistent = {cid: sorted(keys) for cid, keys in voice_map.items()
+                    if len(keys) > 1}
+    voice_ok = not missing_voice and not inconsistent
+    checks["voice_fixed"] = _check(
+        voice_ok,
+        (f"{len(voice_map)} 个角色声音固定（voice_key 唯一）"
+         if voice_ok else f"缺声音: {missing_voice}；同角色多声音: {inconsistent}"),
+        characters={cid: sorted(keys)[0] for cid, keys in voice_map.items()},
+        missing=missing_voice, inconsistent=inconsistent)
+
     extra = qc_extra or {}
     if extra.get("lip_sync"):
         ls = extra["lip_sync"]
@@ -244,6 +266,7 @@ def evaluate(*, video: Path, plan: dict, qc_extra: dict | None = None,
         "broll_shots": sum(1 for s in body_shots if not s.get("line")),
         "scenes": len(scenes), "characters": len(chars),
         "style": str((plan.get("episode") or {}).get("style") or ""),
+        "voices": {cid: sorted(keys)[0] for cid, keys in voice_map.items()},
         "black_segments": black,
         "edge_density": fp.get("edge_density"),
     }

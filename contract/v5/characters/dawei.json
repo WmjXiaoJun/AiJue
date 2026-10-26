@@ -9,10 +9,8 @@
     "figure_b"
   ],
   "voice": {
-    "provider": "breeze",
-    "instruction": "52岁男性，低沉沙哑，慢条斯理，带一点说教味的冷幽默",
-    "seed": 20262015,
-    "cfg_scale": 3.8
+    "voice_id": "legacy_v4_dawei",
+    "provider": "breeze"
   },
   "appearance": {
     "gender": "male",
@@ -68,5 +66,10 @@
     "candy_collage": {
       "line": 1.2
     }
+  },
+  "voice_legacy": {
+    "instruction": "52岁男性，低沉沙哑，慢条斯理，带一点说教味的冷幽默",
+    "seed": 20262015,
+    "cfg_scale": 3.8
   }
 }

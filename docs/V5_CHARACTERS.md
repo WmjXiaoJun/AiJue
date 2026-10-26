@@ -1,3 +1,5 @@
+
+> 声音：每个角色使用 `contract/v5/voices.json` 的固定 voice preset（voice_id），首次生成声音锁后跨镜/跨集 voice clone 一致；修改与试听见 `docs/V5_VOICES.md`。
 # V5 角色库（24 角色 / 程序化立绘 / 口型 viseme）
 
 > 契约：`docs/V5_INTERFACES.md` §3（函数签名不得改）；规划：`docs/PLAN_V5_STYLE_AUDIO.md` §3.4。

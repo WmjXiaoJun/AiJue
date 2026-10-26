@@ -9,10 +9,8 @@
     "host"
   ],
   "voice": {
-    "provider": "breeze",
-    "instruction": "20岁女性，甜美清亮，尾音上扬，笑意明显，语速轻快",
-    "seed": 20262016,
-    "cfg_scale": 4.4
+    "voice_id": "bright_female",
+    "provider": "breeze"
   },
   "appearance": {
     "gender": "female",
@@ -72,5 +70,10 @@
     "candy_collage": {
       "line": 1.2
     }
+  },
+  "voice_legacy": {
+    "instruction": "20岁女性，甜美清亮，尾音上扬，笑意明显，语速轻快",
+    "seed": 20262016,
+    "cfg_scale": 4.4
   }
 }

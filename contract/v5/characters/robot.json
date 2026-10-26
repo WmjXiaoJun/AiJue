@@ -9,10 +9,8 @@
     "guest_b"
   ],
   "voice": {
-    "provider": "breeze",
-    "instruction": "青年中性机械音，平稳无起伏，带轻微电子质感，断句规整",
-    "seed": 20262023,
-    "cfg_scale": 4.5
+    "voice_id": "robot_flat",
+    "provider": "breeze"
   },
   "appearance": {
     "gender": "neutral",
@@ -69,5 +67,10 @@
     "candy_collage": {
       "line": 1.2
     }
+  },
+  "voice_legacy": {
+    "instruction": "青年中性机械音，平稳无起伏，带轻微电子质感，断句规整",
+    "seed": 20262023,
+    "cfg_scale": 4.5
   }
 }

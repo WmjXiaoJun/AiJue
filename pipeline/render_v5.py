@@ -121,19 +121,28 @@ def _character(catalog: dict, char_id: str) -> dict:
 # 1) TTS + 语音驱动时长
 # ---------------------------------------------------------------------------
 def tts_and_pace(plan: dict, catalog: dict, paths: dict, prog, force: bool = False) -> dict:
-    """按角色合成台词（Breeze），并把镜头时长改为「语音自然时长 + lead/tail」。"""
-    from . import tts_breeze
+    """按角色合成台词（Breeze TTS 2 + 角色固定声音锁/voice clone），语音驱动镜头时长。
+
+    - 角色声音来自 `contract/v5/voices.json` preset + 角色 JSON 的 voice 覆盖（v5_voices.resolve_voice）；
+    - 首次为每个角色生成固定参考音频（声音锁），之后所有台词用 voice clone（ref_audio + ref_text），
+      保证同一角色在任意镜头/任意集里音色一致；
+    - 缓存键含 voice_key：修改角色声音后自动失效并重新合成。
+    """
+    from . import tts_breeze, v5_voices
 
     workdir = Path(paths["workdir"])
     audio_dir = utils.ensure_dir(workdir / "audio")
     voice_dir = utils.ensure_dir(workdir / "voice")
+    raw_dir = utils.ensure_dir(voice_dir / "raw")
     shots = plan.get("shots") or []
     cast = (plan.get("meta") or {}).get("cast") or {}
 
-    # 1) 收集每句台词 → (character_id, text)
+    lib = v5_voices.load_voice_library()
+    char_specs = v5_voices.resolve_all_characters(catalog, lib)
+
+    # 1) 收集每句台词 → (character_id, text) + 角色声音 spec
     jobs: list[tuple[dict, str, str]] = []
     role_texts: dict[str, list[str]] = {}
-    voices: dict[str, dict] = {}
     for shot in shots:
         line = str(shot.get("line") or "").strip()
         if not line:
@@ -142,47 +151,100 @@ def tts_and_pace(plan: dict, catalog: dict, paths: dict, prog, force: bool = Fal
         char_id = str(shot.get("character") or (cast.get(role) or {}).get("character") or role)
         if not char_id:
             continue
-        char = _character(catalog, char_id)
-        spec = tts_breeze.voice_spec_from_character(char)
-        if spec:
-            voices[char_id] = spec
+        if char_id not in char_specs:
+            # 兼容：角色无 voice_id/声音库缺项时回退旧逻辑（character.voice 内联 instruction/seed）
+            char = _character(catalog, char_id)
+            legacy = tts_breeze.voice_spec_from_character(char)
+            if not legacy.get("instruction"):
+                legacy["instruction"] = (
+                    f"{char.get('label') or char_id} 的声音，自然中文口语，"
+                    f"{char.get('persona') or '沉稳'}")
+            legacy.setdefault("seed", abs(hash(char_id)) % 100000 + 20264000)
+            legacy.setdefault("cfg_scale", 4.0)
+            char_specs[char_id] = {
+                "character": char_id, "voice_id": f"inline_{char_id}",
+                "provider": "breeze", "seed": int(legacy["seed"]),
+                "cfg_scale": float(legacy["cfg_scale"]),
+                "instruction": str(legacy["instruction"]),
+                "key": v5_voices.voice_key({
+                    "voice_id": f"inline_{char_id}", "provider": "breeze",
+                    "instruction": legacy["instruction"], "seed": legacy["seed"],
+                    "cfg_scale": legacy["cfg_scale"]}),
+                "name": str(char.get("label") or char_id),
+            }
+            LOG.warning("角色 %s 未配置 voice_id，使用内联音色回退", char_id)
         jobs.append((shot, char_id, line))
         role_texts.setdefault(char_id, []).append(line)
 
     if not role_texts:
         raise RenderV5Error("计划里没有任何台词，无法配音")
 
-    # 2) 断点续跑：已合成（按 character+text 缓存）则复用
+    # 2) 保证 Breeze 服务 + 每角色声音锁（reference audio）
+    if prog:
+        prog(5, f"Breeze TTS 2：{len(role_texts)} 个角色 / 固定声音锁")
+    if not tts_breeze.server_alive():
+        if prog:
+            prog(6, "启动 Breeze TTS 2 服务（首次加载 1-2 分钟）")
+        if not tts_breeze.start_server():
+            raise RenderV5Error("Breeze TTS 服务启动失败")
+    relock = str(os.environ.get("V5_VOICE_RELOCK", "")).lower() in ("1", "true", "yes")
+    locks: dict[str, dict] = {}
+    for cid in role_texts:
+        spec = char_specs[cid]
+        try:
+            locks[cid] = v5_voices.ensure_voice_lock(
+                _character(catalog, cid), spec, force=relock)
+        except Exception as exc:  # noqa: BLE001
+            LOG.warning("角色 %s 声音锁生成失败（回退 Voice Design）: %s", cid, exc)
+            locks[cid] = {"character": cid, "key": spec["key"], "wav": "",
+                          "text": "", "cached": False, "voice_id": spec["voice_id"],
+                          "seed": spec["seed"]}
+    voices = {cid: {"instruction": char_specs[cid].get("instruction"),
+                    "seed": char_specs[cid]["seed"],
+                    "cfg_scale": char_specs[cid]["cfg_scale"]}
+              for cid in role_texts}
+    refs = {cid: (lock.get("wav"), lock.get("text") or "")
+            for cid, lock in locks.items() if lock.get("wav")}
+
+    # 3) 断点续跑：缓存键 = character|voice_key|text（改声音会自动失效）
     cache_path = voice_dir / "voice_cache.json"
     cache = utils.read_json(cache_path) or {}
     reuse_tts = str(os.environ.get("V5_REUSE_TTS", "")).lower() in ("1", "true", "yes")
     if force and not reuse_tts:
         cache = {}
+    meta = plan.setdefault("meta", {})
+    meta["voice_provider"] = "breeze"
+    meta["voices"] = [
+        {"character": cid, "voice_id": char_specs[cid]["voice_id"],
+         "key": char_specs[cid]["key"], "seed": char_specs[cid]["seed"],
+         "ref": locks[cid].get("wav") or "", "ref_cached": bool(locks[cid].get("cached"))}
+        for cid in role_texts]
     pending: dict[str, list[str]] = {}
     for char_id, texts in role_texts.items():
+        key_prefix = f"{char_id}|{char_specs[char_id]['key']}|"
         for text in texts:
-            key = f"{char_id}|{text}"
-            if key not in cache:
+            if key_prefix + text not in cache:
                 pending.setdefault(char_id, []).append(text)
 
     if prog:
-        prog(6, f"Breeze TTS 2 配音：{len(pending)} 句 / {len(voices)} 角色")
+        prog(8, f"配音：{sum(len(v) for v in pending.values())} 句 / {len(role_texts)} 角色"
+                f"（voice clone）")
     if pending:
-        if not tts_breeze.server_alive():
-            if prog:
-                prog(7, "启动 Breeze TTS 2 服务（首次加载 1-2 分钟）")
-            if not tts_breeze.start_server():
-                raise RenderV5Error("Breeze TTS 服务启动失败")
-        results = tts_breeze.synthesize(pending, voice_dir / "raw", auto_start=False,
-                                        voices=voices)
+        results = tts_breeze.synthesize(pending, raw_dir, auto_start=False,
+                                        voices=voices, refs=refs)
         for item in results:
-            key = f"{item['role']}|{item['text']}"
+            cid = item["role"]
+            key = f"{cid}|{char_specs[cid]['key']}|{item['text']}"
             cache[key] = {"path": item["path"], "duration": item["duration"],
                           "provider": item.get("provider", "breeze"),
-                          "seed": item.get("seed"), "voice": item.get("voice", "")}
+                          "seed": item.get("seed"),
+                          "voice": item.get("voice", ""),
+                          "voice_id": char_specs[cid]["voice_id"],
+                          "voice_key": char_specs[cid]["key"],
+                          "ref": refs.get(cid, (None, ""))[0] or ""}
         utils.write_json(cache_path, cache)
 
-    # 3) 每镜：语音时长 → 镜头时长；音轨 wav（48k stereo，voice 起点 +0.10s）
+    # 4) 每镜：语音时长 → 镜头时长；音轨 wav（48k stereo，voice 起点 +0.10s）
     total = 0.0
     for shot in shots:
         line = str(shot.get("line") or "").strip()
@@ -200,7 +262,8 @@ def tts_and_pace(plan: dict, catalog: dict, paths: dict, prog, force: bool = Fal
         speech = 0.0
         src_voice = None
         if line:
-            info = cache.get(f"{char_id}|{line}")
+            spec = char_specs[char_id]
+            info = cache.get(f"{char_id}|{spec['key']}|{line}")
             if not info:
                 raise RenderV5Error(f"配音缺失: {char_id} / {line[:20]}")
             speech = float(info.get("duration") or 0.0)
@@ -212,33 +275,42 @@ def tts_and_pace(plan: dict, catalog: dict, paths: dict, prog, force: bool = Fal
             dur = float(shot.get("duration") or 2.6)
         shot["speech_duration"] = round(speech, 3)
         shot["duration"] = round(dur, 3)
+        spec = char_specs.get(char_id) or {}
         shot["voice"] = {"provider": "breeze" if line else "",
                          "character": char_id if line else "",
-                         "text": line, "speech_duration": round(speech, 3)}
+                         "voice_id": spec.get("voice_id", "") if line else "",
+                         "voice_key": spec.get("key", "") if line else "",
+                         "seed": spec.get("seed") if line else None,
+                         "ref": (locks.get(char_id) or {}).get("wav", "") if line else "",
+                         "text": line,
+                         "speech_duration": round(speech, 3)}
         total += dur
-        # 每镜音轨
+        # 每镜音轨（digest 含 voice_key：改声音后强制重混）
         out_wav = audio_dir / f"{shot['id']}.wav"
-        digest = utils.sha1_text("v5-audio", shot["id"], dur, str(src_voice or ""))
+        digest = utils.sha1_text("v5-audio", shot["id"], dur, str(src_voice or ""),
+                                 str(shot["voice"].get("voice_key") or ""))
         meta_path = out_wav.with_suffix(".meta.json")
-        meta = utils.read_json(meta_path) or {}
-        if not force and out_wav.is_file() and meta.get("hash") == digest:
+        m = utils.read_json(meta_path) or {}
+        if not force and out_wav.is_file() and m.get("hash") == digest:
             shot["audio"] = str(out_wav)
             continue
         _build_shot_audio(out_wav, src_voice, dur, workdir)
         utils.write_json(meta_path, {"hash": digest, "duration": dur,
-                                     "speech": round(speech, 3)})
+                                     "speech": round(speech, 3),
+                                     "voice_key": shot["voice"].get("voice_key")})
         shot["audio"] = str(out_wav)
 
     plan["episode"]["total_duration"] = round(total, 3)
     plan["meta"]["speech_driven"] = True
-    plan["meta"]["voice_provider"] = "breeze"
-    # 4) 自然语速超目标 → 裁掉尾部多余镜头（保留最后 1 镜）
+    # 5) 自然语速超目标 → 裁掉尾部多余镜头（保留最后 1 镜）
     target = float((plan.get("meta") or {}).get("target_duration") or 0.0)
     trimmed = _trim_to_target(plan, target)
     if prog:
-        prog(16, f"语音驱动分镜：{len(plan['shots'])} 镜 / {plan['episode']['total_duration']:.2f}s")
+        prog(16, f"语音驱动分镜：{len(plan['shots'])} 镜 / "
+                 f"{plan['episode']['total_duration']:.2f}s")
     return {"shots": len(plan["shots"]), "trimmed": trimmed,
-            "duration": plan["episode"]["total_duration"]}
+            "duration": plan["episode"]["total_duration"],
+            "voices": meta.get("voices")}
 
 
 def _build_shot_audio(out_wav: Path, voice: Path | None, duration: float,

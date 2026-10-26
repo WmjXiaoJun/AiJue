@@ -145,6 +145,40 @@ contract/v5/
 汇总：**16/16 QC PASS**；时长 29.94–44.34s；1280×720/25fps。
 
 
+
+### 5.2 角色固定声音（V5.1）
+
+- 新增 **声音库** `contract/v5/voices.json`：24 个固定 preset（instruction+seed+cfg_scale），
+  laozhou/ali/dawei 与 V4 完全一致（seed 20261026/27/28），其余 21 个角色一人一 preset；
+- 角色 JSON 只引用 `voice_id`（可在角色下覆盖 `seed/instruction/cfg_scale/ref_audio/ref_text`）；
+- **声音锁**：首次为角色生成固定参考音频 `outputs/v5_voices/<角色>/<voice_key>.wav`，
+  之后所有台词用 **Voice Clone**（ref_audio+ref_text）合成 → 同角色跨镜/跨集音色一致；
+- 修改：`python -m pipeline.v5_cli voice set/preview/lock` 或直接改角色 JSON，教程 `docs/V5_VOICES.md`；
+- QC 新增 `voice_fixed`：同角色所有对白镜 voice_key 必须一致；timeline/style_report 记录 voice_id/key/ref。
+
+
+| # | 模板 | 风格 | 时长(s) | 镜头 | 场景数 | QC |
+|---|---|---|---|---|---|---|
+| 1 | classics | woodblock_classic | 44.75 | 8 | 4 | ✅ |
+| 2 | history_mystery | parchment_case | 43.23 | 8 | 4 | ✅ |
+| 3 | history_talk | ink_chronicle | 38.12 | 5 | 4 | ✅ |
+| 4 | hot_ones | film_interview | 43.02 | 7 | 4 | ✅ |
+| 5 | masked_singer | hologram_stage | 44.70 | 7 | 4 | ✅ |
+| 6 | mystery | noir_rain | 37.22 | 8 | 4 | ✅ |
+| 7 | national_treasure | museum_gold | 43.06 | 6 | 3 | ✅ |
+| 8 | qipashuo | silk_arena | 42.94 | 7 | 4 | ✅ |
+| 9 | roundtable | oil_salon | 44.18 | 8 | 3 | ✅ |
+| 10 | shark_tank | blueprint_lab | 33.80 | 7 | 4 | ✅ |
+| 11 | slow_life | clay_diorama | 38.74 | 8 | 4 | ✅ |
+| 12 | snl_sketch | chalk_theatre | 40.58 | 8 | 4 | ✅ |
+| 13 | standup | vhs_late_show | 42.66 | 6 | 3 | ✅ |
+| 14 | taskmaster | candy_collage | 35.06 | 8 | 4 | ✅ |
+| 15 | tonight_show | neon_toon | 43.11 | 7 | 3 | ✅ |
+| 16 | traitors | baroque_candle | 40.42 | 8 | 4 | ✅ |
+
+汇总：**16/16 QC PASS**；时长 33.80–44.75s；1280×720/25fps。
+
+
 ## 6. 复现
 
 ```powershell

@@ -9,10 +9,8 @@
     "expert"
   ],
   "voice": {
-    "provider": "breeze",
-    "instruction": "24岁女性，清亮利落，中气足，英气爽快，语速偏快",
-    "seed": 20262008,
-    "cfg_scale": 4.2
+    "voice_id": "heroine_sashuang",
+    "provider": "breeze"
   },
   "appearance": {
     "gender": "female",
@@ -73,5 +71,10 @@
       "line": 1.0,
       "shade": 0.3
     }
+  },
+  "voice_legacy": {
+    "instruction": "24岁女性，清亮利落，中气足，英气爽快，语速偏快",
+    "seed": 20262008,
+    "cfg_scale": 4.2
   }
 }

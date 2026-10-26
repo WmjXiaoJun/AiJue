@@ -1,0 +1,276 @@
+{
+  "version": 1,
+  "description": "V5 固定角色声音库；角色 JSON 的 voice.voice_id 引用本文件。用户可在 contract/v5/custom/voices.json 覆盖/新增。",
+  "presets": {
+    "legacy_v4_laozhou": {
+      "id": "legacy_v4_laozhou",
+      "provider": "breeze",
+      "tags": [
+        "legacy_v4",
+        "laozhou"
+      ],
+      "label": "深夜秀主持（低沉磁性·冷幽默）",
+      "instruction": "一位42岁的男性深夜秀主持人，声音低沉富有磁性，胸腔共鸣明显，语速偏慢而松弛，带着一点冷幽默的笑意和掌控全场的从容感。",
+      "seed": 20261026,
+      "cfg_scale": 4.0,
+      "notes": "与 V4 语音完全一致（seed=20261026），跨版本固定"
+    },
+    "legacy_v4_ali": {
+      "id": "legacy_v4_ali",
+      "provider": "breeze",
+      "tags": [
+        "legacy_v4",
+        "ali"
+      ],
+      "label": "年轻女嘉宾（明亮清脆·俏皮）",
+      "instruction": "一位24岁的年轻女性嘉宾，声音明亮清脆，音色偏甜，语速略快，语气俏皮活泼、情绪外放，说到兴奋处会有明显的上扬和笑声感。",
+      "seed": 20261027,
+      "cfg_scale": 4.0,
+      "notes": "与 V4 语音完全一致（seed=20261027），跨版本固定"
+    },
+    "legacy_v4_dawei": {
+      "id": "legacy_v4_dawei",
+      "provider": "breeze",
+      "tags": [
+        "legacy_v4",
+        "dawei"
+      ],
+      "label": "资深男嘉宾（沉稳沙哑·严肃）",
+      "instruction": "一位52岁的男性嘉宾，嗓音沉稳、略带沙哑，语速中等偏慢，语气保守严肃，措辞谨慎，重音落在关键判断上。",
+      "seed": 20261028,
+      "cfg_scale": 4.0,
+      "notes": "与 V4 语音完全一致（seed=20261028），跨版本固定"
+    },
+    "strategist_qinglang": {
+      "id": "strategist_qinglang",
+      "provider": "breeze",
+      "label": "谋士·清朗",
+      "instruction": "40岁男性，清朗而沉稳，音色干净偏薄，语速从容，句尾略上扬，像在帐中分析战局，冷静里带一点书卷气。",
+      "seed": 20263001,
+      "cfg_scale": 4.0,
+      "tags": [
+        "v5"
+      ]
+    },
+    "emperor_yazhong": {
+      "id": "emperor_yazhong",
+      "provider": "breeze",
+      "label": "帝王·威压",
+      "instruction": "50岁男性，低沉厚重，共鸣充分，语速偏慢，咬字有力，不怒自威，尾音下沉，像在朝堂上做最后决断。",
+      "seed": 20263002,
+      "cfg_scale": 3.9,
+      "tags": [
+        "v5"
+      ]
+    },
+    "commander_dichen": {
+      "id": "commander_dichen",
+      "provider": "breeze",
+      "label": "统帅·严峻",
+      "instruction": "45岁男性，偏低偏硬，声音里有风沙感，语速中等，短句多、顿挫强，像长期在军中发号施令。",
+      "seed": 20263003,
+      "cfg_scale": 3.8,
+      "tags": [
+        "v5"
+      ]
+    },
+    "ruler_dark": {
+      "id": "ruler_dark",
+      "provider": "breeze",
+      "label": "始皇帝·冷峻",
+      "instruction": "52岁男性，极低极稳，气息沉，语速缓，字与字之间留白明显，带压迫感的平静，不轻易起伏。",
+      "seed": 20263004,
+      "cfg_scale": 3.8,
+      "tags": [
+        "v5"
+      ]
+    },
+    "scholar_wenrun": {
+      "id": "scholar_wenrun",
+      "provider": "breeze",
+      "label": "文士·温润",
+      "instruction": "45岁男性，温润宽厚，音色偏暖，语速舒缓，说到兴处轻轻笑，尾音柔和。",
+      "seed": 20263005,
+      "cfg_scale": 4.0,
+      "tags": [
+        "v5"
+      ]
+    },
+    "poet_haofang": {
+      "id": "poet_haofang",
+      "provider": "breeze",
+      "label": "诗人·豪放",
+      "instruction": "38岁男性，明亮开敞，音量足，语速有快有慢，情绪外放，句尾常带笑意和咏叹。",
+      "seed": 20263006,
+      "cfg_scale": 4.1,
+      "tags": [
+        "v5"
+      ]
+    },
+    "empress_weiyi": {
+      "id": "empress_weiyi",
+      "provider": "breeze",
+      "label": "女皇·威仪",
+      "instruction": "48岁女性，低中音、稳而锋利，语速慢，咬字清晰，语气端肃，不失优雅。",
+      "seed": 20263007,
+      "cfg_scale": 4.0,
+      "tags": [
+        "v5"
+      ]
+    },
+    "heroine_sashuang": {
+      "id": "heroine_sashuang",
+      "provider": "breeze",
+      "label": "女将·飒爽",
+      "instruction": "25岁女性，清亮有力，中高音，语速偏快，果断、带笑，尾音干脆。",
+      "seed": 20263008,
+      "cfg_scale": 4.0,
+      "tags": [
+        "v5"
+      ]
+    },
+    "warrior_houzhong": {
+      "id": "warrior_houzhong",
+      "provider": "breeze",
+      "label": "武圣·浑厚",
+      "instruction": "46岁男性，浑厚宽大，胸腔共鸣强，语速稳，句句落地，带股傲气。",
+      "seed": 20263009,
+      "cfg_scale": 3.9,
+      "tags": [
+        "v5"
+      ]
+    },
+    "envoy_jianyi": {
+      "id": "envoy_jianyi",
+      "provider": "breeze",
+      "label": "使者·坚毅",
+      "instruction": "35岁男性，中低音，语速中等偏慢，气息稳，带长途跋涉后的沙哑与坚定。",
+      "seed": 20263010,
+      "cfg_scale": 3.9,
+      "tags": [
+        "v5"
+      ]
+    },
+    "navigator_kai": {
+      "id": "navigator_kai",
+      "provider": "breeze",
+      "label": "航海家·开阔",
+      "instruction": "44岁男性，宽亮，语速从容，带笑意与海风般的开阔感，尾音舒展。",
+      "seed": 20263011,
+      "cfg_scale": 4.0,
+      "tags": [
+        "v5"
+      ]
+    },
+    "historian_kezhi": {
+      "id": "historian_kezhi",
+      "provider": "breeze",
+      "label": "史官·克制",
+      "instruction": "50岁男性，中低音，语速平缓，克制少起伏，咬字工整，像在念一段不能改的史。",
+      "seed": 20263012,
+      "cfg_scale": 3.9,
+      "tags": [
+        "v5"
+      ]
+    },
+    "bright_female": {
+      "id": "bright_female",
+      "provider": "breeze",
+      "label": "甜妹·明亮",
+      "instruction": "22岁女性，清亮甜，音色偏高，语速快，情绪外放，爱笑，句尾上扬。",
+      "seed": 20263013,
+      "cfg_scale": 4.1,
+      "tags": [
+        "v5"
+      ]
+    },
+    "young_male": {
+      "id": "young_male",
+      "provider": "breeze",
+      "label": "学霸·清亮",
+      "instruction": "24岁男性，清亮干净，语速快而清楚，略带回怼的锐气，尾音利落。",
+      "seed": 20263014,
+      "cfg_scale": 4.0,
+      "tags": [
+        "v5"
+      ]
+    },
+    "warm_male": {
+      "id": "warm_male",
+      "provider": "breeze",
+      "label": "胖子·温厚",
+      "instruction": "35岁男性，厚实温暖，语速偏慢，笑着说话，自带喜感但不油。",
+      "seed": 20263015,
+      "cfg_scale": 4.0,
+      "tags": [
+        "v5"
+      ]
+    },
+    "fast_male": {
+      "id": "fast_male",
+      "provider": "breeze",
+      "label": "卷王·机敏",
+      "instruction": "28岁男性，偏亮，语速极快但咬字清楚，句句带节奏感，像随时要抢话。",
+      "seed": 20263016,
+      "cfg_scale": 4.1,
+      "tags": [
+        "v5"
+      ]
+    },
+    "cool_male": {
+      "id": "cool_male",
+      "provider": "breeze",
+      "label": "冷面·冷峻",
+      "instruction": "32岁男性，低冷，音量不大，语速慢，不轻易有情绪，冷幽默，停顿多。",
+      "seed": 20263017,
+      "cfg_scale": 3.9,
+      "tags": [
+        "v5"
+      ]
+    },
+    "soft_male": {
+      "id": "soft_male",
+      "provider": "breeze",
+      "label": "萌新·清软",
+      "instruction": "21岁男性，偏轻偏软，语速中慢，带一点紧张和真诚，尾音略收。",
+      "seed": 20263018,
+      "cfg_scale": 4.0,
+      "tags": [
+        "v5"
+      ]
+    },
+    "steady_male": {
+      "id": "steady_male",
+      "provider": "breeze",
+      "label": "制片·干练",
+      "instruction": "38岁男性，中音稳，语速中快，职业化、清楚、有掌控感，尾音下压。",
+      "seed": 20263019,
+      "cfg_scale": 4.0,
+      "tags": [
+        "v5"
+      ]
+    },
+    "robot_flat": {
+      "id": "robot_flat",
+      "provider": "breeze",
+      "label": "机器人·平直",
+      "instruction": "机械音，中音区，音高稳定，语速均匀，几乎没有情绪起伏，句尾不上扬。",
+      "seed": 20263020,
+      "cfg_scale": 3.7,
+      "tags": [
+        "v5"
+      ]
+    },
+    "mystery_low": {
+      "id": "mystery_low",
+      "provider": "breeze",
+      "label": "神秘人·低沉",
+      "instruction": "声音低沉偏暗，气息多，语速慢，吐字半含，像不愿让人听清全部。",
+      "seed": 20263021,
+      "cfg_scale": 3.8,
+      "tags": [
+        "v5"
+      ]
+    }
+  }
+}

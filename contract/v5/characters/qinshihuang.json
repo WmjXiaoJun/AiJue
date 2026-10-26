@@ -9,10 +9,8 @@
     "host"
   ],
   "voice": {
-    "provider": "breeze",
-    "instruction": "45岁男性，浑厚威严，极低沉，尾音往下压，帝王气场",
-    "seed": 20262004,
-    "cfg_scale": 4.2
+    "voice_id": "ruler_dark",
+    "provider": "breeze"
   },
   "appearance": {
     "gender": "male",
@@ -70,5 +68,10 @@
       "line": 1.0,
       "shade": 0.3
     }
+  },
+  "voice_legacy": {
+    "instruction": "45岁男性，浑厚威严，极低沉，尾音往下压，帝王气场",
+    "seed": 20262004,
+    "cfg_scale": 4.2
   }
 }
