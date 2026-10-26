@@ -1,0 +1,63 @@
+{
+  "id": "national_treasure",
+  "label": "博物馆金·国宝展陈",
+  "pacing": {
+    "lead_in": 1.42,
+    "mid": 1.06,
+    "climax": 0.9,
+    "coda": 1.3
+  },
+  "opening": {
+    "shot": "EWS",
+    "camera": "crane_down",
+    "hold": 2.6
+  },
+  "closing": {
+    "shot": "WS",
+    "camera": "pull_out",
+    "hold": 2.2
+  },
+  "shot_sequence": [
+    "EWS",
+    "MS",
+    "MCU",
+    "WS",
+    "CU",
+    "DETAIL",
+    "MS",
+    "OTS",
+    "INSERT"
+  ],
+  "camera_palette": [
+    "crane_down",
+    "crane_up",
+    "push_in",
+    "pan_right",
+    "dolly",
+    "rack_focus",
+    "orbit"
+  ],
+  "transition_palette": [
+    "cut",
+    "fade",
+    "dissolve",
+    "cut",
+    "wipeleft",
+    "fadeblack"
+  ],
+  "transition_policy": {
+    "default": "cut",
+    "hard_cut_ratio": 0.55,
+    "dissolve_on_scene_change": true,
+    "max_transition_sec": 0.6
+  },
+  "j_cut_ratio": 0.15,
+  "l_cut_ratio": 0.38,
+  "insert_ratio": 0.22,
+  "detail_ratio": 0.28,
+  "rhythm": {
+    "fast_shots_max": 2.7,
+    "slow_shots_min": 3.7
+  },
+  "notes": "国宝展陈：仪式感环绕与升降，展柜细部特写；段落之间 fade/fadeblack，庄重收尾。"
+}

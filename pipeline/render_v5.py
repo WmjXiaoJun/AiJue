@@ -471,6 +471,13 @@ def _fit_anchor_in_zone(anchor, rect, *, margin_x=0.06, margin_top=0.10,
     return [round(ax, 4), round(ay, 4)]
 
 
+#: V5.4 景别 → 角色屏幕高度倍率（在 base_ratio 之上；让 WS/MS/MCU/OTS 有真实大小差异）
+SIZE_CHAR_SCALE = {
+    "EWS": 0.82, "WS": 0.92, "MS": 1.05, "MCU": 1.35,
+    "CU": 1.6, "ECU": 1.8, "OTS": 1.18, "DETAIL": 1.0, "INSERT": 1.0,
+}
+
+
 def _fit_character_in_zone(anchor, rect, char_height: float,
                            *, top_pad: float = 0.02, bottom_pad: float = 0.02):
     """让角色（脚点 anchor_y、身高 char_height）完整落在 camera zone 内。
@@ -491,6 +498,53 @@ def _fit_character_in_zone(anchor, rect, char_height: float,
         out_h = 0.30
         ay = min(hi_y, y + top_pad + out_h)
     return [round(ax, 4), round(ay, 4)], round(out_h, 3)
+
+
+def _edit_boundaries(shots: list[dict]) -> list[dict]:
+    """逐剪辑点转场计划：body shots 用 editorial 的 transition_out，卡片用 fade。"""
+    boundaries = []
+    for i in range(len(shots) - 1):
+        a, b = shots[i], shots[i + 1]
+        a_edit = a.get("edit") or {}
+        t = a_edit.get("transition_out") or {}
+        is_card = str(a.get("type")) == "card" or str(b.get("type")) == "card"
+        mode = "fade" if is_card else str(t.get("mode") or "cut")
+        dur = 0.5 if is_card else float(t.get("duration") or 0.0)
+        if mode == "cut":
+            dur = 0.0
+        boundaries.append({"from": str(a.get("id")), "to": str(b.get("id")),
+                           "mode": mode, "duration": round(dur, 3)})
+    return boundaries
+
+
+def _scene_anchors(catalog: dict, plan: dict) -> dict:
+    """{scene_id: anchors}（场景 JSON 的演员锚点，用于对话镜取景窗选择）。"""
+    out = {}
+    scene_table = (catalog or {}).get("scenes") or {}
+    for shot in plan.get("shots") or []:
+        sid = str(shot.get("scene") or "")
+        if not sid or sid in out:
+            continue
+        sc = scene_table.get(sid) or {}
+        anchors = sc.get("anchors")
+        if isinstance(anchors, dict) and anchors:
+            out[sid] = anchors
+    return out
+
+
+def _scene_zones(catalog: dict, plan: dict) -> dict:
+    """{scene_id: camera_zones}（直接取场景 JSON，无需渲染）。"""
+    out = {}
+    scene_table = (catalog or {}).get("scenes") or {}
+    for shot in plan.get("shots") or []:
+        sid = str(shot.get("scene") or "")
+        if not sid or sid in out:
+            continue
+        sc = scene_table.get(sid) or {}
+        zones = sc.get("camera_zones")
+        if isinstance(zones, dict) and zones:
+            out[sid] = zones
+    return out
 
 
 def render_shot_clips(plan: dict, catalog: dict, style: dict, paths: dict,
@@ -524,10 +578,24 @@ def render_shot_clips(plan: dict, catalog: dict, style: dict, paths: dict,
         layers = scene_render.render_scene_layers(scene, style, (1600, 900),
                                                   seed=(i + 1) * 17)
         cam = dict(shot.get("camera") or {"type": "push_in"})
+        edit = shot.get("edit") or {}
         zone_name, zone_rect = _pick_zone(shot, layers)
+        edit_zone = edit.get("zone_rect")
+        if edit_zone:
+            zones_now = (layers or {}).get("camera_zones") or {}
+            ezname = str(edit.get("zone") or "edit")
+            if ezname in zones_now:
+                zone_name, zone_rect = ezname, zones_now[ezname]
+            else:
+                zone_name, zone_rect = ezname, edit_zone
         if zone_rect:
             cam["zone"] = zone_rect
             shot["camera_zone_used"] = zone_name
+        edit_cam = str(edit.get("camera") or "")
+        if edit_cam:
+            supported = getattr(motion2d, "SUPPORTED_CAMERA_TYPES", ())
+            if not supported or edit_cam in supported:
+                cam["type"] = edit_cam
         chars_spec = []
         for role in (shot.get("characters") or []):
             char_id = (shot.get("character") if role == shot.get("role")
@@ -551,6 +619,8 @@ def render_shot_clips(plan: dict, catalog: dict, style: dict, paths: dict,
             base_ratio = 0.68 if speaking else 0.52
             char_height = max(0.40, min(0.92,
                                          base_ratio * max(0.55, min(1.0, zone_h))))
+            size_scale = SIZE_CHAR_SCALE.get(str(edit.get("shot_size") or ""), 1.0)
+            char_height = min(0.95, char_height * size_scale)
             anchor, char_height = _fit_character_in_zone(anchor, zone_rect, char_height)
             chars_spec.append({"char": char, "role": role, "pose": "front",
                                "mouth_timeline": mouth, "anchor": anchor,
@@ -596,20 +666,51 @@ def assemble(plan: dict, catalog: dict, style: dict, paths: dict, prog) -> dict:
     clip_paths = {str(s["id"]): Path(paths["shots_dir"]) / f"{s['id']}.mp4" for s in shots}
     if prog:
         prog(82, f"拼接视频（{len(shots)} 镜 / {total:.2f}s）")
-    transition = ("fade", "fade")
+    # V5.4 剪辑：每个剪辑点独立转场（editing.xfade_chain）；不可用时回退原单转场
+    boundaries = _edit_boundaries(shots)
+    video_raw = None
+    transition = {"mode": "editorial", "style": "per-cut"}
+    editing_mod = None
     try:
-        transition = style_v5.transition(style)
-    except Exception:  # noqa: BLE001
-        pass
-    t_mode = str(transition[0] if transition else "fade")
-    t_style = str(transition[1] if len(transition or ()) > 1 else "fade")
-    if t_mode == "cut" or len(shots) <= 1:
-        video_raw = render_mod.concat_video(shots, paths["workdir"], FPS, total,
-                                            clip_paths=clip_paths)
-    else:
-        video_raw = render_mod.concat_video_xfade(
+        from . import editing as editing_mod  # type: ignore
+        video_raw = editing_mod.xfade_chain(
             shots, clip_paths, paths["workdir"], FPS, FINAL_W, FINAL_H, total,
-            transition=t_style, transition_duration=TRANSITION_DUR, prog=prog)
+            boundaries, prog=prog)
+        loss = round(sum(float(b.get("duration") or 0.0) for b in boundaries
+                         if str(b.get("mode")) != "cut"), 3)
+        render_total = round(total - loss, 6)
+        plan.setdefault("meta", {})["transition_loss"] = loss
+        plan["meta"]["_render_total"] = render_total
+        plan["episode"]["total_duration"] = round(render_total, 3)
+        cursor = 0.0
+        for i, sh in enumerate(shots):
+            sh["_edit_start"] = round(cursor, 3)
+            if i < len(boundaries):
+                b = boundaries[i]
+                cursor += float(sh.get("duration") or 0.0) - (
+                    float(b.get("duration") or 0.0) if str(b.get("mode")) != "cut" else 0.0)
+        LOG.info("V5.4 剪辑转场：%d 个剪辑点，转场损耗 %.2fs，成片 %.2fs",
+                 len(boundaries), loss, render_total)
+    except Exception as exc:  # noqa: BLE001
+        LOG.warning("V5.4 editing 不可用，回退单转场: %s", exc)
+        editing_mod = None
+        video_raw = None
+    if video_raw is None:
+        transition = ("fade", "fade")
+        try:
+            transition = style_v5.transition(style)
+        except Exception:  # noqa: BLE001
+            pass
+        t_mode = str(transition[0] if transition else "fade")
+        t_style = str(transition[1] if len(transition or ()) > 1 else "fade")
+        if t_mode == "cut" or len(shots) <= 1:
+            video_raw = render_mod.concat_video(shots, paths["workdir"], FPS, total,
+                                                clip_paths=clip_paths)
+        else:
+            video_raw = render_mod.concat_video_xfade(
+                shots, clip_paths, paths["workdir"], FPS, FINAL_W, FINAL_H, total,
+                transition=t_style, transition_duration=TRANSITION_DUR, prog=prog)
+        transition = {"mode": transition[0], "style": transition[1]}
     LOG.info("video_raw: %s (%.2fs)", video_raw, utils.probe_duration(video_raw))
 
     # 字幕：优先风格化 subtitle_ass，否则 ass_builder
@@ -619,9 +720,10 @@ def assemble(plan: dict, catalog: dict, style: dict, paths: dict, prog) -> dict:
     cursor = 0.0
     for shot in shots:
         dur = float(shot.get("duration") or 0)
-        timings.append({"shot": shot, "start": cursor, "end": cursor + dur,
+        start = float(shot.get("_edit_start", cursor))
+        timings.append({"shot": shot, "start": start, "end": start + dur,
                         "duration": dur})
-        cursor += dur
+        cursor = start + dur
     ass_path = Path(paths["workdir"]) / "final.ass"
     events = []
     for item in timings:
@@ -635,7 +737,25 @@ def assemble(plan: dict, catalog: dict, style: dict, paths: dict, prog) -> dict:
         events.append({"start": start, "end": max(start + 0.4, end),
                        "text": line, "speaker": shot.get("speaker_name") or ""})
     style_v5.subtitle_ass(style, events, ass_path, FINAL_W, FINAL_H)
-    narration = render_mod.concat_audio(shots, paths["workdir"], total)
+    narration = None
+    if editing_mod is not None:
+        try:
+            cuts = [{"shot": str(s.get("id")),
+                     "j_cut": float((s.get("edit") or {}).get("j_cut") or 0.0),
+                     "l_cut": float((s.get("edit") or {}).get("l_cut") or 0.0)}
+                    for s in shots]
+            if any(c["j_cut"] > 0 or c["l_cut"] > 0 for c in cuts):
+                shots_started = [dict(s, start=float(s.get("_edit_start", 0.0)))
+                                 for s in shots]
+                narration = editing_mod.mix_audio_edit(
+                    shots_started, paths["workdir"],
+                    plan["meta"].get("_render_total") or total, cuts)
+        except Exception as exc:  # noqa: BLE001
+            LOG.warning("J/L cut 混音失败（回退直线混音）: %s", exc)
+            narration = None
+    render_total = plan["meta"].get("_render_total") or total
+    if narration is None:
+        narration = render_mod.concat_audio(shots, paths["workdir"], render_total)
     bgm = None
     try:
         from . import v5_audio
@@ -655,46 +775,54 @@ def assemble(plan: dict, catalog: dict, style: dict, paths: dict, prog) -> dict:
     if prog:
         prog(90, "编码成片（字幕/调色/包装/混音）")
     render_mod.final_encode(
-        paths["workdir"], paths["out"], total, FPS, FINAL_W, FINAL_H, bgm,
+        paths["workdir"], paths["out"], render_total, FPS, FINAL_W, FINAL_H, bgm,
         has_ass=True, prog=prog, pct0=90, pct1=99,
         grade_filter=grade or None,
         packaging_filter=packaging or None,
         duck_bgm=True)
     # timeline 产物
-    tl = _build_timeline(plan, style, paths, t_mode, t_style)
+    tl = _build_timeline(plan, style, paths, "editorial", "per-cut")
+
     timeline_art = timeline_mod.write_timeline(tl, paths["out_dir"])
     return {"video_raw": str(video_raw), "ass": str(ass_path),
             "narration": str(narration), "bgm": bool(bgm),
-            "transition": {"mode": t_mode, "style": t_style},
+            "transition": transition if isinstance(transition, dict)
+            else {"mode": str(transition[0]), "style": str(transition[1])},
+            "boundaries": boundaries,
             "timeline": timeline_art}
 
 
 def _build_timeline(plan: dict, style: dict, paths: dict, t_mode: str,
                     t_style: str) -> dict:
     shots = plan.get("shots") or []
-    total = round(sum(float(s.get("duration") or 0) for s in shots), 3)
+    loss = float((plan.get("meta") or {}).get("transition_loss") or 0.0)
+    total = round(sum(float(s.get("duration") or 0) for s in shots) - loss, 3)
     video, voice, subs = [], [], []
     cursor = 0.0
     for shot in shots:
         sid = str(shot["id"])
         dur = round(float(shot.get("duration") or 0), 3)
+        start = float(shot.get("_edit_start", cursor))
+        edit = shot.get("edit") or {}
         video.append({"id": sid, "src": str((Path(paths["shots_dir"]) / f"{sid}.mp4").resolve()),
-                      "in": 0.0, "out": dur, "at": round(cursor, 3),
+                      "in": 0.0, "out": dur, "at": round(start, 3),
                       "kind": "broll" if not shot.get("line") else "dialogue",
                       "scene": shot.get("scene"), "role": shot.get("role"),
-                      "transition": {"type": t_mode, "style": t_style,
-                                     "duration": TRANSITION_DUR}})
+                      "shot_size": edit.get("shot_size"),
+                      "camera": edit.get("camera") or (shot.get("camera") or {}).get("type"),
+                      "transition": edit.get("transition_out") or {
+                          "mode": t_mode, "style": t_style, "duration": TRANSITION_DUR}})
         if shot.get("line"):
             voice.append({"id": f"v_{sid}", "src": str(Path(shot.get("audio", "")).resolve()),
-                          "at": round(cursor, 3), "out": dur,
+                          "at": round(start, 3), "out": dur,
                           "lead_sec": LEAD_SEC, "speech_duration": shot.get("speech_duration"),
                           "provider": "breeze", "character": shot.get("character"),
                           "text": shot.get("line")})
             subs.append({"id": f"s_{sid}", "text": shot.get("line"),
-                         "at": round(cursor + LEAD_SEC, 3),
-                         "out": round(cursor + dur - 0.05, 3),
+                         "at": round(start + LEAD_SEC, 3),
+                         "out": round(start + dur - 0.05, 3),
                          "speaker": shot.get("speaker_name")})
-        cursor += dur
+        cursor = start + dur
     work = Path(paths["workdir"])
     return {
         "version": 5, "template": (plan.get("episode") or {}).get("id"),
@@ -717,6 +845,15 @@ def _build_timeline(plan: dict, style: dict, paths: dict, t_mode: str,
                  "fade_in": 1.5, "fade_out": 3.0}]},
             {"id": "S1", "kind": "subtitle", "clips": subs},
         ],
+        "editing": {"mode": "per-cut",
+                    "boundaries": _edit_boundaries(shots),
+                    "cuts": [{"shot": str(sh.get("id")),
+                              "j_cut": (sh.get("edit") or {}).get("j_cut", 0),
+                              "l_cut": (sh.get("edit") or {}).get("l_cut", 0)}
+                             for sh in shots
+                             if (sh.get("edit") or {}).get("j_cut")
+                             or (sh.get("edit") or {}).get("l_cut")],
+                    "summary": (plan.get("meta") or {}).get("edit") or {}},
         "meta": {"speech_driven": True, "voice_provider": "breeze",
                  "lead_sec": LEAD_SEC, "tail_sec": TAIL_SEC,
                  "scenes": sorted({str(s.get("scene")) for s in shots if s.get("scene")}),
@@ -806,12 +943,39 @@ def run_render(args) -> int:
         except Exception as exc:  # noqa: BLE001
             LOG.warning("停止 Breeze TTS 服务失败: %s", exc)
 
-    style = _style(catalog, str(plan["episode"].get("style") or template.get("style") or ""))
+        style = _style(catalog, str(plan["episode"].get("style") or template.get("style") or ""))
+    # V5.4 剪辑计划（每模板不同：景别/运镜/取景/转场/J-L cut）
+    try:
+        from . import editorial
+        zones = _scene_zones(catalog, plan)
+        anchors = _scene_anchors(catalog, plan)
+        from . import motion2d as _motion2d
+        edit_plan = editorial.build_edit_plan(
+            template, plan, style, seed=seed, zones_by_scene=zones,
+            anchors_by_scene=anchors,
+            supported_cameras=getattr(_motion2d, "SUPPORTED_CAMERA_TYPES", ()))
+        utils.write_json(paths["workdir"] / "edit_plan.json", {
+            "summary": edit_plan["summary"], "shots": edit_plan["shots"]})
+        utils.write_json(paths["workdir"] / "episode.json", plan)
+        LOG.info("V5.4 剪辑：%s", edit_plan["summary"].get("signature"))
+    except Exception as exc:  # noqa: BLE001
+        LOG.warning("V5.4 剪辑计划失败（回退原节奏）：%s", exc)
+        edit_plan = None
+
     prog(20, f"逐镜 2D 动画渲染（{len(plan['shots'])} 镜，风格 {style.get('label')}）")
     clips = render_shot_clips(plan, catalog, style, paths, prog, force=force)
     utils.write_json(paths["workdir"] / "shot_meta.json", clips["metas"])
 
     asm = assemble(plan, catalog, style, paths, prog)
+    # V5.4 分镜表（json/html/png）
+    storyboard_art = {}
+    try:
+        from . import storyboard_v5
+        sb = storyboard_v5.build_storyboard(plan, paths)
+        storyboard_art = storyboard_v5.write_storyboard(sb, Path(paths["out_dir"]))
+        LOG.info("V5.4 分镜表：%s", storyboard_art.get("json"))
+    except Exception as exc:  # noqa: BLE001
+        LOG.warning("分镜表生成失败: %s", exc)
     if not Path(paths["out"]).is_file():
         raise RenderV5Error(f"成片未生成: {paths['out']}")
     probe = utils.probe_video(paths["out"])
@@ -835,6 +999,9 @@ def run_render(args) -> int:
         "qc_failed": [k for k, v in qc["checks"].items() if not v.get("ok")],
         "qc_report": str(paths["out_dir"] / "qc_report.json"),
         "timeline": asm.get("timeline"),
+        "storyboard": storyboard_art,
+        "edit": (plan.get("meta") or {}).get("edit") or {},
+        "transition": asm.get("transition"),
         "contact_sheet": frames.get("sheet", ""),
         "elapsed_sec": elapsed,
     }
@@ -842,6 +1009,8 @@ def run_render(args) -> int:
         "template": template_id, "style": style.get("id"),
         "label": style.get("label"), "technique": style.get("technique"),
         "palette": style.get("palette"), "transition": asm.get("transition"),
+        "edit": (plan.get("meta") or {}).get("edit") or {},
+        "storyboard": storyboard_art,
         "scenes": summary["scenes"], "characters": summary["characters"],
         "shots": [{"id": s["id"], "scene": s.get("scene"),
                    "character": s.get("character"), "duration": s.get("duration")}

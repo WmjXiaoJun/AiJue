@@ -127,7 +127,8 @@ def evaluate(*, video: Path, plan: dict, qc_extra: dict | None = None,
     probe = probe_video(video) if video.is_file() else {
         "duration": 0.0, "width": 0, "height": 0, "fps": 0.0, "has_audio": False}
     shots = _fmt_shots(plan)
-    expected = round(sum(float(s.get("duration") or 0) for s in shots), 3)
+    loss = float(((plan.get("meta") or {}).get("transition_loss") or 0.0))
+    expected = round(sum(float(s.get("duration") or 0) for s in shots) - loss, 3)
     checks: dict[str, dict] = {}
 
     actual = float(probe.get("duration") or 0.0)

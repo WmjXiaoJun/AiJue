@@ -1,20 +1,21 @@
 // V5 模板库：每个模板的风格 / 工作流 / 角色 / 场景「可见可改」
-// - 列表：16+1 模板卡（风格/时长/tags/description/工作流缩略/角色头像/场景缩略）
-// - 详情弹层：7 步 V5 工作流（分镜/TTS/场景/立绘口型/motion2d/包装/混音QC）
+// - 列表：16+1 模板卡（风格/时长/tags/description/工作流缩略/角色头像/场景缩略/剪辑签名）
+// - 详情弹层：子 tab「工作流」7 步 /「分镜·剪辑」（V5.4 分镜表+剪辑时间线+剪辑档案）
 // - 编辑：GET /api/v5/templates/{id} → 改 JSON → PUT（dry_run 校验 / 保存 custom 覆盖）
 // - 用此模板渲染：跳渲染 tab 并预选模板
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import type {
   V5CatalogResponse,
+  V5EditorialData,
   V5Output,
   V5Palette,
   V5StyleSummary,
   V5VoiceInfo,
-} from "../../lib/v5";
-import {
+} from "../../lib/v5";import {
   characterArtUrl,
   characterPreviewUrl,
   defaultStyleForCharacter,
+  isV5NotFound,
   mediaSrc,
   sceneArtUrl,
   scenePreviewUrl,
@@ -41,6 +42,7 @@ import {
 } from "../icons";
 import { EmptyState, Spinner } from "../ui";
 import { Palette, QcBadge, SmartImage, StyleBadge, Tag, VideoModal } from "./shared";
+import { Storyboard } from "./Storyboard";
 
 // ---------------------------------------------------------------------------
 // 类型（模板 / 风格完整 JSON 的子集）
@@ -101,23 +103,34 @@ interface Props {
 }
 
 // ---------------------------------------------------------------------------
-// hash 深链：#/v5/templates[/<id>[?edit=1]]
+// hash 深链：#/v5/templates[/<id>[/storyboard]][?edit=1]
 // ---------------------------------------------------------------------------
+type DetailView = "workflow" | "storyboard";
+
 interface TemplateRoute {
   id?: string;
   edit: boolean;
+  view: DetailView;
 }
 
 function parseRoute(): TemplateRoute {
   const raw = window.location.hash.replace(/^#\/?/, "");
   const [path, query = ""] = raw.split("?");
   const parts = path.split("/").filter(Boolean);
-  if (parts[0] !== "v5" || parts[1] !== "templates") return { edit: false };
-  return { id: parts[2], edit: /(^|&)edit=1/.test(query) };
+  if (parts[0] !== "v5" || parts[1] !== "templates") return { edit: false, view: "workflow" };
+  return {
+    id: parts[2],
+    edit: /(^|&)edit=1/.test(query),
+    view: parts[3] === "storyboard" ? "storyboard" : "workflow",
+  };
 }
 
-function writeRoute(id?: string, edit = false): void {
-  const next = "#/v5/templates" + (id ? "/" + id : "") + (edit ? "?edit=1" : "");
+function writeRoute(id?: string, edit = false, view: DetailView = "workflow"): void {
+  const next =
+    "#/v5/templates" +
+    (id ? "/" + id : "") +
+    (id && view === "storyboard" ? "/storyboard" : "") +
+    (edit ? "?edit=1" : "");
   if (window.location.hash !== next) window.history.replaceState(null, "", next);
 }
 
@@ -134,6 +147,7 @@ export function Templates({ catalog, outputs, loading, onOpenRender, onOpenChara
   const notify = useToast();
   const [details, setDetails] = useState<Record<string, TemplateFull>>({});
   const [detailsLoading, setDetailsLoading] = useState(false);
+  const [signatures, setSignatures] = useState<Record<string, string | null>>({});
   const [route, setRoute] = useState<TemplateRoute>(() => parseRoute());
   const [voices, setVoices] = useState<Record<string, V5VoiceInfo | null>>({});
   const [styleDetails, setStyleDetails] = useState<Record<string, StyleFull>>({});
@@ -175,9 +189,50 @@ export function Templates({ catalog, outputs, loading, onOpenRender, onOpenChara
     }
   }, []);
 
+  // 加载剪辑签名（优先独立剪辑档案；缺失时用 storyboard.json 的 edit.signature / 统计）
+  const loadSignatures = useCallback(async (templates: { id: string }[]) => {
+    const entries = await Promise.all(
+      templates.map(async (item) => {
+        try {
+          const res = await v5api.editorial(item.id);
+          const editorial: V5EditorialData = res.editorial;
+          const seq = editorial.shot_sequence || [];
+          const sizes = new Set(seq.map(String));
+          const cameras = editorial.camera_palette || [];
+          const transitions = new Set((editorial.transition_palette || []).map(String));
+          return [
+            item.id,
+            `${seq.length} 镜 · ${sizes.size} 景别 · ${cameras.length} 运镜 · ${transitions.size} 转场`,
+          ] as const;
+        } catch {
+          try {
+            const res = await v5api.storyboard(item.id);
+            const edit = res.storyboard.edit;
+            if (edit?.signature) return [item.id, String(edit.signature)] as const;
+            if (edit) {
+              return [
+                item.id,
+                `${edit.shots ?? 0} 镜 · ${(edit.shot_sizes || []).length} 景别 · ${(edit.camera_types || []).length} 运镜 · ${(edit.transitions || []).length} 转场`,
+              ] as const;
+            }
+            return [item.id, null] as const;
+          } catch {
+            return [item.id, null] as const;
+          }
+        }
+      })
+    );
+    const next: Record<string, string | null> = {};
+    entries.forEach(([id, signature]) => {
+      next[id] = signature;
+    });
+    setSignatures(next);
+  }, []);
+
   useEffect(() => {
     if (!catalog) return;
     void loadDetails(catalog.templates);
+    void loadSignatures(catalog.templates);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [catalog?.templates.length]);
 
@@ -238,27 +293,44 @@ export function Templates({ catalog, outputs, loading, onOpenRender, onOpenChara
   }, [editOpen, selected?.id]);
 
   const openDetail = useCallback((id: string) => {
-    writeRoute(id);
-    setRoute({ id, edit: false });
+    writeRoute(id, false, "workflow");
+    setRoute({ id, edit: false, view: "workflow" });
   }, []);
+
+  const openStoryboard = useCallback((id: string) => {
+    writeRoute(id, false, "storyboard");
+    setRoute({ id, edit: false, view: "storyboard" });
+  }, []);
+
+  const switchDetailView = useCallback(
+    (view: DetailView) => {
+      if (!route.id) return;
+      writeRoute(route.id, false, view);
+      setRoute({ id: route.id, edit: false, view });
+    },
+    [route.id]
+  );
 
   const closeDetail = useCallback(() => {
     writeRoute();
-    setRoute({ edit: false });
+    setRoute({ edit: false, view: "workflow" });
     setEditOpen(false);
   }, []);
 
-  const openEdit = useCallback((id: string) => {
-    writeRoute(id, true);
-    setRoute({ id, edit: true });
-    setEditOpen(true);
-  }, []);
+  const openEdit = useCallback(
+    (id: string) => {
+      writeRoute(id, true, route.view);
+      setRoute({ id, edit: true, view: route.view });
+      setEditOpen(true);
+    },
+    [route.view]
+  );
 
   const closeEdit = useCallback(() => {
     setEditOpen(false);
-    if (route.id) writeRoute(route.id);
-    setRoute({ id: route.id, edit: false });
-  }, [route.id]);
+    if (route.id) writeRoute(route.id, false, route.view);
+    setRoute({ id: route.id, edit: false, view: route.view });
+  }, [route.id, route.view]);
 
   const doSave = useCallback(
     async (dryRun: boolean) => {
@@ -363,6 +435,7 @@ export function Templates({ catalog, outputs, loading, onOpenRender, onOpenChara
           const scenes = uniqueList(full ? (full.acts || []).map((act) => act.scene) : summary.scene_route || []);
           const actCount = full?.acts?.length ?? summary.act_count ?? 0;
           const custom = summary.custom;
+          const signature = signatures[summary.id] || "";
           return (
             <article key={summary.id} className="v5-tpl-card">
               <button type="button" className="v5-tpl-main" onClick={() => openDetail(summary.id)}>
@@ -391,6 +464,16 @@ export function Templates({ catalog, outputs, loading, onOpenRender, onOpenChara
                     <IconGrid size={12} /> {scenes.length} 场景
                   </span>
                   {output?.duration ? <span>成片 {fmtDuration(output.duration)}</span> : <span className="v5-muted">未渲染</span>}
+                </div>
+                <div className={"v5-tpl-signature" + (signature ? "" : " is-empty")}>
+                  <IconFilm size={12} />
+                  {signature ? (
+                    <>
+                      剪辑签名：<b>{signature}</b>
+                    </>
+                  ) : (
+                    <span>尚未生成分镜数据</span>
+                  )}
                 </div>
                 <div className="v5-tpl-tags">
                   {(summary.tags || []).slice(0, 4).map((tag) => (
@@ -440,6 +523,9 @@ export function Templates({ catalog, outputs, loading, onOpenRender, onOpenChara
               <div className="v5-tpl-actions">
                 <button type="button" className="btn btn-ghost btn-sm" onClick={() => openDetail(summary.id)}>
                   工作流
+                </button>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={() => openStoryboard(summary.id)}>
+                  <IconFilm size={12} /> 分镜/剪辑
                 </button>
                 <button type="button" className="btn btn-ghost btn-sm" onClick={() => openEdit(summary.id)}>
                   <IconEdit size={12} /> 编辑 JSON
@@ -508,9 +594,43 @@ export function Templates({ catalog, outputs, loading, onOpenRender, onOpenChara
                 </button>
               </div>
             </div>
-            <div className="v5-modal-body v5-tpl-detail">
-              <div className="v5-tpl-detail-top">
-                <div className="v5-tpl-detail-meta">
+            <div className="v5-subtabs">
+              <button
+                type="button"
+                className={"v5-subtab" + (route.view === "workflow" ? " active" : "")}
+                onClick={() => switchDetailView("workflow")}
+              >
+                <IconSpark size={13} /> 工作流
+              </button>
+              <button
+                type="button"
+                className={"v5-subtab" + (route.view === "storyboard" ? " active" : "")}
+                onClick={() => switchDetailView("storyboard")}
+              >
+                <IconFilm size={13} /> 分镜 / 剪辑
+              </button>
+              <span className="v5-muted v5-subtabs-hint">
+                {route.view === "storyboard"
+                  ? "分镜表 · 剪辑时间线 · 转场 · 剪辑档案（V5.4）"
+                  : "7 步 V5 工作流（V5.3）"}
+              </span>
+            </div>
+            {route.view === "storyboard" ? (
+              <div className="v5-modal-body v5-tpl-detail v5-tpl-detail-sb">
+                <Storyboard
+                  templateId={selectedId}
+                  templateLabel={selected.label}
+                  acts={selected.acts || []}
+                  outputDuration={selectedOutput?.duration ?? null}
+                  qcOk={selectedOutput?.qc_ok ?? null}
+                  qcChecks={selectedOutput?.qc_checks}
+                  qcTotal={selectedOutput?.qc_total}
+                />
+              </div>
+            ) : (
+              <div className="v5-modal-body v5-tpl-detail">
+                <div className="v5-tpl-detail-top">
+                  <div className="v5-tpl-detail-meta">
                   <StyleBadge label={styleSummary?.label || selected.style || "?"} />
                   <Tag>{fmtDuration(selected.target_duration)}</Tag>
                   <Tag>
@@ -530,7 +650,7 @@ export function Templates({ catalog, outputs, loading, onOpenRender, onOpenChara
                     <IconPlay size={13} /> 播放成片
                   </button>
                 )}
-              </div>
+                </div>
 
               <ol className="v5-flow-steps">
                 {/* ① 分镜 acts → shots */}
@@ -708,6 +828,7 @@ export function Templates({ catalog, outputs, loading, onOpenRender, onOpenChara
                 </FlowStep>
               </ol>
             </div>
+            )}
           </div>
         </div>
       )}

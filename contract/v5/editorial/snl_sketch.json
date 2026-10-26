@@ -1,0 +1,62 @@
+{
+  "id": "snl_sketch",
+  "label": "粉笔小品·固定机位",
+  "pacing": {
+    "lead_in": 1.25,
+    "mid": 0.95,
+    "climax": 0.8,
+    "coda": 1.15
+  },
+  "opening": {
+    "shot": "WS",
+    "camera": "static",
+    "hold": 1.8
+  },
+  "closing": {
+    "shot": "MS",
+    "camera": "pull_out",
+    "hold": 1.7
+  },
+  "shot_sequence": [
+    "WS",
+    "MS",
+    "OTS",
+    "CU",
+    "MCU",
+    "DETAIL",
+    "WS",
+    "MS",
+    "INSERT"
+  ],
+  "camera_palette": [
+    "static",
+    "push_in",
+    "whip_pan",
+    "pan_left",
+    "handheld",
+    "tilt_up"
+  ],
+  "transition_palette": [
+    "cut",
+    "wipeup",
+    "cut",
+    "fade",
+    "hblur",
+    "pixelize"
+  ],
+  "transition_policy": {
+    "default": "cut",
+    "hard_cut_ratio": 0.62,
+    "dissolve_on_scene_change": false,
+    "max_transition_sec": 0.35
+  },
+  "j_cut_ratio": 0.32,
+  "l_cut_ratio": 0.2,
+  "insert_ratio": 0.14,
+  "detail_ratio": 0.1,
+  "rhythm": {
+    "fast_shots_max": 2.1,
+    "slow_shots_min": 3.1
+  },
+  "notes": "小品：固定机位为主、靠硬切推进，突发甩镜/wipeup 制造反转；结尾干净 fade。"
+}

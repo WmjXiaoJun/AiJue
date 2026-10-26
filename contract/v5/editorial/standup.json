@@ -1,0 +1,62 @@
+{
+  "id": "standup",
+  "label": "VHS 单口·长镜冷面",
+  "pacing": {
+    "lead_in": 1.2,
+    "mid": 0.98,
+    "climax": 0.86,
+    "coda": 1.12
+  },
+  "opening": {
+    "shot": "WS",
+    "camera": "static",
+    "hold": 2.0
+  },
+  "closing": {
+    "shot": "MS",
+    "camera": "pull_out",
+    "hold": 1.8
+  },
+  "shot_sequence": [
+    "WS",
+    "MS",
+    "MCU",
+    "OTS",
+    "MS",
+    "CU",
+    "INSERT",
+    "MS",
+    "WS",
+    "DETAIL"
+  ],
+  "camera_palette": [
+    "static",
+    "handheld",
+    "push_in",
+    "tilt_down",
+    "pan_right",
+    "dolly"
+  ],
+  "transition_palette": [
+    "cut",
+    "cut",
+    "fade",
+    "hblur",
+    "dissolve"
+  ],
+  "transition_policy": {
+    "default": "cut",
+    "hard_cut_ratio": 0.66,
+    "dissolve_on_scene_change": false,
+    "max_transition_sec": 0.35
+  },
+  "j_cut_ratio": 0.18,
+  "l_cut_ratio": 0.26,
+  "insert_ratio": 0.2,
+  "detail_ratio": 0.1,
+  "rhythm": {
+    "fast_shots_max": 2.4,
+    "slow_shots_min": 3.4
+  },
+  "notes": "单口喜剧：整场以固定机位/轻手持长镜为主，靠硬切推进段子；爆梗/冷场用甩镜与 fade 反差。"
+}

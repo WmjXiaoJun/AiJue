@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """V5 2D 分层动画渲染器（motion2d）。
 
 契约见 ``docs/V5_INTERFACES.md`` §4（签名不得改）：
@@ -28,21 +28,33 @@
    paste；
 6. 帧数据 ``PIL -> bytearray -> ffmpeg.stdin`` 直通，无临时 png 序列。
 
-相机语义（详见 ``docs/V5_MOTION.md`` §2）
-----------------------------------------
-``camera = {"type": "static|push_in|pull_out|pan_left|pan_right|dolly|handheld",
-           "strength": 0.08, "ease": "in_out", "shake": 0.0}``
+相机语义（详见 ``docs/V5_MOTION.md`` §2 / §2.7）
+----------------------------------------------
+``camera = {"type": "push_in|...|whip_pan", "strength": 0.08, "ease": "in_out",
+           "shake": 0.0, "zone": ...}``
 
-* ``strength``：推拉 = 画面缩放增量（0.08 → 放大 8%）；摇移 = **中景参考平面**在
-  整镜中横向移动的距离（占画面宽度比例）；手持 = 漂移幅度。
-* ``ease``：``linear`` / ``in`` / ``out`` / ``in_out`` / ``in_out_cubic`` /
-  ``sine`` / ``expo`` 或自定义 ``callable(p) -> p``。
-* ``shake``：额外抖动幅度（占画面短边比例），手持默认 0.008。
+基础 7 种：``static`` ``push_in`` ``pull_out`` ``pan_left`` ``pan_right``
+``dolly`` ``handheld``。
+V5.4 电影级 10 种：``truck_left`` ``truck_right`` ``tilt_up`` ``tilt_down``
+``crane_up`` ``crane_down`` ``dolly_zoom`` ``rack_focus`` ``orbit`` ``whip_pan``
+（``SUPPORTED_CAMERA_TYPES`` 共 17 种）。
+
+* ``strength``：推拉 = 画面缩放增量（0.08 → 放大 8%）；摇移/横移/纵摇/升降 = 中景
+  参考平面位移占画面宽/高的比例；``dolly_zoom`` = 变焦量；``orbit`` = 弧线幅度；
+  ``whip_pan`` = 甩镜位移；手持 = 漂移幅度。
+* ``ease``：``linear`` / ``in`` / ``out`` / ``in_out`` / ``in_out_sine`` /
+  ``in_sine`` / ``out_sine`` / ``in_out_quart`` / ``in_out_cubic`` /
+  ``in_out_expo`` / ``out_back`` / ``in_out_back`` / ``in_out_circ`` 或自定义
+  ``callable(p) -> p``。
+* ``shake``：额外抖动幅度（占画面短边比例），手持默认 0.008；``shake_freq`` 调基频。
 * ``parallax``：视差指数（默认 0.65），见 ``_parallax_ratio``。
-* 可选 ``zone_from`` / ``zone_to``：归一化取景窗 ``[x, y, w, h]`` 插值，用于
-  "从全景推到细节" 这类镜头（优先级高于 type 的默认曲线）；也可以直接写
-  ``layers["camera_zones"]`` 里的**名字**（如 ``"zone": "detail"``、
-  ``"zone_from": "wide", "zone_to": "detail"``），由 ``_resolve_zone_refs`` 解析。
+* 可选 ``zone_from`` / ``zone_to`` / ``zone``：归一化取景窗（或 ``camera_zones`` 里的
+  名字），见 ``_zone_framing`` / ``_resolve_zone_refs``。
+
+V5.4 附加输出：``camera_state()`` 额外返回 ``mode`` / ``focus_shift`` /
+``motion_blur`` / ``motion_blur_px`` / ``shear`` / ``orbit_*`` /
+``dolly_zoom_amt`` / ``parallax_eff``；``rack_focus`` 在图层合成阶段按 depth 做前后景
+高斯虚化混合，``whip_pan`` 在特效之后对整帧做水平运动模糊。
 
 本模块失败统一 raise ``V5Error``（若 ``scene_render`` 已定义则复用同一个类）。
 """
@@ -102,7 +114,7 @@ DEFAULT_DEPTH: dict[str, float] = {
 #: 视差指数缺省值（<1 会压低前景位移，避免 2D 剪纸感过猛）
 DEFAULT_PARALLAX = 0.65
 
-#: 支持的相机类型 + 常用别名（模板里可能写 slow_push / pan_r 等）
+#: 支持的相机类型 + 常用别名（模板里可能写 slow_push / pan_r / dolly_in 等）
 CAMERA_ALIASES: dict[str, str] = {
     "static": "static", "still": "static", "fixed": "static", "none": "static",
     "push_in": "push_in", "pushin": "push_in", "push": "push_in",
@@ -115,10 +127,33 @@ CAMERA_ALIASES: dict[str, str] = {
     "dolly": "dolly", "dolly_in": "dolly",
     "handheld": "handheld", "hand_held": "handheld", "shake": "handheld",
     "handheld_shake": "handheld",
+    # ---- V5.4 电影级镜头 ----
+    "truck_left": "truck_left", "truck_l": "truck_left", "truckleft": "truck_left",
+    "truck_right": "truck_right", "truck_r": "truck_right",
+    "truckright": "truck_right", "truck": "truck_right",
+    "tilt_up": "tilt_up", "tilt_u": "tilt_up", "tiltup": "tilt_up",
+    "tilt_down": "tilt_down", "tilt_d": "tilt_down", "tiltdown": "tilt_down",
+    "tilt": "tilt_up",
+    "crane_up": "crane_up", "crane_u": "crane_up", "craneup": "crane_up",
+    "crane_down": "crane_down", "crane_d": "crane_down", "cranedown": "crane_down",
+    "crane": "crane_up", "bow_up": "crane_up",
+    "dolly_zoom": "dolly_zoom", "dollyzoom": "dolly_zoom",
+    "vertigo": "dolly_zoom", "hitchcock": "dolly_zoom", "zolly": "dolly_zoom",
+    "rack_focus": "rack_focus", "rackfocus": "rack_focus", "rack": "rack_focus",
+    "focus_pull": "rack_focus", "focus": "rack_focus", "pull_focus": "rack_focus",
+    "orbit": "orbit", "turntable": "orbit", "arc": "orbit", "orbit_2_5d": "orbit",
+    "whip_pan": "whip_pan", "whip": "whip_pan", "whippan": "whip_pan",
+    "whip_pan_right": "whip_pan", "whip_r": "whip_pan",
 }
 SUPPORTED_CAMERA_TYPES: tuple[str, ...] = (
+    # 基础 7 种
     "static", "push_in", "pull_out", "pan_left", "pan_right", "dolly", "handheld",
+    # V5.4 电影级 10 种
+    "truck_left", "truck_right", "tilt_up", "tilt_down",
+    "crane_up", "crane_down", "dolly_zoom", "rack_focus", "orbit", "whip_pan",
 )
+#: 电影级镜头（V5.4）子集，便于文档/CLI/editorial 引用
+CINEMATIC_CAMERA_TYPES: tuple[str, ...] = SUPPORTED_CAMERA_TYPES[7:]
 
 SUPPORTED_FX: tuple[str, ...] = (
     "rain", "snow", "dust", "embers", "fog", "glow", "speed_lines", "vignette",
@@ -284,14 +319,33 @@ def ease(p: Any, name: Any = "in_out") -> float:
         return x * x * (3.0 - 2.0 * x)
     if key == "smootherstep":
         return x * x * x * (x * (x * 6.0 - 15.0) + 10.0)
-    if key == "sine":
+    # ---- sine（V5.4）----
+    if key in ("sine", "in_out_sine"):
         return 0.5 - 0.5 * math.cos(math.pi * x)
+    if key == "in_sine":
+        return 1.0 - math.cos((x * math.pi) / 2.0)
+    if key == "out_sine":
+        return math.sin((x * math.pi) / 2.0)
     if key == "in_cubic":
         return x ** 3
     if key == "out_cubic":
         return 1.0 - (1.0 - x) ** 3
     if key == "in_out_cubic":
         return 4.0 * x ** 3 if x < 0.5 else 1.0 - ((-2.0 * x + 2.0) ** 3) / 2.0
+    # ---- quart（V5.4，编辑/剪辑常用）----
+    if key == "in_quart":
+        return x ** 4
+    if key == "out_quart":
+        return 1.0 - (1.0 - x) ** 4
+    if key == "in_out_quart":
+        return 8.0 * x ** 4 if x < 0.5 else 1.0 - ((-2.0 * x + 2.0) ** 4) / 2.0
+    if key == "in_quint":
+        return x ** 5
+    if key == "out_quint":
+        return 1.0 - (1.0 - x) ** 5
+    if key == "in_out_quint":
+        return 16.0 * x ** 5 if x < 0.5 else 1.0 - ((-2.0 * x + 2.0) ** 5) / 2.0
+    # ---- expo ----
     if key in ("expo", "in_expo"):
         return 0.0 if x <= 0 else 2.0 ** (10.0 * x - 10.0)
     if key == "out_expo":
@@ -303,9 +357,27 @@ def ease(p: Any, name: Any = "in_out") -> float:
             return 1.0
         return (2.0 ** (20.0 * x - 10.0) / 2.0 if x < 0.5
                 else (2.0 - 2.0 ** (-20.0 * x + 10.0)) / 2.0)
-    if key == "back_out":
+    # ---- back（带轻微过冲，V5.4：out_back 为默认命名）----
+    if key in ("back_out", "out_back"):
         c1 = 1.70158
         return 1.0 + (c1 + 1.0) * (x - 1.0) ** 3 + c1 * (x - 1.0) ** 2
+    if key == "in_back":
+        c1 = 1.70158
+        return (c1 + 1.0) * x ** 3 - c1 * x ** 2
+    if key == "in_out_back":
+        c2 = 1.70158 * 1.525
+        if x < 0.5:
+            return ((2.0 * x) ** 2 * ((c2 + 1.0) * 2.0 * x - c2)) / 2.0
+        return ((2.0 * x - 2.0) ** 2 * ((c2 + 1.0) * (x * 2.0 - 2.0) + c2) + 2.0) / 2.0
+    # ---- circ ----
+    if key == "in_circ":
+        return 1.0 - math.sqrt(max(0.0, 1.0 - x * x))
+    if key == "out_circ":
+        return math.sqrt(max(0.0, 1.0 - (x - 1.0) ** 2))
+    if key == "in_out_circ":
+        if x < 0.5:
+            return (1.0 - math.sqrt(max(0.0, 1.0 - (2.0 * x) ** 2))) / 2.0
+        return (math.sqrt(max(0.0, 1.0 - (-2.0 * x + 2.0) ** 2)) + 1.0) / 2.0
     LOG.warning("motion2d: 未知 ease=%r，回退 in_out", name)
     return x * x * (3.0 - 2.0 * x)
 
@@ -401,9 +473,25 @@ def camera_state(camera: dict | None, t: float, duration: float,
                  size: tuple[int, int] = (1280, 720), seed: int = 0) -> dict:
     """解析某一时刻的相机状态。
 
-    返回 ``{"zoom", "x", "y", "shake_x", "shake_y", "type", "progress",
-    "strength", "ease", "shake", "parallax"}``；``x``/``y`` 是**中景参考平面**
-    在屏幕上的位移（像素），各图层按 ``(depth/depth_ref)**parallax`` 缩放。
+    返回（旧键始终存在，新键为 V5.4 追加、默认中性值）::
+
+        {"zoom", "x", "y",                  # 中景参考平面：缩放 + 屏幕位移(px)
+         "shake_x", "shake_y", "type", "progress", "strength", "ease",
+         "shake", "parallax", "zone",
+         # V5.4 电影级镜头附加键（旧调用可忽略）
+         "mode",            # "normal" | "dolly_zoom" | "orbit"
+         "parallax_eff",    # 本镜实际使用的视差指数（truck 会略加强）
+         "focus_shift",     # rack_focus 的焦点进度 0..1（0=焦点在远，1=焦点在近）
+         "focus_blur_px",   # rack_focus 的最大模糊半径（px，1280x720 基准）
+         "motion_blur",     # whip_pan 的水平运动模糊强度 0..1
+         "motion_blur_px",  # motion_blur 折算的水平模糊像素
+         "shear",           # orbit 的轻微切变（affine 第二列系数）
+         "orbit_dx", "orbit_dy", "orbit_dz",   # orbit 每单位视差比的正弦位移/缩放
+         "dolly_zoom_amt"   # dolly_zoom 的变焦量（按 |ratio-1| 施加到各层）
+        }
+
+    ``x``/``y`` 是**中景参考平面**在屏幕上的位移（像素），各图层按
+    ``(depth/depth_ref)**parallax`` 缩放（见 ``_plane_motion``）。
     """
     cam = dict(camera or {})
     width, height = size
@@ -413,6 +501,17 @@ def camera_state(camera: dict | None, t: float, duration: float,
     strength = float(cam.get("strength", 0.08) or 0.0)
     ease_name = cam.get("ease", "in_out")
     e = ease(p, ease_name)
+
+    # V5.4 附加状态（默认中性）
+    mode = "normal"
+    parallax_eff = float(cam.get("parallax", DEFAULT_PARALLAX) or DEFAULT_PARALLAX)
+    focus_shift = 0.0
+    focus_blur_px = 0.0
+    motion_blur = 0.0
+    motion_blur_px = 0.0
+    shear = 0.0
+    orbit_dx = orbit_dy = orbit_dz = 0.0
+    dolly_zoom_amt = 0.0
 
     # ① 基础取景（zone）：zone_from/zone_to 直接插值（优先于 type 曲线）；
     #    zone 则作为"底"取景窗，type 的运动在它之上叠加（如 push_in 在特写里推）。
@@ -446,6 +545,58 @@ def camera_state(camera: dict | None, t: float, duration: float,
             zoom = base_zoom * (1.0 + 0.5 * strength * e)
             dx = base_dx + 0.16 * strength * width * e
             dy = base_dy + 0.05 * strength * height * math.sin(2.0 * math.pi * 0.21 * t)
+        # ---------------- V5.4 电影级镜头 ----------------
+        elif ctype == "truck_left":
+            # 横移：恒定 zoom，dx 线性移动 + 更明显的视差（近景跑得更快）
+            dx = base_dx + strength * width * e
+            parallax_eff *= 1.25
+        elif ctype == "truck_right":
+            dx = base_dx - strength * width * e
+            parallax_eff *= 1.25
+        elif ctype == "tilt_up":
+            # 纵摇：相机上仰 → 画面内容下移
+            dy = base_dy + strength * height * e
+            parallax_eff *= 1.15
+        elif ctype == "tilt_down":
+            dy = base_dy - strength * height * e
+            parallax_eff *= 1.15
+        elif ctype == "crane_up":
+            # 升降：从略低的机位升起（zoom 由低到高）+ 内容下移
+            dy = base_dy + strength * height * e
+            zoom = base_zoom * (1.0 - 0.25 * strength + 0.40 * strength * e)
+            parallax_eff *= 1.20
+        elif ctype == "crane_down":
+            dy = base_dy - strength * height * e
+            zoom = base_zoom * (1.0 + 0.25 * strength - 0.40 * strength * e)
+            parallax_eff *= 1.20
+        elif ctype == "dolly_zoom":
+            # 希区柯克变焦：主体平面锁住，远近层按 |ratio-1| 反向膨胀（见 _plane_motion）
+            mode = "dolly_zoom"
+            dolly_zoom_amt = strength * e
+            zoom = base_zoom
+        elif ctype == "rack_focus":
+            # 焦点由远到近拉（不动镜头），渲染层按 depth 做模糊渐变
+            focus_shift = _clamp(e, 0.0, 1.0)
+            zoom = base_zoom
+            focus_blur_px = float(cam.get("blur", 3.2) or 3.2) * (height / 720.0)
+        elif ctype == "orbit":
+            # 2.5D 环绕：主体（中景）锁住，远近层反向正弦位移 + 微缩放 + 轻微切变
+            theta = math.pi * _clamp(strength, 0.0, 1.0) * e
+            s = math.sin(theta)
+            mode = "orbit"
+            orbit_dx = -width * 0.20 * s          # 每单位 (ratio-1) 的横向弧线
+            orbit_dy = height * 0.014 * s
+            orbit_dz = 0.045 * s
+            shear = 0.020 * s
+            zoom = base_zoom
+        elif ctype == "whip_pan":
+            # 甩镜：前段快速位移 + 水平运动模糊（motion_blur 峰值在前段）
+            e_fast = 1.0 - (1.0 - e) ** 2.5
+            dx = base_dx - strength * width * e_fast
+            motion_blur = _clamp((1.0 - e) ** 1.6, 0.0, 1.0)
+            motion_blur_px = motion_blur * _clamp(
+                0.05 * width * (float(cam.get("strength", 0.2) or 0.2) / 0.2),
+                0.0, float(cam.get("blur_max", 48.0) or 48.0))
 
     shake = float(cam.get("shake", 0.0) or 0.0)
     if ctype == "handheld" and shake <= 0.0:
@@ -470,6 +621,18 @@ def camera_state(camera: dict | None, t: float, duration: float,
         "shake": float(shake),
         "parallax": float(cam.get("parallax", DEFAULT_PARALLAX) or DEFAULT_PARALLAX),
         "zone": zone_rect,
+        # ---- V5.4 电影级镜头附加键 ----
+        "mode": mode,
+        "parallax_eff": float(parallax_eff),
+        "focus_shift": float(focus_shift),
+        "focus_blur_px": float(focus_blur_px),
+        "motion_blur": float(motion_blur),
+        "motion_blur_px": float(motion_blur_px),
+        "shear": float(shear),
+        "orbit_dx": float(orbit_dx),
+        "orbit_dy": float(orbit_dy),
+        "orbit_dz": float(orbit_dz),
+        "dolly_zoom_amt": float(dolly_zoom_amt),
     }
 
 
@@ -483,15 +646,36 @@ def _parallax_ratio(depth: float, depth_ref: float, gain: float) -> float:
     return _clamp(ratio ** max(0.05, float(gain)), 0.03, 3.0)
 
 
-def _layer_motion(layer: "_PreparedLayer", cam: dict, depth_ref: float,
-                  gain: float) -> tuple[float, float, float]:
-    """某层 (zoom, dx, dy)：位移按视差比例，缩放带轻微景深差。"""
-    ratio = _parallax_ratio(layer.depth, depth_ref, gain)
+def _plane_motion(cam: dict, ratio: float) -> tuple[float, float, float, float]:
+    """中景平面运动 → 某视差比层的 (zoom, dx, dy, shear)。
+
+    V5.4 特殊模式：
+    * ``dolly_zoom``：中景（ratio=1）锁死，远近层按 ``|ratio-1|`` 膨胀；
+    * ``orbit``：中景锁死，远近层按 ``(ratio-1)`` 反向正弦位移 + 微缩放。
+    """
+    mode = str(cam.get("mode") or "normal")
+    if mode == "dolly_zoom":
+        amt = float(cam.get("dolly_zoom_amt", 0.0) or 0.0)
+        zoom = cam["zoom"] * (1.0 + amt * abs(ratio - 1.0))
+        return zoom, cam["x"] * ratio, cam["y"] * ratio, 0.0
+    if mode == "orbit":
+        r1 = ratio - 1.0
+        dx = float(cam.get("orbit_dx", 0.0) or 0.0) * r1
+        dy = float(cam.get("orbit_dy", 0.0) or 0.0) * r1
+        zoom = 1.0 + float(cam.get("orbit_dz", 0.0) or 0.0) * r1
+        return zoom, dx, dy, float(cam.get("shear", 0.0) or 0.0)
     dx = cam["x"] * ratio
     dy = cam["y"] * ratio
     zf = 0.55 + 0.45 * _clamp(ratio, 0.15, 2.2)  # 越近的层推拉越明显
     zoom = 1.0 + (cam["zoom"] - 1.0) * zf
-    return zoom, dx, dy
+    return zoom, dx, dy, float(cam.get("shear", 0.0) or 0.0)
+
+
+def _layer_motion(layer: "_PreparedLayer", cam: dict, depth_ref: float,
+                  gain: float) -> tuple[float, float, float, float]:
+    """某层 (zoom, dx, dy, shear)：位移按视差比例，缩放带轻微景深差。"""
+    ratio = _parallax_ratio(layer.depth, depth_ref, gain)
+    return _plane_motion(cam, ratio)
 
 
 # --------------------------------------------------------------------------- #
@@ -507,6 +691,8 @@ class _PreparedLayer:
     margin: tuple[int, int]                # (mx, my) 单边扩边像素
     content_box: tuple[int, int, int, int]  # alpha>0 内容框（扩边坐标系）
     blur_px: float = 0.0                   # 前景景深虚化半径（0 = 未虚化）
+    rgb_focus: np.ndarray | None = None    # rack_focus 用的额外模糊版本（RGB）
+    alpha_focus: np.ndarray | None = None  # rack_focus 用的额外模糊版本（A）
 
 
 @dataclass
@@ -551,21 +737,21 @@ def _foreground_blur_px(style: dict | None, opaque: bool) -> float:
 
 def _overscan_needed(cam_samples: Iterable[dict], depth: float, depth_ref: float,
                      gain: float, size: tuple[int, int]) -> tuple[int, int]:
-    """按整镜相机轨迹算某层需要的单边扩边像素。"""
+    """按整镜相机轨迹算某层需要的单边扩边像素（含 orbit/shear/dolly_zoom）。"""
     width, height = size
     ratio = _parallax_ratio(depth, depth_ref, gain)
-    zf = 0.55 + 0.45 * _clamp(ratio, 0.15, 2.2)
     need_x = need_y = 0.0
     for cam in cam_samples:
-        z = max(1e-4, 1.0 + (cam["zoom"] - 1.0) * zf)
-        dx = cam["x"] * ratio
-        dy = cam["y"] * ratio
+        z, dx, dy, shear = _plane_motion(cam, ratio)
+        z = max(1e-4, z)
         lo_x = (0.0 - width / 2.0 - dx) / z + width / 2.0
         hi_x = (width - width / 2.0 - dx) / z + width / 2.0
         lo_y = (0.0 - height / 2.0 - dy) / z + height / 2.0
         hi_y = (height - height / 2.0 - dy) / z + height / 2.0
         need_x = max(need_x, -lo_x, hi_x - width)
         need_y = max(need_y, -lo_y, hi_y - height)
+        if shear:  # 切变把 x 按 y 偏移，最多 |shear| * H
+            need_x += abs(shear) * height
     mx = int(min(max(0.0, need_x) + 3, MAX_OVERSCAN_PX))
     my = int(min(max(0.0, need_y) + 3, MAX_OVERSCAN_PX))
     return int(math.ceil(mx)), int(math.ceil(my))
@@ -629,6 +815,11 @@ def prepare_layers(layers: dict, size: tuple[int, int], camera: dict | None = No
     gain = float(cam.get("parallax", DEFAULT_PARALLAX) or DEFAULT_PARALLAX)
     samples = [camera_state(cam, duration * (i / 24.0), max(1e-6, duration),
                             (width, height), seed) for i in range(25)]
+    ctype = _normalize_camera_type(cam.get("type", "static"))
+    # rack_focus：预先烘出「额外高斯模糊」版本（逐帧只做混合，无运行时模糊开销）
+    focus_on = ctype == "rack_focus"
+    focus_blur = float(cam.get("blur", 3.2) or 3.2) * (height / 720.0)
+    focus_blur = _clamp(focus_blur, 0.5, 16.0)
 
     prepared: list[_PreparedLayer] = []
     for key in LAYER_KEYS:
@@ -649,9 +840,18 @@ def prepare_layers(layers: dict, size: tuple[int, int], camera: dict | None = No
                 img = img.filter(ImageFilter.GaussianBlur(float(blur_px)))
         mx, my = _overscan_needed(samples, depth[key], depth_ref, gain, (width, height))
         rgb, alpha, opaque, box = _pad_layer(img, mx, my)
-        prepared.append(_PreparedLayer(key=key, depth=depth[key], rgb=rgb, alpha=alpha,
-                                       opaque=opaque, margin=(mx, my), content_box=box,
-                                       blur_px=blur_px))
+        rgb_focus = alpha_focus = None
+        if focus_on:
+            blurred = img.filter(ImageFilter.GaussianBlur(float(focus_blur)))
+            rgb_focus, alpha_focus, _, _ = _pad_layer(blurred, mx, my)
+            if alpha_focus is None and alpha is not None:  # 理论不会发生
+                alpha_focus = np.ascontiguousarray(
+                    np.pad(np.asarray(blurred.getchannel("A")), ((my, my), (mx, mx)),
+                           mode="edge"))
+        prepared.append(_PreparedLayer(
+            key=key, depth=depth[key], rgb=rgb, alpha=alpha, opaque=opaque,
+            margin=(mx, my), content_box=box, blur_px=blur_px,
+            rgb_focus=rgb_focus, alpha_focus=alpha_focus))
     if not prepared:
         raise V5Error("layers 中没有任何可用图层（background/midground/foreground）")
 
@@ -699,7 +899,10 @@ def _get_layerset(layers: Any, size: tuple[int, int], camera: Any = None,
     cam_for_prep = dict(camera) if isinstance(camera, dict) else None
     if cam_for_prep is not None:
         # 单帧相机状态里的瞬时量不参与缓存键（否则逐帧 miss）
-        for volatile in ("zoom", "x", "y", "progress", "shake_x", "shake_y"):
+        for volatile in ("zoom", "x", "y", "progress", "shake_x", "shake_y",
+                         "focus_shift", "motion_blur", "motion_blur_px",
+                         "orbit_dx", "orbit_dy", "orbit_dz", "dolly_zoom_amt",
+                         "shear", "parallax_eff", "focus_blur_px"):
             cam_for_prep.pop(volatile, None)
     camspec = json.dumps({k: v for k, v in (cam_for_prep or {}).items()
                           if not callable(v)}, sort_keys=True, default=str)
@@ -747,6 +950,55 @@ def _warp_alpha(alpha: np.ndarray, m: np.ndarray, out_size: tuple[int, int]) -> 
             alpha, m.astype(np.float32), (int(out_size[0]), int(out_size[1])),
             flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT, borderValue=0)
     return _warp_pil_array(alpha, m, out_size)
+
+
+def _blend_into(dst: np.ndarray, other: np.ndarray, w: float) -> np.ndarray:
+    """把 ``dst`` 与 ``other`` 按权重 w 混合（V5.4 rack_focus 层混合）。
+
+    cv2 可用时**原地**写 ``dst``（~0.4ms/全帧），否则回退 uint16 定点混合。
+    """
+    w = _clamp(float(w), 0.0, 1.0)
+    if w <= 0.002:
+        return dst
+    if w >= 0.998:
+        return other
+    if cv2 is not None and dst.shape == other.shape and dst.dtype == other.dtype:
+        cv2.addWeighted(dst, 1.0 - w, other, w, 0.0, dst=dst)
+        return dst
+    wi = int(round(w * 256.0))
+    return (((dst.astype(np.uint16) * (256 - wi))
+             + (other.astype(np.uint16) * wi)) >> 8).astype(np.uint8)
+
+
+def _blend_np(a: np.ndarray, b: np.ndarray, w: float) -> np.ndarray:
+    """向后兼容别名（uint8 线性混合）。"""
+    return _blend_into(np.array(a, copy=True), b, w)
+
+
+def _motion_blur_inplace(frame: np.ndarray, px: float) -> None:
+    """水平运动模糊（V5.4 whip_pan）：原地 box blur，成本 ~0.5-2.5ms。"""
+    k = int(round(float(px)))
+    if k < 2 or frame.ndim != 3:
+        return
+    k |= 1                      # 奇数核，保持左右对称
+    k = int(min(k, 65))
+    if cv2 is not None:
+        frame[:] = cv2.blur(frame, (k, 1))
+        return
+    # 无 cv2 回退：滚动平均（whip 镜专用，帧数少）
+    half = k // 2
+    acc = frame.astype(np.uint16) * (2 * half + 1)   # pragma: no cover
+    for i in range(1, half + 1):                     # pragma: no cover
+        acc += np.roll(frame, i, axis=1)
+        acc += np.roll(frame, -i, axis=1)
+    frame[:] = (acc // (2 * half + 1)).astype(np.uint8)  # pragma: no cover
+
+
+def _apply_motion_blur(frame: np.ndarray, cam: dict) -> None:
+    """按相机状态对整帧施加水平运动模糊（原地）。"""
+    px = float(cam.get("motion_blur_px", 0.0) or 0.0)
+    if px >= 2.0:
+        _motion_blur_inplace(frame, px)
 
 
 # --------------------------------------------------------------------------- #
@@ -1413,14 +1665,11 @@ def character_state(entry: dict, layerset: _LayerSet, cam: dict, t: float,
     fade, rise_px = _char_fade(entry, style, t, duration, fps)
 
     # 相机：角色默认贴中景平面
-    gain = float(cam.get("parallax", DEFAULT_PARALLAX) or DEFAULT_PARALLAX)
+    gain = float(cam.get("parallax_eff") or cam.get("parallax") or DEFAULT_PARALLAX)
     depth = float(entry.get("depth") or layerset.depth.get("midground",
                                                           DEFAULT_DEPTH["midground"]))
     ratio = _parallax_ratio(depth, layerset.depth_ref, gain)
-    zf = 0.55 + 0.45 * _clamp(ratio, 0.15, 2.2)
-    zoom = 1.0 + (cam["zoom"] - 1.0) * zf
-    cam_dx = cam["x"] * ratio
-    cam_dy = cam["y"] * ratio
+    zoom, cam_dx, cam_dy, cam_shear = _plane_motion(cam, ratio)
 
     base_x = ax * width - w_nom / 2.0 + micro_x * scale
     base_y = ay * height - h_nom + micro_y * scale + rise_px
@@ -1428,11 +1677,15 @@ def character_state(entry: dict, layerset: _LayerSet, cam: dict, t: float,
     ky = zoom * (h_nom / spr_h)
     tx = (base_x - width / 2.0) * zoom + width / 2.0 + cam_dx
     ty = (base_y - height / 2.0) * zoom + height / 2.0 + cam_dy
-    m = np.array([[kx, 0.0, tx], [0.0, ky, ty]], dtype=np.float64)
+    m = np.array([[kx, cam_shear * ky,
+                   tx + cam_shear * (ty - height / 2.0 - cam_dy)],
+                  [0.0, ky, ty]], dtype=np.float64)
 
     # 落地软阴影（脚底锚点 + 相机变换后）
     foot_x = (ax * width - width / 2.0) * zoom + width / 2.0 + cam_dx + micro_x * zoom
     foot_y = ((ay * height + rise_px) - height / 2.0) * zoom + height / 2.0 + cam_dy
+    if cam_shear:
+        foot_x += cam_shear * (foot_y - height / 2.0 - cam_dy)
     shadow_on = entry.get("shadow")
     if shadow_on is None:
         shadow_on = (style or {}).get("character_shadow", True)
@@ -1469,8 +1722,23 @@ def _resolve_characters_state(characters_state: Any, layerset: _LayerSet,
         if "matrix" in entry and "rgb" in entry:      # 已解析状态
             out.append(entry)
             continue
-        if entry.get("image") is not None:            # 直接贴图
+        if entry.get("image") is not None:            # 直接贴图（cutout 立绘）
             img = _to_image(entry["image"], "character.image").convert("RGBA")
+            # 可选整体缩放：height（占画面高度比例）优先，否则 scale（倍率）
+            try:
+                target_h = entry.get("height")
+                if target_h:
+                    th = max(8, int(round(float(target_h) * height)))
+                    tw = max(1, int(round(th * img.size[0] / float(img.size[1]))))
+                    img = img.resize((tw, th), Image.LANCZOS)
+                else:
+                    sc = float(entry.get("scale", 1.0) or 1.0)
+                    if abs(sc - 1.0) > 1e-3:
+                        img = img.resize((max(1, int(round(img.size[0] * sc))),
+                                          max(1, int(round(img.size[1] * sc)))),
+                                         Image.LANCZOS)
+            except (TypeError, ValueError, ZeroDivisionError):
+                pass
             arr = np.asarray(img, dtype=np.uint8)
             pos = entry.get("pos") or entry.get("anchor") or (0.5, 0.9)
             try:
@@ -1479,15 +1747,26 @@ def _resolve_characters_state(characters_state: Any, layerset: _LayerSet,
                 px, py = 0.5, 0.9
             if abs(px) <= 1.5 and abs(py) <= 1.5:
                 px, py = px * width, py * height
-            ix = int(round(px - img.size[0] / 2.0))
-            iy = int(round(py - img.size[1]))
+            # 相机变换（与真实角色一致：绕锚点缩放 + 视差位移 + 切变）
+            gain_i = float(cam.get("parallax_eff") or cam.get("parallax")
+                           or DEFAULT_PARALLAX)
+            depth_i = float(entry.get("depth") or 0.12)
+            ratio_i = _parallax_ratio(depth_i, layerset.depth_ref, gain_i)
+            z_i, dx_i, dy_i, sh_i = _plane_motion(cam, ratio_i)
+            base_x = px - img.size[0] / 2.0
+            base_y = py - img.size[1]
+            tx = (base_x - width / 2.0) * z_i + width / 2.0 + dx_i
+            ty = (base_y - height / 2.0) * z_i + height / 2.0 + dy_i
             out.append({
                 "role": str(entry.get("role") or "char"),
                 "rgb": np.ascontiguousarray(arr[:, :, :3]),
                 "alpha": np.ascontiguousarray(arr[:, :, 3]),
-                "matrix": np.array([[1.0, 0.0, float(ix)], [0.0, 1.0, float(iy)]]),
+                "matrix": np.array(
+                    [[z_i, sh_i * z_i, tx + sh_i * (ty - height / 2.0 - dy_i)],
+                     [0.0, z_i, ty]], dtype=np.float64),
                 "spr_size": img.size, "pose": "front", "mouth": "closed",
-                "blink": False, "depth": float(entry.get("depth", 0.12)),
+                "blink": False, "depth": depth_i,
+                "alpha_mul": float(entry.get("alpha", 1.0) or 1.0),
             })
             continue
         if not entry.get("_resolved_copy"):
@@ -1894,6 +2173,20 @@ def _resolve_cam(cam_in: Any, t: float, duration: float,
         "shake": float(cam_in.get("shake", 0.0) or 0.0),
         "parallax": float(cam_in.get("parallax", DEFAULT_PARALLAX) or DEFAULT_PARALLAX),
         "zone": cam_in.get("zone"),
+        # ---- V5.4 附加键（部分状态也要齐全，避免下游 KeyError）----
+        "mode": str(cam_in.get("mode") or "normal"),
+        "parallax_eff": float(cam_in.get("parallax_eff")
+                              or cam_in.get("parallax", DEFAULT_PARALLAX)
+                              or DEFAULT_PARALLAX),
+        "focus_shift": float(cam_in.get("focus_shift", 0.0) or 0.0),
+        "focus_blur_px": float(cam_in.get("focus_blur_px", 0.0) or 0.0),
+        "motion_blur": float(cam_in.get("motion_blur", 0.0) or 0.0),
+        "motion_blur_px": float(cam_in.get("motion_blur_px", 0.0) or 0.0),
+        "shear": float(cam_in.get("shear", 0.0) or 0.0),
+        "orbit_dx": float(cam_in.get("orbit_dx", 0.0) or 0.0),
+        "orbit_dy": float(cam_in.get("orbit_dy", 0.0) or 0.0),
+        "orbit_dz": float(cam_in.get("orbit_dz", 0.0) or 0.0),
+        "dolly_zoom_amt": float(cam_in.get("dolly_zoom_amt", 0.0) or 0.0),
     }
 
 
@@ -1946,6 +2239,42 @@ def _char_layer_image(char_state: dict, out_size: tuple[int, int],
     return (Image.fromarray(warped_rgb), Image.fromarray(warped_a)), (x0, y0)
 
 
+def _affine_full(zoom: float, tx: float, ty: float, shear: float = 0.0,
+                 width: float = 0.0, height: float = 0.0,
+                 dx: float = 0.0, dy: float = 0.0) -> np.ndarray:
+    """带轻微切变的前向仿射（V5.4 orbit 用）。
+
+    屏幕坐标：``x = zoom·u + shear·(zoom·v + ty - H/2 - dy) + tx``，
+    即围绕画面中心做横向切变（x 随 y 偏移），用于 2.5D 环绕的"轻微切变"。
+    """
+    if not shear:
+        return _affine(zoom, tx, ty)
+    m = np.array([[zoom, shear * zoom,
+                   tx + shear * (ty - height / 2.0 - dy)],
+                  [0.0, zoom, ty]], dtype=np.float64)
+    return m
+
+
+def _focus_weights(cam: dict, layerset: "_LayerSet") -> dict[str, float]:
+    """rack_focus：按 depth 到焦平面的距离算每层模糊权重 0..1。
+
+    焦平面深度 = lerp(背景depth, 前景depth, focus_shift)；权重 = 距离 / 景深范围。
+    """
+    shift = float(cam.get("focus_shift", 0.0) or 0.0)
+    if shift <= 0.001 and not cam.get("_focus_active"):
+        # shift==0 时仍可能处于"焦点在远"的起始状态（前景模糊），照常计算
+        pass
+    d_bg = float(layerset.depth.get("background", DEFAULT_DEPTH["background"]))
+    d_mid = float(layerset.depth.get("midground", DEFAULT_DEPTH["midground"]))
+    d_fg = float(layerset.depth.get("foreground", DEFAULT_DEPTH["foreground"]))
+    focus_depth = _lerp(d_bg, d_fg, _clamp(shift, 0.0, 1.0))
+    span = max(1e-3, abs(d_fg - d_bg))
+    out = {}
+    for key, d in (("background", d_bg), ("midground", d_mid), ("foreground", d_fg)):
+        out[key] = _clamp(abs(d - focus_depth) / span, 0.0, 1.0)
+    return out
+
+
 def _compose_base(layers: Any, characters_state: Any, camera_state: Any,
                   size: tuple[int, int], t: float, style: dict | None,
                   duration: float, seed: int, fps: float = 25.0,
@@ -1957,21 +2286,43 @@ def _compose_base(layers: Any, characters_state: Any, camera_state: Any,
                              style=style)
     cam_spec = _resolve_zone_refs(camera_state, layerset.camera_zones)
     cam = _resolve_cam(cam_spec, t, duration, (width, height), seed)
-    gain = float(cam.get("parallax", DEFAULT_PARALLAX) or DEFAULT_PARALLAX)
+    # V5.4：truck 等会加强视差（parallax_eff），orbit/dolly_zoom 用 mode 分支
+    gain = float(cam.get("parallax_eff") or cam.get("parallax")
+                 or DEFAULT_PARALLAX)
+    focus_w: dict[str, float] = {}
+    if str(cam.get("mode") or "normal") == "normal" and float(
+            cam.get("focus_shift", 0.0) or 0.0) > 0.0 or cam.get("type") == "rack_focus":
+        focus_w = _focus_weights(cam, layerset)
 
     base = Image.new("RGB", (width, height), layerset.bg_color)
     for layer in layerset.layers:
-        zoom, dx, dy = _layer_motion(layer, cam, layerset.depth_ref, gain)
+        zoom, dx, dy, shear = _layer_motion(layer, cam, layerset.depth_ref, gain)
         mx, my = layer.margin
         tx = (width / 2.0 + dx) - (width / 2.0 + mx) * zoom
         ty = (height / 2.0 + dy) - (height / 2.0 + my) * zoom
-        m = _affine(zoom, tx, ty)
+        m = _affine_full(zoom, tx, ty, shear, width, height, dx, dy)
         warped_rgb = _warp_rgb(layer.rgb, m, (width, height), replicate=layer.opaque)
+        warped_a = None
+        if not layer.opaque:
+            assert layer.alpha is not None
+            warped_a = _warp_alpha(layer.alpha, m, (width, height))
+        # ---- rack_focus：按 depth 权重与"额外模糊版本"做混合 ----
+        fw = float(focus_w.get(layer.key, 0.0))
+        if fw > 0.02 and layer.rgb_focus is not None \
+                and layer.rgb_focus.shape == layer.rgb.shape:
+            blur_rgb = _warp_rgb(layer.rgb_focus, m, (width, height),
+                                 replicate=layer.opaque)
+            if layer.alpha is None or layer.alpha_focus is None:
+                warped_rgb = _blend_into(warped_rgb, blur_rgb, fw)
+            else:
+                blur_a = _warp_alpha(layer.alpha_focus, m, (width, height))
+                warped_rgb = _blend_into(warped_rgb, blur_rgb, fw)
+                assert warped_a is not None
+                warped_a = _blend_into(warped_a, blur_a, fw)
         if layer.opaque:
             base.paste(Image.fromarray(warped_rgb), (0, 0))
             continue
-        assert layer.alpha is not None
-        warped_a = _warp_alpha(layer.alpha, m, (width, height))
+        assert warped_a is not None
         cx0, cy0, cx1, cy1 = layer.content_box
         x0, y0, x1, y1 = _dest_bbox_rect(cx0, cy0, cx1, cy1, m, (width, height), pad=1)
         if x1 <= x0 or y1 <= y0:
@@ -2011,6 +2362,9 @@ def compose_frame(layers: Any, characters_state: Any, camera_state: Any,
       ``{"image": PIL/RGB, "pos": (x, y)}`` 直接贴图；
     * ``camera_state``：``camera_state()`` 结果或 camera spec（按 ``t`` 自动解析）；
     * ``fps`` / ``mouth_strength``：口型平滑与淡入淡出的帧率/峰值幅度（可省）。
+
+    V5.4：若相机是 ``rack_focus`` 会在图层合成阶段做前后景虚化混合；若是
+    ``whip_pan`` 会在特效之后对整帧施加水平运动模糊。
     """
     width, height = int(size[0]), int(size[1])
     base, layerset, cam = _compose_base(layers, characters_state, camera_state,
@@ -2020,11 +2374,14 @@ def compose_frame(layers: Any, characters_state: Any, camera_state: Any,
     bank = None
     if fx_specs:
         bank = _build_fx_bank(fx_specs, (width, height), seed, layerset.anchors)
-    if bank is not None:
+    motion_blur_px = float(cam.get("motion_blur_px", 0.0) or 0.0)
+    if bank is not None or motion_blur_px >= 2.0:
         frame = np.frombuffer(bytearray(base.tobytes()), dtype=np.uint8).reshape(
             height, width, 3)
-        bank.apply(frame, t, "back")
-        bank.apply(frame, t, "front")
+        if bank is not None:
+            bank.apply(frame, t, "back")
+            bank.apply(frame, t, "front")
+        _apply_motion_blur(frame, cam)
         return Image.fromarray(frame)
     return base
 
@@ -2245,6 +2602,9 @@ def render_shot(layers: dict, characters: list[dict], camera: dict,
     writer = _VideoWriter(out_path, (width, height), fps, log_path=log_path)
     compose_times: list[float] = []
     cam_log: dict[str, Any] = {}
+    v54_log: dict[str, Any] = {"focus_shift_end": 0.0, "motion_blur_peak": 0.0,
+                               "shear_peak": 0.0, "dolly_zoom_end": 0.0,
+                               "parallax_eff": 1.0}
     stills: dict[str, str] = {}
     still_targets = {0: "f000", frames // 2: f"f{frames // 2:03d}"}
     try:
@@ -2254,7 +2614,15 @@ def render_shot(layers: dict, characters: list[dict], camera: dict,
             if i == 0:
                 cam_log = {"type": cam["type"], "strength": cam["strength"],
                            "ease": cam["ease"], "zoom0": round(cam["zoom"], 6),
-                           "zone": cam.get("zone")}
+                           "zone": cam.get("zone"), "mode": cam.get("mode"),
+                           "parallax_eff": round(float(cam.get("parallax_eff", 0.0)), 4)}
+            v54_log["focus_shift_end"] = float(cam.get("focus_shift", 0.0) or 0.0)
+            v54_log["motion_blur_peak"] = max(
+                v54_log["motion_blur_peak"], float(cam.get("motion_blur", 0.0) or 0.0))
+            v54_log["shear_peak"] = max(
+                v54_log["shear_peak"], abs(float(cam.get("shear", 0.0) or 0.0)))
+            v54_log["dolly_zoom_end"] = float(cam.get("dolly_zoom_amt", 0.0) or 0.0)
+            v54_log["parallax_eff"] = round(float(cam.get("parallax_eff", 1.0) or 1.0), 4)
             t0 = time.perf_counter()
             img = _compose_base(layerset, char_entries, cam, (width, height), t,
                                 style, duration, seed, fps=fps,
@@ -2272,6 +2640,7 @@ def render_shot(layers: dict, characters: list[dict], camera: dict,
             if fx_bank is not None:
                 fx_bank.apply(frame, t, "back")
                 fx_bank.apply(frame, t, "front")
+            _apply_motion_blur(frame, cam)      # V5.4 whip_pan 水平运动模糊（原地）
             writer.write(buf)
     except BaseException:
         writer.abort()
@@ -2324,6 +2693,9 @@ def render_shot(layers: dict, characters: list[dict], camera: dict,
         "compose_ms_max": round(float(np.max(compose_times)), 2) if compose_times else 0.0,
         "stills": stills,
         "probe": probe,
+        # V5.4 电影级镜头统计（给 editorial/QC 用）
+        "v54": {k: round(v, 4) if isinstance(v, float) else v
+                for k, v in v54_log.items()},
     }
     result = {
         "path": str(out_path),
@@ -2350,6 +2722,8 @@ def render_shot(layers: dict, characters: list[dict], camera: dict,
 __all__ = [
     "V5Error",
     "SUPPORTED_CAMERA_TYPES",
+    "CINEMATIC_CAMERA_TYPES",
+    "CAMERA_ALIASES",
     "SUPPORTED_FX",
     "LAYER_KEYS",
     "DEFAULT_DEPTH",
@@ -2370,3 +2744,73 @@ __all__ = [
     "normalize_fx",
     "reset_character_cache",
 ]
+
+
+# --------------------------------------------------------------------------- #
+# 简易 CLI（`python -m pipeline.motion2d --help`）
+# --------------------------------------------------------------------------- #
+def _cli(argv: Sequence[str] | None = None) -> int:
+    import argparse
+
+    ap = argparse.ArgumentParser(
+        prog="python -m pipeline.motion2d",
+        description="V5 motion2d：分层视差动画渲染器（列出能力 / 单镜自测渲染）")
+    ap.add_argument("--list-cameras", action="store_true", help="列出全部 camera 类型与别名")
+    ap.add_argument("--list-easings", action="store_true", help="列出全部 easing 名称")
+    ap.add_argument("--list-fx", action="store_true", help="列出全部特效类型")
+    ap.add_argument("--self-test", metavar="OUT_MP4",
+                    help="用程序化 mock 图层渲染 1 个 1.2s 片段（验证链路）")
+    ap.add_argument("--camera", default="orbit", help="--self-test 使用的 camera 类型")
+    args = ap.parse_args(argv)
+    if args.list_cameras:
+        print("camera 类型（%d）：" % len(SUPPORTED_CAMERA_TYPES))
+        for name in SUPPORTED_CAMERA_TYPES:
+            print("  -", name, "(cinematic)" if name in CINEMATIC_CAMERA_TYPES else "")
+        print("\n别名：")
+        for alias, target in sorted(CAMERA_ALIASES.items()):
+            if alias != target:
+                print(f"  {alias} -> {target}")
+        return 0
+    if args.list_easings:
+        print("easing：linear in out in_out smootherstep "
+              "in_sine out_sine in_out_sine in_quad out_quad in_out_quad "
+              "in_cubic out_cubic in_out_cubic in_quart out_quart in_out_quart "
+              "in_quint out_quint in_out_quint in_expo out_expo in_out_expo "
+              "in_back out_back in_out_back in_circ out_circ in_out_circ")
+        return 0
+    if args.list_fx:
+        print("fx：" + " ".join(SUPPORTED_FX))
+        return 0
+    if args.self_test:
+        # 极简程序化图层（不依赖 scene_render / characters_v5）
+        w, h = 640, 360
+        bg = Image.new("RGB", (w, h))
+        px = bg.load()
+        for y in range(h):
+            for x in range(w):
+                px[x, y] = (40 + x * 120 // w, 60 + y * 120 // h, 110)
+        bg = bg.convert("RGBA")
+        mid = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        d = ImageDraw.Draw(mid)
+        for i in range(6):
+            x = 40 + i * 95
+            d.rectangle([x, h * 0.45, x + 46, h * 0.9], fill=(220, 210, 190, 235))
+            d.ellipse([x + 9, h * 0.33, x + 37, h * 0.61], fill=(236, 214, 186, 255))
+        fg = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        ImageDraw.Draw(fg).rectangle([0, 0, w, 16], fill=(20, 18, 16, 230))
+        layers = {"background": bg, "midground": mid, "foreground": fg,
+                  "depth": {"background": 0.02, "midground": 0.12, "foreground": 0.3}}
+        style = {"id": "cli_test", "palette": {"bg": ["#808080"], "fg": ["#101010"],
+                                               "accent": ["#b23a2e"]},
+                 "line": {"width": 2, "color": "#101010"}, "fx": ["rain"]}
+        res = render_shot(layers, [], {"type": args.camera, "strength": 0.12},
+                          1.2, 25, args.self_test, style, width=w, height=h)
+        print(f"OK {res['path']}  {res['frames']}帧  {res['render_fps']:.1f} 帧/秒  "
+              f"camera={args.camera}  v54={res['meta'].get('v54')}")
+        return 0
+    ap.print_help()
+    return 0
+
+
+if __name__ == "__main__":  # pragma: no cover
+    raise SystemExit(_cli())

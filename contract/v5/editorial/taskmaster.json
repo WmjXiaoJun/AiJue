@@ -1,0 +1,62 @@
+{
+  "id": "taskmaster",
+  "label": "糖果竞技·混乱快剪",
+  "pacing": {
+    "lead_in": 1.0,
+    "mid": 0.8,
+    "climax": 0.66,
+    "coda": 1.02
+  },
+  "opening": {
+    "shot": "WS",
+    "camera": "truck_left",
+    "hold": 1.2
+  },
+  "closing": {
+    "shot": "MS",
+    "camera": "pull_out",
+    "hold": 1.3
+  },
+  "shot_sequence": [
+    "WS",
+    "MCU",
+    "CU",
+    "MS",
+    "DETAIL",
+    "MCU",
+    "INSERT",
+    "WS",
+    "OTS"
+  ],
+  "camera_palette": [
+    "truck_left",
+    "whip_pan",
+    "dolly_zoom",
+    "handheld",
+    "push_in",
+    "tilt_down"
+  ],
+  "transition_palette": [
+    "cut",
+    "hblur",
+    "pixelize",
+    "slideleft",
+    "radial",
+    "circleopen"
+  ],
+  "transition_policy": {
+    "default": "cut",
+    "hard_cut_ratio": 0.34,
+    "dissolve_on_scene_change": false,
+    "max_transition_sec": 0.35
+  },
+  "j_cut_ratio": 0.4,
+  "l_cut_ratio": 0.1,
+  "insert_ratio": 0.24,
+  "detail_ratio": 0.16,
+  "rhythm": {
+    "fast_shots_max": 1.6,
+    "slow_shots_min": 2.6
+  },
+  "notes": "竞技整活：快切+甩镜+dolly_zoom 制造混乱，插入镜多；circleopen/pixelize 贴纸式转场。"
+}

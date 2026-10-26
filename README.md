@@ -158,3 +158,13 @@ FastAPI · SQLAlchemy · SQLite · Vite · React · TypeScript · FFmpeg 6.1 · 
 - 资产：ssets/v5/characters/<id>/（24）、ssets/v5/scenes/<id>.png+json（61）；提示词 contract/v5/art/prompts.json；复现 python scripts/gen_v5_scene_art.py、python scripts/gen_v5_character_art.py（front: scripts/regen_v5_character_fronts.py）。
 
 > V5.3：设置里 V3/V4 的「工作流模板(h3_roundtable.json)+声音映射」旧面板已从 UI 删除（V5 不用）；前端「V5 世界 → 模板库」展示每个模板自己的工作流（分镜/固定声音/场景/角色/动画/字幕/混音）、场景与角色组合，并支持编辑模板 JSON / 一键用该模板渲染。16 模板 16/16 风格、场景集合、演员组合互不相同。
+
+## V5.4 电影级剪辑 / 镜头 / 分镜 / 转场（2026-10-26）
+
+> 计划/报告：docs/PLAN_V5_4_EDITORIAL.md、docs/V5_4_REPORT.md、docs/V5_4_EDITING.md；验收：docs/V5_4_ACCEPTANCE.md。
+
+- **每模板不同剪辑档案**：contract/v5/editorial/<id>.json（pacing/开场收尾/分镜序列/运镜调色板/转场调色板/硬切比例/J-L cut/insert 比例），16 份互不相同（camera 覆盖 17 种、transition 覆盖 14 种）。
+- **17 种电影级运镜**（motion2d）：push/pull/pan/truck/tilt/crane/dolly/dolly_zoom/rack_focus/orbit/whip_pan/handheld…；按景别与档案自动选镜，角色镜保证头安全（虚拟取景窗）。
+- **每剪辑点独立转场**（pipeline/editing.py）：37 种 ffmpeg xfade + 甩镜过渡、J/L cut 音频重叠、成片时长按 EDL 精确；参考 libopenshot/OpenTimelineIO/open-montage/parallax-maker/ffmpeg xfade 的模型。
+- **分镜产物**：每部成片输出 storyboard.json/html/png；	imeline.json 增加 editing 轨与每镜 shot_size/camera/transition；前端「V5 世界 → 模板库 → 分镜/剪辑」可看分镜表/时间线/剪辑档案（#/v5/templates/<id>/storyboard）。
+- 重渲：python scripts/render_templates_v5.py --duration 40 --refresh；单部 python -m pipeline.cli render_v5 --template history_talk --duration 40。

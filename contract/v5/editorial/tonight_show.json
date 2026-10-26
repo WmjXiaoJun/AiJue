@@ -1,0 +1,64 @@
+{
+  "id": "tonight_show",
+  "label": "霓虹深夜秀·快切综艺",
+  "pacing": {
+    "lead_in": 1.05,
+    "mid": 0.92,
+    "climax": 0.78,
+    "coda": 1.1
+  },
+  "opening": {
+    "shot": "WS",
+    "camera": "truck_right",
+    "hold": 1.6
+  },
+  "closing": {
+    "shot": "MS",
+    "camera": "push_in",
+    "hold": 1.7
+  },
+  "shot_sequence": [
+    "WS",
+    "MS",
+    "MCU",
+    "CU",
+    "OTS",
+    "MS",
+    "DETAIL",
+    "MCU",
+    "INSERT",
+    "WS"
+  ],
+  "camera_palette": [
+    "truck_right",
+    "push_in",
+    "whip_pan",
+    "handheld",
+    "tilt_up",
+    "rack_focus",
+    "dolly_zoom"
+  ],
+  "transition_palette": [
+    "cut",
+    "cut",
+    "hblur",
+    "wiperight",
+    "slideleft",
+    "pixelize"
+  ],
+  "transition_policy": {
+    "default": "cut",
+    "hard_cut_ratio": 0.42,
+    "dissolve_on_scene_change": false,
+    "max_transition_sec": 0.4
+  },
+  "j_cut_ratio": 0.45,
+  "l_cut_ratio": 0.12,
+  "insert_ratio": 0.18,
+  "detail_ratio": 0.12,
+  "rhythm": {
+    "fast_shots_max": 1.8,
+    "slow_shots_min": 2.8
+  },
+  "notes": "综艺快节奏：J-cut 抢先入梗、甩镜/滑擦转场；开场横移带出舞台，收尾推近主持人。"
+}

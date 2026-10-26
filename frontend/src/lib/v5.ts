@@ -194,6 +194,110 @@ export interface V5RenderListResponse {
 }
 
 // ---------------------------------------------------------------------------
+// V5.4 剪辑 / 分镜（GET /api/v5/editorial|storyboard/{template}）
+// ---------------------------------------------------------------------------
+export interface V5TransitionOut {
+  mode?: string;
+  duration?: number;
+  [key: string]: unknown;
+}
+
+export interface V5StoryboardShot {
+  id?: string;
+  shot_id?: string;
+  index?: number;
+  act?: string;
+  act_id?: string;
+  type?: string;
+  scene?: string;
+  start?: number;
+  duration?: number;
+  shot_size?: string;
+  camera?: string;
+  transition_out?: V5TransitionOut | string;
+  j_cut?: number;
+  l_cut?: number;
+  line?: string;
+  role?: string;
+  speaker?: string;
+  text?: string;
+  insert?: boolean;
+  thumbnail?: string;
+  thumbnail_url?: string;
+  edit?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+/** storyboard.json 的 edit 块（V5.4 渲染产物内嵌剪辑档案） */
+export interface V5StoryboardEdit {
+  template?: string;
+  label?: string;
+  shots?: number;
+  shot_sizes?: string[];
+  camera_types?: string[];
+  transitions?: string[];
+  hard_cut_ratio?: number;
+  j_cuts?: number;
+  l_cuts?: number;
+  inserts?: number;
+  signature?: string;
+  profile?: V5EditorialData;
+  [key: string]: unknown;
+}
+
+export interface V5StoryboardData {
+  template?: string;
+  label?: string;
+  style?: string;
+  /** 成片总时长（storyboard.json 用 total 字段） */
+  total?: number;
+  duration?: number;
+  version?: number;
+  shots?: V5StoryboardShot[];
+  edit?: V5StoryboardEdit;
+  storyboard_png_url?: string | null;
+  storyboard_html_url?: string | null;
+  timeline_edit?: Record<string, unknown> | null;
+  [key: string]: unknown;
+}
+
+export interface V5EditorialData {
+  id?: string;
+  label?: string;
+  notes?: string;
+  pacing?: Record<string, number>;
+  opening?: Record<string, unknown>;
+  closing?: Record<string, unknown>;
+  shot_sequence?: string[];
+  camera_palette?: string[];
+  transition_palette?: string[];
+  transition_policy?: Record<string, unknown>;
+  j_cut_ratio?: number;
+  l_cut_ratio?: number;
+  insert_ratio?: number;
+  detail_ratio?: number;
+  rhythm?: Record<string, number>;
+  [key: string]: unknown;
+}
+
+export interface V5EditorialResponse {
+  ok: boolean;
+  template: string;
+  editorial: V5EditorialData;
+  path?: string;
+}
+
+export interface V5StoryboardResponse {
+  ok: boolean;
+  template: string;
+  storyboard: V5StoryboardData;
+  shots: number;
+  storyboard_png_url?: string | null;
+  storyboard_html_url?: string | null;
+  path?: string;
+}
+
+// ---------------------------------------------------------------------------
 // fetch 封装（渲染/试听可能较慢，默认 90s；提交渲染 30s）
 // ---------------------------------------------------------------------------
 export class V5ApiError extends Error {
@@ -312,7 +416,16 @@ export const v5api = {
   renderJob: (jobId: string) => request<{ ok: boolean; job: V5RenderJob }>("/v5/render/" + enc(jobId)),
   cancelRender: (jobId: string) =>
     request<{ ok: boolean; job: V5RenderJob }>("/v5/render/" + enc(jobId), { method: "DELETE" }),
+  /** V5.4 剪辑档案（缺失 404，调用方用 isV5NotFound 容错） */
+  editorial: (template: string) => request<V5EditorialResponse>("/v5/editorial/" + enc(template)),
+  /** V5.4 分镜产物（缺失 404，调用方用 isV5NotFound 容错） */
+  storyboard: (template: string) => request<V5StoryboardResponse>("/v5/storyboard/" + enc(template)),
 };
+
+/** 是否 404（用于「尚未生成」容错，不当成错误） */
+export function isV5NotFound(err: unknown): boolean {
+  return err instanceof V5ApiError && err.status === 404;
+}
 
 // ---------------------------------------------------------------------------
 // URL helpers
@@ -354,6 +467,16 @@ export function sceneArtUrl(sceneId: string): string {
 /** 角色试听 wav（后端 tmp/v5_voice/<id>.wav，带时间戳避免缓存） */
 export function voiceWavUrl(characterId: string): string {
   return mediaSrc("/media/v5/voice/" + enc(characterId) + ".wav") + "?t=" + Date.now();
+}
+
+/** V5.4 分镜整页大图（storyboard.png，缺失 404） */
+export function storyboardPngUrl(templateId: string): string {
+  return mediaSrc("/media/v5/" + enc(templateId) + "/storyboard.png");
+}
+
+/** V5.4 分镜 HTML（storyboard.html，缺失 404） */
+export function storyboardHtmlUrl(templateId: string): string {
+  return mediaSrc("/media/v5/" + enc(templateId) + "/storyboard.html");
 }
 
 /** 风格墙代表场景：优先找使用该 style 的模板的第一个 act.scene */

@@ -50,7 +50,9 @@ TEMPLATE_ID_RE = re.compile(r"^[a-z][a-z0-9_]{1,60}$")
 # 允许通过 /media/v5/{template}/... 下载的文件（相对模板产物目录）
 TEMPLATE_MEDIA_RE = re.compile(
     r"^(final\.mp4|timeline\.html|qc_report\.json|style_report\.json|"
-    r"timeline\.json|contact_sheet\.png|frames/frame_\d{1,3}\.png)$")
+    r"timeline\.json|contact_sheet\.png|storyboard\.png|storyboard\.html|"
+    r"frames/frame_\d{1,3}\.png|shots/[a-z0-9_]{1,80}\.png|"
+    r"work/storyboard/[a-z0-9_]{1,80}\.(jpg|png))$")
 CHAR_MEDIA_RE = re.compile(r"^(portrait|front|cutout|thumb)\.(png|jpg|jpeg|webp)$")
 SCENE_MEDIA_RE = re.compile(r"^[a-z][a-z0-9_]{1,60}(_\d{1,2})?\.(png|jpg|jpeg|webp)$")
 VOICE_RE = re.compile(r"^[a-z][a-z0-9_]{1,60}$")
@@ -250,6 +252,131 @@ def list_outputs(include_custom: bool = Query(default=False),
         "missing": missing,
         "generated_at": _now(),
     }
+
+
+# ---------------------------------------------------------------------------
+# V5.4 剪辑 / 分镜：editorial 档案 + storyboard 产物
+# ---------------------------------------------------------------------------
+def _editorial_root() -> Path:
+    return _repo() / "contract" / "v5" / "editorial"
+
+
+def _storyboard_path(template: str) -> Path:
+    return _outputs_root() / template / "storyboard.json"
+
+
+def _enrich_storyboard(template: str, data: dict) -> dict:
+    """给每镜补 thumbnail_url（若缩略图文件存在），并补 storyboard 图片/HTML 链接。"""
+    out_dir = _outputs_root() / template
+    out_resolved = out_dir.resolve()
+    shots: list[dict] = []
+    raw_shots = data.get("shots") if isinstance(data.get("shots"), list) else []
+    for index, shot in enumerate(raw_shots):
+        if not isinstance(shot, dict):
+            continue
+        item = dict(shot)
+        shot_id = str(item.get("id") or item.get("shot_id") or f"shot{index + 1}")
+        candidates: list[str] = []
+        for key in ("thumbnail", "thumbnail_path", "image", "preview"):
+            value = item.get(key)
+            if not isinstance(value, str) or not value.strip():
+                continue
+            raw_value = value.strip()
+            path = Path(raw_value)
+            if path.is_absolute():
+                # storyboard.json 里 thumbnail 可能是渲染机绝对路径：只接受落在模板产物目录内的
+                try:
+                    relative = path.resolve().relative_to(out_resolved)
+                    candidates.append(relative.as_posix())
+                except ValueError:
+                    continue
+            else:
+                candidates.append(raw_value.replace("\\", "/"))
+        candidates.append(f"shots/{shot_id}.png")
+        candidates.append(f"frames/frame_{index + 1:02d}.png")
+        thumbnail_url = None
+        thumbnail_rel: str | None = None
+        for relative in candidates:
+            if not relative or ".." in Path(relative).parts:
+                continue
+            if not re.match(r"^[A-Za-z0-9_./-]+\.(png|jpg|jpeg|webp)$", relative):
+                continue
+            try:
+                target = _safe_file(out_dir, relative)
+            except HTTPException:
+                continue
+            if target.suffix.lower() in (".png", ".jpg", ".jpeg", ".webp"):
+                if TEMPLATE_MEDIA_RE.match(relative):
+                    thumbnail_url = f"/media/v5/{template}/{relative}"
+                thumbnail_rel = relative
+                break
+        if thumbnail_rel:
+            item["thumbnail"] = thumbnail_rel
+        if thumbnail_url:
+            item["thumbnail_url"] = thumbnail_url
+        shots.append(item)
+    data = dict(data)
+    data["shots"] = shots
+    png = out_dir / "storyboard.png"
+    html = out_dir / "storyboard.html"
+    data["storyboard_png_url"] = (f"/media/v5/{template}/storyboard.png"
+                                  if png.is_file() else None)
+    data["storyboard_html_url"] = (f"/media/v5/{template}/storyboard.html"
+                                   if html.is_file() else None)
+    # timeline.json 的 edit 轨（若渲染已接入 V5.4）
+    timeline = _read_json_file(out_dir / "timeline.json")
+    edit_track = None
+    for track in timeline.get("tracks") or []:
+        if isinstance(track, dict) and track.get("kind") in ("edit", "edl"):
+            edit_track = track
+            break
+    data["timeline_edit"] = edit_track
+    return data
+
+
+@router.get("/api/v5/editorial/{template}", summary="模板剪辑档案（contract/v5/editorial）")
+def get_editorial(template: str):
+    if not TEMPLATE_ID_RE.match(template):
+        raise HTTPException(status_code=404, detail="模板不存在")
+    path = _editorial_root() / f"{template}.json"
+    if not path.is_file():
+        raise HTTPException(status_code=404, detail={
+            "message": "该模板尚未生成剪辑档案",
+            "template": template,
+            "path": str(path),
+        })
+    editorial = _read_json_file(path)
+    if not editorial:
+        raise HTTPException(status_code=404, detail={
+            "message": "剪辑档案为空或不是合法 JSON",
+            "template": template,
+        })
+    return {"ok": True, "template": template, "editorial": editorial, "path": str(path)}
+
+
+@router.get("/api/v5/storyboard/{template}", summary="模板分镜产物（outputs/templates_v5/<id>/storyboard.json）")
+def get_storyboard(template: str):
+    if not TEMPLATE_ID_RE.match(template):
+        raise HTTPException(status_code=404, detail="模板不存在")
+    path = _storyboard_path(template)
+    if not path.is_file():
+        raise HTTPException(status_code=404, detail={
+            "message": "该模板尚未生成分镜数据（重渲后可见）",
+            "template": template,
+            "path": str(path),
+        })
+    data = _read_json_file(path)
+    if not data:
+        raise HTTPException(status_code=404, detail={
+            "message": "分镜数据为空或不是合法 JSON",
+            "template": template,
+        })
+    storyboard = _enrich_storyboard(template, data)
+    return {"ok": True, "template": template, "storyboard": storyboard,
+            "shots": len(storyboard.get("shots") or []),
+            "storyboard_png_url": storyboard.get("storyboard_png_url"),
+            "storyboard_html_url": storyboard.get("storyboard_html_url"),
+            "path": str(path)}
 
 
 # ---------------------------------------------------------------------------

@@ -1,0 +1,62 @@
+{
+  "id": "shark_tank",
+  "label": "蓝图路演·数据质询",
+  "pacing": {
+    "lead_in": 1.15,
+    "mid": 0.9,
+    "climax": 0.78,
+    "coda": 1.1
+  },
+  "opening": {
+    "shot": "WS",
+    "camera": "truck_right",
+    "hold": 1.6
+  },
+  "closing": {
+    "shot": "MS",
+    "camera": "pull_out",
+    "hold": 1.6
+  },
+  "shot_sequence": [
+    "WS",
+    "MS",
+    "MCU",
+    "CU",
+    "DETAIL",
+    "OTS",
+    "INSERT",
+    "WS",
+    "MCU"
+  ],
+  "camera_palette": [
+    "truck_right",
+    "push_in",
+    "dolly_zoom",
+    "tilt_up",
+    "pan_left",
+    "rack_focus"
+  ],
+  "transition_palette": [
+    "cut",
+    "wipeleft",
+    "circleopen",
+    "cut",
+    "pixelize",
+    "slideup"
+  ],
+  "transition_policy": {
+    "default": "cut",
+    "hard_cut_ratio": 0.42,
+    "dissolve_on_scene_change": false,
+    "max_transition_sec": 0.4
+  },
+  "j_cut_ratio": 0.3,
+  "l_cut_ratio": 0.18,
+  "insert_ratio": 0.28,
+  "detail_ratio": 0.26,
+  "rhythm": {
+    "fast_shots_max": 2.0,
+    "slow_shots_min": 3.0
+  },
+  "notes": "路演质询：数据插入镜多（DETAIL/INSERT）、truck+推镜跟随演示；circleopen/pixelize 切换提案页。"
+}

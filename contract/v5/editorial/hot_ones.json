@@ -1,0 +1,61 @@
+{
+  "id": "hot_ones",
+  "label": "暖调访谈·双人对话",
+  "pacing": {
+    "lead_in": 1.3,
+    "mid": 1.0,
+    "climax": 0.9,
+    "coda": 1.2
+  },
+  "opening": {
+    "shot": "WS",
+    "camera": "push_in",
+    "hold": 2.2
+  },
+  "closing": {
+    "shot": "MCU",
+    "camera": "pull_out",
+    "hold": 2.0
+  },
+  "shot_sequence": [
+    "WS",
+    "MS",
+    "MCU",
+    "OTS",
+    "CU",
+    "DETAIL",
+    "MS",
+    "WS",
+    "INSERT"
+  ],
+  "camera_palette": [
+    "push_in",
+    "rack_focus",
+    "pan_left",
+    "dolly",
+    "handheld",
+    "pull_out"
+  ],
+  "transition_palette": [
+    "cut",
+    "dissolve",
+    "cut",
+    "fade",
+    "wipeleft"
+  ],
+  "transition_policy": {
+    "default": "cut",
+    "hard_cut_ratio": 0.58,
+    "dissolve_on_scene_change": true,
+    "max_transition_sec": 0.5
+  },
+  "j_cut_ratio": 0.42,
+  "l_cut_ratio": 0.25,
+  "insert_ratio": 0.16,
+  "detail_ratio": 0.12,
+  "rhythm": {
+    "fast_shots_max": 2.3,
+    "slow_shots_min": 3.3
+  },
+  "notes": "暖调双人访谈：以推/拉与 rack_focus 在主持人与嘉宾间转移，J-cut 抢话；转场克制。"
+}
