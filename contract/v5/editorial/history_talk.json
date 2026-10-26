@@ -47,7 +47,7 @@
   ],
   "transition_policy": {
     "default": "cut",
-    "hard_cut_ratio": 0.55,
+    "hard_cut_ratio": 0.45,
     "dissolve_on_scene_change": true,
     "max_transition_sec": 0.55
   },
@@ -59,5 +59,5 @@
     "fast_shots_max": 2.5,
     "slow_shots_min": 3.5
   },
-  "notes": "水墨史书：crane/dolly 缓慢移动，长镜头为主；场景切换 dissolve，硬切+少量 wipe 收束。"
+  "notes": "V6 agent edit: 硬切 0.55→0.45（示例）"
 }

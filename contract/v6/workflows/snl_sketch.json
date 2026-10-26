@@ -1,0 +1,121 @@
+{
+  "version": 1,
+  "id": "snl_sketch",
+  "name": "周六夜现场 工作流",
+  "description": "模板 snl_sketch 的智能体编排（可编辑 stages/params）",
+  "variables": {
+    "template": "snl_sketch",
+    "duration": 40.0,
+    "seed": 20261101
+  },
+  "stages": [
+    {
+      "id": "story",
+      "agent": "story_architect",
+      "tool": "build_story",
+      "depends": [],
+      "enabled": true,
+      "optional": false,
+      "params": {},
+      "desc": "模板 → 分镜脚本/台词/节奏"
+    },
+    {
+      "id": "voice",
+      "agent": "voice_director",
+      "tool": "synthesize_voices",
+      "depends": [
+        "story"
+      ],
+      "enabled": true,
+      "optional": false,
+      "params": {},
+      "desc": "固定音色 TTS + 语速/停顿适配"
+    },
+    {
+      "id": "editorial",
+      "agent": "editor",
+      "tool": "plan_editing",
+      "depends": [
+        "voice"
+      ],
+      "enabled": true,
+      "optional": false,
+      "params": {},
+      "desc": "剪辑档案 → 逐镜景别/运镜/取景/转场/J-L"
+    },
+    {
+      "id": "shots",
+      "agent": "video_director",
+      "tool": "render_shots",
+      "depends": [
+        "editorial"
+      ],
+      "enabled": true,
+      "optional": false,
+      "params": {},
+      "desc": "2D 电影级动效逐镜渲染（17 运镜 + 表演 + 音频口型）"
+    },
+    {
+      "id": "h3",
+      "agent": "video_director",
+      "tool": "render_h3",
+      "depends": [
+        "editorial"
+      ],
+      "enabled": false,
+      "optional": true,
+      "params": {
+        "hero_shots": 2
+      },
+      "desc": "H3 图生视频 hero 镜（GPU，默认关闭）"
+    },
+    {
+      "id": "assemble",
+      "agent": "editor",
+      "tool": "assemble_episode",
+      "depends": [
+        "shots"
+      ],
+      "enabled": true,
+      "optional": false,
+      "params": {},
+      "desc": "per-cut 转场/J-L/字幕/包装/BGM 成片"
+    },
+    {
+      "id": "storyboard",
+      "agent": "editor",
+      "tool": "build_storyboard",
+      "depends": [
+        "assemble"
+      ],
+      "enabled": true,
+      "optional": false,
+      "params": {},
+      "desc": "分镜表 json/html/png"
+    },
+    {
+      "id": "qc",
+      "agent": "qa",
+      "tool": "evaluate_qc",
+      "depends": [
+        "assemble"
+      ],
+      "enabled": true,
+      "optional": false,
+      "params": {},
+      "desc": "QC 硬门 + 抽帧"
+    },
+    {
+      "id": "publish",
+      "agent": "publisher",
+      "tool": "write_report",
+      "depends": [
+        "qc"
+      ],
+      "enabled": true,
+      "optional": false,
+      "params": {},
+      "desc": "成片/报告/批量汇总"
+    }
+  ]
+}

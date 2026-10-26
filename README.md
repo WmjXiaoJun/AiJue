@@ -168,3 +168,16 @@ FastAPI · SQLAlchemy · SQLite · Vite · React · TypeScript · FFmpeg 6.1 · 
 - **每剪辑点独立转场**（pipeline/editing.py）：37 种 ffmpeg xfade + 甩镜过渡、J/L cut 音频重叠、成片时长按 EDL 精确；参考 libopenshot/OpenTimelineIO/open-montage/parallax-maker/ffmpeg xfade 的模型。
 - **分镜产物**：每部成片输出 storyboard.json/html/png；	imeline.json 增加 editing 轨与每镜 shot_size/camera/transition；前端「V5 世界 → 模板库 → 分镜/剪辑」可看分镜表/时间线/剪辑档案（#/v5/templates/<id>/storyboard）。
 - 重渲：python scripts/render_templates_v5.py --duration 40 --refresh；单部 python -m pipeline.cli render_v5 --template history_talk --duration 40。
+
+## V6 智能体工作台（Agent Orchestration，2026-10-26）
+
+参考 [ArcReel](https://github.com/ArcReel/ArcReel)（AI Agent 驱动的小说→角色/场景/剧本/分镜/视频工作台）：
+- **8 个角色智能体**：制片 / 编剧 / 声音导演 / 美术 / 剪辑 / 视频导演 / 质检 / 发布；
+- **每模板可编辑工作流**：`contract/v6/workflows/<template>.json`（stages/agents/tools/depends/params）；
+- **9 个工具**：build_story / synthesize_voices / plan_editing / render_shots / render_h3 /
+  assemble_episode / build_storyboard / evaluate_qc / write_report；
+- **智能体式修改**：`python -m pipeline.agents edit --op set_voice|patch_editorial|patch_template|patch_workflow`
+  → 自动返回受影响阶段 + 增量重跑命令；
+- **验收门 + run 证据**：每次执行写 `outputs/agent_runs/<run_id>/{run.json,events.jsonl,summary.md}`，
+  QC 硬门不过即失败；
+- 文档：`AGENTS.md`、`docs/V6_AGENT_ORCHESTRATION.md`；CLI：`python -m pipeline.agents list|inspect|run|edit|status`。
