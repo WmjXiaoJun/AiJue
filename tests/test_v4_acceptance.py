@@ -458,6 +458,31 @@ def test_loudness(tid: str):
     assert low <= info["lufs"] <= high, (
         f"{tid}: integrated LUFS={info['lufs']:.2f} 不在 [{low}, {high}]")
     assert info["tp"] <= TP_MAX, f"{tid}: true peak={info['tp']:.2f} > {TP_MAX} dBTP"
+    # 新代码/修复后的 qc_report 应带 loudness check（-17~-15 + TP≤-1.0），存在则必须 ok
+    report = qc_report(tid)
+    cmap = checks_map(report)
+    stats = report.get("stats") or {}
+    loud = cmap.get("loudness")
+    if isinstance(loud, dict):
+        assert loud.get("ok") is True, (
+            f"{tid}: qc_report.loudness check 未通过：{loud.get('detail')}")
+        qc_lufs = (stats.get("loudness_lufs")
+                   if isinstance(stats.get("loudness_lufs"), (int, float))
+                   else None)
+        for key in ("lufs", "loudness", "integrated_lufs"):
+            if qc_lufs is None and isinstance(loud.get(key), (int, float)):
+                qc_lufs = loud[key]
+        qc_tp = (stats.get("loudness_tp")
+                 if isinstance(stats.get("loudness_tp"), (int, float)) else None)
+        for key in ("tp", "true_peak", "true_peak_dbtp"):
+            if qc_tp is None and isinstance(loud.get(key), (int, float)):
+                qc_tp = loud[key]
+        if isinstance(qc_lufs, (int, float)):
+            assert abs(float(qc_lufs) - info["lufs"]) <= 0.6, (
+                f"{tid}: qc.loudness={qc_lufs} 与 QA 实测 {info['lufs']} 差 >0.6dB")
+        if isinstance(qc_tp, (int, float)):
+            assert abs(float(qc_tp) - info["tp"]) <= 0.6, (
+                f"{tid}: qc.true_peak={qc_tp} 与 QA 实测 {info['tp']} 差 >0.6dB")
 
 
 @pytest.mark.parametrize("tid", V4_READY)
