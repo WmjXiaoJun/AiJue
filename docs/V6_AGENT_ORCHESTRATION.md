@@ -101,3 +101,31 @@ python -m pipeline.agents status --template history_talk
 3. **参考图→视频模式**：单张角色档案图直接生成镜头（ArcReel reference-to-video）。
 4. **剪映草稿导出**：分镜/时间线导出可编辑工程。
 5. **审批门**：QC 失败/成本超预算时暂停，等待人工或上级智能体确认。
+
+## 8. HTTP API（`backend/app/routers/v6_agent.py`）
+
+| 方法 | 路径 | 说明 |
+|---|---|---|
+| GET | `/api/v6/agent/overview` | 8 角色 + 16 模板工作流概览 |
+| GET | `/api/v6/agent/workflow/{template}` | 读取工作流 JSON |
+| PUT | `/api/v6/agent/workflow/{template}` | 保存（智能体编辑）工作流 |
+| POST | `/api/v6/agent/run` | 启动后台 run（单并发；支持 dry_run/stages/goal） |
+| GET | `/api/v6/agent/runs` | 内存 job + 磁盘 run 列表 |
+| GET | `/api/v6/agent/runs/{job_id}` | job 状态/日志/结果 |
+| POST | `/api/v6/agent/edit` | 修改：set_voice/set_pose/patch_editorial/patch_template/patch_workflow |
+| GET | `/api/v6/agent/art` | 24 角色资产 + 姿态策略 |
+| POST | `/api/v6/agent/pose` | 启停角色姿态资产 |
+| GET | `/media/agent_runs/{run_id}/{file}` | run 证据文件（summary.md/run.json/events.jsonl） |
+
+## 9. 前端「智能体」面板
+
+`frontend/src/components/v5/AgentPanel.tsx`（V5 世界 → 智能体 tab，`#/v5/agent`）：
+
+- **模板工作流**：下拉选模板、阶段表（agent/tool/desc/params、启停开关）、保存/重载；
+- **运行智能体**：目标/时长/阶段过滤、试运行(dry-run)/开始运行、实时日志、阶段结果 chip、run 证据链接；
+- **智能体修改**：5 种 op（改声音/姿态/剪辑/模板/工作流）+ JSON 编辑 + `affected_stages` + 一键填入受影响阶段；
+- **美术资产**：24 角色缩略图 + point/think 姿态启停；
+- **运行记录**：内存 job + 磁盘 run（summary.md 链接）。
+
+截图/断言（8090 正式后端）：`tmp/v6_frontend/screenshots/v6_agent_panel.png`、
+`tmp/v6_frontend/agent_ui_check.json`（**13/13 PASS**：面板/角色 chips/10 阶段/5 操作/24 角色/运行记录/dry-run job/edit API/art API）。

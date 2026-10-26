@@ -170,6 +170,7 @@ FastAPI · SQLAlchemy · SQLite · Vite · React · TypeScript · FFmpeg 6.1 · 
 - 重渲：python scripts/render_templates_v5.py --duration 40 --refresh；单部 python -m pipeline.cli render_v5 --template history_talk --duration 40。
 
 ## V6 智能体工作台（Agent Orchestration，2026-10-26）
+- 前端：「V5 世界 → 智能体」面板（工作流编辑/运行日志/修改/美术资产/运行记录，`#/v5/agent`）；
 
 参考 [ArcReel](https://github.com/ArcReel/ArcReel)（AI Agent 驱动的小说→角色/场景/剧本/分镜/视频工作台）：
 - **8 个角色智能体**：制片 / 编剧 / 声音导演 / 美术 / 剪辑 / 视频导演 / 质检 / 发布；

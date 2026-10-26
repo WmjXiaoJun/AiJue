@@ -11,10 +11,11 @@ import { StyleWall } from "./v5/StyleWall";
 import { SceneLibrary } from "./v5/SceneLibrary";
 import { CharacterLibrary } from "./v5/CharacterLibrary";
 import { RenderPanel } from "./v5/RenderPanel";
+import { AgentPanel } from "./v5/AgentPanel";
 
-type V5Tab = "gallery" | "templates" | "styles" | "scenes" | "characters" | "render";
+type V5Tab = "gallery" | "templates" | "styles" | "scenes" | "characters" | "render" | "agent";
 
-const TAB_KEYS: V5Tab[] = ["gallery", "templates", "styles", "scenes", "characters", "render"];
+const TAB_KEYS: V5Tab[] = ["gallery", "templates", "styles", "scenes", "characters", "render", "agent"];
 
 /** 子 tab 与 hash 双向同步（#/v5/gallery、#/v5/scenes… 可直接打开/截图） */
 function tabFromHash(): V5Tab {
@@ -34,6 +35,7 @@ const TABS: { key: V5Tab; label: string; icon: ReactNode }[] = [
   { key: "scenes", label: "场景库", icon: <IconGrid size={15} /> },
   { key: "characters", label: "角色库", icon: <IconUser size={15} /> },
   { key: "render", label: "渲染", icon: <IconSpark size={15} /> },
+  { key: "agent", label: "智能体", icon: <IconSpark size={15} /> },
 ];
 
 export function V5Studio() {
@@ -153,6 +155,7 @@ export function V5Studio() {
     if (tab === "styles") return <StyleWall catalog={catalog} loading={loading} />;
     if (tab === "scenes") return <SceneLibrary catalog={catalog} loading={loading} />;
     if (tab === "characters") return <CharacterLibrary catalog={catalog} loading={loading} />;
+    if (tab === "agent") return <AgentPanel />;
     return (
       <RenderPanel
         catalog={catalog}
