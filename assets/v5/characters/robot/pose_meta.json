@@ -1,0 +1,258 @@
+{
+  "id": "robot",
+  "point": {
+    "id": "robot",
+    "pose": "point",
+    "source": "imagegen_pose",
+    "created_at": "2026-10-26T21:04:36",
+    "elapsed_sec": 50.3,
+    "seed": 47,
+    "seed_base": 43,
+    "ip_adapter": {
+      "strength": 0.22,
+      "end_at": 0.75,
+      "weight_type": "style transfer"
+    },
+    "bg_mode": "white",
+    "ref_used": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\robot\\pose_point\\ref_white.png",
+    "portrait_ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\robot\\portrait.png",
+    "prompt_id": "a15faabb-37a5-4002-a777-bbbf8285b2c2",
+    "files": {
+      "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\robot\\pose_point\\front.png",
+      "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\robot\\cutout_point.png"
+    },
+    "sizes": {
+      "cutout": [
+        792,
+        906
+      ]
+    },
+    "front_white": {
+      "ok": true,
+      "corners": [
+        {
+          "rgb": [
+            254,
+            255,
+            255
+          ],
+          "mean": 254.3,
+          "spread": 3.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 255.0,
+          "spread": 2.0
+        },
+        {
+          "rgb": [
+            254,
+            254,
+            254
+          ],
+          "mean": 254.2,
+          "spread": 2.0
+        },
+        {
+          "rgb": [
+            254,
+            254,
+            254
+          ],
+          "mean": 254.1,
+          "spread": 3.0
+        }
+      ],
+      "white_ratio": 0.817
+    },
+    "cutout_validation": {
+      "ok": true,
+      "alpha0": 0.628,
+      "visible": 0.372,
+      "corners_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "bbox": [
+        8,
+        8,
+        784,
+        898
+      ],
+      "aspect": 0.874,
+      "bbox_h_ratio": 0.982,
+      "wash": {
+        "removed": false,
+        "color": null,
+        "ratio": 0.0
+      }
+    },
+    "face_norm": {
+      "score": 0.45,
+      "estimated": false,
+      "source": "haar",
+      "bbox": [
+        0.08207070707070707,
+        0.17770419426048564,
+        0.1830808080808081,
+        0.26600441501103755
+      ],
+      "mouth": {
+        "cx": 0.13257575757575757,
+        "cy": 0.24657836644591613,
+        "w": 0.03434343434343434,
+        "h": 0.013509933774834438
+      },
+      "eyes": {
+        "y": 0.21479028697571742,
+        "w": 0.022222222222222223,
+        "cx": [
+          0.10833333333333332,
+          0.15681818181818183
+        ]
+      },
+      "skin": "#e9fefc",
+      "lip": "#5d7c81",
+      "line": "#01010e",
+      "face_w": 80.0
+    },
+    "prompts": {
+      "front": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1robot, mechanical, metal head, antenna, glowing cyan eyes, LED mouth, silver metal robot body, chest LED panel, sci-fi, friendly robotic, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference, dynamic gesture, one arm extended to the side, index finger pointing, explaining pose, confident body language, weight on one leg, action pose",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, human face, organic skin, modern clothing, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan, circular background, round backdrop, oval background, colored circle, pastel circle, background circle, sitting, upper body only, half body, cropped at waist, close-up, zoomed in, hands in pockets, static stiff pose, barefoot, bare feet"
+    }
+  },
+  "updated_at": "2026-10-26T21:12:26",
+  "think": {
+    "id": "robot",
+    "pose": "think",
+    "source": "imagegen_pose",
+    "created_at": "2026-10-26T21:12:26",
+    "elapsed_sec": 13.6,
+    "seed": 43,
+    "seed_base": 43,
+    "ip_adapter": {
+      "strength": 0.35,
+      "end_at": 0.9,
+      "weight_type": "style transfer"
+    },
+    "bg_mode": "white",
+    "ref_used": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\robot\\portrait.png",
+    "portrait_ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\robot\\portrait.png",
+    "prompt_id": "035cb0b7-0a3b-433e-a797-11bebb96df24",
+    "files": {
+      "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\robot\\pose_think\\front.png",
+      "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\robot\\cutout_think.png"
+    },
+    "sizes": {
+      "cutout": [
+        947,
+        981
+      ]
+    },
+    "front_white": {
+      "ok": true,
+      "corners": [
+        {
+          "rgb": [
+            252,
+            252,
+            253
+          ],
+          "mean": 252.6,
+          "spread": 5.0
+        },
+        {
+          "rgb": [
+            254,
+            254,
+            254
+          ],
+          "mean": 253.7,
+          "spread": 3.0
+        },
+        {
+          "rgb": [
+            253,
+            253,
+            253
+          ],
+          "mean": 252.9,
+          "spread": 4.0
+        },
+        {
+          "rgb": [
+            251,
+            252,
+            253
+          ],
+          "mean": 252.1,
+          "spread": 4.0
+        }
+      ],
+      "white_ratio": 0.643
+    },
+    "cutout_validation": {
+      "ok": true,
+      "alpha0": 0.556,
+      "visible": 0.444,
+      "corners_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "bbox": [
+        8,
+        8,
+        939,
+        973
+      ],
+      "aspect": 0.965,
+      "bbox_h_ratio": 0.984,
+      "wash": {
+        "removed": false,
+        "color": null,
+        "ratio": 0.0
+      }
+    },
+    "face_norm": {
+      "score": 0.45,
+      "estimated": false,
+      "source": "haar",
+      "bbox": [
+        0.1795142555438226,
+        0.1488277268093782,
+        0.30306230200633577,
+        0.26809378185524974
+      ],
+      "mouth": {
+        "cx": 0.2412882787750792,
+        "cy": 0.24185524974515799,
+        "w": 0.04200633579725449,
+        "h": 0.018246687054026503
+      },
+      "eyes": {
+        "y": 0.19891946992864423,
+        "w": 0.027180570221752902,
+        "cx": [
+          0.21163674762407603,
+          0.27093980992608235
+        ]
+      },
+      "skin": "#e3edf4",
+      "lip": "#6d546a",
+      "line": "#113758",
+      "face_w": 117.0
+    },
+    "prompts": {
+      "front": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1robot, mechanical, metal head, antenna, glowing cyan eyes, LED mouth, silver metal robot body, chest LED panel, sci-fi, friendly robotic, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference, thoughtful pose, one hand on chin, other arm crossed under it, contemplative, head slightly tilted, relaxed stance",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, human face, organic skin, modern clothing, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan, circular background, round backdrop, oval background, colored circle, pastel circle, background circle, sitting, upper body only, half body, cropped at waist, close-up, zoomed in, hands in pockets, static stiff pose, barefoot, bare feet"
+    }
+  }
+}

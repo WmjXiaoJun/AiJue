@@ -1,0 +1,258 @@
+{
+  "id": "ali",
+  "point": {
+    "id": "ali",
+    "pose": "point",
+    "source": "imagegen_pose",
+    "created_at": "2026-10-26T20:56:00",
+    "elapsed_sec": 72.5,
+    "seed": 43,
+    "seed_base": 43,
+    "ip_adapter": {
+      "strength": 0.35,
+      "end_at": 0.9,
+      "weight_type": "style transfer"
+    },
+    "bg_mode": "white",
+    "ref_used": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\ali\\portrait.png",
+    "portrait_ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\ali\\portrait.png",
+    "prompt_id": "1421756c-ce88-404b-8068-2efa3050154a",
+    "files": {
+      "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\ali\\pose_point\\front.png",
+      "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\ali\\cutout_point.png"
+    },
+    "sizes": {
+      "cutout": [
+        823,
+        963
+      ]
+    },
+    "front_white": {
+      "ok": true,
+      "corners": [
+        {
+          "rgb": [
+            254,
+            254,
+            254
+          ],
+          "mean": 254.0,
+          "spread": 3.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 254.9,
+          "spread": 2.0
+        },
+        {
+          "rgb": [
+            254,
+            255,
+            255
+          ],
+          "mean": 254.5,
+          "spread": 3.0
+        },
+        {
+          "rgb": [
+            254,
+            255,
+            255
+          ],
+          "mean": 254.6,
+          "spread": 2.0
+        }
+      ],
+      "white_ratio": 0.784
+    },
+    "cutout_validation": {
+      "ok": true,
+      "alpha0": 0.676,
+      "visible": 0.324,
+      "corners_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "bbox": [
+        8,
+        8,
+        815,
+        955
+      ],
+      "aspect": 0.855,
+      "bbox_h_ratio": 0.983,
+      "wash": {
+        "removed": false,
+        "color": null,
+        "ratio": 0.0
+      }
+    },
+    "face_norm": {
+      "score": 0.0,
+      "estimated": true,
+      "source": "estimate",
+      "bbox": [
+        0.4417982989064399,
+        0.09003115264797508,
+        0.7417982989064399,
+        0.3
+      ],
+      "mouth": {
+        "cx": 0.5917375455650061,
+        "cy": 0.2538006230529595,
+        "w": 0.1020048602673147,
+        "h": 0.039231568016614746
+      },
+      "eyes": {
+        "y": 0.1782035306334372,
+        "w": 0.06600243013365735,
+        "cx": [
+          0.5197326852976913,
+          0.6637424058323208
+        ]
+      },
+      "skin": "#cdb5d1",
+      "lip": "#76495f",
+      "line": "#0c0b10",
+      "face_w": 246.9
+    },
+    "prompts": {
+      "front": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1girl, female, young adult female, violet hair, twintails, long hair, blue eyes, big eyes, soft eyebrows, purple hoodie, hoodie, casual, sky blue accents, headphones, star hair ornament, hair clip, cheerful smile, energetic, content creator, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference, dynamic gesture, one arm extended to the side, index finger pointing, explaining pose, confident body language, weight on one leg, action pose",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan, circular background, round backdrop, oval background, colored circle, pastel circle, background circle, sitting, upper body only, half body, cropped at waist, close-up, zoomed in, hands in pockets, static stiff pose, barefoot, bare feet"
+    }
+  },
+  "updated_at": "2026-10-26T21:09:15",
+  "think": {
+    "id": "ali",
+    "pose": "think",
+    "source": "imagegen_pose",
+    "created_at": "2026-10-26T21:09:15",
+    "elapsed_sec": 28.2,
+    "seed": 45,
+    "seed_base": 43,
+    "ip_adapter": {
+      "strength": 0.25,
+      "end_at": 0.8,
+      "weight_type": "style transfer"
+    },
+    "bg_mode": "white",
+    "ref_used": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\ali\\pose_think\\ref_white.png",
+    "portrait_ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\ali\\portrait.png",
+    "prompt_id": "88dc0768-54dd-42b3-85f7-011c83cc091a",
+    "files": {
+      "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\ali\\pose_think\\front.png",
+      "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\ali\\cutout_think.png"
+    },
+    "sizes": {
+      "cutout": [
+        854,
+        896
+      ]
+    },
+    "front_white": {
+      "ok": true,
+      "corners": [
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 254.9,
+          "spread": 1.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 255.0,
+          "spread": 2.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 254.9,
+          "spread": 1.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 255.0,
+          "spread": 1.0
+        }
+      ],
+      "white_ratio": 0.727
+    },
+    "cutout_validation": {
+      "ok": true,
+      "alpha0": 0.559,
+      "visible": 0.441,
+      "corners_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "bbox": [
+        8,
+        8,
+        846,
+        888
+      ],
+      "aspect": 0.953,
+      "bbox_h_ratio": 0.982,
+      "wash": {
+        "removed": false,
+        "color": null,
+        "ratio": 0.0
+      }
+    },
+    "face_norm": {
+      "score": 0.45,
+      "estimated": false,
+      "source": "haar",
+      "bbox": [
+        0.4964871194379391,
+        0.16741071428571427,
+        0.7049180327868853,
+        0.36607142857142855
+      ],
+      "mouth": {
+        "cx": 0.6007025761124122,
+        "cy": 0.3223660714285714,
+        "w": 0.0708665105386417,
+        "h": 0.030390625
+      },
+      "eyes": {
+        "y": 0.2508482142857143,
+        "w": 0.04585480093676814,
+        "cx": [
+          0.5506791569086651,
+          0.6507259953161593
+        ]
+      },
+      "skin": "#a3aab1",
+      "lip": "#553d54",
+      "line": "#121418",
+      "face_w": 178.0
+    },
+    "prompts": {
+      "front": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1girl, female, young adult female, violet hair, twintails, long hair, blue eyes, big eyes, soft eyebrows, purple hoodie, hoodie, casual, sky blue accents, headphones, star hair ornament, hair clip, cheerful smile, energetic, content creator, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference, thoughtful pose, one hand on chin, other arm crossed under it, contemplative, head slightly tilted, relaxed stance",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan, circular background, round backdrop, oval background, colored circle, pastel circle, background circle, sitting, upper body only, half body, cropped at waist, close-up, zoomed in, hands in pockets, static stiff pose, barefoot, bare feet"
+    }
+  }
+}

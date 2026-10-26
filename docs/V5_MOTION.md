@@ -334,8 +334,24 @@ render_still(layers, characters_state, camera_state, size=(1280,720), t=0.0,
  "mouth_strength": 0.85,          # 可选：口型峰值幅度（0~1，缺省 style 或 1.0）
  "mouth_transition": 2,           # 可选：口型过渡帧数（默认 2）
  "fade_in": 8, "fade_out": 8,     # 可选：入场/离场帧数（0 = 关；默认 8）
- "flip": False}                   # 左右翻转（朝向）
+ "flip": False,                   # 左右翻转（朝向）
+ # ---- V5.5 角色表演 ----
+ "pose_timeline": [[0.0, 1.2, "front"], [1.2, 2.4, "point"], [2.4, 3.0, "think"]],
+ "pose_transition": 5,            # 姿态交叉淡化帧数（默认 5，建议 4-6）
+ "idle_strength": 1.0,            # 呼吸/重心/点头幅度倍率（0 = 关；默认 1.0）
+ "gesture": True,                 # 偶发点头/侧头/前倾（默认开，每 2-4s）
+ "perform": True,                 # 表演总开关（False = 旧的纯相机/口型行为）
+ "entrance": "walk_in",           # 可选：从画面外走入锚点（0.8s，脚步 bob）
+ "walk_in_frames": 20, "walk_in_from": "left",
+ # 图片立绘角色的姿态变体（可选）：{pose: PIL/路径}
+ "images": {"front": ..., "point": ..., "think": ...},
+}
 ```
+
+> `character_state()`（程序化立绘）与 `_image_character_state()`（图片 cutout）共用同一
+> 套表演/矩阵逻辑；图片姿态来源优先级：`entry["images"]` → `entry["image"]`（front）→
+> `assets/v5/characters/<id>/cutout_<pose>.png` → `pipeline.v5_art.character_pose_art(id, pose)`
+> → 回退 front（无姿态资产也不会崩）。
 
 ### 3.2.1 口型平滑（避免 viseme 逐帧硬跳）
 
@@ -377,6 +393,153 @@ dx = 0.9·sin(2πt/6.7 + φ2)
 dy = -1.5·sin(2πt/4.2 + φ1)                # 呼吸：肩部起伏
 dy += 1.2·sin(2πt/2.6 + φ3)   # 仅在说话（mouth != closed）时点头
 ```
+
+### 3.2.3 V5.5 角色表演（pose_timeline + 可见 idle/说话动作）
+
+> 背景：用户反馈"人物都没有动作"。V5.5 起角色除了口型/眨眼，还有**姿态切换**与
+> **可见身体表演**（此前只有 ±1.5px 的微动，肉眼几乎不可见）。
+
+#### pose_timeline（姿态时间轴）
+
+```python
+"pose_timeline": [[t0, t1, "front"], [t1, t2, "point"], [t2, t3, "think"]]
+```
+
+* 半开区间 `[t0, t1)`（秒）；也可写 `[{"t0":..,"t1":..,"pose":..}]`。
+* 切换时自动 **4-6 帧交叉淡化**（`pose_transition` 默认 5）：`pose_plan_at()` 输出
+  `[(prev, 1-w), (cur, w)]`，`w = smoothstep((age+1)/(N+1))`，与口型方案组合后
+  用 `_CharacterRenderer.blend_states()` 混合立绘（pose × mouth 最多 4 张，按
+  (pose, mouth, w/64) 缓存，逐帧零成本）。
+* **姿态"演技"**：即使姿态资产相同（例如 `characters_v5` 程序化立绘的 pose 差异很小），
+  也会通过 `POSE_ACT` 给每个姿态叠加身体体态（相对角色高度）：
+
+  | pose | dx | dy | scale | shear（体态倾斜） |
+  |---|---|---|---|---|
+  | `front` | 0 | 0 | 1.0 | 0 |
+  | `point` | +1.4% | -0.5% | +0.5% | +0.030（指向侧前倾） |
+  | `think` | -1.0% | -0.2% | -0.2% | -0.024（侧头沉思） |
+  | `side` | -0.8% | 0 | -5.5%(横向压扁，≈侧身) | -0.012 |
+  | `surprise` | 0 | -1.2% | +2.0% | +0.006 |
+  | `lean_in` | +0.8% | -0.7% | +1.0% | +0.020 |
+
+  所以 front→point→think 在画面里是"身体前倾指出 → 侧头思考"，肉眼可见。
+
+#### 可见表演（idle / gesture / speaking）
+
+`_char_perform()` 逐帧输出屏幕像素级 `dx/dy/sx/sy/shear`（再叠加到相机变换上）：
+
+| 动作 | 机制 | 幅度（446px 高角色） | 参数 |
+|---|---|---|---|
+| 呼吸 | 纵向起伏 + 挤压 | `dy ≈ 0~-6px`，`sy ±0.6%` | `idle_strength` 缩放 |
+| 重心移动 | 慢速左右摆 + 体态切变 | `dx ±6px`（周期 5.3s），`shear ±0.010` | `idle_strength` |
+| 说话前倾 | 靠近镜头 + 上移 + 放大 + 说话节奏点头 | `dy -6px`、`scale +2%`、`shear +0.018`、`1.6px@2.4s` 点头 | 由口型权重反推 `speak∈[0,1]` |
+| 偶发点头/侧头/前倾 | 确定性事件表（seed+role，每 2-4s，持续 0.62s，sin²包络） | `dy 3~5px` / `shear ±0.030` | `gesture`（默认 True） |
+| walk_in 入场 | 从画面外 0.62·W 处走到锚点（`1-(1-u)³` ease-out）+ 脚步 bob | 20 帧（0.8s），bob ≈5px | `entrance="walk_in"` |
+
+* `idle_strength`：0 = 完全静止（回到旧行为）；1.0 = 默认可见；2.0 = 夸张。
+* `gesture=False`：只保留呼吸/重心（不做偶发点头）。
+* `breath=False`：等价 `idle_strength=0`（兼容旧字段）。
+* 说话前倾由**口型权重**驱动（`mouth_plan` 中非闭口权重和 / 0.85），所以"开口说话才前倾"，
+  静默镜头不会莫名前倾。
+
+#### 图片立绘（cutout）的姿态变体
+
+render-dev 会为 24 角色生成 `cutout_point.png` / `cutout_think.png`；
+`_pose_image_pil()` 按优先级查找：`entry["images"][pose]` → `entry["image"]`（front）→
+`assets/v5/characters/<id>/cutout_<pose>.png` → `pipeline.v5_art.character_pose_art(id, pose)`
+→ 回退 front（**资产未就绪也不报错**）。姿态图片同样支持 4-6 帧交叉淡化与全部表演动作。
+
+#### 性能
+
+| 场景 | 单帧合成 | 渲染速度 |
+|---|---|---|
+| pose_timeline（2 姿态 × 2 口型混合） | 15.5~17.4ms | 44~49 帧/秒 |
+| idle 静默 | 9.2~10.9ms | 63~75 帧/秒 |
+| idle 说话（口型+前倾） | 13.6~15.5ms | 49~56 帧/秒 |
+| 图片立绘 + 姿态变体 | 8.8~9.1ms | 74~77 帧/秒 |
+| walk_in 入场 | 8.8~9.0ms | 75 帧/秒 |
+
+全部 ≤25ms 目标；姿态/口型/图片混合结果都有缓存，长镜头稳态不随姿态数量增长。
+
+#### 限制
+
+* 单张 cutout 的四肢无法独立驱动（无骨骼绑定）；姿态切换靠"不同姿态立绘 + 体态变换"，
+  不是真骨骼动画。需要更细的手臂/走路动画时，仍建议 render-dev 出多帧序列。
+* 交叉淡化是**整幅 alpha 混合**：两个姿态剪影差异很大时（如挥手）能看到短暂"重影"，
+  4-6 帧内通常可接受；要更干净可让资产姿态差异小一点或把 `pose_transition` 降到 3。
+* walk_in 只有"滑入 + bob + 体态"，没有腿部走路循环（需要腿部帧资产）。
+
+#### render_v5 建议接线
+
+```python
+# 每镜按台词/角色给 pose_timeline（示例策略）
+poses = []
+if line_text_has("问"/"为何"):        # 提问 → 侧头思考
+    poses = [[0.0, dur * 0.5, "front"], [dur * 0.5, dur, "think"]]
+elif shot.get("beat") == "point":     # 指地图/指人
+    poses = [[0.0, dur, "point"]]
+# 或模板级：cast 里 host 默认 front，figure 用 point/think 交替
+char_entry = {"char": char, "role": role, "pose_timeline": poses,
+              "idle_strength": 1.0, "gesture": True,
+              "mouth_timeline": viseme_timeline(line, dur)}
+# 空镜无角色时不需要；入场镜头加 "entrance": "walk_in"
+```
+
+### 3.2.4 V5.5.1 修复：AI 姿态资产「斜躺/横飞/拉伸」
+
+> 现象：V5 成片里 AI cutout 角色整体旋转/斜切成 40-60° 躺着、飞起来。
+> 根因**不是**矩阵/单位错误，而是**姿态资产本身 + 非等比 fit**：
+> `assets/v5/characters/laozhou/cutout_point.png` 是 imagegen 生成的**斜向奔跑/指人**
+> 动态姿势（968×955、bbox aspect≈1.01、长轴倾角≈-8°），而 front cutout 是
+> 293×961 竖版站姿（aspect≈0.29）。`v5_art._fit_cutout` 会按"整张塞进画布"缩放，
+> 于是 point 姿态只占画布高度 ~59%（角色变小），再叠加 POSE_ACT 的体态切变，
+> 画面就呈现"斜躺/飞起来 + 大小跳变"。
+
+**motion2d 侧修复（图片立绘 / AI cutout 同一套）**：
+
+1. **姿态资产质量门** `_pose_art_ok()`：非 front 姿态先检查 alpha 内容框
+   - bbox 宽高比 ∈ `[0.18, 0.85]`；
+   - 内容高度 ≥ front 的 `0.72`；
+   - 最小外接矩形长轴倾角 ≤ `6°`。
+   不合格 → **回退 front 立绘**（只用体态表演），并记录
+   `meta.pose_art.fallbacks = ["laozhou:point:aspect=1.01∉[0.18,0.85]"]`。
+2. **内容 bbox 归一化** `_normalize_pose_sprite()`：合格姿态按 alpha 内容框裁切 →
+   等比缩放到 **front 的内容高度** → 底部对齐 + 水平居中；偏宽姿态按 alpha 重心
+   水平裁切两侧（**不是压扁**）。全程等比，禁止非等比 resize。
+3. **表演安全上限**：`shear ≤ 0.020`（≈1.15°）、缩放 ∈ `[0.96, 1.06]`、
+   dx/dy ≤ 3% 角色高度（`PERFORM_MAX_SHEAR` / `PERFORM_SCALE_RANGE` /
+   `PERFORM_MAX_SHIFT_FRAC`）；`POSE_ACT` 的 shear 也全部降到 ≤0.02。
+4. **图片立绘路径** `_pose_sprite_pil()` / `_blend_image_poses()`：每个姿态先过质量门 +
+   内容 bbox 归一化 + `_fit_uniform()` 等比 fit，再按权重混合（多姿态交叉淡化不会拉伸）。
+5. **开关** `MOTION2D_POSE_ART`：`auto`(默认：质量门+归一化) / `force`(跳过质量门，
+   便于资产调优) / `off`(始终 front，只用体态表演)。
+
+**结论**：姿态资产可以先用不合格的生成图；motion2d 自动回退 front + 体态表演，
+成片不会出现斜躺/拉伸。render-dev 产出合格姿态资产（站姿/半身、bbox aspect 0.18-0.85、
+倾角 ≤6°）后会**自动启用**，无需改代码。
+
+**回归自测**（`tmp/v55_motion/image_cutout_perform.py`，真实资产
+`laozhou/cutout.png + cutout_point.png`，`compose_frame` 逐帧度量）：
+
+| 断言 | 实测 |
+|---|---|
+| 变换引入的倾角增量 ≤3° | c5_art 2.71° / img_auto 1.19° |
+| bbox 宽高比偏差 ≤5% | 4.35% / 4.75% |
+| 角色高度偏差 ≤8% | 1.62% / 1.82% |
+| force 模式：矩阵等比（|kx/ky-1| ≤2%） | 1.97% |
+| force 模式：归一化后高度偏差 ≤10% | 1.59% |
+| force 模式：倾角增量 ≤3° | 1.53° |
+| max|atan(shear)| ≤3°（Lead: 0.5-1.2°） | 1.15° |
+| 帧间可见运动 / 非全图位移 | 灰度差 1.38 / 质心漂移 14px |
+| auto：斜躺 point 资产被拒并回退 front | Δtilt 1.15° |
+
+网格：`tmp/v55_motion/image_cutout_perform.png`（c5_art / img_auto / img_force / real_bg 四组）。
+
+**端到端**（`tmp/v55_motion/e2e_render_check.py`）：模拟 render_v5 的台词驱动
+`pose_timeline`（point/think/lean_in）+ idle/gesture，真实 palace plate 背景、
+1280×720 渲染 push_in / pan_right 两镜：角色倾角 0.0°、宽高比偏差 ≤2.8%、
+高度偏差 ≤7.1%，渲染 50-87 帧/秒、单帧合成 6.4-14.8ms。
+网格：`tmp/v55_motion/e2e_render_check.png`。
 
 ### 3.3 characters_v5 对接与 fallback
 
@@ -530,6 +693,20 @@ orbit / rack_focus（均为 2.0s）+ whip_pan / dolly_zoom / crane_up / truck_le
 **6/6 PASS**：h264 / yuv420p / 1280×720 / 25fps / 无音轨、帧数精确、
 单帧合成 13.3~17.2ms、`meta.v54` 各键正确（focus_shift_end=1.0、motion_blur_peak=1.0、
 dolly_zoom_end=0.2、shear_peak=0.02、parallax_eff=0.78~0.81 等）。
+### 5.3.2 V5.5 角色表演实测（`tmp/v55_motion/make_animations.py`）
+
+| clip | 帧数 | 用时 | 渲染速度 | 单帧合成 | 角色区运动量（峰值） |
+|---|---|---|---|---|---|
+| `pose_animation`（front→point→think 3s） | 75 | 1.74s | 44.1 帧/秒 | 17.4ms | 7.6 |
+| `idle_silent`（静默 3s） | 75 | 1.22s | 63.2 帧/秒 | 10.9ms | 3.8 |
+| `idle_speaking`（说话 3s） | 75 | 1.56s | 49.2 帧/秒 | 15.5ms | 5.0 |
+| `pose_cutout`（图片立绘姿态变体 3s） | 75 | 1.05s | 74.4 帧/秒 | 9.1ms | 11.1 |
+| `walk_in`（入场 3s） | 75 | 1.04s | 74.8 帧/秒 | 9.0ms | 10.8 |
+
+* 说话 vs 静默（同帧角色区灰度差）= **3.33**；生动度（相邻采样帧差）silent 2.45 →
+  speaking **3.75**（+53%），即"说话时明显更活"。
+* 全部 clip 单帧合成 ≤25ms；`idle_animation.mp4` 为"静默 3s + 说话 3s"拼接对比。
+
 ### 5.4 结论与优化记录
 
 * **达标情况**：单镜 1280×720 稳定 **43~70 帧/秒**，远超「≥25 帧/秒」要求；
@@ -694,6 +871,13 @@ python tmp\v5_motion_demo\profile_motion.py
 python tmp\v54_motion\camera_matrix.py          # → tmp/v54_motion/cameras.png / report.json
 python tmp\v54_motion\probe_cameras.py          # 打印每机位状态（调试用）
 python tmp\v54_motion\render_real_asset.py      # 6 段真实素材渲染 + ffprobe 合规校验
+# 6) V5.5 角色表演：姿态切换 / 可见 idle / 说话对比 / walk_in
+python tmp\v55_motion\make_animations.py        # → pose_animation.mp4 / idle_animation.mp4 / sheet.png
+python tmp\v55_motion\probe_performance.py      # 逐帧打印角色几何/表演偏移（调试用）
+# 7) V5.5.1 AI 姿态资产回归（斜躺/拉伸防护）
+python tmp\v55_motion\image_cutout_perform.py   # → image_cutout_perform.png（真实 cutout 资产）
+python tmp\v55_motion\e2e_render_check.py       # → e2e_render_check.png（模拟 render_v5 台词驱动姿态）
+python tmp\v55_motion\diag_pose_assets.py       # 打印姿态资产 bbox/倾角/宽高比（排查用）
 ```
 
 关键产物（人工抽检用）：
@@ -818,3 +1002,41 @@ render_v5: assemble + TTS 音轨 + 字幕 + ducking + loudnorm → final.mp4
 * 自测：`tmp/v54_motion/cameras.png`（17 机位 × 1.2s × 3 帧，真实 plate+cutout）、
   `report.json`、`render_real_asset.py`（6 段真实素材 6/6 PASS）；
   回归：`pytest pipeline/tests -q` **184 passed**、旧 `verify_motion.py` **45/45 PASS**。
+
+### V5.5 修订（2026-10-26，task-18：角色表演）
+
+* 新增 `pose_timeline`（姿态时间轴 + 4-6 帧交叉淡化）+ `POSE_ACT` 姿态体态
+  （point 前倾指出 / think 侧头沉思 / side 侧身压扁 / surprise / lean_in）。
+* 新增可见表演：呼吸（±6px + 挤压）、重心移动（±6px@5.3s）、说话前倾/靠近
+  （-6px + 2% 放大 + 说话节奏点头）、偶发点头/侧头（每 2-4s，确定性 seed）、
+  可选 `entrance="walk_in"` 入场（0.8s，脚步 bob）。
+* 新参数：`pose_timeline` / `pose_transition` / `idle_strength` / `gesture` /
+  `perform` / `entrance` / `walk_in_frames` / `walk_in_from` / `images`（图片姿态变体）。
+  旧字段（`pose` / `breath` / 相机 / 口型）行为不变（`breath=False` ≡ `idle_strength=0`）。
+* 图片立绘（cutout）角色支持姿态变体通道：`entry["images"]` →
+  `assets/v5/characters/<id>/cutout_<pose>.png` → `v5_art.character_pose_art`
+  → 回退 front（资产未就绪不报错）。
+* `meta.characters[*]` 增加 `poses/idle_strength/gesture/entrance` 与
+  `meta.performance`（表演参数快照），便于 QC/editorial 核对。
+* 自测：`tmp/v55_motion/`（pose_animation / idle_animation / sheet / report，7/7 PASS）；
+  回归：`pytest pipeline/tests -q` **186 passed**、旧 `verify_motion.py` **45/45 PASS**、
+  `tmp/v54_motion/camera_matrix.py` 17 机位仍全部有运动。
+
+### V5.5.1 修订（2026-10-26，image-cutout 姿态修复）
+
+* **修复**：AI cutout 姿态资产（`cutout_point.png` 斜向动态姿势、968×955）经
+  `_fit_cutout` contain 缩放后只占画布 ~59% 高度，叠加体态切变 → 成片角色"斜躺/横飞 +
+  大小跳变"。motion2d 图片路径改为：
+  1) 姿态资产**质量门**（bbox aspect 0.18-0.85、高度≥front 0.72、倾角≤6°），
+     不合格自动回退 front（只做体态表演），`meta.pose_art.fallbacks` 可见；
+  2) 合格姿态按 **alpha 内容 bbox 归一化**（等比缩放到 front 内容高度、底部对齐、
+     偏宽时按重心水平裁切，禁止非等比 resize）；
+  3) 表演**安全上限** shear ≤0.02(≈1.15°)、缩放 ±6%、偏移 ≤3% 身高；`POSE_ACT` shear 全部 ≤0.02；
+  4) 图片立绘多姿态混合前逐姿态过门 + 归一化 + `_fit_uniform` 等比 fit；
+  5) 新增开关 `MOTION2D_POSE_ART=auto|force|off`（默认 auto）。
+* **自测**：`tmp/v55_motion/image_cutout_perform.py`（14 项断言全 PASS，
+  `image_cutout_perform.png`）、`tmp/v55_motion/e2e_render_check.py`
+  （render_v5 风格两镜，`e2e_render_check.png`）。
+* **回归**：`pytest pipeline/tests -q` **186 passed**；旧 `verify_motion.py` **45/45 PASS**；
+  `tmp/v54_motion/camera_matrix.py` 17 机位全部有运动；V5.5 demo 7/7 PASS。
+* render_v5 侧可用 `V55_PERFORM=1` 重新开启表演（默认仍保留关闭开关）。

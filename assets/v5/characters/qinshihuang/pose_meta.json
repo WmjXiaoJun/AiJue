@@ -1,0 +1,262 @@
+{
+  "id": "qinshihuang",
+  "point": {
+    "id": "qinshihuang",
+    "pose": "point",
+    "source": "imagegen_pose",
+    "created_at": "2026-10-26T21:03:46",
+    "elapsed_sec": 15.3,
+    "seed": 43,
+    "seed_base": 43,
+    "ip_adapter": {
+      "strength": 0.35,
+      "end_at": 0.9,
+      "weight_type": "style transfer"
+    },
+    "bg_mode": "white",
+    "ref_used": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\qinshihuang\\portrait.png",
+    "portrait_ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\qinshihuang\\portrait.png",
+    "prompt_id": "b40141fe-bc77-48a6-8de8-d895684a0d45",
+    "files": {
+      "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\qinshihuang\\pose_point\\front.png",
+      "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\qinshihuang\\cutout_point.png"
+    },
+    "sizes": {
+      "cutout": [
+        989,
+        1014
+      ]
+    },
+    "front_white": {
+      "ok": true,
+      "corners": [
+        {
+          "rgb": [
+            254,
+            254,
+            253
+          ],
+          "mean": 253.6,
+          "spread": 3.0
+        },
+        {
+          "rgb": [
+            254,
+            254,
+            255
+          ],
+          "mean": 254.4,
+          "spread": 2.0
+        },
+        {
+          "rgb": [
+            254,
+            254,
+            254
+          ],
+          "mean": 254.2,
+          "spread": 3.0
+        },
+        {
+          "rgb": [
+            253,
+            253,
+            253
+          ],
+          "mean": 253.2,
+          "spread": 2.0
+        }
+      ],
+      "white_ratio": 0.495
+    },
+    "cutout_validation": {
+      "ok": true,
+      "alpha0": 0.412,
+      "visible": 0.588,
+      "corners_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "bbox": [
+        8,
+        8,
+        981,
+        1006
+      ],
+      "aspect": 0.975,
+      "bbox_h_ratio": 0.984,
+      "wash": {
+        "removed": false,
+        "color": null,
+        "ratio": 0.0
+      }
+    },
+    "face_norm": {
+      "score": 0.859,
+      "estimated": false,
+      "source": "yunet",
+      "bbox": [
+        0.47654196157735085,
+        0.07238658777120316,
+        0.561071789686552,
+        0.16992110453648918
+      ],
+      "mouth": {
+        "cx": 0.5188270980788675,
+        "cy": 0.14849112426035502,
+        "w": 0.0287360970677452,
+        "h": 0.012613412228796844
+      },
+      "eyes": {
+        "y": 0.11337278106508875,
+        "w": 0.01859453993933266,
+        "cx": [
+          0.49854398382204246,
+          0.5391102123356926
+        ]
+      },
+      "skin": "#fedcbf",
+      "lip": "#77403c",
+      "line": "#050002",
+      "face_w": 83.59
+    },
+    "prompts": {
+      "front": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, chinese hair bun, imperial crown, mianguan, long beard, goatee, cold stern eyes, thick eyebrows, black imperial robe, gold dragon pattern, jade pendant, sword at waist, authoritative emperor, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference, dynamic gesture, one arm extended to the side, index finger pointing, explaining pose, confident body language, weight on one leg, action pose",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan, circular background, round backdrop, oval background, colored circle, pastel circle, background circle, sitting, upper body only, half body, cropped at waist, close-up, zoomed in, hands in pockets, static stiff pose, barefoot, bare feet"
+    }
+  },
+  "updated_at": "2026-10-26T21:12:12",
+  "think": {
+    "id": "qinshihuang",
+    "pose": "think",
+    "source": "imagegen_pose",
+    "created_at": "2026-10-26T21:12:12",
+    "elapsed_sec": 13.3,
+    "seed": 43,
+    "seed_base": 43,
+    "ip_adapter": {
+      "strength": 0.35,
+      "end_at": 0.9,
+      "weight_type": "style transfer"
+    },
+    "bg_mode": "white",
+    "ref_used": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\qinshihuang\\portrait.png",
+    "portrait_ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\qinshihuang\\portrait.png",
+    "prompt_id": "40cb2779-efea-4ce0-8be8-45c96e45ade0",
+    "files": {
+      "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\qinshihuang\\pose_think\\front.png",
+      "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\qinshihuang\\cutout_think.png"
+    },
+    "sizes": {
+      "cutout": [
+        958,
+        1018
+      ]
+    },
+    "front_white": {
+      "ok": true,
+      "corners": [
+        {
+          "rgb": [
+            255,
+            255,
+            254
+          ],
+          "mean": 254.6,
+          "spread": 2.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 254.9,
+          "spread": 2.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 254.9,
+          "spread": 3.0
+        },
+        {
+          "rgb": [
+            254,
+            254,
+            254
+          ],
+          "mean": 254.0,
+          "spread": 3.0
+        }
+      ],
+      "white_ratio": 0.556
+    },
+    "cutout_validation": {
+      "ok": true,
+      "alpha0": 0.56,
+      "visible": 0.44,
+      "corners_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "bbox": [
+        8,
+        8,
+        950,
+        1010
+      ],
+      "aspect": 0.941,
+      "bbox_h_ratio": 0.984,
+      "wash": {
+        "removed": true,
+        "ratio": 0.142,
+        "color": [
+          206,
+          144,
+          77
+        ]
+      }
+    },
+    "face_norm": {
+      "score": 0.861,
+      "estimated": false,
+      "source": "yunet",
+      "bbox": [
+        0.43455114822546975,
+        0.07534381139489195,
+        0.5325678496868476,
+        0.1925343811394892
+      ],
+      "mouth": {
+        "cx": 0.48351774530271396,
+        "cy": 0.16673870333988214,
+        "w": 0.033329853862212946,
+        "h": 0.01411591355599214
+      },
+      "eyes": {
+        "y": 0.12456777996070727,
+        "w": 0.021565762004175367,
+        "cx": [
+          0.45998956158663884,
+          0.5070459290187892
+        ]
+      },
+      "skin": "#edc1b0",
+      "lip": "#824642",
+      "line": "#231110",
+      "face_w": 93.92
+    },
+    "prompts": {
+      "front": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, chinese hair bun, imperial crown, mianguan, long beard, goatee, cold stern eyes, thick eyebrows, black imperial robe, gold dragon pattern, jade pendant, sword at waist, authoritative emperor, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference, thoughtful pose, one hand on chin, other arm crossed under it, contemplative, head slightly tilted, relaxed stance",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan, circular background, round backdrop, oval background, colored circle, pastel circle, background circle, sitting, upper body only, half body, cropped at waist, close-up, zoomed in, hands in pockets, static stiff pose, barefoot, bare feet"
+    }
+  }
+}

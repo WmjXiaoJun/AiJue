@@ -1,0 +1,71 @@
+{
+  "id": "simaqian",
+  "name": "司马迁",
+  "title": "太史令，忍辱著史，说话克制而坚持；最看重“真”与“据”。",
+  "persona": "太史令，忍辱著史，说话克制而坚持；最看重“真”与“据”。",
+  "mode": "three_view",
+  "style": "anime",
+  "model": "animagine-xl-4.0.safetensors",
+  "steps": 28,
+  "cfg": 5.5,
+  "sampler": "euler_ancestral",
+  "scheduler": "normal",
+  "seed": 43,
+  "size": {
+    "portrait": [
+      832,
+      1216
+    ],
+    "other": [
+      1024,
+      1024
+    ]
+  },
+  "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, full body, multiple characters",
+  "prompt": {
+    "front": "masterpiece, best quality, anime style, solo, 1boy, male, mature male, black hair, black eyes, beige robe, brown accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, hair bun, long beard, goatee, deep thoughtful eyes, brown sash, brush in hand, scroll in hand, weary calm expression, dark circles, historian, looking at viewer, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference, thoughtful pose, one hand on chin, other arm crossed under it, contemplative, head slightly tilted, relaxed stance"
+  },
+  "created_at": "2026-10-26T21:12:38",
+  "elapsed_sec": 12.4,
+  "files": {
+    "portrait": null,
+    "three_view": {
+      "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\simaqian\\pose_think\\three_view\\front.png"
+    },
+    "expressions": {},
+    "scene": null,
+    "sheet": null
+  },
+  "images": [
+    {
+      "tag": "front",
+      "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\simaqian\\pose_think\\three_view/front.png",
+      "seed": 43,
+      "width": 1024,
+      "height": 1024,
+      "gen_sec": 12.2,
+      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, mature male, black hair, black eyes, beige robe, brown accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, hair bun, long beard, goatee, deep thoughtful eyes, brown sash, brush in hand, scroll in hand, weary calm expression, dark circles, historian, looking at viewer, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference, thoughtful pose, one hand on chin, other arm crossed under it, contemplative, head slightly tilted, relaxed stance",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, multiple views, split screen, cropped, lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan, circular background, round backdrop, oval background, colored circle, pastel circle, background circle, sitting, upper body only, half body, cropped at waist, close-up, zoomed in, hands in pockets, static stiff pose, barefoot, bare feet",
+      "composition": "front",
+      "expression": null,
+      "ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\simaqian\\portrait.png",
+      "ip_adapter": {
+        "preset": "PLUS (high strength)",
+        "weight": 0.35,
+        "start_at": 0.0,
+        "end_at": 0.9
+      }
+    }
+  ],
+  "ip_adapter": {
+    "enabled": true,
+    "ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\simaqian\\portrait.png",
+    "ref_comfy_input": "zaopianju_concepts/simaqian_ref_portrait.png",
+    "preset": "PLUS (high strength)",
+    "weight": 0.35,
+    "weight_type": "style transfer",
+    "start_at": 0.0,
+    "end_at": 0.9,
+    "ckpt": "animagine-xl-4.0.safetensors"
+  }
+}

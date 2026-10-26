@@ -32,6 +32,7 @@ from __future__ import annotations
 import json
 import math
 import os
+import re
 import subprocess
 import sys
 import time
@@ -87,8 +88,24 @@ OVERLAY_MIN_FACE_W = 30.0   # 渲染后脸宽 < 30px 不叠口型/眨眼（Lead 
 _FACE_MODEL = REPO / "local_models" / "lipsync_models" / "yunet" / "face_detection_yunet_2023mar.onnx"
 
 _ART_CACHE: dict[str, dict] = {}
+_POSE_CACHE: dict[tuple[str, str], dict] = {}
 _FACE_CACHE: dict[tuple, dict] = {}
 _YUNET = None
+
+# ---- V5.5 姿态变体（point / think）----
+POSE_NAMES = ("point", "think")
+# 这两个角色（无脸/机甲）姿态变体收益低，渲染时仍用 front（任务书要求）
+POSE_SKIP_CHARS = frozenset({"mystery_guest", "robot"})
+POSE_PROMPTS = {
+    "point": ("dynamic gesture, one arm extended to the side, index finger pointing, "
+              "explaining pose, confident body language, weight on one leg, action pose"),
+    "think": ("thoughtful pose, one hand on chin, other arm crossed under it, "
+              "contemplative, head slightly tilted, relaxed stance"),
+}
+POSE_NEGATIVE_EXTRA = ("sitting, upper body only, half body, cropped at waist, close-up, "
+                       "zoomed in, hands in pockets, static stiff pose, barefoot, bare feet")
+# 姿态变体允许更宽的前景占比：伸手/托腮姿态 bbox 会变宽，alpha0 上限放宽到 0.82
+POSE_ALPHA0_RANGE = (0.30, 0.82)
 
 
 class V5ArtError(RuntimeError):
@@ -118,11 +135,30 @@ def _read_json(path: Path, default=None):
 
 
 def _write_json(path: Path, data) -> None:
+    """写 JSON（Windows 同步盘文件锁重试 + 兜底直写）。"""
     path.parent.mkdir(parents=True, exist_ok=True)
+    text = json.dumps(data, ensure_ascii=False, indent=2)
     tmp = path.with_suffix(path.suffix + ".tmp")
-    with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-    os.replace(tmp, path)
+    last: Exception | None = None
+    for attempt in range(4):
+        try:
+            with open(tmp, "w", encoding="utf-8") as f:
+                f.write(text)
+            os.replace(tmp, path)
+            return
+        except OSError as exc:  # WinError 5/32：同步盘/杀毒临时占用
+            last = exc
+            time.sleep(0.4 * (attempt + 1))
+    try:
+        tmp.unlink(missing_ok=True)
+    except OSError:
+        pass
+    try:
+        path.write_text(text, encoding="utf-8")
+    except OSError:
+        if last is not None:
+            raise last
+        raise
 
 
 def _hex(rgb) -> str:
@@ -490,6 +526,10 @@ def _run_imagegen(spec_path: Path, outdir: Path, mode: str, seed: int,
         tail = out.strip().splitlines()[-12:]
         raise V5ArtError("imagegen 失败（%s seed=%s）：%s"
                          % (mode, seed, "\n".join(tail)[-1200:]))
+    # ComfyUI 提交时 stdout 有 “[submit] 已入队 prompt_id=xxxx”；抽出来做证据链
+    match = re.search(r"prompt_id=([0-9a-fA-F][0-9a-fA-F-]{7,})", out)
+    if match:
+        summary["prompt_id"] = match.group(1)
     return summary
 
 
@@ -1062,7 +1102,8 @@ def _white_report(im: Image.Image) -> dict:
     return rep
 
 
-def _validate_cutout(cutout: Image.Image) -> dict:
+def _validate_cutout(cutout: Image.Image,
+                     alpha0_range: tuple[float, float] | None = None) -> dict:
     """cutout 质量校验：alpha0 0.3-0.6 / 四角 alpha=0 / bbox 高度 >=55% 且不贴满边。"""
     arr = np.array(cutout.convert("RGBA"))
     alpha = arr[:, :, 3]
@@ -1073,7 +1114,7 @@ def _validate_cutout(cutout: Image.Image) -> dict:
                int(alpha[h - 3, 2]), int(alpha[h - 3, w - 3])]
     bbox = cutout.getbbox()
     ratio = float(w) / max(1, h)
-    lo, hi = CUTOUT_ALPHA0_RANGE
+    lo, hi = alpha0_range or CUTOUT_ALPHA0_RANGE
     bbox_h_ratio = ((bbox[3] - bbox[1]) / h) if bbox else 0.0
     ok = (lo <= alpha0 <= hi and all(c <= 10 for c in corners)
           and bbox is not None and bbox_h_ratio >= CUTOUT_MIN_BBOX_H
@@ -1425,6 +1466,218 @@ def generate_character_front(character_id: str, outdir: str | Path | None = None
 
 
 # ---------------------------------------------------------------------------
+# 5.5 姿态变体（V5.5 point / think）
+# ---------------------------------------------------------------------------
+def _pose_paths(character_id: str, pose: str) -> dict:
+    base = ASSETS_DIR / str(character_id)
+    p = str(pose).lower()
+    return {
+        "dir": base,
+        "pose_dir": base / f"pose_{p}",
+        "front": base / f"pose_{p}" / "front.png",
+        "cutout": base / f"cutout_{p}.png",
+        "meta": base / "pose_meta.json",
+        "portrait": base / "portrait.png",
+    }
+
+
+def _pose_prompt_id(pose_dir: Path) -> str | None:
+    """从 pose 目录读 ComfyUI prompt_id（生成时写 prompt_id.txt）或 imagegen meta。"""
+    pid_file = pose_dir / "prompt_id.txt"
+    try:
+        if pid_file.is_file():
+            pid = pid_file.read_text(encoding="utf-8").strip()
+            if pid:
+                return pid
+    except OSError:
+        pass
+    meta = _read_json(pose_dir / "meta.json", {}) or {}
+    for key in ("prompt_id", "prompt_ids"):
+        value = meta.get(key)
+        if isinstance(value, list) and value:
+            return str(value[0])
+        if value:
+            return str(value)
+    return None
+
+
+def character_pose_art(character_id: str, pose: str,
+                       art: dict | None = None) -> dict:
+    """返回姿态变体资产 dict；缺失/pose 非变体时回退 front（character_art）。"""
+    cid = str(character_id or "")
+    p = str(pose or "front").lower()
+    if p not in POSE_NAMES:
+        return character_art(cid, art)
+    key = (cid, p)
+    cached = _POSE_CACHE.get(key)
+    if cached is not None:
+        return cached
+    paths = _pose_paths(cid, p)
+    pose_meta = _read_json(paths["meta"], {}) or {}
+    entry = pose_meta.get(p) if isinstance(pose_meta.get(p), dict) else {}
+    cutout = paths["cutout"]
+    info: dict
+    if cutout.is_file():
+        norm = entry.get("face_norm")
+        size = None
+        try:
+            with Image.open(cutout) as im:
+                size = list(im.size)
+                if not isinstance(norm, dict):
+                    norm = _norm_geom(face_geometry(im.convert("RGBA"), "cutout"))
+        except Exception as exc:  # noqa: BLE001
+            LOG.warning("姿态资产读取失败 %s/%s: %s", cid, p, exc)
+        info = {
+            "id": cid, "pose": p, "exists": True,
+            "dir": str(paths["dir"]), "pose_dir": str(paths["pose_dir"]),
+            "front": str(paths["front"]) if paths["front"].is_file() else None,
+            "cutout": str(cutout), "meta": entry,
+            "source": entry.get("source") or "imagegen_pose",
+            "size": size, "face_norm": norm,
+        }
+    else:
+        info = character_art(cid, art)
+        info = dict(info)
+        info["pose"] = p
+        info["requested_pose"] = p
+        info["pose_fallback_front"] = True
+    _POSE_CACHE[key] = info
+    return info
+
+
+def generate_character_pose(character_id: str, pose: str, *,
+                            seed: int = 43, force: bool = False,
+                            log=print) -> dict:
+    """生成一个姿态变体（point/think）：portrait 作 IP-Adapter 参考 → 白底全身 → 抠图。
+
+    - 产物：`assets/v5/characters/<id>/pose_<pose>/front.png`
+      + `<id>/cutout_<pose>.png` + `<id>/pose_meta.json`（不动现有 front/cutout）；
+    - 质量门与 front 一致：白底四角/四角透明/alpha0 0.30-0.72/bbox 高>=55%；
+    - 强度回退 0.35→0.25→0.22 + seed 重试（最多 3 次），仍失败抛 V5ArtError。
+    """
+    cid = str(character_id or "").strip()
+    p = str(pose or "").strip().lower()
+    if not cid or p not in POSE_NAMES:
+        raise V5ArtError(f"generate_character_pose: 参数非法 id={cid!r} pose={pose!r}")
+    paths = _pose_paths(cid, p)
+    base_dir = paths["dir"]
+    pose_dir = paths["pose_dir"]
+    cutout_path = paths["cutout"]
+    if cutout_path.is_file() and not force:
+        _log(log, f"[skip] {cid}/{p}: 已存在 {cutout_path.name}")
+        return character_pose_art(cid, p)
+    ref_path = paths["portrait"]
+    if not ref_path.is_file():
+        raise V5ArtError(f"{cid}: 缺少 portrait 参考图 {ref_path}")
+    spec_path = _ensure_spec(cid)
+    spec = _read_json(spec_path, {}) or {}
+    profile = _prompt_profile(cid)
+    spec_extra = _spec_prompt_extra(spec)
+    raw_front = profile.get("front_tags") or (
+        f"{spec_extra}, full body, front view, standing, arms at sides, "
+        f"simple background, white background, plain background")
+    prompt = (f"{_front_prompt(raw_front)}, {FRONT_REF_PROMPT}, "
+              f"{POSE_PROMPTS[p]}")
+    negative = profile.get("negative") or ""
+    negative_all = ", ".join(t for t in (
+        negative, FRONT_NEG_EXTRA, FRONT_REF_NEGATIVE, POSE_NEGATIVE_EXTRA) if t)
+    pose_dir = pose_dir if pose_dir.is_absolute() else (REPO / pose_dir)
+    pose_dir.mkdir(parents=True, exist_ok=True)
+    front_png = pose_dir / "front.png"
+    three_front = pose_dir / "three_view" / "front.png"
+    t0 = time.time()
+    chosen = None
+    errors: list[str] = []
+    for tries in range(1, 4):
+        strength, end_at = FRONT_REF_SCHEDULE[min(tries - 1, len(FRONT_REF_SCHEDULE) - 1)]
+        s = seed + 2 * (tries - 1)
+        ref_for_try = ref_path
+        if tries >= 2:
+            white_ref = _make_white_reference(ref_path, pose_dir / "ref_white.png")
+            if white_ref is not None:
+                ref_for_try = white_ref
+        try:
+            res = _run_imagegen(spec_path, pose_dir, "three_view", s, prompt,
+                                style="anime", negative_extra=negative_all, views="front",
+                                ref=str(ref_for_try), ip_strength=strength,
+                                ip_end_at=end_at, ip_weight_type="style transfer")
+        except Exception as exc:  # noqa: BLE001
+            errors.append(f"imagegen: {exc}")
+            continue
+        prompt_id = (res or {}).get("prompt_id") or _pose_prompt_id(pose_dir)
+        if prompt_id:
+            try:
+                (pose_dir / "prompt_id.txt").write_text(str(prompt_id), encoding="utf-8")
+            except OSError:
+                pass
+        if not three_front.is_file():
+            errors.append("imagegen 未产出 three_view/front.png")
+            continue
+        front_img = Image.open(three_front)
+        front_img.save(front_png)
+        white = _white_report(front_img)
+        artifact = _wide_artifact(front_img)
+        _log(log, f"[pose] {cid}/{p}: seed={s} ip={strength:.2f} "
+                  f"white={white.get('white_ratio')} artifact={bool(artifact)}")
+        if artifact is not None:
+            errors.append(f"seed={s} 装饰物={artifact}")
+            continue
+        if white["ok"]:
+            cutout, wash = remove_white(front_img, with_report=True)
+            validation = _validate_cutout(cutout, POSE_ALPHA0_RANGE)
+            validation["wash"] = wash
+            mode = "white"
+        else:
+            cutout, info = remove_background_robust(front_img)
+            validation = _validate_cutout(cutout, POSE_ALPHA0_RANGE)
+            validation["wash"] = info.get("wash")
+            validation["adaptive"] = info.get("adaptive")
+            mode = "adaptive"
+        if validation["ok"]:
+            chosen = {"cutout": cutout, "validation": validation, "white": white,
+                      "mode": mode, "seed": s, "ip": {"strength": strength,
+                                                       "end_at": end_at},
+                      "ref_used": str(ref_for_try),
+                      "prompt_id": prompt_id}
+            break
+        errors.append(f"seed={s} validation={validation}")
+    if chosen is None:
+        raise V5ArtError(f"{cid}/{p}: 姿态生成 3 次均不达标: {errors[-2:]}")
+    cutout = chosen["cutout"]
+    cutout.save(cutout_path)
+    geo = face_geometry(cutout, "cutout")
+    norm = _norm_geom(geo)
+    prompt_id = chosen.get("prompt_id") or _pose_prompt_id(pose_dir)
+    entry = {
+        "id": cid, "pose": p, "source": "imagegen_pose",
+        "created_at": _now(), "elapsed_sec": round(time.time() - t0, 1),
+        "seed": chosen["seed"], "seed_base": seed,
+        "ip_adapter": {**chosen["ip"], "weight_type": "style transfer"},
+        "bg_mode": chosen["mode"], "ref_used": chosen.get("ref_used"),
+        "portrait_ref": str(ref_path),
+        "prompt_id": prompt_id,
+        "files": {"front": str(front_png), "cutout": str(cutout_path)},
+        "sizes": {"cutout": list(cutout.size)},
+        "front_white": chosen["white"],
+        "cutout_validation": chosen["validation"],
+        "face_norm": norm,
+        "prompts": {"front": prompt, "negative": negative_all},
+    }
+    pose_meta = _read_json(paths["meta"], {}) or {}
+    pose_meta["id"] = cid
+    pose_meta[p] = entry
+    pose_meta["updated_at"] = _now()
+    _write_json(paths["meta"], pose_meta)
+    _ART_CACHE.pop(cid, None)
+    _POSE_CACHE.pop((cid, p), None)
+    _FACE_CACHE.clear()
+    _log(log, f"[done] {cid}/{p}: cutout={cutout.size} "
+              f"alpha0={chosen['validation']['alpha0']} {round(time.time() - t0, 1)}s")
+    return {"id": cid, "pose": p, "cutout": str(cutout_path),
+            "size": list(cutout.size), "meta": entry}
+
+
+# ---------------------------------------------------------------------------
 # 6. 渲染（供 characters_v5 调用）
 # ---------------------------------------------------------------------------
 def _load_style_finish():
@@ -1532,7 +1785,13 @@ def render_art_character(char, style, size=(512, 768), pose: str = "front",
         cid = str(char_spec.get("id") or "")
         if not cid:
             return None
-        art = character_art(cid, char_spec.get("art") if isinstance(char_spec.get("art"), dict) else None)
+        art = None
+        pose_key = str(pose or "front").strip().lower()
+        art_ref = char_spec.get("art") if isinstance(char_spec.get("art"), dict) else None
+        if pose_key in POSE_NAMES and cid not in POSE_SKIP_CHARS:
+            art = character_pose_art(cid, pose_key, art_ref)
+        if not art or not art.get("exists"):
+            art = character_art(cid, art_ref)
         if not art.get("exists"):
             return None
         cutout = Image.open(art["cutout"]).convert("RGBA")
@@ -1572,7 +1831,9 @@ def render_art_character(char, style, size=(512, 768), pose: str = "front",
             face_w_px = (norm["bbox"][2] - norm["bbox"][0]) * cw * scale
         overlay_allowed = (_char_overlay_allowed(char_spec)
                            and _overlay_geom_ok(norm))
-        if overlay_allowed and mouth != "closed":
+        # think 姿态手托下巴/遮嘴 → 只眨眼不叠口型（避免口型画到手上）
+        mouth_allowed = overlay_allowed and pose_key != "think"
+        if mouth_allowed and mouth != "closed":
             canvas = apply_mouth(canvas, mouth, geom=geom, face_w=face_w_px)
         if overlay_allowed and blink:
             canvas = apply_blink(canvas, geom=geom, face_w=face_w_px)
@@ -1619,6 +1880,7 @@ def audit(character_ids: list[str] | None = None) -> dict:
 
 def clear_cache() -> None:
     _ART_CACHE.clear()
+    _POSE_CACHE.clear()
     _FACE_CACHE.clear()
 
 

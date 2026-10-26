@@ -1,0 +1,258 @@
+{
+  "id": "lengmian",
+  "point": {
+    "id": "lengmian",
+    "pose": "point",
+    "source": "imagegen_pose",
+    "created_at": "2026-10-26T21:08:18",
+    "elapsed_sec": 13.3,
+    "seed": 51,
+    "seed_base": 51,
+    "ip_adapter": {
+      "strength": 0.35,
+      "end_at": 0.9,
+      "weight_type": "style transfer"
+    },
+    "bg_mode": "white",
+    "ref_used": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\lengmian\\portrait.png",
+    "portrait_ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\lengmian\\portrait.png",
+    "prompt_id": "fd8f2525-f6ea-4cdf-9e40-6e3d2e49c5dd",
+    "files": {
+      "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\lengmian\\pose_point\\front.png",
+      "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\lengmian\\cutout_point.png"
+    },
+    "sizes": {
+      "cutout": [
+        906,
+        925
+      ]
+    },
+    "front_white": {
+      "ok": true,
+      "corners": [
+        {
+          "rgb": [
+            255,
+            255,
+            254
+          ],
+          "mean": 254.6,
+          "spread": 4.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 255.0,
+          "spread": 2.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 255.0,
+          "spread": 0.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 255.0,
+          "spread": 1.0
+        }
+      ],
+      "white_ratio": 0.817
+    },
+    "cutout_validation": {
+      "ok": true,
+      "alpha0": 0.683,
+      "visible": 0.317,
+      "corners_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "bbox": [
+        8,
+        8,
+        898,
+        917
+      ],
+      "aspect": 0.979,
+      "bbox_h_ratio": 0.983,
+      "wash": {
+        "removed": false,
+        "color": null,
+        "ratio": 0.0
+      }
+    },
+    "face_norm": {
+      "score": 0.547,
+      "estimated": false,
+      "source": "yunet",
+      "bbox": [
+        0.6441501103752759,
+        0.188,
+        0.7433774834437086,
+        0.30864864864864866
+      ],
+      "mouth": {
+        "cx": 0.6937969094922738,
+        "cy": 0.28214054054054055,
+        "w": 0.033730684326710815,
+        "h": 0.014864864864864866
+      },
+      "eyes": {
+        "y": 0.23868108108108108,
+        "w": 0.02182119205298013,
+        "cx": [
+          0.6699779249448123,
+          0.7176048565121412
+        ]
+      },
+      "skin": "#eed4cf",
+      "lip": "#7f4c57",
+      "line": "#0e0c1b",
+      "face_w": 89.89
+    },
+    "prompts": {
+      "front": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, adult male, black hair, slicked back hair, dark eyes, straight eyebrows, black turtleneck sweater, gray accents, black sunglasses, deadpan cold expression, no smile, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference, dynamic gesture, one arm extended to the side, index finger pointing, explaining pose, confident body language, weight on one leg, action pose",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan, circular background, round backdrop, oval background, colored circle, pastel circle, background circle, sitting, upper body only, half body, cropped at waist, close-up, zoomed in, hands in pockets, static stiff pose, barefoot, bare feet"
+    }
+  },
+  "updated_at": "2026-10-26T21:10:35",
+  "think": {
+    "id": "lengmian",
+    "pose": "think",
+    "source": "imagegen_pose",
+    "created_at": "2026-10-26T21:10:35",
+    "elapsed_sec": 13.2,
+    "seed": 43,
+    "seed_base": 43,
+    "ip_adapter": {
+      "strength": 0.35,
+      "end_at": 0.9,
+      "weight_type": "style transfer"
+    },
+    "bg_mode": "white",
+    "ref_used": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\lengmian\\portrait.png",
+    "portrait_ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\lengmian\\portrait.png",
+    "prompt_id": "04ef2ba6-1ddd-4f9d-8b36-f1b5a9847084",
+    "files": {
+      "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\lengmian\\pose_think\\front.png",
+      "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\lengmian\\cutout_think.png"
+    },
+    "sizes": {
+      "cutout": [
+        845,
+        990
+      ]
+    },
+    "front_white": {
+      "ok": true,
+      "corners": [
+        {
+          "rgb": [
+            254,
+            254,
+            254
+          ],
+          "mean": 254.3,
+          "spread": 2.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 254.9,
+          "spread": 2.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 254.9,
+          "spread": 2.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 254.9,
+          "spread": 1.0
+        }
+      ],
+      "white_ratio": 0.756
+    },
+    "cutout_validation": {
+      "ok": true,
+      "alpha0": 0.669,
+      "visible": 0.331,
+      "corners_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "bbox": [
+        8,
+        8,
+        837,
+        982
+      ],
+      "aspect": 0.854,
+      "bbox_h_ratio": 0.984,
+      "wash": {
+        "removed": false,
+        "color": null,
+        "ratio": 0.0
+      }
+    },
+    "face_norm": {
+      "score": 0.861,
+      "estimated": false,
+      "source": "yunet",
+      "bbox": [
+        0.5355029585798816,
+        0.04727272727272727,
+        0.6288757396449703,
+        0.1522222222222222
+      ],
+      "mouth": {
+        "cx": 0.5822130177514793,
+        "cy": 0.1291212121212121,
+        "w": 0.031727810650887575,
+        "h": 0.012181818181818183
+      },
+      "eyes": {
+        "y": 0.09135353535353535,
+        "w": 0.020532544378698225,
+        "cx": [
+          0.5598224852071007,
+          0.6046153846153846
+        ]
+      },
+      "skin": "#e1c6c6",
+      "lip": "#88565c",
+      "line": "#080511",
+      "face_w": 78.85
+    },
+    "prompts": {
+      "front": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, adult male, black hair, slicked back hair, dark eyes, straight eyebrows, black turtleneck sweater, gray accents, black sunglasses, deadpan cold expression, no smile, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference, thoughtful pose, one hand on chin, other arm crossed under it, contemplative, head slightly tilted, relaxed stance",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan, circular background, round backdrop, oval background, colored circle, pastel circle, background circle, sitting, upper body only, half body, cropped at waist, close-up, zoomed in, hands in pockets, static stiff pose, barefoot, bare feet"
+    }
+  }
+}

@@ -1,0 +1,254 @@
+{
+  "id": "caocao",
+  "point": {
+    "id": "caocao",
+    "pose": "point",
+    "source": "imagegen_pose",
+    "created_at": "2026-10-26T20:58:22",
+    "elapsed_sec": 142.2,
+    "seed": 43,
+    "seed_base": 43,
+    "ip_adapter": {
+      "strength": 0.35,
+      "end_at": 0.9,
+      "weight_type": "style transfer"
+    },
+    "bg_mode": "white",
+    "ref_used": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\caocao\\portrait.png",
+    "portrait_ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\caocao\\portrait.png",
+    "prompt_id": "ebcabb6e-c31e-47b3-8ec1-c56e6b2e4dc1",
+    "files": {
+      "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\caocao\\pose_point\\front.png",
+      "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\caocao\\cutout_point.png"
+    },
+    "sizes": {
+      "cutout": [
+        903,
+        983
+      ]
+    },
+    "front_white": {
+      "ok": true,
+      "corners": [
+        {
+          "rgb": [
+            254,
+            254,
+            254
+          ],
+          "mean": 253.8,
+          "spread": 3.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 254.9,
+          "spread": 2.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 254.8,
+          "spread": 2.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 255.0,
+          "spread": 1.0
+        }
+      ],
+      "white_ratio": 0.669
+    },
+    "cutout_validation": {
+      "ok": true,
+      "alpha0": 0.592,
+      "visible": 0.408,
+      "corners_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "bbox": [
+        8,
+        8,
+        895,
+        975
+      ],
+      "aspect": 0.919,
+      "bbox_h_ratio": 0.984,
+      "wash": {
+        "removed": false,
+        "color": null,
+        "ratio": 0.0
+      }
+    },
+    "face_norm": {
+      "score": 0.866,
+      "estimated": false,
+      "source": "yunet",
+      "bbox": [
+        0.470874861572536,
+        0.11210579857578841,
+        0.5687707641196014,
+        0.2083418107833164
+      ],
+      "mouth": {
+        "cx": 0.5198338870431894,
+        "cy": 0.1871414038657172,
+        "w": 0.033255813953488374,
+        "h": 0.013743641912512716
+      },
+      "eyes": {
+        "y": 0.15251271617497456,
+        "w": 0.0215171650055371,
+        "cx": [
+          0.4963676633444076,
+          0.5433111849390919
+        ]
+      },
+      "skin": "#fddbc4",
+      "lip": "#885653",
+      "line": "#100d0f",
+      "face_w": 88.33
+    },
+    "prompts": {
+      "front": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, chinese hair bun, black king hat, full beard, sharp dark eyes, thick eyebrows, dark red and black hanfu, gold belt, sword at waist, ambitious smirk, commanding warlord, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference, dynamic gesture, one arm extended to the side, index finger pointing, explaining pose, confident body language, weight on one leg, action pose",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan, circular background, round backdrop, oval background, colored circle, pastel circle, background circle, sitting, upper body only, half body, cropped at waist, close-up, zoomed in, hands in pockets, static stiff pose, barefoot, bare feet"
+    }
+  },
+  "updated_at": "2026-10-26T21:15:05",
+  "think": {
+    "id": "caocao",
+    "pose": "think",
+    "source": "imagegen_pose",
+    "created_at": "2026-10-26T21:15:05",
+    "elapsed_sec": null,
+    "seed": 43,
+    "seed_base": 43,
+    "ip_adapter": {
+      "strength": 0.35,
+      "end_at": 0.9,
+      "weight_type": "style transfer"
+    },
+    "bg_mode": "white",
+    "portrait_ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\caocao\\portrait.png",
+    "prompt_id": "77c6cd14-b0b5-4915-83ff-ca9fd0c1ed6b",
+    "files": {
+      "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\caocao\\pose_think\\front.png",
+      "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\caocao\\cutout_think.png"
+    },
+    "sizes": {
+      "cutout": [
+        566,
+        950
+      ]
+    },
+    "front_white": {
+      "ok": true,
+      "corners": [
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 254.8,
+          "spread": 2.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 254.9,
+          "spread": 2.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 254.8,
+          "spread": 2.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 254.9,
+          "spread": 2.0
+        }
+      ],
+      "white_ratio": 0.767
+    },
+    "cutout_validation": {
+      "ok": true,
+      "alpha0": 0.535,
+      "visible": 0.465,
+      "corners_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "bbox": [
+        8,
+        8,
+        558,
+        942
+      ],
+      "aspect": 0.596,
+      "bbox_h_ratio": 0.983,
+      "wash": {
+        "removed": false,
+        "color": null,
+        "ratio": 0.0
+      }
+    },
+    "face_norm": {
+      "score": 0.45,
+      "estimated": false,
+      "source": "haar",
+      "bbox": [
+        0.3568904593639576,
+        0.12842105263157894,
+        0.6537102473498233,
+        0.30526315789473685
+      ],
+      "mouth": {
+        "cx": 0.5053003533568905,
+        "cy": 0.26635789473684207,
+        "w": 0.10091872791519434,
+        "h": 0.027052631578947366
+      },
+      "eyes": {
+        "y": 0.20269473684210526,
+        "w": 0.06530035335689047,
+        "cx": [
+          0.4340636042402827,
+          0.5765371024734982
+        ]
+      },
+      "skin": "#ddc5ac",
+      "lip": "#664044",
+      "line": "#100e10",
+      "face_w": 168.0
+    },
+    "note": "repair: pose_meta 写盘被同步盘文件锁打断后重建"
+  }
+}

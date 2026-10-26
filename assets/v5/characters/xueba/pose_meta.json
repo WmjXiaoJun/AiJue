@@ -1,0 +1,258 @@
+{
+  "id": "xueba",
+  "point": {
+    "id": "xueba",
+    "pose": "point",
+    "source": "imagegen_pose",
+    "created_at": "2026-10-26T21:06:37",
+    "elapsed_sec": 29.6,
+    "seed": 45,
+    "seed_base": 43,
+    "ip_adapter": {
+      "strength": 0.25,
+      "end_at": 0.8,
+      "weight_type": "style transfer"
+    },
+    "bg_mode": "white",
+    "ref_used": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\xueba\\pose_point\\ref_white.png",
+    "portrait_ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\xueba\\portrait.png",
+    "prompt_id": "df46a6ae-69e3-44ff-b710-7eeee3c54bc9",
+    "files": {
+      "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\xueba\\pose_point\\front.png",
+      "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\xueba\\cutout_point.png"
+    },
+    "sizes": {
+      "cutout": [
+        487,
+        955
+      ]
+    },
+    "front_white": {
+      "ok": true,
+      "corners": [
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 255.0,
+          "spread": 1.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 254.9,
+          "spread": 3.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 255.0,
+          "spread": 1.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 254.9,
+          "spread": 3.0
+        }
+      ],
+      "white_ratio": 0.87
+    },
+    "cutout_validation": {
+      "ok": true,
+      "alpha0": 0.679,
+      "visible": 0.321,
+      "corners_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "bbox": [
+        8,
+        8,
+        479,
+        947
+      ],
+      "aspect": 0.51,
+      "bbox_h_ratio": 0.983,
+      "wash": {
+        "removed": false,
+        "color": null,
+        "ratio": 0.0
+      }
+    },
+    "face_norm": {
+      "score": 0.83,
+      "estimated": false,
+      "source": "yunet",
+      "bbox": [
+        0.5427104722792608,
+        0.06115183246073298,
+        0.7340862422997947,
+        0.17979057591623035
+      ],
+      "mouth": {
+        "cx": 0.6383162217659137,
+        "cy": 0.1537068062827225,
+        "w": 0.06507186858316222,
+        "h": 0.014931937172774868
+      },
+      "eyes": {
+        "y": 0.11098429319371728,
+        "w": 0.04211498973305955,
+        "cx": [
+          0.5923819301848049,
+          0.6842710472279261
+        ]
+      },
+      "skin": "#c4beb0",
+      "lip": "#895853",
+      "line": "#161617",
+      "face_w": 93.21
+    },
+    "prompts": {
+      "front": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, young adult male, black hair, neat short hair, dark eyes, straight eyebrows, light blue cardigan, white shirt, round glasses, old book in hand, serious studious calm expression, top student, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference, dynamic gesture, one arm extended to the side, index finger pointing, explaining pose, confident body language, weight on one leg, action pose",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan, circular background, round backdrop, oval background, colored circle, pastel circle, background circle, sitting, upper body only, half body, cropped at waist, close-up, zoomed in, hands in pockets, static stiff pose, barefoot, bare feet"
+    }
+  },
+  "updated_at": "2026-10-26T21:14:01",
+  "think": {
+    "id": "xueba",
+    "pose": "think",
+    "source": "imagegen_pose",
+    "created_at": "2026-10-26T21:14:01",
+    "elapsed_sec": 13.6,
+    "seed": 43,
+    "seed_base": 43,
+    "ip_adapter": {
+      "strength": 0.35,
+      "end_at": 0.9,
+      "weight_type": "style transfer"
+    },
+    "bg_mode": "white",
+    "ref_used": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\xueba\\portrait.png",
+    "portrait_ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\xueba\\portrait.png",
+    "prompt_id": "5402d176-feb7-4106-a142-527d64f709bc",
+    "files": {
+      "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\xueba\\pose_think\\front.png",
+      "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\xueba\\cutout_think.png"
+    },
+    "sizes": {
+      "cutout": [
+        935,
+        990
+      ]
+    },
+    "front_white": {
+      "ok": true,
+      "corners": [
+        {
+          "rgb": [
+            254,
+            254,
+            254
+          ],
+          "mean": 253.9,
+          "spread": 4.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 255.0,
+          "spread": 1.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 254.8,
+          "spread": 2.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 255.0,
+          "spread": 0.0
+        }
+      ],
+      "white_ratio": 0.765
+    },
+    "cutout_validation": {
+      "ok": true,
+      "alpha0": 0.718,
+      "visible": 0.282,
+      "corners_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "bbox": [
+        8,
+        8,
+        927,
+        982
+      ],
+      "aspect": 0.944,
+      "bbox_h_ratio": 0.984,
+      "wash": {
+        "removed": false,
+        "color": null,
+        "ratio": 0.0
+      }
+    },
+    "face_norm": {
+      "score": 0.45,
+      "estimated": false,
+      "source": "haar",
+      "bbox": [
+        0.34759358288770054,
+        0.21818181818181817,
+        0.4481283422459893,
+        0.31313131313131315
+      ],
+      "mouth": {
+        "cx": 0.39786096256684494,
+        "cy": 0.29224242424242425,
+        "w": 0.03418181818181818,
+        "h": 0.014525252525252526
+      },
+      "eyes": {
+        "y": 0.25806060606060605,
+        "w": 0.02211764705882353,
+        "cx": [
+          0.37373262032085564,
+          0.42198930481283425
+        ]
+      },
+      "skin": "#fef6e6",
+      "lip": "#8e5c5f",
+      "line": "#000000",
+      "face_w": 94.0
+    },
+    "prompts": {
+      "front": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, young adult male, black hair, neat short hair, dark eyes, straight eyebrows, light blue cardigan, white shirt, round glasses, old book in hand, serious studious calm expression, top student, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference, thoughtful pose, one hand on chin, other arm crossed under it, contemplative, head slightly tilted, relaxed stance",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan, circular background, round backdrop, oval background, colored circle, pastel circle, background circle, sitting, upper body only, half body, cropped at waist, close-up, zoomed in, hands in pockets, static stiff pose, barefoot, bare feet"
+    }
+  }
+}

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """V5 2D 分层动画渲染器（motion2d）。
 
 契约见 ``docs/V5_INTERFACES.md`` §4（签名不得改）：
@@ -63,6 +63,7 @@ from __future__ import annotations
 import json
 import logging
 import math
+import os
 import random
 import subprocess
 import sys
@@ -1124,13 +1125,434 @@ def _char_phase(seed: int, role: str) -> tuple[float, float, float]:
 
 def char_micro_motion(t: float, phase: tuple[float, float, float],
                       speaking: bool = False) -> tuple[float, float]:
-    """呼吸/点头微动（±1~2px）：返回 (dx, dy) 像素偏移。"""
+    """旧版微动（±1~2px，仅兼容保留）。
+
+    V5.5 起角色表演走 ``_char_perform()``（可见的呼吸/重心/点头/说话前倾），
+    这个函数不再被渲染链路使用，但保留给外部调试/兼容。
+    """
     p1, p2, p3 = phase
     dx = 0.9 * math.sin(2.0 * math.pi * t / 6.7 + p2)
     dy = -1.5 * math.sin(2.0 * math.pi * t / 4.2 + p1)      # 呼吸：肩部起伏
     if speaking:                                            # 说话时轻微点头
         dy += 1.2 * math.sin(2.0 * math.pi * t / 2.6 + p3)
     return dx, dy
+
+
+# --------------------------------------------------------------------------- #
+# V5.5 角色表演：pose_timeline / 呼吸 / 重心 / 点头侧头 / 说话前倾 / walk_in
+# --------------------------------------------------------------------------- #
+#: pose 交叉淡化帧数（4-6 帧）
+POSE_TRANSITION_FRAMES = 5
+#: 表演幅度（相对角色高度的比例 / 缩放系数）
+PERFORM_IDLE_STRENGTH = 1.0
+PERFORM_BREATH_FRAC = 0.014      # 呼吸纵向起伏（占角色高度，≈6px @446px 高）
+PERFORM_SWAY_FRAC = 0.013        # 左右重心移动
+PERFORM_SWAY_PERIOD = 5.3
+PERFORM_BREATH_PERIOD = 4.0
+PERFORM_LEAN_FRAC = 0.014        # 说话前倾（上移，占角色高度）
+PERFORM_LEAN_SCALE = 0.020       # 说话前倾（轻微放大，模拟靠近镜头）
+PERFORM_TALK_BOB_PERIOD = 2.4    # 说话节奏点头周期（秒）
+#: 偶发点头/侧头：每 GESTURE_INTERVAL 秒一次，持续 GESTURE_DUR 秒
+GESTURE_INTERVAL = (2.0, 4.0)
+GESTURE_DUR = 0.62
+_GESTURE_KINDS: tuple[str, ...] = ("nod", "tilt", "nod", "lean")
+#: 姿态"体态度"（x_frac, y_frac, scale_x, scale_y, shear）；x/y 相对角色高度
+#: 注意：shear 是**小角度仿射切变**（tanθ），必须很小（≤0.02 ≈1.15°）；
+#: 体态主要靠位移/缩放表达，禁止用大 shear 冒充"转身/躺下"。
+POSE_ACT: dict[str, tuple[float, float, float, float, float]] = {
+    "front": (0.0, 0.0, 1.0, 1.0, 0.0),
+    "point": (0.022, -0.008, 1.006, 1.004, 0.020),
+    "think": (-0.016, -0.004, 0.997, 1.0, -0.016),
+    "side": (-0.012, 0.0, 0.945, 1.0, -0.008),
+    "surprise": (0.0, -0.014, 1.020, 1.014, 0.004),
+    "lean_in": (0.012, -0.010, 1.010, 1.008, 0.012),
+    "back": (0.0, 0.004, 0.985, 1.0, -0.008),
+}
+
+
+def pose_at(timeline: Sequence[Any] | None, t: float, default: str = "front") -> str:
+    """从 ``[[t0, t1, pose], ...]``（或 dict 形态）取当前姿态。"""
+    if not timeline:
+        return str(default or "front")
+    for item in timeline:
+        try:
+            if isinstance(item, dict):
+                t0 = float(item.get("t0", 0.0))
+                t1 = float(item.get("t1", 0.0))
+                pose = item.get("pose") or item.get("name") or item.get("value")
+            else:
+                t0, t1, pose = float(item[0]), float(item[1]), item[2]
+        except (TypeError, ValueError, IndexError):
+            continue
+        if t0 <= t < t1:
+            return str(pose or "front")
+    return str(default or "front")
+
+
+def pose_plan_at(timeline: Sequence[Any] | None, t: float, fps: float = 25.0,
+                 transition_frames: int = POSE_TRANSITION_FRAMES,
+                 default: str = "front") -> list[tuple[str, float]]:
+    """逐帧姿态方案 ``[(pose, weight), ...]``；姿态切换时 4-6 帧交叉淡化。
+
+    * 无 ``pose_timeline`` / 未切换 → ``[(当前pose, 1.0)]``（旧行为不变）；
+    * 切换后第 k 帧：``w = smoothstep((k+1)/(N+1))``，N=``transition_frames``；
+    * 用 ``t`` 反推帧号，所以与 fps/帧序号严格对齐、可复现。
+    """
+    cur = pose_at(timeline, t, default)
+    if not timeline or transition_frames <= 0:
+        return [(cur, 1.0)]
+    fps = max(1e-6, float(fps or 25.0))
+    frame = max(0, int(round(float(t) * fps)))
+    prev: str | None = None
+    age = 0
+    probe = frame - 1
+    while probe >= 0 and age <= transition_frames + 2:
+        p = pose_at(timeline, probe / fps, default)
+        if p == cur:
+            age += 1
+            probe -= 1
+            continue
+        prev = p
+        break
+    if prev is None or prev == cur or age >= transition_frames:
+        return [(cur, 1.0)]
+    w = (age + 1.0) / (transition_frames + 1.0)
+    w = w * w * (3.0 - 2.0 * w)                 # smoothstep
+    w = _clamp(w, 0.0, 1.0)
+    return [(prev, 1.0 - w), (cur, w)]
+
+
+def _gesture_schedule(duration: float, seed: int, role: str) -> list[tuple[float, float, str, int]]:
+    """确定性偶发动作表：每 2~4s 一次点头/侧头/前倾（seed+role 决定）。"""
+    rng = random.Random(f"{seed}|{role}|gesture")
+    events: list[tuple[float, float, str, int]] = []
+    t = rng.uniform(0.7, 1.5)
+    duration = max(0.0, float(duration))
+    while t < duration:
+        events.append((t, GESTURE_DUR, rng.choice(_GESTURE_KINDS),
+                       rng.choice((-1, 1))))
+        t += rng.uniform(*GESTURE_INTERVAL)
+    return events
+
+
+def _gesture_offset(t: float,
+                    events: Sequence[tuple[float, float, str, int]]
+                    ) -> tuple[float, float, float]:
+    """当前帧的偶发动作偏移 → (dx_frac, dy_frac, shear)，单位=角色高度比例。"""
+    dx = dy = shear = 0.0
+    for t0, dur, kind, sign in events:
+        if not (t0 <= t < t0 + dur):
+            continue
+        u = (t - t0) / max(1e-6, dur)
+        e = math.sin(math.pi * u) ** 2
+        if kind == "nod":
+            dy += 0.011 * e
+            shear += 0.012 * e * sign
+        elif kind == "tilt":
+            shear += 0.030 * e * sign
+            dx += 0.005 * e * sign
+        else:  # lean
+            dy -= 0.007 * e
+            shear += 0.018 * e * sign
+    return dx, dy, shear
+
+
+def _pose_act(pose_plan: Sequence[tuple[str, float]]
+              ) -> tuple[float, float, float, float, float]:
+    """按权重插值姿态体态度 → (x_frac, y_frac, sx, sy, shear)。"""
+    act = [0.0, 0.0, 0.0, 0.0, 0.0]      # x, y, (sx-1), (sy-1), shear
+    total = 0.0
+    for pose, w in pose_plan or [("front", 1.0)]:
+        key = str(pose or "front").lower()
+        pa = POSE_ACT.get(key) or POSE_ACT["front"]
+        act[0] += pa[0] * w
+        act[1] += pa[1] * w
+        act[2] += (pa[2] - 1.0) * w
+        act[3] += (pa[3] - 1.0) * w
+        act[4] += pa[4] * w
+        total += w
+    if total > 1e-6:
+        act = [v / total for v in act]
+    act[2] += 1.0
+    act[3] += 1.0
+    return (act[0], act[1], act[2], act[3], act[4])
+
+
+def _char_perform(entry: dict, style: dict | None, t: float, duration: float,
+                  fps: float, mouth_plan: Sequence[tuple[str, float]],
+                  pose_plan: Sequence[tuple[str, float]], h_nom: float,
+                  width: int, size: tuple[int, int],
+                  role: str = "", seed: int = 0) -> dict:
+    """V5.5 可见表演 → 屏幕像素级偏移/缩放/切变（不含相机变换）。
+
+    返回 ``{"dx", "dy", "sx", "sy", "shear", "walk_x", "speaking", "idle"}``。
+    """
+    idle = float(entry.get("idle_strength", PERFORM_IDLE_STRENGTH)
+                 if entry.get("idle_strength") is not None
+                 else PERFORM_IDLE_STRENGTH)
+    if entry.get("breath", True) is False:
+        idle = 0.0
+    idle = _clamp(idle, 0.0, 4.0)
+    gesture_on = bool(entry.get("gesture", True))
+    perf_on = bool(entry.get("perform", True))
+    if not perf_on:
+        idle = 0.0
+        gesture_on = False
+
+    # 说话程度：用口型权重之和（0..~0.85）平滑反推 → 0..1
+    speak = 0.0
+    for mouth, w in mouth_plan or []:
+        if mouth != "closed":
+            speak += float(w)
+    speak = _clamp(speak / 0.85, 0.0, 1.0)
+
+    # 姿态体态度（pose_timeline 的"演技"）
+    x_frac, y_frac, sx, sy, shear = _pose_act(pose_plan)
+
+    phase = entry.get("_phase")
+    if phase is None:
+        phase = _char_phase(seed, role)
+        entry["_phase"] = phase
+
+    dx = dy = 0.0
+    # ① 呼吸：可见的纵向起伏 + 轻微挤压（占角色高度 1.4%）
+    if idle > 0.0:
+        br = math.sin(2.0 * math.pi * t / PERFORM_BREATH_PERIOD + phase[0])
+        breath = h_nom * PERFORM_BREATH_FRAC * idle
+        dy -= 0.5 * breath * (1.0 + br)
+        sx *= 1.0 - 0.004 * idle * br
+        sy *= 1.0 + 0.006 * idle * br
+        # ② 重心左右移动（慢速，可见）
+        sway = math.sin(2.0 * math.pi * t / PERFORM_SWAY_PERIOD + phase[1])
+        dx += h_nom * PERFORM_SWAY_FRAC * idle * sway
+        shear += 0.010 * idle * sway
+        # ③ 说话：前倾/靠近镜头 + 轻微上移 + 说话节奏点头
+        dx += 0.004 * h_nom * idle * speak
+        dy -= h_nom * PERFORM_LEAN_FRAC * idle * speak
+        dy += 1.6 * idle * speak * math.sin(
+            2.0 * math.pi * t / PERFORM_TALK_BOB_PERIOD + phase[2])
+        sx *= 1.0 + PERFORM_LEAN_SCALE * speak
+        sy *= 1.0 + PERFORM_LEAN_SCALE * 0.6 * speak
+        shear += 0.018 * idle * speak
+        # ④ 偶发点头/侧头/前倾（确定性 seed，每 2-4s）
+        if gesture_on and duration > 0:
+            events = entry.get("_gesture_events")
+            if events is None:
+                events = _gesture_schedule(duration, seed, role)
+                entry["_gesture_events"] = events
+            gdx, gdy, gshear = _gesture_offset(t, events)
+            dx += gdx * h_nom * idle
+            dy += gdy * h_nom * idle
+            shear += gshear * idle
+
+    # ⑤ 走路入场（可选）：从画面外走到锚点，带脚步 bob
+    walk_x = 0.0
+    entrance = str(entry.get("entrance") or "").lower()
+    if entrance in ("walk_in", "walkin", "walk"):
+        wf = max(1, int(entry.get("walk_in_frames", 20)))
+        frame = int(round(float(t) * max(1e-6, float(fps))))
+        if frame < wf:
+            u = _clamp(frame / float(max(1, wf - 1)), 0.0, 1.0)
+            p = 1.0 - (1.0 - u) ** 3
+            side = 1 if str(entry.get("walk_in_from", "left")).lower() == "right" else -1
+            walk_x = side * (1.0 - p) * width * 0.62
+            dy += -abs(math.sin(math.pi * frame / 3.0)) * 5.0 * (1.0 - 0.5 * p)
+            shear += 0.012 * math.sin(math.pi * frame / 3.0) * (1.0 - p)
+
+    # 安全上限（V5.5.1）：shear ≤ ~1.15°、缩放 ≤±6%、偏移 ≤3% 身高；
+    # 防止异常参数/姿态资产把角色渲染成"斜躺/横飞/拉伸"。
+    shear = _clamp(shear, -PERFORM_MAX_SHEAR, PERFORM_MAX_SHEAR)
+    sx = _clamp(sx, PERFORM_SCALE_RANGE[0], PERFORM_SCALE_RANGE[1])
+    sy = _clamp(sy, PERFORM_SCALE_RANGE[0], PERFORM_SCALE_RANGE[1])
+    max_shift = PERFORM_MAX_SHIFT_FRAC * max(1.0, h_nom)
+    dx = _clamp(dx + x_frac * h_nom, -max_shift, max_shift)
+    dy = _clamp(dy + y_frac * h_nom, -max_shift, max_shift)
+    return {"dx": dx, "dy": dy,
+            "sx": sx, "sy": sy, "shear": shear, "walk_x": walk_x,
+            "speaking": speak, "idle": idle, "gesture": gesture_on}
+
+
+# --------------------------------------------------------------------------- #
+# 图片立绘（cutout）姿态变体：assets / v5_art / entry["images"]
+# --------------------------------------------------------------------------- #
+_IMAGE_SPRITE_CACHE: dict[tuple, tuple[np.ndarray, np.ndarray]] = {}
+_IMAGE_SRC_CACHE: dict[tuple, Image.Image] = {}
+
+
+def _pose_image_asset(char_id: str, pose: str) -> Image.Image | None:
+    """按角色 id + pose 找姿态 cutout：assets 优先，其次 v5_art.character_pose_art。"""
+    char_id = str(char_id or "").strip()
+    pose = str(pose or "front").strip().lower()
+    if not char_id or pose in ("", "front"):
+        return None
+    key = ("asset", char_id, pose)
+    if key in _IMAGE_SRC_CACHE:
+        return _IMAGE_SRC_CACHE[key]
+    img: Image.Image | None = None
+    base = config.REPO_ROOT / "assets" / "v5" / "characters" / char_id
+    for cand in (base / f"cutout_{pose}.png", base / f"{pose}.png",
+                 base / "poses" / f"{pose}.png"):
+        try:
+            if cand.is_file():
+                img = Image.open(cand).convert("RGBA")
+                break
+        except OSError:
+            continue
+    if img is None:                      # 兼容 render-dev 的 v5_art 接口（后到则用）
+        try:
+            from . import v5_art as _v5_art  # type: ignore
+            fn = getattr(_v5_art, "character_pose_art", None)
+            if callable(fn):
+                res = fn(char_id, pose)
+                if isinstance(res, Image.Image):
+                    img = res.convert("RGBA")
+                elif isinstance(res, (str, Path)) and Path(res).is_file():
+                    img = Image.open(res).convert("RGBA")
+        except Exception:  # noqa: BLE001
+            img = None
+    _IMAGE_SRC_CACHE[key] = img        # None 也缓存，避免逐帧尝试
+    return img
+
+
+def _pose_image_pil(entry: dict, pose: str) -> Image.Image:
+    """取某姿态的图片立绘（PIL，RGBA）；来源：entry.images → entry.image → assets → v5_art。"""
+    pose = str(pose or "front").lower()
+    key = ("pil", id(entry), pose)
+    hit = _IMAGE_SRC_CACHE.get(key)
+    if hit is not None:
+        return hit
+    images = entry.get("images") or entry.get("pose_images")
+    img: Image.Image | None = None
+    if isinstance(images, dict):
+        cand = images.get(pose)
+        if cand is None and pose == "front":
+            cand = images.get("front")
+        if isinstance(cand, Image.Image):
+            img = cand
+        elif isinstance(cand, (str, Path)) and Path(str(cand)).is_file():
+            try:
+                img = Image.open(str(cand))
+            except OSError:
+                img = None
+    if img is None and pose == "front":
+        base_img = entry.get("image")
+        if base_img is not None:
+            img = _to_image(base_img, "character.image")
+    if img is None:
+        char_obj = entry.get("char")
+        char_id = _char_key(char_obj) if char_obj is not None else str(
+            entry.get("id") or entry.get("role") or "char")
+        img = _pose_image_asset(char_id, pose)
+        if img is None and pose != "front":
+            LOG.debug("motion2d: 角色 %s 无姿态 %s 立绘，回退 front", char_id, pose)
+            return _pose_image_pil(entry, "front")
+    if img is None:
+        raise V5Error(f"角色条目缺少可用的图片立绘（pose={pose}）")
+    img = img.convert("RGBA")
+    _IMAGE_SRC_CACHE[key] = img
+    return img
+
+
+def _load_pose_image(entry: dict, pose: str, target: tuple[int, int] | None = None
+                     ) -> tuple[np.ndarray, np.ndarray]:
+    """取某姿态的图片立绘 numpy（RGBA 分离），带尺寸/来源缓存。"""
+    img = _pose_image_pil(entry, pose)
+    if target is not None and tuple(img.size) != tuple(target):
+        target = (max(1, int(target[0])), max(1, int(target[1])))
+        cache_key = ("np", id(entry), str(pose), id(img), target)
+        hit = _IMAGE_SPRITE_CACHE.get(cache_key)
+        if hit is not None:
+            return hit
+        img = img.resize(target, Image.LANCZOS)
+    else:
+        cache_key = ("np", id(entry), str(pose), id(img), "native")
+        hit = _IMAGE_SPRITE_CACHE.get(cache_key)
+        if hit is not None:
+            return hit
+    arr = np.asarray(img, dtype=np.uint8)
+    pair = (np.ascontiguousarray(arr[:, :, :3]), np.ascontiguousarray(arr[:, :, 3]))
+    _IMAGE_SPRITE_CACHE[cache_key] = pair
+    return pair
+
+def _fit_uniform(img: Image.Image, size: tuple[int, int]) -> Image.Image:
+    """等比缩放并底部居中放入画布（**禁止非等比 resize**）。"""
+    W, H = max(1, int(size[0])), max(1, int(size[1]))
+    f = min(W / max(1, img.width), H / max(1, img.height))
+    nw = max(1, int(round(img.width * f)))
+    nh = max(1, int(round(img.height * f)))
+    out = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    out.alpha_composite(img.resize((nw, nh), Image.LANCZOS),
+                        (int(round((W - nw) / 2.0)), int(round(H - nh))))
+    return out
+
+
+def _pose_sprite_pil(entry: dict, pose: str) -> Image.Image:
+    """某姿态的图片立绘（已过质量门 + 内容 bbox 归一化）。
+
+    * 姿态资产与 front 构图/倾角差异过大（斜躺/横飞）→ 回退 front；
+    * 合格姿态按 content bbox 等比归一化到 front 的同一基坐标；
+    * ``MOTION2D_POSE_ART=off`` 时始终用 front 立绘（只保留体态表演）。
+    """
+    pose = str(pose or "front").lower()
+    front = _pose_image_pil(entry, "front")
+    if pose == "front" or pose_art_mode() == "off":
+        return front
+    key = ("pose_norm", id(entry), pose)
+    hit = _IMAGE_SRC_CACHE.get(key)
+    if hit is not None:
+        return hit
+    raw = _pose_image_pil(entry, pose)
+    if pose_art_mode() == "force":
+        out = _normalize_pose_sprite(raw, front, front.size)
+    else:
+        ok, why = _pose_art_ok(raw, front)
+        if ok:
+            out = _normalize_pose_sprite(raw, front, front.size)
+        else:
+            LOG.warning("motion2d: 图片立绘角色姿态 %s 不合格（%s），回退 front",
+                        pose, why)
+            out = front
+    _IMAGE_SRC_CACHE[key] = out
+    return out
+
+
+def _blend_image_poses(entry: dict, plan: Sequence[tuple[str, float]],
+                       target: tuple[int, int]) -> tuple[np.ndarray, np.ndarray]:
+    """按 pose 方案混合图片立绘（交叉淡化），结果按量化权重缓存。
+
+    V5.5.1：每个姿态先过质量门 + content bbox 归一化 + **等比** fit 到目标画布，
+    避免不同构图/长宽比的 AI 姿态图混合时出现拉伸/斜切/大小跳变。
+    """
+    plan = [(str(p), float(w)) for p, w in (plan or [("front", 1.0)]) if w > 0.001]
+    total = sum(w for _, w in plan)
+    if not plan or total <= 0:
+        plan = [("front", 1.0)]
+        total = 1.0
+    plan = [(p, w / total) for p, w in plan]
+    key = ("blend2", id(entry), tuple(target),
+           tuple((p, int(round(w * 64))) for p, w in plan))
+    hit = _IMAGE_SPRITE_CACHE.get(key)
+    if hit is not None:
+        return hit
+    acc_rgb = None
+    acc_a = None
+    for pose, w in plan:
+        img = _fit_uniform(_pose_sprite_pil(entry, pose), target)
+        arr = np.asarray(img, dtype=np.uint8)
+        rgb = arr[:, :, :3].astype(np.float32) * w
+        alpha = arr[:, :, 3].astype(np.float32) * w
+        if acc_rgb is None:
+            acc_rgb, acc_a = rgb, alpha
+        else:
+            acc_rgb += rgb
+            acc_a += alpha
+    if acc_rgb is None:
+        acc_rgb = np.zeros((target[1], target[0], 3), np.float32)
+        acc_a = np.zeros((target[1], target[0]), np.float32)
+    pair = (np.ascontiguousarray(np.clip(acc_rgb, 0, 255).astype(np.uint8)),
+            np.ascontiguousarray(np.clip(acc_a, 0, 255).astype(np.uint8)))
+    _IMAGE_SPRITE_CACHE[key] = pair
+    return pair
 
 
 # --------------------------------------------------------------------------- #
@@ -1345,6 +1767,152 @@ def _draw_placeholder_character(char: dict, style: dict, size: tuple[int, int],
 
 
 # --------------------------------------------------------------------------- #
+# 立绘几何归一化（V5.5.1：修 AI 姿态资产长宽比/构图差异导致的拉伸/斜躺）
+# --------------------------------------------------------------------------- #
+#: 姿态资产质量门：不合格就回退 front 立绘（只用体态表演，避免"躺着/飞起来"）
+POSE_ART_MIN_ANGLE_COS = math.cos(math.radians(6.0))   # 主体长轴倾角 ≤ 6°
+POSE_ART_ASPECT_RANGE = (0.18, 0.85)                   # bbox 宽/高 合理区间
+POSE_ART_MIN_HEIGHT_RATIO = 0.72                       # 相对 front 的内容高度比
+#: 表演变换安全上限（防止夸张/异常参数导致整体斜切/旋转）
+PERFORM_MAX_SHEAR = 0.020          # ≈1.15°（Lead 要求 lean 0.5-1.2°）
+PERFORM_SCALE_RANGE = (0.96, 1.06)
+PERFORM_MAX_SHIFT_FRAC = 0.030     # dx/dy 最多 3% 角色高度
+
+
+def pose_art_mode() -> str:
+    """姿态资产开关：``auto``(默认，质量门+归一化) / ``force``(跳过质量门) / ``off``。"""
+    val = str(os.environ.get("MOTION2D_POSE_ART", "") or "").strip().lower()
+    if val in ("off", "0", "false", "no"):
+        return "off"
+    if val in ("force", "1", "true", "yes", "all"):
+        return "force"
+    return "auto"
+
+
+def _sprite_content_box(img: Image.Image) -> tuple[int, int, int, int] | None:
+    """RGBA 立绘的 alpha 内容框 (x0, y0, x1, y1)；空图返回 None。"""
+    try:
+        alpha = img.getchannel("A")
+    except (ValueError, AttributeError):
+        return None
+    bbox = alpha.point(lambda v: 255 if v > 16 else 0).getbbox()
+    if not bbox:
+        return None
+    x0, y0, x1, y1 = bbox
+    if x1 - x0 < 4 or y1 - y0 < 4:
+        return None
+    return (x0, y0, x1, y1)
+
+
+def _sprite_tilt_deg(img: Image.Image) -> float:
+    """主体长轴（最小外接矩形）相对竖直方向的夹角（度，≤45）。
+
+    用于判断姿态资产是否"人躺着/横飞"：正常站姿/半身像应 ≤ ~3°。
+    """
+    try:
+        alpha = np.asarray(img.getchannel("A"), dtype=np.uint8)
+    except (ValueError, AttributeError):
+        return 0.0
+    mask = (alpha > 24).astype(np.uint8)
+    if mask.sum() < 100:
+        return 0.0
+    if cv2 is not None:
+        try:
+            cnts, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL,
+                                       cv2.CHAIN_APPROX_SIMPLE)
+            if not cnts:
+                return 0.0
+            cnt = max(cnts, key=cv2.contourArea)
+            (_c, (rw, rh), ang) = cv2.minAreaRect(cnt)
+            if rw < rh:            # 长轴是 h → 与竖直方向的夹角
+                a = float(ang)
+            else:                  # 长轴是 w → 对应旋转 90° 后的角
+                a = float(ang) - 90.0
+            return abs(((a + 45.0) % 90.0) - 45.0)
+        except cv2.error:  # pragma: no cover
+            pass
+    # 无 cv2 回退：用 bbox 的高宽比粗判（宽>高视为"横躺"→ 返回大角度）
+    h, w = mask.shape
+    ys, xs = np.nonzero(mask)
+    bw = int(xs.max() - xs.min()) + 1 if xs.size else 0
+    bh = int(ys.max() - ys.min()) + 1 if ys.size else 0
+    if bh <= 0:
+        return 0.0
+    return 0.0 if bw <= bh else 45.0
+
+
+def _pose_art_ok(img: Image.Image, front: Image.Image) -> tuple[bool, str]:
+    """姿态资产质量门：构图/倾角与 front 差异过大 → 判定不可用（返回原因）。"""
+    box = _sprite_content_box(img)
+    fbox = _sprite_content_box(front)
+    if box is None:
+        return False, "empty"
+    if fbox is None:
+        return True, ""
+    w = box[2] - box[0]
+    h = box[3] - box[1]
+    fh = max(1, fbox[3] - fbox[1])
+    aspect = w / max(1.0, float(h))
+    lo, hi = POSE_ART_ASPECT_RANGE
+    if not (lo <= aspect <= hi):
+        return False, f"aspect={aspect:.2f}∉[{lo},{hi}]"
+    h_ratio = h / float(fh)
+    if h_ratio < POSE_ART_MIN_HEIGHT_RATIO:
+        return False, f"height_ratio={h_ratio:.2f}<{POSE_ART_MIN_HEIGHT_RATIO}"
+    tilt = _sprite_tilt_deg(img)
+    if tilt > 6.0:
+        return False, f"tilt={tilt:.1f}°>6°"
+    return True, ""
+
+
+def _normalize_pose_sprite(img: Image.Image, front: Image.Image,
+                           size: tuple[int, int]) -> Image.Image:
+    """把姿态立绘按其 alpha 内容框归一化到 front 的"同一基坐标"：
+
+    * 等比缩放到 **front 内容高度**（消除不同构图/画布尺寸造成的大小跳变）；
+    * 底部对齐 + 水平居中（脚底/重心一致，不会浮空/横飞）；
+    * 姿态图偏宽（张开手臂/持扇）时按 alpha 重心**水平裁切**两侧，**不是压扁**。
+    * 全程**等比缩放**（禁止非等比 resize → 不产生斜切/拉伸）。
+    """
+    W, H = int(size[0]), int(size[1])
+    box = _sprite_content_box(img)
+    fbox = _sprite_content_box(front)
+    if box is None:
+        return Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    crop = img.crop(box)
+    cw, ch = crop.size
+    target_h = (fbox[3] - fbox[1]) if fbox else max(8, int(H * 0.94))
+    scale = float(target_h) / max(1, ch)
+    max_w = W * 0.98
+    if cw * scale > max_w:
+        # 保持高度缩放不变，按 alpha 重心水平裁切到画布宽度（纵横比不变）
+        keep_w = max(4.0, max_w / max(1e-6, scale))
+        try:
+            alpha = np.asarray(crop.getchannel("A"), dtype=np.float32)
+            col = alpha.sum(axis=0)
+            total = float(col.sum()) or 1.0
+            centroid = float((col * np.arange(len(col))).sum() / total)
+        except Exception:  # noqa: BLE001
+            centroid = cw / 2.0
+        x0 = int(round(_clamp(centroid - keep_w / 2.0, 0.0,
+                              max(0.0, cw - keep_w))))
+        x1 = int(round(min(float(cw), x0 + keep_w)))
+        if x1 - x0 < 4:
+            x0, x1 = 0, cw
+        crop = crop.crop((x0, 0, x1, ch))
+        cw, ch = crop.size
+        scale = float(target_h) / max(1, ch)
+        if cw * scale > max_w:          # 极端宽图兜底：仍等比，略缩小
+            scale = max_w / max(1, cw)
+    nw = max(1, int(round(cw * scale)))
+    nh = max(1, int(round(ch * scale)))
+    crop = crop.resize((nw, nh), Image.LANCZOS)
+    canvas = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    canvas.alpha_composite(crop, (int(round((W - nw) / 2.0)), int(round(H - nh))))
+    return canvas
+
+
+# --------------------------------------------------------------------------- #
 # 角色立绘缓存 / characters_v5 对接
 # --------------------------------------------------------------------------- #
 class _CharacterRenderer:
@@ -1352,6 +1920,11 @@ class _CharacterRenderer:
 
     按 ``(char_key, pose, mouth, blink, sprite_size, flip)`` 懒缓存；来源记录在
     ``source``（``characters_v5`` / ``fallback``）供 meta 与文档核对。
+
+    V5.5.1：非 front 姿态会先过**姿态资产质量门**（`_pose_art_ok`）：
+    构图/长宽比/倾角异常的 AI 姿态（如斜躺/横飞）自动回退 front 立绘，
+    只用体态表演；合格姿态用 `_normalize_pose_sprite` 按内容 bbox 等比
+    归一化到 front 的同一基坐标（消除大小跳变与非等比拉伸）。
     """
 
     def __init__(self) -> None:
@@ -1363,6 +1936,7 @@ class _CharacterRenderer:
         self._blend_cache: dict[tuple, tuple[np.ndarray, np.ndarray]] = {}
         self.source = "fallback"
         self.warnings: list[str] = []
+        self.pose_fallbacks: list[str] = []
 
     def _load_module(self) -> Any:
         if self._module_checked:
@@ -1438,6 +2012,32 @@ class _CharacterRenderer:
                 self.source = "fallback"
         if flip:
             img = img.transpose(Image.FLIP_LEFT_RIGHT)
+        # V5.5.1：姿态立绘质量门 + 内容 bbox 归一化（图片/AI cutout 路径核心修复）
+        mode = pose_art_mode()
+        if pose and pose != "front" and mode != "off":
+            try:
+                ref = self.get(char, style, spr_size, "front", "closed",
+                               bool(blink), flip)
+                if mode == "force":
+                    img = _normalize_pose_sprite(img, ref, tuple(spr_size))
+                else:
+                    ok, why = _pose_art_ok(img, ref)
+                    if ok:
+                        img = _normalize_pose_sprite(img, ref, tuple(spr_size))
+                    else:
+                        tag = f"{char_key}:{pose}:{why}"
+                        if tag not in self.pose_fallbacks:
+                            self.pose_fallbacks.append(tag)
+                            LOG.warning("motion2d: 角色 %s 姿态 %s 资产不合格（%s），"
+                                        "回退 front 立绘（仅体态表演）", char_key, pose, why)
+                        img = ref.copy()
+            except Exception as exc:  # noqa: BLE001
+                LOG.warning("motion2d: 姿态归一化失败（%s），回退 front", exc)
+                try:
+                    img = self.get(char, style, spr_size, "front", "closed",
+                                   bool(blink), flip).copy()
+                except Exception:  # noqa: BLE001
+                    pass
         self._cache[key] = img
         return img
 
@@ -1481,6 +2081,54 @@ class _CharacterRenderer:
         acc_rgb = None
         acc_a = None
         for mouth, w in plan:
+            rgb, alpha = self.arrays(char, style, spr_size, pose, mouth, blink, flip)
+            if acc_rgb is None:
+                acc_rgb = rgb.astype(np.float32) * w
+                acc_a = alpha.astype(np.float32) * w
+            else:
+                acc_rgb += rgb.astype(np.float32) * w
+                acc_a += alpha.astype(np.float32) * w
+        pair = (np.ascontiguousarray(np.clip(acc_rgb, 0, 255).astype(np.uint8)),
+                np.ascontiguousarray(np.clip(acc_a, 0, 255).astype(np.uint8)))
+        self._blend_cache[key] = pair
+        return pair
+
+    def blend_states(self, char: dict, style: dict, spr_size: tuple[int, int],
+                     states: Sequence[tuple[str, str, float]], blink: bool = False,
+                     flip: bool = False) -> tuple[np.ndarray, np.ndarray]:
+        """按 ``[(pose, mouth, weight), ...]`` 混合立绘（V5.5 姿态交叉淡化）。
+
+        单姿态时退化为口型混合（``blend_arrays``），多姿态时组合 pose×mouth 的
+        加权立绘；权重量化到 1/64，结果缓存。
+        """
+        states = [(str(p or "front"), normalize_mouth(m), float(w))
+                  for p, m, w in (states or []) if float(w) > 0.001]
+        total = sum(w for _, _, w in states)
+        if not states or total <= 0:
+            return self.arrays(char, style, spr_size, "front", "closed", blink, flip)
+        states = [(p, m, w / total) for p, m, w in states]
+        if len(states) == 1:
+            pose, mouth, _ = states[0]
+            return self.arrays(char, style, spr_size, pose, mouth, blink, flip)
+        poses = {p for p, _, _ in states}
+        if len(poses) == 1:      # 只换口型 → 走原 blend_arrays（缓存更细）
+            pose = states[0][0]
+            mouth_plan = [(m, w) for _, m, w in states]
+            return self.blend_arrays(char, style, spr_size, pose, mouth_plan,
+                                     blink, flip)
+        char_key = _char_key(char)
+        style_key = (style or {}).get("id") if isinstance(style, dict) else None
+        if style_key is None:
+            style_key = id(style)
+        quant = tuple((p, m, int(round(w * 64))) for p, m, w in states)
+        key = (char_key, bool(blink), bool(flip), int(spr_size[0]), int(spr_size[1]),
+               style_key, quant)
+        hit = self._blend_cache.get(key)
+        if hit is not None:
+            return hit
+        acc_rgb = None
+        acc_a = None
+        for pose, mouth, w in states:
             rgb, alpha = self.arrays(char, style, spr_size, pose, mouth, blink, flip)
             if acc_rgb is None:
                 acc_rgb = rgb.astype(np.float32) * w
@@ -1543,12 +2191,13 @@ def _char_box(entry: dict, size: tuple[int, int]) -> tuple[float, float]:
 
 
 def _char_fade(entry: dict, style: dict | None, t: float, duration: float,
-               fps: float) -> tuple[float, float]:
+               fps: float, suppress_rise: bool = False) -> tuple[float, float]:
     """入场/离场：返回 (alpha 系数 0~1, 入场时的纵向下沉像素)。
 
     默认：镜头开头 ``CHAR_FADE_FRAMES``(8) 帧从 anchor 下方 20px 升起并淡入，
     结尾同帧数淡出。可用条目字段 ``fade_in``/``fade_out``（帧数，0=关）或
     ``style["character_fade"] = false / {"in": 8, "out": 8}`` 覆盖。
+    ``suppress_rise=True``（walk_in 入场时）只做 alpha 淡入，不再从下方升起。
     """
     st = style or {}
     fin = entry.get("fade_in")
@@ -1576,7 +2225,7 @@ def _char_fade(entry: dict, style: dict | None, t: float, duration: float,
     rise = 0.0
     if fin_i > 0 and frame < fin_i:
         fade = (frame + 0.5) / float(fin_i)
-        rise = CHAR_FADE_RISE_PX * (1.0 - fade)
+        rise = 0.0 if suppress_rise else CHAR_FADE_RISE_PX * (1.0 - fade)
     if fout_i > 0 and frame >= frames - fout_i:
         fade_out = max(0.0, (frames - frame - 0.5) / float(fout_i))
         fade = min(fade, fade_out)
@@ -1594,15 +2243,23 @@ def character_state(entry: dict, layerset: _LayerSet, cam: dict, t: float,
     角色条目（契约 §4 ``characters[i]``）::
 
         {"char": <character json>, "style": <style dict>|None, "role": "host",
-         "pose": "front", "mouth_timeline": [(t0, t1, viseme), ...],
+         "pose": "front", "pose_timeline": [[t0, t1, "point"], ...],
+         "mouth_timeline": [(t0, t1, viseme), ...],
          "anchor": (nx, ny), "anchor_space": "scene"|"zone",
          "scale": 1.0, "blink": True, "depth": 0.12,
          "height": 0.62, "flip": False, "breath": True,
          "mouth_strength": 0.85, "mouth_transition": 2,
-         "fade_in": 8, "fade_out": 8, "shadow": True}
+         "fade_in": 8, "fade_out": 8, "shadow": True,
+         # V5.5 表演
+         "pose_transition": 5, "idle_strength": 1.0, "gesture": True,
+         "entrance": "walk_in"|None, "walk_in_frames": 20, "walk_in_from": "left"}
 
     ``anchor_space="zone"`` 时 anchor 视为 **camera.zone 内**的归一化坐标
     （按当前取景窗换算回场景坐标）；默认 ``"scene"``，与 scene_render.anchors 一致。
+
+    V5.5：``pose_timeline`` 按时间切姿态并做 4-6 帧交叉淡化；``idle_strength`` /
+    ``gesture`` 控制可见表演（呼吸/重心/点头侧头/说话前倾）；``entrance="walk_in"``
+    从画面外走入锚点（0.8s，脚步 bob）。
     """
     cache = renderer or _char_renderer()
     char = _char_dict(entry)
@@ -1644,29 +2301,38 @@ def character_state(entry: dict, layerset: _LayerSet, cam: dict, t: float,
             schedule = blink_schedule(duration, seed, role)
             entry["_blink_schedule"] = schedule
         blink = is_blinking(schedule, t)
-    pose = str(entry.get("pose") or "front")
 
-    phase = entry.get("_phase")
-    if phase is None:
-        phase = _char_phase(seed, role)
-        entry["_phase"] = phase
-    speaking = mouth != "closed"
-    micro_x, micro_y = char_micro_motion(t, phase, speaking)
-    if entry.get("breath", True) is False:
-        micro_x = micro_y = 0.0
+    # V5.5：姿态（pose_timeline 优先；无则固定 pose）→ 4-6 帧交叉淡化
+    pose_timeline = entry.get("pose_timeline")
+    pose_plan = pose_plan_at(pose_timeline, t, fps=fps,
+                             transition_frames=int(entry.get("pose_transition",
+                                                             POSE_TRANSITION_FRAMES)),
+                             default=str(entry.get("pose") or "front"))
+    pose = max(pose_plan, key=lambda p: p[1])[0] if pose_plan else "front"
 
     spr_w = max(8, int(round(w_nom * CHAR_SPRITE_SUPERSAMPLE)))
     spr_h = max(8, int(round(h_nom * CHAR_SPRITE_SUPERSAMPLE)))
     flip = bool(entry.get("flip", False))
-    if len(mouth_plan) == 1:
-        rgb, alpha = cache.arrays(char, style, (spr_w, spr_h), pose,
+    if len(pose_plan) == 1 and len(mouth_plan) == 1:
+        rgb, alpha = cache.arrays(char, style, (spr_w, spr_h), pose_plan[0][0],
                                   mouth_plan[0][0], blink, flip)
-    else:
-        rgb, alpha = cache.blend_arrays(char, style, (spr_w, spr_h), pose,
+    elif len(pose_plan) == 1:
+        rgb, alpha = cache.blend_arrays(char, style, (spr_w, spr_h), pose_plan[0][0],
                                         mouth_plan, blink, flip)
+    else:
+        states = [(p, m, wp * wm) for p, wp in pose_plan for m, wm in mouth_plan]
+        rgb, alpha = cache.blend_states(char, style, (spr_w, spr_h), states,
+                                        blink, flip)
 
-    # 入场/离场（开头 6-10 帧从 anchor 下方 20px 升起 + alpha 0→1；结尾淡出）
-    fade, rise_px = _char_fade(entry, style, t, duration, fps)
+    # V5.5 可见表演（呼吸/重心/说话前倾/点头侧头/walk_in）
+    walk_active = str(entry.get("entrance") or "").lower() in (
+        "walk_in", "walkin", "walk")
+    perf = _char_perform(entry, style, t, duration, fps, mouth_plan, pose_plan,
+                         h_nom, width, layerset.size, role=role, seed=seed)
+
+    # 入场/离场（开头 6-10 帧 alpha 0→1；walk_in 时不从下方升起）
+    fade, rise_px = _char_fade(entry, style, t, duration, fps,
+                               suppress_rise=walk_active)
 
     # 相机：角色默认贴中景平面
     gain = float(cam.get("parallax_eff") or cam.get("parallax") or DEFAULT_PARALLAX)
@@ -1675,35 +2341,122 @@ def character_state(entry: dict, layerset: _LayerSet, cam: dict, t: float,
     ratio = _parallax_ratio(depth, layerset.depth_ref, gain)
     zoom, cam_dx, cam_dy, cam_shear = _plane_motion(cam, ratio)
 
-    base_x = ax * width - w_nom / 2.0 + micro_x * scale
-    base_y = ay * height - h_nom + micro_y * scale + rise_px
-    kx = zoom * (w_nom / spr_w)
-    ky = zoom * (h_nom / spr_h)
-    tx = (base_x - width / 2.0) * zoom + width / 2.0 + cam_dx
-    ty = (base_y - height / 2.0) * zoom + height / 2.0 + cam_dy
-    m = np.array([[kx, cam_shear * ky,
-                   tx + cam_shear * (ty - height / 2.0 - cam_dy)],
-                  [0.0, ky, ty]], dtype=np.float64)
-
-    # 落地软阴影（脚底锚点 + 相机变换后）
-    foot_x = (ax * width - width / 2.0) * zoom + width / 2.0 + cam_dx + micro_x * zoom
-    foot_y = ((ay * height + rise_px) - height / 2.0) * zoom + height / 2.0 + cam_dy
-    if cam_shear:
-        foot_x += cam_shear * (foot_y - height / 2.0 - cam_dy)
+    # 角色基准点（脚底中心）+ 表演偏移 → 相机变换 → 精灵仿射
+    m, foot_x, foot_y, shadow_base = _char_placement(
+        ax, ay, width, height, w_nom, h_nom, spr_w, spr_h, perf, rise_px,
+        (zoom, cam_dx, cam_dy, cam_shear))
     shadow_on = entry.get("shadow")
     if shadow_on is None:
         shadow_on = (style or {}).get("character_shadow", True)
     shadow = None
-    if shadow_on and fade > 0.02:
-        shadow = (w_nom * zoom * 1.02, max(6.0, h_nom * zoom * 0.052), fade)
+    if shadow_on and fade > 0.02 and shadow_base is not None:
+        shadow = (shadow_base[0], shadow_base[1], fade)
     return {
         "role": role, "rgb": rgb, "alpha": alpha, "matrix": m,
         "spr_size": (spr_w, spr_h), "pose": pose, "mouth": mouth, "blink": blink,
-        "mouth_plan": mouth_plan, "alpha_mul": float(fade),
+        "mouth_plan": mouth_plan, "pose_plan": pose_plan,
+        "alpha_mul": float(fade), "performance": perf,
         "depth": depth, "anchor": (ax, ay), "scale": scale,
         "foot": (foot_x, foot_y), "shadow": shadow,
     }
 
+
+def _char_placement(ax: float, ay: float, width: int, height: int,
+                    w_nom: float, h_nom: float, spr_w: int, spr_h: int,
+                    perf: dict, rise_px: float,
+                    cam_motion: tuple[float, float, float, float]
+                    ) -> tuple[np.ndarray, float, float, tuple[float, float] | None]:
+    """角色锚点 + 表演偏移 → 相机变换 → 精灵仿射矩阵 / 脚底点 / 阴影尺寸。"""
+    zoom, cam_dx, cam_dy, cam_shear = cam_motion
+    anchor_px = ax * width + perf["dx"] + perf.get("walk_x", 0.0)
+    anchor_py = ay * height + perf["dy"] + rise_px
+    anchor_sx = (anchor_px - width / 2.0) * zoom + width / 2.0 + cam_dx
+    anchor_sy = (anchor_py - height / 2.0) * zoom + height / 2.0 + cam_dy
+    kx = zoom * (w_nom / spr_w) * perf["sx"]
+    ky = zoom * (h_nom / spr_h) * perf["sy"]
+    shear_total = cam_shear + perf["shear"]
+    ty = anchor_sy - ky * spr_h
+    tx = (anchor_sx - kx * spr_w / 2.0
+          + shear_total * (ty - height / 2.0 - cam_dy))
+    m = np.array([[kx, shear_total * ky, tx], [0.0, ky, ty]], dtype=np.float64)
+    shadow = (w_nom * zoom * perf["sx"] * 1.02, max(6.0, zoom * h_nom * 0.052))
+    return m, anchor_sx, anchor_sy, shadow
+
+
+def _image_character_state(entry: dict, layerset: _LayerSet, cam: dict, t: float,
+                           duration: float, seed: int = 0, fps: float = 25.0,
+                           default_style: dict | None = None) -> dict:
+    """图片立绘（cutout）角色的单帧状态：pose_timeline + 可见表演 + 相机变换。
+
+    与 ``character_state`` 的区别只在立绘来源（``entry["images"]`` / ``image`` /
+    assets 姿态变体 / ``v5_art.character_pose_art``），矩阵/表演/淡入淡出逻辑一致。
+    """
+    width, height = layerset.size
+    role = str(entry.get("role") or "char")
+    style = entry.get("style") or default_style or {}
+    front = _pose_image_pil(entry, "front")
+    aspect = front.size[0] / max(1.0, float(front.size[1]))
+    scale = float(entry.get("scale", 1.0) or 1.0)
+    h_frac = float(entry.get("height", CHAR_DEFAULT_HEIGHT) or CHAR_DEFAULT_HEIGHT)
+    h_nom = max(8.0, h_frac * height * scale)
+    w_nom = max(8.0, h_nom * aspect)
+    spr_w = max(8, int(round(w_nom)))
+    spr_h = max(8, int(round(h_nom)))
+
+    pose_plan = pose_plan_at(entry.get("pose_timeline"), t, fps=fps,
+                             transition_frames=int(entry.get("pose_transition",
+                                                             POSE_TRANSITION_FRAMES)),
+                             default=str(entry.get("pose") or "front"))
+    pose = max(pose_plan, key=lambda p: p[1])[0] if pose_plan else "front"
+    rgb, alpha = _blend_image_poses(entry, pose_plan, (spr_w, spr_h))
+
+    mouth_plan = mouth_plan_at(entry.get("mouth_timeline"), t, fps=fps,
+                               strength=entry.get("mouth_strength"),
+                               default=entry.get("mouth", "closed"))
+    mouth = max(mouth_plan, key=lambda p: p[1])[0] if mouth_plan else "closed"
+
+    walk_active = str(entry.get("entrance") or "").lower() in (
+        "walk_in", "walkin", "walk")
+    perf = _char_perform(entry, style, t, duration, fps, mouth_plan, pose_plan,
+                         h_nom, width, layerset.size, role=role, seed=seed)
+    fade, rise_px = _char_fade(entry, style, t, duration, fps,
+                               suppress_rise=walk_active)
+
+    pos = entry.get("pos") or entry.get("anchor") or (0.5, 0.92)
+    try:
+        ax, ay = float(pos[0]), float(pos[1])
+    except (TypeError, ValueError, IndexError):
+        ax, ay = 0.5, 0.92
+    if abs(ax) > 1.5 or abs(ay) > 1.5:      # 像素坐标 → 归一化
+        ax, ay = ax / width, ay / height
+    if str(entry.get("anchor_space") or "scene").lower() == "zone":
+        zone = cam.get("zone")
+        if zone:
+            zx, zy, zw, zh = (float(v) for v in zone)
+            ax, ay = zx + ax * zw, zy + ay * zh
+
+    gain = float(cam.get("parallax_eff") or cam.get("parallax") or DEFAULT_PARALLAX)
+    depth = float(entry.get("depth") or 0.12)
+    ratio = _parallax_ratio(depth, layerset.depth_ref, gain)
+    plane = _plane_motion(cam, ratio)
+    m, foot_x, foot_y, shadow_base = _char_placement(
+        ax, ay, width, height, w_nom, h_nom, spr_w, spr_h, perf, rise_px, plane)
+    alpha_mul = float(fade) * float(entry.get("alpha", 1.0) or 1.0)
+    shadow_on = entry.get("shadow")
+    if shadow_on is None:
+        shadow_on = (style or {}).get("character_shadow", True)
+    shadow = None
+    if shadow_on and alpha_mul > 0.02 and shadow_base is not None:
+        shadow = (shadow_base[0], shadow_base[1], alpha_mul)
+    return {
+        "role": role, "rgb": rgb, "alpha": alpha, "matrix": m,
+        "spr_size": (spr_w, spr_h), "pose": pose, "mouth": mouth, "blink": False,
+        "mouth_plan": mouth_plan, "pose_plan": pose_plan,
+        "alpha_mul": alpha_mul, "performance": perf,
+        "depth": depth, "anchor": (ax, ay), "scale": scale,
+        "foot": (foot_x, foot_y), "shadow": shadow,
+        "image_entry": True,
+    }
 
 def _resolve_characters_state(characters_state: Any, layerset: _LayerSet,
                               cam: dict, t: float, duration: float,
@@ -1726,52 +2479,14 @@ def _resolve_characters_state(characters_state: Any, layerset: _LayerSet,
         if "matrix" in entry and "rgb" in entry:      # 已解析状态
             out.append(entry)
             continue
-        if entry.get("image") is not None:            # 直接贴图（cutout 立绘）
-            img = _to_image(entry["image"], "character.image").convert("RGBA")
-            # 可选整体缩放：height（占画面高度比例）优先，否则 scale（倍率）
+        if entry.get("image") is not None or entry.get("images") \
+                or entry.get("pose_images"):     # 图片立绘（cutout，支持姿态变体）
             try:
-                target_h = entry.get("height")
-                if target_h:
-                    th = max(8, int(round(float(target_h) * height)))
-                    tw = max(1, int(round(th * img.size[0] / float(img.size[1]))))
-                    img = img.resize((tw, th), Image.LANCZOS)
-                else:
-                    sc = float(entry.get("scale", 1.0) or 1.0)
-                    if abs(sc - 1.0) > 1e-3:
-                        img = img.resize((max(1, int(round(img.size[0] * sc))),
-                                          max(1, int(round(img.size[1] * sc)))),
-                                         Image.LANCZOS)
-            except (TypeError, ValueError, ZeroDivisionError):
-                pass
-            arr = np.asarray(img, dtype=np.uint8)
-            pos = entry.get("pos") or entry.get("anchor") or (0.5, 0.9)
-            try:
-                px, py = float(pos[0]), float(pos[1])
-            except (TypeError, ValueError, IndexError):
-                px, py = 0.5, 0.9
-            if abs(px) <= 1.5 and abs(py) <= 1.5:
-                px, py = px * width, py * height
-            # 相机变换（与真实角色一致：绕锚点缩放 + 视差位移 + 切变）
-            gain_i = float(cam.get("parallax_eff") or cam.get("parallax")
-                           or DEFAULT_PARALLAX)
-            depth_i = float(entry.get("depth") or 0.12)
-            ratio_i = _parallax_ratio(depth_i, layerset.depth_ref, gain_i)
-            z_i, dx_i, dy_i, sh_i = _plane_motion(cam, ratio_i)
-            base_x = px - img.size[0] / 2.0
-            base_y = py - img.size[1]
-            tx = (base_x - width / 2.0) * z_i + width / 2.0 + dx_i
-            ty = (base_y - height / 2.0) * z_i + height / 2.0 + dy_i
-            out.append({
-                "role": str(entry.get("role") or "char"),
-                "rgb": np.ascontiguousarray(arr[:, :, :3]),
-                "alpha": np.ascontiguousarray(arr[:, :, 3]),
-                "matrix": np.array(
-                    [[z_i, sh_i * z_i, tx + sh_i * (ty - height / 2.0 - dy_i)],
-                     [0.0, z_i, ty]], dtype=np.float64),
-                "spr_size": img.size, "pose": "front", "mouth": "closed",
-                "blink": False, "depth": depth_i,
-                "alpha_mul": float(entry.get("alpha", 1.0) or 1.0),
-            })
+                out.append(_image_character_state(entry, layerset, cam, t, duration,
+                                                  seed, fps=fps,
+                                                  default_style=default_style))
+            except V5Error as exc:
+                LOG.warning("motion2d: 角色 %s 图片立绘失败（%s），跳过", entry.get("role"), exc)
             continue
         if not entry.get("_resolved_copy"):
             entry = dict(entry)
@@ -2677,8 +3392,25 @@ def render_shot(layers: dict, characters: list[dict], camera: dict,
                         "fade_out": e.get("fade_out", CHAR_FADE_FRAMES),
                         "mouth_strength": e.get("mouth_strength",
                                                 style.get("mouth_strength",
-                                                          mouth_strength))}
+                                                          mouth_strength)),
+                        # V5.5 表演
+                        "poses": sorted({str(p) for p in
+                                         (x[2] for x in (e.get("pose_timeline") or [])
+                                          if isinstance(x, (list, tuple)) and len(x) > 2)}
+                                        or {str(e.get("pose") or "front")}),
+                        "idle_strength": e.get("idle_strength", PERFORM_IDLE_STRENGTH),
+                        "gesture": bool(e.get("gesture", True)),
+                        "entrance": e.get("entrance")}
                        for e in char_entries],
+        "performance": {"idle_strength": PERFORM_IDLE_STRENGTH,
+                        "gesture": True,
+                        "shear_cap": PERFORM_MAX_SHEAR,
+                        "scale_range": list(PERFORM_SCALE_RANGE),
+                        "pose_transition_frames": POSE_TRANSITION_FRAMES,
+                        "breath_frac": PERFORM_BREATH_FRAC,
+                        "sway_frac": PERFORM_SWAY_FRAC,
+                        "lean_frac": PERFORM_LEAN_FRAC,
+                        "gesture_interval": list(GESTURE_INTERVAL)},
         "mouth": {"strength": mouth_strength if mouth_strength is not None
                               else style.get("mouth_strength", MOUTH_DEFAULT_STRENGTH),
                   "transition_frames": MOUTH_TRANSITION_FRAMES,
@@ -2686,6 +3418,8 @@ def render_shot(layers: dict, characters: list[dict], camera: dict,
         "char_source": renderer.source,
         "char_sprites": renderer.cache_size,
         "char_warnings": list(renderer.warnings),
+        "pose_art": {"mode": pose_art_mode(),
+                     "fallbacks": list(getattr(renderer, "pose_fallbacks", []))},
         "seed": seed,
         "codec": "h264",
         "pix_fmt": "yuv420p",
@@ -2747,6 +3481,11 @@ __all__ = [
     "is_blinking",
     "normalize_fx",
     "reset_character_cache",
+    # V5.5 角色表演
+    "POSE_TRANSITION_FRAMES",
+    "POSE_ACT",
+    "pose_at",
+    "pose_plan_at",
 ]
 
 

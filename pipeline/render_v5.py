@@ -478,6 +478,35 @@ SIZE_CHAR_SCALE = {
 }
 
 
+def eget(m: dict, key: str, default=None):
+    return (m or {}).get(key, default)
+
+
+POINT_WORDS = ("这", "那", "看", "指", "地图", "这里", "那里", "我们", "你",
+               "这面", "这条", "那个", "这个", "场上", "镜头", "前面")
+THINK_WORDS = ("为什么", "怎么", "是否", "想", "觉得", "难", "问题", "能不能",
+               "是不是", "到底", "凭什么", "怎么办", "原因", "答案")
+
+
+def _pose_timeline(line: str, duration: float) -> list:
+    """按台词给说话角色一个表演节拍：front → 手势/情绪 → front。"""
+    text = str(line or "")
+    if not text or duration < 1.2:
+        return []
+    if any(w in text for w in POINT_WORDS):
+        act = "point"
+    elif any(w in text for w in THINK_WORDS):
+        act = "think"
+    else:
+        act = "lean_in"
+    dur = float(duration)
+    t0 = round(min(0.9, dur * 0.22), 2)
+    t1 = round(min(dur - 0.7, t0 + max(1.2, dur * 0.28)), 2)
+    if t1 <= t0 + 0.3:
+        return []
+    return [[0.0, t0, "front"], [t0, t1, act], [t1, dur, "front"]]
+
+
 def _fit_character_in_zone(anchor, rect, char_height: float,
                            *, top_pad: float = 0.02, bottom_pad: float = 0.02):
     """让角色（脚点 anchor_y、身高 char_height）完整落在 camera zone 内。
@@ -622,13 +651,31 @@ def render_shot_clips(plan: dict, catalog: dict, style: dict, paths: dict,
             size_scale = SIZE_CHAR_SCALE.get(str(edit.get("shot_size") or ""), 1.0)
             char_height = min(0.95, char_height * size_scale)
             anchor, char_height = _fit_character_in_zone(anchor, zone_rect, char_height)
-            chars_spec.append({"char": char, "role": role, "pose": "front",
-                               "mouth_timeline": mouth, "anchor": anchor,
-                               "scale": float(shot.get("scale") or 1.0),
-                               "height": round(char_height, 3),
-                               "mouth_strength": 0.85,
-                               "fade_in": 8, "fade_out": 8,
-                               "blink": True, "speaking": role == shot.get("role")})
+            speaking = role == shot.get("role") and bool(str(shot.get("line") or "").strip())
+            perform = str(os.environ.get("V55_PERFORM", "")).lower() in ("1", "true", "yes")
+            entry = {"char": char, "role": role, "pose": "front",
+                     "mouth_timeline": mouth, "anchor": anchor,
+                     "scale": float(shot.get("scale") or 1.0),
+                     "height": round(char_height, 3),
+                     "mouth_strength": 0.85,
+                     "fade_in": 8, "fade_out": 8,
+                     "blink": True,
+                     "idle_strength": 1.0 if perform else 0.0,
+                     "gesture": perform,
+                     "speaking": speaking}
+            shot_line = str(shot.get("line") or "").strip()
+            if perform and speaking and shot_line:
+                pt = _pose_timeline(shot_line, dur)
+                if pt:
+                    entry["pose_timeline"] = pt
+            # 首次出场（前 2 镜且有角色）从画面外走入，替代默认上浮
+            first_appearance = i <= 1 and not any(
+                str(x.get("character")) == str(char.get("id")) for x in
+                [s0 for s0 in shots[:i] if s0.get("character")])
+            if perform and first_appearance and not speaking and not eget(shot, "insert"):
+                entry["entrance"] = "walk_in"
+                entry["walk_in_from"] = ("left" if (anchor and anchor[0] < 0.5) else "right")
+            chars_spec.append(entry)
         if prog and i % 2 == 0:
             prog(22 + 55.0 * i / max(1, len(shots)), f"逐镜动画 {i + 1}/{len(shots)}")
         t0 = time.time()
@@ -712,6 +759,16 @@ def assemble(plan: dict, catalog: dict, style: dict, paths: dict, prog) -> dict:
                 shots, clip_paths, paths["workdir"], FPS, FINAL_W, FINAL_H, total,
                 transition=t_style, transition_duration=TRANSITION_DUR, prog=prog)
         transition = {"mode": transition[0], "style": transition[1]}
+    # 关键：final_encode 读取 workdir/video_raw.mp4；把本次拼好的视频同步到该文件名，
+    # 避免使用上一轮遗留的 video_raw.mp4（否则 per-cut 转场不会进入成片）。
+    try:
+        import shutil as _shutil
+        target = Path(paths["workdir"]) / "video_raw.mp4"
+        if Path(video_raw).resolve() != target.resolve():
+            _shutil.copy2(video_raw, target)
+        LOG.info("video_raw 同步: %s -> %s", video_raw, target)
+    except Exception as exc:  # noqa: BLE001
+        LOG.warning("video_raw 同步失败: %s", exc)
     LOG.info("video_raw: %s (%.2fs)", video_raw, utils.probe_duration(video_raw))
 
     # 字幕：优先风格化 subtitle_ass，否则 ass_builder
