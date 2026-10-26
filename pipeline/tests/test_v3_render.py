@@ -599,7 +599,7 @@ def _namespace(tmp_path: Path, **overrides):
                 out=str(tmp_path / "final.mp4"),
                 workdir=str(tmp_path / "work"),
                 seed=20261026, force=True, limit=None,
-                fallback_static=False, width=1280, height=720)
+                fallback_static=False, width=1280, height=720, legacy_audio=True)
     base.update(overrides)
     return argparse.Namespace(**base)
 

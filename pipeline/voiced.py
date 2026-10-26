@@ -362,7 +362,9 @@ def prepare_and_pace(plan: dict, workdir: Path, prog=None, force: bool = False) 
     meta["speech_driven"] = True
     meta["lead_sec"] = LEAD_SEC
     meta["tail_sec"] = TAIL_SEC
-    meta["voice_provider"] = meta.get("voice_provider", "breeze")
+    providers = sorted({str(v.get("provider")) for v in voice_by_sid.values()
+                        if v.get("provider")})
+    meta["voice_provider"] = providers[0] if providers else meta.get("voice_provider", "breeze")
     meta["speech_shots"] = sum(1 for s in new_shots if s.get("speech_duration"))
     meta["splits"] = splits
     meta["atempo_max"] = 1.0
