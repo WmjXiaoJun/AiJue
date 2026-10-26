@@ -74,5 +74,10 @@
     "instruction": "42岁男性，成熟磁性，略带鼻音，半开玩笑的调侃语气，节奏稳",
     "seed": 20262013,
     "cfg_scale": 4.0
+  },
+  "art": {
+    "portrait": "assets/v5/characters/laozhou/portrait.png",
+    "front": "assets/v5/characters/laozhou/front.png",
+    "cutout": "assets/v5/characters/laozhou/cutout.png"
   }
 }

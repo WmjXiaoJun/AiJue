@@ -40,6 +40,7 @@ import math
 import random
 import re
 import time
+import zlib
 from pathlib import Path
 
 import numpy as np
@@ -1035,9 +1036,18 @@ def apply_finish(img: Image.Image, style: dict, kind: str = "plate") -> Image.Im
     techniques = [str(t) for t in (style.get("technique") or [])]
     if not techniques:  # 从 style.id / texture 猜一个主 technique
         techniques = [t for t in TECHNIQUES if t in str(style.get("id") or "")]
-    for tech in TECHNIQUES:
-        if tech in techniques:
-            out = _technique_fx(out, style, params, tech, kind)
+    # V5.2：AI 素材走强化链路（plate 强处理 / character 中强度且脸安全）；
+    # 程序化素材继续走旧强度（不改变旧路径观感）。
+    ai_plate = kind == "plate" and bool(techniques) and looks_like_ai_art(source)
+    if ai_plate:
+        out = _ai_plate_finish(out, style, params, techniques)
+        params = _ai_overlay_params(params)  # 强链路已含纹理/暗角/颗粒，避免双层叠加
+    elif kind == "character" and techniques:
+        out = _ai_character_finish(out, style, params, techniques)
+    else:
+        for tech in TECHNIQUES:
+            if tech in techniques:
+                out = _technique_fx(out, style, params, tech, kind)
 
     # ---- 通用叠加 ----
     scale = 0.55 if kind == "character" else 1.0
@@ -1123,8 +1133,846 @@ def apply_finish(img: Image.Image, style: dict, kind: str = "plate") -> Image.Im
 
 
 # ===========================================================================
-# 5. ffmpeg 调色链（grade_filter）
+# 4b. V5.2 AI 素材风格化（AI plate / AI 立绘专用强处理）
+# ---------------------------------------------------------------------------
+# 背景：V5.2 起场景/角色换成 SDXL 动漫美术（assets/v5/...）。同一张 AI 素材如果
+# 只走旧版轻微调色，16 个风格会像同一部片。本节给 AI plate 叠加**强影像处理**，
+# 由 style.technique 分派；程序化 fallback 继续走 §4 的旧强度（行为不变）。
+#   - 仅 plate 路径（AI 检测命中）启用强处理；角色立绘用中强度、脸/嘴安全版本；
+#   - 全部随机量由 style.id 派生 seed（确定性：同素材+同风格=同输出）；
+#   - 只读 style JSON 的 finish/palette，不新增契约字段。
 # ===========================================================================
+_V52_SEED = 20261026
+
+
+def _stable_seed(style: dict, salt: str = "") -> int:
+    """style.id 派生的确定性 seed（同风格同 salt 永远一致）。"""
+    style = style if isinstance(style, dict) else {}
+    key = f"{style.get('id') or style.get('style') or 'style'}|{salt}|{_V52_SEED}"
+    return int(zlib.crc32(key.encode("utf-8")) & 0xFFFFFFFF)
+
+
+def looks_like_ai_art(img: Image.Image) -> bool:
+    """粗判是否 AI/SDXL 绘景（用于启用 V5.2 强风格化）。
+
+    特征：160×90 缩略图的唯一色数 + 高频能量（相对高斯模糊的残差）+ 拉普拉斯均值。
+    实测：AI plate uniq≈9k-13k / hf≈14-19 / lap≈26-33；程序化 plate uniq≈2.5k-6.5k /
+    hf≈7.5-10.4 / lap≈14-18。阈值取中间，程序化路径维持旧强度。
+    """
+    try:
+        small = img.convert("RGB").resize((160, 90), Image.BILINEAR)
+        arr = np.asarray(small, dtype=np.float32)
+        uniq = int(len(np.unique(np.asarray(small, dtype=np.uint8).reshape(-1, 3), axis=0)))
+        blur = np.asarray(small.filter(ImageFilter.GaussianBlur(2.0)), dtype=np.float32)
+        hf = float(np.abs(arr - blur).mean())
+        luma = arr.mean(axis=2)
+        lap = float(np.abs(4.0 * luma[1:-1, 1:-1] - luma[:-2, 1:-1] - luma[2:, 1:-1]
+                           - luma[1:-1, :-2] - luma[1:-1, 2:]).mean())
+    except Exception:  # noqa: BLE001 - 判定失败回退程序化路径
+        return False
+    return (uniq >= 8000 and hf >= 12.0) or (uniq >= 12000 and lap >= 24.0)
+
+
+# ---- 通用影像工具（全部保持 alpha；确定性 seed 由调用方传入）-------
+def _rgb_op(img: Image.Image, op) -> Image.Image:
+    """对 RGB 做处理并保留原 alpha（RGB 输入原样返回 RGB）。"""
+    has_alpha = img.mode == "RGBA"
+    alpha = img.getchannel("A") if has_alpha else None
+    rgb = op(img.convert("RGB"))
+    if rgb.mode != "RGB":
+        rgb = rgb.convert("RGB")
+    if not has_alpha:
+        return rgb
+    out = rgb.convert("RGBA")
+    out.putalpha(alpha)
+    return out
+
+
+def _duotone_rgb(rgb: Image.Image, dark, light, strength: float = 1.0) -> Image.Image:
+    """RGB 图按亮度映射到双色渐变（strength<1 时与原图混合）。"""
+    l = np.asarray(rgb.convert("L"), dtype=np.float32) / 255.0
+    d = np.array(tuple(int(v) for v in dark[:3]), dtype=np.float32)
+    h = np.array(tuple(int(v) for v in light[:3]), dtype=np.float32)
+    arr = d[None, None, :] * (1.0 - l[..., None]) + h[None, None, :] * l[..., None]
+    duo = Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8), "RGB")
+    if strength >= 0.999:
+        return duo
+    return Image.blend(rgb, duo, max(0.0, min(1.0, float(strength))))
+
+
+def _tone_map(img: Image.Image, dark, light, strength: float = 1.0) -> Image.Image:
+    return _rgb_op(img, lambda rgb: _duotone_rgb(rgb, dark, light, strength))
+
+
+def _curve_lut(img: Image.Image, contrast: float = 1.0, gamma: float = 1.0,
+               shadows: float = 0.0, highlights: float = 1.0,
+               pivot: float = 0.5) -> Image.Image:
+    """LUT 曲线：对比/伽马/抬黑/压高光（一次 point 完成）。"""
+    def op(rgb: Image.Image) -> Image.Image:
+        x = np.arange(256, dtype=np.float32) / 255.0
+        y = np.clip((x - pivot) * float(contrast) + pivot, 0.0, 1.0) ** float(gamma)
+        y = y * float(highlights) + float(shadows) * (1.0 - y)
+        lut = np.clip(y * 255.0, 0, 255).astype(np.uint8).tolist()
+        return rgb.point(lut * 3)
+    return _rgb_op(img, op)
+
+
+def _limit_colors(img: Image.Image, colors: int = 6, blend: float = 0.6,
+                  dither: bool = False) -> Image.Image:
+    """平涂限色（木刻/拼贴）：中位切分量化后与��图混合。"""
+    def op(rgb: Image.Image) -> Image.Image:
+        method = Image.Dither.FLOYDSTEINBERG if dither else Image.Dither.NONE
+        q = rgb.quantize(colors=max(2, int(colors)), method=Image.Quantize.MEDIANCUT,
+                         dither=method).convert("RGB")
+        return Image.blend(rgb, q, max(0.0, min(1.0, float(blend))))
+    return _rgb_op(img, op)
+
+
+def _luma_posterize(img: Image.Image, levels: int = 6, blend: float = 0.5) -> Image.Image:
+    """按亮度色阶压平（水墨块面/版画），保留色相。"""
+    def op(rgb: Image.Image) -> Image.Image:
+        arr = np.asarray(rgb, dtype=np.float32)
+        l = arr.mean(axis=2, keepdims=True) / 255.0
+        steps = max(2, int(levels)) - 1
+        q = np.round(l * steps) / steps
+        out = np.clip(arr * (q / np.maximum(l, 1e-3)), 0, 255).astype(np.uint8)
+        poster = Image.fromarray(out, "RGB")
+        return Image.blend(rgb, poster, max(0.0, min(1.0, float(blend))))
+    return _rgb_op(img, op)
+
+
+def _split_tone(img: Image.Image, shadow_color, highlight_color,
+                strength: float = 0.4) -> Image.Image:
+    """分离色调：暗部→shadow_color，亮部→highlight_color。"""
+    def op(rgb: Image.Image) -> Image.Image:
+        arr = np.asarray(rgb, dtype=np.float32)
+        l = (arr.mean(axis=2, keepdims=True) / 255.0)
+        d = np.array(tuple(int(v) for v in shadow_color[:3]), dtype=np.float32)
+        h = np.array(tuple(int(v) for v in highlight_color[:3]), dtype=np.float32)
+        tone = d[None, None, :] * (1.0 - l) + h[None, None, :] * l
+        s = max(0.0, min(1.0, float(strength)))
+        out = arr * (1.0 - s) + tone * s
+        return Image.fromarray(np.clip(out, 0, 255).astype(np.uint8), "RGB")
+    return _rgb_op(img, op)
+
+
+def _hard_edges(img: Image.Image, color, threshold: float = 24.0, thickness: int = 1,
+                alpha: int = 220, seed: int = 0, blur: float = 0.4,
+                jitter: float = 0.5) -> Image.Image:
+    """粗黑刻线（版画/蚀刻）：阈值边缘 + 飞白抖动 + 加粗。"""
+    def op(rgb: Image.Image) -> Image.Image:
+        w, h = rgb.size
+        luma = rgb.convert("L").filter(ImageFilter.GaussianBlur(max(0.0, float(blur))))
+        edges = luma.filter(ImageFilter.FIND_EDGES).point(
+            lambda v: 255 if v > float(threshold) else 0)
+        if thickness > 1:
+            edges = edges.filter(ImageFilter.MaxFilter(int(thickness) * 2 + 1))
+        if jitter > 0.02:
+            n = scene_render.smooth_noise(max(8, w // 4), max(8, h // 4),
+                                          scale=max(3.0, min(w, h) * 0.035),
+                                          seed=seed, octaves=3)
+            n_img = Image.fromarray((np.clip(n, 0, 1) * 255).astype(np.uint8), "L").resize(
+                (w, h), Image.BILINEAR)
+            edges = ImageChops.multiply(
+                edges, n_img.point(lambda v: int(90 + v * (165.0 / 255.0) * float(jitter))))
+        layer = scene_render.mask_layer((w, h), edges,
+                                        tuple(int(c) for c in color[:3]) + (int(alpha),))
+        base = rgb.convert("RGBA")
+        base.alpha_composite(layer)
+        return base.convert("RGB")
+    return _rgb_op(img, op)
+
+
+def _edge_glow(img: Image.Image, color_a, color_b, threshold: float = 28.0,
+               radius: float = 5.0, strength: float = 0.7) -> Image.Image:
+    """霓虹描边光：边缘 → 双色泛光（glow + 硬芯）。"""
+    def op(rgb: Image.Image) -> Image.Image:
+        w, h = rgb.size
+        luma = rgb.convert("L").filter(ImageFilter.GaussianBlur(0.5))
+        edges = luma.filter(ImageFilter.FIND_EDGES).point(
+            lambda v: 255 if v > float(threshold) else 0)
+        soft = edges.filter(ImageFilter.GaussianBlur(max(1.0, float(radius)))).point(
+            lambda v: int(v * min(1.0, float(strength))))
+        base = rgb.convert("RGBA")
+        base.alpha_composite(scene_render.mask_layer(
+            (w, h), soft, tuple(int(c) for c in color_a[:3]) + (255,)))
+        base.alpha_composite(scene_render.mask_layer(
+            (w, h), edges, tuple(int(c) for c in color_b[:3]) + (200,)))
+        return base.convert("RGB")
+    return _rgb_op(img, op)
+
+
+def _wet_bleed(img: Image.Image, color, strength: float = 0.6, seed: int = 0) -> Image.Image:
+    """湿边/洇墨：边缘扩散到两侧，低饱和冷色晕开（水墨）。"""
+    def op(rgb: Image.Image) -> Image.Image:
+        w, h = rgb.size
+        edges = rgb.convert("L").filter(ImageFilter.GaussianBlur(0.4)).filter(
+            ImageFilter.FIND_EDGES)
+        edges = edges.filter(ImageFilter.GaussianBlur(max(2.0, min(w, h) * 0.004)))
+        edges = edges.point(lambda v: int(v * min(1.0, float(strength)) * 0.55))
+        layer = scene_render.mask_layer((w, h), edges,
+                                        tuple(int(c) for c in color[:3]) + (255,))
+        base = rgb.convert("RGBA")
+        base.alpha_composite(layer)
+        return base.convert("RGB")
+    return _rgb_op(img, op)
+
+
+def _blinds(img: Image.Image, color, count: int = 9, strength: float = 0.35,
+            seed: int = 0, angle: float = 12.0) -> Image.Image:
+    """百叶窗硬光带（noir / baroque 用）。"""
+    def op(rgb: Image.Image) -> Image.Image:
+        w, h = rgb.size
+        layer = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(layer)
+        band = max(4.0, h / (count * 2.6))
+        alpha = int(255 * max(0.0, min(0.9, float(strength))))
+        step = h / float(max(1, count))
+        for i in range(count):
+            y = i * step + step * 0.22
+            draw.line([(-w * 0.1, y - band * 0.5), (w * 1.1, y - band * 0.5 + math.tan(
+                math.radians(angle)) * w)],
+                fill=tuple(int(c) for c in color[:3]) + (alpha,), width=int(band))
+        layer = layer.filter(ImageFilter.GaussianBlur(max(2.0, h * 0.006)))
+        base = rgb.convert("RGBA")
+        base.alpha_composite(layer)
+        return base.convert("RGB")
+    return _rgb_op(img, op)
+
+
+def _candle_light(img: Image.Image, style: dict, strength: float = 0.8,
+                  seed: int = 0) -> Image.Image:
+    """烛光照明：上方暖色光晕 + 强暗角 + 暗部冷褐（baroque / 烛光室内）。"""
+    def op(rgb: Image.Image) -> Image.Image:
+        w, h = rgb.size
+        warm = _rgb(style, "accent", fallback="highlight")
+        glow = scene_render.glow_layer(
+            (w, h), [(w * 0.5, h * 0.30, w * 0.42, h * 0.44,
+                      max(0.0, min(1.5, float(strength))))],
+            tuple(int(c) for c in warm[:3]) + (255,), power=1.7, downscale=6)
+        base = rgb.convert("RGBA")
+        base.alpha_composite(glow)
+        out = base.convert("RGB")
+        out = _duotone_rgb(out, _mix(_rgb(style, "shadow", fallback="bg"), (20, 10, 4), 0.5),
+                           _mix(_rgb(style, "highlight", fallback="paper"),
+                                (255, 214, 150), 0.5), 0.30)
+        return out
+    return _rgb_op(img, op)
+
+
+def _spotlight(img: Image.Image, color, strength: float = 0.8,
+               cx: float = 0.5, cy: float = 0.34) -> Image.Image:
+    """博物馆聚光：中心提亮 + 四周压暗。"""
+    def op(rgb: Image.Image) -> Image.Image:
+        w, h = rgb.size
+        glow = scene_render.glow_layer(
+            (w, h), [(w * cx, h * cy, w * 0.40, h * 0.42,
+                      max(0.0, min(1.5, float(strength))))],
+            tuple(int(c) for c in color[:3]) + (255,), power=1.4, downscale=6)
+        base = rgb.convert("RGBA")
+        base.alpha_composite(glow)
+        return base.convert("RGB")
+    return _rgb_op(img, op)
+
+
+def _tilt_blur(img: Image.Image, strength: float = 0.5) -> Image.Image:
+    """移轴/黏土微缩感：上下轻模糊、中间清晰。"""
+    def op(rgb: Image.Image) -> Image.Image:
+        w, h = rgb.size
+        blurred = rgb.filter(ImageFilter.GaussianBlur(max(1.0, min(w, h) * 0.012)))
+        sw, sh = 64, 36
+        yy = np.mgrid[0:sh, 0:sw][0].astype(np.float32) / max(1, sh - 1)
+        mask = np.clip((np.abs(yy - 0.52) * 2.0 - 0.25) / 0.75, 0, 1) ** 1.3
+        m = Image.fromarray((np.clip(mask, 0, 1) * 255
+                             * max(0.0, min(1.0, float(strength)))).astype(np.uint8), "L")
+        m = m.resize((w, h), Image.BILINEAR)
+        return Image.composite(blurred, rgb, m)
+    return _rgb_op(img, op)
+
+
+def _chalkify(img: Image.Image, style: dict, seed: int = 0,
+              strength: float = 0.75) -> Image.Image:
+    """黑板粉笔：深色板面 + 白色粗糙粉笔线 + 粉笔灰。"""
+    def op(rgb: Image.Image) -> Image.Image:
+        w, h = rgb.size
+        # 黑板底：无论 plate 多亮都压成深色板面（粉笔是“线”，不是“灰照片”）
+        board = _mix((13, 23, 19), _rgb(style, "shadow", fallback="bg"), 0.22)
+        l = np.asarray(rgb.convert("L"), dtype=np.float32) / 255.0
+        tone = np.array(tuple(int(c) for c in board), dtype=np.float32)[None, None, :] \
+            * (0.72 + 0.50 * (1.0 - l[..., None]))
+        base = Image.fromarray(np.clip(tone, 0, 255).astype(np.uint8), "RGB")
+        luma = rgb.convert("L").filter(ImageFilter.GaussianBlur(1.2))
+        edges = luma.filter(ImageFilter.FIND_EDGES)
+        strong = edges.point(lambda v: 255 if v > 62 else 0)
+        weak = edges.point(lambda v: 120 if v > 40 else 0)
+        rng = np.random.default_rng(int(seed) & 0xFFFFFFFF)
+        noise = np.clip(rng.standard_normal((max(8, h // 3), max(8, w // 3)),
+                                            dtype=np.float32) * 0.5 + 0.5, 0, 1)
+        n_img = Image.fromarray((noise * 255).astype(np.uint8), "L").resize(
+            (w, h), Image.BILINEAR)
+        strong = ImageChops.multiply(strong, n_img.point(lambda v: int(130 + v * 0.45)))
+        chalk = _mix((236, 236, 228), _rgb(style, "highlight", fallback="paper"), 0.45)
+        out = base.convert("RGBA")
+        out.alpha_composite(scene_render.mask_layer(
+            (w, h), weak, tuple(int(c) for c in chalk[:3]) + (46,)))
+        out.alpha_composite(scene_render.mask_layer(
+            (w, h), strong, tuple(int(c) for c in chalk[:3]) + (232,)))
+        out = _chalk_dust(out, 0.26 * float(strength), color=chalk,
+                          seed=int(seed) & 0xFFFF)
+        return out.convert("RGB")
+    return _rgb_op(img, op)
+
+
+def _blueprint_lineify(img: Image.Image, style: dict, seed: int = 0) -> Image.Image:
+    """蓝图白线：深蓝底 + 亮度分层 + 白色技术线 + 网格。"""
+    def op(rgb: Image.Image) -> Image.Image:
+        w, h = rgb.size
+        navy = _mix(_rgb(style, "bg", fallback="fg"), (6, 18, 48), 0.55)
+        ice = _mix(_rgb(style, "highlight", fallback="paper"), (205, 232, 255), 0.6)
+        base = _duotone_rgb(rgb, navy, _mix(navy, ice, 0.38), 0.9)
+        arr = np.asarray(base, dtype=np.float32)
+        layers = np.clip((arr.mean(axis=2) - 72.0) / 150.0, 0.0, 1.0)[..., None] * 0.28
+        arr = arr + (np.array(tuple(int(c) for c in ice[:3]), dtype=np.float32)
+                     [None, None, :] - arr) * layers
+        base = Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8), "RGB")
+        luma = base.convert("L").filter(ImageFilter.GaussianBlur(0.6))
+        edges = luma.filter(ImageFilter.FIND_EDGES).point(lambda v: 255 if v > 20 else 0)
+        edges = edges.point(lambda v: int(v * 0.85))
+        out = base.convert("RGBA")
+        out.alpha_composite(scene_render.mask_layer(
+            (w, h), edges, tuple(int(c) for c in ice[:3]) + (205,)))
+        # 技术网格
+        _grid = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        gd = ImageDraw.Draw(_grid)
+        step = max(24, int(min(w, h) * 0.045))
+        for x in range(0, w, step):
+            gd.line([(x, 0), (x, h)], fill=tuple(int(c) for c in ice[:3]) + (24,), width=1)
+        for y in range(0, h, step):
+            gd.line([(0, y), (w, y)], fill=tuple(int(c) for c in ice[:3]) + (24,), width=1)
+        out.alpha_composite(_grid)
+        return out.convert("RGB")
+    return _rgb_op(img, op)
+
+
+def _gold_accent(img: Image.Image, color, strength: float = 0.55,
+                 threshold: float = 0.42, power: float = 1.3) -> Image.Image:
+    """金色高光：只把亮部染成金色（暗部保持黑，博物馆金黑的关键）。"""
+    def op(rgb: Image.Image) -> Image.Image:
+        arr = np.asarray(rgb, dtype=np.float32)
+        l = arr.mean(axis=2, keepdims=True) / 255.0
+        mask = np.clip((l - float(threshold)) / max(1e-3, 1.0 - float(threshold)),
+                       0.0, 1.0) ** float(power)
+        gold = np.array(tuple(int(c) for c in color[:3]), dtype=np.float32)
+        out = arr * (1.0 - float(strength) * mask) + gold[None, None, :] * (float(strength) * mask)
+        return Image.fromarray(np.clip(out, 0, 255).astype(np.uint8), "RGB")
+    return _rgb_op(img, op)
+
+
+def _torn_border(img: Image.Image, style: dict, seed: int = 0,
+                 width_ratio: float = 0.035) -> Image.Image:
+    """拼贴撕纸边：四周不规则纸边 + 轻投影（collage）。"""
+    def op(rgb: Image.Image) -> Image.Image:
+        w, h = rgb.size
+        rng = random.Random(int(seed) & 0x7FFFFFFF)
+        paper = _rgb(style, "paper", fallback="bg")
+        t = max(6.0, min(w, h) * float(width_ratio))
+        mask = Image.new("L", (w, h), 255)
+        md = ImageDraw.Draw(mask)
+        # 内侧不规则撕边（把外圈 mask 掉一部分 → 形成纸边）
+        teeth = 26
+        for i in range(teeth + 1):
+            x = i * w / max(1, teeth)
+            y = rng.uniform(0.25, 1.25) * t
+            md.polygon([(x - w / teeth * 0.7, 0), (x + w / teeth * 0.7, 0),
+                        (x + w / teeth * 0.35, y), (x - w / teeth * 0.35, y * 0.8)], fill=0)
+            md.polygon([(x - w / teeth * 0.7, h), (x + w / teeth * 0.7, h),
+                        (x + w / teeth * 0.35, h - y), (x - w / teeth * 0.35, h - y * 0.8)],
+                       fill=0)
+        for i in range(teeth + 1):
+            y = i * h / max(1, teeth)
+            x = rng.uniform(0.25, 1.25) * t
+            md.polygon([(0, y - h / teeth * 0.7), (0, y + h / teeth * 0.7),
+                        (x, y + h / teeth * 0.35), (x * 0.8, y - h / teeth * 0.35)], fill=0)
+            md.polygon([(w, y - h / teeth * 0.7), (w, y + h / teeth * 0.7),
+                        (w - x, y + h / teeth * 0.35), (w - x * 0.8, y - h / teeth * 0.35)],
+                       fill=0)
+        border = scene_render.mask_layer(
+            (w, h), ImageChops.invert(mask), tuple(int(c) for c in paper[:3]) + (248,))
+        shadow = border.filter(ImageFilter.GaussianBlur(max(2.0, t * 0.35)))
+        base = rgb.convert("RGBA")
+        sh = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        sh.paste((0, 0, 0, 110), (int(t * 0.12), int(t * 0.16)),
+                 shadow.getchannel("A"))
+        base.alpha_composite(sh)
+        base.alpha_composite(border)
+        return base.convert("RGB")
+    return _rgb_op(img, op)
+
+
+def _film_frame(img: Image.Image, style: dict, seed: int = 0) -> Image.Image:
+    """16mm 胶片边框：上下片框 + 两侧齿孔 + 划痕。"""
+    def op(rgb: Image.Image) -> Image.Image:
+        w, h = rgb.size
+        rng = random.Random(int(seed) & 0x7FFFFFFF)
+        frame = _mix(_rgb(style, "shadow", fallback="fg"), (8, 7, 6), 0.6)
+        layer = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        d = ImageDraw.Draw(layer)
+        side = max(7.0, w * 0.022)
+        top = max(5.0, h * 0.030)
+        d.rectangle((0, 0, side, h), fill=tuple(int(c) for c in frame[:3]) + (240,))
+        d.rectangle((w - side, 0, w, h), fill=tuple(int(c) for c in frame[:3]) + (240,))
+        d.rectangle((0, 0, w, top), fill=tuple(int(c) for c in frame[:3]) + (240,))
+        d.rectangle((0, h - top, w, h), fill=tuple(int(c) for c in frame[:3]) + (240,))
+        hole_w, hole_h = side * 0.48, max(3.0, h * 0.020)
+        y = top + h * 0.03
+        while y < h - top - hole_h:
+            for x0 in (side * 0.26, w - side * 0.26 - hole_w):
+                d.rounded_rectangle((x0, y, x0 + hole_w, y + hole_h),
+                                    radius=int(hole_w * 0.25),
+                                    fill=tuple(int(c) for c in
+                                               _mix(rgb.getpixel((int(x0 + 1), int(y + 1))),
+                                                    (235, 228, 210), 0.7)[:3]) + (215,))
+            y += hole_h * 2.4
+        for _ in range(10):
+            x = rng.uniform(0, w)
+            y0 = rng.uniform(0, h * 0.6)
+            d.line([(x, y0), (x + rng.uniform(-2, 2), y0 + rng.uniform(h * 0.05, h * 0.3))],
+                   fill=(235, 230, 215, rng.randint(12, 42)), width=1)
+        base = rgb.convert("RGBA")
+        base.alpha_composite(layer)
+        return base.convert("RGB")
+    return _rgb_op(img, op)
+
+
+def _vhs_osd(img: Image.Image, style: dict, seed: int = 0) -> Image.Image:
+    """VHS OSD：左上 ●REC + 右下时间码（低透明度，模拟录像带）。"""
+    def op(rgb: Image.Image) -> Image.Image:
+        w, h = rgb.size
+        layer = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        d = ImageDraw.Draw(layer)
+        red = (228, 62, 52)
+        white = (238, 236, 226)
+        dot = max(3, int(h * 0.011))
+        x0, y0 = int(w * 0.035), int(h * 0.045)
+        d.ellipse((x0, y0, x0 + dot, y0 + dot), fill=red + (215,))
+        try:
+            info = _font_paths()
+            from PIL import ImageFont as _IF
+            font = _IF.truetype(info["body"], max(10, int(h * 0.034)))
+            small = _IF.truetype(info["body"], max(9, int(h * 0.026)))
+        except Exception:  # noqa: BLE001
+            font = small = None
+        d.text((x0 + dot + 6, y0 - dot * 0.6), "REC", font=font, fill=white + (200,))
+        code = f"PM {11 + (int(seed) % 5)}:{32 + (int(seed) % 20)}:0{int(seed) % 9}"
+        d.text((w - int(w * 0.04), h - int(h * 0.065)), code, font=small,
+               fill=white + (185,), anchor="ra")
+        base = rgb.convert("RGBA")
+        base.alpha_composite(layer)
+        return base.convert("RGB")
+    return _rgb_op(img, op)
+
+
+def _chroma_bleed(img: Image.Image, amount: float = 0.5) -> Image.Image:
+    """色度横向拖尾（VHS/录像带）：R/B 通道横向模糊。"""
+    def op(rgb: Image.Image) -> Image.Image:
+        w, h = rgb.size
+        a = max(0.0, min(1.0, float(amount)))
+        r, g, bch = rgb.split()
+        k = max(2, int(w * 0.004))
+        r = Image.blend(r, r.filter(ImageFilter.GaussianBlur(k)), a * 0.8)
+        bch = Image.blend(bch, bch.filter(ImageFilter.GaussianBlur(k)), a * 0.8)
+        return Image.merge("RGB", (r, g, bch))
+    return _rgb_op(img, op)
+
+
+def _draw_seal(img: Image.Image, style: dict, ratio: float = 0.075,
+               pos=(0.065, 0.845), seed: int = 0) -> Image.Image:
+    """朱印点缀（水墨/版刻）：风格 accent 方印 + 反白刻字 + 磨损。"""
+    def op(rgb: Image.Image) -> Image.Image:
+        w, h = rgb.size
+        ss = max(16, int(min(w, h) * float(ratio)))
+        small = Image.new("RGBA", (ss, ss), (0, 0, 0, 0))
+        sd = ImageDraw.Draw(small)
+        accent = _rgb(style, "accent", fallback="seal")
+        paper = _rgb(style, "paper", fallback="bg")
+        pad = max(1, int(ss * 0.06))
+        sd.rectangle((pad, pad, ss - pad, ss - pad),
+                     fill=tuple(int(c) for c in accent[:3]) + (232,))
+        sd.rectangle((pad * 2, pad * 2, ss - pad * 2, ss - pad * 2),
+                     outline=tuple(int(c) for c in paper[:3]) + (230,),
+                     width=max(1, int(ss * 0.035)))
+        text = "史"
+        pack = style.get("packaging") if isinstance(style.get("packaging"), dict) else {}
+        if pack.get("seal"):
+            text = str(pack["seal"])[:1]
+        try:
+            info = _font_paths()
+            from PIL import ImageFont as _IF
+            font = _IF.truetype(info["display"], max(10, int(ss * 0.62)))
+        except Exception:  # noqa: BLE001
+            font = None
+        try:
+            sd.text((ss / 2, ss / 2 + ss * 0.02), text, font=font,
+                    fill=tuple(int(c) for c in paper[:3]) + (245,), anchor="mm")
+        except Exception:  # noqa: BLE001
+            pass
+        rng = random.Random(int(seed) & 0x7FFFFFFF)
+        for _ in range(max(4, int(ss * 0.4))):
+            x, y = rng.uniform(0, ss), rng.uniform(0, ss)
+            rr = max(0.6, ss * rng.uniform(0.006, 0.02))
+            sd.ellipse((x - rr, y - rr, x + rr, y + rr),
+                       fill=tuple(int(c) for c in paper[:3]) + (rng.randint(50, 170),))
+        angle = -6 + (int(seed) % 9)
+        small = small.rotate(angle, expand=True, resample=Image.BICUBIC)
+        px = int(round(w * float(pos[0]) - small.width / 2.0))
+        py = int(round(h * float(pos[1]) - small.height / 2.0))
+        shadow_alpha = small.getchannel("A").point(lambda v: int(v * 0.20))
+        sh = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        sh.paste((0, 0, 0, 255), (px + 2, py + 3), shadow_alpha)
+        base = rgb.convert("RGBA")
+        base.alpha_composite(sh)
+        base.alpha_composite(small, (px, py))
+        return base.convert("RGB")
+    return _rgb_op(img, op)
+
+
+# ---- AI plate 的 16 风格强处理链 -------------------------------------------
+#: 强链路已覆盖的通用项；主流程据此把旧版通用叠加的参数清零，避免双层叠加。
+_AI_HANDLED_KEYS = (
+    "paper", "canvas", "hatch", "edge_ink", "bloom", "scanlines", "chroma_shift",
+    "glitch", "wobble", "halftone", "chalk_dust", "clay_shade", "brush_strokes",
+    "crackle", "silk_sheen", "gold_foil", "emboss", "duotone",
+)
+
+
+def _ai_overlay_params(params: dict) -> dict:
+    """AI 强链路后，旧版通用叠加只保留很轻的暗角/颗粒/锐化。"""
+    out = dict(params or {})
+    for key in _AI_HANDLED_KEYS:
+        out[key] = 0
+    out["vignette"] = float(out.get("vignette", 0.0)) * 0.45
+    out["grain"] = float(out.get("grain", 0.0)) * 0.55
+    return out
+
+
+def _ai_plate_finish(img: Image.Image, style: dict, params: dict,
+                     techniques: list[str]) -> Image.Image:
+    """V5.2：AI plate 的强风格化（按第一 technique 分派；保证 16 风格肉眼可分）。"""
+    tech = techniques[0] if techniques else _primary_technique(style)
+    seed = _stable_seed(style, f"plate:{tech}")
+    fg = _rgb(style, "fg")
+    accent = _rgb(style, "accent")
+    highlight = _rgb(style, "highlight", fallback="paper")
+    paper = _rgb(style, "paper", fallback="bg")
+    shadow = _rgb(style, "shadow", fallback="fg")
+    bg = _rgb(style, "bg")
+    mid = _rgb(style, "mid", fallback="fg")
+    out = img
+    if tech == "ink_wash":
+        # 冷灰墨 + 湿边/飞白 + 宣纸 + 朱印
+        out = _tone_map(out, _mix(fg, (18, 24, 28), 0.55), _mix(paper, (250, 249, 242), 0.5),
+                        0.62)
+        out = _rgb_op(out, lambda rgb: ImageEnhance.Color(rgb).enhance(0.30))
+        out = _curve_lut(out, contrast=1.06, gamma=1.0, shadows=0.04, highlights=0.95)
+        out = _luma_posterize(out, levels=7, blend=0.42)
+        out = _wet_bleed(out, _mix(fg, (78, 96, 104), 0.55), 0.75, seed)
+        out = _paper_texture(out, paper, 0.20, seed=seed & 0xFFFF, fibers=120)
+        out = _hard_edges(out, _mix(fg, (26, 30, 34), 0.55), threshold=24.0,
+                          thickness=1, alpha=150, seed=seed & 0xFFFF, jitter=0.8)
+        out = _draw_seal(out, style, 0.078, (0.072, 0.862), seed)
+        out = _vignette(out, 0.20, color=_mix(shadow, (40, 48, 52), 0.5))
+        out = _grain(out, 0.030, seed=seed & 0xFFFF, color=_mix(shadow, (60, 70, 76), 0.4),
+                     light=paper)
+    elif tech == "woodblock":
+        # 高对比黑刻线 + 平涂限色 + 纸黄
+        out = _rgb_op(out, lambda rgb: ImageEnhance.Color(rgb).enhance(0.62))
+        out = _limit_colors(out, 5, 0.58)
+        out = _curve_lut(out, contrast=1.22, gamma=0.95, shadows=0.02, highlights=0.98)
+        out = _paper_texture(out, paper, 0.20, seed=seed & 0xFFFF, fibers=50)
+        out = _rgb_op(out, lambda rgb: Image.blend(
+            rgb, Image.new("RGB", rgb.size, _mix(paper, accent, 0.14)), 0.16))
+        out = _hard_edges(out, _mix(fg, (18, 12, 8), 0.6), threshold=20.0,
+                          thickness=2, alpha=235, seed=seed & 0xFFFF, jitter=0.45)
+        out = _vignette(out, 0.16, color=shadow)
+        out = _grain(out, 0.035, seed=seed & 0xFFFF, color=shadow, light=paper)
+    elif tech == "parchment_engrave":
+        # 做旧褐 + 铜版排线/交叉网点 + 档案暗角
+        out = _tone_map(out, _mix(shadow, (46, 30, 16), 0.66),
+                        _mix(paper, (236, 206, 152), 0.55), 0.86)
+        out = _rgb_op(out, lambda rgb: ImageEnhance.Color(rgb).enhance(0.30))
+        out = _curve_lut(out, contrast=1.16, gamma=1.02, shadows=0.02, highlights=0.97)
+        out = _hatch_shadows(out, 0.42, spacing=max(3.0, min(out.size) * 0.0044),
+                             color=_mix(shadow, (66, 42, 22), 0.55), angle=-42.0)
+        out = _hatch_shadows(out, 0.26, spacing=max(4.0, min(out.size) * 0.0068),
+                             color=_mix(shadow, (88, 58, 30), 0.45), angle=48.0)
+        out = _paper_texture(out, paper, 0.24, seed=seed & 0xFFFF, fibers=40)
+        out = _edge_ink(out, 0.20, color=_mix(fg, (56, 38, 22), 0.4), gain=1.9)
+        out = _crackle(out, 0.14, color=_mix(shadow, (56, 36, 20), 0.5),
+                       seed=seed & 0xFFFF)
+        out = _vignette(out, 0.42, color=_mix(shadow, (40, 26, 14), 0.4))
+        out = _grain(out, 0.07, seed=seed & 0xFFFF)
+    elif tech == "museum_gold":
+        # 黑金 + 聚光 + 强暗角：先压成“黑底”，只给亮部上金（否则像普通金色场景）
+        out = _curve_lut(out, contrast=1.24, gamma=1.92, shadows=0.0, highlights=1.0)
+        out = _rgb_op(out, lambda rgb: ImageEnhance.Color(rgb).enhance(0.26))
+        out = _gold_accent(out, _mix(accent, (255, 228, 162), 0.45), 0.66, 0.36, 1.2)
+        out = _split_tone(out, (1, 1, 7), _mix(accent, highlight, 0.3), 0.26)
+        out = _spotlight(out, _mix(accent, (255, 228, 168), 0.5), 0.85, 0.50, 0.32)
+        out = _bloom(out, threshold=145, radius=max(4, out.size[0] * 0.014),
+                     strength=0.60, tint=accent)
+        out = _gold_dust(out, 0.42, color=accent, seed=(seed + 7) & 0xFFFF)
+        out = _vignette(out, 0.78, color=(0, 0, 2), radius=0.38, power=1.55)
+        out = _sharpen(out, 0.42)
+        out = _grain(out, 0.040, seed=seed & 0xFFFF)
+    elif tech == "neon_toon":
+        # 霓虹 glow + 青洋红偏移 + 扫描线（暗部偏青、亮部偏洋红）
+        out = _rgb_op(out, lambda rgb: ImageEnhance.Color(rgb).enhance(1.44))
+        out = _split_tone(out, (10, 54, 96), (255, 66, 206), 0.34)
+        out = _bloom(out, threshold=132, radius=max(4, out.size[0] * 0.015),
+                     strength=0.70, tint=accent)
+        out = _edge_glow(out, _mix(mid, (40, 220, 255), 0.6),
+                         _mix(accent, (255, 60, 210), 0.5), threshold=26.0,
+                         radius=max(3.0, out.size[0] * 0.007), strength=0.75)
+        out = _channel_shift(out, max(2, int(out.size[0] * 0.0022)))
+        out = _scanlines(out, 0.06, spacing=3)
+        out = _vignette(out, 0.26, color=(4, 4, 12))
+        out = _grain(out, 0.025, seed=seed & 0xFFFF)
+    elif tech == "hologram":
+        # 全息粒子网格 + 故障带 + 扫描光
+        out = _tone_map(out, _mix(bg, (4, 10, 30), 0.5), _mix(mid, (150, 235, 255), 0.7), 0.62)
+        out = _grid_overlay(out, accent=_mix(mid, (120, 220, 255), 0.5),
+                            strength=0.10, spacing=max(18, int(out.size[0] * 0.035)))
+        out = _scanlines(out, 0.22, spacing=3)
+        out = _glitch_bands(out, 0.36, seed=seed & 0xFFFF)
+        out = _channel_shift(out, max(2, int(out.size[0] * 0.003)),
+                             dy=max(1, int(out.size[1] * 0.0012)))
+        out = _bloom(out, threshold=145, radius=max(5, out.size[0] * 0.016),
+                     strength=0.52, tint=_mix(accent, (120, 230, 255), 0.5))
+        out = _vignette(out, 0.30, color=(4, 4, 16))
+    elif tech == "vhs":
+        # 扫描线 + 色差 + 磁带走带 + REC OSD（暖洋红 + 强 scanline）
+        out = _rgb_op(out, lambda rgb: ImageEnhance.Color(rgb).enhance(1.02))
+        out = _chroma_bleed(out, 0.85)
+        out = _rgb_op(out, lambda rgb: Image.blend(
+            rgb, Image.new("RGB", rgb.size, (176, 38, 132)), 0.11))
+        out = _split_tone(out, (26, 2, 30), (255, 214, 188), 0.26)
+        out = _channel_shift(out, max(4, int(out.size[0] * 0.0042)))
+        out = _row_wobble(out, 1.1, freq=0.10, seed=seed & 0xFFFF)
+        out = _scanlines(out, 0.44, spacing=3, color=(24, 8, 0))
+        out = _bloom(out, threshold=180, radius=max(3, out.size[0] * 0.01),
+                     strength=0.18, tint=(255, 225, 195))
+        out = _vhs_osd(out, style, seed)
+        out = _grain(out, 0.15, seed=seed & 0xFFFF, color=(24, 0, 22),
+                     light=(255, 242, 226))
+        out = _vignette(out, 0.26, color=(20, 8, 4))
+    elif tech == "film_grain":
+        # 16mm 颗粒 + 暖调 + 片框 + 轻晃
+        out = _split_tone(out, _mix(bg, (24, 14, 8), 0.4), (255, 232, 198), 0.34)
+        out = _bloom(out, threshold=175, radius=max(4, out.size[0] * 0.012),
+                     strength=0.20, tint=(255, 226, 190))
+        out = _row_wobble(out, 0.14, freq=0.03, seed=seed & 0xFFFF)
+        out = _film_frame(out, style, seed)
+        out = _grain(out, 0.15, seed=seed & 0xFFFF, color=(28, 18, 10),
+                     light=(255, 246, 232))
+        out = _vignette(out, 0.28, color=(22, 12, 6))
+    elif tech == "noir":
+        # 高反差去色 + 百叶硬光 + 强暗角
+        out = _rgb_op(out, lambda rgb: ImageEnhance.Color(rgb).enhance(0.10))
+        out = _curve_lut(out, contrast=1.46, gamma=0.88, shadows=0.0, highlights=1.0)
+        out = _blinds(out, (0, 0, 0), count=9, strength=0.34, seed=seed & 0xFFFF)
+        out = _split_tone(out, _mix(bg, (2, 6, 14), 0.5), (232, 240, 246), 0.30)
+        out = _bloom(out, threshold=175, radius=max(5, out.size[0] * 0.014),
+                     strength=0.20, tint=(190, 215, 255))
+        out = _vignette(out, 0.56, color=(0, 0, 0), radius=0.48, power=1.5)
+        out = _grain(out, 0.13, seed=seed & 0xFFFF)
+    elif tech == "oil_impasto":
+        # 厚涂笔触 + 色斑 + 画布 + 清漆暖调（提亮成“上光油画”，避免与黑金混淆）
+        out = _limit_colors(out, 10, 0.26)
+        out = _canvas_texture(out, 0.24, color=_mix(shadow, (60, 40, 20), 0.4))
+        out = _emboss_relief(out, 0.40)
+        out = _brush_strokes(out, style, 0.50, seed=seed & 0xFFFF)
+        out = _curve_lut(out, contrast=1.04, gamma=0.90, shadows=0.02, highlights=1.06)
+        out = _rgb_op(out, lambda rgb: ImageEnhance.Color(rgb).enhance(1.16))
+        out = _split_tone(out, _mix(bg, (54, 32, 12), 0.4), (255, 232, 186), 0.32)
+        out = _crackle(out, 0.14, color=_mix(shadow, (70, 48, 24), 0.5),
+                       seed=seed & 0xFFFF)
+        out = _vignette(out, 0.22, color=(24, 12, 4))
+        out = _sharpen(out, 0.34)
+    elif tech == "baroque_candle":
+        # 烛光暖暗 + 明暗对照（压得比 oil 更深更暖，暗部冷褐）
+        out = _candle_light(out, style, 1.05, seed)
+        out = _curve_lut(out, contrast=1.22, gamma=1.20, shadows=0.0, highlights=1.0)
+        out = _split_tone(out, _mix(bg, (26, 4, 6), 0.55), (255, 196, 116), 0.58)
+        out = _blinds(out, (0, 0, 0), count=5, strength=0.28, seed=seed & 0xFFFF,
+                      angle=42.0)
+        out = _bloom(out, threshold=150, radius=max(5, out.size[0] * 0.018),
+                     strength=0.50, tint=(255, 192, 112))
+        out = _vignette(out, 0.60, color=(12, 3, 4), radius=0.46, power=1.45)
+        out = _crackle(out, 0.08, color=_mix(shadow, (52, 32, 12), 0.5),
+                       seed=seed & 0xFFFF)
+        out = _grain(out, 0.080, seed=seed & 0xFFFF, color=(22, 10, 4),
+                     light=(255, 226, 180))
+    elif tech == "blueprint":
+        # 蓝图白线 + 技术网格
+        out = _blueprint_lineify(out, style, seed)
+        out = _vignette(out, 0.28, color=(2, 8, 22))
+        out = _grain(out, 0.035, seed=seed & 0xFFFF)
+    elif tech == "collage_cutout":
+        # 限色平涂 + 半调网点 + 撕纸边
+        out = _rgb_op(out, lambda rgb: ImageEnhance.Color(rgb).enhance(1.32))
+        out = _limit_colors(out, 8, 0.46)
+        out = _paper_texture(out, paper, 0.16, seed=seed & 0xFFFF, fibers=70)
+        out = _halftone_overlay(out, 0.20, color=_mix(shadow, (40, 30, 24), 0.4),
+                                spacing=max(7, int(out.size[0] * 0.0075)))
+        out = _torn_border(out, style, seed)
+        out = _sharpen(out, 0.22)
+        out = _vignette(out, 0.12, color=shadow)
+    elif tech == "claymation":
+        # 黏土颗粒 + 柔焦 + 微缩移轴（提亮成柔嫩手作感，避免与暗色系混淆）
+        out = _limit_colors(out, 12, 0.30)
+        out = _curve_lut(out, contrast=0.98, gamma=0.88, shadows=0.02, highlights=1.12)
+        out = _rgb_op(out, lambda rgb: ImageEnhance.Color(rgb).enhance(1.08))
+        out = _clay_shade(out, 0.40)
+        out = _tilt_blur(out, 0.52)
+        out = _split_tone(out, _mix(bg, (80, 62, 44), 0.4), (255, 242, 220), 0.24)
+        out = _bloom(out, threshold=188, radius=max(3, out.size[0] * 0.01),
+                     strength=0.20, tint=(255, 238, 216))
+        out = _grain(out, 0.04, seed=seed & 0xFFFF)
+        out = _vignette(out, 0.12, color=_mix(shadow, (70, 52, 36), 0.4))
+    elif tech == "chalk_sketch":
+        # 黑板粉笔 + 白线 + 粉笔灰（强制深色板面，避免变成浅灰素描）
+        out = _chalkify(out, style, seed, 0.92)
+        out = _vignette(out, 0.30, color=(2, 6, 4))
+        out = _grain(out, 0.05, seed=seed & 0xFFFF)
+    elif tech == "silk_gongbi":
+        # 绢本淡彩：整体提亮/降饱和成“淡绢”，与暖色黏土/油画拉开
+        out = _rgb_op(out, lambda rgb: ImageEnhance.Color(rgb).enhance(0.58))
+        out = _curve_lut(out, contrast=0.98, gamma=0.86, shadows=0.02, highlights=1.12)
+        out = _tone_map(out, _mix(shadow, (92, 82, 68), 0.40), (252, 246, 232), 0.46)
+        out = _silk_weave(out, 0.38)
+        out = _paper_texture(out, paper, 0.10, seed=seed & 0xFFFF, fibers=34)
+        out = _edge_ink(out, 0.10, color=_mix(fg, (52, 38, 24), 0.35), gain=1.7,
+                        blur=0.6)
+        out = _bloom(out, threshold=205, radius=max(2, out.size[0] * 0.008),
+                     strength=0.14, tint=highlight)
+        out = _vignette(out, 0.12, color=_mix(shadow, (70, 54, 36), 0.30))
+        out = _grain(out, 0.020, seed=seed & 0xFFFF)
+    return out
+
+
+def _ai_character_finish(img: Image.Image, style: dict, params: dict,
+                         techniques: list[str]) -> Image.Image:
+    """V5.2：AI 立绘的中强度风格化（脸/嘴安全，不糊五官，保留 alpha）。"""
+    treatment = str(style.get("character_treatment") or "")
+    tech = techniques[0] if techniques else _primary_technique(style)
+    seed = _stable_seed(style, f"char:{treatment or tech}")
+    fg = _rgb(style, "fg")
+    accent = _rgb(style, "accent")
+    paper = _rgb(style, "paper", fallback="bg")
+    shadow = _rgb(style, "shadow", fallback="fg")
+    out = img
+    if treatment in ("ink_brush",) or tech == "ink_wash":
+        out = _rgb_op(out, lambda rgb: ImageEnhance.Color(rgb).enhance(0.34))
+        out = _tone_map(out, _mix(fg, (20, 26, 32), 0.55),
+                        _mix(paper, (246, 244, 236), 0.45), 0.58)
+        out = _paper_texture(out, paper, 0.14, seed=seed & 0xFFFF, fibers=60)
+        out = _edge_ink(out, 0.36, color=_mix(fg, (32, 38, 44), 0.45), gain=2.2, blur=0.35)
+    elif treatment in ("cutout_paper", "collage") or tech == "collage_cutout":
+        out = _rgb_op(out, lambda rgb: ImageEnhance.Color(rgb).enhance(1.32))
+        out = _limit_colors(out, 7, 0.52)
+        out = _paper_texture(out, paper, 0.10, seed=seed & 0xFFFF, fibers=40)
+        out = _hard_edges(out, _mix(fg, (16, 12, 8), 0.6), threshold=22.0,
+                          thickness=2, alpha=210, seed=seed & 0xFFFF, jitter=0.4)
+        out = _halftone_overlay(out, 0.14, color=_mix(shadow, (40, 30, 24), 0.4),
+                                spacing=max(6, int(out.size[0] * 0.012)))
+    elif treatment in ("engrave",) or tech == "parchment_engrave":
+        out = _tone_map(out, _mix(shadow, (48, 32, 18), 0.6),
+                        _mix(paper, (230, 202, 156), 0.5), 0.74)
+        out = _rgb_op(out, lambda rgb: ImageEnhance.Color(rgb).enhance(0.34))
+        out = _hatch_shadows(out, 0.30, spacing=max(3.0, min(out.size) * 0.0052),
+                             color=_mix(shadow, (76, 52, 28), 0.55), angle=-42.0)
+        out = _hatch_shadows(out, 0.18, spacing=max(4.0, min(out.size) * 0.0075),
+                             color=_mix(shadow, (96, 66, 34), 0.45), angle=48.0)
+        out = _edge_ink(out, 0.20, color=_mix(fg, (56, 40, 24), 0.4), gain=1.9)
+    elif treatment in ("gold_silhouette", "candle") or tech in ("museum_gold", "baroque_candle"):
+        out = _curve_lut(out, contrast=1.14, gamma=1.35)
+        out = _rgb_op(out, lambda rgb: ImageEnhance.Color(rgb).enhance(0.42))
+        out = _gold_accent(out, _mix(accent, (255, 218, 146), 0.5), 0.52, 0.20, 1.1)
+        out = _split_tone(out, _mix(shadow, (4, 4, 6), 0.55),
+                          _mix(accent, (255, 218, 146), 0.55), 0.40)
+        out = _edge_glow(out, _mix(accent, (255, 200, 120), 0.4), accent,
+                         threshold=58.0, radius=max(2.0, out.size[0] * 0.010),
+                         strength=0.55)
+        out = _bloom(out, threshold=158, radius=max(3, out.size[0] * 0.012),
+                     strength=0.36, tint=accent)
+        out = _gold_dust(out, 0.13, color=accent, seed=seed & 0xFFFF)
+        out = _vignette(out, 0.32, color=(0, 0, 0))
+    elif treatment in ("clay",) or tech == "claymation":
+        out = _curve_lut(out, contrast=0.96, gamma=0.86, highlights=1.14)
+        out = _rgb_op(out, lambda rgb: ImageEnhance.Color(rgb).enhance(1.16))
+        out = _clay_shade(out, 0.44)
+        out = _limit_colors(out, 10, 0.30)
+        out = _split_tone(out, _mix(shadow, (88, 68, 46), 0.4), (255, 244, 222), 0.26)
+        out = _bloom(out, threshold=192, radius=max(3, out.size[0] * 0.01),
+                     strength=0.20, tint=(255, 238, 216))
+    elif treatment in ("toon",) or tech == "neon_toon":
+        out = _rgb_op(out, lambda rgb: ImageEnhance.Color(rgb).enhance(1.42))
+        out = _split_tone(out, (12, 60, 104), (255, 70, 208), 0.28)
+        out = _bloom(out, threshold=155, radius=max(3, out.size[0] * 0.012),
+                     strength=0.40, tint=accent)
+        out = _edge_glow(out, _mix(accent, (255, 80, 200), 0.4),
+                         _mix(accent, (80, 230, 255), 0.4), threshold=30.0,
+                         radius=max(2.0, out.size[0] * 0.008), strength=0.55)
+    elif treatment in ("oil",) or tech == "oil_impasto":
+        out = _rgb_op(out, lambda rgb: ImageEnhance.Color(rgb).enhance(1.16))
+        out = _curve_lut(out, contrast=1.04, gamma=0.92, highlights=1.04)
+        out = _emboss_relief(out, 0.32)
+        out = _brush_strokes(out, style, 0.32, seed=seed & 0xFFFF)
+        out = _split_tone(out, _mix(shadow, (46, 28, 12), 0.4), (255, 232, 190), 0.30)
+        out = _vignette(out, 0.20, color=(24, 12, 4))
+    elif treatment in ("chalk",) or tech == "chalk_sketch":
+        out = _rgb_op(out, lambda rgb: ImageEnhance.Color(rgb).enhance(0.62))
+        out = _chalk_dust(out, 0.20, color=(235, 235, 226), seed=seed & 0xFFFF)
+        out = _edge_ink(out, 0.18, color=(240, 240, 232), gain=1.8, blur=0.5)
+    elif treatment in ("gongbi",) or tech == "silk_gongbi":
+        out = _silk_weave(out, 0.30)
+        out = _edge_ink(out, 0.20, color=_mix(fg, (52, 38, 24), 0.35), gain=1.8, blur=0.5)
+        out = _split_tone(out, _mix(shadow, (62, 46, 30), 0.3), (255, 246, 228), 0.28)
+    elif treatment in ("vhs",) or tech == "vhs":
+        out = _chroma_bleed(out, 0.6)
+        out = _channel_shift(out, max(3, int(out.size[0] * 0.016)))
+        out = _scanlines(out, 0.30, spacing=3)
+        out = _grain(out, 0.12, seed=seed & 0xFFFF)
+    elif treatment in ("film",) or tech == "film_grain":
+        out = _split_tone(out, _mix(shadow, (24, 14, 8), 0.4), (255, 232, 198), 0.34)
+        out = _bloom(out, threshold=180, radius=max(3, out.size[0] * 0.012),
+                     strength=0.18, tint=(255, 226, 190))
+        out = _grain(out, 0.12, seed=seed & 0xFFFF)
+    elif treatment in ("noir",) or tech == "noir":
+        out = _rgb_op(out, lambda rgb: ImageEnhance.Color(rgb).enhance(0.12))
+        out = _curve_lut(out, contrast=1.32, gamma=0.92)
+        out = _vignette(out, 0.34, color=(0, 0, 0))
+    elif treatment in ("hologram",) or tech == "hologram":
+        out = _tone_map(out, _mix(shadow, (6, 10, 28), 0.5), _mix(accent, (150, 235, 255), 0.5),
+                        0.40)
+        out = _scanlines(out, 0.16, spacing=3)
+        out = _bloom(out, threshold=160, radius=max(3, out.size[0] * 0.012),
+                     strength=0.30, tint=accent)
+    elif treatment in ("blueprint",) or tech == "blueprint":
+        out = _blueprint_lineify(out, style, seed)
+        out = _rgb_op(out, lambda rgb: Image.blend(
+            rgb, ImageEnhance.Brightness(rgb).enhance(1.10), 0.4))
+    else:
+        out = _rgb_op(out, lambda rgb: ImageEnhance.Color(rgb).enhance(
+            0.75 + 0.35 * float(params.get("saturation", 1.0))))
+    if treatment in ("ink_brush", "engrave", "gongbi"):
+        out = _edge_ink(out, 0.24, color=_mix(fg, (30, 34, 38), 0.4), gain=2.0, blur=0.35)
+    else:
+        out = _edge_ink(out, 0.14, color=_mix(fg, shadow, 0.5), gain=1.7, blur=0.5)
+    return out
+
+
+
 #: 每个 technique 的兜底调色链（style.grade 缺省时用；保证 16 风格观感不同）
 TECHNIQUE_GRADE: dict[str, str] = {
     "ink_wash": "eq=contrast=1.06:saturation=0.66:gamma=1.02,colorbalance=rs=0.03:gs=0.01:bs=-0.02",

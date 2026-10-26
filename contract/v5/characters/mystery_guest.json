@@ -72,5 +72,10 @@
     "instruction": "低沉稳重的神秘中低音，略带沙哑与电子处理感，语速慢，压迫感强",
     "seed": 20262024,
     "cfg_scale": 4.6
+  },
+  "art": {
+    "portrait": "assets/v5/characters/mystery_guest/portrait.png",
+    "front": "assets/v5/characters/mystery_guest/front.png",
+    "cutout": "assets/v5/characters/mystery_guest/cutout.png"
   }
 }

@@ -1,0 +1,27 @@
+{
+  "scene": "battlefield",
+  "label": "战场",
+  "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\scenes\\battlefield.png",
+  "png": "battlefield.png",
+  "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, chinese ancient setting, historical, ancient china, wide shot, ancient chinese battlefield, distant misty mountains, war banners, distant cavalry and soldier silhouettes, spears, smoke and dust, sunset, epic scale",
+  "raw_prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, chinese ancient setting, historical, ancient china, wide shot, ancient chinese battlefield, distant misty mountains, war banners, distant cavalry and soldier silhouettes, spears, smoke and dust, sunset, epic scale",
+  "prompt_source": "prompts.json",
+  "negative": "lowres, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, detailed faces, foreground people, portrait, close-up",
+  "seed": 20261101,
+  "size": [
+    1280,
+    720
+  ],
+  "requested_size": [
+    1280,
+    720
+  ],
+  "model": "animagine-xl-4.0.safetensors",
+  "steps": 28,
+  "cfg": 5.5,
+  "sampler": "euler_ancestral",
+  "scheduler": "normal",
+  "prompt_id": "629cae7e-09e7-4d8a-818c-8f9c5e2632b8",
+  "gen_sec": 16.2,
+  "created_at": "2026-10-26 18:43:36"
+}

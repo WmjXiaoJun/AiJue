@@ -74,5 +74,10 @@
     "instruction": "24岁女性，明亮跳脱，音色偏甜，语速快，带笑意的吐槽感",
     "seed": 20262014,
     "cfg_scale": 4.2
+  },
+  "art": {
+    "portrait": "assets/v5/characters/ali/portrait.png",
+    "front": "assets/v5/characters/ali/front.png",
+    "cutout": "assets/v5/characters/ali/cutout.png"
   }
 }

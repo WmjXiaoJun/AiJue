@@ -1,0 +1,208 @@
+{
+  "id": "simaqian",
+  "name": "司马迁",
+  "title": "太史令，忍辱著史，说话克制而坚持；最看重“真”与“据”。",
+  "persona": "太史令，忍辱著史，说话克制而坚持；最看重“真”与“据”。",
+  "mode": "three_view",
+  "style": "anime",
+  "model": "animagine-xl-4.0.safetensors",
+  "steps": 28,
+  "cfg": 5.5,
+  "sampler": "euler_ancestral",
+  "scheduler": "normal",
+  "seed": 42,
+  "size": {
+    "portrait": [
+      832,
+      1216
+    ],
+    "other": [
+      1024,
+      1024
+    ]
+  },
+  "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, full body, multiple characters",
+  "prompt": {
+    "portrait": "masterpiece, best quality, anime style, solo, 1boy, male, mature male, black hair, black eyes, beige robe, brown accents, upper body, looking at viewer, centered composition, studio lighting, dark background, clean lineart, cel shading, vibrant colors, detailed face, hair bun, long beard, goatee, deep thoughtful eyes, brown sash, brush in hand, scroll in hand, weary calm expression, dark circles, historian, chinese ancient setting, simple background",
+    "front": "masterpiece, best quality, anime style, solo, 1boy, male, mature male, black hair, black eyes, beige robe, brown accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, hair bun, long beard, goatee, deep thoughtful eyes, brown sash, brush in hand, scroll in hand, weary calm expression, dark circles, historian, looking at viewer, pure white background, isolated on white background, no shadow, no scenery"
+  },
+  "created_at": "2026-10-26T18:41:02",
+  "elapsed_sec": 33.7,
+  "files": {
+    "portrait": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\simaqian\\portrait.png",
+    "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\simaqian\\front.png",
+    "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\simaqian\\cutout.png"
+  },
+  "images": [
+    {
+      "tag": "portrait",
+      "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\simaqian\\portrait.png",
+      "seed": 42,
+      "width": 832,
+      "height": 1216,
+      "gen_sec": 16.0,
+      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, mature male, black hair, black eyes, beige robe, brown accents, upper body, looking at viewer, centered composition, studio lighting, dark background, clean lineart, cel shading, vibrant colors, detailed face, hair bun, long beard, goatee, deep thoughtful eyes, brown sash, brush in hand, scroll in hand, weary calm expression, dark circles, historian, chinese ancient setting, simple background",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, full body, multiple characters, lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone",
+      "composition": "portrait",
+      "expression": null
+    },
+    {
+      "tag": "front",
+      "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\simaqian\\three_view/front.png",
+      "seed": 43,
+      "width": 1024,
+      "height": 1024,
+      "gen_sec": 16.1,
+      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, mature male, black hair, black eyes, beige robe, brown accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, hair bun, long beard, goatee, deep thoughtful eyes, brown sash, brush in hand, scroll in hand, weary calm expression, dark circles, historian, looking at viewer, pure white background, isolated on white background, no shadow, no scenery",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, multiple views, split screen, cropped, lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements",
+      "composition": "front",
+      "expression": null
+    }
+  ],
+  "source": "imagegen",
+  "created_by": "pipeline/v5_art.generate_character_art",
+  "status": "ok",
+  "prompt_source": "contract/v5/art/prompts.json#characters",
+  "sizes": {
+    "portrait": [
+      832,
+      1216
+    ],
+    "cutout": [
+      511,
+      922
+    ]
+  },
+  "alpha_ratio": 0.483,
+  "front_white": {
+    "ok": true,
+    "corners": [
+      {
+        "rgb": [
+          255,
+          255,
+          255
+        ],
+        "mean": 255.0,
+        "spread": 1.0
+      },
+      {
+        "rgb": [
+          255,
+          255,
+          255
+        ],
+        "mean": 255.0,
+        "spread": 2.0
+      },
+      {
+        "rgb": [
+          255,
+          255,
+          255
+        ],
+        "mean": 255.0,
+        "spread": 2.0
+      },
+      {
+        "rgb": [
+          255,
+          255,
+          255
+        ],
+        "mean": 255.0,
+        "spread": 2.0
+      }
+    ],
+    "white_ratio": 0.788
+  },
+  "front_attempts": 1,
+  "cutout_validation": {
+    "ok": true,
+    "alpha0": 0.517,
+    "visible": 0.483,
+    "corners_alpha": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "bbox": [
+      8,
+      8,
+      503,
+      914
+    ],
+    "aspect": 0.554,
+    "bbox_h_ratio": 0.983,
+    "wash": {
+      "removed": false,
+      "color": null,
+      "ratio": 0.0
+    }
+  },
+  "face_norm": {
+    "score": 0.6,
+    "estimated": false,
+    "source": "yunet",
+    "bbox": [
+      0.33737769080234836,
+      0.03036876355748373,
+      0.5481409001956947,
+      0.18861171366594362
+    ],
+    "mouth": {
+      "cx": 0.4427005870841487,
+      "cy": 0.15374186550976138,
+      "w": 0.07166340508806261,
+      "h": 0.01787418655097614
+    },
+    "eyes": {
+      "y": 0.09677874186550976,
+      "w": 0.0463600782778865,
+      "cx": [
+        0.39211350293542074,
+        0.49326810176125246
+      ]
+    },
+    "skin": "#e8bc7f",
+    "lip": "#4d3a3a",
+    "line": "#000000",
+    "face_w": 107.69
+  },
+  "face_portrait_norm": {
+    "score": 0.588,
+    "estimated": false,
+    "bbox": [
+      0.3893028846153846,
+      0.23824013157894736,
+      0.6381009615384615,
+      0.4676809210526316
+    ],
+    "mouth": {
+      "cx": 0.5136778846153847,
+      "cy": 0.41722861842105263,
+      "w": 0.07462740384615385,
+      "h": 0.022976973684210526
+    },
+    "eyes": {
+      "y": 0.33461348684210523,
+      "w": 0.054723557692307696,
+      "cx": [
+        0.4539663461538461,
+        0.5733774038461539
+      ]
+    },
+    "skin": "#f2c284",
+    "lip": "#8e5041",
+    "line": "#000001",
+    "face_w": 206.97
+  },
+  "prompts": {
+    "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, hair bun, long beard, goatee, deep thoughtful eyes, beige robe, brown sash, brush in hand, scroll in hand, weary calm expression, dark circles, historian, chinese ancient setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+    "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, hair bun, long beard, goatee, deep thoughtful eyes, beige robe, brown sash, brush in hand, scroll in hand, weary calm expression, dark circles, historian, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery",
+    "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements"
+  },
+  "face_source": "yunet",
+  "overlay_allowed": true
+}

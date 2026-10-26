@@ -1,0 +1,27 @@
+{
+  "scene": "rainy_street",
+  "label": "雨夜街道",
+  "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\scenes\\rainy_street.png",
+  "png": "rainy_street.png",
+  "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide establishing shot, panoramic, noir rainy street at night, wet asphalt reflections, street lamps, distant skyline, dramatic shadows",
+  "raw_prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide establishing shot, panoramic, noir rainy street at night, wet asphalt reflections, street lamps, distant skyline, dramatic shadows",
+  "prompt_source": "prompts.json",
+  "negative": "lowres, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, detailed faces, foreground people, portrait, close-up",
+  "seed": 20261101,
+  "size": [
+    1280,
+    720
+  ],
+  "requested_size": [
+    1280,
+    720
+  ],
+  "model": "animagine-xl-4.0.safetensors",
+  "steps": 28,
+  "cfg": 5.5,
+  "sampler": "euler_ancestral",
+  "scheduler": "normal",
+  "prompt_id": "a4eea493-bffb-4ee2-9985-34a1705202a5",
+  "gen_sec": 8.1,
+  "created_at": "2026-10-26 18:33:07"
+}

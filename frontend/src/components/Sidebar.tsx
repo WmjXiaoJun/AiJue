@@ -1,7 +1,7 @@
 import type { Health, Project } from "../types";
 import { fmtMoney, label, PROJECT_STATUS_LABEL } from "../lib/format";
 import { templateLabel } from "../lib/templates";
-import { BrandMark, IconPlus, IconProjects, IconSettings, IconTemplate } from "./icons";
+import { BrandMark, IconPlus, IconProjects, IconSettings, IconSpark, IconTemplate } from "./icons";
 import { StatusBadge } from "./ui";
 
 interface Props {
@@ -9,6 +9,8 @@ interface Props {
   activeProjectId: string | null;
   offline: boolean;
   health: Health | null;
+  activeV5?: boolean;
+  onV5?: () => void;
   onHome: () => void;
   onSelectProject: (project: Project) => void;
   onTemplates: () => void;
@@ -21,6 +23,8 @@ export function Sidebar({
   activeProjectId,
   offline,
   health,
+  activeV5 = false,
+  onV5,
   onHome,
   onSelectProject,
   onTemplates,
@@ -75,6 +79,16 @@ export function Sidebar({
       </div>
 
       <nav className="rail-nav">
+        <button
+          type="button"
+          className={"rail-link" + (activeV5 ? " active" : "")}
+          onClick={onV5}
+          title="V5 世界：成片画廊 / 风格墙 / 场景库 / 角色库 / 渲染"
+        >
+          <IconSpark size={17} />
+          <span>V5 世界</span>
+          <span className="rail-link-badge">V5</span>
+        </button>
         <button type="button" className="rail-link" onClick={onTemplates}>
           <IconTemplate size={17} />
           <span>节目模板</span>

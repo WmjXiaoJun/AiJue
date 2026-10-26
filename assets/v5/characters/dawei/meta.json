@@ -1,0 +1,47 @@
+{
+  "id": "dawei",
+  "source": "v3_reuse",
+  "portrait": "assets\\v5\\characters\\dawei\\portrait.png",
+  "front": "assets\\v5\\characters\\dawei\\front.png",
+  "cutout": "assets\\v5\\characters\\dawei\\cutout.png",
+  "cutout_size": [
+    311,
+    984
+  ],
+  "portrait_size": [
+    832,
+    1216
+  ],
+  "note": "复用最早 3 个角色（SDXL 动漫立绘 + 泛洪抠图），V5.2 直接沿用",
+  "face_norm": {
+    "score": 0.523,
+    "estimated": false,
+    "source": "yunet",
+    "bbox": [
+      0.38810289389067526,
+      0.05203252032520325,
+      0.7356913183279743,
+      0.18516260162601625
+    ],
+    "mouth": {
+      "cx": 0.5619935691318328,
+      "cy": 0.15590447154471546,
+      "w": 0.11819935691318327,
+      "h": 0.016808943089430893
+    },
+    "eyes": {
+      "y": 0.10797764227642276,
+      "w": 0.0764951768488746,
+      "cx": [
+        0.47855305466237946,
+        0.6454019292604501
+      ]
+    },
+    "skin": "#cddacb",
+    "lip": "#695359",
+    "line": "#030405",
+    "face_w": 108.12
+  },
+  "face_source": "yunet",
+  "overlay_allowed": true
+}

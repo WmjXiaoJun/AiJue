@@ -72,5 +72,10 @@
     "instruction": "32岁女性，干练清晰，中音偏实，语速快，命令句多，带掌控感",
     "seed": 20262022,
     "cfg_scale": 4.0
+  },
+  "art": {
+    "portrait": "assets/v5/characters/producer/portrait.png",
+    "front": "assets/v5/characters/producer/front.png",
+    "cutout": "assets/v5/characters/producer/cutout.png"
   }
 }

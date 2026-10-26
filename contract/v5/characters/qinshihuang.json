@@ -73,5 +73,10 @@
     "instruction": "45岁男性，浑厚威严，极低沉，尾音往下压，帝王气场",
     "seed": 20262004,
     "cfg_scale": 4.2
+  },
+  "art": {
+    "portrait": "assets/v5/characters/qinshihuang/portrait.png",
+    "front": "assets/v5/characters/qinshihuang/front.png",
+    "cutout": "assets/v5/characters/qinshihuang/cutout.png"
   }
 }

@@ -76,5 +76,10 @@
     "instruction": "38岁女性，华丽沉稳，中低音，咬字清晰，笑意里带威压",
     "seed": 20262007,
     "cfg_scale": 4.1
+  },
+  "art": {
+    "portrait": "assets/v5/characters/wuzetian/portrait.png",
+    "front": "assets/v5/characters/wuzetian/front.png",
+    "cutout": "assets/v5/characters/wuzetian/cutout.png"
   }
 }

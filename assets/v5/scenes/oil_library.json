@@ -1,0 +1,27 @@
+{
+  "scene": "oil_library",
+  "label": "油画藏书厅",
+  "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\scenes\\oil_library.png",
+  "png": "oil_library.png",
+  "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, renaissance oil painting library, tall wooden shelves, arches and warm window light, candelabra, rich warm tones",
+  "raw_prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, renaissance oil painting library, tall wooden shelves, arches and warm window light, candelabra, rich warm tones",
+  "prompt_source": "prompts.json",
+  "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+  "seed": 20261101,
+  "size": [
+    1280,
+    720
+  ],
+  "requested_size": [
+    1280,
+    720
+  ],
+  "model": "animagine-xl-4.0.safetensors",
+  "steps": 28,
+  "cfg": 5.5,
+  "sampler": "euler_ancestral",
+  "scheduler": "normal",
+  "prompt_id": "d326ab18-dd51-4d19-9f5b-86fbcd89e01d",
+  "gen_sec": 8.0,
+  "created_at": "2026-10-26 18:32:17"
+}

@@ -9,6 +9,7 @@ import { Workspace } from "./components/Workspace";
 import { SettingsModal } from "./components/SettingsModal";
 import { TemplateModal } from "./components/TemplateModal";
 import { NewProjectModal } from "./components/NewProjectModal";
+import { V5Studio } from "./components/V5Studio";
 import { BrandMark, IconRefresh } from "./components/icons";
 import { Spinner } from "./components/ui";
 
@@ -16,11 +17,17 @@ export type TabKey = "script" | "assets" | "storyboard" | "generate" | "finish";
 
 const TAB_KEYS: TabKey[] = ["script", "assets", "storyboard", "generate", "finish"];
 
-type ViewState = { mode: "projects" } | { mode: "workspace"; project: Project; episode: Episode };
+type ViewState =
+  | { mode: "projects" }
+  | { mode: "workspace"; project: Project; episode: Episode }
+  | { mode: "v5" };
 
-function parseHash(): { eid?: string; tab: TabKey } {
+function parseHash(): { eid?: string; tab: TabKey; v5?: boolean } {
   const raw = window.location.hash.replace(/^#\/?/, "");
   const parts = raw.split("/").filter(Boolean);
+  if (parts[0] === "v5") {
+    return { tab: "script", v5: true };
+  }
   if (parts[0] === "episodes" && parts[1]) {
     const tab = TAB_KEYS.includes(parts[2] as TabKey) ? (parts[2] as TabKey) : "script";
     return { eid: decodeURIComponent(parts[1]), tab };
@@ -73,7 +80,9 @@ function Shell() {
         setOffline(false);
         lastSyncRef.current = Date.now();
         const route = parseHash();
-        if (route.eid) {
+        if (route.v5) {
+          setView({ mode: "v5" });
+        } else if (route.eid) {
           const episode = await api.episode(route.eid);
           const project = list.find((item) => item.id === episode.project_id) || (await api.project(episode.project_id));
           setEpisodes(await api.episodes(project.id));
@@ -137,6 +146,11 @@ function Shell() {
   useEffect(() => {
     const onHash = () => {
       const route = parseHash();
+      if (route.v5) {
+        setView({ mode: "v5" });
+        setTab("script");
+        return;
+      }
       if (!route.eid) {
         setView({ mode: "projects" });
         setTab("script");
@@ -233,6 +247,14 @@ function Shell() {
     void loadProjects().catch(() => undefined);
   }, [loadProjects]);
 
+  const openV5 = useCallback(() => {
+    setView({ mode: "v5" });
+    setEpisodes(null);
+    setTab("script");
+    setTaskStats({ activeJobs: 0, cost: 0 });
+    if (window.location.hash !== "#/v5") window.location.hash = "#/v5";
+  }, []);
+
   const handleSynced = useCallback((stats: { activeJobs: number; cost: number }) => {
     lastSyncRef.current = Date.now();
     setTaskStats(stats);
@@ -305,6 +327,8 @@ function Shell() {
         activeProjectId={view.mode === "workspace" ? view.project.id : null}
         offline={offline}
         health={health}
+        activeV5={view.mode === "v5"}
+        onV5={openV5}
         onHome={goHome}
         onSelectProject={(project) => void openProject(project)}
         onTemplates={() => setModal("templates")}
@@ -332,7 +356,9 @@ function Shell() {
         )}
 
         <main className="app-content">
-          {view.mode === "projects" ? (
+          {view.mode === "v5" ? (
+            <V5Studio />
+          ) : view.mode === "projects" ? (
             <ProjectList
               projects={projects || []}
               onOpenProject={(project) => void openProject(project)}

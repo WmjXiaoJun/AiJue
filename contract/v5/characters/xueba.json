@@ -72,5 +72,10 @@
     "instruction": "22岁男性，清亮偏平稳，语速均匀，逻辑重音清楚，略书呆气",
     "seed": 20262017,
     "cfg_scale": 3.9
+  },
+  "art": {
+    "portrait": "assets/v5/characters/xueba/portrait.png",
+    "front": "assets/v5/characters/xueba/front.png",
+    "cutout": "assets/v5/characters/xueba/cutout.png"
   }
 }

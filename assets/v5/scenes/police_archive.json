@@ -1,0 +1,27 @@
+{
+  "scene": "police_archive",
+  "label": "警局档案室",
+  "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\scenes\\police_archive.png",
+  "png": "police_archive.png",
+  "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, noir police archive room, shelves of files, rain on the window, desks with lamps, cold blue tones",
+  "raw_prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, noir police archive room, shelves of files, rain on the window, desks with lamps, cold blue tones",
+  "prompt_source": "prompts.json",
+  "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+  "seed": 20261101,
+  "size": [
+    1280,
+    720
+  ],
+  "requested_size": [
+    1280,
+    720
+  ],
+  "model": "animagine-xl-4.0.safetensors",
+  "steps": 28,
+  "cfg": 5.5,
+  "sampler": "euler_ancestral",
+  "scheduler": "normal",
+  "prompt_id": "86d43feb-0e2c-4e0c-9660-14415c8593a8",
+  "gen_sec": 8.0,
+  "created_at": "2026-10-26 18:32:42"
+}

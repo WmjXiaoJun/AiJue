@@ -1,0 +1,208 @@
+{
+  "id": "zhuge",
+  "name": "诸葛亮",
+  "title": "蜀汉丞相，羽扇纶巾、运筹帷幄，说话慢条斯理却句句点穴；爱用比喻讲大局。",
+  "persona": "蜀汉丞相，羽扇纶巾、运筹帷幄，说话慢条斯理却句句点穴；爱用比喻讲大局。",
+  "mode": "three_view",
+  "style": "anime",
+  "model": "animagine-xl-4.0.safetensors",
+  "steps": 28,
+  "cfg": 5.5,
+  "sampler": "euler_ancestral",
+  "scheduler": "normal",
+  "seed": 60,
+  "size": {
+    "portrait": [
+      832,
+      1216
+    ],
+    "other": [
+      1024,
+      1024
+    ]
+  },
+  "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, full body, multiple characters",
+  "prompt": {
+    "portrait": "masterpiece, best quality, anime style, solo, 1boy, male, mature male, black hair, black eyes, cream hanfu, teal accents, upper body, looking at viewer, centered composition, studio lighting, dark background, clean lineart, cel shading, vibrant colors, detailed face, chinese hair bun, lun jin headwear, long beard, goatee, long black eyebrows, dark eyes, ivory hanfu, wide sleeves, blue trim, white feather fan in hand, calm wise expression, gentle smile, sage strategist, chinese ancient setting, simple background",
+    "front": "masterpiece, best quality, anime style, solo, 1boy, male, mature male, black hair, black eyes, cream hanfu, teal accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, chinese hair bun, lun jin headwear, long beard, goatee, long black eyebrows, dark eyes, ivory hanfu, wide sleeves, blue trim, white feather fan in hand, calm wise expression, gentle smile, looking at viewer, pure white background, isolated on white background, no shadow, no scenery"
+  },
+  "created_at": "2026-10-26T18:31:11",
+  "elapsed_sec": 30.1,
+  "files": {
+    "portrait": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\zhuge\\portrait.png",
+    "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\zhuge\\front.png",
+    "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\zhuge\\cutout.png"
+  },
+  "images": [
+    {
+      "tag": "portrait",
+      "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\zhuge\\portrait.png",
+      "seed": 60,
+      "width": 832,
+      "height": 1216,
+      "gen_sec": 12.2,
+      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, mature male, black hair, black eyes, cream hanfu, teal accents, upper body, looking at viewer, centered composition, studio lighting, dark background, clean lineart, cel shading, vibrant colors, detailed face, chinese hair bun, lun jin headwear, long beard, goatee, long black eyebrows, dark eyes, ivory hanfu, wide sleeves, blue trim, white feather fan in hand, calm wise expression, gentle smile, sage strategist, chinese ancient setting, simple background",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, full body, multiple characters, lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone",
+      "composition": "portrait",
+      "expression": null
+    },
+    {
+      "tag": "front",
+      "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\zhuge\\three_view/front.png",
+      "seed": 61,
+      "width": 1024,
+      "height": 1024,
+      "gen_sec": 16.1,
+      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, mature male, black hair, black eyes, cream hanfu, teal accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, chinese hair bun, lun jin headwear, long beard, goatee, long black eyebrows, dark eyes, ivory hanfu, wide sleeves, blue trim, white feather fan in hand, calm wise expression, gentle smile, looking at viewer, pure white background, isolated on white background, no shadow, no scenery",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, multiple views, split screen, cropped, lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements",
+      "composition": "front",
+      "expression": null
+    }
+  ],
+  "source": "imagegen",
+  "created_by": "pipeline/v5_art.generate_character_art",
+  "status": "ok",
+  "prompt_source": "contract/v5/art/prompts.json#characters",
+  "sizes": {
+    "portrait": [
+      832,
+      1216
+    ],
+    "cutout": [
+      550,
+      949
+    ]
+  },
+  "alpha_ratio": 0.428,
+  "front_white": {
+    "ok": true,
+    "corners": [
+      {
+        "rgb": [
+          255,
+          255,
+          255
+        ],
+        "mean": 255.0,
+        "spread": 1.0
+      },
+      {
+        "rgb": [
+          255,
+          255,
+          255
+        ],
+        "mean": 254.9,
+        "spread": 2.0
+      },
+      {
+        "rgb": [
+          255,
+          255,
+          255
+        ],
+        "mean": 255.0,
+        "spread": 1.0
+      },
+      {
+        "rgb": [
+          255,
+          255,
+          255
+        ],
+        "mean": 255.0,
+        "spread": 2.0
+      }
+    ],
+    "white_ratio": 0.794
+  },
+  "front_attempts": 1,
+  "cutout_validation": {
+    "ok": true,
+    "alpha0": 0.572,
+    "visible": 0.428,
+    "corners_alpha": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "bbox": [
+      8,
+      8,
+      542,
+      941
+    ],
+    "aspect": 0.58,
+    "bbox_h_ratio": 0.983,
+    "wash": {
+      "removed": false,
+      "color": null,
+      "ratio": 0.0
+    }
+  },
+  "face_norm": {
+    "score": 0.849,
+    "estimated": false,
+    "source": "yunet",
+    "bbox": [
+      0.5294545454545454,
+      0.10273972602739725,
+      0.6398181818181817,
+      0.19315068493150686
+    ],
+    "mouth": {
+      "cx": 0.5846545454545454,
+      "cy": 0.1732349841938883,
+      "w": 0.03756363636363636,
+      "h": 0.009799789251844047
+    },
+    "eyes": {
+      "y": 0.14070600632244468,
+      "w": 0.02430909090909091,
+      "cx": [
+        0.5581272727272728,
+        0.6111636363636364
+      ]
+    },
+    "skin": "#fee1b9",
+    "lip": "#7a4a45",
+    "line": "#000000",
+    "face_w": 60.77
+  },
+  "face_portrait_norm": {
+    "score": 0.0,
+    "estimated": true,
+    "bbox": [
+      0.3,
+      0.18001644736842107,
+      0.7,
+      0.5199835526315789
+    ],
+    "mouth": {
+      "cx": 0.5,
+      "cy": 0.4383963815789474,
+      "w": 0.10400240384615385,
+      "h": 0.029884868421052636
+    },
+    "eyes": {
+      "y": 0.32279605263157896,
+      "w": 0.08,
+      "cx": [
+        0.41199519230769227,
+        0.5880048076923077
+      ]
+    },
+    "skin": "#f1c9a1",
+    "lip": "#725441",
+    "line": "#060509",
+    "face_w": 332.8
+  },
+  "prompts": {
+    "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, chinese hair bun, lun jin headwear, long beard, goatee, long black eyebrows, dark eyes, ivory hanfu, wide sleeves, blue trim, white feather fan in hand, calm wise expression, gentle smile, sage strategist, chinese ancient setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+    "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, chinese hair bun, lun jin headwear, long beard, goatee, long black eyebrows, dark eyes, ivory hanfu, wide sleeves, blue trim, white feather fan in hand, calm wise expression, gentle smile, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery",
+    "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements"
+  },
+  "face_source": "yunet",
+  "overlay_allowed": true
+}

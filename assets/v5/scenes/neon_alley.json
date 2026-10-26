@@ -1,0 +1,27 @@
+{
+  "scene": "neon_alley",
+  "label": "霓虹巷",
+  "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\scenes\\neon_alley.png",
+  "png": "neon_alley.png",
+  "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, neon alley at night, rain, wet reflective ground, neon signs and tubes, brick walls, haze",
+  "raw_prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, neon alley at night, rain, wet reflective ground, neon signs and tubes, brick walls, haze",
+  "prompt_source": "prompts.json",
+  "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+  "seed": 20261101,
+  "size": [
+    1280,
+    720
+  ],
+  "requested_size": [
+    1280,
+    720
+  ],
+  "model": "animagine-xl-4.0.safetensors",
+  "steps": 28,
+  "cfg": 5.5,
+  "sampler": "euler_ancestral",
+  "scheduler": "normal",
+  "prompt_id": "a4ad0e47-542b-4a35-91f5-bbfb557ab3e5",
+  "gen_sec": 8.0,
+  "created_at": "2026-10-26 18:31:52"
+}

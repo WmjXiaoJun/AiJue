@@ -75,6 +75,89 @@ EXTENSION_MODULES = ("v5_primitives_history", "v5_primitives_modern",
 
 FONT_SCRATCH = REPO / "tmp" / "v5_fonts"
 
+# AI 场景 plate 目录（V5.2 美术升级）；可用 V5_SCENE_ART_DIR 覆盖（测试用）
+SCENE_ART_DIR = Path(os.environ.get("V5_SCENE_ART_DIR", "") or (REPO / "assets" / "v5" / "scenes"))
+
+
+def _scene_plate_path(scene: dict) -> Path | None:
+    """返回该场景的 AI plate 路径；没有则 None（走程序化 fallback）。"""
+    art = scene.get("art")
+    if isinstance(art, dict):
+        rel = art.get("plate") or art.get("image")
+        if rel:
+            p = Path(rel)
+            if not p.is_absolute():
+                p = REPO / p
+            if p.is_file():
+                return p
+    sid = str(scene.get("id") or scene.get("scene") or "").strip()
+    if not sid:
+        return None
+    p = Path(SCENE_ART_DIR) / f"{sid}.png"
+    return p if p.is_file() else None
+
+
+def _fit_cover(img: Image.Image, size: tuple[int, int]) -> Image.Image:
+    """等比缩放铺满 size，居中裁剪（避免 AI plate 比例不符变形）。"""
+    w, h = size
+    iw, ih = img.size
+    scale = max(w / max(1, iw), h / max(1, ih))
+    nw, nh = max(1, int(round(iw * scale))), max(1, int(round(ih * scale)))
+    img = img.resize((nw, nh), Image.LANCZOS)
+    left, top = (nw - w) // 2, (nh - h) // 2
+    return img.crop((left, top, left + w, top + h))
+
+
+def _render_plate_layers(scene: dict, style: dict, size: tuple[int, int],
+                         seed: int, plate_path: Path) -> dict:
+    """AI plate → 三层图层：plate 做 background（风格 finish），叠加雾/光/暗角。"""
+    width, height = size
+    plate = Image.open(plate_path).convert("RGBA")
+    plate = _fit_cover(plate, size)
+    try:
+        from . import style_v5  # 延迟 import，避免循环
+        finished = style_v5.apply_finish(plate, style)
+        if isinstance(finished, Image.Image) and finished.size == size:
+            plate = finished.convert("RGBA")
+    except Exception as exc:  # noqa: BLE001
+        LOG.debug("plate style finish 跳过: %s", exc)
+    background = plate.copy()
+    midground = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    foreground = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    palette = style.get("palette") or {}
+    try:
+        haze_color = tuple(resolve_color(palette, "highlight", fallback="paper"))[:3]
+    except Exception:  # noqa: BLE001
+        haze_color = (240, 240, 240)
+    haze = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    hd = ImageDraw.Draw(haze)
+    for i in range(6):
+        y = int(height * (0.35 + i * 0.11))
+        alpha = 8 + i * 3
+        hd.rectangle([0, y, width, min(height, y + height // 7)],
+                     fill=tuple(haze_color) + (alpha,))
+    midground.alpha_composite(haze.filter(ImageFilter.GaussianBlur(40)))
+    vignette = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    vd = ImageDraw.Draw(vignette)
+    edge = int(min(width, height) * 0.16)
+    for i in range(edge):
+        a = int(46 * (1 - i / max(1, edge)) ** 1.6)
+        if a <= 0:
+            continue
+        vd.rectangle([i, i, width - 1 - i, height - 1 - i], outline=(0, 0, 0, a))
+    foreground.alpha_composite(vignette.filter(ImageFilter.GaussianBlur(12)))
+    top = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    td = ImageDraw.Draw(top)
+    for i in range(int(height * 0.18)):
+        a = int(52 * (1 - i / (height * 0.18)))
+        td.line([(0, i), (width, i)], fill=(0, 0, 0, a))
+    foreground.alpha_composite(top)
+    return {"background": background, "midground": midground,
+            "foreground": foreground}
+
+
+
+
 
 class V5Error(RuntimeError):
     """V5 风格/场景契约被违反（未知 primitive / 非法 palette / 非法图层等）。"""
@@ -962,12 +1045,22 @@ def render_scene_layers(scene: dict, style: dict, size: tuple[int, int],
         raise V5Error(f"scene {scene_id!r} 变体 {variant!r} 未在 variants 中声明: {variants}")
     layers = _apply_variant(layers_raw, variant)
 
-    imgs: dict[str, Image.Image] = {
-        name: Image.new("RGBA", (width, height), (0, 0, 0, 0)) for name in LAYERS
-    }
-    used: list[dict] = []
-    foreground_used = False
-    for index, spec in enumerate(layers):
+    plate_path = _scene_plate_path(scene)
+    plate_art = ""
+    if plate_path is not None:
+        plate_layers = _render_plate_layers(scene, style, (width, height), seed, plate_path)
+        imgs = {name: plate_layers[name] for name in LAYERS}
+        used = [{"index": 0, "type": f"plate:{plate_path.name}", "layer": "background"}]
+        foreground_used = True
+        plate_art = str(plate_path)
+        LOG.debug("scene %s 使用 AI plate: %s", scene_id, plate_path)
+    else:
+        imgs = {
+            name: Image.new("RGBA", (width, height), (0, 0, 0, 0)) for name in LAYERS
+        }
+        used = []
+        foreground_used = False
+    for index, spec in enumerate(layers if plate_path is None else []):
         if not _layer_applies(spec, style_id):
             continue
         name = str(spec.get("type") or "").strip()
@@ -1047,6 +1140,7 @@ def render_scene_layers(scene: dict, style: dict, size: tuple[int, int],
         "scene": scene_id,
         "label": str(scene.get("label") or ""),
         "style": style_id,
+        "art": plate_art or "procedural",
         "variants": variants,
         "variant": variant,
         "size": [width, height],

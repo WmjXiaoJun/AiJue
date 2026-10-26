@@ -75,5 +75,10 @@
     "instruction": "20岁女性，甜美清亮，尾音上扬，笑意明显，语速轻快",
     "seed": 20262016,
     "cfg_scale": 4.4
+  },
+  "art": {
+    "portrait": "assets/v5/characters/tianmei/portrait.png",
+    "front": "assets/v5/characters/tianmei/front.png",
+    "cutout": "assets/v5/characters/tianmei/cutout.png"
   }
 }

@@ -401,3 +401,116 @@ python -m pipeline.scene_render --check-scenes
 - `finish`/`grade`/`packaging`/`typography` 字段语义不变，只允许追加键；
 - 任何“引擎行为”变化（如新增转场映射、字幕 family）必须同时更新 A.3-A.7；
 - 本文档与 `contract/v5/styles/*.json` 冲突时，**以 JSON 为准**，文档记录“推荐值/意图”。
+
+---
+
+# D. AI 素材风格化（V5.2）
+
+> 背景：V5.2 起 24 角色 + 61 场景换成 SDXL 动漫美术（`assets/v5/characters/<id>/cutout.png`、
+> `assets/v5/scenes/<id>.png`，同一画风）。同一张 AI 素材若只靠旧版轻微调色，16 风格会像同一部片。
+> 为此 `style_v5.apply_finish` 增加 **AI 素材强化链路**；程序化 fallback 保持旧强度不变。
+
+## D.1 启用条件与调用链
+
+```
+scene_render plate 模式                        characters_v5 AI 立绘
+  assets/v5/scenes/<id>.png                      assets/v5/characters/<id>/cutout.png
+      │  _fit_cover(输出尺寸)                          │  render_character()
+      ▼                                                ▼
+style_v5.apply_finish(plate, style)            style_v5.apply_finish(img, style, kind="character")
+  ├─ looks_like_ai_art(plate) → True               ├─ _ai_character_finish（中强度、脸安全）
+  ├─ _ai_plate_finish（强处理，按 technique 分派）    ├─ 通用叠加（轻） + character_treatment 描边
+  └─ 旧版通用叠加降为 45% 暗角 / 55% 颗粒            └─ characters_v5 再做 identity 保持/暖调/去白边
+```
+
+**AI 检测**（`style_v5.looks_like_ai_art`，确定性、~3ms）：160×90 缩略图的
+`uniq_colors` / `hf`（相对高斯模糊残差）/ `lap`（拉普拉斯均值）。
+实测 AI plate：uniq 9k-13k、hf 14-19、lap 26-33；程序化 plate：uniq 2.5k-6.5k、hf 7.5-10.4、lap 14-18。
+阈值 `(uniq≥8000 且 hf≥12) 或 (uniq≥12000 且 lap≥24)`；**4 个历史程序化场景实测全部 False（维持旧观感）**，
+61 张 AI plate 实测全部 True。
+
+**接口不变**：`apply_finish(img, style, kind="plate"|"character") -> PIL.Image`（RGB in→RGB out，RGBA in→RGBA out，
+alpha 保留）。新增内部函数均为私有；`contract/v5/styles/*.json` 未改，`finish` 字段仍被读取
+（强链路把它的值当“下限/上限”用，不会因为旧 JSON 参数太小而失去风格）。
+
+## D.2 确定性（可复现）
+
+- 所有随机纹理/抖动/印章磨损的 seed 由 **`style.id`** 派生：`_stable_seed(style, salt) = crc32(f"{id}|{salt}|20261026")`；
+- 同素材 + 同风格 → 逐字节相同（自测 `deterministic=True ×16`）；不同机器/进程亦一致（无全局随机）；
+- 不依赖时间/环境/文件系统顺序；与 `style.finish` 数值一起决定唯一输出。
+
+## D.3 16 风格处理链（plate 强处理 / character 中强度）
+
+> 下表是 `_ai_plate_finish` 的主链（省略调色前置步骤）；character 链见 `_ai_character_finish`。
+> 记号：`tone`=双色调映射，`curve`=LUT 曲线，`limit`=限色平涂，`poster`=亮度色阶，`edges`=粗黑刻线，
+> `glow`=边缘霓虹光，`hatch`=排线，`screen`=网点，`frame`=胶片框，`osd`=录像 OSD，`seal`=朱印。
+
+| style_id | plate 强链路（关键步骤） | character 中强度链 | 一眼可辨特征 |
+|---|---|---|---|
+| `ink_chronicle` | tone 冷灰墨 → 去饱和 0.30 → curve → poster 7 级 0.42 → 湿边洇墨 → 宣纸纹理 0.20 → 飞白刻线 → **朱印** → 暗角 | tone 冷灰 0.58 + 去饱和 0.34 + 纸纹 + 墨边 0.36 | 冷灰单色、宣纸颗粒、左下朱印 |
+| `woodblock_classic` | 去饱和 0.62 → limit 5 色 0.58 → curve 1.22 → 纸黄叠加 → **粗黑刻线 thickness=2** → 暗角 | limit 7 色 + 粗黑边 + 纸纹 + 网点 | 平涂 5 色块、粗黑刻线、纸黄 |
+| `parchment_case` | tone 深褐 0.86 → 去饱和 0.30 → curve → **双角度排线 0.42/0.26** → 纸纹 → 裂纹 → 强暗角 | tone 褐 0.74 + 双角度排线 + 墨边 | 褐黄做旧、密集铜版排线 |
+| `museum_gold` | curve gamma 1.92 压黑 → 去饱和 0.26 → **gold_accent（只亮部上金）** → 聚光 → 金粉 → 暗角 0.78 | gamma 1.35 + gold_accent + 金边 glow | 黑底金饰、强聚光、四周全黑 |
+| `silk_arena` | 去饱和 0.58 → curve 提亮 → tone 淡绢 0.46 → **绢面织纹 0.38** → 纸纹 → 细线 → 轻暗角 | 绢纹 + 细墨线 + 淡绢 tone | 极淡暖白绢面、细织纹 |
+| `neon_toon` | 饱和 1.44 → **青暗部/洋红亮部分离** → glow 0.70 → 边缘双色霓虹光 → 色差 → 扫描线 → 暗角 | 饱和 1.42 + 青洋红 split + 霓虹边光 | 青洋红霓虹发光、色差 |
+| `hologram_stage` | tone 青蓝 → **全息网格** → 扫描线 0.22 → 故障带 → 通道错位 → 青光 bloom | 青蓝 tone + 扫描线 + bloom | 青绿全息、故障横条 |
+| `vhs_late_show` | 饱和 1.02 → 色度拖尾 → **洋红染色 11%** → 色差 → 行抖 1.1 → 扫描线 0.44 → **REC OSD** | 色度拖尾 + 色差 + 扫描线 | 洋红偏色、扫描线、左上 REC |
+| `film_interview` | 暖调分离 → 暖 bloom → 行抖 0.14 → **16mm 片框/齿孔** → 颗粒 0.15 → 暗角 | 暖 tone + bloom + 颗粒 | 上下片框齿孔、暖橙颗粒 |
+| `noir_rain` | 去色 0.10 → curve 1.46 → **百叶硬光带** → 冷调分离 → 强暗角 0.56 | 去色 0.12 + 高对比 + 暗角 | 黑白高反差、百叶光带 |
+| `oil_impasto` | limit 10 色 → **画布纹理** → 浮雕 0.40 → **笔触 0.50** → 提亮 curve → 暖调分离 → 裂纹 → 锐化 | 饱和 1.16 + 浮雕 + 笔触 + 暖调 | 厚涂笔触、画布、上光暖色 |
+| `baroque_candle` | **烛光光晕 1.05** → gamma 1.20 → 红褐分离 0.58 → 硬光带 → 暖 bloom → 暗角 0.60 | 暖 split + 金 bloom + 暗角 | 深红褐烛光、明暗对照 |
+| `blueprint_lab` | **蓝图白线化**（navy 底+亮度分层+白线）→ 技术网格 → 冷暗角 | 蓝图线化 + 提亮 | 深蓝底白色线稿+网格 |
+| `candy_collage` | 饱和 1.32 → limit 8 色 → 纸纹 → **半调网点 0.20** → **撕纸边** → 锐化 | limit 色块 + 网点 + 纸纹 | 高饱和平涂、撕纸白边、网点 |
+| `clay_diorama` | limit 12 色 → 提亮 curve → **黏土柔光 0.40** → **移轴模糊 0.52** → 暖 tone → 轻暗角 | 提亮 + 黏土柔光 + 限色 | 柔嫩粉彩、上下虚化（微缩感） |
+| `chalk_sketch` | **黑板化**（深绿板底 0.72-1.22×）→ 白色粗糙粉笔线（强/弱两级）→ 粉笔灰 → 暗角 | 去饱和 + 粉笔灰 + 白边 | 深绿黑板 + 白色粉笔线 |
+
+## D.4 人脸/嘴可读性（历史风格尤其重要）
+
+- `kind="character"` 走**中强度**链：不做整图 posterize/重模糊；历史 4 风格只做色调/纸纹/细墨边；
+- 头部区域高频能量（`face_energy_ratio` = 处理后/原图拉普拉斯均值，>0.45 视为可读）实测：
+  ink 0.94、woodblock 1.53、parchment 0.62、museum 0.90、silk 0.96、baroque 0.87、clay 0.82 …**16/16 ≥ 0.62**；
+- `characters_v5` 在 `apply_finish` 之后还会做 `preserve_identity`（把五官/脸型细节贴回）、
+  `warm_correct`、`matte_cleanup`，因此播放尺度下脸/嘴比本自测 sheet 更清晰；
+- 若未来用户自定义 style 想更狠的风格化：请调 `character_treatment`，不要提高 `finish` 里的
+  `posterize/hatch`（引擎对 character 分支会忽略极端值）。
+
+## D.5 性能（CPU，纯 PIL/numpy）
+
+| 项目 | 实测 |
+|---|---|
+| AI plate `apply_finish`（1280×720，16 风格） | min 232ms / mean 363ms / max 616ms |
+| `scene_render` plate 模式单场景（含 finish + 雾/暗角叠层） | 245-405ms |
+| AI 立绘 `render_character`（420×640，含 finish） | 91-136ms |
+| 16 风格自测 sheet（16 plate + 16 立绘 + 合成） | 21.4s total |
+
+> plate 每场景只处理 1 次（不是每帧）；对 40s 成片（~8-12 场景）额外耗时 ~3-5s，可接受。
+
+## D.6 自测命令与产物
+
+```bash
+# 16 风格 × (AI plate + AI 立绘) → 3 张 contact sheet + 差异度/人脸可读性报告
+python tmp/v52_style_finish/gen_sheet.py
+
+# 产物
+#   tmp/v52_style_finish/sheet.png         主验收图（4×4：plate+立绘合成）
+#   tmp/v52_style_finish/sheet_plates.png  4×4 场景 plate（看场景风格）
+#   tmp/v52_style_finish/sheet_chars.png   4×4 立绘（看角色风格+脸可读）
+#   tmp/v52_style_finish/<style>.png / plate_<style>.png / char_<style>.png
+#   tmp/v52_style_finish/report.json        耗时/确定性/直方图两两距离/人脸能量
+```
+
+**验收指标（V5.2.0 实测）**：16/16 确定性一致；两两 8-bin RGB 直方图卡方距离
+**最小 0.171**（museum_gold × baroque_candle，两者亮度/暗部结构已显著不同）、**中位 0.542**；
+肉眼抽检 4×4 sheet 16 格均可命名区分；`python -m pytest pipeline/tests -q` → **175 passed**（不回归）。
+
+## D.7 调参 / 扩展约定
+
+1. 强链路只读 `style.technique`（主 technique 决定主风格）+ `style.palette`（颜色来源）+ `style.finish`（强度基线）；
+2. 想让某风格“更狠/更柔”：优先调该风格的 `finish`（强链路会对 paper/hatch/vignette/grain 做上下限钳制），
+   或新增 `technique`；**不要**在 `apply_finish` 里加“if style.id == xxx”的硬编码；
+3. 新增 technique：在 `TECHNIQUES`、`TECHNIQUE_FINISH`、`_technique_fx`、`_ai_plate_finish`、
+   `_ai_character_finish` 各加一个分支，并补 D.3 表与 A.1 总表；
+4. 新 AI 素材若被误判为程序化（plans 尺寸/画风差异大）：调 `looks_like_ai_art` 阈值，
+   并在 `tmp/v52_style_finish/gen_sheet.py` 打印的 `ai_detect` 与 report 里留证据；
+5. 自测 sheet 与 report 随每次风格改动重跑，作为回归基线（`tmp/v52_style_finish/` 已被 git 忽略）。
+

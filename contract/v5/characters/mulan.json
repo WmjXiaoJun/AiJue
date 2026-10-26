@@ -76,5 +76,10 @@
     "instruction": "24岁女性，清亮利落，中气足，英气爽快，语速偏快",
     "seed": 20262008,
     "cfg_scale": 4.2
+  },
+  "art": {
+    "portrait": "assets/v5/characters/mulan/portrait.png",
+    "front": "assets/v5/characters/mulan/front.png",
+    "cutout": "assets/v5/characters/mulan/cutout.png"
   }
 }

@@ -72,5 +72,10 @@
     "instruction": "青年中性机械音，平稳无起伏，带轻微电子质感，断句规整",
     "seed": 20262023,
     "cfg_scale": 4.5
+  },
+  "art": {
+    "portrait": "assets/v5/characters/robot/portrait.png",
+    "front": "assets/v5/characters/robot/front.png",
+    "cutout": "assets/v5/characters/robot/cutout.png"
   }
 }

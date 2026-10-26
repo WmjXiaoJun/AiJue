@@ -75,5 +75,10 @@
     "instruction": "30岁男性，圆润温和，笑眯眯的，语速慢，带咀嚼般的松弛感",
     "seed": 20262018,
     "cfg_scale": 4.1
+  },
+  "art": {
+    "portrait": "assets/v5/characters/pangzi/portrait.png",
+    "front": "assets/v5/characters/pangzi/front.png",
+    "cutout": "assets/v5/characters/pangzi/cutout.png"
   }
 }

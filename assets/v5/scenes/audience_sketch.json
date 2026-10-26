@@ -1,0 +1,27 @@
+{
+  "scene": "audience_sketch",
+  "label": "粉笔观众席",
+  "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\scenes\\audience_sketch.png",
+  "png": "audience_sketch.png",
+  "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, chalk sketch audience on a blackboard, rows of chalk silhouettes in darkness, theater spotlights, chalk hatching",
+  "raw_prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, chalk sketch audience on a blackboard, rows of chalk silhouettes in darkness, theater spotlights, chalk hatching",
+  "prompt_source": "prompts.json",
+  "negative": "lowres, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, detailed faces, foreground people, portrait, close-up",
+  "seed": 20261101,
+  "size": [
+    1280,
+    720
+  ],
+  "requested_size": [
+    1280,
+    720
+  ],
+  "model": "animagine-xl-4.0.safetensors",
+  "steps": 28,
+  "cfg": 5.5,
+  "sampler": "euler_ancestral",
+  "scheduler": "normal",
+  "prompt_id": "c438010e-d96b-4f7a-ae91-b526804b2f27",
+  "gen_sec": 8.0,
+  "created_at": "2026-10-26 18:26:02"
+}

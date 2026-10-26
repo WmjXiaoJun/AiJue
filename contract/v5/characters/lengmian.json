@@ -71,5 +71,10 @@
     "instruction": "35岁男性，平直无起伏的低音，冷幽默停顿感，几乎不带情绪",
     "seed": 20262020,
     "cfg_scale": 3.7
+  },
+  "art": {
+    "portrait": "assets/v5/characters/lengmian/portrait.png",
+    "front": "assets/v5/characters/lengmian/front.png",
+    "cutout": "assets/v5/characters/lengmian/cutout.png"
   }
 }

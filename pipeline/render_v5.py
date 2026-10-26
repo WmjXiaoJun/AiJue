@@ -179,70 +179,57 @@ def tts_and_pace(plan: dict, catalog: dict, paths: dict, prog, force: bool = Fal
     if not role_texts:
         raise RenderV5Error("计划里没有任何台词，无法配音")
 
-    # 2) 保证 Breeze 服务 + 每角色声音锁（reference audio）
+    # 2) 声音锁 + 缓存检查：全部就绪时不启动 Breeze（纯 CPU 重渲可省一次模型加载）
     if prog:
         prog(5, f"Breeze TTS 2：{len(role_texts)} 个角色 / 固定声音锁")
-    if not tts_breeze.server_alive():
-        if prog:
-            prog(6, "启动 Breeze TTS 2 服务（首次加载 1-2 分钟）")
-        if not tts_breeze.start_server():
-            raise RenderV5Error("Breeze TTS 服务启动失败")
     relock = str(os.environ.get("V5_VOICE_RELOCK", "")).lower() in ("1", "true", "yes")
-    locks: dict[str, dict] = {}
-    for cid in role_texts:
-        spec = char_specs[cid]
-        try:
-            locks[cid] = v5_voices.ensure_voice_lock(
-                _character(catalog, cid), spec, force=relock)
-        except Exception as exc:  # noqa: BLE001
-            LOG.warning("角色 %s 声音锁生成失败（回退 Voice Design）: %s", cid, exc)
-            locks[cid] = {"character": cid, "key": spec["key"], "wav": "",
-                          "text": "", "cached": False, "voice_id": spec["voice_id"],
-                          "seed": spec["seed"]}
-    voices = {cid: {"instruction": char_specs[cid].get("instruction"),
-                    "seed": char_specs[cid]["seed"],
-                    "cfg_scale": char_specs[cid]["cfg_scale"]}
-              for cid in role_texts}
-    refs = {cid: (lock.get("wav"), lock.get("text") or "")
-            for cid, lock in locks.items() if lock.get("wav")}
-
-    # 3) 断点续跑：缓存键 = character|voice_key|text（改声音会自动失效）
     cache_path = voice_dir / "voice_cache.json"
     cache = utils.read_json(cache_path) or {}
     reuse_tts = str(os.environ.get("V5_REUSE_TTS", "")).lower() in ("1", "true", "yes")
     if force and not reuse_tts:
         cache = {}
-    meta = plan.setdefault("meta", {})
-    meta["voice_provider"] = "breeze"
-    meta["voices"] = [
-        {"character": cid, "voice_id": char_specs[cid]["voice_id"],
-         "key": char_specs[cid]["key"], "seed": char_specs[cid]["seed"],
-         "ref": locks[cid].get("wav") or "", "ref_cached": bool(locks[cid].get("cached"))}
-        for cid in role_texts]
     pending: dict[str, list[str]] = {}
     for char_id, texts in role_texts.items():
         key_prefix = f"{char_id}|{char_specs[char_id]['key']}|"
         for text in texts:
             if key_prefix + text not in cache:
                 pending.setdefault(char_id, []).append(text)
-
-    if prog:
-        prog(8, f"配音：{sum(len(v) for v in pending.values())} 句 / {len(role_texts)} 角色"
-                f"（voice clone）")
-    if pending:
-        results = tts_breeze.synthesize(pending, raw_dir, auto_start=False,
-                                        voices=voices, refs=refs)
-        for item in results:
-            cid = item["role"]
-            key = f"{cid}|{char_specs[cid]['key']}|{item['text']}"
-            cache[key] = {"path": item["path"], "duration": item["duration"],
-                          "provider": item.get("provider", "breeze"),
-                          "seed": item.get("seed"),
-                          "voice": item.get("voice", ""),
-                          "voice_id": char_specs[cid]["voice_id"],
-                          "voice_key": char_specs[cid]["key"],
-                          "ref": refs.get(cid, (None, ""))[0] or ""}
-        utils.write_json(cache_path, cache)
+    locks: dict[str, dict] = {}
+    missing_lock = False
+    for cid in role_texts:
+        spec = char_specs[cid]
+        wav, _meta = v5_voices.lock_paths(cid, spec)
+        if relock or not wav.is_file():
+            missing_lock = True
+            break
+    if (pending or missing_lock) and not tts_breeze.server_alive():
+        if prog:
+            prog(6, "启动 Breeze TTS 2 服务（配音/声音锁需要，首次加载 1-2 分钟）")
+        if not tts_breeze.start_server():
+            raise RenderV5Error("Breeze TTS 服务启动失败")
+    for cid in role_texts:
+        spec = char_specs[cid]
+        if relock or not v5_voices.lock_paths(cid, spec)[0].is_file():
+            try:
+                locks[cid] = v5_voices.ensure_voice_lock(
+                    _character(catalog, cid), spec, force=relock)
+            except Exception as exc:  # noqa: BLE001
+                LOG.warning("角色 %s 声音锁生成失败（回退 Voice Design）: %s", cid, exc)
+                locks[cid] = {"character": cid, "key": spec["key"], "wav": "",
+                              "text": "", "cached": False, "voice_id": spec["voice_id"],
+                              "seed": spec["seed"]}
+        else:
+            wav, meta_p = v5_voices.lock_paths(cid, spec)
+            info = utils.read_json(meta_p) or {}
+            locks[cid] = {"character": cid, "key": spec["key"], "wav": str(wav),
+                          "text": info.get("text") or "", "cached": True,
+                          "voice_id": spec["voice_id"], "seed": spec["seed"]}
+    refs = {cid: (lock.get("wav"), lock.get("text") or "")
+            for cid, lock in locks.items() if lock.get("wav")}
+    voices = {cid: {"instruction": char_specs[cid].get("instruction"),
+                    "seed": char_specs[cid]["seed"],
+                    "cfg_scale": char_specs[cid]["cfg_scale"]}
+              for cid in role_texts}
 
     # 4) 每镜：语音时长 → 镜头时长；音轨 wav（48k stereo，voice 起点 +0.10s）
     total = 0.0
@@ -443,6 +430,20 @@ def _pick_zone(shot: dict, layers: dict) -> tuple[str | None, list[float] | None
 # ---------------------------------------------------------------------------
 # 2) 逐镜视觉渲染（场景 + 角色 + 2D 动画）
 # ---------------------------------------------------------------------------
+def _fit_anchor_in_zone(anchor, rect, *, margin_x=0.06, margin_top=0.10,
+                        margin_bottom=0.06):
+    """把角色落脚点收进 camera zone（normalized），防止角色被取景裁出画面。"""
+    if not anchor or not rect:
+        return anchor
+    ax, ay = float(anchor[0]), float(anchor[1])
+    x, y, w, h = [float(v) for v in rect]
+    lo_x, hi_x = x + margin_x * w, x + (1.0 - margin_x) * w
+    lo_y, hi_y = y + margin_top * h, y + (1.0 - margin_bottom) * h
+    ax = max(lo_x, min(hi_x, ax))
+    ay = max(lo_y, min(hi_y, ay))
+    return [round(ax, 4), round(ay, 4)]
+
+
 def render_shot_clips(plan: dict, catalog: dict, style: dict, paths: dict,
                       prog, force: bool = False) -> dict:
     scene_render = _require("scene_render")
@@ -494,8 +495,13 @@ def render_shot_clips(plan: dict, catalog: dict, style: dict, paths: dict,
                     mouth = []
             anchor = (layers.get("anchors") or {}).get(role)
             zone_rect = cam.get("zone") if isinstance(cam, dict) else None
+            if anchor:
+                anchor = _fit_anchor_in_zone(anchor, zone_rect)
             zone_h = float(zone_rect[3]) if zone_rect else 1.0
-            char_height = max(0.40, min(0.90, 0.62 * max(0.55, min(1.0, zone_h))))
+            speaking = role == shot.get("role") and str(shot.get("line") or "").strip()
+            base_ratio = 0.68 if speaking else 0.52
+            char_height = max(0.40, min(0.92,
+                                         base_ratio * max(0.55, min(1.0, zone_h))))
             chars_spec.append({"char": char, "role": role, "pose": "front",
                                "mouth_timeline": mouth, "anchor": anchor,
                                "scale": float(shot.get("scale") or 1.0),

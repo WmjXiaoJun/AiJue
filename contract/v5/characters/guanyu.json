@@ -76,5 +76,10 @@
     "instruction": "45岁男性，厚重洪亮，正气凛然，尾音沉稳，带一点傲气",
     "seed": 20262009,
     "cfg_scale": 4.0
+  },
+  "art": {
+    "portrait": "assets/v5/characters/guanyu/portrait.png",
+    "front": "assets/v5/characters/guanyu/front.png",
+    "cutout": "assets/v5/characters/guanyu/cutout.png"
   }
 }

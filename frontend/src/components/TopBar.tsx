@@ -3,7 +3,10 @@ import { fmtMoney } from "../lib/format";
 import { IconChevronRight, IconJobs, IconSettings, IconWallet } from "./icons";
 import { StatusBadge } from "./ui";
 
-type ViewState = { mode: "projects" } | { mode: "workspace"; project: Project; episode: Episode };
+type ViewState =
+  | { mode: "projects" }
+  | { mode: "workspace"; project: Project; episode: Episode }
+  | { mode: "v5" };
 
 interface Props {
   view: ViewState;
@@ -35,6 +38,11 @@ export function TopBar({ view, offline, health, taskStats, onOpenJobs, onOpenCos
             </div>
             <StatusBadge status={episode.status} kind="episode" />
           </>
+        ) : view.mode === "v5" ? (
+          <div className="topbar-episode">
+            <span className="topbar-ep-no">V5 · 可变风格世界</span>
+            <h1>V5 世界</h1>
+          </div>
         ) : (
           <div className="topbar-episode">
             <span className="topbar-ep-no">造片局 · AI 微综艺</span>

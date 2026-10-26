@@ -1,0 +1,77 @@
+{
+  "id": "laozhou",
+  "name": "老周",
+  "title": "造片局主持人，老练毒舌、控场一流；爱用冷幽默拆穿嘉宾的场面话。",
+  "persona": "造片局主持人，老练毒舌、控场一流；爱用冷幽默拆穿嘉宾的场面话。",
+  "mode": "portrait",
+  "style": "anime",
+  "model": "animagine-xl-4.0.safetensors",
+  "steps": 28,
+  "cfg": 5.5,
+  "sampler": "euler_ancestral",
+  "scheduler": "normal",
+  "seed": 42,
+  "size": {
+    "portrait": [
+      832,
+      1216
+    ],
+    "other": [
+      1024,
+      1024
+    ]
+  },
+  "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, full body, multiple characters",
+  "prompt": {},
+  "created_at": "2026-10-26T18:22:42",
+  "elapsed_sec": 0.2,
+  "files": {
+    "portrait": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\laozhou\\portrait.png",
+    "three_view": {},
+    "expressions": {},
+    "scene": null,
+    "sheet": null
+  },
+  "images": [
+    {
+      "tag": "portrait",
+      "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\laozhou\\portrait.png",
+      "seed": 42,
+      "width": 832,
+      "height": 1216,
+      "skipped": true,
+      "gen_sec": 0.0
+    }
+  ],
+  "face_norm": {
+    "score": 0.75,
+    "estimated": false,
+    "source": "yunet",
+    "bbox": [
+      0.3948805460750853,
+      0.052445369406867844,
+      0.6494880546075086,
+      0.1490114464099896
+    ],
+    "mouth": {
+      "cx": 0.5221843003412969,
+      "cy": 0.1277939646201873,
+      "w": 0.08648464163822525,
+      "h": 0.011862643080124871
+    },
+    "eyes": {
+      "y": 0.09303850156087409,
+      "w": 0.055938566552901026,
+      "cx": [
+        0.461160409556314,
+        0.5832423208191125
+      ]
+    },
+    "skin": "#f8d5b0",
+    "lip": "#945643",
+    "line": "#010102",
+    "face_w": 74.52
+  },
+  "face_source": "yunet",
+  "overlay_allowed": true
+}

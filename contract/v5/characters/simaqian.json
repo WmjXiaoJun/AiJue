@@ -76,5 +76,10 @@
     "instruction": "45岁男性，清瘦沉静的中音，略带沙哑，语气克制，字字有据",
     "seed": 20262012,
     "cfg_scale": 3.7
+  },
+  "art": {
+    "portrait": "assets/v5/characters/simaqian/portrait.png",
+    "front": "assets/v5/characters/simaqian/front.png",
+    "cutout": "assets/v5/characters/simaqian/cutout.png"
   }
 }

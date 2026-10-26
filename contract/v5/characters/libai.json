@@ -76,5 +76,10 @@
     "instruction": "35岁男性，明亮张扬，音色偏高，带酒后的松弛和狂气",
     "seed": 20262006,
     "cfg_scale": 4.3
+  },
+  "art": {
+    "portrait": "assets/v5/characters/libai/portrait.png",
+    "front": "assets/v5/characters/libai/front.png",
+    "cutout": "assets/v5/characters/libai/cutout.png"
   }
 }

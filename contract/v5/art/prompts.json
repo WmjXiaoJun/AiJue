@@ -1,0 +1,979 @@
+{
+  "meta": {
+    "model": "animagine-xl-4.0.safetensors",
+    "steps": 28,
+    "cfg_scale": 5.5,
+    "sampler": "euler_ancestral",
+    "scheduler": "normal",
+    "seed_base": 42,
+    "sizes": {
+      "portrait": [
+        832,
+        1216
+      ],
+      "front": [
+        1024,
+        1024
+      ],
+      "scene": [
+        1280,
+        720
+      ]
+    },
+    "note": "与最早 3 角色（laozhou/ali/dawei）同一条 SDXL Animagine 美术管线：角色白底 front 图用 scripts/make_2d_cutouts.remove_white 泛洪抠图；场景为风格无关 anime environment plate，运行时由 style_v5.apply_finish 套风格。"
+  },
+  "characters": {
+    "zhuge": {
+      "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, chinese hair bun, lun jin headwear, long beard, goatee, long black eyebrows, dark eyes, ivory hanfu, wide sleeves, blue trim, white feather fan in hand, calm wise expression, gentle smile, sage strategist, chinese ancient setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+      "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, chinese hair bun, lun jin headwear, long beard, goatee, long black eyebrows, dark eyes, ivory hanfu, wide sleeves, blue trim, white feather fan in hand, calm wise expression, gentle smile, sage strategist, chinese ancient setting, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background",
+      "extra_tags": "1boy, male, mature male, black hair, chinese hair bun, lun jin headwear, long beard, goatee, long black eyebrows, dark eyes, ivory hanfu, wide sleeves, blue trim, white feather fan in hand, calm wise expression, gentle smile, sage strategist, chinese ancient setting",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone"
+    },
+    "caocao": {
+      "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, chinese hair bun, black king hat, full beard, sharp dark eyes, thick eyebrows, dark red and black hanfu, gold belt, sword at waist, ambitious smirk, commanding warlord, chinese ancient setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+      "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, chinese hair bun, black king hat, full beard, sharp dark eyes, thick eyebrows, dark red and black hanfu, gold belt, sword at waist, ambitious smirk, commanding warlord, chinese ancient setting, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background",
+      "extra_tags": "1boy, male, mature male, black hair, chinese hair bun, black king hat, full beard, sharp dark eyes, thick eyebrows, dark red and black hanfu, gold belt, sword at waist, ambitious smirk, commanding warlord, chinese ancient setting",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone"
+    },
+    "sunwu": {
+      "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, topknot, black headband, short beard, moustache, steady dark eyes, dark green hanfu, brown leather belt, scroll in hand, sword at waist, calm composed expression, military strategist, chinese ancient setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+      "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, topknot, black headband, short beard, moustache, steady dark eyes, dark green hanfu, brown leather belt, scroll in hand, sword at waist, calm composed expression, military strategist, chinese ancient setting, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background",
+      "extra_tags": "1boy, male, mature male, black hair, topknot, black headband, short beard, moustache, steady dark eyes, dark green hanfu, brown leather belt, scroll in hand, sword at waist, calm composed expression, military strategist, chinese ancient setting",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone"
+    },
+    "qinshihuang": {
+      "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, chinese hair bun, imperial crown, mianguan, long beard, goatee, cold stern eyes, thick eyebrows, black imperial robe, gold dragon pattern, jade pendant, sword at waist, authoritative emperor, chinese ancient setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+      "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, chinese hair bun, imperial crown, mianguan, long beard, goatee, cold stern eyes, thick eyebrows, black imperial robe, gold dragon pattern, jade pendant, sword at waist, authoritative emperor, chinese ancient setting, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background",
+      "extra_tags": "1boy, male, mature male, black hair, chinese hair bun, imperial crown, mianguan, long beard, goatee, cold stern eyes, thick eyebrows, black imperial robe, gold dragon pattern, jade pendant, sword at waist, authoritative emperor, chinese ancient setting",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone"
+    },
+    "sushi": {
+      "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, hair bun, futou hat, long beard, goatee, warm dark eyes, long eyebrows, cream robe, green sash, brush in hand, scroll in hand, cheerful warm smile, relaxed literary scholar, chinese ancient setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+      "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, hair bun, futou hat, long beard, goatee, warm dark eyes, long eyebrows, cream robe, green sash, brush in hand, scroll in hand, cheerful warm smile, relaxed literary scholar, chinese ancient setting, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background",
+      "extra_tags": "1boy, male, mature male, black hair, hair bun, futou hat, long beard, goatee, warm dark eyes, long eyebrows, cream robe, green sash, brush in hand, scroll in hand, cheerful warm smile, relaxed literary scholar, chinese ancient setting",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone"
+    },
+    "libai": {
+      "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, long black hair, loose hair, short beard, bright dark eyes, white hanfu, blue trim, wine flagon in hand, sword at waist, free-spirited cheerful expression, romantic poet, chinese ancient setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+      "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, long black hair, loose hair, short beard, bright dark eyes, white hanfu, blue trim, wine flagon in hand, sword at waist, free-spirited cheerful expression, romantic poet, chinese ancient setting, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background",
+      "extra_tags": "1boy, male, mature male, long black hair, loose hair, short beard, bright dark eyes, white hanfu, blue trim, wine flagon in hand, sword at waist, free-spirited cheerful expression, romantic poet, chinese ancient setting",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone"
+    },
+    "wuzetian": {
+      "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1girl, female, mature female, black hair, high chignon, phoenix crown, ornate gold hairpins, soft eyebrows, phoenix eyes, crimson imperial robe, gold embroidery, jade pendant, fan, regal graceful expression, empress, chinese ancient setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+      "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1girl, female, mature female, black hair, high chignon, phoenix crown, ornate gold hairpins, soft eyebrows, phoenix eyes, crimson imperial robe, gold embroidery, jade pendant, fan, regal graceful expression, empress, chinese ancient setting, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background",
+      "extra_tags": "1girl, female, mature female, black hair, high chignon, phoenix crown, ornate gold hairpins, soft eyebrows, phoenix eyes, crimson imperial robe, gold embroidery, jade pendant, fan, regal graceful expression, empress, chinese ancient setting",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone"
+    },
+    "mulan": {
+      "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1girl, female, young adult female, black hair, ponytail, red chinese helmet, determined eyes, angled eyebrows, red chinese armor, shoulder armor, sword, bow, brave firm expression, warrior, chinese ancient setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+      "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1girl, female, young adult female, black hair, ponytail, red chinese helmet, determined eyes, angled eyebrows, red chinese armor, shoulder armor, sword, bow, brave firm expression, warrior, chinese ancient setting, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background",
+      "extra_tags": "1girl, female, young adult female, black hair, ponytail, red chinese helmet, determined eyes, angled eyebrows, red chinese armor, shoulder armor, sword, bow, brave firm expression, warrior, chinese ancient setting",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone"
+    },
+    "guanyu": {
+      "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, long black hair, loose hair, red skin tone, headband, long beard, goatee, phoenix eyes, thick eyebrows, scar on eyebrow, green chinese armor, gold trim, guandao polearm, dignified loyal expression, martial saint, chinese ancient setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+      "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, long black hair, loose hair, red skin tone, headband, long beard, goatee, phoenix eyes, thick eyebrows, scar on eyebrow, green chinese armor, gold trim, guandao polearm, dignified loyal expression, martial saint, chinese ancient setting, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background",
+      "extra_tags": "1boy, male, mature male, long black hair, loose hair, red skin tone, headband, long beard, goatee, phoenix eyes, thick eyebrows, scar on eyebrow, green chinese armor, gold trim, guandao polearm, dignified loyal expression, martial saint, chinese ancient setting",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone"
+    },
+    "zhangqian": {
+      "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, topknot, brown fur hat, short beard, moustache, steady eyes, brown travel robe, blue accents, wooden staff in hand, scroll in hand, travel-worn resolute expression, explorer, chinese ancient setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+      "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, topknot, brown fur hat, short beard, moustache, steady eyes, brown travel robe, blue accents, wooden staff in hand, scroll in hand, travel-worn resolute expression, explorer, chinese ancient setting, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background",
+      "extra_tags": "1boy, male, mature male, black hair, topknot, brown fur hat, short beard, moustache, steady eyes, brown travel robe, blue accents, wooden staff in hand, scroll in hand, travel-worn resolute expression, explorer, chinese ancient setting",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone"
+    },
+    "zhenghe": {
+      "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, chinese hair bun, black eunuch official hat, short beard, warm dark eyes, navy blue official robe, gold trim, compass in hand, scroll in hand, calm experienced expression, admiral, chinese ancient setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+      "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, chinese hair bun, black eunuch official hat, short beard, warm dark eyes, navy blue official robe, gold trim, compass in hand, scroll in hand, calm experienced expression, admiral, chinese ancient setting, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background",
+      "extra_tags": "1boy, male, mature male, black hair, chinese hair bun, black eunuch official hat, short beard, warm dark eyes, navy blue official robe, gold trim, compass in hand, scroll in hand, calm experienced expression, admiral, chinese ancient setting",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone"
+    },
+    "simaqian": {
+      "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, hair bun, long beard, goatee, deep thoughtful eyes, beige robe, brown sash, brush in hand, scroll in hand, weary calm expression, dark circles, historian, chinese ancient setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+      "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, hair bun, long beard, goatee, deep thoughtful eyes, beige robe, brown sash, brush in hand, scroll in hand, weary calm expression, dark circles, historian, chinese ancient setting, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background",
+      "extra_tags": "1boy, male, mature male, black hair, hair bun, long beard, goatee, deep thoughtful eyes, beige robe, brown sash, brush in hand, scroll in hand, weary calm expression, dark circles, historian, chinese ancient setting",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone"
+    },
+    "laozhou": {
+      "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, short hair, swept bangs, black eyes, thick eyebrows, stubble, navy blue suit, business suit, necktie, white shirt, gold accents, wristwatch, holding a microphone, slight smile, confident smirk, talk show host, modern setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+      "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, short hair, swept bangs, black eyes, thick eyebrows, stubble, navy blue suit, business suit, necktie, white shirt, gold accents, wristwatch, holding a microphone, slight smile, confident smirk, talk show host, modern setting, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background",
+      "extra_tags": "1boy, male, mature male, black hair, short hair, swept bangs, black eyes, thick eyebrows, stubble, navy blue suit, business suit, necktie, white shirt, gold accents, wristwatch, holding a microphone, slight smile, confident smirk, talk show host, modern setting",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume"
+    },
+    "ali": {
+      "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1girl, female, young adult female, violet hair, twintails, long hair, blue eyes, big eyes, soft eyebrows, purple hoodie, hoodie, casual, sky blue accents, headphones, star hair ornament, hair clip, cheerful smile, energetic, content creator, modern setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+      "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1girl, female, young adult female, violet hair, twintails, long hair, blue eyes, big eyes, soft eyebrows, purple hoodie, hoodie, casual, sky blue accents, headphones, star hair ornament, hair clip, cheerful smile, energetic, content creator, modern setting, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background",
+      "extra_tags": "1girl, female, young adult female, violet hair, twintails, long hair, blue eyes, big eyes, soft eyebrows, purple hoodie, hoodie, casual, sky blue accents, headphones, star hair ornament, hair clip, cheerful smile, energetic, content creator, modern setting",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume"
+    },
+    "dawei": {
+      "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, middle-aged man, bald, black eyes, narrow eyes, thick eyebrows, goatee, black jacket, collared shirt, coral accents, glasses, scar on eyebrow, serious slight smirk, authoritative, veteran director, modern setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+      "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, middle-aged man, bald, black eyes, narrow eyes, thick eyebrows, goatee, black jacket, collared shirt, coral accents, glasses, scar on eyebrow, serious slight smirk, authoritative, veteran director, modern setting, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background",
+      "extra_tags": "1boy, male, middle-aged man, bald, black eyes, narrow eyes, thick eyebrows, goatee, black jacket, collared shirt, coral accents, glasses, scar on eyebrow, serious slight smirk, authoritative, veteran director, modern setting",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume"
+    },
+    "tianmei": {
+      "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1girl, female, young adult female, pink hair, double buns, twin buns, big purple eyes, soft eyebrows, pink dress, white accents, hair clip, smartphone in hand, cute big smile, cheerful sweet girl, freckles, modern setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+      "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1girl, female, young adult female, pink hair, double buns, twin buns, big purple eyes, soft eyebrows, pink dress, white accents, hair clip, smartphone in hand, cute big smile, cheerful sweet girl, freckles, modern setting, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background",
+      "extra_tags": "1girl, female, young adult female, pink hair, double buns, twin buns, big purple eyes, soft eyebrows, pink dress, white accents, hair clip, smartphone in hand, cute big smile, cheerful sweet girl, freckles, modern setting",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume"
+    },
+    "xueba": {
+      "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, young adult male, black hair, neat short hair, dark eyes, straight eyebrows, light blue cardigan, white shirt, round glasses, old book in hand, serious studious calm expression, top student, modern setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+      "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, young adult male, black hair, neat short hair, dark eyes, straight eyebrows, light blue cardigan, white shirt, round glasses, old book in hand, serious studious calm expression, top student, modern setting, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background",
+      "extra_tags": "1boy, male, young adult male, black hair, neat short hair, dark eyes, straight eyebrows, light blue cardigan, white shirt, round glasses, old book in hand, serious studious calm expression, top student, modern setting",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume"
+    },
+    "pangzi": {
+      "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, adult male, black hair, buzz cut, warm dark eyes, soft eyebrows, moustache, green t-shirt, cream accents, snack in hand, happy relaxed smile, chubby friendly food lover, modern setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+      "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, adult male, black hair, buzz cut, warm dark eyes, soft eyebrows, moustache, green t-shirt, cream accents, snack in hand, happy relaxed smile, chubby friendly food lover, modern setting, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background",
+      "extra_tags": "1boy, male, adult male, black hair, buzz cut, warm dark eyes, soft eyebrows, moustache, green t-shirt, cream accents, snack in hand, happy relaxed smile, chubby friendly food lover, modern setting",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume"
+    },
+    "juanwang": {
+      "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, young adult male, black hair, undercut, dark eyes, tired eyes, dark circles, angled eyebrows, white shirt, blue necktie, laptop in hand, coffee cup, anxious hardworking expression, office worker, modern setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+      "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, young adult male, black hair, undercut, dark eyes, tired eyes, dark circles, angled eyebrows, white shirt, blue necktie, laptop in hand, coffee cup, anxious hardworking expression, office worker, modern setting, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background",
+      "extra_tags": "1boy, male, young adult male, black hair, undercut, dark eyes, tired eyes, dark circles, angled eyebrows, white shirt, blue necktie, laptop in hand, coffee cup, anxious hardworking expression, office worker, modern setting",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume"
+    },
+    "lengmian": {
+      "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, adult male, black hair, slicked back hair, dark eyes, straight eyebrows, black turtleneck sweater, gray accents, black sunglasses, deadpan cold expression, no smile, modern setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+      "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, adult male, black hair, slicked back hair, dark eyes, straight eyebrows, black turtleneck sweater, gray accents, black sunglasses, deadpan cold expression, no smile, modern setting, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background",
+      "extra_tags": "1boy, male, adult male, black hair, slicked back hair, dark eyes, straight eyebrows, black turtleneck sweater, gray accents, black sunglasses, deadpan cold expression, no smile, modern setting",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume"
+    },
+    "mengxin": {
+      "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1girl, female, young adult female, brown hair, bob cut, brown eyes, soft eyebrows, light blue oversized hoodie, yellow accents, backpack, smartphone in hand, nervous shy timid expression, freckles, modern setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+      "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1girl, female, young adult female, brown hair, bob cut, brown eyes, soft eyebrows, light blue oversized hoodie, yellow accents, backpack, smartphone in hand, nervous shy timid expression, freckles, modern setting, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background",
+      "extra_tags": "1girl, female, young adult female, brown hair, bob cut, brown eyes, soft eyebrows, light blue oversized hoodie, yellow accents, backpack, smartphone in hand, nervous shy timid expression, freckles, modern setting",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume"
+    },
+    "producer": {
+      "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1girl, female, adult female, black hair, low bun, dark eyes, sharp eyebrows, dark gray blazer, gold accents, clipboard in hand, headset with microphone, efficient confident professional expression, producer, modern setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+      "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1girl, female, adult female, black hair, low bun, dark eyes, sharp eyebrows, dark gray blazer, gold accents, clipboard in hand, headset with microphone, efficient confident professional expression, producer, modern setting, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background",
+      "extra_tags": "1girl, female, adult female, black hair, low bun, dark eyes, sharp eyebrows, dark gray blazer, gold accents, clipboard in hand, headset with microphone, efficient confident professional expression, producer, modern setting",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume"
+    },
+    "robot": {
+      "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1robot, mechanical, metal head, antenna, glowing cyan eyes, LED mouth, silver metal robot body, chest LED panel, sci-fi, friendly robotic, modern setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+      "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1robot, mechanical, metal head, antenna, glowing cyan eyes, LED mouth, silver metal robot body, chest LED panel, sci-fi, friendly robotic, modern setting, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background",
+      "extra_tags": "1robot, mechanical, metal head, antenna, glowing cyan eyes, LED mouth, silver metal robot body, chest LED panel, sci-fi, friendly robotic, modern setting",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, human face, organic skin, modern clothing"
+    },
+    "mystery_guest": {
+      "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1person, hooded dark purple cloak, face hidden, dark face mask, glowing violet eyes, mysterious aura, dark, modern setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+      "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1person, hooded dark purple cloak, face hidden, dark face mask, glowing violet eyes, mysterious aura, dark, modern setting, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background",
+      "extra_tags": "1person, hooded dark purple cloak, face hidden, dark face mask, glowing violet eyes, mysterious aura, dark, modern setting",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, visible face, bright lighting"
+    }
+  },
+  "scenes": {
+    "ancient_map": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, no humans, flat 2D cartography illustration, clean lineart, cel shading, vibrant colors, 16:9 widescreen, chinese ancient setting, historical, ancient china, top-down view, full-frame ancient chinese parchment war map filling the entire image, large compass rose in the center, winding roads connecting many small square city icons and fortress icons, bold red dashed marching route with arrowheads, ink mountain contours, rivers, small pagoda markers, red seal stamps, legend box, aged parchment texture, high detail",
+      "negative": "lowres, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, human, ornamental border, decorative frame, floral pattern, mandala, wood carving, landscape painting, perspective view, blurry",
+      "tags": [
+        "history",
+        "ink",
+        "parchment",
+        "map",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "archive_vault": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, chinese ancient setting, historical, ancient china, wide shot, ancient chinese archive library interior, towering wooden shelves packed with scrolls and bamboo slips, wooden ladder, low desk with scrolls, paper lantern, warm candlelight, floating dust",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "history",
+        "ink",
+        "archive",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "audience_sketch": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, chalk sketch audience on a blackboard, rows of chalk silhouettes in darkness, theater spotlights, chalk hatching",
+      "negative": "lowres, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, detailed faces, foreground people, portrait, close-up",
+      "tags": [
+        "modern",
+        "sketch",
+        "chalk",
+        "audience",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "audience_star_sea": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, holographic concert audience, sea of glowing light sticks and particles in darkness, distant blurred crowd silhouettes, stage spotlights, mirror reflections",
+      "negative": "lowres, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, detailed faces, foreground people, portrait, close-up",
+      "tags": [
+        "modern",
+        "hologram",
+        "audience",
+        "concert",
+        "reaction",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "backstage_neon": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, neon backstage corridor of a tv studio, glowing neon tubes, glass screens, dark reflective floor, cables, atmospheric haze",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "neon",
+        "backstage",
+        "corridor",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "battlefield": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, chinese ancient setting, historical, ancient china, wide shot, ancient chinese battlefield, distant misty mountains, war banners, distant cavalry and soldier silhouettes, spears, smoke and dust, sunset, epic scale",
+      "negative": "lowres, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, detailed faces, foreground people, portrait, close-up",
+      "tags": [
+        "history",
+        "war",
+        "ink",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "blueprint_wall": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, tech lab blueprint wall, grid lines, technical diagrams, diagram nodes, sticky notes, neon tube accent, dark background",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "blueprint",
+        "wall",
+        "diagram",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "brick_wall": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, brick wall of a comedy club, neon signs, VHS glow, worn stage floor, single spotlight, night atmosphere",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "vhs",
+        "brick",
+        "neon",
+        "monologue",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "cafe_window": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, cozy cafe by a large window, warm afternoon sunlight, bokeh, wooden shelves, coffee cups on a desk, plants, soft film look",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "film",
+        "cafe",
+        "window",
+        "cozy",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "candle_corridor": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, baroque castle corridor, gothic stone arches, iron candelabras with candles, velvet drapery, stone floor, warm candlelight",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "traitors",
+        "baroque",
+        "corridor",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "candle_gallery": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, renaissance painting gallery hall, stone arches, tall windows with warm light, candelabras, red drapery, oil painting atmosphere",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "roundtable",
+        "oil",
+        "gallery",
+        "candle",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "castle_hall_baroque": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, baroque castle hall, stone floor, gothic arches, hanging banners, iron candelabra, dramatic chiaroscuro lighting",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "traitors",
+        "baroque",
+        "castle",
+        "hall",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "chalk_stage": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, chalk drawn theater stage on a blackboard, chalk curtains, chalk props, stage spotlights, sketch style",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "sketch",
+        "chalk",
+        "stage",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "city_vhs": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide establishing shot, panoramic, 1980s city street at night, neon signs, skyline, street lamps, wet asphalt reflections, VHS aesthetic, retro",
+      "negative": "lowres, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, detailed faces, foreground people, portrait, close-up",
+      "tags": [
+        "modern",
+        "vhs",
+        "city",
+        "street",
+        "establishing",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "clay_diorama": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, handmade clay miniature town diorama, clay houses, tiny clay trees, tilt-shift, pastel colors, soft studio light",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "slow_life",
+        "clay",
+        "diorama",
+        "miniature",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "clay_garden": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, handmade clay miniature garden, clay plants and flowers, clay mountains backdrop, tilt-shift, pastel, soft light",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "slow_life",
+        "clay",
+        "garden",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "clay_kitchen": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, handmade clay miniature kitchen, clay pots and pans on shelves, wooden counter, warm cozy light, tilt-shift",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "slow_life",
+        "clay",
+        "kitchen",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "clay_street": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, handmade clay miniature street, clay houses and shops, clay trees, pastel colors, tilt-shift",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "slow_life",
+        "clay",
+        "street",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "comedy_club_vhs": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, 1980s comedy club stage, brick back wall, neon sign, single microphone stand, wooden stool, warm spotlight, VHS look",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "vhs",
+        "comedy",
+        "club",
+        "stage",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "confetti_stage": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, candy collage game show stage, paper cutout panels, torn paper edges, halftone dots, confetti and stickers, colorful",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "game_show",
+        "collage",
+        "celebration",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "costume_room_chalk": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, chalk sketch costume room on a blackboard, chalk mannequins, hangers, costume racks, chalk hatching",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "sketch",
+        "chalk",
+        "backstage",
+        "costume",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "court_audience": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, chinese silk painting debate hall audience, gongbi clouds and mountains, silk ground wash, red columns, painted screens, elegant",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "debate",
+        "silk",
+        "audience",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "crypt": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, baroque crypt vault, old brick walls, stone floor, iron candelabras, dark shadows, cold damp atmosphere",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "traitors",
+        "baroque",
+        "crypt",
+        "dark",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "display_case": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, chinese ancient setting, historical, ancient china, wide shot, museum display case close-up, glass case and spotlight on a marble pedestal, ancient golden artifact, floating dust particles, dark exhibition hall",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "history",
+        "museum",
+        "artifact",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "dressing_room_vhs": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, 1980s dressing room, vanity mirror with warm bulbs, costume racks, shelves, warm lamp light, VHS look",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "vhs",
+        "backstage",
+        "dressing",
+        "cozy",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "excavation_site": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, chinese ancient setting, historical, ancient china, wide shot, archaeology excavation site, dig pit with measuring grid, brushes and tools on a desk, parchment maps, terracotta fragments, dusty warm light",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "history",
+        "archaeology",
+        "archive",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "film_strip": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, abstract background, no characters, film strip and dust on a warm light background, analog film texture, grain, vignette, transition plate",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "film",
+        "transition",
+        "title",
+        "texture",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "game_stage_collage": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, candy collage game show stage, paper panels, torn paper, halftone dots, stickers and confetti, colorful playful",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "game_show",
+        "collage",
+        "stage",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "great_wall": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, chinese ancient setting, historical, ancient china, wide shot, ancient chinese great wall pass, mountain gate and watchtowers, smoke beacons, war banners, snow, ink-wash atmosphere, epic",
+      "negative": "lowres, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, detailed faces, foreground people, portrait, close-up",
+      "tags": [
+        "history",
+        "war",
+        "ink",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "hologram_stage": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, holographic concert stage, hologram grid, laser beams, mirror shards, glowing particles, dark futuristic arena",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "hologram",
+        "stage",
+        "concert",
+        "main",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "ink_arena": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, chinese ink circle debate arena, silk wash background, gongbi mountains and clouds, ink circle stage floor, elegant minimal",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "debate",
+        "silk",
+        "arena",
+        "close",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "interrogation_room": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, noir interrogation room, brick wall, venetian blind shadows, single hanging spotlight over a metal desk, cold blue light",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "noir",
+        "interrogation",
+        "crime",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "interview_sofa": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, warm interview set, cozy sofa, curtains, bookshelf, soft window light, film look, intimate atmosphere",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "film",
+        "interview",
+        "sofa",
+        "warm",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "kitchen_film": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, warm film-style kitchen, wooden counter, shelves with jars, steam rising from a pot, window light, cozy homey",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "film",
+        "kitchen",
+        "warm",
+        "life",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "lantern_market": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, chinese ancient setting, historical, ancient china, wide shot, ancient chinese night market street, red lanterns, wooden stalls, banner flags, distant blurred crowd silhouettes, river town",
+      "negative": "lowres, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, detailed faces, foreground people, portrait, close-up",
+      "tags": [
+        "history",
+        "market",
+        "night",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "late_night_studio": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, neon late-night talk show studio, glass wall with city bokeh, host desk and guest sofa set, spotlights, glossy floor",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "neon",
+        "studio",
+        "talk_show",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "leaderboard_collage": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, candy collage leaderboard board, paper panels, rows of ranks, stickers and halftone dots, playful",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "game_show",
+        "collage",
+        "leaderboard",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "light_tunnel": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, abstract background, no characters, abstract holographic light tunnel, glowing grid lines, particles, mirror shards, futuristic b_roll background",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "hologram",
+        "transition",
+        "abstract",
+        "b_roll",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "mirror_room": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, backstage mirror room, broken mirror shards, spotlights, smoke, columns, moody holographic light",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "hologram",
+        "mirror",
+        "backstage",
+        "mood",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "museum_hall": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, chinese ancient setting, historical, ancient china, wide shot, grand museum exhibition hall, marble floor, stone arches and columns, spotlights, glass display cases, dark elegant",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "history",
+        "museum",
+        "exhibition",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "neon_alley": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, neon alley at night, rain, wet reflective ground, neon signs and tubes, brick walls, haze",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "neon",
+        "street",
+        "rain",
+        "b_roll",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "neon_skyline": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide establishing shot, panoramic, neon city skyline at night, skyscrapers with glowing signs, distant lights, establishing shot, cinematic",
+      "negative": "lowres, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, detailed faces, foreground people, portrait, close-up",
+      "tags": [
+        "modern",
+        "neon",
+        "city",
+        "establishing",
+        "night",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "noir_office": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, detective noir office, venetian blinds casting hard shadows, desk with lamp, bookshelves, cigarette smoke, window light",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "noir",
+        "office",
+        "detective",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "oil_library": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, renaissance oil painting library, tall wooden shelves, arches and warm window light, candelabra, rich warm tones",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "roundtable",
+        "oil",
+        "library",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "oil_roundtable": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, oil painting renaissance round table chamber, stone arches, red drapery, candelabra, warm chiaroscuro",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "roundtable",
+        "oil",
+        "renaissance",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "palace_hall": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, chinese ancient setting, historical, ancient china, wide shot, ancient chinese palace hall, red lacquer columns, dragon throne, painted screens, ceremonial banners, golden light",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "history",
+        "palace",
+        "ink",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "pitch_boardroom": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, modern tech boardroom, long table, presentation screen, glass wall with city view, blueprint accents, spotlights",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "blueprint",
+        "boardroom",
+        "pitch",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "police_archive": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, noir police archive room, shelves of files, rain on the window, desks with lamps, cold blue tones",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "noir",
+        "archive",
+        "crime",
+        "evidence",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "prop_table": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, game show prop table, collage paper panels, halftone dots, stickers, colorful props displayed on a table",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "game_show",
+        "collage",
+        "props",
+        "table",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "prototype_lab": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, tech prototype lab, blueprint grid wall, glass case with prototype device, screen glow, spotlights, futuristic",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "blueprint",
+        "lab",
+        "prototype",
+        "closeup",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "rainy_street": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide establishing shot, panoramic, noir rainy street at night, wet asphalt reflections, street lamps, distant skyline, dramatic shadows",
+      "negative": "lowres, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, detailed faces, foreground people, portrait, close-up",
+      "tags": [
+        "modern",
+        "noir",
+        "street",
+        "rain",
+        "establishing",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "river_fleet": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, chinese ancient setting, historical, ancient china, wide shot, ancient chinese river fleet, war boats with sails and banners, red lanterns, waves, misty mountains, epic scale",
+      "negative": "lowres, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, detailed faces, foreground people, portrait, close-up",
+      "tags": [
+        "history",
+        "river",
+        "war",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "scholar_study": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, chinese ancient setting, historical, ancient china, wide shot, ancient chinese scholar study, bamboo screens, wooden shelves, low desk with scrolls and bamboo slips, candle light, ink atmosphere",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "history",
+        "ink",
+        "study",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "scroll_split": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, ink scroll split panels, silk panels with gongbi mountains and clouds, ink circle stage, elegant composition",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "debate",
+        "silk",
+        "split",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "silk_debate_hall": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, chinese silk gongbi debate hall, silk banner with cloud pattern, pale wash, red columns, painted screens, refined",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "debate",
+        "silk",
+        "arena",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "sketch_backdrop": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, chalk sketch stage backdrop on a blackboard, chalk drawn objects and hatching, theater mood",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "sketch",
+        "chalk",
+        "backdrop",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "stone_roundtable": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, baroque stone roundtable chamber, gothic arches, baroque chandelier, red drapery, dramatic candlelight",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "traitors",
+        "baroque",
+        "roundtable",
+        "stone",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "temple_court": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, chinese ancient setting, historical, ancient china, wide shot, ancient chinese temple court, red columns, stone arches, ceremonial banners, incense smoke, altar desk, warm light",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "history",
+        "temple",
+        "ritual",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "war_council": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, chinese ancient setting, historical, ancient china, wide shot, ancient chinese war council tent, sand table map with miniature terrain, banners and spears, wooden desk, candlelight, ink atmosphere",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "history",
+        "ink",
+        "war",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "whiteboard_lab": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, modern lab whiteboard wall covered with diagrams and sticky notes, grid lines, clean bright workspace",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "modern",
+        "blueprint",
+        "whiteboard",
+        "lab",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    },
+    "custom_holo_gallery": {
+      "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, wide shot, holographic gallery hall, glowing grid, glass display, columns, spotlights, blue cyan ambience",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+      "tags": [
+        "custom",
+        "example",
+        "gallery",
+        "hologram",
+        "environment",
+        "no_humans",
+        "anime_environment"
+      ]
+    }
+  }
+}

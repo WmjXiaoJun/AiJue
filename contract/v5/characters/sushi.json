@@ -76,5 +76,10 @@
     "instruction": "48岁男性，温润清亮，带笑意，语气松弛幽默，偶尔拖长音",
     "seed": 20262005,
     "cfg_scale": 4.0
+  },
+  "art": {
+    "portrait": "assets/v5/characters/sushi/portrait.png",
+    "front": "assets/v5/characters/sushi/front.png",
+    "cutout": "assets/v5/characters/sushi/cutout.png"
   }
 }

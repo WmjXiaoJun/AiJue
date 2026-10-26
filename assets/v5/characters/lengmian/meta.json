@@ -1,0 +1,208 @@
+{
+  "id": "lengmian",
+  "name": "冷面",
+  "title": "冷面笑匠，面无表情讲最狠的笑话；越冷越好笑，自己从不笑。",
+  "persona": "冷面笑匠，面无表情讲最狠的笑话；越冷越好笑，自己从不笑。",
+  "mode": "three_view",
+  "style": "anime",
+  "model": "animagine-xl-4.0.safetensors",
+  "steps": 28,
+  "cfg": 5.5,
+  "sampler": "euler_ancestral",
+  "scheduler": "normal",
+  "seed": 42,
+  "size": {
+    "portrait": [
+      832,
+      1216
+    ],
+    "other": [
+      1024,
+      1024
+    ]
+  },
+  "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, full body, multiple characters",
+  "prompt": {
+    "portrait": "masterpiece, best quality, anime style, solo, 1boy, male, adult male, black hair, black eyes, black turtleneck, lavender accents, upper body, looking at viewer, centered composition, studio lighting, dark background, clean lineart, cel shading, vibrant colors, detailed face, slicked back hair, dark eyes, straight eyebrows, black turtleneck sweater, gray accents, black sunglasses, deadpan cold expression, no smile, modern setting, simple background",
+    "front": "masterpiece, best quality, anime style, solo, 1boy, male, adult male, black hair, black eyes, black turtleneck, lavender accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, slicked back hair, dark eyes, straight eyebrows, black turtleneck sweater, gray accents, black sunglasses, deadpan cold expression, no smile, looking at viewer, pure white background, isolated on white background, no shadow, no scenery"
+  },
+  "created_at": "2026-10-26T18:36:05",
+  "elapsed_sec": 32.9,
+  "files": {
+    "portrait": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\lengmian\\portrait.png",
+    "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\lengmian\\front.png",
+    "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\lengmian\\cutout.png"
+  },
+  "images": [
+    {
+      "tag": "portrait",
+      "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\lengmian\\portrait.png",
+      "seed": 42,
+      "width": 832,
+      "height": 1216,
+      "gen_sec": 10.1,
+      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, adult male, black hair, black eyes, black turtleneck, lavender accents, upper body, looking at viewer, centered composition, studio lighting, dark background, clean lineart, cel shading, vibrant colors, detailed face, slicked back hair, dark eyes, straight eyebrows, black turtleneck sweater, gray accents, black sunglasses, deadpan cold expression, no smile, modern setting, simple background",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, full body, multiple characters, lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume",
+      "composition": "portrait",
+      "expression": null
+    },
+    {
+      "tag": "front",
+      "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\lengmian\\three_view/front.png",
+      "seed": 52,
+      "width": 1024,
+      "height": 1024,
+      "gen_sec": 10.0,
+      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, adult male, black hair, black eyes, black turtleneck, lavender accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, slicked back hair, dark eyes, straight eyebrows, black turtleneck sweater, gray accents, black sunglasses, deadpan cold expression, no smile, looking at viewer, pure white background, isolated on white background, no shadow, no scenery",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, multiple views, split screen, cropped, lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements",
+      "composition": "front",
+      "expression": null
+    }
+  ],
+  "source": "imagegen",
+  "created_by": "pipeline/v5_art.generate_character_art",
+  "status": "ok",
+  "prompt_source": "contract/v5/art/prompts.json#characters",
+  "sizes": {
+    "portrait": [
+      832,
+      1216
+    ],
+    "cutout": [
+      236,
+      975
+    ]
+  },
+  "alpha_ratio": 0.547,
+  "front_white": {
+    "ok": true,
+    "corners": [
+      {
+        "rgb": [
+          255,
+          255,
+          255
+        ],
+        "mean": 254.9,
+        "spread": 2.0
+      },
+      {
+        "rgb": [
+          255,
+          255,
+          255
+        ],
+        "mean": 254.9,
+        "spread": 2.0
+      },
+      {
+        "rgb": [
+          255,
+          255,
+          255
+        ],
+        "mean": 254.9,
+        "spread": 2.0
+      },
+      {
+        "rgb": [
+          255,
+          255,
+          255
+        ],
+        "mean": 255.0,
+        "spread": 1.0
+      }
+    ],
+    "white_ratio": 0.885
+  },
+  "front_attempts": 1,
+  "cutout_validation": {
+    "ok": true,
+    "alpha0": 0.453,
+    "visible": 0.547,
+    "corners_alpha": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "bbox": [
+      8,
+      8,
+      228,
+      967
+    ],
+    "aspect": 0.242,
+    "bbox_h_ratio": 0.984,
+    "wash": {
+      "removed": false,
+      "color": null,
+      "ratio": 0.0
+    }
+  },
+  "face_norm": {
+    "score": 0.867,
+    "estimated": false,
+    "source": "yunet",
+    "bbox": [
+      0.413135593220339,
+      0.045230769230769234,
+      0.7309322033898306,
+      0.14912820512820513
+    ],
+    "mouth": {
+      "cx": 0.5719491525423729,
+      "cy": 0.12624615384615384,
+      "w": 0.10813559322033899,
+      "h": 0.011774358974358974
+    },
+    "eyes": {
+      "y": 0.08884102564102564,
+      "w": 0.06995762711864408,
+      "cx": [
+        0.49563559322033895,
+        0.6483050847457628
+      ]
+    },
+    "skin": "#fce7d5",
+    "lip": "#905954",
+    "line": "#030203",
+    "face_w": 75.06
+  },
+  "face_portrait_norm": {
+    "score": 0.0,
+    "estimated": true,
+    "bbox": [
+      0.3,
+      0.18001644736842107,
+      0.7,
+      0.5199835526315789
+    ],
+    "mouth": {
+      "cx": 0.5,
+      "cy": 0.4451973684210526,
+      "w": 0.12000000000000001,
+      "h": 0.036949013157894735
+    },
+    "eyes": {
+      "y": 0.32279605263157896,
+      "w": 0.08800480769230769,
+      "cx": [
+        0.4040024038461538,
+        0.5959975961538462
+      ]
+    },
+    "skin": "#feead9",
+    "lip": "#663c42",
+    "line": "#00020e",
+    "face_w": 332.8
+  },
+  "prompts": {
+    "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, adult male, black hair, slicked back hair, dark eyes, straight eyebrows, black turtleneck sweater, gray accents, black sunglasses, deadpan cold expression, no smile, modern setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+    "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, adult male, black hair, slicked back hair, dark eyes, straight eyebrows, black turtleneck sweater, gray accents, black sunglasses, deadpan cold expression, no smile, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery",
+    "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements"
+  },
+  "face_source": "yunet",
+  "overlay_allowed": true
+}

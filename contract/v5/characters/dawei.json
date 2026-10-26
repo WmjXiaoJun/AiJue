@@ -71,5 +71,10 @@
     "instruction": "52岁男性，低沉沙哑，慢条斯理，带一点说教味的冷幽默",
     "seed": 20262015,
     "cfg_scale": 3.8
+  },
+  "art": {
+    "portrait": "assets/v5/characters/dawei/portrait.png",
+    "front": "assets/v5/characters/dawei/front.png",
+    "cutout": "assets/v5/characters/dawei/cutout.png"
   }
 }

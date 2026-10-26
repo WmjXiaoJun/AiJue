@@ -1,0 +1,208 @@
+{
+  "id": "xueba",
+  "name": "学霸",
+  "title": "名校学霸，逻辑狂魔，凡事先列三点；说话像论文答辩，偶尔忘了人情味。",
+  "persona": "名校学霸，逻辑狂魔，凡事先列三点；说话像论文答辩，偶尔忘了人情味。",
+  "mode": "three_view",
+  "style": "anime",
+  "model": "animagine-xl-4.0.safetensors",
+  "steps": 28,
+  "cfg": 5.5,
+  "sampler": "euler_ancestral",
+  "scheduler": "normal",
+  "seed": 42,
+  "size": {
+    "portrait": [
+      832,
+      1216
+    ],
+    "other": [
+      1024,
+      1024
+    ]
+  },
+  "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, full body, multiple characters",
+  "prompt": {
+    "portrait": "masterpiece, best quality, anime style, solo, 1boy, male, young adult male, black hair, black eyes, cream cardigan, teal accents, glasses, upper body, looking at viewer, centered composition, studio lighting, dark background, clean lineart, cel shading, vibrant colors, detailed face, neat short hair, dark eyes, straight eyebrows, light blue cardigan, white shirt, round glasses, old book in hand, serious studious calm expression, top student, modern setting, simple background",
+    "front": "masterpiece, best quality, anime style, solo, 1boy, male, young adult male, black hair, black eyes, cream cardigan, teal accents, glasses, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, neat short hair, dark eyes, straight eyebrows, light blue cardigan, white shirt, round glasses, old book in hand, serious studious calm expression, top student, looking at viewer, pure white background, isolated on white background, no shadow, no scenery"
+  },
+  "created_at": "2026-10-26T18:43:13",
+  "elapsed_sec": 21.7,
+  "files": {
+    "portrait": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\xueba\\portrait.png",
+    "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\xueba\\front.png",
+    "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\xueba\\cutout.png"
+  },
+  "images": [
+    {
+      "tag": "portrait",
+      "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\xueba\\portrait.png",
+      "seed": 42,
+      "width": 832,
+      "height": 1216,
+      "gen_sec": 10.0,
+      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, young adult male, black hair, black eyes, cream cardigan, teal accents, glasses, upper body, looking at viewer, centered composition, studio lighting, dark background, clean lineart, cel shading, vibrant colors, detailed face, neat short hair, dark eyes, straight eyebrows, light blue cardigan, white shirt, round glasses, old book in hand, serious studious calm expression, top student, modern setting, simple background",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, full body, multiple characters, lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume",
+      "composition": "portrait",
+      "expression": null
+    },
+    {
+      "tag": "front",
+      "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\xueba\\three_view/front.png",
+      "seed": 43,
+      "width": 1024,
+      "height": 1024,
+      "gen_sec": 10.0,
+      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, young adult male, black hair, black eyes, cream cardigan, teal accents, glasses, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, neat short hair, dark eyes, straight eyebrows, light blue cardigan, white shirt, round glasses, old book in hand, serious studious calm expression, top student, looking at viewer, pure white background, isolated on white background, no shadow, no scenery",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, multiple views, split screen, cropped, lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements",
+      "composition": "front",
+      "expression": null
+    }
+  ],
+  "source": "imagegen",
+  "created_by": "pipeline/v5_art.generate_character_art",
+  "status": "ok",
+  "prompt_source": "contract/v5/art/prompts.json#characters",
+  "sizes": {
+    "portrait": [
+      832,
+      1216
+    ],
+    "cutout": [
+      356,
+      981
+    ]
+  },
+  "alpha_ratio": 0.487,
+  "front_white": {
+    "ok": true,
+    "corners": [
+      {
+        "rgb": [
+          255,
+          255,
+          255
+        ],
+        "mean": 255.0,
+        "spread": 1.0
+      },
+      {
+        "rgb": [
+          255,
+          255,
+          255
+        ],
+        "mean": 255.0,
+        "spread": 3.0
+      },
+      {
+        "rgb": [
+          255,
+          255,
+          255
+        ],
+        "mean": 254.9,
+        "spread": 1.0
+      },
+      {
+        "rgb": [
+          255,
+          255,
+          255
+        ],
+        "mean": 255.0,
+        "spread": 2.0
+      }
+    ],
+    "white_ratio": 0.846
+  },
+  "front_attempts": 1,
+  "cutout_validation": {
+    "ok": true,
+    "alpha0": 0.513,
+    "visible": 0.487,
+    "corners_alpha": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "bbox": [
+      8,
+      8,
+      348,
+      973
+    ],
+    "aspect": 0.363,
+    "bbox_h_ratio": 0.984,
+    "wash": {
+      "removed": false,
+      "color": null,
+      "ratio": 0.0
+    }
+  },
+  "face_norm": {
+    "score": 0.562,
+    "estimated": false,
+    "source": "yunet",
+    "bbox": [
+      0.3592696629213483,
+      0.060652395514780834,
+      0.6370786516853932,
+      0.18409785932721712
+    ],
+    "mouth": {
+      "cx": 0.4981741573033708,
+      "cy": 0.15693170234454637,
+      "w": 0.094438202247191,
+      "h": 0.0154230377166157
+    },
+    "eyes": {
+      "y": 0.11251783893985728,
+      "w": 0.06112359550561798,
+      "cx": [
+        0.43151685393258427,
+        0.5648314606741573
+      ]
+    },
+    "skin": "#eed1b2",
+    "lip": "#6b3f3d",
+    "line": "#000000",
+    "face_w": 98.89
+  },
+  "face_portrait_norm": {
+    "score": 0.0,
+    "estimated": true,
+    "bbox": [
+      0.3,
+      0.18001644736842107,
+      0.7,
+      0.5199835526315789
+    ],
+    "mouth": {
+      "cx": 0.5,
+      "cy": 0.4451973684210526,
+      "w": 0.12000000000000001,
+      "h": 0.036949013157894735
+    },
+    "eyes": {
+      "y": 0.32279605263157896,
+      "w": 0.08800480769230769,
+      "cx": [
+        0.4040024038461538,
+        0.5959975961538462
+      ]
+    },
+    "skin": "#e5deca",
+    "lip": "#89464f",
+    "line": "#000000",
+    "face_w": 332.8
+  },
+  "prompts": {
+    "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, young adult male, black hair, neat short hair, dark eyes, straight eyebrows, light blue cardigan, white shirt, round glasses, old book in hand, serious studious calm expression, top student, modern setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+    "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, young adult male, black hair, neat short hair, dark eyes, straight eyebrows, light blue cardigan, white shirt, round glasses, old book in hand, serious studious calm expression, top student, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery",
+    "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements"
+  },
+  "face_source": "yunet",
+  "overlay_allowed": true
+}

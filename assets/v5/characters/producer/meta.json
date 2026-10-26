@@ -1,0 +1,208 @@
+{
+  "id": "producer",
+  "name": "制片",
+  "title": "节目制片人，统筹一切、时间感极强；每句话都像在催进度。",
+  "persona": "节目制片人，统筹一切、时间感极强；每句话都像在催进度。",
+  "mode": "three_view",
+  "style": "anime",
+  "model": "animagine-xl-4.0.safetensors",
+  "steps": 28,
+  "cfg": 5.5,
+  "sampler": "euler_ancestral",
+  "scheduler": "normal",
+  "seed": 42,
+  "size": {
+    "portrait": [
+      832,
+      1216
+    ],
+    "other": [
+      1024,
+      1024
+    ]
+  },
+  "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, full body, multiple characters",
+  "prompt": {
+    "portrait": "masterpiece, best quality, anime style, solo, 1girl, female, adult female, black hair, dark grey eyes, soft eyebrows, dark grey blazer, orange accents, upper body, looking at viewer, centered composition, studio lighting, dark background, clean lineart, cel shading, vibrant colors, detailed face, low bun, dark eyes, sharp eyebrows, dark gray blazer, gold accents, clipboard in hand, headset with microphone, efficient confident professional expression, producer, modern setting, simple background",
+    "front": "masterpiece, best quality, anime style, solo, 1girl, female, adult female, black hair, dark grey eyes, soft eyebrows, dark grey blazer, orange accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, low bun, dark eyes, sharp eyebrows, dark gray blazer, gold accents, clipboard in hand, headset with microphone, efficient confident professional expression, producer, looking at viewer, pure white background, isolated on white background, no shadow, no scenery"
+  },
+  "created_at": "2026-10-26T18:39:04",
+  "elapsed_sec": 33.9,
+  "files": {
+    "portrait": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\producer\\portrait.png",
+    "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\producer\\front.png",
+    "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\producer\\cutout.png"
+  },
+  "images": [
+    {
+      "tag": "portrait",
+      "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\producer\\portrait.png",
+      "seed": 42,
+      "width": 832,
+      "height": 1216,
+      "gen_sec": 16.0,
+      "prompt": "masterpiece, best quality, anime style, solo, 1girl, female, adult female, black hair, dark grey eyes, soft eyebrows, dark grey blazer, orange accents, upper body, looking at viewer, centered composition, studio lighting, dark background, clean lineart, cel shading, vibrant colors, detailed face, low bun, dark eyes, sharp eyebrows, dark gray blazer, gold accents, clipboard in hand, headset with microphone, efficient confident professional expression, producer, modern setting, simple background",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, full body, multiple characters, lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume",
+      "composition": "portrait",
+      "expression": null
+    },
+    {
+      "tag": "front",
+      "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\producer\\three_view/front.png",
+      "seed": 43,
+      "width": 1024,
+      "height": 1024,
+      "gen_sec": 16.0,
+      "prompt": "masterpiece, best quality, anime style, solo, 1girl, female, adult female, black hair, dark grey eyes, soft eyebrows, dark grey blazer, orange accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, low bun, dark eyes, sharp eyebrows, dark gray blazer, gold accents, clipboard in hand, headset with microphone, efficient confident professional expression, producer, looking at viewer, pure white background, isolated on white background, no shadow, no scenery",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, multiple views, split screen, cropped, lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements",
+      "composition": "front",
+      "expression": null
+    }
+  ],
+  "source": "imagegen",
+  "created_by": "pipeline/v5_art.generate_character_art",
+  "status": "ok",
+  "prompt_source": "contract/v5/art/prompts.json#characters",
+  "sizes": {
+    "portrait": [
+      832,
+      1216
+    ],
+    "cutout": [
+      320,
+      991
+    ]
+  },
+  "alpha_ratio": 0.495,
+  "front_white": {
+    "ok": true,
+    "corners": [
+      {
+        "rgb": [
+          255,
+          255,
+          255
+        ],
+        "mean": 254.9,
+        "spread": 2.0
+      },
+      {
+        "rgb": [
+          255,
+          255,
+          255
+        ],
+        "mean": 254.9,
+        "spread": 2.0
+      },
+      {
+        "rgb": [
+          255,
+          255,
+          255
+        ],
+        "mean": 254.9,
+        "spread": 2.0
+      },
+      {
+        "rgb": [
+          255,
+          255,
+          255
+        ],
+        "mean": 255.0,
+        "spread": 1.0
+      }
+    ],
+    "white_ratio": 0.855
+  },
+  "front_attempts": 1,
+  "cutout_validation": {
+    "ok": true,
+    "alpha0": 0.505,
+    "visible": 0.495,
+    "corners_alpha": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "bbox": [
+      8,
+      8,
+      312,
+      983
+    ],
+    "aspect": 0.323,
+    "bbox_h_ratio": 0.984,
+    "wash": {
+      "removed": false,
+      "color": null,
+      "ratio": 0.0
+    }
+  },
+  "face_norm": {
+    "score": 0.596,
+    "estimated": false,
+    "source": "yunet",
+    "bbox": [
+      0.36062500000000003,
+      0.06145307769929364,
+      0.686875,
+      0.19999999999999998
+    ],
+    "mouth": {
+      "cx": 0.5237499999999999,
+      "cy": 0.16949545913218972,
+      "w": 0.11087499999999999,
+      "h": 0.016115035317860748
+    },
+    "eyes": {
+      "y": 0.11961654894046418,
+      "w": 0.07175000000000001,
+      "cx": [
+        0.4455,
+        0.60203125
+      ]
+    },
+    "skin": "#fde3c5",
+    "lip": "#774647",
+    "line": "#020203",
+    "face_w": 104.35
+  },
+  "face_portrait_norm": {
+    "score": 0.0,
+    "estimated": true,
+    "bbox": [
+      0.3,
+      0.18001644736842107,
+      0.7,
+      0.5199835526315789
+    ],
+    "mouth": {
+      "cx": 0.5,
+      "cy": 0.4451973684210526,
+      "w": 0.12000000000000001,
+      "h": 0.036949013157894735
+    },
+    "eyes": {
+      "y": 0.32279605263157896,
+      "w": 0.08800480769230769,
+      "cx": [
+        0.4040024038461538,
+        0.5959975961538462
+      ]
+    },
+    "skin": "#f4d9c6",
+    "lip": "#563a3a",
+    "line": "#040405",
+    "face_w": 332.8
+  },
+  "prompts": {
+    "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1girl, female, adult female, black hair, low bun, dark eyes, sharp eyebrows, dark gray blazer, gold accents, clipboard in hand, headset with microphone, efficient confident professional expression, producer, modern setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
+    "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1girl, female, adult female, black hair, low bun, dark eyes, sharp eyebrows, dark gray blazer, gold accents, clipboard in hand, headset with microphone, efficient confident professional expression, producer, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery",
+    "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements"
+  },
+  "face_source": "yunet",
+  "overlay_allowed": true
+}

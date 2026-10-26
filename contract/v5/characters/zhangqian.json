@@ -73,5 +73,10 @@
     "instruction": "40岁男性，风尘仆仆的温厚中音，带笑意，像讲故事一样娓娓道来",
     "seed": 20262010,
     "cfg_scale": 3.9
+  },
+  "art": {
+    "portrait": "assets/v5/characters/zhangqian/portrait.png",
+    "front": "assets/v5/characters/zhangqian/front.png",
+    "cutout": "assets/v5/characters/zhangqian/cutout.png"
   }
 }

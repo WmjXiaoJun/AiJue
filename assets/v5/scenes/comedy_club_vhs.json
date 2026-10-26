@@ -1,0 +1,27 @@
+{
+  "scene": "comedy_club_vhs",
+  "label": "VHS 喜剧俱乐部",
+  "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\scenes\\comedy_club_vhs.png",
+  "png": "comedy_club_vhs.png",
+  "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, 1980s comedy club stage, brick back wall, neon sign, single microphone stand, wooden stool, warm spotlight, VHS look",
+  "raw_prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, modern setting, contemporary, wide shot, 1980s comedy club stage, brick back wall, neon sign, single microphone stand, wooden stool, warm spotlight, VHS look",
+  "prompt_source": "prompts.json",
+  "negative": "lowres, bad anatomy, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, portrait, close-up face, detailed people, foreground character",
+  "seed": 20261101,
+  "size": [
+    1280,
+    720
+  ],
+  "requested_size": [
+    1280,
+    720
+  ],
+  "model": "animagine-xl-4.0.safetensors",
+  "steps": 28,
+  "cfg": 5.5,
+  "sampler": "euler_ancestral",
+  "scheduler": "normal",
+  "prompt_id": "1ef39986-9ea5-44cd-8389-1acbff0e1ad5",
+  "gen_sec": 8.0,
+  "created_at": "2026-10-26 18:28:25"
+}

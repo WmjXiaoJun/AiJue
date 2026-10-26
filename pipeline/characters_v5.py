@@ -1942,6 +1942,12 @@ _RENDER_CACHE_MAX = 24
 def clear_cache() -> None:
     """清空立绘缓存（角色/风格数据热更新后调用）。"""
     _RENDER_CACHE.clear()
+    mod = _art_module()
+    if mod is not None:
+        try:
+            mod.clear_cache()
+        except Exception:  # noqa: BLE001
+            pass
 
 
 def _style_key(style: dict) -> str:
@@ -1953,6 +1959,53 @@ def _style_key(style: dict) -> str:
 def _char_key(char: dict) -> str:
     return hashlib.md5(json.dumps(char.get("appearance") or {}, ensure_ascii=False,
                                   sort_keys=True).encode("utf-8")).hexdigest()
+
+
+# --- V5.2：AI 美术资产（assets/v5/characters/<id>/cutout.png）优先，缺失回退程序化 ---
+_ART_MODULE = None
+_ART_FAILED = False
+
+
+def _art_module():
+    """懒加载 pipeline/v5_art.py（缺失/异常时静默回退程序化立绘）。"""
+    global _ART_MODULE, _ART_FAILED
+    if _ART_MODULE is not None or _ART_FAILED:
+        return _ART_MODULE
+    try:
+        from . import v5_art as mod  # type: ignore
+        _ART_MODULE = mod
+    except Exception:  # noqa: BLE001
+        _ART_FAILED = True
+        _ART_MODULE = None
+    return _ART_MODULE
+
+
+def art_character(char) -> dict:
+    """角色 AI 美术资产信息（不存在时 exists=False；供 API/前端角色卡用）。"""
+    mod = _art_module()
+    try:
+        spec = get_character(char)
+    except Exception:  # noqa: BLE001
+        spec = {"id": str(char)}
+    art = spec.get("art") if isinstance(spec.get("art"), dict) else None
+    if mod is None:
+        return {"id": str(spec.get("id") or char), "exists": False, "error": "v5_art 不可用"}
+    try:
+        return mod.character_art(str(spec.get("id") or char), art)
+    except Exception as exc:  # noqa: BLE001
+        return {"id": str(spec.get("id") or char), "exists": False, "error": str(exc)}
+
+
+def _render_art_character(char_spec: dict, style_spec: dict, size: tuple[int, int],
+                          pose: str, mouth: str, blink: bool):
+    """AI 立绘渲染；无资产/异常返回 None（调用方回退程序化）。"""
+    mod = _art_module()
+    if mod is None:
+        return None
+    try:
+        return mod.render_art_character(char_spec, style_spec, size, pose, mouth, bool(blink))
+    except Exception:  # noqa: BLE001
+        return None
 
 
 def render_character(char, style, size=DEFAULT_SIZE, pose: str = "front",
@@ -1983,6 +2036,16 @@ def render_character(char, style, size=DEFAULT_SIZE, pose: str = "front",
     cached = _RENDER_CACHE.get(cache_key)
     if cached is not None:
         return cached.copy()
+    # V5.2：有 AI 立绘（cutout.png）时优先走 AI 美术路径（风格化+口型/眨眼）
+    art_img = _render_art_character(char_spec, style_spec, (W, H), pose, mouth, bool(blink))
+    if isinstance(art_img, Image.Image):
+        art_img = art_img.convert("RGBA")
+        if art_img.size != (W, H):
+            art_img = art_img.resize((W, H), Image.LANCZOS)
+        if len(_RENDER_CACHE) >= _RENDER_CACHE_MAX:
+            _RENDER_CACHE.pop(next(iter(_RENDER_CACHE)))
+        _RENDER_CACHE[cache_key] = art_img
+        return art_img.copy()
     # 2x 超采样上限（避免大尺寸过慢）
     scale = 2 if W * H <= 1_200_000 else 1
     SS_W, SS_H = W * scale, H * scale

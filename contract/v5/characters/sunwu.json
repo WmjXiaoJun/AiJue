@@ -73,5 +73,10 @@
     "instruction": "45岁男性，平直冷静，中气足，像军令一样干脆，少起伏",
     "seed": 20262003,
     "cfg_scale": 3.9
+  },
+  "art": {
+    "portrait": "assets/v5/characters/sunwu/portrait.png",
+    "front": "assets/v5/characters/sunwu/front.png",
+    "cutout": "assets/v5/characters/sunwu/cutout.png"
   }
 }

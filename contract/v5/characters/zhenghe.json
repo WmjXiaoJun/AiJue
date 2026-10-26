@@ -76,5 +76,10 @@
     "instruction": "45岁男性，宽厚沉稳，中低音，带海风般的开阔感，语速稳",
     "seed": 20262011,
     "cfg_scale": 3.8
+  },
+  "art": {
+    "portrait": "assets/v5/characters/zhenghe/portrait.png",
+    "front": "assets/v5/characters/zhenghe/front.png",
+    "cutout": "assets/v5/characters/zhenghe/cutout.png"
   }
 }

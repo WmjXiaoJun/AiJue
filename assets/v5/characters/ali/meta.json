@@ -1,0 +1,47 @@
+{
+  "id": "ali",
+  "source": "v3_reuse",
+  "portrait": "assets\\v5\\characters\\ali\\portrait.png",
+  "front": "assets\\v5\\characters\\ali\\front.png",
+  "cutout": "assets\\v5\\characters\\ali\\cutout.png",
+  "cutout_size": [
+    452,
+    984
+  ],
+  "portrait_size": [
+    832,
+    1216
+  ],
+  "note": "复用最早 3 个角色（SDXL 动漫立绘 + 泛洪抠图），V5.2 直接沿用",
+  "face_norm": {
+    "score": 0.657,
+    "estimated": false,
+    "source": "yunet",
+    "bbox": [
+      0.3588495575221239,
+      0.03678861788617886,
+      0.6628318584070797,
+      0.21361788617886177
+    ],
+    "mouth": {
+      "cx": 0.5108407079646018,
+      "cy": 0.1747459349593496,
+      "w": 0.10338495575221238,
+      "h": 0.021371951219512197
+    },
+    "eyes": {
+      "y": 0.11107723577235772,
+      "w": 0.06690265486725663,
+      "cx": [
+        0.43785398230088496,
+        0.5838274336283186
+      ]
+    },
+    "skin": "#bdbbbd",
+    "lip": "#56476b",
+    "line": "#090714",
+    "face_w": 137.46
+  },
+  "face_source": "yunet",
+  "overlay_allowed": true
+}

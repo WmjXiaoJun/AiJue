@@ -1,0 +1,27 @@
+{
+  "scene": "lantern_market",
+  "label": "灯市",
+  "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\scenes\\lantern_market.png",
+  "png": "lantern_market.png",
+  "prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, chinese ancient setting, historical, ancient china, wide shot, ancient chinese night market street, red lanterns, wooden stalls, banner flags, distant blurred crowd silhouettes, river town",
+  "raw_prompt": "masterpiece, best quality, anime style, detailed background, scenery, no humans, background plate, clean lineart, cel shading, vibrant colors, cinematic lighting, 16:9 widescreen, chinese ancient setting, historical, ancient china, wide shot, ancient chinese night market street, red lanterns, wooden stalls, banner flags, distant blurred crowd silhouettes, river town",
+  "prompt_source": "prompts.json",
+  "negative": "lowres, bad hands, text, watermark, logo, signature, photorealistic, 3d render, realistic, detailed faces, foreground people, portrait, close-up",
+  "seed": 20261101,
+  "size": [
+    1280,
+    720
+  ],
+  "requested_size": [
+    1280,
+    720
+  ],
+  "model": "animagine-xl-4.0.safetensors",
+  "steps": 28,
+  "cfg": 5.5,
+  "sampler": "euler_ancestral",
+  "scheduler": "normal",
+  "prompt_id": "ca65970e-33bf-4d2a-b57e-339cc3e06abe",
+  "gen_sec": 16.0,
+  "created_at": "2026-10-26 18:31:02"
+}

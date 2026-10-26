@@ -75,5 +75,10 @@
     "instruction": "50岁男性，低沉浑厚，带一点沙哑和压迫感，笑意不达眼底",
     "seed": 20262002,
     "cfg_scale": 3.8
+  },
+  "art": {
+    "portrait": "assets/v5/characters/caocao/portrait.png",
+    "front": "assets/v5/characters/caocao/front.png",
+    "cutout": "assets/v5/characters/caocao/cutout.png"
   }
 }

@@ -28,6 +28,7 @@ from sqlalchemy.orm import Session
 from . import character_files, concept_files, config, jobs, llm, models, schemas, script_parser, seed
 from .db import SessionLocal, get_db, init_db
 from .routers import v5_catalog as v5_catalog_router
+from .routers import v5_studio as v5_studio_router
 
 logger = logging.getLogger(__name__)
 
@@ -2153,6 +2154,7 @@ async def events(episode_id: Optional[str] = None):
 # --------------------------------------------------------------------------- #
 app.include_router(router)
 # V5 契约 API（/api/v5/*，独立前缀；不改变既有 V3/V4 接口）
+app.include_router(v5_studio_router.router)
 app.include_router(v5_catalog_router.router)
 
 config.OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
