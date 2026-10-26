@@ -706,7 +706,8 @@ def final_encode(workdir: Path, out: Path, total_duration: float, fps: int,
                  prog, pct0: float, pct1: float,
                  transition_sfx: Path | None = None,
                  grade_filter: str | None = None,
-                 packaging_filter: str | None = None) -> None:
+                 packaging_filter: str | None = None,
+                 duck_bgm: bool = False) -> None:
     inputs = ["-i", "video_raw.mp4", "-i", "audio/narration.wav"]
     fc: list[str] = []
     video_parts: list[str] = []
@@ -738,16 +739,30 @@ def final_encode(workdir: Path, out: Path, total_duration: float, fps: int,
             f"aresample={config.SAMPLE_RATE}[a]"
         )
     else:
-        fc.append("[1:a]volume=1.0[nar]")
-        parts = ["[nar]"]
-        if bgm_idx is not None:
+        if duck_bgm and bgm_idx is not None:
+            # V4：旁白触发 BGM sidechain ducking（对话时自动压低音乐）
+            fc.append("[1:a]volume=1.0,asplit=2[nar][narkey]")
             fc.append(
                 f"[{bgm_idx}:a]volume={config.BGM_VOLUME},"
                 f"atrim=0:{total_duration:.3f},"
                 f"afade=t=in:st=0:d=2,"
-                f"afade=t=out:st={max(0.0, total_duration - 4.0):.3f}:d=4[bg]"
+                f"afade=t=out:st={max(0.0, total_duration - 4.0):.3f}:d=4,"
+                f"aformat=sample_rates={config.SAMPLE_RATE}:channel_layouts=stereo[bg]"
             )
-            parts.append("[bg]")
+            fc.append("[bg][narkey]sidechaincompress=threshold=0.035:ratio=6:"
+                      "attack=15:release=350:makeup=1.0[bgd]")
+            parts = ["[nar]", "[bgd]"]
+        else:
+            fc.append("[1:a]volume=1.0[nar]")
+            parts = ["[nar]"]
+            if bgm_idx is not None:
+                fc.append(
+                    f"[{bgm_idx}:a]volume={config.BGM_VOLUME},"
+                    f"atrim=0:{total_duration:.3f},"
+                    f"afade=t=in:st=0:d=2,"
+                    f"afade=t=out:st={max(0.0, total_duration - 4.0):.3f}:d=4[bg]"
+                )
+                parts.append("[bg]")
         if tsx_idx is not None:
             fc.append(f"[{tsx_idx}:a]volume=0.85,atrim=0:{total_duration:.3f}[tsx]")
             parts.append("[tsx]")

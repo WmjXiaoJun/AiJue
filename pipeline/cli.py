@@ -171,6 +171,8 @@ def build_parser() -> argparse.ArgumentParser:
                        help="H3 失败镜回退静态并写 fallback 标记（QC 会标红，验收不接受）")
     p_rv3.add_argument("--width", type=int, default=1280, help="成片宽（默认 1280）")
     p_rv3.add_argument("--height", type=int, default=720, help="成片高（默认 720）")
+    p_rv3.add_argument("--legacy-audio", action="store_true", default=False,
+                       help="回退 V3 音频路径（edge-tts + atempo，仅 A/B 对照用）")
     p_rv3.set_defaults(func=cmd_render_v3)
     return parser
 

@@ -60,6 +60,8 @@ def main(argv=None) -> int:
     ap.add_argument("--prompt-file", default=None)
     ap.add_argument("--out", required=True)
     ap.add_argument("--duration", type=float, default=5.0)
+    ap.add_argument("--length", type=int, default=None,
+                    help="显式帧数（17k+5，如 124/141/158）；给定时覆盖 duration 换算")
     ap.add_argument("--width", type=int, default=768)
     ap.add_argument("--height", type=int, default=768)
     ap.add_argument("--fps", type=int, default=24)
@@ -79,7 +81,13 @@ def main(argv=None) -> int:
     if not prompt:
         prompt = PROMPT_FL2V if args.mode == "fl2v" else NEUTRAL_PROMPT
 
-    length = frame_length(args.duration)
+    if args.length:
+        length = int(args.length)
+        if length < 5 or (length - 5) % 17 != 0:
+            raise SystemExit(f"--length 必须是 17k+5（如 124/141/158），当前 {length}")
+        length = min(3600, max(5, length))
+    else:
+        length = frame_length(args.duration)
     audio_rel = None
     if args.mode == "audio_ref":
         wav = args.audio

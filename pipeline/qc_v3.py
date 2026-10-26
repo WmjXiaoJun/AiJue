@@ -386,6 +386,37 @@ def evaluate(*, video, plan, shot_metas, template, subtitles=None,
         "每镜 ref_image 均存在" if not ref_missing else f"{len(ref_missing)} 镜缺 ref_image",
         missing=ref_missing)
 
+    # 11) V4 语音节奏（自然语速：atempo=1.0 / 无截断 / 语音能装进镜头）
+    voice_shots = [s for s in shots
+                   if (s.get("voice") or {}) or float(s.get("speech_duration") or 0) > 0]
+    atempo_bad: list[str] = []
+    trunc_bad: list[str] = []
+    overflow: list[str] = []
+    for shot in voice_shots:
+        sid = str(shot.get("id"))
+        v = shot.get("voice") if isinstance(shot.get("voice"), dict) else {}
+        if abs(float(v.get("atempo") or 1.0) - 1.0) > 1e-3:
+            atempo_bad.append(sid)
+        if v.get("truncated"):
+            trunc_bad.append(sid)
+        sp = float(shot.get("speech_duration") or 0.0)
+        dur = float(shot.get("duration") or 0.0)
+        if sp and dur and sp + 0.10 + 0.25 > dur + 0.06:
+            overflow.append(sid)
+    if voice_shots:
+        pace_ok = not atempo_bad and not trunc_bad and not overflow
+        checks["audio_pace"] = _check(
+            pace_ok,
+            (f"{len(voice_shots)} 个配音镜：自然语速 1.0x、无截断、语音装进镜头"
+             if pace_ok else
+             f"atempo≠1: {atempo_bad}；截断: {trunc_bad}；超容量: {overflow}"),
+            voice_shots=len(voice_shots), atempo_bad=atempo_bad,
+            truncated=trunc_bad, overflow=overflow)
+    else:
+        checks["audio_pace"] = _check(
+            True, "legacy 路径：无 V4 语音节奏信息（跳过）", skipped=True,
+            voice_shots=0)
+
     ok = all(item["ok"] for item in checks.values())
     previs = not h3_require
     stats = {
@@ -404,6 +435,13 @@ def evaluate(*, video, plan, shot_metas, template, subtitles=None,
         "dialogue_shots": dialog_count,
         "h3_coverage": h3_ratio,
         "prompt_ids": len(set(prompt_ids)),
+        "voice_shots": len(voice_shots),
+        "voice_provider": str((episode or {}).get("voice_provider")
+                              or ((plan or {}).get("meta") or {}).get("voice_provider")
+                              or ""),
+        "speech_driven": bool((plan or {}).get("meta", {}).get("speech_driven")),
+        "atempo_max": 1.0,
+        "truncated_shots": trunc_bad,
         "elapsed_sec": round(time.time() - t0, 1),
     }
     report = {

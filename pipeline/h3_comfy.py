@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import json
 import logging
+import math
 import os
 import subprocess
 import sys
@@ -462,6 +463,19 @@ def _snap32(value: int) -> int:
     return max(256, (int(value) // 32) * 32)
 
 
+def _snap_frames_up(seconds: float, fps: int = 24) -> int:
+    """秒 → H3 合法帧数（17k+5），向上取整（保证片段不短于镜头/语音）。
+
+    允许 1 帧（~0.042s）容差，避免 3 位小数舍入把 5.167s 抬到 141 帧。
+    """
+    sec = max(0.3, float(seconds or 0.3))
+    frames = int(round(sec * fps))
+    k = max(7, int(-(-(frames - 5) // 17)))
+    while (17 * k + 5) / fps < sec - 1.0 / fps + 1e-9:
+        k += 1
+    return 17 * k + 5
+
+
 # --------------------------------------------------------------------------- #
 # 生成
 # --------------------------------------------------------------------------- #
@@ -574,9 +588,16 @@ def generate(shot: dict, first_image: str | Path, out_mp4: str | Path, *,
         LOG.info("H3 目标已存在，将覆盖: %s", out)
     utils.ensure_dir(out.parent)
 
+    # V4：镜头时长常来自语音自然时长（非固定 5.17s），必须用「向上取整」的合法帧数，
+    # 否则 CLI 的 frame_length(round) 可能生成比镜头更短的片段（尾部冻结/口型错位）。
+    length_frames = _snap_frames_up(req_duration, fps=24)
+    if abs(length_frames / 24.0 - req_duration) > 0.5:
+        LOG.info("H3 帧数向上取整: %.3fs -> %d 帧 (%.3fs)", req_duration,
+                 length_frames, length_frames / 24.0)
+
     args = [
         "--mode", mode, "--image", str(first), "--out", str(out),
-        "--duration", f"{req_duration:.3f}",
+        "--duration", f"{req_duration:.3f}", "--length", str(length_frames),
         "--width", str(width), "--height", str(height), "--fps", str(fps),
         "--seed", str(seed_value), "--prompt-file", str(prompt_file),
     ]

@@ -686,7 +686,8 @@ def render_shot_clips(plan: dict, template: dict, paths: dict, *, mode: str,
 # 剪辑 / 包装 / 混音
 # ---------------------------------------------------------------------------
 def assemble_video(plan: dict, template: dict, paths: dict, template_id: str,
-                   prog, *, profile: dict, mode: str) -> dict:
+                   prog, *, profile: dict, mode: str,
+                   duck_bgm: bool = False) -> dict:
     from . import render as render_mod
     shots = plan.get("shots") or []
     total = storyboard_v3.plan_duration(plan)
@@ -748,7 +749,8 @@ def assemble_video(plan: dict, template: dict, paths: dict, template_id: str,
         paths["workdir"], paths["out"], total, fps, FINAL_W, FINAL_H, bgm,
         has_ass=ass_info["events"] > 0, prog=prog, pct0=90, pct1=99,
         transition_sfx=transition_sfx, grade_filter=grade or None,
-        packaging_filter=packaging_filter or None)
+        packaging_filter=packaging_filter or None,
+        duck_bgm=bool(duck_bgm))
     return {"total_duration": total, "video_raw": str(video_raw),
             "ass": ass_info, "narration": str(narration),
             "bgm": bool(bgm), "transition_sfx": bool(transition_sfx),
@@ -818,6 +820,8 @@ def build_h3_meta(plan: dict, template: dict, shot_metas: dict, mode: str,
             "action": meta.get("action") or shot.get("action"),
             "duration": meta.get("duration") or shot.get("duration"),
             "line": bool(str(shot.get("line") or "").strip()),
+            "speech_duration": shot.get("speech_duration"),
+            "voice": shot.get("voice") or {},
         })
         shots_meta.append(meta)
     bodies = [m for m in shots_meta if not m.get("static_card") and
@@ -953,8 +957,43 @@ def _run_render(args) -> int:
              sum(1 for s in plan["shots"] if str(s.get("line") or "").strip()))
     prog(4, f"storyboard：{len(plan['shots'])} 镜 / {total:.2f}s")
 
-    # ---- 3) TTS / 镜头音轨 ----
-    audio_info = prepare_audio(plan, paths["workdir"], prog, force)
+    # ---- 3) V4 语音（Breeze TTS 2）→ 语音驱动镜头时长 ----
+    legacy_audio = bool(_arg(args, "legacy_audio", False))
+    v4_previs = (previs and str(os.environ.get("V4_PREVIS", "")).lower() in ("1", "true", "yes"))
+    voice_info = None
+    if (not previs or v4_previs) and not legacy_audio:
+        try:
+            from . import voiced
+            prog(5, "角色配音（Breeze TTS 2）：先配音、再按语音自然时长定镜头")
+            voice_info = voiced.prepare_and_pace(plan, paths["workdir"], prog, force=force)
+            total = storyboard_v3.plan_duration(plan)
+            utils.write_json(paths["workdir"] / "episode.json", plan)
+            LOG.info("语音驱动分镜: %d 镜 / %.2fs（provider=%s，对话镜 %d，切分 %d）",
+                     len(plan["shots"]), total, voice_info["provider"],
+                     voice_info["speech_shots"], len(voice_info.get("splits") or []))
+            prog(18, f"语音驱动分镜：{len(plan['shots'])} 镜 / {total:.2f}s")
+        except Exception as exc:  # noqa: BLE001
+            LOG.warning("V4 语音（Breeze）失败，回退 V3 edge-tts 路径：%s", exc)
+            legacy_audio = True
+            voice_info = None
+            plan = storyboard_v3.build_plan(template, duration, include_cards=True, seed=seed)
+            total = storyboard_v3.plan_duration(plan)
+            utils.write_json(paths["workdir"] / "episode.json", plan)
+
+    # ---- 3b) TTS / 镜头音轨 ----
+    if voice_info is not None:
+        audio_results = voiced.build_all_shot_audio(
+            plan, voice_info["voice_map"], paths["workdir"], prog, force=force)
+        audio_info = {
+            "shot_tts_map": {sid: info.get("path") for sid, info in
+                             (voice_info.get("voice_map") or {}).items()
+                             if info.get("path")},
+            "audio": audio_results, "tts_fail": 0,
+            "voice_info": voice_info, "legacy": False,
+        }
+        LOG.info("镜头音轨（V4 自然语速）: %d 镜", len(audio_results))
+    else:
+        audio_info = prepare_audio(plan, paths["workdir"], prog, force)
 
     # ---- 4) 每镜 stage → H3（GPU 串行）----
     prog(22, f"逐镜生成（{mode}）：stage 首帧 → {'静态 clip' if previs else 'H3'}")
@@ -970,7 +1009,22 @@ def _run_render(args) -> int:
 
     # ---- 5) 剪辑 / 字幕 / 混音 / 编码 ----
     assemble = assemble_video(plan, template, paths, template_id, prog,
-                              profile=profile, mode=mode)
+                              profile=profile, mode=mode,
+                              duck_bgm=not legacy_audio)
+    # ---- 5b) V4 时间线（OpenFilm 式声明式剪辑产物，可人工编辑后重渲）----
+    timeline_art: dict = {}
+    try:
+        from . import timeline as timeline_mod
+        tr = assemble.get("transition") or {}
+        tl = timeline_mod.build_timeline(
+            plan, template, paths, profile=profile, mode=mode,
+            transition=str(tr.get("mode") or "xfade"),
+            transition_style=str(tr.get("style") or "fade"),
+            transition_duration=float(tr.get("duration") or 0.3))
+        timeline_art = timeline_mod.write_timeline(tl, paths["out_dir"])
+        LOG.info("timeline.json / timeline.html: %s", timeline_art.get("json"))
+    except Exception as exc:  # noqa: BLE001
+        LOG.warning("timeline 产物生成失败（不影响成片）: %s", exc)
     if not paths["out"].is_file():
         raise RenderV3Error(f"成片未生成: {paths['out']}")
     probe = _probe(paths["out"])
@@ -1044,6 +1098,16 @@ def _run_render(args) -> int:
                                        for m in shot_metas.values()))},
         "h3_resolution": clips.get("h3_resolution"),
         "tts_failures": audio_info.get("tts_fail"),
+        "audio_mode": "legacy_edge" if legacy_audio else "v4_breeze",
+        "voice_provider": (voice_info or {}).get("provider", "")
+        if voice_info else str((plan.get("meta") or {}).get("voice_provider") or ""),
+        "speech_driven": bool(voice_info is not None),
+        "speech_shots": int((voice_info or {}).get("speech_shots") or 0),
+        "splits": len((voice_info or {}).get("splits") or []),
+        "atempo_max": 1.0,
+        "truncated_shots": [] if voice_info is not None else [],
+        "duck_bgm": not legacy_audio,
+        "timeline": timeline_art,
     }
     manifest = dict(summary)
     manifest["plan_meta"] = plan.get("meta")

@@ -16,3 +16,6 @@ integrations/metaso/.env
 localize/models/
 backend/data/*.env
 backend/data/llm.env
+
+# local model weights (Breeze TTS 2 etc.)
+local_models/
