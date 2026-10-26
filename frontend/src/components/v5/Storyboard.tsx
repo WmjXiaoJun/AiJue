@@ -306,7 +306,6 @@ export function Storyboard({ templateId, templateLabel, acts, outputDuration, qc
               <b>{item.value}</b> {item.label}
             </span>
           ))}
-          {signatureText && <span className="v5-muted v5-sb-signature-src" title="storyboard.json edit.signature">{signatureText}</span>}
           {stats.hardCutRatio !== null && (
             <span className="v5-sb-stat">
               硬切 <b>{Math.round(stats.hardCutRatio * 100)}%</b>

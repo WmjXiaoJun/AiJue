@@ -189,33 +189,33 @@ export function Templates({ catalog, outputs, loading, onOpenRender, onOpenChara
     }
   }, []);
 
-  // 加载剪辑签名（优先独立剪辑档案；缺失时用 storyboard.json 的 edit.signature / 统计）
+  // 加载剪辑签名（优先已渲染 storyboard.json 的实际 EDL；未重渲再用 editorial 档案的「计划」）
   const loadSignatures = useCallback(async (templates: { id: string }[]) => {
     const entries = await Promise.all(
       templates.map(async (item) => {
         try {
-          const res = await v5api.editorial(item.id);
-          const editorial: V5EditorialData = res.editorial;
-          const seq = editorial.shot_sequence || [];
-          const sizes = new Set(seq.map(String));
-          const cameras = editorial.camera_palette || [];
-          const transitions = new Set((editorial.transition_palette || []).map(String));
-          return [
-            item.id,
-            `${seq.length} 镜 · ${sizes.size} 景别 · ${cameras.length} 运镜 · ${transitions.size} 转场`,
-          ] as const;
+          const res = await v5api.storyboard(item.id);
+          const edit = res.storyboard.edit;
+          if (edit?.signature) return [item.id, String(edit.signature)] as const;
+          if (edit) {
+            return [
+              item.id,
+              `${edit.shots ?? 0} 镜 · ${(edit.shot_sizes || []).length} 景别 · ${(edit.camera_types || []).length} 运镜 · ${(edit.transitions || []).length} 转场`,
+            ] as const;
+          }
+          return [item.id, null] as const;
         } catch {
           try {
-            const res = await v5api.storyboard(item.id);
-            const edit = res.storyboard.edit;
-            if (edit?.signature) return [item.id, String(edit.signature)] as const;
-            if (edit) {
-              return [
-                item.id,
-                `${edit.shots ?? 0} 镜 · ${(edit.shot_sizes || []).length} 景别 · ${(edit.camera_types || []).length} 运镜 · ${(edit.transitions || []).length} 转场`,
-              ] as const;
-            }
-            return [item.id, null] as const;
+            const res = await v5api.editorial(item.id);
+            const editorial: V5EditorialData = res.editorial;
+            const seq = editorial.shot_sequence || [];
+            const sizes = new Set(seq.map(String));
+            const cameras = editorial.camera_palette || [];
+            const transitions = new Set((editorial.transition_palette || []).map(String));
+            return [
+              item.id,
+              `计划 · ${seq.length} 镜 · ${sizes.size} 景别 · ${cameras.length} 运镜 · ${transitions.size} 转场`,
+            ] as const;
           } catch {
             return [item.id, null] as const;
           }

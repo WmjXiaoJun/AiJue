@@ -78,6 +78,7 @@ editing.supported_modes()                      # 37 个可用 mode 名
 | 划像 | `wipeleft` `wiperight` `wipeup` `wipedown` `wipetl` `wipetr` `wipebl` `wipebr` |
 | 滑动 | `slideleft` `slideright` `slideup` `slidedown` `smoothleft` `smoothright` `smoothup` `smoothdown` |
 | 形状/特效 | `circleopen` `circleclose` `radial` `pixelize` `hblur` `vblur` `zoomin` `diagtl` `diagbr` |
+| 当前 ffmpeg 不支持 | `vblur`（本机 ffmpeg 构建只有 `hblur`）→ 自动替代为 `hblur` 并 warning |
 | 切 | `cut`（别名 `none`/`hard`） |
 | 甩镜别名 | `whip_left` `whip_right` `whip` → 映射 `hblur`（需要真实运动模糊时用 `whip_pan_transition` 生成过渡片段） |
 
@@ -98,9 +99,31 @@ expected_total = sum(shot.duration) - sum(non_cut_boundary.duration)
 
 ```powershell
 python -m pytest pipeline/tests/test_editing.py -q
-# 9 passed（约 2s）：时长公式 / mode 别名 / cut 链 / 混合 cut+xfade / 未知回退 /
-#                 单镜 / J-L cut 混音（48k stereo）/ 无音频静音补齐 / 甩镜过渡
+# 11 passed（约 2s）：时长公式 / mode 别名 / cut 链 / 混合 cut+xfade / 未知回退 /
+#                  单镜 / J-L cut 混音（48k stereo）/ 无音频静音补齐 / 甩镜过渡 /
+#                  不同来源+帧率+尺寸（含 concat→xfade timebase 回归）/
+#                  上一轮 xfade_chain 产物再作输入
 ```
+
+### 5.1 V5.4 真 bug 修复记录（timebase / vblur）
+
+Lead QA 在 `history_mystery` 报 `[Parsed_xfade_8] First input link main timebase (1/12800)
+do not match the corresponding second input link xfade timebase (1/1000000)`，`render_v5`
+回退旧单转场。定位为两个独立问题：
+
+1. **链式 timebase 不一致**：`concat`/`xfade` 输出的 timebase 会变成 `1/12800`，而下一段的
+   规范化输入是 `1/1000000`（AVTB），直接相加链接报错。
+   → 修复：每个 `concat`/`xfade` 输出后统一再走 `fps=…,settb=AVTB,setpts=PTS-STARTPTS,format=yuv420p`
+   再进入下一次滤镜（`_post_norm`）；兜底路径（`_xfade_chain_fallback`）对 `[0:v]`/`[1:v]` 两个输入
+   都做同样规范化，并在最终输出再编码时统一 timebase。
+2. **当前 ffmpeg 构建不支持 `vblur`**：`ffmpeg -h filter=xfade` 实测 59 个 transition，
+   有 `hblur` 但**没有 `vblur`**；编辑档案里用了 `vblur` 会直接失败。
+   → 修复：`pipeline.editing._xfade_supported_names()` 惰性探测当前 ffmpeg 支持的 transition；
+   不支持的 mode 先尝试邻近替代（`vblur→hblur`），仍不支持则回退 `fade` 并 warning。
+
+回归验证用真实 `history_mystery` 素材：10 镜、9 边界（含 5 个硬切 + vblur→hblur 0.4 + dissolve 0.5
++ fade 0.5 + fade 0.5），expected=41.33s，pilot=41.33s（旧回退路径为 sum shots=43.23s），
+1280×720/25fps/含音轨/blackdetect 0。
 
 ## 6. Pilot（history_talk 5 镜）
 
@@ -128,6 +151,20 @@ python tmp/v54_editing/make_pilot.py
 | pilot 时长 / 分辨率 / fps | 34.080s / 1280×720 / 25 |
 | blackdetect（d=0.30, pix_th=0.10） | **0 段** |
 | 音轨 | AAC 192k（pilot）/ 内部 48k stereo PCM |
+
+### 6.1 history_mystery 回归 pilot（timebase / vblur 修复验证）
+
+```powershell
+python tmp/v54_editing/make_pilot_history_mystery.py
+```
+
+- 用真实 `outputs/templates_v5/history_mystery` 的 10 镜 + timeline 里的每剪辑点 transition；
+- 边界：5×cut + `vblur 0.40`（自动替代 hblur） + `dissolve 0.50` + `fade 0.50` + `fade 0.50`；
+- 产物：`tmp/v54_editing/pilot_history_mystery.mp4`（41.33s，1280×720/25fps/含 AAC）；
+- 证据：`tmp/v54_editing/pilot_history_mystery_evidence.json`（expected/video/audio/pilot 时长、
+  edit_meta、blackdetect=0）、`tmp/v54_editing/frames_hm/` 抽帧；
+- 对账：旧回退路径 duration = sum shots = **43.23s**；per-cut 修复后 expected=**41.33s**
+  （扣 4 个非 cut 转场 0.4+0.5+0.5+0.5），实测 pilot=41.33s。
 
 ## 7. 与 render_v5 集成（Lead）
 

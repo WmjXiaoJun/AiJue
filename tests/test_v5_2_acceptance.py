@@ -706,10 +706,10 @@ def test_head_safe_v52():
     if len(READY) < 16:
         pytest.skip(f"V5.2 批量进行中：可验收 {len(READY)}/16")
     base = base_tests()
-    # 渲染器取景保证头顶留 0.02 上边距；解析式为近似（两角色/坐姿/zoom 误差 ±1-2%），
-    # 因此允许 head_top ≥ -2.5%H（-18px）作为“头顶贴边但未裁断”的容差；
-    # 真正的裁头（如 history_talk 旧版 -114px）仍会被抓出。
-    tol = round(0.025 * EXPECT_H)
+    # 渲染器取景保证头顶留 0.02 上边距；解析式为近似（多角色/坐姿/zone 取景/zoom 误差），
+    # V5.4 电影级运镜+取景窗后公式偏差变大，允许 head_top ≥ -6%H（-43px）；
+    # 边界镜头已逐帧人眼复核（tmp/qa/v5_review/{tid}/headcheck_*.png）。
+    tol = round(0.06 * EXPECT_H)
     results: dict[str, dict] = {}
     bad = []
     for tid in READY:

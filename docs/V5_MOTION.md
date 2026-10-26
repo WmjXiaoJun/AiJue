@@ -37,10 +37,13 @@
 
 ```python
 camera = {
-    "type": "push_in",     # 见下表；也接受别名 slow_push / pan_r / handheld_shake ...
+    "type": "push_in",     # 17 种（见 §2.2 基础 7 种 + §2.7 电影级 10 种）；兼容别名
     "strength": 0.08,      # 幅度（含义随 type 变化，见下表）
-    "ease": "in_out",      # 缓动，默认 in_out
+    "ease": "in_out",      # 缓动，默认 in_out（V5.4 新增 sine/quart/back/circ 家族）
     "shake": 0.0,          # 附加抖动幅度（占画面短边比例），手持默认 0.008
+    "shake_freq": 0.9,     # 手持抖动基频（V5.4）
+    "blur": 3.2,           # rack_focus 的最大高斯模糊半径（px）
+    "blur_max": 48.0,      # whip_pan 水平运动模糊上限（px）
     "parallax": 0.65,      # 视差指数（可选，默认 0.65，见 §2.5）
     "zone": "medium",      # 可选：基础取景窗（场景 camera_zones 的名字或 [x,y,w,h]），
                            #       type 的运动叠加在它上面（见 §2.3）
@@ -53,7 +56,7 @@ camera = {
 进度 `p = clamp(t / duration, 0, 1)`，`e = ease(p, ease)`。所有机位在整镜内单调一次到位
 （没有往复/多段关键帧；多段请拆成多个 act/shot）。
 
-### 2.2 7 种 type 的运动公式（`camera_state()` 的实现）
+### 2.2 基础 7 种 type 的运动公式（`camera_state()` 的实现；V5.4 新增 10 种见 §2.7）
 
 `W, H` = 输出宽高（默认 1280×720）；`x/y` 是**中景参考平面**在屏幕上的位移（像素，y 向下）。
 若给了 `zone`（见 §2.3），`zoom/x/y` 都是**在取景窗（zone）基础上**叠加的。
@@ -126,10 +129,20 @@ dy   = -(cy - H/2) · zoom
 
 ### 2.4 ease
 
-`ease(p, name)`：`linear` / `in` / `out` / `in_out`(=smoothstep，默认) / `smootherstep` /
-`sine` / `in_cubic` / `out_cubic` / `in_out_cubic` / `expo` / `in_expo` / `out_expo` /
-`in_out_expo` / `back_out`，或自定义 `callable(p) -> p`（返回值会被 clamp 到 [0,1]）。
+`ease(p, name)` 支持（V5.4 扩展后共 30+ 种，别名互通）：
+
+* 基础：`linear` / `in` / `out` / `in_out`(=smoothstep，默认) / `smootherstep`
+* sine 家族（V5.4）：`in_sine` / `out_sine` / `in_out_sine`（`sine` 同 `in_out_sine`）
+* 幂次：`in_quad`/`out_quad`/`in_out_quad`、`in_cubic`/`out_cubic`/`in_out_cubic`、
+  **`in_quart`/`out_quart`/`in_out_quart`**（V5.4，剪辑常用）、`in_quint/out_quint/in_out_quint`
+* expo：`in_expo`(`expo`) / `out_expo` / `in_out_expo`
+* back（带过冲）：**`out_back`（V5.4 命名，等同 `back_out`）** / `in_back` / `in_out_back`
+* circ：`in_circ` / `out_circ` / `in_out_circ`
+* 或自定义 `callable(p) -> p`（返回值会被 clamp 到 [0,1]）
+
 未知名字 → **warning + 回退 in_out**（配置错误不静默，但也不炸片）。
+`whip_pan` 内部会对位置再套一层 `1-(1-e)^2.5`（前段甩到位），所以它的 `ease` 建议
+用 `linear`/`in_out_sine`，不必写极端曲线。
 
 ### 2.5 视差（parallax）与 depth
 
@@ -177,6 +190,65 @@ zoom_l  = 1 + (cam.zoom - 1) * (0.55 + 0.45 * clamp(ratio_l, 0.15, 2.2))
 
 ---
 
+### 2.7 V5.4 电影级镜头类型（10 种，`SUPPORTED_CAMERA_TYPES` 共 17 种）
+
+`SUPPORTED_CAMERA_TYPES` 最终值::
+
+    static, push_in, pull_out, pan_left, pan_right, dolly, handheld,
+    truck_left, truck_right, tilt_up, tilt_down, crane_up, crane_down,
+    dolly_zoom, rack_focus, orbit, whip_pan
+
+`CINEMATIC_CAMERA_TYPES` = 后 10 种（供 editorial/CLI 引用）。全部沿用
+`strength` / `ease` / `zone` 语义，旧 7 种行为不变（`verify_motion.py` 45 项回归全 PASS）。
+
+| type | 运动 / 语义 | 公式（e=ease(p)，W/H=输出宽高） | 典型 strength | 适用场景 |
+|---|---|---|---|---|
+| `truck_left` / `truck_right` | 相机**横移**（不转），近景视差更强 | `dx = ±strength·W·e`；`parallax_eff = parallax×1.25` | 0.10~0.18 | 跟拍人物/穿过走廊/横向揭示 |
+| `tilt_up` / `tilt_down` | 相机**上仰/下俯**（内容下移/上移） | `dy = ±strength·H·e`；`parallax_eff ×1.15` | 0.08~0.14 | 从地到天揭示、俯看/仰望 |
+| `crane_up` / `crane_down` | **摇臂升降**：从低机位升起 + 微推 | `dy = ±strength·H·e`；`zoom = 1 ∓0.25s ±0.40s·e` | 0.10~0.16 | 开场/收尾大揭示、舞台升降 |
+| `dolly_zoom` | **希区柯克变焦**（主体锁死，远近层反向膨胀） | `zoom=1`；每层 `z_l = 1 + amt·|ratio_l−1|`，`amt=strength·e` | 0.15~0.30 | 眩晕/震惊、悬疑反转、心理压迫 |
+| `rack_focus` | **前后景虚实渐变**（焦点由远到近，镜头不动） | `focus_shift = e`；焦平面深度 `= lerp(bg_depth, fg_depth, shift)`；层模糊权重 `= |depth−focus|/span` | 用 `blur`（px，默认 3.2） | 对话转情绪、揭示前景物件、悬疑 |
+| `orbit` | **2.5D 环绕**（中景/角色锁死，远近层反向滑移） | `θ = π·strength·e`；`orbit_dx = −0.20W·sinθ`；层 `dx = orbit_dx·(ratio−1)`；`orbit_dz=0.045·sinθ`；`shear=0.02·sinθ` | 0.35~0.65 | 产品/人物转盘展示、全景环视 |
+| `whip_pan` | **快速甩镜**（前段甩到位 + 水平运动模糊） | `x = −strength·W·(1−(1−e)^2.5)`；`motion_blur=(1−e)^1.6`；`motion_blur_px = blur·min(0.05W·s/0.2, blur_max)` | 0.15~0.30 | 镜头间甩接、喜剧/综艺重击、转场接点 |
+
+`camera_state()` V5.4 新增输出键（旧调用可忽略，均有中性默认值）：
+
+| 键 | 含义 |
+|---|---|
+| `mode` | `"normal"` / `"dolly_zoom"` / `"orbit"`（渲染层据此走特殊分层逻辑） |
+| `focus_shift` | rack_focus 焦点进度 0..1（0=焦点在远/前景虚，1=焦点在近/背景虚） |
+| `focus_blur_px` | rack_focus 最大模糊半径（px） |
+| `motion_blur` | whip_pan 模糊强度 0..1 |
+| `motion_blur_px` | 折算水平 box-blur 像素（≥2 时逐帧施加） |
+| `shear` | orbit 轻微切变系数（affine 第二列） |
+| `orbit_dx` / `orbit_dy` / `orbit_dz` | orbit 每单位 `(ratio−1)` 的横/纵位移与微缩放 |
+| `dolly_zoom_amt` | dolly_zoom 变焦量（按 `|ratio−1|` 施加到各层） |
+| `parallax_eff` | 本镜实际视差指数（truck/tilt/crane 会略加强） |
+
+渲染实现（`_compose_base` / `_plane_motion`）：
+
+* `dolly_zoom` / `orbit` 走 `_plane_motion(cam, ratio)` 特殊分支——中景平面（角色/主体）
+  精确锁死，背景/前景按 `|ratio−1|` 或 `(ratio−1)` 反向运动；orbit 的切变通过
+  扩展仿射矩阵 `[z, shear·z, tx+shear·(ty−H/2−dy)]` 实现（cv2/PIL 回退都支持）。
+* `rack_focus` 在 `prepare_layers` 阶段**预烘每层的额外模糊版本**（一次 ~0.2-0.3s/镜），
+  逐帧只做 `cv2.addWeighted` 混合（原地，~0.4ms/层），不会逐帧跑高斯模糊。
+* `whip_pan` 在特效之后对整帧做**水平 box blur**（`cv2.blur(k×1)`，原地，~1-3ms/帧），
+  模糊像素由 `motion_blur_px` 决定；无 cv2 时用滚动平均回退（仅甩镜用）。
+* 角色与图层用同一套 `_plane_motion`，所以主体在 dolly_zoom/orbit 中不会"漂"。
+
+**每模板 ≥5 种运镜的推荐组合**（editorial 用，详见 `docs/PLAN_V5_4_EDITORIAL.md`）：
+
+| 节目类型 | 推荐 camera palette |
+|---|---|
+| 历史叙事（ink/woodblock） | `crane_up` + `push_in` + `pan_right` + `rack_focus` + `orbit` |
+| 悬疑/档案（parchment/noir） | `dolly_zoom` + `tilt_down` + `rack_focus` + `static`(特写) + `whip_pan` |
+| 综艺/脱口秀（neon/vhs/candy） | `whip_pan` + `truck_left/right` + `handheld` + `push_in` + `orbit` |
+| 访谈/慢生活（film/clay） | `push_in` + `pull_out` + `rack_focus` + `dolly`(轻) + `tilt_up` |
+| 国宝/油画（museum/oil） | `orbit` + `crane_down` + `tilt_up` + `rack_focus` + `static` |
+
+性能：17 种机位在 1280×720 下逐帧合成 **12.4~17.4ms**（rack_focus 最重 17.4ms，
+仍 < 25ms 目标）；`meta.v54` 会记录本镜的 `focus_shift_end` / `motion_blur_peak` /
+`shear_peak` / `dolly_zoom_end` / `parallax_eff`，供 editorial/QC 核对"运镜真的生效"。
 ## 3. 帧生成流程
 
 ```
@@ -441,6 +513,23 @@ style["fx"]  →  layers["meta"]["fx"]  →  layers["fx"]
 `scene_render.render_scene_layers` 本身 160-260ms/场景（1600×900 内部分辨率），
 `prepare_layers` 25-45ms/镜，均摊到 5-8s 镜头可忽略。
 
+### 5.3.1 V5.4 电影级镜头实测（`tmp/v54_motion/`）
+
+**17 种机位 × 1.2s 网格自测**（`tmp/v54_motion/camera_matrix.py`，真实素材
+`assets/v5/scenes/palace_hall.png` + `laozhou/cutout.png`，1280×720/25fps）：
+
+| 指标 | 值 |
+|---|---|
+| 总帧数 / 用时 | 510 帧 / 10.91s = **46.8 帧/秒** |
+| 单帧合成耗时 | **12.4~17.4 ms**（rack_focus 最重 17.4ms，其余 12.4~16.8ms，均 < 25ms 目标） |
+| 3 帧差异（运动可见性） | 除 static=0.02 外全部 **17.4~62.7**（灰度均差），无"看不见运动"的机位 |
+| rack_focus | 21 → **40.5 帧/秒**（模糊版本预烘 + `cv2.addWeighted` 原地混合优化后） |
+
+**真实素材渲染验证**（`tmp/v54_motion/render_real_asset.py`，palace plate + laozhou cutout）：
+orbit / rack_focus（均为 2.0s）+ whip_pan / dolly_zoom / crane_up / truck_left（1.5s）
+**6/6 PASS**：h264 / yuv420p / 1280×720 / 25fps / 无音轨、帧数精确、
+单帧合成 13.3~17.2ms、`meta.v54` 各键正确（focus_shift_end=1.0、motion_blur_peak=1.0、
+dolly_zoom_end=0.2、shear_peak=0.02、parallax_eff=0.78~0.81 等）。
 ### 5.4 结论与优化记录
 
 * **达标情况**：单镜 1280×720 稳定 **43~70 帧/秒**，远超「≥25 帧/秒」要求；
@@ -535,11 +624,19 @@ def camera_zones_zoom(scene: dict, zone_name: str) -> float:
 
 ### 6.2 模板 act.camera 名称映射
 
-`SUPPORTED_CAMERA_TYPES = static / push_in / pull_out / pan_left / pan_right / dolly / handheld`，
+`SUPPORTED_CAMERA_TYPES`（17 种）= `static / push_in / pull_out / pan_left / pan_right /
+dolly / handheld` + `truck_left / truck_right / tilt_up / tilt_down / crane_up / crane_down /
+dolly_zoom / rack_focus / orbit / whip_pan`。
 并接受别名（`CAMERA_ALIASES`）：`slow_push→push_in`、`slow_pull→pull_out`、
 `zoom_in/out→push_in/pull_out`、`pan/pan_r→pan_right`、`pan_l→pan_left`、
-`dolly_in→dolly`、`hand_shake/shake→handheld` 等。未知 type 会 `raise V5Error`
-（不静默），请在模板里用上面 7 个名字或已知别名。
+`dolly_in→dolly`、`hand_shake/shake→handheld`、`truck_l/truck_r`、
+`crane_u/crane_d`、`vertigo/hitchcock/zolly→dolly_zoom`、
+`rack/rackfocus/focus_pull→rack_focus`、`turntable/arc→orbit`、`whip→whip_pan` 等。
+未知 type 会 `raise V5Error`（不静默），请在模板/editorial 里用上面 17 个名字或已知别名。
+
+editorial（`contract/v5/editorial/<template>.json`）的 `camera_palette` 直接用这些名字即可；
+`render_v5` 只需把 shot 的 `camera` 原样传给 `motion2d.render_shot`，`dolly_in` 之类
+的旧写法也能被别名接住。
 
 ### 6.3 预览 / QC 静帧
 
@@ -592,6 +689,11 @@ python tmp\v5_motion_demo\integration_scene_render.py
 
 # 4) 单帧性能分解 + cProfile
 python tmp\v5_motion_demo\profile_motion.py
+
+# 5) V5.4 电影级镜头：17 种机位 × 1.2s 抽 3 帧网格（真实 plate + cutout）
+python tmp\v54_motion\camera_matrix.py          # → tmp/v54_motion/cameras.png / report.json
+python tmp\v54_motion\probe_cameras.py          # 打印每机位状态（调试用）
+python tmp\v54_motion\render_real_asset.py      # 6 段真实素材渲染 + ffprobe 合规校验
 ```
 
 关键产物（人工抽检用）：
@@ -689,3 +791,30 @@ render_v5: assemble + TTS 音轨 + 字幕 + ducking + loudnorm → final.mp4
 `meta` 增补 `camera.zone` / `layers[*].blur_px` / `mouth` / `characters[*].fade_*`。
 回归：`verify_motion.py` 45 项全 PASS；demo 600 帧 49.6 帧/秒；真实场景对接 650 帧
 44.1 帧/秒、5/5 PASS。
+
+### V5.4 修订（2026-10-26，task-14：电影级镜头运动）
+
+新增 10 种 camera（`SUPPORTED_CAMERA_TYPES` 7 → **17**）：
+
+| type | 一句话 |
+|---|---|
+| `truck_left` / `truck_right` | 横移（视差加强 1.25×） |
+| `tilt_up` / `tilt_down` | 纵摇（dy） |
+| `crane_up` / `crane_down` | 摇臂升降（dy + zoom 低→高/高→低） |
+| `dolly_zoom` | 希区柯克变焦（主体锁死、远近层按 `\|ratio−1\|` 膨胀） |
+| `rack_focus` | 前后景虚实渐变（`focus_shift` 0..1 + 预烘模糊层混合） |
+| `orbit` | 2.5D 环绕（中景锁死、远近层反向正弦 + 微缩放 + 轻微切变） |
+| `whip_pan` | 快速甩镜（前 30% 甩到位 + 水平运动模糊 `motion_blur` 0..1） |
+
+* easing 新增 `in_sine/out_sine/in_out_sine`、`in_quart/out_quart/in_out_quart`、
+  `out_back/in_back/in_out_back`、`in_quint/out_quint/in_out_quint`、`in_circ/out_circ/in_out_circ`；
+  `handheld` 的 `shake_freq` 已有，文档补上。
+* `camera_state()` 新增可选键 `mode/focus_shift/focus_blur_px/motion_blur/motion_blur_px/
+  shear/orbit_*/dolly_zoom_amt/parallax_eff`，旧键与旧调用完全兼容。
+* 渲染链路：`_plane_motion()` 统一图层/角色/图片立绘的运动（subject-lock + shear）；
+  `rack_focus` 预烘模糊版本 + `cv2.addWeighted` 原地混合；`whip_pan` 在 fx 之后
+  整帧水平 box blur；`meta.v54` 输出运镜统计供 editorial/QC 使用。
+* 新增 CLI：`python -m pipeline.motion2d --list-cameras|--list-easings|--list-fx|--self-test`。
+* 自测：`tmp/v54_motion/cameras.png`（17 机位 × 1.2s × 3 帧，真实 plate+cutout）、
+  `report.json`、`render_real_asset.py`（6 段真实素材 6/6 PASS）；
+  回归：`pytest pipeline/tests -q` **184 passed**、旧 `verify_motion.py` **45/45 PASS**。

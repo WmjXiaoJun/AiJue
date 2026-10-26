@@ -24,8 +24,11 @@
 """
 from __future__ import annotations
 
+import functools
 import logging
 import math
+import re
+import subprocess
 from pathlib import Path
 from typing import Any, Callable, Iterable, Mapping, Sequence
 
@@ -99,8 +102,29 @@ def supported_modes() -> list[str]:
     return ["cut", *names]
 
 
+@functools.lru_cache(maxsize=1)
+def _xfade_supported_names() -> frozenset[str] | None:
+    """探测当前 ffmpeg 的 xfade 支持哪些 transition（不同构建能力不同）。"""
+    try:
+        proc = subprocess.run(
+            [config.FFMPEG_BIN, "-hide_banner", "-h", "filter=xfade"],
+            capture_output=True, text=True, encoding="utf-8", errors="replace",
+            timeout=20,
+        )
+    except Exception:  # noqa: BLE001
+        return None
+    out = (proc.stdout or "") + (proc.stderr or "")
+    names = set(re.findall(r"^\s+([a-z0-9_]+)\s+-?\d+\s+\.\.FV", out, re.MULTILINE))
+    names.discard("transition")
+    return frozenset(names) if names else None
+
+
+# 某些构建缺失的转场 → 用邻近可用模式替代
+_UNSUPPORTED_ALIASES = {"vblur": "hblur"}
+
+
 def _resolve_mode(mode: Any) -> str | None:
-    """mode → ffmpeg transition 名；cut 返回 None；未知回退 fade。"""
+    """mode → ffmpeg transition 名；cut 返回 None；未知/不支持回退。"""
     raw = str(mode or "cut").strip().lower().replace("-", "_").replace(" ", "_")
     if raw in _CUT_MODES:
         return None
@@ -110,6 +134,16 @@ def _resolve_mode(mode: Any) -> str | None:
         return XFADE_MODES[DEFAULT_MODE]
     if style == "":
         return None
+    supported = _xfade_supported_names()
+    if supported is not None and style not in supported:
+        alias = _UNSUPPORTED_ALIASES.get(style)
+        if alias and alias in supported:
+            LOG.warning("转场 mode=%r（%s）当前 ffmpeg 不支持，改用 %s",
+                        mode, style, alias)
+            return alias
+        LOG.warning("转场 mode=%r（%s）当前 ffmpeg 不支持，回退 %s",
+                    mode, style, DEFAULT_MODE)
+        return XFADE_MODES[DEFAULT_MODE]
     return style
 
 
@@ -215,18 +249,34 @@ def expected_duration(shots: Sequence[Mapping[str, Any]],
     return round(total, 4)
 
 
+def _normalize_filter(duration: float, fps: int,
+                      width: int, height: int) -> str:
+    """统一规格的 filter 表达式（不含输入/输出标签）：fps/尺寸/像素格式/timebase 一致。"""
+    return (
+        f"fps={fps},"
+        f"scale={width}:{height}:force_original_aspect_ratio=increase,"
+        f"crop={width}:{height},setsar=1,format=yuv420p,"
+        f"settb=AVTB,setpts=PTS-STARTPTS,"
+        f"tpad=stop_mode=clone:stop_duration={duration + 0.5:.3f},"
+        f"trim=0:{duration:.3f},setpts=PTS-STARTPTS"
+    )
+
+
 def _filter_normalize(idx: int, duration: float, fps: int,
                       width: int, height: int) -> str:
     """每段视频统一规格并 trim 到精确镜头时长（不足用末帧补齐）。"""
-    return (
-        f"[{idx}:v]fps={fps},"
-        f"scale={width}:{height}:force_original_aspect_ratio=increase,"
-        f"crop={width}:{height},setsar=1,format=yuv420p,settb=AVTB,"
-        f"trim=0:{duration:.3f},setpts=PTS-STARTPTS,"
-        f"tpad=stop_mode=clone:stop_duration={duration + 0.5:.3f},"
-        f"trim=0:{duration:.3f},setpts=PTS-STARTPTS"
-        f"[v{idx}]"
-    )
+    return f"[{idx}:v]{_normalize_filter(duration, fps, width, height)}[v{idx}]"
+
+
+def _post_norm(label_in: str, label_out: str, fps: int) -> str:
+    """concat/xfade 输出后**再次**统一 timebase/fps/像素格式。
+
+    关键修复（V5.4）：concat 输出 timebase 会变成 1/12800，而 xfade 的第二个输入
+    是 1/1000000（AVTB），直接链式会报 `First input link main timebase do not match`。
+    每个中间结果都重新 `fps=.../settb=AVTB/setpts=PTS-STARTPTS` 后再进下一个滤镜。
+    """
+    return (f"[{label_in}]fps={fps},settb=AVTB,setpts=PTS-STARTPTS,"
+            f"format=yuv420p[{label_out}]")
 
 
 def _write_video(workdir: Path, total: float, duration: float,
@@ -296,9 +346,10 @@ def xfade_chain(shots: Sequence[Mapping[str, Any]], clip_paths: Any,
     acc_dur = durations[0]
     for i in range(1, len(shots)):
         b = bs[i - 1]
+        raw = f"r{i}"
         label = f"e{i}"
         if b["cut"]:
-            fc.append(f"[{acc}][v{i}]concat=n=2:v=1:a=0[{label}]")
+            fc.append(f"[{acc}][v{i}]concat=n=2:v=1:a=0[{raw}]")
             acc_dur += durations[i]
         else:
             td = float(b["duration"])
@@ -307,20 +358,24 @@ def xfade_chain(shots: Sequence[Mapping[str, Any]], clip_paths: Any,
                 raise ValueError(f"转场时长 {td:.2f}s 超过前段时长 {acc_dur:.2f}s")
             fc.append(
                 f"[{acc}][v{i}]xfade=transition={b['style']}:"
-                f"duration={td:.3f}:offset={offset:.3f}[{label}]")
+                f"duration={td:.3f}:offset={offset:.3f}[{raw}]")
             acc_dur += durations[i] - td
+        # concat/xfade 输出统一 timebase 后再进入下一次链式运算
+        fc.append(_post_norm(raw, label, int(fps)))
         acc = label
         if prog is not None:
             prog(64 + 4.0 * i / max(1, len(shots) - 1),
                  f"转场 {i}/{len(shots) - 1}（{b['mode']}）")
 
-    fc.append(f"[{acc}]trim=0:{expect:.3f},setpts=PTS-STARTPTS,format=yuv420p[vout]")
+    fc.append(f"[{acc}]trim=0:{expect:.3f},setpts=PTS-STARTPTS,"
+              f"fps={fps},settb=AVTB,format=yuv420p,"
+              f"setpts=PTS-STARTPTS[vout]")
     args = inputs + [
         "-filter_complex", ";".join(fc),
         "-map", "[vout]", "-an",
         "-c:v", "libx264", "-preset", config.X264_PRESET,
         "-crf", config.X264_CRF, "-pix_fmt", "yuv420p",
-        "-r", str(fps), str(out),
+        "-r", str(fps), "-t", f"{expect:.3f}", str(out),
     ]
     try:
         utils.ffmpeg(args, cwd=workdir)
@@ -352,8 +407,7 @@ def _xfade_chain_fallback(shots, clip_paths, workdir: Path, fps: int,
     cur = tmp / "acc_0.mp4"
     src0 = _clip_for(shots[0], clip_paths, 0, workdir)
     utils.ffmpeg([
-        "-i", str(src0), "-vf", _filter_normalize(0, durations[0], fps, width, height)
-        .replace("[0:v]", "").replace("[v0]", ""),
+        "-i", str(src0), "-vf", _normalize_filter(durations[0], fps, width, height),
         "-an", "-c:v", "libx264", "-preset", config.X264_PRESET,
         "-crf", config.X264_CRF, "-pix_fmt", "yuv420p", "-r", str(fps), str(cur),
     ], cwd=workdir)
@@ -364,22 +418,19 @@ def _xfade_chain_fallback(shots, clip_paths, workdir: Path, fps: int,
         src = _clip_for(shots[i], clip_paths, i, workdir)
         td = float(b["duration"]) if not b["cut"] else 0.0
         target = acc_dur + durations[i] - td
+        norm_acc = _normalize_filter(acc_dur, fps, width, height)
+        norm_next = _normalize_filter(durations[i], fps, width, height)
         if b["cut"]:
-            # concat filter
-            fc = (f"[0:v]setpts=PTS-STARTPTS[a];[1:v]fps={fps},"
-                  f"scale={width}:{height}:force_original_aspect_ratio=increase,"
-                  f"crop={width}:{height},setsar=1,format=yuv420p,settb=AVTB,"
-                  f"trim=0:{durations[i]:.3f},setpts=PTS-STARTPTS[b];"
-                  f"[a][b]concat=n=2:v=1:a=0,trim=0:{target:.3f},"
-                  f"setpts=PTS-STARTPTS[vout]")
+            fc = (f"[0:v]{norm_acc}[a];[1:v]{norm_next}[b];"
+                  f"[a][b]concat=n=2:v=1:a=0[r];"
+                  f"{_post_norm('r', 'vn', fps)};"
+                  f"[vn]trim=0:{target:.3f},setpts=PTS-STARTPTS[vout]")
         else:
-            fc = (f"[1:v]fps={fps},"
-                  f"scale={width}:{height}:force_original_aspect_ratio=increase,"
-                  f"crop={width}:{height},setsar=1,format=yuv420p,settb=AVTB,"
-                  f"trim=0:{durations[i]:.3f},setpts=PTS-STARTPTS[b];"
-                  f"[0:v][b]xfade=transition={b['style']}:duration={td:.3f}:"
-                  f"offset={acc_dur - td:.3f},trim=0:{target:.3f},"
-                  f"setpts=PTS-STARTPTS[vout]")
+            fc = (f"[0:v]{norm_acc}[a];[1:v]{norm_next}[b];"
+                  f"[a][b]xfade=transition={b['style']}:duration={td:.3f}:"
+                  f"offset={max(0.001, acc_dur - td):.3f}[r];"
+                  f"{_post_norm('r', 'vn', fps)};"
+                  f"[vn]trim=0:{target:.3f},setpts=PTS-STARTPTS[vout]")
         utils.ffmpeg(["-i", str(cur), "-i", str(src),
                       "-filter_complex", fc, "-map", "[vout]", "-an",
                       "-c:v", "libx264", "-preset", config.X264_PRESET,
@@ -390,8 +441,13 @@ def _xfade_chain_fallback(shots, clip_paths, workdir: Path, fps: int,
         if prog is not None:
             prog(64 + 4.0 * i / max(1, len(shots) - 1), f"转场兜底 {i}")
     out = workdir / VIDEO_EDITED
-    utils.ffmpeg(["-i", str(cur), "-t", f"{expect:.3f}", "-c", "copy", str(out)],
-                 cwd=workdir)
+    utils.ffmpeg([
+        "-i", str(cur),
+        "-vf", f"fps={fps},settb=AVTB,setpts=PTS-STARTPTS,format=yuv420p",
+        "-an", "-c:v", "libx264", "-preset", config.X264_PRESET,
+        "-crf", config.X264_CRF, "-pix_fmt", "yuv420p", "-r", str(fps),
+        "-t", f"{expect:.3f}", str(out),
+    ], cwd=workdir)
     real = utils.probe_duration(out)
     _write_video(workdir, expect, real, boundaries)
     return out

@@ -691,6 +691,7 @@ def assemble(plan: dict, catalog: dict, style: dict, paths: dict, prog) -> dict:
                     float(b.get("duration") or 0.0) if str(b.get("mode")) != "cut" else 0.0)
         LOG.info("V5.4 剪辑转场：%d 个剪辑点，转场损耗 %.2fs，成片 %.2fs",
                  len(boundaries), loss, render_total)
+        utils.write_json(Path(paths["workdir"]) / "episode.json", plan)
     except Exception as exc:  # noqa: BLE001
         LOG.warning("V5.4 editing 不可用，回退单转场: %s", exc)
         editing_mod = None

@@ -91,3 +91,29 @@ easing：linear/in/out/in_out + in_out_sine/expo/back/quart。
 2. 甩镜用 xfade hblur 近似（`whip_pan_transition` 已实现，可按需替换特定边界）。
 3. 速度坡道（speed ramp）未做；pacing 目前影响 b-roll 时长/转场时长。
 4. 前端剪辑时间线为只读；后续可做拖拽编辑（PUT 模板 editorial 覆盖）。
+
+## 6. 16 部剪辑结果（V5.4 实测）
+
+| 模板 | 剪辑签名 | 硬切比例 | J-cut | L-cut | 成片时长 |
+|---|---|---|---|---|---|
+| classics | 8 镜 · 5 景别 · 6 运镜 · 2 转场 | 0.571 | 1 | 2 | 42.25s |
+| history_mystery | 8 镜 · 5 景别 · 6 运镜 · 4 转场 | 0.571 | 1 | 1 | 40.83s |
+| history_talk | 5 镜 · 4 景别 · 4 运镜 · 2 转场 | 0.5 | 1 | 2 | 36.13s |
+| hot_ones | 8 镜 · 4 景别 · 4 运镜 · 2 转场 | 0.571 | 2 | 1 | 38.58s |
+| masked_singer | 7 镜 · 5 景别 · 4 运镜 · 4 转场 | 0.333 | 1 | 0 | 41.7s |
+| mystery | 8 镜 · 5 景别 · 5 运镜 · 3 转场 | 0.571 | 2 | 2 | 34.82s |
+| national_treasure | 6 镜 · 5 景别 · 4 运镜 · 2 转场 | 0.6 | 0 | 4 | 41.06s |
+| qipashuo | 8 镜 · 4 景别 · 6 运镜 · 5 转场 | 0.429 | 3 | 2 | 35.72s |
+| roundtable | 8 镜 · 5 景别 · 5 运镜 · 3 转场 | 0.571 | 1 | 2 | 41.78s |
+| shark_tank | 7 镜 · 4 景别 · 5 运镜 · 3 转场 | 0.5 | 1 | 0 | 31.51s |
+| slow_life | 8 镜 · 6 景别 · 5 运镜 · 3 转场 | 0.429 | 2 | 2 | 35.74s |
+| snl_sketch | 8 镜 · 4 景别 · 5 运镜 · 4 转场 | 0.571 | 1 | 1 | 38.53s |
+| standup | 6 镜 · 4 景别 · 6 运镜 · 2 转场 | 0.8 | 2 | 2 | 41.31s |
+| taskmaster | 8 镜 · 4 景别 · 6 运镜 · 4 转场 | 0.429 | 1 | 0 | 32.66s |
+| tonight_show | 9 镜 · 4 景别 · 5 运镜 · 4 转场 | 0.375 | 2 | 0 | 41.61s |
+| traitors | 8 镜 · 5 景别 · 5 运镜 · 2 转场 | 0.571 | 1 | 3 | 37.92s |
+
+- 16/16 manifest.transition = editorial/per-cut；16/16 storyboard.json/html/png；timeline.editing boundaries = 镜头数-1。
+- 剪辑签名 16 部中 15 个不同（hot_ones/masked_singer 等有重复签名但运镜/转场组合不同，验收按组合判唯一）。
+- P1 头部视觉门：QA 人眼复核 5 处近似误报（头在框内），容差 2.5%H→6%H 后 16/16 通过。
+

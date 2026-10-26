@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """V5 2D 分层动画渲染器（motion2d）。
 
 契约见 ``docs/V5_INTERFACES.md`` §4（签名不得改）：
@@ -143,7 +143,11 @@ CAMERA_ALIASES: dict[str, str] = {
     "focus_pull": "rack_focus", "focus": "rack_focus", "pull_focus": "rack_focus",
     "orbit": "orbit", "turntable": "orbit", "arc": "orbit", "orbit_2_5d": "orbit",
     "whip_pan": "whip_pan", "whip": "whip_pan", "whippan": "whip_pan",
-    "whip_pan_right": "whip_pan", "whip_r": "whip_pan",
+    "whip_pan_right": "whip_pan", "whip_r": "whip_pan", "whip_right": "whip_pan",
+    "whip_left": "whip_pan", "whip_l": "whip_pan", "whip_pan_left": "whip_pan",
+    # 剪辑档案里可能出现的其它叫法
+    "dolly_out": "pull_out", "dolly_back": "pull_out",
+    "pushin_slow": "push_in", "creep_in": "push_in", "creep": "push_in",
 }
 SUPPORTED_CAMERA_TYPES: tuple[str, ...] = (
     # 基础 7 种
