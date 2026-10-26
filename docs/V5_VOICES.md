@@ -99,6 +99,13 @@ outputs/v5_voices/<character>/<voice_key>.json   # key/seed/voice_id/instruction
 - 锁可复用（跨模板/跨集）；`--force` 重建（例如你换了 instruction 但 seed 不变也可重建）。
 - 锁缺失时自动生成（渲染/试听时），失败会回退 Voice Design（仍固定 seed+instruction）并告警。
 
+## 4.1 试听样本（24 角色）
+
+- 每个角色的固定声音参考（锁）导出为 48k stereo 试听：outputs/v5_voices/previews/<character>.wav
+- 清单（角色/voice_id/seed/key/时长/参考文本）：outputs/v5_voices/previews/manifest.json
+- 24 角色连续试听（每段间隔 0.8s，约 164s）：outputs/v5_voices/voice_demo_all.wav
+- 生成/刷新：python tmp/v5_all_voice_previews.py（需要 Breeze TTS 服务，GPU 约 4 分钟；已生成的锁会复用）
+
 ## 5. 一致性校验
 
 - **QC `voice_fixed`**：同一角色所有对白镜的 `voice_key` 必须一致、对白镜必须有 voice_id；
