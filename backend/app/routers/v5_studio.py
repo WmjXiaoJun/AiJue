@@ -53,7 +53,7 @@ TEMPLATE_MEDIA_RE = re.compile(
     r"timeline\.json|contact_sheet\.png|storyboard\.png|storyboard\.html|"
     r"frames/frame_\d{1,3}\.png|shots/[a-z0-9_]{1,80}\.png|"
     r"work/storyboard/[a-z0-9_]{1,80}\.(jpg|png))$")
-CHAR_MEDIA_RE = re.compile(r"^(portrait|front|cutout|thumb)\.(png|jpg|jpeg|webp)$")
+CHAR_MEDIA_RE = re.compile(r"^(portrait|portrait_real|front|cutout|thumb)\.(png|jpg|jpeg|webp)$")
 SCENE_MEDIA_RE = re.compile(r"^[a-z][a-z0-9_]{1,60}(_\d{1,2})?\.(png|jpg|jpeg|webp)$")
 VOICE_RE = re.compile(r"^[a-z][a-z0-9_]{1,60}$")
 MEDIA_TYPES = {

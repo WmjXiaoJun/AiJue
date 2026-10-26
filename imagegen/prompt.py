@@ -257,6 +257,16 @@ STYLE_PRESETS = {
         "suffix": ["clean lineart", "elegant color palette", "detailed face"],
         "negative": ["western comic", "3d render"],
     },
+    "realistic": {
+        "prefix": ["photorealistic", "raw photo", "masterpiece", "best quality",
+                   "ultra realistic", "solo", "detailed skin texture",
+                   "professional photography"],
+        "suffix": ["sharp focus", "detailed face", "detailed makeup",
+                   "cinematic lighting", "8k"],
+        "negative": ["anime", "cartoon", "illustration", "2d", "cel shading",
+                     "flat colors", "sketch", "painting", "cgi", "3d render",
+                     "doll", "plastic skin"],
+    },
 }
 
 NEGATIVE_BASE = ["lowres", "bad anatomy", "bad hands", "text", "watermark",
@@ -334,7 +344,9 @@ def build_prompt(spec: dict, style: str = "anime", prompt_extra: str = "",
     tags += preset["suffix"]
     tags = _dedup(tags)
 
-    negative = _dedup(NEGATIVE_BASE + preset["negative"]
+    neg_base = [t for t in NEGATIVE_BASE
+                if not (style == "realistic" and t == "realistic")]
+    negative = _dedup(neg_base + preset["negative"]
                       + COMPOSITION_NEGATIVES.get(comp, []))
     return {
         "positive": ", ".join(tags),

@@ -694,6 +694,10 @@ def _run_imagegen(spec_path: Path, outdir: Path, mode: str, seed: int,
     cmd = [sys.executable, "-m", "imagegen.cli", "generate",
            "--spec", str(spec_path), "--outdir", str(outdir),
            "--mode", mode, "--style", style, "--seed", str(seed)]
+    # V6：可切换 checkpoint（如 RealVisXL 写实模型），默认用 imagegen 内置
+    ckpt = os.environ.get("V5_ART_CKPT", "").strip()
+    if ckpt:
+        cmd += ["--ckpt", ckpt]
     if prompt_extra:
         cmd += ["--prompt-extra", prompt_extra]
     if negative_extra:
@@ -1247,6 +1251,8 @@ def character_art(character_id: str, art: dict | None = None) -> dict:
         "exists": bool(Path(cutout).is_file()),
         "dir": str(paths["dir"]),
         "portrait": str(paths["portrait"]) if Path(paths["portrait"]).is_file() else None,
+        "portrait_real": (str(Path(paths["dir"]) / "portrait_real.png")
+                          if (Path(paths["dir"]) / "portrait_real.png").is_file() else None),
         "front": str(paths["front"]) if Path(paths["front"]).is_file() else None,
         "cutout": str(cutout) if Path(cutout).is_file() else None,
         "meta": meta,

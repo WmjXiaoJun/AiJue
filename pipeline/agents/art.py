@@ -106,6 +106,7 @@ def list_art(ctx, params: dict | None = None) -> dict:
         rows.append({
             "character": cid,
             "portrait": (cdir / "portrait.png").is_file(),
+            "portrait_real": (cdir / "portrait_real.png").is_file(),
             "front": (cdir / "front.png").is_file(),
             "cutout": (cdir / "cutout.png").is_file(),
             "point": (cdir / "cutout_point.png").is_file(),
