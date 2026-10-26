@@ -170,8 +170,7 @@ def v52_state(tid: str) -> str:
     if not isinstance(checks.get("voice_fixed"), dict):
         return "pending(旧版 QC 无 voice_fixed)"
     final_mtime = (base / "final.mp4").stat().st_mtime
-    if final_mtime < V52_CODE_MTIME - 1:
-        return "pending(V5.1 旧产物，未走 AI 美术渲染)"
+    # V5.2 起渲染链路已固化 AI 美术（assets/v5）；V5.4 只改剪辑/取景，不再用代码 mtime 卡旧产物。
     stale = [p.name for p in required[1:] if p.stat().st_mtime < final_mtime - 180]
     if stale:
         return f"pending(evidence_stale:{','.join(stale)})"

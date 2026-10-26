@@ -309,8 +309,15 @@ def test_timeline_contract(tid: str):
     cursor = 0.0
     for clip in clips:
         cursor = round(cursor + float(clip.get("out") or 0), 3)
-    if clips and abs(cursor - total) > DURATION_TOL:
-        problems.append(f"V1 总长 {cursor:.3f}s vs timeline {total:.3f}s")
+    # V5.4：每个剪辑点独立 xfade 会产生重叠，timeline 总时长 = sum(镜头) - 实际重叠
+    overlap = sum(
+        max(0.0, float(clips[i].get("at") or 0) + float(clips[i].get("out") or 0)
+            - float(clips[i + 1].get("at") or 0))
+        for i in range(len(clips) - 1))
+    expected_total = cursor - overlap if tl.get("editing") else cursor
+    if clips and abs(expected_total - total) > DURATION_TOL:
+        problems.append(f"V1 总长 {expected_total:.3f}s（sum-重叠 {overlap:.3f}）"
+                        f" vs timeline {total:.3f}s")
     plan_len = len((plan(tid).get("shots") or []))
     if plan_len and len(clips) != plan_len:
         problems.append(f"V1 clips={len(clips)} != plan shots={plan_len}")
