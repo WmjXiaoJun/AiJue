@@ -1,0 +1,103 @@
+{
+  "id": "candy_collage",
+  "label": "糖果拼贴综艺",
+  "version": 1,
+  "description": "糖果拼贴综艺：撕纸拼贴、贴纸与半调网点、糖果粉黄青高饱和，游戏任务舞台的塑料欢乐感。",
+  "tags": [
+    "modern",
+    "game_show",
+    "collage",
+    "candy",
+    "pop"
+  ],
+  "technique": [
+    "collage_cutout"
+  ],
+  "palette": {
+    "bg": [
+      "#FFF3E4",
+      "#FFE3EF"
+    ],
+    "fg": [
+      "#2B2140",
+      "#4A3A66"
+    ],
+    "accent": [
+      "#FF5C9E",
+      "#FFD84D",
+      "#3FD6D0"
+    ],
+    "paper": "#FFF9F0",
+    "shadow": "#C77A9A",
+    "highlight": "#FFFFFF",
+    "purple": "#7A5CFF",
+    "mint": "#8FF0EA",
+    "lemon": "#FFE98A"
+  },
+  "texture": [
+    "halftone",
+    "torn_paper",
+    "stickers",
+    "paper_grain"
+  ],
+  "line": {
+    "style": "thick_outline",
+    "width": 5,
+    "color": "#2B2140",
+    "jitter": 0.08,
+    "opacity": 1.0
+  },
+  "character_treatment": "cutout_paper",
+  "typography": {
+    "title_font": "variety_pop",
+    "subtitle": "comic",
+    "lower_third": "sticker_badge",
+    "fallback_font": "DengXian",
+    "text_color": "#2B2140",
+    "seal_color": "#FF5C9E",
+    "vertical": false,
+    "letter_spacing": 0.02
+  },
+  "transition": "sticker_pop",
+  "audio": {
+    "bgm": "cartoon_bounce",
+    "sfx": [
+      "pop",
+      "boing",
+      "confetti_burst",
+      "ding"
+    ],
+    "ambience": "game_show",
+    "ducking": 0.3
+  },
+  "h3": {
+    "style_prompt": "colorful candy collage variety show stage, cut paper cutouts, torn paper edges, halftone dots, glossy stickers and tape, bright bubblegum pink lemon yellow cyan palette, playful game show set, flat graphic design, no text",
+    "negative_prompt": "realistic photo, dark moody, grunge, watermark"
+  },
+  "finish": {
+    "brightness": 1.04,
+    "contrast": 1.08,
+    "saturation": 1.22,
+    "temperature": 0.03,
+    "vignette": 0.1,
+    "grain": 0.02,
+    "paper": 0.1,
+    "halftone": 0.1,
+    "sharpen": 0.18
+  },
+  "grade": {
+    "eq": "contrast=1.05:saturation=1.15:brightness=0.02",
+    "colorbalance": "rs=0.02:gs=0.0:bs=0.02",
+    "extra": ""
+  },
+  "packaging": {
+    "tag": "任务挑战",
+    "tag_color": "#FF5C9E",
+    "bars": "red_tape",
+    "frame": "none",
+    "seal": "玩",
+    "seal_color": "#FF5C9E",
+    "brand": "造片局 · 糖果拼贴",
+    "watermark": true
+  }
+}

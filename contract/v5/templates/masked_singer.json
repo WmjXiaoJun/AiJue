@@ -1,0 +1,166 @@
+{
+  "id": "masked_singer",
+  "label": "蒙面歌手",
+  "version": 5,
+  "description": "V5 模板：蒙面歌手（风格 hologram_stage）",
+  "tags": [
+    "v5",
+    "hologram_stage"
+  ],
+  "style": "hologram_stage",
+  "target_duration": 38,
+  "aspect": [
+    16,
+    9
+  ],
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "name": "老周"
+    },
+    {
+      "role": "figure_a",
+      "character": "ali",
+      "name": "阿栗"
+    },
+    {
+      "role": "figure_b",
+      "character": "tianmei",
+      "name": "甜妹"
+    }
+  ],
+  "acts": [
+    {
+      "id": "act01",
+      "name": "第 1 幕",
+      "scene": "hologram_stage",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 2.8,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    },
+    {
+      "id": "act02",
+      "name": "第 2 幕",
+      "scene": "mirror_room",
+      "camera": "dolly",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "host",
+      "text": "阿栗，你这新歌听着挺新鲜的，全息舞台也挺酷啊！",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act03",
+      "name": "第 3 幕",
+      "scene": "audience_star_sea",
+      "camera": "pan_left",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "figure_a",
+      "text": "哈哈，多亏了AI帮我写词谱曲，这次真的是跨界合作",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act04",
+      "name": "第 4 幕",
+      "scene": "light_tunnel",
+      "camera": "handheld",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "host",
+      "text": "那你说说，AI写的歌到底算不算音乐呢？",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act05",
+      "name": "第 5 幕",
+      "scene": "mirror_room",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "figure_a",
+      "text": "这还用说，当然算啦！就是现代版的‘人工’音乐呗！",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act06",
+      "name": "第 6 幕",
+      "scene": "audience_star_sea",
+      "camera": "dolly",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "figure_b",
+      "text": "但我也觉得，关键还是得有人的情感在里面，AI再先进也替代不了感情",
+      "characters": [
+        "figure_b",
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act07",
+      "name": "第 7 幕",
+      "scene": "light_tunnel",
+      "camera": "pan_left",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "host",
+      "text": "对头，感情是音乐的灵魂，缺了它就是冷冰冰的科技产品",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act08",
+      "name": "第 8 幕",
+      "scene": "light_tunnel",
+      "camera": "handheld",
+      "camera_strength": 0.06,
+      "duration": 3.0,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    }
+  ],
+  "packaging": {
+    "subtitle": "hologram_stage",
+    "transition": "hologram_stage",
+    "title": "蒙面歌手",
+    "end_card": "下期见"
+  },
+  "audio": {
+    "bgm": "future_bass",
+    "sfx": [
+      "whoosh",
+      "click"
+    ]
+  },
+  "lipsync": {
+    "mode": "viseme"
+  },
+  "meta": {
+    "source": "v3_remap",
+    "script_lines": 6
+  }
+}

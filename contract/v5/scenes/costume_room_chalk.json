@@ -1,0 +1,144 @@
+{
+  "id": "costume_room_chalk",
+  "label": "粉笔服装间",
+  "description": "粉笔素描服装间：黑板上的镜子、衣架、戏服与旧箱子，手绘线稿质感，后台换装时刻。",
+  "tags": [
+    "modern",
+    "sketch",
+    "chalk",
+    "backstage",
+    "costume"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "seed": 20261073,
+  "layers": [
+    {
+      "type": "blackboard",
+      "layer": "background",
+      "color": "board",
+      "frame": "wood",
+      "strength": 0.35
+    },
+    {
+      "type": "chalk_hatching",
+      "layer": "background",
+      "count": 25,
+      "color": "fg",
+      "opacity": 0.14,
+      "seed": 6
+    },
+    {
+      "type": "chalk_objects",
+      "layer": "midground",
+      "kind": "mirror",
+      "x": 0.3,
+      "y": 0.35,
+      "scale": 1.0,
+      "color": "fg"
+    },
+    {
+      "type": "chalk_objects",
+      "layer": "midground",
+      "kind": "clothes_rack",
+      "x": 0.72,
+      "y": 0.5,
+      "scale": 1.0,
+      "color": "fg"
+    },
+    {
+      "type": "chalk_objects",
+      "layer": "midground",
+      "kind": "costume",
+      "x": 0.55,
+      "y": 0.45,
+      "scale": 1.0,
+      "color": "fg"
+    },
+    {
+      "type": "chalk_objects",
+      "layer": "midground",
+      "kind": "trunk",
+      "x": 0.2,
+      "y": 0.82,
+      "scale": 1.0,
+      "color": "fg"
+    },
+    {
+      "type": "chalk_hatching",
+      "layer": "midground",
+      "count": 15,
+      "color": "fg",
+      "opacity": 0.12,
+      "seed": 13
+    },
+    {
+      "type": "spotlights",
+      "layer": "foreground",
+      "count": 1,
+      "color": "fg",
+      "strength": 0.35
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.162,
+      0.16,
+      0.476,
+      0.78
+    ],
+    "detail": [
+      0.34,
+      0.21,
+      0.32,
+      0.34
+    ],
+    "room": [
+      0.05,
+      0.08,
+      0.9,
+      0.85
+    ],
+    "host": [
+      0.3,
+      0.12,
+      0.338,
+      0.77
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.5,
+      0.86
+    ],
+    "guest_a": [
+      0.3,
+      0.86
+    ],
+    "guest_b": [
+      0.7,
+      0.86
+    ],
+    "figure_a": [
+      0.3,
+      0.86
+    ],
+    "figure_b": [
+      0.7,
+      0.86
+    ]
+  },
+  "variants": [
+    "rehearsal",
+    "quickchange"
+  ],
+  "props": []
+}

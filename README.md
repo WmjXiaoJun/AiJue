@@ -136,3 +136,13 @@ FastAPI · SQLAlchemy · SQLite · Vite · React · TypeScript · FFmpeg 6.1 · 
 - **QC 增量**：`audio_pace` 硬门（atempo=1.0 / 无截断 / 语音装进镜头）。
 - **复现**：`python scripts/tts_server.py start` → `python -m pipeline.cli render_v3 --template tonight_show --duration 40 --h3 comfy --force`；A/B 对照加 `--legacy-audio`。
 - 说明：Breeze TTS 2 权重为 research / non-commercial 许可（demo 用途；商用需 BreezeBlue 授权）。
+
+## V5 风格世界 + 口型同步 + 全量自定义（2026-10-26）
+
+> 规划/报告：docs/PLAN_V5_STYLE_AUDIO.md、docs/V5_REPORT.md；验收：docs/V5_ACCEPTANCE.md。
+
+- **16 种截然不同的视觉风格**：水墨史书 / 版刻典籍 / 羊皮纸档案 / 博物馆金黑 / 霓虹卡通 / 全息舞台 / VHS / 暖光胶片 / 黑色电影 / 文艺复兴油画 / 巴洛克烛光 / 科技蓝图 / 糖果拼贴 / 黏土定格 / 粉笔剧场 / 绢本辩论；历史类含古地图、战场、军议、宫殿等场景。
+- **口型同步**：对白镜用 2D 角色 + TTS 音素时间轴驱动 viseme（零漂移）；pipeline/lipsync.py 交付 MuseTalk 1.5（48ms/帧、6.85GB、MIT）作为 H3 B-roll 可选后处理。
+- **可自定义**：contract/v5/ 六类 JSON（styles/scenes/characters/props/templates/packs）+ custom/ 覆盖 + schema 校验 + CLI（python -m pipeline.v5_cli validate/list/export/preview）+ API（/api/v5/...），教程 docs/V5_CUSTOMIZATION.md。
+- **渲染**：python -m pipeline.cli render_v5 --template history_talk --duration 40；批量 python scripts/render_templates_v5.py --duration 40 --refresh；产物 outputs/templates_v5/{id}/。
+- 规模：**16 风格 / 61 场景 / 24 角色 / 44 道具 / 2 风格包**，契约 validate 0 error/0 warning。

@@ -1,0 +1,156 @@
+{
+  "id": "court_audience",
+  "label": "绢本观众席",
+  "description": "绢本设色的观众/群臣席：层叠墨色剪影、宫灯与屏风，适合观众反应与全场投票镜头。",
+  "tags": [
+    "modern",
+    "debate",
+    "silk",
+    "audience"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "seed": 20261028,
+  "layers": [
+    {
+      "type": "paper",
+      "layer": "background",
+      "palette": "silk",
+      "mottle": 0.4
+    },
+    {
+      "type": "silk_weave",
+      "layer": "background",
+      "opacity": 0.3,
+      "spacing": 0.02,
+      "angle": 8
+    },
+    {
+      "type": "gongbi_clouds",
+      "layer": "midground",
+      "count": 5,
+      "color": "accent:1",
+      "opacity": 0.32,
+      "seed": 6
+    },
+    {
+      "type": "silk_ground_wash",
+      "layer": "background",
+      "y": 0.6,
+      "color": "azurite"
+    },
+    {
+      "type": "columns",
+      "layer": "midground",
+      "count": 2,
+      "color": "shadow",
+      "opacity": 0.26
+    },
+    {
+      "type": "screens",
+      "layer": "midground",
+      "count": 2,
+      "color": "paper",
+      "opacity": 0.55
+    },
+    {
+      "type": "lanterns",
+      "layer": "midground",
+      "count": 4,
+      "color": "highlight",
+      "opacity": 0.8
+    },
+    {
+      "type": "ink_crowd",
+      "layer": "midground",
+      "rows": 3,
+      "per_row": 11,
+      "y_start": 0.96,
+      "color": "fg",
+      "opacity": 0.38,
+      "seed": 21
+    },
+    {
+      "type": "scroll_rods",
+      "layer": "foreground",
+      "color": "shadow",
+      "accent": "accent:1"
+    },
+    {
+      "type": "seal_stamp",
+      "layer": "foreground",
+      "x": 0.08,
+      "y": 0.16,
+      "text": "辩",
+      "color": "accent",
+      "size": 0.07
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.0,
+      0.2,
+      0.638,
+      0.78
+    ],
+    "detail": [
+      0.34,
+      0.25,
+      0.32,
+      0.34
+    ],
+    "orchestra": [
+      0.0,
+      0.12,
+      1.0,
+      0.28
+    ],
+    "balcony": [
+      0.1,
+      0.12,
+      0.8,
+      0.2
+    ],
+    "host_close": [
+      0.362,
+      0.12,
+      0.288,
+      0.81
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.5,
+      0.9
+    ],
+    "figure_a": [
+      0.12,
+      0.9
+    ],
+    "figure_b": [
+      0.88,
+      0.9
+    ],
+    "guest_a": [
+      0.12,
+      0.9
+    ],
+    "guest_b": [
+      0.88,
+      0.9
+    ]
+  },
+  "variants": [
+    "applause",
+    "hush"
+  ],
+  "props": []
+}

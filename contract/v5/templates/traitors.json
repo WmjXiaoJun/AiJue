@@ -1,0 +1,166 @@
+{
+  "id": "traitors",
+  "label": "叛徒圆桌",
+  "version": 5,
+  "description": "V5 模板：叛徒圆桌（风格 baroque_candle）",
+  "tags": [
+    "v5",
+    "baroque_candle"
+  ],
+  "style": "baroque_candle",
+  "target_duration": 38,
+  "aspect": [
+    16,
+    9
+  ],
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "name": "老周"
+    },
+    {
+      "role": "figure_a",
+      "character": "wuzetian",
+      "name": "武则天"
+    },
+    {
+      "role": "figure_b",
+      "character": "caocao",
+      "name": "曹操"
+    }
+  ],
+  "acts": [
+    {
+      "id": "act01",
+      "name": "第 1 幕",
+      "scene": "castle_hall_baroque",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 2.8,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    },
+    {
+      "id": "act02",
+      "name": "第 2 幕",
+      "scene": "candle_corridor",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "host",
+      "text": "烛光摇曳，武则天与曹操对视，气氛紧张",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act03",
+      "name": "第 3 幕",
+      "scene": "stone_roundtable",
+      "camera": "dolly",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "figure_a",
+      "text": "我武则天何许人也？你曹操可是深谙权谋啊。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act04",
+      "name": "第 4 幕",
+      "scene": "crypt",
+      "camera": "pan_right",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "figure_b",
+      "text": "那咱俩得来个真心话大冒险，试探试探对方。",
+      "characters": [
+        "figure_b",
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act05",
+      "name": "第 5 幕",
+      "scene": "candle_corridor",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "host",
+      "text": "就怕这冒险，一不小心就成了千古遗恨。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act06",
+      "name": "第 6 幕",
+      "scene": "stone_roundtable",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "figure_a",
+      "text": "放心，我武某人从不轻易下结论。",
+      "characters": [
+        "figure_a",
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act07",
+      "name": "第 7 幕",
+      "scene": "crypt",
+      "camera": "dolly",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "figure_b",
+      "text": "那咱俩就从你开始，你先来。",
+      "characters": [
+        "figure_b"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act08",
+      "name": "第 8 幕",
+      "scene": "crypt",
+      "camera": "pan_right",
+      "camera_strength": 0.06,
+      "duration": 3.0,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    }
+  ],
+  "packaging": {
+    "subtitle": "baroque_candle",
+    "transition": "baroque_candle",
+    "title": "叛徒圆桌",
+    "end_card": "下期见"
+  },
+  "audio": {
+    "bgm": "organ",
+    "sfx": [
+      "whoosh",
+      "click"
+    ]
+  },
+  "lipsync": {
+    "mode": "viseme"
+  },
+  "meta": {
+    "source": "v3_remap",
+    "script_lines": 6
+  }
+}

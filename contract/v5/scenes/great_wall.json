@@ -1,0 +1,160 @@
+{
+  "id": "great_wall",
+  "label": "关隘长城",
+  "description": "长城关隘：群山 + 城墙垛口 + 城门楼 + 烽火 + 军旗 + 雪",
+  "tags": [
+    "history",
+    "war",
+    "ink"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "layers": [
+    {
+      "type": "sky_gradient",
+      "layer": "background",
+      "top": "sky:0",
+      "bottom": "sky:1",
+      "horizon": 0.52,
+      "haze": 0.5,
+      "clouds": 2
+    },
+    {
+      "type": "mountains",
+      "layer": "background",
+      "count": 4,
+      "y": 0.56,
+      "height": 0.4,
+      "color": "fg",
+      "seed": 13
+    },
+    {
+      "type": "wall_gate",
+      "layer": "midground",
+      "x": 0.02,
+      "w": 0.96,
+      "y": 0.78,
+      "height": 0.15,
+      "color": "stone",
+      "gate_x": 0.52,
+      "gate_w": 0.13
+    },
+    {
+      "type": "smoke",
+      "layer": "midground",
+      "count": 2,
+      "color": "shadow",
+      "y": 0.52,
+      "rise": 0.3,
+      "spread": 0.1,
+      "alpha": 90,
+      "plume": true,
+      "seed": 17,
+      "variants": {
+        "beacon": {
+          "count": 3,
+          "alpha": 110
+        },
+        "siege": {
+          "count": 4,
+          "alpha": 130
+        }
+      }
+    },
+    {
+      "type": "banners",
+      "layer": "midground",
+      "count": 4,
+      "x0": 0.08,
+      "x1": 0.92,
+      "y": 0.42,
+      "width": 0.035,
+      "height": 0.14,
+      "color": "accent",
+      "kind": "war"
+    },
+    {
+      "type": "snow",
+      "layer": "foreground",
+      "count": 140,
+      "color": "highlight",
+      "size": 0.005,
+      "variants": {
+        "beacon": {
+          "count": 90
+        },
+        "siege": {
+          "count": 190
+        }
+      }
+    },
+    {
+      "type": "particles",
+      "layer": "foreground",
+      "count": 36,
+      "color": "highlight",
+      "size": 0.002
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.26
+    },
+    {
+      "type": "grain",
+      "layer": "foreground",
+      "strength": 0.06
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0,
+      0,
+      1,
+      1
+    ],
+    "gate_close": [
+      0.4,
+      0.48,
+      0.34,
+      0.48
+    ],
+    "beacon": [
+      0.62,
+      0.1,
+      0.34,
+      0.5
+    ],
+    "wall_walk": [
+      0.02,
+      0.52,
+      0.6,
+      0.44
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.18,
+      0.96
+    ],
+    "figure_a": [
+      0.76,
+      0.96
+    ],
+    "figure_b": [
+      0.52,
+      0.97
+    ]
+  },
+  "variants": [
+    "beacon",
+    "siege"
+  ],
+  "depth": {
+    "background": 0.04,
+    "midground": 0.16,
+    "foreground": 0.34
+  }
+}

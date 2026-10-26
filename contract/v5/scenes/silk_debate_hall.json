@@ -1,0 +1,161 @@
+{
+  "id": "silk_debate_hall",
+  "label": "绢本辩论场",
+  "description": "绢本设色的辩论主舞台：远山云纹、对垒双幡、墨圈舞台与台下观众剪影，工笔细线收边。",
+  "tags": [
+    "modern",
+    "debate",
+    "silk",
+    "arena"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "seed": 20261026,
+  "layers": [
+    {
+      "type": "paper",
+      "layer": "background",
+      "palette": "silk",
+      "mottle": 0.35
+    },
+    {
+      "type": "silk_weave",
+      "layer": "background",
+      "opacity": 0.35,
+      "spacing": 0.018,
+      "angle": 12
+    },
+    {
+      "type": "gongbi_mountains",
+      "layer": "background",
+      "count": 3,
+      "color": "azurite",
+      "opacity": 0.7,
+      "seed": 11
+    },
+    {
+      "type": "gongbi_clouds",
+      "layer": "midground",
+      "count": 4,
+      "color": "accent:1",
+      "opacity": 0.4,
+      "seed": 5
+    },
+    {
+      "type": "columns",
+      "layer": "midground",
+      "count": 2,
+      "color": "shadow",
+      "opacity": 0.3
+    },
+    {
+      "type": "silk_banner",
+      "layer": "midground",
+      "count": 2,
+      "x": 0.11,
+      "y": 0.16,
+      "w": 0.09,
+      "h": 0.6,
+      "color": "accent",
+      "accent": "accent:1"
+    },
+    {
+      "type": "silk_ground_wash",
+      "layer": "background",
+      "y": 0.66,
+      "color": "azurite"
+    },
+    {
+      "type": "ink_circle_stage",
+      "layer": "midground",
+      "x": 0.5,
+      "y": 0.8,
+      "r": 0.3,
+      "color": "fg",
+      "opacity": 0.4
+    },
+    {
+      "type": "ink_crowd",
+      "layer": "foreground",
+      "rows": 2,
+      "per_row": 9,
+      "y_start": 0.88,
+      "color": "fg",
+      "opacity": 0.32,
+      "seed": 7
+    },
+    {
+      "type": "scroll_rods",
+      "layer": "foreground",
+      "color": "shadow",
+      "accent": "accent:1"
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.122,
+      0.13,
+      0.516,
+      0.78
+    ],
+    "detail": [
+      0.34,
+      0.19,
+      0.32,
+      0.34
+    ],
+    "stage": [
+      0.18,
+      0.12,
+      0.64,
+      0.75
+    ],
+    "host": [
+      0.36,
+      0.12,
+      0.28,
+      0.75
+    ],
+    "banners": [
+      0.02,
+      0.12,
+      0.96,
+      0.62
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.5,
+      0.84
+    ],
+    "figure_a": [
+      0.26,
+      0.82
+    ],
+    "figure_b": [
+      0.74,
+      0.82
+    ],
+    "guest_a": [
+      0.26,
+      0.82
+    ],
+    "guest_b": [
+      0.74,
+      0.82
+    ]
+  },
+  "variants": [
+    "pro",
+    "con"
+  ],
+  "props": []
+}

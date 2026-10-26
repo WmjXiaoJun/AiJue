@@ -1,0 +1,48 @@
+{
+  "id": "headphones",
+  "label": "耳机",
+  "kind": "headphones",
+  "description": "头戴式耳机",
+  "tags": [
+    "modern",
+    "studio",
+    "audio",
+    "prop"
+  ],
+  "appearance": {
+    "shape": "headphones",
+    "main": "#c4b0e2",
+    "accent": "#33e6ff",
+    "material": "plastic",
+    "size": [
+      0.1,
+      0.08
+    ]
+  },
+  "style": {
+    "default": {
+      "line": 1.0
+    },
+    "neon_toon": {
+      "line": 1.2,
+      "glow": 0.6
+    },
+    "noir_rain": {
+      "line": 1.1,
+      "tint": "#8a8a8a"
+    },
+    "oil_salon": {
+      "line": 1.3,
+      "tint": "#b08a3e"
+    },
+    "hologram_stage": {
+      "glow": 0.5
+    },
+    "film_interview": {
+      "tint": "#d9a56a"
+    },
+    "vhs_late_show": {
+      "glow": 0.25
+    }
+  }
+}

@@ -1,0 +1,166 @@
+{
+  "id": "mystery",
+  "label": "悬疑现场",
+  "version": 5,
+  "description": "V5 模板：悬疑现场（风格 noir_rain）",
+  "tags": [
+    "v5",
+    "noir_rain"
+  ],
+  "style": "noir_rain",
+  "target_duration": 38,
+  "aspect": [
+    16,
+    9
+  ],
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "name": "老周"
+    },
+    {
+      "role": "figure_a",
+      "character": "lengmian",
+      "name": "冷面"
+    },
+    {
+      "role": "figure_b",
+      "character": "mystery_guest",
+      "name": "神秘嘉宾"
+    }
+  ],
+  "acts": [
+    {
+      "id": "act01",
+      "name": "第 1 幕",
+      "scene": "noir_office",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 2.8,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    },
+    {
+      "id": "act02",
+      "name": "第 2 幕",
+      "scene": "rainy_street",
+      "camera": "pan_right",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "host",
+      "text": "今晚的雨真大，咱们就一起揭开这雨夜的谜团",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act03",
+      "name": "第 3 幕",
+      "scene": "interrogation_room",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "figure_a",
+      "text": "我在那栋老宅里等了她一整夜",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act04",
+      "name": "第 4 幕",
+      "scene": "police_archive",
+      "camera": "dolly",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "host",
+      "text": "那你说说，那晚到底发生了什么",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act05",
+      "name": "第 5 幕",
+      "scene": "rainy_street",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "figure_b",
+      "text": "雨声掩盖了一切，只留下空荡荡的走廊",
+      "characters": [
+        "figure_b"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act06",
+      "name": "第 6 幕",
+      "scene": "interrogation_room",
+      "camera": "pan_right",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "figure_a",
+      "text": "她消失在走廊尽头，却再也没有出现",
+      "characters": [
+        "figure_a",
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act07",
+      "name": "第 7 幕",
+      "scene": "police_archive",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "host",
+      "text": "雨夜之后，真相只在你我心中",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act08",
+      "name": "第 8 幕",
+      "scene": "police_archive",
+      "camera": "dolly",
+      "camera_strength": 0.1,
+      "duration": 3.0,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    }
+  ],
+  "packaging": {
+    "subtitle": "noir_rain",
+    "transition": "noir_rain",
+    "title": "悬疑现场",
+    "end_card": "下期见"
+  },
+  "audio": {
+    "bgm": "noir_jazz",
+    "sfx": [
+      "whoosh",
+      "click"
+    ]
+  },
+  "lipsync": {
+    "mode": "viseme"
+  },
+  "meta": {
+    "source": "v3_remap",
+    "script_lines": 6
+  }
+}

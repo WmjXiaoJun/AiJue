@@ -1,0 +1,137 @@
+{
+  "id": "sketch_backdrop",
+  "label": "粉笔素描背景",
+  "description": "粉笔素描布景：黑板上的城市/房间线稿、路灯与摄影机手绘，做小品换景的素描背景板。",
+  "tags": [
+    "modern",
+    "sketch",
+    "chalk",
+    "backdrop"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "seed": 20261072,
+  "layers": [
+    {
+      "type": "blackboard",
+      "layer": "background",
+      "color": "board",
+      "frame": "wood",
+      "strength": 0.35
+    },
+    {
+      "type": "chalk_hatching",
+      "layer": "background",
+      "count": 40,
+      "color": "fg",
+      "opacity": 0.16,
+      "seed": 7
+    },
+    {
+      "type": "chalk_objects",
+      "layer": "midground",
+      "kind": "cityscape",
+      "x": 0.5,
+      "y": 0.62,
+      "scale": 1.0,
+      "color": "fg"
+    },
+    {
+      "type": "chalk_objects",
+      "layer": "midground",
+      "kind": "street_lamp",
+      "count": 2,
+      "x": 0.2,
+      "y": 0.6,
+      "color": "fg"
+    },
+    {
+      "type": "chalk_objects",
+      "layer": "midground",
+      "kind": "camera",
+      "x": 0.85,
+      "y": 0.8,
+      "scale": 0.8,
+      "color": "fg"
+    },
+    {
+      "type": "chalk_hatching",
+      "layer": "midground",
+      "count": 18,
+      "color": "fg",
+      "opacity": 0.14,
+      "seed": 11
+    },
+    {
+      "type": "chalk_audience",
+      "layer": "foreground",
+      "rows": 1,
+      "per_row": 8,
+      "y_start": 0.99,
+      "color": "fg",
+      "opacity": 0.4,
+      "seed": 5
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.142,
+      0.18,
+      0.496,
+      0.78
+    ],
+    "detail": [
+      0.34,
+      0.23,
+      0.32,
+      0.34
+    ],
+    "backdrop": [
+      0.05,
+      0.1,
+      0.9,
+      0.8
+    ],
+    "host": [
+      0.3,
+      0.12,
+      0.338,
+      0.79
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.5,
+      0.88
+    ],
+    "guest_a": [
+      0.28,
+      0.88
+    ],
+    "guest_b": [
+      0.72,
+      0.88
+    ],
+    "figure_a": [
+      0.28,
+      0.88
+    ],
+    "figure_b": [
+      0.72,
+      0.88
+    ]
+  },
+  "variants": [
+    "day",
+    "night"
+  ],
+  "props": []
+}

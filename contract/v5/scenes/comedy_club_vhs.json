@@ -1,0 +1,120 @@
+{
+  "id": "comedy_club_vhs",
+  "label": "VHS 喜剧俱乐部",
+  "description": "80s VHS 喜剧俱乐部：砖墙舞台、霓虹招牌、麦克风架与暖黄追光，磁带扫描线覆盖。",
+  "tags": [
+    "modern",
+    "vhs",
+    "comedy",
+    "club",
+    "stage"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "size": [
+    1600,
+    900
+  ],
+  "seed": 5511,
+  "layers": [
+    {
+      "type": "sky_gradient",
+      "layer": "background",
+      "top": "shadow",
+      "bottom": "bg:1"
+    },
+    {
+      "type": "brick_wall",
+      "layer": "background",
+      "color": "brick",
+      "opacity": 0.95
+    },
+    {
+      "type": "neon_signs",
+      "layer": "midground",
+      "color": "accent",
+      "density": 0.4,
+      "seed": 5512
+    },
+    {
+      "type": "spotlights",
+      "layer": "midground",
+      "color": "accent:2",
+      "count": 2,
+      "opacity": 0.35
+    },
+    {
+      "type": "stage_floor",
+      "layer": "midground",
+      "color": "tape",
+      "horizon": 0.72
+    },
+    {
+      "type": "comedy_stage",
+      "layer": "midground",
+      "color": "brick",
+      "x": 0.5,
+      "y": 0.84
+    },
+    {
+      "type": "scanline",
+      "layer": "foreground",
+      "color": "shadow",
+      "opacity": 0.18
+    },
+    {
+      "type": "vhs_osd",
+      "layer": "foreground",
+      "color": "accent:1",
+      "x": 0.2,
+      "y": 0.1
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.3
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.282,
+      0.19,
+      0.536,
+      0.78
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.42,
+      0.92
+    ],
+    "guest_a": [
+      0.64,
+      0.92
+    ],
+    "guest_b": [
+      0.68,
+      0.94
+    ],
+    "figure_a": [
+      0.64,
+      0.92
+    ],
+    "figure_b": [
+      0.68,
+      0.94
+    ]
+  },
+  "variants": [
+    "open_mic",
+    "late_set"
+  ]
+}

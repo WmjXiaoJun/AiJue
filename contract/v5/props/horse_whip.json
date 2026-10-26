@@ -1,0 +1,42 @@
+{
+  "id": "horse_whip",
+  "label": "马鞭",
+  "kind": "whip",
+  "description": "皮质马鞭",
+  "tags": [
+    "history",
+    "war",
+    "prop"
+  ],
+  "appearance": {
+    "shape": "whip",
+    "main": "#5a4a3a",
+    "accent": "#8a5a3b",
+    "material": "leather",
+    "size": [
+      0.04,
+      0.2
+    ]
+  },
+  "style": {
+    "default": {
+      "line": 1.0
+    },
+    "ink_chronicle": {
+      "line": 1.3,
+      "tint": "#1c1a16"
+    },
+    "woodblock_classic": {
+      "line": 1.5,
+      "tint": "#2b2b2b"
+    },
+    "parchment_case": {
+      "line": 1.1,
+      "tint": "#5a4a3a"
+    },
+    "museum_gold": {
+      "gold": 0.5,
+      "line": 0.9
+    }
+  }
+}

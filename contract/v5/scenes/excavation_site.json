@@ -1,0 +1,173 @@
+{
+  "id": "excavation_site",
+  "label": "发掘现场",
+  "description": "考古发掘：地形等高线 + 探方透视网格 + 剖面图 + 记录卷 + 物证印",
+  "tags": [
+    "history",
+    "archaeology",
+    "archive"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "layers": [
+    {
+      "type": "paper",
+      "layer": "background",
+      "mottle": 0.55,
+      "edge": 0.55
+    },
+    {
+      "type": "terrain_contours",
+      "layer": "background",
+      "levels": 5,
+      "step": 2,
+      "scale": 0.5,
+      "seed": 23,
+      "color": "shadow",
+      "bold_color": "fg",
+      "alpha": 100,
+      "bold_alpha": 150,
+      "shade": 0.15
+    },
+    {
+      "type": "grid",
+      "layer": "midground",
+      "perspective": 1,
+      "y_horizon": 0.4,
+      "vanish_x": 0.5,
+      "spacing": 0.06,
+      "alpha": 90,
+      "fade": 0.6
+    },
+    {
+      "type": "cross_section_grid",
+      "layer": "midground",
+      "x": 0.56,
+      "y": 0.2,
+      "w": 0.38,
+      "h": 0.5,
+      "layers": 5,
+      "finds": 5,
+      "depth_step": 1
+    },
+    {
+      "type": "desk",
+      "layer": "midground",
+      "x": 0.06,
+      "y": 0.64,
+      "w": 0.34,
+      "h": 0.24,
+      "color": "wood",
+      "items": [
+        {
+          "type": "map",
+          "x": 0.35,
+          "y": 0.5
+        },
+        {
+          "type": "brush",
+          "x": 0.65,
+          "y": 0.45
+        }
+      ]
+    },
+    {
+      "type": "scroll",
+      "layer": "midground",
+      "x": 0.1,
+      "y": 0.46,
+      "w": 0.24,
+      "h": 0.14,
+      "columns": 2,
+      "angle": -4,
+      "tie": false
+    },
+    {
+      "type": "seal_stamp",
+      "layer": "foreground",
+      "x": 0.36,
+      "y": 0.8,
+      "text": "证",
+      "size": 0.055,
+      "color": "accent",
+      "angle": -6
+    },
+    {
+      "type": "particles",
+      "layer": "foreground",
+      "count": 54,
+      "color": "highlight",
+      "size": 0.0018,
+      "drift": 0.2,
+      "variants": {
+        "trench": {
+          "count": 80
+        },
+        "finds": {
+          "count": 30
+        }
+      }
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.28
+    },
+    {
+      "type": "grain",
+      "layer": "foreground",
+      "strength": 0.06
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0,
+      0,
+      1,
+      1
+    ],
+    "section_close": [
+      0.52,
+      0.14,
+      0.44,
+      0.64
+    ],
+    "trench_down": [
+      0.02,
+      0.4,
+      0.54,
+      0.54
+    ],
+    "tag_close": [
+      0.24,
+      0.64,
+      0.26,
+      0.28
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.14,
+      0.96
+    ],
+    "figure_a": [
+      0.86,
+      0.96
+    ],
+    "figure_b": [
+      0.5,
+      0.97
+    ]
+  },
+  "variants": [
+    "trench",
+    "finds"
+  ],
+  "depth": {
+    "background": 0.02,
+    "midground": 0.14,
+    "foreground": 0.3
+  }
+}

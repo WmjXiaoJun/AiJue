@@ -1,0 +1,109 @@
+{
+  "id": "woodblock_classic",
+  "label": "版刻典籍",
+  "version": 1,
+  "description": "版刻/竹简：木刻线条、纸黄、朱印；典籍与书院叙事风格",
+  "tags": [
+    "history",
+    "woodblock",
+    "chinese",
+    "print"
+  ],
+  "technique": [
+    "woodblock"
+  ],
+  "palette": {
+    "bg": [
+      "#e3d3ac",
+      "#d3bd8e"
+    ],
+    "fg": [
+      "#241d16",
+      "#4a3b28"
+    ],
+    "accent": [
+      "#a83226",
+      "#c8a14a"
+    ],
+    "paper": "#ead9b8",
+    "ink": "#2a2119",
+    "mid": "#8a6a3a",
+    "shadow": "#7a6242",
+    "highlight": "#f5ead0",
+    "seal": "#a83226",
+    "water": "#6a7468",
+    "wood": "#7a5a34",
+    "stone": "#8a7a5c",
+    "glow": "#c8a14a",
+    "gold": "#c8a14a"
+  },
+  "texture": [
+    "paper_grain",
+    "wood_grain"
+  ],
+  "line": {
+    "style": "woodcut",
+    "width": 4,
+    "color": "#241d16",
+    "jitter": 0.35,
+    "opacity": 1.0
+  },
+  "character_treatment": "cutout_paper",
+  "typography": {
+    "title_font": "serif_woodblock",
+    "subtitle": "classic_box",
+    "lower_third": "woodcut_tag",
+    "text_color": "#241d16",
+    "seal_color": "#a83226",
+    "vertical": false,
+    "letter_spacing": 3
+  },
+  "transition": "woodblock_wipe",
+  "audio": {
+    "bgm": "guqin_pluck",
+    "sfx": [
+      "wood_knock",
+      "page_turn",
+      "stamp"
+    ],
+    "ambience": "library_room",
+    "ducking": 0.2
+  },
+  "h3": {
+    "style_prompt": "Chinese woodblock print (banhua), carved black lines, flat ink impression, aged yellow paper texture, red seal stamps, minimal shading, 2D print",
+    "negative_prompt": "3d, photo, gradient glow, modern, text, watermark",
+    "motion": "static",
+    "guidance": 5.2
+  },
+  "finish": {
+    "contrast": 1.15,
+    "saturation": 0.82,
+    "temperature": 0.12,
+    "paper": 0.22,
+    "edge_ink": 0.28,
+    "vignette": 0.22,
+    "grain": 0.04
+  },
+  "grade": {
+    "eq": "contrast=1.14:saturation=0.82:brightness=0.01",
+    "colorbalance": "rs=0.05:gs=0.02:bs=-0.04"
+  },
+  "packaging": {
+    "tag": "版刻典籍",
+    "tag_color": "#a83226",
+    "bars": "none",
+    "frame": "double",
+    "seal": "典",
+    "seal_color": "#a83226",
+    "brand": "造片局 · 典籍",
+    "watermark": true
+  },
+  "recommended_scenes": [
+    "scholar_study",
+    "archive_vault",
+    "palace_hall",
+    "ancient_map",
+    "temple_court",
+    "war_council"
+  ]
+}

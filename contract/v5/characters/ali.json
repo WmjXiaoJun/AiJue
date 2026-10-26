@@ -1,0 +1,75 @@
+{
+  "id": "ali",
+  "label": "阿栗",
+  "era": "modern",
+  "persona": "AI 内容创业者，语速快、脑洞大，乐观到有点欠揍；张口就是新项目。",
+  "role_pool": [
+    "guest_a",
+    "host",
+    "expert"
+  ],
+  "voice": {
+    "provider": "breeze",
+    "instruction": "24岁女性，明亮跳脱，音色偏甜，语速快，带笑意的吐槽感",
+    "seed": 20262014,
+    "cfg_scale": 4.2
+  },
+  "appearance": {
+    "gender": "female",
+    "age": 24,
+    "skin": "#F6DCCB",
+    "hair": "#6B4A8F",
+    "hair_style": "twin_tail",
+    "eye": "#3A6FE0",
+    "brow": "soft",
+    "beard": "none",
+    "outfit": {
+      "type": "hoodie",
+      "main": "#8B6BB5",
+      "accent": "#5AC8FA",
+      "hat": "none"
+    },
+    "accessories": [
+      "headphones"
+    ],
+    "head_ratio": 1.2,
+    "chibi": 0.35,
+    "eye_style": "round_big",
+    "face_ratio": 1.0,
+    "marks": [
+      "freckles"
+    ]
+  },
+  "poses": [
+    "front",
+    "side",
+    "point",
+    "think"
+  ],
+  "mouth": [
+    "closed",
+    "a",
+    "o",
+    "e",
+    "i",
+    "u",
+    "m"
+  ],
+  "style_overrides": {
+    "neon_toon": {
+      "line": 1.3
+    },
+    "film_interview": {
+      "line": 1.1
+    },
+    "noir_rain": {
+      "line": 1.2
+    },
+    "blueprint_lab": {
+      "line": 0.9
+    },
+    "candy_collage": {
+      "line": 1.2
+    }
+  }
+}

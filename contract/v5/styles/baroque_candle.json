@@ -1,0 +1,99 @@
+{
+  "id": "baroque_candle",
+  "label": "巴洛克烛光古堡",
+  "version": 1,
+  "description": "巴洛克烛光古堡：哥特拱顶、烛火轮廓光、暗红天鹅绒与古金，阴谋与密谈的舞台。",
+  "tags": [
+    "modern",
+    "traitors",
+    "baroque",
+    "candlelight",
+    "gothic"
+  ],
+  "technique": [
+    "baroque_candle"
+  ],
+  "palette": {
+    "bg": [
+      "#1A0709",
+      "#3A0F14"
+    ],
+    "fg": [
+      "#D9CBB3",
+      "#B9A88C"
+    ],
+    "accent": [
+      "#A8792B",
+      "#D9B25A"
+    ],
+    "paper": "#E8DCC4",
+    "shadow": "#0B0405",
+    "highlight": "#F2C46B",
+    "velvet": "#6E1A1F",
+    "stone": "#3A3530",
+    "candle": "#F2C46B"
+  },
+  "texture": [
+    "canvas",
+    "candle_smoke",
+    "film_grain"
+  ],
+  "line": {
+    "style": "engrave",
+    "width": 2.8,
+    "color": "#12080A",
+    "jitter": 0.2,
+    "opacity": 0.8
+  },
+  "character_treatment": "candle",
+  "typography": {
+    "title_font": "variety_ink",
+    "subtitle": "serif",
+    "lower_third": "brass_plate",
+    "fallback_font": "DengXian",
+    "text_color": "#D9CBB3",
+    "seal_color": "#A8792B",
+    "vertical": false,
+    "letter_spacing": 0.12
+  },
+  "transition": "candle_fade",
+  "audio": {
+    "bgm": "pipe_organ",
+    "sfx": [
+      "bell",
+      "candle_flicker",
+      "door_creak"
+    ],
+    "ambience": "castle_hall",
+    "ducking": 0.45
+  },
+  "h3": {
+    "style_prompt": "baroque candlelit gothic castle interior, dramatic chiaroscuro, warm flickering candle glow, deep crimson velvet and antique gold, stone pointed arches, volumetric haze, cinematic historical thriller, no text",
+    "negative_prompt": "modern furniture, daylight flat lighting, cartoon, neon, watermark"
+  },
+  "finish": {
+    "brightness": 1.03,
+    "contrast": 1.14,
+    "saturation": 1.02,
+    "temperature": 0.18,
+    "vignette": 0.4,
+    "grain": 0.08,
+    "bloom": 0.28,
+    "crackle": 0.06
+  },
+  "grade": {
+    "eq": "contrast=1.10:saturation=0.96:brightness=-0.03",
+    "colorbalance": "rs=0.06:gs=0.0:bs=-0.05",
+    "extra": ""
+  },
+  "packaging": {
+    "tag": "古堡密谈",
+    "tag_color": "#D9B25A",
+    "bars": "letterbox",
+    "frame": "none",
+    "seal": "谋",
+    "seal_color": "#6E1A1F",
+    "brand": "造片局 · 烛光古堡",
+    "watermark": true
+  }
+}

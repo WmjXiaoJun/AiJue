@@ -1,0 +1,71 @@
+{
+  "id": "pack_history_chronicle",
+  "label": "水墨史诗包",
+  "description": "历史题材全家桶：水墨/版刻/羊皮纸/博物馆金 4 种风格 + 历史场景/角色/道具/模板。",
+  "tags": [
+    "history",
+    "ink",
+    "epic"
+  ],
+  "styles": [
+    "ink_chronicle",
+    "woodblock_classic",
+    "parchment_case",
+    "museum_gold"
+  ],
+  "scenes": [
+    "ancient_map",
+    "war_council",
+    "battlefield",
+    "palace_hall",
+    "scholar_study",
+    "archive_vault",
+    "temple_court",
+    "great_wall",
+    "excavation_site",
+    "museum_hall",
+    "display_case"
+  ],
+  "characters": [
+    "caocao",
+    "guanyu",
+    "libai",
+    "mulan",
+    "qinshihuang",
+    "simaqian",
+    "sunwu",
+    "sushi",
+    "wuzetian",
+    "zhangqian",
+    "zhenghe",
+    "zhuge"
+  ],
+  "props": [
+    "scroll",
+    "bamboo_slips",
+    "seal",
+    "war_banner",
+    "torch",
+    "sandbox",
+    "bronze_ding",
+    "porcelain_vase",
+    "jade_artifact",
+    "map_tube",
+    "command_arrow",
+    "tiger_tally",
+    "counting_rods",
+    "bronze_mirror",
+    "bianzhong",
+    "war_drum",
+    "war_bow",
+    "horse_whip",
+    "imperial_edict",
+    "jade_pendant"
+  ],
+  "templates": [
+    "history_talk",
+    "classics",
+    "history_mystery",
+    "national_treasure"
+  ]
+}

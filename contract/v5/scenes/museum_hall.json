@@ -1,0 +1,179 @@
+{
+  "id": "museum_hall",
+  "label": "博物馆展厅",
+  "description": "博物馆：大理石 + 连拱 + 立柱 + 聚光 + 双展柜 + 光尘",
+  "tags": [
+    "history",
+    "museum",
+    "exhibition"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "layers": [
+    {
+      "type": "marble",
+      "layer": "background",
+      "color": "paper",
+      "veins": 8,
+      "sheen": 0.3,
+      "sheen_x": 0.6
+    },
+    {
+      "type": "arches",
+      "layer": "midground",
+      "count": 3,
+      "x0": 0.02,
+      "x1": 0.98,
+      "y": 0.22,
+      "height": 0.34,
+      "color": "stone",
+      "style": "round"
+    },
+    {
+      "type": "columns",
+      "layer": "midground",
+      "count": 4,
+      "x0": 0.04,
+      "x1": 0.96,
+      "y": 0.02,
+      "y_bottom": 0.88,
+      "width": 0.055,
+      "color": "stone"
+    },
+    {
+      "type": "spotlights",
+      "layer": "foreground",
+      "count": 3,
+      "x0": 0.22,
+      "x1": 0.78,
+      "strength": 0.55,
+      "y_target": 0.8,
+      "spread": 0.18,
+      "color": "highlight",
+      "variants": {
+        "gold": {
+          "strength": 0.62
+        },
+        "jade": {
+          "count": 4,
+          "strength": 0.48
+        }
+      }
+    },
+    {
+      "type": "glass_case",
+      "layer": "midground",
+      "x": 0.1,
+      "y": 0.3,
+      "w": 0.3,
+      "h": 0.56,
+      "kind": "ding",
+      "label": "青铜鼎",
+      "artifact": {
+        "kind": "ding",
+        "w": 0.46,
+        "h": 0.4
+      },
+      "color": "metal"
+    },
+    {
+      "type": "glass_case",
+      "layer": "midground",
+      "x": 0.6,
+      "y": 0.3,
+      "w": 0.28,
+      "h": 0.56,
+      "kind": "vase",
+      "label": "青瓷瓶",
+      "artifact": {
+        "kind": "vase",
+        "w": 0.4,
+        "h": 0.42
+      },
+      "color": "metal",
+      "variants": {
+        "gold": {
+          "kind": "ding",
+          "label": "金缕鼎"
+        },
+        "jade": {
+          "kind": "jade",
+          "label": "玉璧",
+          "artifact": {
+            "kind": "jade",
+            "w": 0.5,
+            "h": 0.5
+          }
+        }
+      }
+    },
+    {
+      "type": "particles",
+      "layer": "foreground",
+      "count": 56,
+      "color": "highlight",
+      "size": 0.0016
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.34
+    },
+    {
+      "type": "grain",
+      "layer": "foreground",
+      "strength": 0.05
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0,
+      0,
+      1,
+      1
+    ],
+    "case_close": [
+      0.06,
+      0.24,
+      0.38,
+      0.66
+    ],
+    "hall_columns": [
+      0.28,
+      0.04,
+      0.44,
+      0.8
+    ],
+    "spotlights_top": [
+      0.14,
+      0.0,
+      0.72,
+      0.44
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.3,
+      0.98
+    ],
+    "figure_a": [
+      0.74,
+      0.98
+    ],
+    "figure_b": [
+      0.52,
+      0.99
+    ]
+  },
+  "variants": [
+    "gold",
+    "jade"
+  ],
+  "depth": {
+    "background": 0.02,
+    "midground": 0.14,
+    "foreground": 0.32
+  }
+}

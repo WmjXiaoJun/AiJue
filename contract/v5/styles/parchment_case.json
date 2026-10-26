@@ -1,0 +1,111 @@
+{
+  "id": "parchment_case",
+  "label": "羊皮纸档案",
+  "version": 1,
+  "description": "羊皮纸考古档案：铜版排线、红线证据板、剖面网格；历史悬案叙事",
+  "tags": [
+    "history",
+    "parchment",
+    "engrave",
+    "archive"
+  ],
+  "technique": [
+    "parchment_engrave"
+  ],
+  "palette": {
+    "bg": [
+      "#cbb083",
+      "#b89a6a"
+    ],
+    "fg": [
+      "#3b2f24",
+      "#5a4a38"
+    ],
+    "accent": [
+      "#a63d2f",
+      "#4f6b6b"
+    ],
+    "paper": "#d9c49a",
+    "ink": "#3b2f24",
+    "mid": "#7f6a4d",
+    "shadow": "#8d7355",
+    "highlight": "#efe1c2",
+    "seal": "#a63d2f",
+    "water": "#5f7470",
+    "wood": "#6d5436",
+    "stone": "#8a7a62",
+    "glow": "#c9a35e",
+    "metal": "#8a7f6a"
+  },
+  "texture": [
+    "paper_grain",
+    "crosshatch"
+  ],
+  "line": {
+    "style": "engrave",
+    "width": 1.5,
+    "color": "#3b2f24",
+    "jitter": 0.2,
+    "opacity": 0.85
+  },
+  "character_treatment": "engrave",
+  "typography": {
+    "title_font": "serif_typewriter",
+    "subtitle": "case_file",
+    "lower_third": "evidence_tag",
+    "text_color": "#3b2f24",
+    "seal_color": "#a63d2f",
+    "vertical": false,
+    "letter_spacing": 1
+  },
+  "transition": "redline",
+  "audio": {
+    "bgm": "strings_suspense",
+    "sfx": [
+      "paper_rustle",
+      "pin_drop",
+      "stamp"
+    ],
+    "ambience": "rain_soft",
+    "ducking": 0.22
+  },
+  "h3": {
+    "style_prompt": "copperplate engraving on aged parchment, fine cross-hatching, sepia archival document, red evidence threads, old cartography and excavation sketches",
+    "negative_prompt": "3d, color photo, glossy, neon, text, watermark",
+    "motion": "slow_push",
+    "guidance": 5.0
+  },
+  "finish": {
+    "contrast": 1.1,
+    "saturation": 0.56,
+    "temperature": 0.18,
+    "paper": 0.24,
+    "hatch": 0.28,
+    "edge_ink": 0.2,
+    "vignette": 0.32,
+    "grain": 0.08,
+    "crackle": 0.1
+  },
+  "grade": {
+    "eq": "contrast=1.10:saturation=0.55:brightness=0.01",
+    "colorbalance": "rs=0.07:gs=0.03:bs=-0.05"
+  },
+  "packaging": {
+    "tag": "CASE FILE",
+    "tag_color": "#a63d2f",
+    "bars": "red_tape",
+    "frame": "thin",
+    "seal": "卷",
+    "seal_color": "#a63d2f",
+    "brand": "造片局 · 历史悬案",
+    "watermark": true
+  },
+  "recommended_scenes": [
+    "excavation_site",
+    "archive_vault",
+    "ancient_map",
+    "war_council",
+    "scholar_study",
+    "great_wall"
+  ]
+}

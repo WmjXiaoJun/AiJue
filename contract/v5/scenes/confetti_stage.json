@@ -1,0 +1,157 @@
+{
+  "id": "confetti_stage",
+  "label": "彩带庆典舞台",
+  "description": "糖果拼贴庆典舞台：满台彩带纸屑、聚光灯与星爆贴纸，适合宣布结果与庆祝镜头。",
+  "tags": [
+    "modern",
+    "game_show",
+    "collage",
+    "celebration"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "seed": 20261054,
+  "layers": [
+    {
+      "type": "paper",
+      "layer": "background",
+      "color": "paper",
+      "mottle": 0.25
+    },
+    {
+      "type": "collage_panels",
+      "layer": "background",
+      "count": 5,
+      "colors": [
+        "accent",
+        "accent:1",
+        "purple"
+      ],
+      "seed": 13
+    },
+    {
+      "type": "torn_paper",
+      "layer": "background",
+      "color": "bg",
+      "opacity": 0.8
+    },
+    {
+      "type": "halftone",
+      "layer": "midground",
+      "color": "fg",
+      "opacity": 0.1
+    },
+    {
+      "type": "sticker_burst",
+      "layer": "midground",
+      "count": 4,
+      "x": 0.5,
+      "y": 0.35,
+      "colors": [
+        "accent",
+        "accent:1",
+        "accent:2"
+      ],
+      "seed": 6
+    },
+    {
+      "type": "stickers",
+      "layer": "midground",
+      "count": 5,
+      "color": "accent:2",
+      "seed": 14
+    },
+    {
+      "type": "confetti_rain",
+      "layer": "midground",
+      "count": 140,
+      "colors": [
+        "accent",
+        "accent:1",
+        "accent:2",
+        "purple",
+        "mint"
+      ],
+      "seed": 23
+    },
+    {
+      "type": "confetti_rain",
+      "layer": "foreground",
+      "count": 60,
+      "colors": [
+        "accent:1",
+        "accent:2",
+        "lemon"
+      ],
+      "seed": 31
+    },
+    {
+      "type": "spotlights",
+      "layer": "foreground",
+      "count": 3,
+      "color": "highlight",
+      "strength": 0.55
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.082,
+      0.14,
+      0.556,
+      0.78
+    ],
+    "detail": [
+      0.34,
+      0.19,
+      0.32,
+      0.34
+    ],
+    "stage": [
+      0.1,
+      0.1,
+      0.8,
+      0.8
+    ],
+    "host": [
+      0.34,
+      0.12,
+      0.32,
+      0.75
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.5,
+      0.84
+    ],
+    "guest_a": [
+      0.22,
+      0.84
+    ],
+    "guest_b": [
+      0.78,
+      0.84
+    ],
+    "figure_a": [
+      0.22,
+      0.84
+    ],
+    "figure_b": [
+      0.78,
+      0.84
+    ]
+  },
+  "variants": [
+    "win",
+    "celebration"
+  ],
+  "props": []
+}

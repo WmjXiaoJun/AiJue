@@ -96,6 +96,12 @@ def cmd_render_v3(args: argparse.Namespace) -> int:
     return render_v3.main(args)
 
 
+def cmd_render_v5(args: argparse.Namespace) -> int:
+    """V5 渲染：模板(acts/场景/角色) -> TTS -> 2D 动画 -> 拼接/风格包装 -> QC。"""
+    from . import render_v5
+    return render_v5.main(args)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="python -m pipeline.cli",
@@ -174,6 +180,17 @@ def build_parser() -> argparse.ArgumentParser:
     p_rv3.add_argument("--legacy-audio", action="store_true", default=False,
                        help="回退 V3 音频路径（edge-tts + atempo，仅 A/B 对照用）")
     p_rv3.set_defaults(func=cmd_render_v3)
+
+    p_rv5 = sub.add_parser("render_v5", help="V5 渲染（风格世界 + 2D 动画 + 口型同步）")
+    p_rv5.add_argument("--template", required=True, help="V5 模板 id（contract/v5/templates）")
+    p_rv5.add_argument("--duration", type=float, default=38.0, help="目标时长（秒）")
+    p_rv5.add_argument("--out", default=None,
+                       help="成片路径或输出目录（默认 outputs/templates_v5/{id}/final.mp4）")
+    p_rv5.add_argument("--workdir", default=None, help="中间产物目录")
+    p_rv5.add_argument("--seed", type=int, default=20261101, help="渲染 seed")
+    p_rv5.add_argument("--force", action="store_true", help="忽略缓存重新生成")
+    p_rv5.add_argument("--limit", type=int, default=None, help="只渲染前 N 镜（调试用）")
+    p_rv5.set_defaults(func=cmd_render_v5)
     return parser
 
 

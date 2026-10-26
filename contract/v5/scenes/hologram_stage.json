@@ -1,0 +1,147 @@
+{
+  "id": "hologram_stage",
+  "label": "全息舞台",
+  "description": "全息演唱会主舞台：半透明光板、激光束、镜面地板与粒子网格，歌手位于舞台中央。",
+  "tags": [
+    "modern",
+    "hologram",
+    "stage",
+    "concert",
+    "main"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "size": [
+    1600,
+    900
+  ],
+  "seed": 5411,
+  "layers": [
+    {
+      "type": "sky_gradient",
+      "layer": "background",
+      "top": "shadow",
+      "bottom": "bg:1",
+      "horizon": 0.5
+    },
+    {
+      "type": "hologram_grid",
+      "layer": "background",
+      "color": "accent:1",
+      "y_horizon": 0.46,
+      "vanish_x": 0.5,
+      "opacity": 0.75
+    },
+    {
+      "type": "spotlights",
+      "layer": "midground",
+      "color": "accent:1",
+      "count": 4,
+      "strength": 1.05,
+      "x0": 0.15,
+      "x1": 0.85,
+      "y_source": -0.02,
+      "y_target": 0.94,
+      "spread": 0.3
+    },
+    {
+      "type": "particles",
+      "layer": "midground",
+      "color": "accent:1",
+      "count": 180,
+      "size": 0.0028,
+      "drift": 0.2
+    },
+    {
+      "type": "mirror_shards",
+      "layer": "midground",
+      "color": "mirror",
+      "count": 20,
+      "opacity": 0.55
+    },
+    {
+      "type": "stage_floor",
+      "layer": "midground",
+      "color": "accent:1",
+      "horizon": 0.66
+    },
+    {
+      "type": "neon_tube",
+      "layer": "midground",
+      "color": "accent:2",
+      "x": 0.24,
+      "y": 0.16,
+      "length": 0.52,
+      "opacity": 0.7
+    },
+    {
+      "type": "light_tunnel",
+      "layer": "foreground",
+      "color": "accent:1",
+      "x": 0.5,
+      "y": 0.34,
+      "rings": 14,
+      "opacity": 0.55
+    },
+    {
+      "type": "neon_tube",
+      "layer": "foreground",
+      "color": "accent:0",
+      "x": 0.18,
+      "y": 0.06,
+      "length": 0.64,
+      "opacity": 0.7
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.28
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.042,
+      0.19,
+      0.916,
+      0.78
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.18,
+      0.92
+    ],
+    "guest_a": [
+      0.82,
+      0.92
+    ],
+    "guest_b": [
+      0.68,
+      0.94
+    ],
+    "figure_a": [
+      0.82,
+      0.92
+    ],
+    "figure_b": [
+      0.68,
+      0.94
+    ],
+    "performer": [
+      0.5,
+      0.92
+    ]
+  },
+  "variants": [
+    "drop",
+    "encore"
+  ]
+}

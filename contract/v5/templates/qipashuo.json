@@ -1,0 +1,166 @@
+{
+  "id": "qipashuo",
+  "label": "奇葩说",
+  "version": 5,
+  "description": "V5 模板：奇葩说（风格 silk_arena）",
+  "tags": [
+    "v5",
+    "silk_arena"
+  ],
+  "style": "silk_arena",
+  "target_duration": 38,
+  "aspect": [
+    16,
+    9
+  ],
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "name": "老周"
+    },
+    {
+      "role": "figure_a",
+      "character": "zhuge",
+      "name": "诸葛亮"
+    },
+    {
+      "role": "figure_b",
+      "character": "caocao",
+      "name": "曹操"
+    }
+  ],
+  "acts": [
+    {
+      "id": "act01",
+      "name": "第 1 幕",
+      "scene": "silk_debate_hall",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 2.8,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    },
+    {
+      "id": "act02",
+      "name": "第 2 幕",
+      "scene": "scroll_split",
+      "camera": "pan_left",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "figure_a",
+      "text": "曹孟德，你可是个狡猾的奸雄啊！",
+      "characters": [
+        "figure_a",
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act03",
+      "name": "第 3 幕",
+      "scene": "court_audience",
+      "camera": "pan_right",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "host",
+      "text": "没错没错，诸葛亮同志你俩都是史上有名的风云人物！",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act04",
+      "name": "第 4 幕",
+      "scene": "ink_arena",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "figure_b",
+      "text": "脸皮薄点才容易出人头地嘛，我曹操就是个活生生的例子！",
+      "characters": [
+        "figure_b",
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act05",
+      "name": "第 5 幕",
+      "scene": "scroll_split",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "figure_a",
+      "text": "哼，你那脸皮薄得跟纸一样，哪比得上我蜀国的仁德之师？",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act06",
+      "name": "第 6 幕",
+      "scene": "court_audience",
+      "camera": "pan_left",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "host",
+      "text": "有理有据，这辩论真是精彩！",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act07",
+      "name": "第 7 幕",
+      "scene": "ink_arena",
+      "camera": "pan_right",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "figure_b",
+      "text": "仁德？你诸葛亮可是个小心眼，连庞统都忌惮三分！",
+      "characters": [
+        "figure_b"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act08",
+      "name": "第 8 幕",
+      "scene": "ink_arena",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 3.0,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    }
+  ],
+  "packaging": {
+    "subtitle": "silk_arena",
+    "transition": "silk_arena",
+    "title": "奇葩说",
+    "end_card": "下期见"
+  },
+  "audio": {
+    "bgm": "pipa",
+    "sfx": [
+      "whoosh",
+      "click"
+    ]
+  },
+  "lipsync": {
+    "mode": "viseme"
+  },
+  "meta": {
+    "source": "v3_remap",
+    "script_lines": 6
+  }
+}

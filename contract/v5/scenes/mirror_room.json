@@ -1,0 +1,132 @@
+{
+  "id": "mirror_room",
+  "label": "后台镜屋",
+  "description": "后台镜屋：多面镜墙与无限反射、灯带轮廓与雾气，适合揭面前独白与神秘过场。",
+  "tags": [
+    "modern",
+    "hologram",
+    "mirror",
+    "backstage",
+    "mood"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "size": [
+    1600,
+    900
+  ],
+  "seed": 5421,
+  "layers": [
+    {
+      "type": "sky_gradient",
+      "layer": "background",
+      "top": "shadow",
+      "bottom": "bg:0",
+      "horizon": 0.6
+    },
+    {
+      "type": "columns",
+      "layer": "background",
+      "color": "mirror",
+      "count": 4,
+      "x0": 0.06,
+      "x1": 0.94,
+      "y": 0.02,
+      "y_bottom": 0.8,
+      "width": 0.09,
+      "opacity": 0.85
+    },
+    {
+      "type": "mirror_shards",
+      "layer": "midground",
+      "color": "highlight",
+      "count": 22,
+      "opacity": 0.6
+    },
+    {
+      "type": "spotlights",
+      "layer": "midground",
+      "color": "accent:2",
+      "count": 2,
+      "strength": 0.75,
+      "x0": 0.3,
+      "x1": 0.7,
+      "y_source": 0.0,
+      "y_target": 0.9,
+      "spread": 0.22
+    },
+    {
+      "type": "stage_floor",
+      "layer": "midground",
+      "color": "mirror",
+      "horizon": 0.7
+    },
+    {
+      "type": "smoke",
+      "layer": "midground",
+      "color": "accent:1",
+      "y": 0.66,
+      "count": 3,
+      "alpha": 50
+    },
+    {
+      "type": "particles",
+      "layer": "foreground",
+      "color": "highlight",
+      "count": 90,
+      "size": 0.0024,
+      "opacity": 0.4
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.36
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.302,
+      0.21,
+      0.516,
+      0.78
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.68,
+      0.96
+    ],
+    "guest_a": [
+      0.44,
+      0.96
+    ],
+    "guest_b": [
+      0.68,
+      0.94
+    ],
+    "figure_a": [
+      0.44,
+      0.96
+    ],
+    "figure_b": [
+      0.68,
+      0.94
+    ],
+    "performer": [
+      0.44,
+      0.96
+    ]
+  },
+  "variants": [
+    "before_mask",
+    "after_mask"
+  ]
+}

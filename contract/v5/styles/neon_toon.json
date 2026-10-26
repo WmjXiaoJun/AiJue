@@ -1,0 +1,108 @@
+{
+  "id": "neon_toon",
+  "label": "霓虹卡通",
+  "version": 1,
+  "description": "霓虹 3D 卡通演播厅：玻璃幕墙、灯带轮廓光、湿地面反射与城市夜光；厚描边 + 发光边卡通渲染。",
+  "tags": [
+    "modern",
+    "neon",
+    "toon",
+    "studio",
+    "night"
+  ],
+  "technique": [
+    "neon_toon"
+  ],
+  "palette": {
+    "bg": [
+      "#070b1f",
+      "#0f1838"
+    ],
+    "fg": [
+      "#eaf6ff",
+      "#b9d7ff"
+    ],
+    "accent": [
+      "#ff2fd6",
+      "#33e6ff",
+      "#ffb347"
+    ],
+    "paper": "#0a1028",
+    "shadow": "#050814",
+    "highlight": "#8ef7ff"
+  },
+  "texture": [
+    "neon_bloom",
+    "grid",
+    "scanline_soft"
+  ],
+  "line": {
+    "style": "thick_outline",
+    "width": 4,
+    "color": "#eaf6ff",
+    "jitter": 0.15,
+    "opacity": 0.9
+  },
+  "character_treatment": "toon",
+  "typography": {
+    "title_font": "sans_heavy",
+    "subtitle": "modern_caption",
+    "lower_third": "neon_strip",
+    "text_color": "#eaf6ff",
+    "seal_color": "#ff2fd6",
+    "vertical": false,
+    "letter_spacing": 1.5
+  },
+  "transition": "neon_wipe",
+  "finish": {
+    "brightness": 1.0,
+    "contrast": 1.14,
+    "saturation": 1.22,
+    "temperature": 0.02,
+    "vignette": 0.24,
+    "grain": 0.02,
+    "scanlines": 0.0,
+    "chroma_shift": 0.02,
+    "bloom": 0.3,
+    "paper": 0.0,
+    "hatch": 0.0,
+    "edge_ink": 0.3,
+    "gold_foil": 0.0,
+    "silk_sheen": 0.0
+  },
+  "grade": {
+    "eq": "contrast=1.14:saturation=1.22:brightness=0.0",
+    "colorbalance": "rs=0.05:bs=0.08:gs=-0.02",
+    "extra": ""
+  },
+  "audio": {
+    "bgm": "synthwave",
+    "sfx": [
+      "neon_hum",
+      "city_night",
+      "crowd_cheer"
+    ],
+    "ambience": "city_night",
+    "ducking": 0.6
+  },
+  "h3": {
+    "style_prompt": "neon-lit 3d toon late-night talk show studio, cyan and magenta rim light, glossy reflective floor, glass curtain wall with city bokeh, cinematic bloom, thick clean outlines",
+    "negative_prompt": "photorealistic, flat 2d, blurry, text artifacts, watermark",
+    "motion": "slow dolly-in with light sweep",
+    "guidance": 4.0
+  },
+  "packaging": {
+    "tag": "NEON TONIGHT",
+    "tag_color": "#FF3FD8",
+    "bars": "thin",
+    "seal": "LIVE",
+    "accent_bar": true,
+    "lower_third_bg": "#0f1838",
+    "accent_bar_color": "#33e6ff",
+    "title_glow": "#ff2fd6",
+    "chapter_style": "neon_chip",
+    "vignette": 0.18,
+    "transition_speed": 0.28,
+    "seal_color": "#FF2FD6"
+  }
+}

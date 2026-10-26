@@ -1,0 +1,171 @@
+{
+  "id": "lantern_market",
+  "label": "灯市",
+  "description": "市井灯市：屋顶天际线 + 摊位 + 灯笼串 + 人群 + 蒸汽",
+  "tags": [
+    "history",
+    "market",
+    "night"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "layers": [
+    {
+      "type": "sky_gradient",
+      "layer": "background",
+      "top": "sky:0",
+      "bottom": "sky:1",
+      "horizon": 0.52,
+      "haze": 0.45,
+      "sun": {
+        "x": 0.16,
+        "y": 0.14,
+        "r": 0.032,
+        "color": "highlight"
+      }
+    },
+    {
+      "type": "skyline",
+      "layer": "midground",
+      "y": 0.52,
+      "rows": 2,
+      "count": 16,
+      "height": 0.26,
+      "windows": 0.18,
+      "color": "fg"
+    },
+    {
+      "type": "stalls",
+      "layer": "midground",
+      "count": 4,
+      "y": 0.7,
+      "scale": 0.2,
+      "color": "accent"
+    },
+    {
+      "type": "banners",
+      "layer": "midground",
+      "count": 3,
+      "x0": 0.08,
+      "x1": 0.92,
+      "y": 0.22,
+      "width": 0.04,
+      "height": 0.14,
+      "color": "accent",
+      "kind": "shop"
+    },
+    {
+      "type": "lanterns",
+      "layer": "midground",
+      "count": 10,
+      "y": 0.14,
+      "x0": 0.03,
+      "x1": 0.97,
+      "size": 0.03,
+      "color": "accent",
+      "variants": {
+        "festival": {
+          "count": 14
+        },
+        "late_night": {
+          "count": 6,
+          "y": 0.18
+        }
+      }
+    },
+    {
+      "type": "crowd",
+      "layer": "midground",
+      "count": 18,
+      "y": 0.88,
+      "scale": 0.1,
+      "color": "fg",
+      "variants": {
+        "festival": {
+          "count": 30
+        },
+        "late_night": {
+          "count": 9
+        }
+      }
+    },
+    {
+      "type": "smoke",
+      "layer": "foreground",
+      "count": 2,
+      "color": "highlight",
+      "y": 0.66,
+      "rise": 0.1,
+      "spread": 0.22,
+      "alpha": 50
+    },
+    {
+      "type": "particles",
+      "layer": "foreground",
+      "count": 40,
+      "color": "glow",
+      "size": 0.0016
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.28
+    },
+    {
+      "type": "grain",
+      "layer": "foreground",
+      "strength": 0.06
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0,
+      0,
+      1,
+      1
+    ],
+    "lanterns_close": [
+      0.2,
+      0.02,
+      0.6,
+      0.4
+    ],
+    "stalls_down": [
+      0.05,
+      0.52,
+      0.9,
+      0.46
+    ],
+    "crowd_sea": [
+      0.1,
+      0.62,
+      0.8,
+      0.36
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.14,
+      0.96
+    ],
+    "figure_a": [
+      0.8,
+      0.96
+    ],
+    "figure_b": [
+      0.52,
+      0.97
+    ]
+  },
+  "variants": [
+    "festival",
+    "late_night"
+  ],
+  "depth": {
+    "background": 0.03,
+    "midground": 0.15,
+    "foreground": 0.34
+  }
+}

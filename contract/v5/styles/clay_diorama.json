@@ -1,0 +1,99 @@
+{
+  "id": "clay_diorama",
+  "label": "黏土定格慢生活",
+  "version": 1,
+  "description": "黏土定格微缩：手作黏土质感、指纹与工具痕、移轴微距，陶土与鼠尾草绿的温柔慢生活。",
+  "tags": [
+    "modern",
+    "slow_life",
+    "claymation",
+    "handmade",
+    "cozy"
+  ],
+  "technique": [
+    "claymation"
+  ],
+  "palette": {
+    "bg": [
+      "#F4E3C8",
+      "#E8D2B0"
+    ],
+    "fg": [
+      "#5C3A28",
+      "#7A4E36"
+    ],
+    "accent": [
+      "#9CAE8B",
+      "#D99A6C"
+    ],
+    "paper": "#F4E3C8",
+    "shadow": "#6B4630",
+    "highlight": "#FFF3DE",
+    "clay": "#C9784F",
+    "sage": "#9CAE8B",
+    "butter": "#F2D9A0"
+  },
+  "texture": [
+    "clay_noise",
+    "paper_grain",
+    "bokeh"
+  ],
+  "line": {
+    "style": "none",
+    "width": 0,
+    "color": "#5C3A28",
+    "jitter": 0,
+    "opacity": 0
+  },
+  "character_treatment": "clay",
+  "typography": {
+    "title_font": "variety_clay",
+    "subtitle": "handwritten",
+    "lower_third": "clay_tag",
+    "fallback_font": "DengXian",
+    "text_color": "#5C3A28",
+    "seal_color": "#9CAE8B",
+    "vertical": false,
+    "letter_spacing": 0.03
+  },
+  "transition": "stopmotion_jump",
+  "audio": {
+    "bgm": "ukulele_soft",
+    "sfx": [
+      "clay_pat",
+      "wood_knock",
+      "bird_tweet"
+    ],
+    "ambience": "cozy_room",
+    "ducking": 0.35
+  },
+  "h3": {
+    "style_prompt": "handmade claymation diorama, stop-motion miniature set, plasticine texture with fingerprints and tool marks, soft tilt-shift macro photography, warm terracotta sage green and cream palette, cozy slow living interior, no text",
+    "negative_prompt": "photo, glossy plastic, sharp digital render, neon, watermark"
+  },
+  "finish": {
+    "brightness": 1.03,
+    "contrast": 1.0,
+    "saturation": 1.03,
+    "temperature": 0.08,
+    "vignette": 0.18,
+    "grain": 0.03,
+    "clay_shade": 0.38,
+    "bloom": 0.08
+  },
+  "grade": {
+    "eq": "contrast=1.0:saturation=0.96:brightness=0.01",
+    "colorbalance": "rs=0.03:gs=0.02:bs=-0.02",
+    "extra": ""
+  },
+  "packaging": {
+    "tag": "慢生活",
+    "tag_color": "#9CAE8B",
+    "bars": "none",
+    "frame": "thin",
+    "seal": "暖",
+    "seal_color": "#D99A6C",
+    "brand": "造片局 · 黏土慢生活",
+    "watermark": true
+  }
+}

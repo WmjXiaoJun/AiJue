@@ -1,0 +1,163 @@
+{
+  "id": "castle_hall_baroque",
+  "label": "巴洛克古堡大厅",
+  "description": "古堡大厅：高耸哥特拱顶、石地、暗红帷幔、巨型烛台吊灯与家族旗帜，阴谋密谈主舞台。",
+  "tags": [
+    "modern",
+    "traitors",
+    "baroque",
+    "castle",
+    "hall"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "seed": 20261041,
+  "layers": [
+    {
+      "type": "paper",
+      "layer": "background",
+      "color": "shadow",
+      "opacity": 1.0
+    },
+    {
+      "type": "stone_floor",
+      "layer": "background",
+      "y": 0.62,
+      "rows": 6,
+      "color": "stone",
+      "accent": "shadow",
+      "seed": 5
+    },
+    {
+      "type": "gothic_arch",
+      "layer": "midground",
+      "count": 4,
+      "color": "stone",
+      "accent": "accent",
+      "opacity": 0.95
+    },
+    {
+      "type": "drapery",
+      "layer": "midground",
+      "x": 0.0,
+      "y": 0.0,
+      "w": 0.18,
+      "h": 0.98,
+      "color": "velvet",
+      "accent": "accent",
+      "folds": 6
+    },
+    {
+      "type": "drapery",
+      "layer": "midground",
+      "x": 0.82,
+      "y": 0.0,
+      "w": 0.18,
+      "h": 0.98,
+      "color": "velvet",
+      "accent": "accent",
+      "folds": 6
+    },
+    {
+      "type": "banners",
+      "layer": "midground",
+      "count": 2,
+      "color": "velvet",
+      "accent": "accent"
+    },
+    {
+      "type": "chandelier_baroque",
+      "layer": "midground",
+      "x": 0.5,
+      "y": 0.14,
+      "scale": 0.45,
+      "candles": 9,
+      "color": "accent",
+      "glow": 0.6
+    },
+    {
+      "type": "candelabra",
+      "layer": "midground",
+      "x": 0.12,
+      "y": 0.52,
+      "scale": 0.24,
+      "candles": 5,
+      "color": "accent:1",
+      "glow": 0.5
+    },
+    {
+      "type": "candle_glow",
+      "layer": "foreground",
+      "count": 5,
+      "strength": 0.33,
+      "color": "candle"
+    },
+    {
+      "type": "smoke",
+      "layer": "foreground",
+      "count": 3,
+      "opacity": 0.2
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.142,
+      0.14,
+      0.496,
+      0.78
+    ],
+    "detail": [
+      0.34,
+      0.19,
+      0.32,
+      0.34
+    ],
+    "hall": [
+      0.1,
+      0.1,
+      0.8,
+      0.85
+    ],
+    "throne": [
+      0.35,
+      0.12,
+      0.3,
+      0.57
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.5,
+      0.84
+    ],
+    "guest_a": [
+      0.28,
+      0.84
+    ],
+    "guest_b": [
+      0.72,
+      0.84
+    ],
+    "figure_a": [
+      0.28,
+      0.84
+    ],
+    "figure_b": [
+      0.72,
+      0.84
+    ]
+  },
+  "variants": [
+    "council",
+    "betrayal"
+  ],
+  "props": []
+}

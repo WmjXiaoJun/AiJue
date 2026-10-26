@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://zaopianju.local/contract/v5/schema/timeline.schema.json",
+  "title": "V5 timeline（render_v5 时间线产物）",
+  "description": "render_v5 输出的 timeline.json（version=5，TTS 语音自然时长驱动）：video/voice/music/subtitle/sfx 轨道 + 每轨 clips。用于 QC / 剪辑 / 回放校验，不参与 contract/v5 目录的 validate_catalog（用 validate_timeline()）。",
+  "type": "object",
+  "required": ["version", "template", "tracks", "duration"],
+  "properties": {
+    "version": { "type": "integer", "minimum": 1 },
+    "template": { "$ref": "#/$defs/id" },
+    "label": { "type": "string" },
+    "mode": { "type": "string", "description": "如 v5_motion2d" },
+    "fps": { "type": "integer", "minimum": 1 },
+    "resolution": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": { "type": "integer", "minimum": 16 }
+    },
+    "duration": { "type": "number", "exclusiveMinimum": 0 },
+    "style": {
+      "type": "object",
+      "description": "本片风格快照（id/label/technique/palette/transition）",
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "type": "string" },
+        "technique": { "type": "array", "items": { "type": "string" } },
+        "palette": { "type": "object" },
+        "transition": { "type": "object" }
+      },
+      "additionalProperties": true
+    },
+    "tracks": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/track" }
+    },
+    "meta": {
+      "type": "object",
+      "description": "speech_driven / voice_provider / lead_sec / tail_sec / scenes / characters 等",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{1,60}$"
+    },
+    "clip": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "src": { "type": "string", "minLength": 1 },
+        "at": { "type": "number", "minimum": 0, "description": "轨道内起始时间（秒）" },
+        "in": { "type": "number", "minimum": 0 },
+        "out": {
+          "type": "number",
+          "minimum": 0,
+          "description": "video/voice/music 轨：片段时长（秒）；subtitle 轨：绝对结束时间（秒，render_v5 现状）"
+        },
+        "duration": { "type": "number", "minimum": 0 },
+        "kind": { "type": "string", "description": "画面轨的镜头类型：dialogue / broll / card …" },
+        "scene": { "type": ["string", "null"], "description": "卡片/B-roll 镜可为 null" },
+        "role": { "type": ["string", "null"] },
+        "transition": { "type": "object" },
+        "text": { "type": "string" },
+        "speaker": { "type": ["string", "null"] },
+        "character": { "type": ["string", "null"] },
+        "provider": { "type": ["string", "null"] },
+        "lead_sec": { "type": "number", "minimum": 0 },
+        "speech_duration": { "type": "number", "minimum": 0 },
+        "gain": { "type": "number", "minimum": 0 },
+        "duck": { "type": "object" },
+        "fade_in": { "type": "number", "minimum": 0 },
+        "fade_out": { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": true
+    },
+    "track": {
+      "type": "object",
+      "required": ["id", "kind", "clips"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": { "type": "string", "enum": ["video", "voice", "music", "subtitle", "sfx"] },
+        "clips": { "type": "array", "items": { "$ref": "#/$defs/clip" } }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "const": "video" } }, "required": ["kind"] },
+          "then": { "properties": { "clips": { "items": {
+            "allOf": [{ "$ref": "#/$defs/clip" },
+                      { "required": ["src", "at", "out"] }] } } } }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "voice" } }, "required": ["kind"] },
+          "then": { "properties": { "clips": { "items": {
+            "allOf": [{ "$ref": "#/$defs/clip" },
+                      { "required": ["src", "at", "out", "text"] }] } } } }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "music" } }, "required": ["kind"] },
+          "then": { "properties": { "clips": { "items": {
+            "allOf": [{ "$ref": "#/$defs/clip" },
+                      { "required": ["src", "at", "out"] }] } } } }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "subtitle" } }, "required": ["kind"] },
+          "then": { "properties": { "clips": { "items": {
+            "allOf": [{ "$ref": "#/$defs/clip" },
+                      { "required": ["text", "at", "out"] }] } } } }
+        }
+      ],
+      "additionalProperties": true
+    }
+  }
+}

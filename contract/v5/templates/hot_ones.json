@@ -1,0 +1,166 @@
+{
+  "id": "hot_ones",
+  "label": "热辣对话",
+  "version": 5,
+  "description": "V5 模板：热辣对话（风格 film_interview）",
+  "tags": [
+    "v5",
+    "film_interview"
+  ],
+  "style": "film_interview",
+  "target_duration": 38,
+  "aspect": [
+    16,
+    9
+  ],
+  "cast": [
+    {
+      "role": "host",
+      "character": "ali",
+      "name": "阿栗"
+    },
+    {
+      "role": "figure_a",
+      "character": "laozhou",
+      "name": "老周"
+    },
+    {
+      "role": "figure_b",
+      "character": "dawei",
+      "name": "大魏"
+    }
+  ],
+  "acts": [
+    {
+      "id": "act01",
+      "name": "第 1 幕",
+      "scene": "interview_sofa",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 2.8,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    },
+    {
+      "id": "act02",
+      "name": "第 2 幕",
+      "scene": "cafe_window",
+      "camera": "dolly",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "host",
+      "text": "老周，你这回可真够辣的，和大魏聊中年人的体面，这话题我可是听新鲜了。",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act03",
+      "name": "第 3 幕",
+      "scene": "kitchen_film",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "figure_a",
+      "text": "是啊，咱们这辈人，年轻时拼事业，现在该拼点啥？",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act04",
+      "name": "第 4 幕",
+      "scene": "film_strip",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "host",
+      "text": "对了大魏，你这回是怎么看的？",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act05",
+      "name": "第 5 幕",
+      "scene": "cafe_window",
+      "camera": "dolly",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "figure_b",
+      "text": "我觉得啊，老周说的没错，体面不光是面子，更是生活的质量。",
+      "characters": [
+        "figure_b"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act06",
+      "name": "第 6 幕",
+      "scene": "kitchen_film",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "host",
+      "text": "那你们俩的体面，是不是也体现在这节目上呢？",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act07",
+      "name": "第 7 幕",
+      "scene": "film_strip",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "figure_a",
+      "text": "这节目确实挺接地气儿的，咱们聊的就是生活里的真事儿。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act08",
+      "name": "第 8 幕",
+      "scene": "film_strip",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 3.0,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    }
+  ],
+  "packaging": {
+    "subtitle": "film_interview",
+    "transition": "film_interview",
+    "title": "热辣对话",
+    "end_card": "下期见"
+  },
+  "audio": {
+    "bgm": "jazz_piano",
+    "sfx": [
+      "whoosh",
+      "click"
+    ]
+  },
+  "lipsync": {
+    "mode": "viseme"
+  },
+  "meta": {
+    "source": "v3_remap",
+    "script_lines": 6
+  }
+}

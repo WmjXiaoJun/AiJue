@@ -1,0 +1,148 @@
+{
+  "id": "prop_table",
+  "label": "道具拼贴台",
+  "description": "糖果拼贴道具台：撕纸台面、奖杯按钮卡片等拼贴道具图标、贴纸标签与彩带，任务道具特写台。",
+  "tags": [
+    "modern",
+    "game_show",
+    "collage",
+    "props",
+    "table"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "seed": 20261052,
+  "layers": [
+    {
+      "type": "paper",
+      "layer": "background",
+      "color": "paper",
+      "mottle": 0.25
+    },
+    {
+      "type": "torn_paper",
+      "layer": "background",
+      "color": "bg",
+      "opacity": 0.85
+    },
+    {
+      "type": "collage_panels",
+      "layer": "background",
+      "count": 5,
+      "colors": [
+        "accent:2",
+        "accent",
+        "lemon"
+      ],
+      "seed": 7
+    },
+    {
+      "type": "halftone",
+      "layer": "midground",
+      "color": "fg",
+      "opacity": 0.1
+    },
+    {
+      "type": "desk",
+      "layer": "midground",
+      "x": 0.5,
+      "y": 0.82,
+      "w": 0.8,
+      "h": 0.22,
+      "color": "accent:2",
+      "accent": "accent:1"
+    },
+    {
+      "type": "prop_icons",
+      "layer": "midground",
+      "count": 6,
+      "x": 0.5,
+      "y": 0.72,
+      "seed": 3,
+      "colors": [
+        "accent",
+        "accent:1",
+        "purple"
+      ]
+    },
+    {
+      "type": "stickers",
+      "layer": "midground",
+      "count": 5,
+      "color": "accent:1",
+      "seed": 12
+    },
+    {
+      "type": "confetti_rain",
+      "layer": "foreground",
+      "count": 30,
+      "colors": [
+        "accent",
+        "accent:1",
+        "accent:2"
+      ],
+      "seed": 17
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.142,
+      0.14,
+      0.496,
+      0.78
+    ],
+    "detail": [
+      0.34,
+      0.19,
+      0.32,
+      0.34
+    ],
+    "table": [
+      0.1,
+      0.12,
+      0.8,
+      0.37
+    ],
+    "host": [
+      0.35,
+      0.12,
+      0.3,
+      0.75
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.5,
+      0.84
+    ],
+    "guest_a": [
+      0.28,
+      0.84
+    ],
+    "guest_b": [
+      0.72,
+      0.84
+    ],
+    "figure_a": [
+      0.28,
+      0.84
+    ],
+    "figure_b": [
+      0.72,
+      0.84
+    ]
+  },
+  "variants": [
+    "props",
+    "chaos"
+  ],
+  "props": []
+}

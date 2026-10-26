@@ -1,0 +1,123 @@
+{
+  "id": "neon_alley",
+  "label": "霓虹巷",
+  "description": "雨后霓虹小巷：砖墙、竖排灯牌、积水反光与雨帘前景，适合 B-roll 与街头访谈。",
+  "tags": [
+    "modern",
+    "neon",
+    "street",
+    "rain",
+    "b_roll"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "size": [
+    1600,
+    900
+  ],
+  "seed": 5041,
+  "layers": [
+    {
+      "type": "sky_gradient",
+      "layer": "background",
+      "top": "shadow",
+      "bottom": "bg:1"
+    },
+    {
+      "type": "brick_wall",
+      "layer": "background",
+      "color": "bg:1",
+      "opacity": 0.95
+    },
+    {
+      "type": "neon_signs",
+      "layer": "midground",
+      "color": "accent",
+      "density": 0.55,
+      "seed": 5042
+    },
+    {
+      "type": "neon_tube",
+      "layer": "midground",
+      "color": "accent:1",
+      "x": 0.14,
+      "y": 0.44,
+      "length": 0.3
+    },
+    {
+      "type": "smoke",
+      "layer": "midground",
+      "color": "highlight",
+      "opacity": 0.14
+    },
+    {
+      "type": "stage_floor",
+      "layer": "midground",
+      "color": "bg:1",
+      "horizon": 0.78
+    },
+    {
+      "type": "rain",
+      "layer": "foreground",
+      "color": "highlight",
+      "density": 0.35,
+      "opacity": 0.22
+    },
+    {
+      "type": "neon_tube",
+      "layer": "foreground",
+      "color": "accent:0",
+      "x": 0.5,
+      "y": 0.06,
+      "length": 0.14,
+      "opacity": 0.5
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.34
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.222,
+      0.19,
+      0.596,
+      0.78
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.36,
+      0.92
+    ],
+    "guest_a": [
+      0.62,
+      0.92
+    ],
+    "guest_b": [
+      0.68,
+      0.94
+    ],
+    "figure_a": [
+      0.62,
+      0.92
+    ],
+    "figure_b": [
+      0.68,
+      0.94
+    ]
+  },
+  "variants": [
+    "rain_heavy",
+    "after_hours"
+  ]
+}

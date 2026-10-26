@@ -1,0 +1,47 @@
+{
+  "id": "data_tablet",
+  "label": "数据板",
+  "kind": "tablet",
+  "description": "悬浮数据面板，发光图表",
+  "tags": [
+    "modern",
+    "tech",
+    "prop"
+  ],
+  "appearance": {
+    "shape": "tablet",
+    "main": "#101820",
+    "accent": "#33e6ff",
+    "material": "glass",
+    "size": [
+      0.1,
+      0.14
+    ]
+  },
+  "style": {
+    "default": {
+      "line": 1.0
+    },
+    "neon_toon": {
+      "line": 1.2,
+      "glow": 0.6
+    },
+    "noir_rain": {
+      "line": 1.1,
+      "tint": "#8a8a8a"
+    },
+    "oil_salon": {
+      "line": 1.3,
+      "tint": "#b08a3e"
+    },
+    "hologram_stage": {
+      "glow": 0.5
+    },
+    "film_interview": {
+      "tint": "#d9a56a"
+    },
+    "vhs_late_show": {
+      "glow": 0.25
+    }
+  }
+}

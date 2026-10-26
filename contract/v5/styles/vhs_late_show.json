@@ -1,0 +1,111 @@
+{
+  "id": "vhs_late_show",
+  "label": "80s VHS",
+  "version": 1,
+  "description": "80s VHS 深夜秀：录像带扫描线、色差、砖墙霓虹与俱乐部舞台；复古字体与磁带跳帧转场。",
+  "tags": [
+    "modern",
+    "vhs",
+    "retro",
+    "comedy",
+    "80s"
+  ],
+  "technique": [
+    "vhs"
+  ],
+  "palette": {
+    "bg": [
+      "#1b0f2b",
+      "#2e1740"
+    ],
+    "fg": [
+      "#fff1c9",
+      "#ffd9a0"
+    ],
+    "accent": [
+      "#ff3fa4",
+      "#41f0e0",
+      "#ffd400"
+    ],
+    "paper": "#241033",
+    "shadow": "#0d0616",
+    "highlight": "#fff6d8",
+    "tape": "#8a5a3b",
+    "brick": "#5a2a33"
+  },
+  "texture": [
+    "scanline",
+    "halftone",
+    "chroma_shift",
+    "grain"
+  ],
+  "line": {
+    "style": "retro_chroma",
+    "width": 3,
+    "color": "#fff1c9",
+    "jitter": 0.35,
+    "opacity": 0.95
+  },
+  "character_treatment": "vhs",
+  "typography": {
+    "title_font": "retro_sans",
+    "subtitle": "vhs_caption",
+    "lower_third": "vhs_osd",
+    "text_color": "#fff1c9",
+    "seal_color": "#ff3fa4",
+    "vertical": false,
+    "letter_spacing": 1.8
+  },
+  "transition": "tape_jump",
+  "finish": {
+    "brightness": 1.02,
+    "contrast": 1.05,
+    "saturation": 1.2,
+    "temperature": 0.08,
+    "vignette": 0.25,
+    "grain": 0.15,
+    "scanlines": 0.35,
+    "chroma_shift": 0.3,
+    "bloom": 0.15,
+    "paper": 0.0,
+    "hatch": 0.0,
+    "edge_ink": 0.1,
+    "gold_foil": 0.0,
+    "silk_sheen": 0.0
+  },
+  "grade": {
+    "eq": "contrast=1.05:saturation=1.20:brightness=0.01",
+    "colorbalance": "rs=0.06:bs=0.03:gs=-0.01",
+    "extra": ""
+  },
+  "audio": {
+    "bgm": "synth_funk",
+    "sfx": [
+      "tape_stop",
+      "vhs_tracking",
+      "laugh_track"
+    ],
+    "ambience": "club_80s",
+    "ducking": 0.6
+  },
+  "h3": {
+    "style_prompt": "1980s VHS late-night comedy club, brick wall with neon sign, magenta and cyan stage light, scanlines and chromatic aberration, analog tape grain, warm retro",
+    "negative_prompt": "modern clean, 4k sharp, pastel, text artifacts",
+    "motion": "tape-jump handheld drift",
+    "guidance": 3.8
+  },
+  "packaging": {
+    "tag": "VHS 1987",
+    "tag_color": "#FF3FA4",
+    "bars": "scanlines",
+    "seal": "REC",
+    "accent_bar": true,
+    "osd": true,
+    "tracking_bar": true,
+    "subtitle_bg": "#0d0616CC",
+    "accent_bar_color": "#ff3fa4",
+    "chapter_style": "vhs_label",
+    "chroma_shift": 0.4,
+    "seal_color": "#FF3FA4"
+  }
+}

@@ -1,0 +1,156 @@
+{
+  "id": "interview_sofa",
+  "label": "暖光访谈沙发",
+  "description": "16mm 暖光访谈主场景：奶油色墙面、窗光、双人沙发与茶几，前景柔焦与胶片边框。",
+  "tags": [
+    "modern",
+    "film",
+    "interview",
+    "sofa",
+    "warm"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "size": [
+    1600,
+    900
+  ],
+  "seed": 5111,
+  "layers": [
+    {
+      "type": "canvas",
+      "layer": "background",
+      "color": "paper"
+    },
+    {
+      "type": "window_light",
+      "layer": "background",
+      "color": "highlight",
+      "x": 0.24,
+      "y": 0.3,
+      "size": 0.42,
+      "opacity": 0.45
+    },
+    {
+      "type": "curtains",
+      "layer": "background",
+      "color": "accent:1",
+      "side": "left",
+      "width": 0.13,
+      "opacity": 0.6
+    },
+    {
+      "type": "shelves",
+      "layer": "background",
+      "color": "wood",
+      "x": 0.7,
+      "y": 0.14,
+      "w": 0.24,
+      "h": 0.42,
+      "rows": 3,
+      "opacity": 0.85
+    },
+    {
+      "type": "stage_floor",
+      "layer": "midground",
+      "color": "wood",
+      "horizon": 0.78
+    },
+    {
+      "type": "sofa_set",
+      "layer": "midground",
+      "color": "accent:1",
+      "x": 0.46,
+      "y": 0.96,
+      "width": 0.46,
+      "height": 0.3
+    },
+    {
+      "type": "desk",
+      "layer": "midground",
+      "color": "wood",
+      "x": 0.34,
+      "y": 0.84,
+      "w": 0.4,
+      "h": 0.14,
+      "items": [
+        {
+          "type": "cup",
+          "x": 0.36,
+          "y": 0.5
+        },
+        {
+          "type": "scroll",
+          "x": 0.62,
+          "y": 0.55
+        }
+      ]
+    },
+    {
+      "type": "desk_lamp",
+      "layer": "midground",
+      "color": "accent:0",
+      "x": 0.86,
+      "y": 0.72,
+      "size": 0.14
+    },
+    {
+      "type": "bokeh",
+      "layer": "foreground",
+      "color": "highlight",
+      "density": 0.3
+    },
+    {
+      "type": "film_border",
+      "layer": "foreground",
+      "opacity": 0.85
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.26
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.202,
+      0.21,
+      0.616,
+      0.78
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.34,
+      0.96
+    ],
+    "guest_a": [
+      0.6,
+      0.96
+    ],
+    "guest_b": [
+      0.68,
+      0.94
+    ],
+    "figure_a": [
+      0.6,
+      0.96
+    ],
+    "figure_b": [
+      0.68,
+      0.94
+    ]
+  },
+  "variants": [
+    "golden_hour",
+    "evening"
+  ]
+}

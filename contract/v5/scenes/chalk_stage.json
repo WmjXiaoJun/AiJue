@@ -1,0 +1,145 @@
+{
+  "id": "chalk_stage",
+  "label": "粉笔舞台",
+  "description": "粉笔素描舞台：绿黑板底、红幕粉笔线、聚光锥与手绘地板，像现场画出来的剧场。",
+  "tags": [
+    "modern",
+    "sketch",
+    "chalk",
+    "stage"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "seed": 20261071,
+  "layers": [
+    {
+      "type": "blackboard",
+      "layer": "background",
+      "color": "board",
+      "frame": "wood",
+      "strength": 0.4
+    },
+    {
+      "type": "chalk_hatching",
+      "layer": "background",
+      "count": 30,
+      "color": "fg",
+      "opacity": 0.15,
+      "seed": 5
+    },
+    {
+      "type": "chalk_curtains",
+      "layer": "midground",
+      "color": "curtain",
+      "accent": "accent:1",
+      "opacity": 0.95
+    },
+    {
+      "type": "spotlights",
+      "layer": "midground",
+      "count": 2,
+      "color": "fg",
+      "strength": 0.4
+    },
+    {
+      "type": "chalk_objects",
+      "layer": "midground",
+      "kind": "microphone",
+      "x": 0.5,
+      "y": 0.78,
+      "scale": 1.0,
+      "color": "fg"
+    },
+    {
+      "type": "chalk_objects",
+      "layer": "midground",
+      "kind": "chairs",
+      "count": 3,
+      "x": 0.5,
+      "y": 0.82,
+      "scale": 0.9,
+      "color": "fg"
+    },
+    {
+      "type": "chalk_hatching",
+      "layer": "midground",
+      "count": 20,
+      "y": 0.5,
+      "h": 0.5,
+      "color": "fg",
+      "opacity": 0.18,
+      "seed": 9
+    },
+    {
+      "type": "chalk_audience",
+      "layer": "foreground",
+      "rows": 1,
+      "per_row": 8,
+      "y_start": 0.98,
+      "color": "fg",
+      "opacity": 0.5,
+      "seed": 3
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.122,
+      0.15,
+      0.516,
+      0.78
+    ],
+    "detail": [
+      0.34,
+      0.2,
+      0.32,
+      0.34
+    ],
+    "stage": [
+      0.08,
+      0.1,
+      0.84,
+      0.8
+    ],
+    "host": [
+      0.34,
+      0.12,
+      0.32,
+      0.76
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.5,
+      0.85
+    ],
+    "guest_a": [
+      0.26,
+      0.85
+    ],
+    "guest_b": [
+      0.74,
+      0.85
+    ],
+    "figure_a": [
+      0.26,
+      0.85
+    ],
+    "figure_b": [
+      0.74,
+      0.85
+    ]
+  },
+  "variants": [
+    "opening",
+    "finale"
+  ],
+  "props": []
+}

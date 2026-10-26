@@ -1,0 +1,115 @@
+{
+  "id": "museum_gold",
+  "label": "博物馆金黑",
+  "version": 1,
+  "description": "博物馆金黑：大理石、展柜、聚光、金边；国宝文物叙事",
+  "tags": [
+    "history",
+    "museum",
+    "gold",
+    "exhibition"
+  ],
+  "technique": [
+    "museum_gold"
+  ],
+  "palette": {
+    "bg": [
+      "#0c0c0e",
+      "#1a1512"
+    ],
+    "fg": [
+      "#e8d9b0",
+      "#c9a24a"
+    ],
+    "accent": [
+      "#d4af37",
+      "#7a1f1f"
+    ],
+    "paper": "#121114",
+    "ink": "#0a0a0c",
+    "mid": "#3a2f24",
+    "shadow": "#050506",
+    "highlight": "#f4e2a8",
+    "seal": "#7a1f1f",
+    "water": "#1d2a2c",
+    "wood": "#3b2e20",
+    "stone": "#2b2a2e",
+    "glow": "#e7c975",
+    "gold": "#d4af37",
+    "metal": "#c9a24a",
+    "jade": "#4f7f74",
+    "sky": [
+      "#0a0a0f",
+      "#171017"
+    ]
+  },
+  "texture": [
+    "grain",
+    "bokeh"
+  ],
+  "line": {
+    "style": "gold_bevel",
+    "width": 2,
+    "color": "#d4af37",
+    "jitter": 0.0,
+    "opacity": 0.9
+  },
+  "character_treatment": "gold_silhouette",
+  "typography": {
+    "title_font": "gold_plaque",
+    "subtitle": "gilded_plate",
+    "lower_third": "museum_plate",
+    "text_color": "#f4e2a8",
+    "seal_color": "#7a1f1f",
+    "vertical": false,
+    "letter_spacing": 4
+  },
+  "transition": "spotlight_iris",
+  "audio": {
+    "bgm": "orchestra_bells",
+    "sfx": [
+      "chime",
+      "spotlight_on",
+      "footstep_marble"
+    ],
+    "ambience": "hall_reverb",
+    "ducking": 0.16
+  },
+  "h3": {
+    "style_prompt": "museum exhibition hall, black marble and gold, dramatic spotlights on a glass display case, bronze ritual vessel, volumetric light beams, polished stone reflections, cinematic 2D illustration",
+    "negative_prompt": "outdoor daylight, cartoon, flat color, text, watermark",
+    "motion": "slow_push",
+    "guidance": 5.4
+  },
+  "finish": {
+    "brightness": 0.98,
+    "contrast": 1.18,
+    "saturation": 1.05,
+    "vignette": 0.34,
+    "bloom": 0.42,
+    "grain": 0.05,
+    "gold_foil": 0.3,
+    "sharpen": 0.35
+  },
+  "grade": {
+    "eq": "contrast=1.18:saturation=1.04:brightness=-0.01",
+    "colorbalance": "rs=0.03:bs=-0.03"
+  },
+  "packaging": {
+    "tag": "国宝 · 博物馆",
+    "tag_color": "#d4af37",
+    "bars": "gold_frame",
+    "frame": "gold",
+    "seal": "宝",
+    "seal_color": "#7a1f1f",
+    "brand": "造片局 · 国宝",
+    "watermark": true
+  },
+  "recommended_scenes": [
+    "museum_hall",
+    "display_case",
+    "palace_hall",
+    "temple_court",
+    "excavation_site"
+  ]
+}

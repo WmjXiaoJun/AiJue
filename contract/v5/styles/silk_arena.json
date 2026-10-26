@@ -1,0 +1,102 @@
+{
+  "id": "silk_arena",
+  "label": "绢本设色辩论",
+  "version": 1,
+  "description": "绢本设色的工笔辩论场：绢米底、石青/朱砂矿物色、细笔飞白、竖排印章包装；舞台是墨圈与两阵对垒。",
+  "tags": [
+    "modern",
+    "debate",
+    "silk",
+    "gongbi",
+    "east_asian"
+  ],
+  "technique": [
+    "silk_gongbi"
+  ],
+  "palette": {
+    "bg": [
+      "#E8DFC8",
+      "#D9CBA9"
+    ],
+    "fg": [
+      "#1C1A16",
+      "#3A352C"
+    ],
+    "accent": [
+      "#B23A2E",
+      "#C9A227"
+    ],
+    "paper": "#EFE6D3",
+    "shadow": "#8C7A5E",
+    "highlight": "#F8F1E2",
+    "seal": "#B23A2E",
+    "ink": "#1C1A16",
+    "azurite": "#2E5E6E",
+    "silk": "#E4D9BE"
+  },
+  "texture": [
+    "silk_weave",
+    "paper_grain",
+    "ink_bleed"
+  ],
+  "line": {
+    "style": "fine",
+    "width": 2.4,
+    "color": "#1C1A16",
+    "jitter": 0.12,
+    "opacity": 0.92
+  },
+  "character_treatment": "ink_brush",
+  "typography": {
+    "title_font": "variety_ink",
+    "subtitle": "serif",
+    "lower_third": "ink_seal",
+    "fallback_font": "DengXian",
+    "text_color": "#1C1A16",
+    "seal_color": "#B23A2E",
+    "vertical": true,
+    "letter_spacing": 0.08
+  },
+  "transition": "scroll_unroll",
+  "audio": {
+    "bgm": "pipa_drum",
+    "sfx": [
+      "woodblock",
+      "gong",
+      "paper"
+    ],
+    "ambience": "court_room",
+    "ducking": 0.35
+  },
+  "h3": {
+    "style_prompt": "traditional Chinese silk gongbi painting, fine mineral-pigment brushwork, azurite blue and cinnabar accents on aged rice-silk, scholar debate arena with ink circle stage and vertical banners, flat decorative composition, elegant negative space, no text",
+    "negative_prompt": "photo, 3d render, neon, glossy plastic, watermark, text artifacts"
+  },
+  "finish": {
+    "brightness": 1.03,
+    "contrast": 1.02,
+    "saturation": 0.94,
+    "temperature": 0.04,
+    "silk_sheen": 0.26,
+    "paper": 0.08,
+    "edge_ink": 0.13,
+    "vignette": 0.14,
+    "grain": 0.03,
+    "hatch": 0.0
+  },
+  "grade": {
+    "eq": "contrast=1.03:saturation=0.94:brightness=0.00",
+    "colorbalance": "rs=0.04:gs=0.01:bs=-0.03",
+    "extra": ""
+  },
+  "packaging": {
+    "tag": "绢本辩论",
+    "tag_color": "#B23A2E",
+    "bars": "thin",
+    "frame": "none",
+    "seal": "辩",
+    "seal_color": "#B23A2E",
+    "brand": "造片局 · 绢本设色",
+    "watermark": true
+  }
+}

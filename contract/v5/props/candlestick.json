@@ -1,0 +1,48 @@
+{
+  "id": "candlestick",
+  "label": "烛台",
+  "kind": "candlestick",
+  "description": "黄铜烛台",
+  "tags": [
+    "modern",
+    "baroque",
+    "light",
+    "prop"
+  ],
+  "appearance": {
+    "shape": "candlestick",
+    "main": "#8a6a3a",
+    "accent": "#c9a227",
+    "material": "metal",
+    "size": [
+      0.05,
+      0.12
+    ]
+  },
+  "style": {
+    "default": {
+      "line": 1.0
+    },
+    "neon_toon": {
+      "line": 1.2,
+      "glow": 0.6
+    },
+    "noir_rain": {
+      "line": 1.1,
+      "tint": "#8a8a8a"
+    },
+    "oil_salon": {
+      "line": 1.3,
+      "tint": "#b08a3e"
+    },
+    "hologram_stage": {
+      "glow": 0.5
+    },
+    "film_interview": {
+      "tint": "#d9a56a"
+    },
+    "vhs_late_show": {
+      "glow": 0.25
+    }
+  }
+}

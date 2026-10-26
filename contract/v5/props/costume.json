@@ -1,0 +1,47 @@
+{
+  "id": "costume",
+  "label": "戏服",
+  "kind": "costume",
+  "description": "挂在衣架上的戏服",
+  "tags": [
+    "modern",
+    "theatre",
+    "prop"
+  ],
+  "appearance": {
+    "shape": "fabric",
+    "main": "#7a1f1a",
+    "accent": "#c9a227",
+    "material": "fabric",
+    "size": [
+      0.16,
+      0.24
+    ]
+  },
+  "style": {
+    "default": {
+      "line": 1.0
+    },
+    "neon_toon": {
+      "line": 1.2,
+      "glow": 0.6
+    },
+    "noir_rain": {
+      "line": 1.1,
+      "tint": "#8a8a8a"
+    },
+    "oil_salon": {
+      "line": 1.3,
+      "tint": "#b08a3e"
+    },
+    "hologram_stage": {
+      "glow": 0.5
+    },
+    "film_interview": {
+      "tint": "#d9a56a"
+    },
+    "vhs_late_show": {
+      "glow": 0.25
+    }
+  }
+}

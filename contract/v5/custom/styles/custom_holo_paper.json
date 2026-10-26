@@ -1,0 +1,45 @@
+{
+  "id": "custom_holo_paper",
+  "label": "全息宣纸（示例）",
+  "version": 1,
+  "description": "示例自定义风格：宣纸纹理 + 全息扫描线 + 朱砂印章，演示如何在 custom/styles/ 下新增一套完整风格。",
+  "tags": ["custom", "example", "hologram", "ink"],
+  "technique": ["ink_wash", "hologram", "rice_paper"],
+  "palette": {
+    "bg": ["#0f1b24", "#e9e2d0"],
+    "fg": ["#f2ead6", "#101820"],
+    "accent": ["#37e0d8", "#c0392b"],
+    "paper": "#efe6d3",
+    "shadow": "#5a4a3a",
+    "highlight": "#9ff5ef"
+  },
+  "texture": ["paper_grain", "scanline", "hologram_grid"],
+  "line": {
+    "style": "brush_edge",
+    "width": 3,
+    "color": "#101820",
+    "jitter": 0.2
+  },
+  "character_treatment": "ink_brush",
+  "typography": {
+    "title_font": "serif",
+    "subtitle": "holo_sans",
+    "lower_third": "ink_seal",
+    "text_color": "#f2ead6",
+    "seal_color": "#c0392b"
+  },
+  "transition": "ink_wipe",
+  "audio": {
+    "bgm": "synth_guqin",
+    "sfx": ["paper_scan", "taiko"],
+    "ambience": "quiet_data_hall"
+  },
+  "h3": {
+    "style_prompt": "holographic Chinese ink-wash on rice paper, cyan scanlines, seal-red accent, cinematic volumetric light",
+    "negative_prompt": "flat colors, low contrast, watermark, text artifacts"
+  },
+  "packaging": {
+    "subtitle_style": "holo_seal",
+    "lower_third": "ink_seal_cyan"
+  }
+}

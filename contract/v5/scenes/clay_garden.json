@@ -1,0 +1,158 @@
+{
+  "id": "clay_garden",
+  "label": "黏土花园",
+  "description": "黏土定格花园：奶油天空、陶土远丘、黏土植物与篱笆，浇水壶与长椅，微距移轴。",
+  "tags": [
+    "modern",
+    "slow_life",
+    "clay",
+    "garden"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "seed": 20261062,
+  "layers": [
+    {
+      "type": "sky_gradient",
+      "layer": "background",
+      "top": "#F4E3C8",
+      "bottom": "#E8D2B0"
+    },
+    {
+      "type": "mountains",
+      "layer": "background",
+      "count": 2,
+      "color": "accent",
+      "opacity": 0.45
+    },
+    {
+      "type": "clay_objects",
+      "layer": "midground",
+      "kind": "fence",
+      "count": 9,
+      "y": 0.78,
+      "color": "butter",
+      "accent": "clay",
+      "seed": 6
+    },
+    {
+      "type": "clay_plants",
+      "layer": "midground",
+      "count": 8,
+      "y": 0.8,
+      "color": "sage",
+      "accent": "clay",
+      "seed": 12
+    },
+    {
+      "type": "clay_objects",
+      "layer": "midground",
+      "kind": "watering_can",
+      "count": 1,
+      "x": 0.78,
+      "y": 0.8,
+      "scale": 1.0,
+      "color": "sage",
+      "accent": "clay",
+      "seed": 2
+    },
+    {
+      "type": "clay_objects",
+      "layer": "midground",
+      "kind": "bench",
+      "count": 1,
+      "x": 0.3,
+      "y": 0.86,
+      "color": "clay",
+      "accent": "butter",
+      "seed": 4
+    },
+    {
+      "type": "clay_plants",
+      "layer": "midground",
+      "count": 5,
+      "y": 0.9,
+      "scale": 0.8,
+      "color": "clay",
+      "accent": "sage",
+      "seed": 9
+    },
+    {
+      "type": "clay_plants",
+      "layer": "foreground",
+      "count": 3,
+      "y": 1.0,
+      "scale": 1.4,
+      "color": "sage",
+      "accent": "clay",
+      "seed": 7
+    },
+    {
+      "type": "tilt_shift",
+      "layer": "foreground",
+      "focus_y": 0.7,
+      "strength": 0.55
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.142,
+      0.16,
+      0.496,
+      0.78
+    ],
+    "detail": [
+      0.34,
+      0.21,
+      0.32,
+      0.34
+    ],
+    "garden": [
+      0.05,
+      0.12,
+      0.9,
+      0.67
+    ],
+    "host": [
+      0.35,
+      0.12,
+      0.3,
+      0.77
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.5,
+      0.86
+    ],
+    "guest_a": [
+      0.28,
+      0.86
+    ],
+    "guest_b": [
+      0.72,
+      0.86
+    ],
+    "figure_a": [
+      0.28,
+      0.86
+    ],
+    "figure_b": [
+      0.72,
+      0.86
+    ]
+  },
+  "variants": [
+    "spring",
+    "harvest"
+  ],
+  "props": []
+}

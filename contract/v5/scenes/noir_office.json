@@ -1,0 +1,126 @@
+{
+  "id": "noir_office",
+  "label": "侦探办公室",
+  "description": "黑色电影侦探办公室：百叶窗硬投影、桌面台灯与窗外雨夜，烟雾与高反差剪影。",
+  "tags": [
+    "modern",
+    "noir",
+    "office",
+    "detective"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "size": [
+    1600,
+    900
+  ],
+  "seed": 5211,
+  "layers": [
+    {
+      "type": "canvas",
+      "layer": "background",
+      "color": "paper"
+    },
+    {
+      "type": "blinds",
+      "layer": "background",
+      "color": "highlight",
+      "x": 0.72,
+      "y": 0.3,
+      "size": 0.46,
+      "opacity": 0.85
+    },
+    {
+      "type": "window_light",
+      "layer": "background",
+      "color": "fg:1",
+      "x": 0.72,
+      "y": 0.34,
+      "size": 0.34,
+      "opacity": 0.35
+    },
+    {
+      "type": "shelves",
+      "layer": "background",
+      "color": "shadow",
+      "x": 0.16,
+      "y": 0.42,
+      "opacity": 0.75
+    },
+    {
+      "type": "desk",
+      "layer": "midground",
+      "color": "shadow",
+      "x": 0.44,
+      "y": 0.86,
+      "width": 0.46
+    },
+    {
+      "type": "desk_lamp",
+      "layer": "midground",
+      "color": "accent:0",
+      "x": 0.62,
+      "y": 0.7
+    },
+    {
+      "type": "smoke",
+      "layer": "midground",
+      "color": "fg:1",
+      "opacity": 0.18
+    },
+    {
+      "type": "rain",
+      "layer": "foreground",
+      "color": "highlight",
+      "density": 0.18,
+      "opacity": 0.14
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.5
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.202,
+      0.19,
+      0.616,
+      0.78
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.34,
+      0.92
+    ],
+    "guest_a": [
+      0.6,
+      0.92
+    ],
+    "guest_b": [
+      0.68,
+      0.94
+    ],
+    "figure_a": [
+      0.6,
+      0.92
+    ],
+    "figure_b": [
+      0.68,
+      0.94
+    ]
+  },
+  "variants": [
+    "night_rain",
+    "lamp_off"
+  ]
+}

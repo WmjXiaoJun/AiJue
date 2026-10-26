@@ -1,0 +1,104 @@
+{
+  "id": "film_strip",
+  "label": "胶片条",
+  "description": "胶片条/场记板过场：齿孔胶片边框、灰尘划痕与暖光渐变，用于片头、章节卡与转场。",
+  "tags": [
+    "modern",
+    "film",
+    "transition",
+    "title",
+    "texture"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "size": [
+    1600,
+    900
+  ],
+  "seed": 5141,
+  "layers": [
+    {
+      "type": "canvas",
+      "layer": "background",
+      "color": "bg:1"
+    },
+    {
+      "type": "window_light",
+      "layer": "background",
+      "color": "highlight",
+      "x": 0.5,
+      "y": 0.5,
+      "size": 0.9,
+      "opacity": 0.45
+    },
+    {
+      "type": "film_strip",
+      "layer": "midground",
+      "color": "fg:0",
+      "x": 0.5,
+      "y": 0.5,
+      "size": 0.8,
+      "opacity": 0.9
+    },
+    {
+      "type": "dust",
+      "layer": "foreground",
+      "color": "dust",
+      "density": 0.3,
+      "opacity": 0.25
+    },
+    {
+      "type": "grain",
+      "layer": "foreground",
+      "strength": 0.18
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.3
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.182,
+      0.19,
+      0.636,
+      0.78
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.5,
+      0.94
+    ],
+    "guest_a": [
+      0.32,
+      0.94
+    ],
+    "guest_b": [
+      0.68,
+      0.94
+    ],
+    "figure_a": [
+      0.32,
+      0.94
+    ],
+    "figure_b": [
+      0.68,
+      0.94
+    ]
+  },
+  "variants": [
+    "title",
+    "chapter",
+    "burn"
+  ]
+}

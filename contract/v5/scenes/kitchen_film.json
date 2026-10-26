@@ -1,0 +1,122 @@
+{
+  "id": "kitchen_film",
+  "label": "胶片厨房",
+  "description": "暖光厨房：木质操作台、吊柜、窗光蒸汽，适合生活类访谈与做饭 B-roll。",
+  "tags": [
+    "modern",
+    "film",
+    "kitchen",
+    "warm",
+    "life"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "size": [
+    1600,
+    900
+  ],
+  "seed": 5131,
+  "layers": [
+    {
+      "type": "canvas",
+      "layer": "background",
+      "color": "bg:0"
+    },
+    {
+      "type": "window_light",
+      "layer": "background",
+      "color": "highlight",
+      "x": 0.78,
+      "y": 0.3,
+      "size": 0.36,
+      "opacity": 0.45
+    },
+    {
+      "type": "shelves",
+      "layer": "background",
+      "color": "wood",
+      "x": 0.34,
+      "y": 0.3,
+      "opacity": 0.8
+    },
+    {
+      "type": "kitchen_counter",
+      "layer": "midground",
+      "color": "wood",
+      "x": 0.5,
+      "y": 0.82
+    },
+    {
+      "type": "smoke",
+      "layer": "midground",
+      "color": "highlight",
+      "opacity": 0.2
+    },
+    {
+      "type": "desk_lamp",
+      "layer": "midground",
+      "color": "accent:0",
+      "x": 0.12,
+      "y": 0.66
+    },
+    {
+      "type": "bokeh",
+      "layer": "foreground",
+      "color": "highlight",
+      "density": 0.18,
+      "opacity": 0.14
+    },
+    {
+      "type": "film_border",
+      "layer": "foreground",
+      "opacity": 0.8
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.28
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.182,
+      0.19,
+      0.636,
+      0.78
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.32,
+      0.92
+    ],
+    "guest_a": [
+      0.66,
+      0.92
+    ],
+    "guest_b": [
+      0.68,
+      0.94
+    ],
+    "figure_a": [
+      0.66,
+      0.92
+    ],
+    "figure_b": [
+      0.68,
+      0.94
+    ]
+  },
+  "variants": [
+    "cooking",
+    "after_dinner"
+  ]
+}

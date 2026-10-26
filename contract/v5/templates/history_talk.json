@@ -1,0 +1,181 @@
+{
+  "id": "history_talk",
+  "label": "历史夜话",
+  "version": 5,
+  "description": "V5 模板：历史夜话（风格 ink_chronicle）",
+  "tags": [
+    "v5",
+    "ink_chronicle"
+  ],
+  "style": "ink_chronicle",
+  "target_duration": 38,
+  "aspect": [
+    16,
+    9
+  ],
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "name": "老周"
+    },
+    {
+      "role": "figure_a",
+      "character": "caocao",
+      "name": "曹操"
+    },
+    {
+      "role": "figure_b",
+      "character": "zhuge",
+      "name": "诸葛亮"
+    }
+  ],
+  "acts": [
+    {
+      "id": "act01",
+      "name": "第 1 幕",
+      "scene": "ancient_map",
+      "camera": "pan_right",
+      "camera_strength": 0.06,
+      "duration": 2.8,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    },
+    {
+      "id": "act02",
+      "name": "第 2 幕",
+      "scene": "war_council",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "host",
+      "text": "今天把官渡之战摊在地图上，换个问法：如果曹操输了，历史会怎么走？",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act03",
+      "name": "第 3 幕",
+      "scene": "battlefield",
+      "camera": "pan_left",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "figure_a",
+      "text": "我输不起，因为我的粮道只有一条，烧了就什么都没了。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act04",
+      "name": "第 4 幕",
+      "scene": "palace_hall",
+      "camera": "dolly",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "figure_b",
+      "text": "可你赢了，也只是把乱世推迟了二十年。",
+      "characters": [
+        "figure_b",
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act05",
+      "name": "第 5 幕",
+      "scene": "scholar_study",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "host",
+      "text": "地图上这条线，就是两个人的生死线。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act06",
+      "name": "第 6 幕",
+      "scene": "war_council",
+      "camera": "pan_right",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "host",
+      "text": "先看这张地图，许攸投奔那晚，乌巢的粮仓就在这条河边。",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act07",
+      "name": "第 7 幕",
+      "scene": "battlefield",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "figure_a",
+      "text": "所以我说，决定胜负的不是兵多，是我敢不敢烧掉自己的退路。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act08",
+      "name": "第 8 幕",
+      "scene": "palace_hall",
+      "camera": "pan_left",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "figure_b",
+      "text": "可火烧起来之后，北方的百姓还要过很多年苦日子。",
+      "characters": [
+        "figure_b",
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act09",
+      "name": "第 9 幕",
+      "scene": "scholar_study",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 3.0,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    }
+  ],
+  "packaging": {
+    "subtitle": "ink_chronicle",
+    "transition": "ink_chronicle",
+    "title": "历史夜话",
+    "end_card": "下期见"
+  },
+  "audio": {
+    "bgm": "guqin",
+    "sfx": [
+      "whoosh",
+      "click"
+    ]
+  },
+  "lipsync": {
+    "mode": "viseme"
+  },
+  "meta": {
+    "source": "v3_remap",
+    "script_lines": 7
+  }
+}

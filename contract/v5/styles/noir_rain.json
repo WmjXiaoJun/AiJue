@@ -1,0 +1,109 @@
+{
+  "id": "noir_rain",
+  "label": "黑色电影",
+  "version": 1,
+  "description": "黑色电影：高反差黑白、百叶窗硬影、雨夜街道与琥珀色点缀；硬光剪影、雨丝与烟雾层。",
+  "tags": [
+    "modern",
+    "noir",
+    "rain",
+    "crime",
+    "monochrome"
+  ],
+  "technique": [
+    "noir"
+  ],
+  "palette": {
+    "bg": [
+      "#0b0f14",
+      "#141a22"
+    ],
+    "fg": [
+      "#e8e8e8",
+      "#9aa3ad"
+    ],
+    "accent": [
+      "#e0a33e",
+      "#6ea8c8"
+    ],
+    "paper": "#10151b",
+    "shadow": "#05070a",
+    "highlight": "#cfd6dd",
+    "blood": "#8a2b2b",
+    "glass": "#2a3540"
+  },
+  "texture": [
+    "rain",
+    "grain",
+    "blinds_shadow"
+  ],
+  "line": {
+    "style": "hard",
+    "width": 2,
+    "color": "#e8e8e8",
+    "jitter": 0.0,
+    "opacity": 0.8
+  },
+  "character_treatment": "noir",
+  "typography": {
+    "title_font": "serif_condensed",
+    "subtitle": "noir_caption",
+    "lower_third": "noir_file",
+    "text_color": "#e8e8e8",
+    "seal_color": "#e0a33e",
+    "vertical": false,
+    "letter_spacing": 2.0
+  },
+  "transition": "blinds_wipe",
+  "finish": {
+    "brightness": 0.98,
+    "contrast": 1.25,
+    "saturation": 0.25,
+    "temperature": -0.05,
+    "vignette": 0.5,
+    "grain": 0.18,
+    "scanlines": 0.0,
+    "chroma_shift": 0.0,
+    "bloom": 0.08,
+    "paper": 0.0,
+    "hatch": 0.0,
+    "edge_ink": 0.2,
+    "gold_foil": 0.0,
+    "silk_sheen": 0.0
+  },
+  "grade": {
+    "eq": "contrast=1.25:saturation=0.25:brightness=-0.02",
+    "colorbalance": "bs=0.10:rs=0.02:gs=-0.01",
+    "extra": ""
+  },
+  "audio": {
+    "bgm": "cold_jazz",
+    "sfx": [
+      "rain_loop",
+      "thunder",
+      "typewriter"
+    ],
+    "ambience": "rain_street",
+    "ducking": 0.7
+  },
+  "h3": {
+    "style_prompt": "1940s film noir, rain-soaked night street, venetian blind hard shadows, high contrast black and white with amber accents, cigarette smoke, wet asphalt reflections",
+    "negative_prompt": "colorful, bright, cartoon, modern, text artifacts",
+    "motion": "slow sideways dolly",
+    "guidance": 4.0
+  },
+  "packaging": {
+    "tag": "NIGHT CASE FILES",
+    "tag_color": "#E0A33E",
+    "bars": "letterbox",
+    "seal": "CASE",
+    "accent_bar": true,
+    "vignette": 0.5,
+    "grain": 0.3,
+    "title_pulp": true,
+    "subtitle_bg": "#0b0f14BB",
+    "accent_bar_color": "#e0a33e",
+    "chapter_style": "case_file",
+    "seal_color": "#E0A33E"
+  }
+}

@@ -1,0 +1,166 @@
+{
+  "id": "slow_life",
+  "label": "慢生活",
+  "version": 5,
+  "description": "V5 模板：慢生活（风格 clay_diorama）",
+  "tags": [
+    "v5",
+    "clay_diorama"
+  ],
+  "style": "clay_diorama",
+  "target_duration": 38,
+  "aspect": [
+    16,
+    9
+  ],
+  "cast": [
+    {
+      "role": "host",
+      "character": "ali",
+      "name": "阿栗"
+    },
+    {
+      "role": "figure_a",
+      "character": "tianmei",
+      "name": "甜妹"
+    },
+    {
+      "role": "figure_b",
+      "character": "pangzi",
+      "name": "胖子"
+    }
+  ],
+  "acts": [
+    {
+      "id": "act01",
+      "name": "第 1 幕",
+      "scene": "clay_kitchen",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 2.8,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    },
+    {
+      "id": "act02",
+      "name": "第 2 幕",
+      "scene": "clay_garden",
+      "camera": "dolly",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "figure_a",
+      "text": "这道甜品叫什么来着？",
+      "characters": [
+        "figure_a",
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act03",
+      "name": "第 3 幕",
+      "scene": "clay_street",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "host",
+      "text": "你忘了？上次不是刚做过的抹茶红豆啵啵蛋糕吗？",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act04",
+      "name": "第 4 幕",
+      "scene": "clay_diorama",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "figure_b",
+      "text": "哦！对对对！那个红豆又软又甜，超好吃！",
+      "characters": [
+        "figure_b",
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act05",
+      "name": "第 5 幕",
+      "scene": "clay_garden",
+      "camera": "dolly",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "host",
+      "text": "对了，黏土定格动画也是咱的主题之一，这手艺可真治愈",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act06",
+      "name": "第 6 幕",
+      "scene": "clay_street",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "figure_a",
+      "text": "粘土捏成的食物，做出来跟真的一样，感觉就像在吃故事。",
+      "characters": [
+        "figure_a",
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act07",
+      "name": "第 7 幕",
+      "scene": "clay_diorama",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "figure_b",
+      "text": "是啊，吃个蛋糕还能看个小动画，这个生活真不赖！",
+      "characters": [
+        "figure_b"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act08",
+      "name": "第 8 幕",
+      "scene": "clay_diorama",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 3.0,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    }
+  ],
+  "packaging": {
+    "subtitle": "clay_diorama",
+    "transition": "clay_diorama",
+    "title": "慢生活",
+    "end_card": "下期见"
+  },
+  "audio": {
+    "bgm": "ukulele",
+    "sfx": [
+      "whoosh",
+      "click"
+    ]
+  },
+  "lipsync": {
+    "mode": "viseme"
+  },
+  "meta": {
+    "source": "v3_remap",
+    "script_lines": 6
+  }
+}

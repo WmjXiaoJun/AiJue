@@ -1,0 +1,150 @@
+{
+  "id": "leaderboard_collage",
+  "label": "拼贴排行榜",
+  "description": "糖果拼贴排行榜：撕纸榜单、彩色排名条与贴纸数字、星爆与彩带，公布分数与淘汰。",
+  "tags": [
+    "modern",
+    "game_show",
+    "collage",
+    "leaderboard"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "seed": 20261053,
+  "layers": [
+    {
+      "type": "paper",
+      "layer": "background",
+      "color": "paper",
+      "mottle": 0.3
+    },
+    {
+      "type": "torn_paper",
+      "layer": "background",
+      "color": "bg",
+      "opacity": 0.85
+    },
+    {
+      "type": "collage_panels",
+      "layer": "background",
+      "count": 6,
+      "colors": [
+        "accent",
+        "accent:2",
+        "lemon"
+      ],
+      "seed": 11
+    },
+    {
+      "type": "leaderboard_rows",
+      "layer": "midground",
+      "rows": 5,
+      "color": "fg",
+      "accent": "accent",
+      "seed": 5
+    },
+    {
+      "type": "stickers",
+      "layer": "midground",
+      "count": 4,
+      "color": "accent:1",
+      "seed": 8
+    },
+    {
+      "type": "sticker_burst",
+      "layer": "midground",
+      "count": 2,
+      "x": 0.8,
+      "y": 0.25,
+      "colors": [
+        "accent:1",
+        "accent:2"
+      ],
+      "seed": 2
+    },
+    {
+      "type": "confetti_rain",
+      "layer": "foreground",
+      "count": 40,
+      "colors": [
+        "accent",
+        "accent:1",
+        "accent:2"
+      ],
+      "seed": 19
+    },
+    {
+      "type": "grid",
+      "layer": "foreground",
+      "color": "fg",
+      "opacity": 0.06
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.062,
+      0.18,
+      0.576,
+      0.78
+    ],
+    "detail": [
+      0.34,
+      0.23,
+      0.32,
+      0.34
+    ],
+    "board": [
+      0.18,
+      0.12,
+      0.64,
+      0.72
+    ],
+    "top": [
+      0.3,
+      0.1,
+      0.4,
+      0.3
+    ],
+    "host": [
+      0.35,
+      0.12,
+      0.3,
+      0.79
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.5,
+      0.88
+    ],
+    "guest_a": [
+      0.2,
+      0.88
+    ],
+    "guest_b": [
+      0.8,
+      0.88
+    ],
+    "figure_a": [
+      0.2,
+      0.88
+    ],
+    "figure_b": [
+      0.8,
+      0.88
+    ]
+  },
+  "variants": [
+    "scores",
+    "winner"
+  ],
+  "props": []
+}

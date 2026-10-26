@@ -1,0 +1,238 @@
+{
+  "id": "ancient_map",
+  "label": "古地图",
+  "description": "古地图：等高线 + 河流 + 城池朱印 + 行军路线 + 罗盘印章",
+  "tags": [
+    "history",
+    "ink",
+    "parchment",
+    "map"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "layers": [
+    {
+      "type": "paper",
+      "layer": "background",
+      "mottle": 0.66,
+      "edge": 0.55
+    },
+    {
+      "type": "grid",
+      "layer": "midground",
+      "spacing": 0.085,
+      "color": "shadow",
+      "alpha": 30,
+      "fade": 0.4
+    },
+    {
+      "type": "terrain_contours",
+      "layer": "background",
+      "levels": 7,
+      "step": 2,
+      "scale": 0.36,
+      "seed": 11,
+      "color": "shadow",
+      "bold_color": "ink",
+      "alpha": 150,
+      "bold_alpha": 215,
+      "shade": 0.26
+    },
+    {
+      "type": "rivers",
+      "layer": "midground",
+      "count": 3,
+      "y": 0.48,
+      "gap": 0.13,
+      "width": [
+        2,
+        5
+      ],
+      "color": "water",
+      "seed": 5
+    },
+    {
+      "type": "city_markers",
+      "layer": "midground",
+      "count": 12,
+      "size": 0.017,
+      "style": "seal",
+      "color": "accent",
+      "y0": 0.14,
+      "y1": 0.84,
+      "variants": {
+        "campaign": {
+          "count": 16
+        },
+        "treaty": {
+          "count": 6,
+          "style": "dot"
+        }
+      }
+    },
+    {
+      "type": "route_arrows",
+      "layer": "midground",
+      "width": 5,
+      "color": "accent",
+      "dashed": true,
+      "dash": 22,
+      "gap": 13,
+      "arrowheads": true,
+      "nodes": [
+        0.0,
+        0.45,
+        0.8
+      ],
+      "path": [
+        [
+          0.13,
+          0.68
+        ],
+        [
+          0.24,
+          0.56
+        ],
+        [
+          0.36,
+          0.58
+        ],
+        [
+          0.46,
+          0.45
+        ],
+        [
+          0.58,
+          0.47
+        ],
+        [
+          0.7,
+          0.33
+        ],
+        [
+          0.8,
+          0.2
+        ]
+      ],
+      "variants": {
+        "campaign": {
+          "width": 6,
+          "path": [
+            [
+              0.1,
+              0.8
+            ],
+            [
+              0.26,
+              0.72
+            ],
+            [
+              0.4,
+              0.5
+            ],
+            [
+              0.52,
+              0.52
+            ],
+            [
+              0.66,
+              0.3
+            ],
+            [
+              0.84,
+              0.24
+            ]
+          ]
+        },
+        "treaty": {
+          "dashed": false,
+          "color": "accent:1",
+          "width": 3
+        }
+      }
+    },
+    {
+      "type": "compass_rose",
+      "layer": "midground",
+      "x": 0.86,
+      "y": 0.14,
+      "size": 0.105,
+      "color": "fg",
+      "accent": "accent"
+    },
+    {
+      "type": "seal_stamp",
+      "layer": "foreground",
+      "x": 0.075,
+      "y": 0.865,
+      "text": "史",
+      "size": 0.072,
+      "color": "accent",
+      "angle": -5,
+      "variants": {
+        "campaign": {
+          "text": "征"
+        },
+        "treaty": {
+          "text": "盟"
+        }
+      }
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.24
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0,
+      0,
+      1,
+      1
+    ],
+    "map_detail": [
+      0.2,
+      0.14,
+      0.48,
+      0.6
+    ],
+    "route": [
+      0.3,
+      0.28,
+      0.46,
+      0.46
+    ],
+    "compass": [
+      0.7,
+      0.02,
+      0.28,
+      0.3
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.16,
+      0.92
+    ],
+    "figure_a": [
+      0.74,
+      0.92
+    ],
+    "figure_b": [
+      0.4,
+      0.94
+    ]
+  },
+  "variants": [
+    "campaign",
+    "treaty"
+  ],
+  "depth": {
+    "background": 0.015,
+    "midground": 0.1,
+    "foreground": 0.26
+  }
+}

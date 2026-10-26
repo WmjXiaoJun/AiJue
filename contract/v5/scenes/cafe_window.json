@@ -1,0 +1,123 @@
+{
+  "id": "cafe_window",
+  "label": "咖啡馆窗边",
+  "description": "胶片咖啡馆窗边：窗框光斑、街道 bokeh、小桌与咖啡杯，适合轻松对谈与生活感 B-roll。",
+  "tags": [
+    "modern",
+    "film",
+    "cafe",
+    "window",
+    "cozy"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "size": [
+    1600,
+    900
+  ],
+  "seed": 5121,
+  "layers": [
+    {
+      "type": "canvas",
+      "layer": "background",
+      "color": "bg:0"
+    },
+    {
+      "type": "window_light",
+      "layer": "background",
+      "color": "highlight",
+      "x": 0.5,
+      "y": 0.34,
+      "size": 0.66,
+      "opacity": 0.5
+    },
+    {
+      "type": "glass_wall",
+      "layer": "background",
+      "color": "paper",
+      "opacity": 0.35
+    },
+    {
+      "type": "bokeh",
+      "layer": "midground",
+      "color": "highlight",
+      "density": 0.35,
+      "opacity": 0.3
+    },
+    {
+      "type": "desk",
+      "layer": "midground",
+      "color": "wood",
+      "x": 0.5,
+      "y": 0.9,
+      "width": 0.58
+    },
+    {
+      "type": "shelves",
+      "layer": "background",
+      "color": "wood",
+      "x": 0.14,
+      "y": 0.42,
+      "opacity": 0.6
+    },
+    {
+      "type": "curtains",
+      "layer": "foreground",
+      "color": "accent:1",
+      "x": 0.9,
+      "opacity": 0.65
+    },
+    {
+      "type": "film_border",
+      "layer": "foreground",
+      "opacity": 0.8
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.26
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.222,
+      0.19,
+      0.596,
+      0.78
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.36,
+      0.94
+    ],
+    "guest_a": [
+      0.64,
+      0.94
+    ],
+    "guest_b": [
+      0.68,
+      0.94
+    ],
+    "figure_a": [
+      0.64,
+      0.94
+    ],
+    "figure_b": [
+      0.68,
+      0.94
+    ]
+  },
+  "variants": [
+    "morning_light",
+    "rainy_window"
+  ]
+}

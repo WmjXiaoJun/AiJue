@@ -1,0 +1,150 @@
+{
+  "id": "rainy_street",
+  "label": "雨夜街道",
+  "description": "雨夜街道：湿沥青反光、路灯光晕、远处车灯与建筑剪影，雨丝与烟雾前景。",
+  "tags": [
+    "modern",
+    "noir",
+    "street",
+    "rain",
+    "establishing"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "size": [
+    1600,
+    900
+  ],
+  "seed": 5221,
+  "layers": [
+    {
+      "type": "sky_gradient",
+      "layer": "background",
+      "top": "shadow",
+      "bottom": "bg:1",
+      "horizon": 0.6,
+      "haze": 0.5
+    },
+    {
+      "type": "skyline",
+      "layer": "background",
+      "color": "shadow",
+      "y": 0.5,
+      "rows": 2,
+      "count": 12,
+      "height": 0.34,
+      "windows": 0.18
+    },
+    {
+      "type": "columns",
+      "layer": "background",
+      "color": "shadow",
+      "count": 3,
+      "x0": 0.02,
+      "x1": 0.16,
+      "y": 0.1,
+      "y_bottom": 0.72,
+      "width": 0.08
+    },
+    {
+      "type": "spotlights",
+      "layer": "midground",
+      "color": "accent:0",
+      "count": 2,
+      "strength": 0.5,
+      "x0": 0.2,
+      "x1": 0.8,
+      "y_source": 0.1,
+      "y_target": 0.85,
+      "spread": 0.1
+    },
+    {
+      "type": "street_lamp",
+      "layer": "midground",
+      "color": "accent:0",
+      "x": 0.2,
+      "y": 0.48,
+      "height": 0.42
+    },
+    {
+      "type": "street_lamp",
+      "layer": "midground",
+      "color": "accent:0",
+      "x": 0.78,
+      "y": 0.52,
+      "height": 0.4
+    },
+    {
+      "type": "stage_floor",
+      "layer": "midground",
+      "color": "glass",
+      "horizon": 0.7
+    },
+    {
+      "type": "smoke",
+      "layer": "midground",
+      "color": "fg:1",
+      "y": 0.68,
+      "count": 4,
+      "alpha": 55,
+      "spread": 0.22
+    },
+    {
+      "type": "rain",
+      "layer": "foreground",
+      "color": "highlight",
+      "count": 220,
+      "length": 0.026,
+      "angle": 8,
+      "mist": 0.6,
+      "opacity": 0.3
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.55
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.262,
+      0.21,
+      0.556,
+      0.78
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.4,
+      0.96
+    ],
+    "guest_a": [
+      0.66,
+      0.96
+    ],
+    "guest_b": [
+      0.68,
+      0.94
+    ],
+    "figure_a": [
+      0.66,
+      0.96
+    ],
+    "figure_b": [
+      0.68,
+      0.94
+    ]
+  },
+  "variants": [
+    "downpour",
+    "after_midnight"
+  ]
+}

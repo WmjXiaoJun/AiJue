@@ -1,0 +1,166 @@
+{
+  "id": "taskmaster",
+  "label": "任务大师",
+  "version": 5,
+  "description": "V5 模板：任务大师（风格 candy_collage）",
+  "tags": [
+    "v5",
+    "candy_collage"
+  ],
+  "style": "candy_collage",
+  "target_duration": 38,
+  "aspect": [
+    16,
+    9
+  ],
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "name": "老周"
+    },
+    {
+      "role": "figure_a",
+      "character": "pangzi",
+      "name": "胖子"
+    },
+    {
+      "role": "figure_b",
+      "character": "tianmei",
+      "name": "甜妹"
+    }
+  ],
+  "acts": [
+    {
+      "id": "act01",
+      "name": "第 1 幕",
+      "scene": "game_stage_collage",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 2.8,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    },
+    {
+      "id": "act02",
+      "name": "第 2 幕",
+      "scene": "prop_table",
+      "camera": "pan_left",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "host",
+      "text": "胖子，你这次能不能不靠吃东西逗笑裁判？",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act03",
+      "name": "第 3 幕",
+      "scene": "leaderboard_collage",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "figure_a",
+      "text": "那可不行，我的笑点只在美食上。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act04",
+      "name": "第 4 幕",
+      "scene": "confetti_stage",
+      "camera": "handheld",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "host",
+      "text": "那甜妹，你准备好了吗？",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act05",
+      "name": "第 5 幕",
+      "scene": "prop_table",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "figure_b",
+      "text": "准备好了，不过我可不想被胖哥吃掉。",
+      "characters": [
+        "figure_b"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act06",
+      "name": "第 6 幕",
+      "scene": "leaderboard_collage",
+      "camera": "pan_left",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "host",
+      "text": "放心，这次不许吃，只能逗！",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act07",
+      "name": "第 7 幕",
+      "scene": "confetti_stage",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "figure_a",
+      "text": "那还不简单，给他们来点糖果拼贴吧。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act08",
+      "name": "第 8 幕",
+      "scene": "confetti_stage",
+      "camera": "handheld",
+      "camera_strength": 0.06,
+      "duration": 3.0,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    }
+  ],
+  "packaging": {
+    "subtitle": "candy_collage",
+    "transition": "candy_collage",
+    "title": "任务大师",
+    "end_card": "下期见"
+  },
+  "audio": {
+    "bgm": "cartoon",
+    "sfx": [
+      "whoosh",
+      "click"
+    ]
+  },
+  "lipsync": {
+    "mode": "viseme"
+  },
+  "meta": {
+    "source": "v3_remap",
+    "script_lines": 6
+  }
+}

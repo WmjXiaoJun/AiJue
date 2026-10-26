@@ -1,0 +1,72 @@
+{
+  "id": "lengmian",
+  "label": "冷面",
+  "era": "modern",
+  "persona": "冷面笑匠，面无表情讲最狠的笑话；越冷越好笑，自己从不笑。",
+  "role_pool": [
+    "guest_b",
+    "expert",
+    "guest_a"
+  ],
+  "voice": {
+    "provider": "breeze",
+    "instruction": "35岁男性，平直无起伏的低音，冷幽默停顿感，几乎不带情绪",
+    "seed": 20262020,
+    "cfg_scale": 3.7
+  },
+  "appearance": {
+    "gender": "male",
+    "age": 35,
+    "skin": "#EBD0B8",
+    "hair": "#14161A",
+    "hair_style": "slick_back",
+    "eye": "#1E2228",
+    "brow": "straight",
+    "beard": "none",
+    "outfit": {
+      "type": "turtleneck",
+      "main": "#2B2F36",
+      "accent": "#8A96A8",
+      "hat": "none"
+    },
+    "accessories": [
+      "sunglasses"
+    ],
+    "head_ratio": 1.08,
+    "chibi": 0.14,
+    "eye_style": "deadpan",
+    "face_ratio": 0.9
+  },
+  "poses": [
+    "front",
+    "side",
+    "point",
+    "think"
+  ],
+  "mouth": [
+    "closed",
+    "a",
+    "o",
+    "e",
+    "i",
+    "u",
+    "m"
+  ],
+  "style_overrides": {
+    "neon_toon": {
+      "line": 1.3
+    },
+    "film_interview": {
+      "line": 1.1
+    },
+    "noir_rain": {
+      "line": 1.2
+    },
+    "blueprint_lab": {
+      "line": 0.9
+    },
+    "candy_collage": {
+      "line": 1.2
+    }
+  }
+}

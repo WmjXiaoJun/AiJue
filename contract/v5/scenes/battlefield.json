@@ -1,0 +1,201 @@
+{
+  "id": "battlefield",
+  "label": "战场",
+  "description": "战场：远山 + 烽火 + 军旗 + 兵阵剪影 + 骑兵 + 矛林 + 烟尘",
+  "tags": [
+    "history",
+    "war",
+    "ink"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "layers": [
+    {
+      "type": "sky_gradient",
+      "layer": "background",
+      "top": "bg:1",
+      "bottom": "highlight",
+      "horizon": 0.58,
+      "haze": 0.55,
+      "sun": {
+        "x": 0.74,
+        "y": 0.3,
+        "r": 0.05,
+        "color": "accent"
+      },
+      "clouds": 2,
+      "variants": {
+        "dawn": {
+          "top": "bg:0",
+          "bottom": "highlight",
+          "sun": {
+            "x": 0.22,
+            "y": 0.32,
+            "r": 0.055,
+            "color": "accent"
+          }
+        },
+        "dusk": {
+          "top": "fg:0",
+          "bottom": "accent:1"
+        }
+      }
+    },
+    {
+      "type": "mountains",
+      "layer": "background",
+      "count": 2,
+      "y": 0.5,
+      "height": 0.28,
+      "color": "shadow",
+      "seed": 3
+    },
+    {
+      "type": "mountains",
+      "layer": "background",
+      "count": 2,
+      "y": 0.66,
+      "height": 0.3,
+      "color": "mid",
+      "seed": 4
+    },
+    {
+      "type": "smoke",
+      "layer": "midground",
+      "count": 3,
+      "color": "shadow",
+      "y": 0.6,
+      "rise": 0.34,
+      "spread": 0.14,
+      "alpha": 95,
+      "plume": true,
+      "seed": 7,
+      "variants": {
+        "dawn": {
+          "alpha": 70
+        },
+        "dusk": {
+          "count": 4,
+          "alpha": 115
+        }
+      }
+    },
+    {
+      "type": "banners",
+      "layer": "midground",
+      "count": 5,
+      "x0": 0.06,
+      "x1": 0.94,
+      "y": 0.15,
+      "width": 0.052,
+      "height": 0.22,
+      "color": "accent",
+      "kind": "war"
+    },
+    {
+      "type": "soldier_silhouettes",
+      "layer": "midground",
+      "bands": 3,
+      "count": 36,
+      "color": "ink",
+      "y": 0.86,
+      "scale": 0.18,
+      "spears": true,
+      "dust": 0.6,
+      "seed": 9,
+      "variants": {
+        "dawn": {
+          "count": 24
+        },
+        "dusk": {
+          "count": 44
+        }
+      }
+    },
+    {
+      "type": "horses",
+      "layer": "midground",
+      "count": 7,
+      "y": 0.88,
+      "scale": 0.25,
+      "color": "ink",
+      "riders": true,
+      "dust": 0.7,
+      "seed": 11
+    },
+    {
+      "type": "spears",
+      "layer": "midground",
+      "count": 40,
+      "y": 0.88,
+      "length": 0.32,
+      "color": "ink"
+    },
+    {
+      "type": "smoke",
+      "layer": "foreground",
+      "count": 2,
+      "color": "paper",
+      "y": 0.86,
+      "rise": 0.1,
+      "spread": 0.3,
+      "alpha": 60
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.26
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0,
+      0,
+      1,
+      1
+    ],
+    "cavalry": [
+      0.34,
+      0.28,
+      0.46,
+      0.56
+    ],
+    "left_flank": [
+      0.02,
+      0.24,
+      0.34,
+      0.6
+    ],
+    "smoke_sky": [
+      0.5,
+      0.02,
+      0.46,
+      0.42
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.1,
+      0.95
+    ],
+    "figure_a": [
+      0.62,
+      0.96
+    ],
+    "figure_b": [
+      0.86,
+      0.94
+    ]
+  },
+  "variants": [
+    "dawn",
+    "dusk"
+  ],
+  "depth": {
+    "background": 0.03,
+    "midground": 0.16,
+    "foreground": 0.36
+  }
+}

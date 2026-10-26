@@ -1,0 +1,109 @@
+{
+  "id": "film_interview",
+  "label": "暖光胶片访谈",
+  "version": 1,
+  "description": "16mm 暖光胶片访谈：奶油暖橙、柔焦与细颗粒、场记板与胶片边框；人物柔光近景、浅景深生活空间。",
+  "tags": [
+    "modern",
+    "film",
+    "interview",
+    "warm",
+    "cozy"
+  ],
+  "technique": [
+    "film_grain"
+  ],
+  "palette": {
+    "bg": [
+      "#f4e3c8",
+      "#e6cba6"
+    ],
+    "fg": [
+      "#2c211b",
+      "#4a372c"
+    ],
+    "accent": [
+      "#d97a35",
+      "#8a5a3b"
+    ],
+    "paper": "#f7ead4",
+    "shadow": "#6b4a33",
+    "highlight": "#ffe9c4",
+    "dust": "#c9a679",
+    "wood": "#8a5a3b"
+  },
+  "texture": [
+    "film_grain",
+    "bokeh",
+    "dust"
+  ],
+  "line": {
+    "style": "soft",
+    "width": 2,
+    "color": "#4a372c",
+    "jitter": 0.05,
+    "opacity": 0.65
+  },
+  "character_treatment": "film",
+  "typography": {
+    "title_font": "serif_classic",
+    "subtitle": "warm_caption",
+    "lower_third": "film_slate",
+    "text_color": "#2c211b",
+    "seal_color": "#d97a35",
+    "vertical": false,
+    "letter_spacing": 0.5
+  },
+  "transition": "film_burn",
+  "finish": {
+    "brightness": 1.0,
+    "contrast": 1.06,
+    "saturation": 1.04,
+    "temperature": 0.12,
+    "vignette": 0.26,
+    "grain": 0.12,
+    "scanlines": 0.0,
+    "chroma_shift": 0.0,
+    "bloom": 0.12,
+    "paper": 0.0,
+    "hatch": 0.0,
+    "edge_ink": 0.0,
+    "gold_foil": 0.0,
+    "silk_sheen": 0.0
+  },
+  "grade": {
+    "eq": "contrast=1.04:saturation=1.02:brightness=0.0",
+    "colorbalance": "rs=0.04:bs=-0.05:gs=0.01",
+    "extra": ""
+  },
+  "audio": {
+    "bgm": "jazz_piano",
+    "sfx": [
+      "film_projector",
+      "mug_clink",
+      "paper_rustle"
+    ],
+    "ambience": "room_warm",
+    "ducking": 0.65
+  },
+  "h3": {
+    "style_prompt": "warm 16mm film interview set, cream and amber practical light, soft bokeh background, gentle film grain, shallow depth of field, analog color",
+    "negative_prompt": "digital clean, neon, high contrast, text artifacts",
+    "motion": "gentle handheld drift",
+    "guidance": 3.5
+  },
+  "packaging": {
+    "tag": "16MM SESSIONS",
+    "tag_color": "#F2A65A",
+    "bars": "letterbox",
+    "seal": "16MM",
+    "accent_bar": true,
+    "letterbox": 0.06,
+    "title_slate": true,
+    "subtitle_bg": "#f7ead4CC",
+    "accent_bar_color": "#d97a35",
+    "chapter_style": "film_clap",
+    "vignette": 0.22,
+    "seal_color": "#8A5A3B"
+  }
+}

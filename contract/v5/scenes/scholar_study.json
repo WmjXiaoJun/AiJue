@@ -1,0 +1,187 @@
+{
+  "id": "scholar_study",
+  "label": "书斋",
+  "description": "书斋：窗棂 + 书架 + 案几笔墨 + 卷轴 + 竹简 + 烛 + 浮尘",
+  "tags": [
+    "history",
+    "ink",
+    "study"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "layers": [
+    {
+      "type": "paper",
+      "layer": "background",
+      "mottle": 0.58,
+      "edge": 0.5
+    },
+    {
+      "type": "screens",
+      "layer": "midground",
+      "x": 0.06,
+      "y": 0.1,
+      "w": 0.38,
+      "h": 0.44,
+      "panels": 2,
+      "style": "lattice",
+      "color": "wood"
+    },
+    {
+      "type": "shelves",
+      "layer": "midground",
+      "x": 0.62,
+      "y": 0.12,
+      "w": 0.34,
+      "h": 0.74,
+      "rows": 4,
+      "color": "wood",
+      "variants": {
+        "night_reading": {
+          "rows": 4
+        },
+        "morning": {
+          "rows": 3
+        }
+      }
+    },
+    {
+      "type": "desk",
+      "layer": "midground",
+      "x": 0.16,
+      "y": 0.58,
+      "w": 0.6,
+      "h": 0.3,
+      "color": "wood",
+      "items": [
+        {
+          "type": "brush",
+          "x": 0.28,
+          "y": 0.42
+        },
+        {
+          "type": "inkstone",
+          "x": 0.46,
+          "y": 0.55
+        },
+        {
+          "type": "cup",
+          "x": 0.66,
+          "y": 0.4
+        },
+        {
+          "type": "scroll",
+          "x": 0.82,
+          "y": 0.55
+        }
+      ]
+    },
+    {
+      "type": "scroll",
+      "layer": "midground",
+      "x": 0.24,
+      "y": 0.4,
+      "w": 0.26,
+      "h": 0.16,
+      "columns": 2,
+      "angle": -2,
+      "tie": false
+    },
+    {
+      "type": "bamboo_slips",
+      "layer": "midground",
+      "x": 0.54,
+      "y": 0.36,
+      "w": 0.14,
+      "h": 0.2,
+      "count": 6,
+      "angle": -3
+    },
+    {
+      "type": "candle_glow",
+      "layer": "midground",
+      "count": 2,
+      "y": 0.5,
+      "x0": 0.26,
+      "x1": 0.6,
+      "size": 0.05,
+      "variants": {
+        "night_reading": {
+          "count": 3
+        },
+        "morning": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "type": "particles",
+      "layer": "foreground",
+      "count": 44,
+      "color": "highlight",
+      "size": 0.0016,
+      "drift": 0.15
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.28
+    },
+    {
+      "type": "grain",
+      "layer": "foreground",
+      "strength": 0.05
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0,
+      0,
+      1,
+      1
+    ],
+    "desk_top": [
+      0.14,
+      0.38,
+      0.64,
+      0.5
+    ],
+    "scroll_close": [
+      0.2,
+      0.3,
+      0.38,
+      0.34
+    ],
+    "shelves_right": [
+      0.6,
+      0.08,
+      0.38,
+      0.74
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.28,
+      0.97
+    ],
+    "figure_a": [
+      0.72,
+      0.97
+    ],
+    "figure_b": [
+      0.5,
+      0.98
+    ]
+  },
+  "variants": [
+    "night_reading",
+    "morning"
+  ],
+  "depth": {
+    "background": 0.02,
+    "midground": 0.12,
+    "foreground": 0.3
+  }
+}

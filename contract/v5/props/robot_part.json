@@ -1,0 +1,47 @@
+{
+  "id": "robot_part",
+  "label": "机器人零件",
+  "kind": "robot_part",
+  "description": "金属零件与线缆",
+  "tags": [
+    "modern",
+    "tech",
+    "prop"
+  ],
+  "appearance": {
+    "shape": "box",
+    "main": "#c9d4de",
+    "accent": "#39e6ff",
+    "material": "metal",
+    "size": [
+      0.1,
+      0.08
+    ]
+  },
+  "style": {
+    "default": {
+      "line": 1.0
+    },
+    "neon_toon": {
+      "line": 1.2,
+      "glow": 0.6
+    },
+    "noir_rain": {
+      "line": 1.1,
+      "tint": "#8a8a8a"
+    },
+    "oil_salon": {
+      "line": 1.3,
+      "tint": "#b08a3e"
+    },
+    "hologram_stage": {
+      "glow": 0.5
+    },
+    "film_interview": {
+      "tint": "#d9a56a"
+    },
+    "vhs_late_show": {
+      "glow": 0.25
+    }
+  }
+}

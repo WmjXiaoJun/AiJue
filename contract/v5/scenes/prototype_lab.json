@@ -1,0 +1,170 @@
+{
+  "id": "prototype_lab",
+  "label": "原型实验室",
+  "description": "科技原型实验室：暗调实验室、发光数据屏、玻璃展柜中的原型机与粒子微光，产品特写场景。",
+  "tags": [
+    "modern",
+    "blueprint",
+    "lab",
+    "prototype",
+    "closeup"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "size": [
+    1600,
+    900
+  ],
+  "seed": 5341,
+  "layers": [
+    {
+      "type": "grid",
+      "layer": "background",
+      "color": "grid",
+      "spacing": 0.05,
+      "alpha": 110
+    },
+    {
+      "type": "blueprint_lines",
+      "layer": "background",
+      "color": "fg:1",
+      "spacing": 0.1,
+      "dimensions": true,
+      "circles": 3,
+      "alpha": 0.45
+    },
+    {
+      "type": "spotlights",
+      "layer": "midground",
+      "color": "highlight",
+      "count": 2,
+      "strength": 0.6,
+      "x0": 0.3,
+      "x1": 0.7,
+      "y_source": 0.0,
+      "y_target": 0.9,
+      "spread": 0.22
+    },
+    {
+      "type": "screens",
+      "layer": "midground",
+      "color": "bg:1",
+      "x": 0.06,
+      "y": 0.16,
+      "w": 0.3,
+      "h": 0.36,
+      "panels": 2
+    },
+    {
+      "type": "glass_case",
+      "layer": "midground",
+      "color": "accent:1",
+      "artifact": "relay",
+      "x": 0.42,
+      "y": 0.18,
+      "w": 0.22,
+      "h": 0.34,
+      "label": true
+    },
+    {
+      "type": "stage_floor",
+      "layer": "midground",
+      "color": "grid",
+      "horizon": 0.74
+    },
+    {
+      "type": "desk",
+      "layer": "midground",
+      "color": "fg:1",
+      "x": 0.14,
+      "y": 0.66,
+      "w": 0.7,
+      "h": 0.26,
+      "items": [
+        {
+          "type": "scroll",
+          "x": 0.25,
+          "y": 0.5
+        },
+        {
+          "type": "cup",
+          "x": 0.7,
+          "y": 0.55
+        }
+      ]
+    },
+    {
+      "type": "monitor",
+      "layer": "midground",
+      "color": "accent:1",
+      "x": 0.84,
+      "y": 0.62,
+      "width": 0.16
+    },
+    {
+      "type": "diagram_nodes",
+      "layer": "foreground",
+      "color": "accent:0",
+      "x": 0.52,
+      "y": 0.82,
+      "size": 0.14,
+      "nodes": 5,
+      "opacity": 0.6
+    },
+    {
+      "type": "particles",
+      "layer": "foreground",
+      "color": "accent:0",
+      "count": 90,
+      "size": 0.0022,
+      "opacity": 0.5
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.26
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.122,
+      0.21,
+      0.696,
+      0.78
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.26,
+      0.96
+    ],
+    "guest_a": [
+      0.68,
+      0.96
+    ],
+    "guest_b": [
+      0.68,
+      0.94
+    ],
+    "figure_a": [
+      0.68,
+      0.96
+    ],
+    "figure_b": [
+      0.68,
+      0.94
+    ]
+  },
+  "variants": [
+    "powered",
+    "dark"
+  ]
+}

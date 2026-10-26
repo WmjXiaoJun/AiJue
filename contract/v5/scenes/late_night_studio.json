@@ -1,0 +1,170 @@
+{
+  "id": "late_night_studio",
+  "label": "深夜演播厅",
+  "description": "霓虹 3D 卡通演播厅主场景：上层玻璃幕墙城市夜景、主持台与沙发区、灯带轮廓光与舞台追光。",
+  "tags": [
+    "modern",
+    "neon",
+    "studio",
+    "talk_show"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "size": [
+    1600,
+    900
+  ],
+  "seed": 5021,
+  "layers": [
+    {
+      "type": "sky_gradient",
+      "layer": "background",
+      "top": "bg",
+      "bottom": "bg:1",
+      "horizon": 0.55
+    },
+    {
+      "type": "skyline",
+      "layer": "background",
+      "color": "shadow",
+      "y": 0.6,
+      "rows": 2,
+      "count": 18,
+      "height": 0.26,
+      "windows": 0.22
+    },
+    {
+      "type": "glass_wall",
+      "layer": "background",
+      "color": "bg:1",
+      "x": 0.0,
+      "y": 0.04,
+      "w": 1.0,
+      "h": 0.58,
+      "columns": 4,
+      "rows": 1,
+      "opacity": 0.8
+    },
+    {
+      "type": "spotlights",
+      "layer": "midground",
+      "color": "highlight",
+      "count": 3,
+      "strength": 0.9,
+      "x0": 0.24,
+      "x1": 0.76,
+      "y_source": -0.04,
+      "y_target": 0.95,
+      "spread": 0.24
+    },
+    {
+      "type": "stage_floor",
+      "layer": "midground",
+      "color": "bg:1",
+      "horizon": 0.7
+    },
+    {
+      "type": "screens",
+      "layer": "midground",
+      "color": "bg:1",
+      "x": 0.72,
+      "y": 0.18,
+      "w": 0.2,
+      "h": 0.24,
+      "panels": 1,
+      "style": "lattice"
+    },
+    {
+      "type": "studio_desk",
+      "layer": "midground",
+      "color": "accent:2",
+      "x": 0.32,
+      "y": 0.93,
+      "width": 0.3,
+      "height": 0.2
+    },
+    {
+      "type": "sofa_set",
+      "layer": "midground",
+      "color": "accent:1",
+      "x": 0.72,
+      "y": 0.93,
+      "width": 0.3,
+      "height": 0.2
+    },
+    {
+      "type": "neon_tube",
+      "layer": "foreground",
+      "color": "accent:1",
+      "x": 0.18,
+      "y": 0.07,
+      "length": 0.64,
+      "opacity": 0.9
+    },
+    {
+      "type": "neon_tube",
+      "layer": "foreground",
+      "color": "accent:0",
+      "x": 0.045,
+      "y": 0.3,
+      "length": 0.34,
+      "vertical": true,
+      "opacity": 0.75
+    },
+    {
+      "type": "smoke",
+      "layer": "foreground",
+      "color": "highlight",
+      "y": 0.82,
+      "count": 2,
+      "alpha": 45
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.22
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.162,
+      0.19,
+      0.776,
+      0.78
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.3,
+      0.94
+    ],
+    "guest_a": [
+      0.64,
+      0.94
+    ],
+    "guest_b": [
+      0.8,
+      0.94
+    ],
+    "figure_a": [
+      0.64,
+      0.94
+    ],
+    "figure_b": [
+      0.8,
+      0.94
+    ]
+  },
+  "variants": [
+    "on_air",
+    "late_quiet"
+  ]
+}

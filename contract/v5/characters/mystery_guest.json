@@ -1,0 +1,73 @@
+{
+  "id": "mystery_guest",
+  "label": "神秘嘉宾",
+  "era": "modern",
+  "persona": "从不露脸的嘉宾，声音经过处理，专问最不该问的问题；身份始终成谜。",
+  "role_pool": [
+    "guest_b",
+    "narrator",
+    "figure_b"
+  ],
+  "voice": {
+    "provider": "breeze",
+    "instruction": "低沉稳重的神秘中低音，略带沙哑与电子处理感，语速慢，压迫感强",
+    "seed": 20262024,
+    "cfg_scale": 4.6
+  },
+  "appearance": {
+    "gender": "other",
+    "age": 30,
+    "skin": "#C7C0D8",
+    "hair": "#0E0E14",
+    "hair_style": "hood",
+    "eye": "#B39DFF",
+    "brow": "straight",
+    "beard": "none",
+    "outfit": {
+      "type": "cloak",
+      "main": "#1B1730",
+      "accent": "#7C5CFF",
+      "hat": "hood"
+    },
+    "accessories": [
+      "mask",
+      "glow"
+    ],
+    "head_ratio": 1.15,
+    "chibi": 0.2,
+    "eye_style": "glow",
+    "face_ratio": 1.0
+  },
+  "poses": [
+    "front",
+    "side",
+    "point",
+    "think"
+  ],
+  "mouth": [
+    "closed",
+    "a",
+    "o",
+    "e",
+    "i",
+    "u",
+    "m"
+  ],
+  "style_overrides": {
+    "neon_toon": {
+      "line": 1.3
+    },
+    "film_interview": {
+      "line": 1.1
+    },
+    "noir_rain": {
+      "line": 1.2
+    },
+    "blueprint_lab": {
+      "line": 0.9
+    },
+    "candy_collage": {
+      "line": 1.2
+    }
+  }
+}

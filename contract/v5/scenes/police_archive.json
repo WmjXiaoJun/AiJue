@@ -1,0 +1,127 @@
+{
+  "id": "police_archive",
+  "label": "警局档案室",
+  "description": "警局档案室：高耸档案架、卷宗与证物箱、顶部冷光与雨窗，适合查案与证据特写。",
+  "tags": [
+    "modern",
+    "noir",
+    "archive",
+    "crime",
+    "evidence"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "size": [
+    1600,
+    900
+  ],
+  "seed": 5241,
+  "layers": [
+    {
+      "type": "canvas",
+      "layer": "background",
+      "color": "paper"
+    },
+    {
+      "type": "shelves",
+      "layer": "background",
+      "color": "shadow",
+      "x": 0.5,
+      "y": 0.42,
+      "opacity": 0.95
+    },
+    {
+      "type": "window_light",
+      "layer": "background",
+      "color": "fg:1",
+      "x": 0.84,
+      "y": 0.3,
+      "size": 0.24,
+      "opacity": 0.3
+    },
+    {
+      "type": "rain",
+      "layer": "background",
+      "color": "fg:1",
+      "density": 0.12,
+      "opacity": 0.12
+    },
+    {
+      "type": "desk",
+      "layer": "midground",
+      "color": "glass",
+      "x": 0.4,
+      "y": 0.88,
+      "width": 0.5
+    },
+    {
+      "type": "desk_lamp",
+      "layer": "midground",
+      "color": "accent:0",
+      "x": 0.66,
+      "y": 0.72
+    },
+    {
+      "type": "glass_case",
+      "layer": "midground",
+      "color": "fg:1",
+      "x": 0.16,
+      "y": 0.62,
+      "size": 0.18,
+      "opacity": 0.35
+    },
+    {
+      "type": "smoke",
+      "layer": "midground",
+      "color": "fg:1",
+      "opacity": 0.14
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.48
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.162,
+      0.19,
+      0.656,
+      0.78
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.3,
+      0.92
+    ],
+    "guest_a": [
+      0.56,
+      0.92
+    ],
+    "guest_b": [
+      0.68,
+      0.94
+    ],
+    "figure_a": [
+      0.56,
+      0.92
+    ],
+    "figure_b": [
+      0.68,
+      0.94
+    ]
+  },
+  "variants": [
+    "night_shift",
+    "lights_out"
+  ]
+}

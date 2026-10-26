@@ -1,0 +1,166 @@
+{
+  "id": "roundtable",
+  "label": "圆桌派",
+  "version": 5,
+  "description": "V5 模板：圆桌派（风格 oil_salon）",
+  "tags": [
+    "v5",
+    "oil_salon"
+  ],
+  "style": "oil_salon",
+  "target_duration": 38,
+  "aspect": [
+    16,
+    9
+  ],
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "name": "老周"
+    },
+    {
+      "role": "figure_a",
+      "character": "sushi",
+      "name": "苏轼"
+    },
+    {
+      "role": "figure_b",
+      "character": "libai",
+      "name": "李白"
+    }
+  ],
+  "acts": [
+    {
+      "id": "act01",
+      "name": "第 1 幕",
+      "scene": "oil_roundtable",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 2.8,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    },
+    {
+      "id": "act02",
+      "name": "第 2 幕",
+      "scene": "oil_library",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "host",
+      "text": "苏轼和李白，两位文坛巨匠来聊聊传统与创新的话题吧。",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act03",
+      "name": "第 3 幕",
+      "scene": "candle_gallery",
+      "camera": "pan_left",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "figure_a",
+      "text": "李白来了，咱们先聊聊，咱们古人诗词里，传统和创新是啥样？",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act04",
+      "name": "第 4 幕",
+      "scene": "oil_library",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "host",
+      "text": "李白那可是活在唐诗里的活神仙，苏轼兄弟，您怎么看？",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act05",
+      "name": "第 5 幕",
+      "scene": "candle_gallery",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "figure_b",
+      "text": "咱们苏轼，就是想突破传统，创新一下嘛。",
+      "characters": [
+        "figure_b"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act06",
+      "name": "第 6 幕",
+      "scene": "oil_library",
+      "camera": "pan_left",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "host",
+      "text": "创新也要有根，不然就成无本之木了。",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act07",
+      "name": "第 7 幕",
+      "scene": "candle_gallery",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "figure_a",
+      "text": "那咱们写诗作画，是不是得从古人身上找找灵感？",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act08",
+      "name": "第 8 幕",
+      "scene": "candle_gallery",
+      "camera": "pan_left",
+      "camera_strength": 0.06,
+      "duration": 3.0,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    }
+  ],
+  "packaging": {
+    "subtitle": "oil_salon",
+    "transition": "oil_salon",
+    "title": "圆桌派",
+    "end_card": "下期见"
+  },
+  "audio": {
+    "bgm": "cello",
+    "sfx": [
+      "whoosh",
+      "click"
+    ]
+  },
+  "lipsync": {
+    "mode": "viseme"
+  },
+  "meta": {
+    "source": "v3_remap",
+    "script_lines": 6
+  }
+}

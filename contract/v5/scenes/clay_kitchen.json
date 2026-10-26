@@ -1,0 +1,167 @@
+{
+  "id": "clay_kitchen",
+  "label": "黏土厨房",
+  "description": "黏土定格厨房：瓷砖墙、木架、粗陶罐与灶台，暖陶土奶油色，微缩移轴。",
+  "tags": [
+    "modern",
+    "slow_life",
+    "clay",
+    "kitchen"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "seed": 20261061,
+  "layers": [
+    {
+      "type": "paper",
+      "layer": "background",
+      "color": "paper",
+      "mottle": 0.3
+    },
+    {
+      "type": "clay_objects",
+      "layer": "background",
+      "kind": "tiles",
+      "count": 12,
+      "y": 0.22,
+      "h": 0.42,
+      "color": "butter",
+      "accent": "clay",
+      "seed": 4
+    },
+    {
+      "type": "shelves",
+      "layer": "midground",
+      "count": 3,
+      "color": "clay",
+      "accent": "butter",
+      "opacity": 0.95
+    },
+    {
+      "type": "arches",
+      "layer": "midground",
+      "count": 1,
+      "color": "clay",
+      "accent": "butter",
+      "opacity": 0.9
+    },
+    {
+      "type": "clay_objects",
+      "layer": "midground",
+      "kind": "pots",
+      "count": 6,
+      "x": 0.16,
+      "y": 0.52,
+      "scale": 0.8,
+      "color": "clay",
+      "accent": "butter",
+      "seed": 8
+    },
+    {
+      "type": "desk",
+      "layer": "midground",
+      "x": 0.5,
+      "y": 0.84,
+      "w": 0.74,
+      "h": 0.2,
+      "color": "clay",
+      "accent": "butter"
+    },
+    {
+      "type": "clay_objects",
+      "layer": "midground",
+      "kind": "utensils",
+      "count": 4,
+      "x": 0.56,
+      "y": 0.78,
+      "scale": 0.9,
+      "color": "clay",
+      "accent": "sage",
+      "seed": 12
+    },
+    {
+      "type": "clay_plants",
+      "layer": "midground",
+      "count": 2,
+      "x": 0.18,
+      "y": 0.8,
+      "scale": 0.9,
+      "color": "sage",
+      "accent": "clay",
+      "seed": 3
+    },
+    {
+      "type": "smoke",
+      "layer": "foreground",
+      "count": 2,
+      "opacity": 0.15
+    },
+    {
+      "type": "tilt_shift",
+      "layer": "foreground",
+      "focus_y": 0.62,
+      "strength": 0.5
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.122,
+      0.15,
+      0.516,
+      0.78
+    ],
+    "detail": [
+      0.34,
+      0.2,
+      0.32,
+      0.34
+    ],
+    "counter": [
+      0.1,
+      0.12,
+      0.8,
+      0.47
+    ],
+    "host": [
+      0.33,
+      0.12,
+      0.308,
+      0.76
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.5,
+      0.85
+    ],
+    "guest_a": [
+      0.26,
+      0.85
+    ],
+    "guest_b": [
+      0.74,
+      0.85
+    ],
+    "figure_a": [
+      0.26,
+      0.85
+    ],
+    "figure_b": [
+      0.74,
+      0.85
+    ]
+  },
+  "variants": [
+    "morning",
+    "evening"
+  ],
+  "props": []
+}

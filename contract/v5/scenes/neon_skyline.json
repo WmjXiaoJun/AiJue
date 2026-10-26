@@ -1,0 +1,135 @@
+{
+  "id": "neon_skyline",
+  "label": "霓虹城市天台",
+  "description": "深夜秀片头 establishing：天台俯瞰霓虹城市天际线，湿地面反光，霓虹灯牌与细雨。",
+  "tags": [
+    "modern",
+    "neon",
+    "city",
+    "establishing",
+    "night"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "size": [
+    1600,
+    900
+  ],
+  "seed": 5011,
+  "layers": [
+    {
+      "type": "sky_gradient",
+      "layer": "background",
+      "top": "bg",
+      "bottom": "bg:1",
+      "horizon": 0.58,
+      "haze": 0.6
+    },
+    {
+      "type": "skyline",
+      "layer": "background",
+      "color": "shadow",
+      "y": 0.58,
+      "rows": 3,
+      "count": 16,
+      "height": 0.3,
+      "windows": 0.22
+    },
+    {
+      "type": "neon_signs",
+      "layer": "midground",
+      "color": "accent",
+      "count": 7,
+      "seed": 5012,
+      "text": "霓虹夜"
+    },
+    {
+      "type": "neon_tube",
+      "layer": "midground",
+      "color": "accent:1",
+      "x": 0.18,
+      "y": 0.3,
+      "length": 0.22,
+      "opacity": 0.9
+    },
+    {
+      "type": "neon_tube",
+      "layer": "midground",
+      "color": "accent:0",
+      "x": 0.8,
+      "y": 0.38,
+      "length": 0.18,
+      "opacity": 0.8
+    },
+    {
+      "type": "stage_floor",
+      "layer": "midground",
+      "color": "bg:1",
+      "horizon": 0.8
+    },
+    {
+      "type": "smoke",
+      "layer": "midground",
+      "color": "highlight",
+      "y": 0.86,
+      "count": 2,
+      "alpha": 45
+    },
+    {
+      "type": "rain",
+      "layer": "foreground",
+      "color": "highlight",
+      "count": 130,
+      "length": 0.02,
+      "mist": 0.5,
+      "opacity": 0.2
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.3
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.162,
+      0.19,
+      0.656,
+      0.78
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.3,
+      0.94
+    ],
+    "guest_a": [
+      0.62,
+      0.94
+    ],
+    "guest_b": [
+      0.68,
+      0.94
+    ],
+    "figure_a": [
+      0.62,
+      0.94
+    ],
+    "figure_b": [
+      0.68,
+      0.94
+    ]
+  },
+  "variants": [
+    "night_clear",
+    "acid_rain"
+  ]
+}

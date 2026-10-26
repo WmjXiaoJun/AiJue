@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://zaopianju.local/contract/v5/schema/style.schema.json",
+  "title": "V5 style（视觉风格 / 技法包）",
+  "description": "风格 = 可组合的视觉原语：技法/调色/纹理/线条/角色处理/排版/转场/音效/H3 prompt。custom/styles/ 下同名文件会与本文件定义深合并（字典递归、数组替换）。",
+  "type": "object",
+  "required": ["id", "label", "technique", "palette"],
+  "properties": {
+    "id": { "$ref": "#/$defs/id" },
+    "label": { "type": "string", "minLength": 1, "description": "中文显示名" },
+    "version": { "type": "integer", "minimum": 1, "default": 1 },
+    "extends": { "$ref": "#/$defs/id", "description": "继承另一个 style id（可选，加载时由使用方决定是否展开）" },
+    "description": { "type": "string" },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "technique": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 },
+      "description": "技法原语：ink_wash / woodblock / parchment_engrave / museum_gold / silk_gongbi / hologram / vhs / film_grain / noir / oil_impasto / baroque_candle / blueprint / collage_cutout / claymation / chalk_sketch / neon_toon …"
+    },
+    "palette": {
+      "type": "object",
+      "required": ["bg", "fg", "accent"],
+      "description": "6-8 色 hex；bg/fg/accent 可为单色或颜色数组（数组按顺序取用），其余键（paper/shadow/highlight/…）自由扩展",
+      "properties": {
+        "bg": { "$ref": "#/$defs/colorOrList" },
+        "fg": { "$ref": "#/$defs/colorOrList" },
+        "accent": { "$ref": "#/$defs/colorOrList" },
+        "paper": { "$ref": "#/$defs/hex" },
+        "shadow": { "$ref": "#/$defs/hex" },
+        "highlight": { "$ref": "#/$defs/hex" },
+        "seal": { "$ref": "#/$defs/hex" },
+        "ink": { "$ref": "#/$defs/hex" }
+      },
+      "additionalProperties": { "$ref": "#/$defs/colorOrList" }
+    },
+    "texture": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "paper_grain / canvas / scanline / halftone / clay_noise / chalk_dust / grid / bokeh / film_grain …"
+    },
+    "line": {
+      "type": "object",
+      "properties": {
+        "style": { "type": "string", "description": "brush_edge / woodcut / engrave / thick_outline / none / sketch / fine" },
+        "width": { "type": "number", "minimum": 0 },
+        "color": { "$ref": "#/$defs/hex" },
+        "jitter": { "type": "number", "minimum": 0 },
+        "opacity": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "additionalProperties": true
+    },
+    "character_treatment": {
+      "type": "string",
+      "description": "ink_brush / cutout_paper / clay / pixel / halftone / oil / chalk / toon / gongbi / engrave / hologram / vhs / film / noir / blueprint / collage / candle …",
+      "minLength": 1
+    },
+    "typography": {
+      "type": "object",
+      "properties": {
+        "title_font": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "lower_third": { "type": "string" },
+        "fallback_font": { "type": "string" },
+        "text_color": { "$ref": "#/$defs/hex" },
+        "seal_color": { "$ref": "#/$defs/hex" },
+        "vertical": { "type": "boolean" },
+        "letter_spacing": { "type": "number" }
+      },
+      "additionalProperties": true
+    },
+    "transition": {
+      "type": "string",
+      "minLength": 1,
+      "description": "ink_wipe / scroll_unroll / spotlight_iris / tape_jump / film_burn / candle_fade / blueprint_wipe / sticker_pop / stopmotion_jump / chalk_wipe / neon_wipe / hard_cut / fade / crossfade …"
+    },
+    "audio": {
+      "type": "object",
+      "properties": {
+        "bgm": { "type": "string", "description": "BGM preset 名（guqin / synthwave / jazz / organ …）" },
+        "sfx": {
+          "oneOf": [
+            { "type": "string" },
+            { "type": "array", "items": { "type": "string" } }
+          ],
+          "description": "SFX pack 名或音效名列表（taiko / tape / candle …）"
+        },
+        "ambience": { "type": "string" },
+        "ducking": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "additionalProperties": true
+    },
+    "h3": {
+      "type": "object",
+      "properties": {
+        "style_prompt": { "type": "string", "description": "H3 / 图像生成用风格 prompt（英文）" },
+        "negative_prompt": { "type": "string" },
+        "motion": { "type": "string" },
+        "guidance": { "type": "number" }
+      },
+      "additionalProperties": true
+    },
+    "packaging": {
+      "type": "object",
+      "description": "字幕/人名条/章节卡等风格化包装参数（自由扩展）",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{1,60}$",
+      "description": "小写字母开头，仅含小写字母/数字/下划线；用户新建对象用 custom_ 前缀"
+    },
+    "hex": {
+      "type": "string",
+      "pattern": "^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$"
+    },
+    "colorOrList": {
+      "oneOf": [
+        { "$ref": "#/$defs/hex" },
+        { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/hex" } }
+      ]
+    }
+  }
+}

@@ -1,0 +1,152 @@
+{
+  "id": "shark_tank",
+  "label": "创投路演",
+  "version": 5,
+  "description": "V5 模板：创投路演（风格 blueprint_lab）",
+  "tags": [
+    "v5",
+    "blueprint_lab"
+  ],
+  "style": "blueprint_lab",
+  "target_duration": 38,
+  "aspect": [
+    16,
+    9
+  ],
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "name": "老周"
+    },
+    {
+      "role": "figure_a",
+      "character": "producer",
+      "name": "制片"
+    },
+    {
+      "role": "figure_b",
+      "character": "xueba",
+      "name": "学霸"
+    }
+  ],
+  "acts": [
+    {
+      "id": "act01",
+      "name": "第 1 幕",
+      "scene": "pitch_boardroom",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 2.8,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    },
+    {
+      "id": "act02",
+      "name": "第 2 幕",
+      "scene": "blueprint_wall",
+      "camera": "pan_right",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "host",
+      "text": "figure_a，你们的AI工具能做些什么？",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act03",
+      "name": "第 3 幕",
+      "scene": "whiteboard_lab",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "figure_a",
+      "text": "figure_b，它可以自动生成脚本，还能优化内容，提高效率！",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act04",
+      "name": "第 4 幕",
+      "scene": "prototype_lab",
+      "camera": "dolly",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "host",
+      "text": "哇，听起来很有前景，但市场这么竞争激烈，你们有什么特别的吗？",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act05",
+      "name": "第 5 幕",
+      "scene": "blueprint_wall",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "figure_b",
+      "text": "我们有独家算法，可以根据用户需求精准调整，效果杠杠的！",
+      "characters": [
+        "figure_b"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act06",
+      "name": "第 6 幕",
+      "scene": "whiteboard_lab",
+      "camera": "pan_right",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "host",
+      "text": "数据支持一下吗？",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act07",
+      "name": "第 7 幕",
+      "scene": "prototype_lab",
+      "camera": "dolly",
+      "camera_strength": 0.1,
+      "duration": 3.0,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    }
+  ],
+  "packaging": {
+    "subtitle": "blueprint_lab",
+    "transition": "blueprint_lab",
+    "title": "创投路演",
+    "end_card": "下期见"
+  },
+  "audio": {
+    "bgm": "electronic",
+    "sfx": [
+      "whoosh",
+      "click"
+    ]
+  },
+  "lipsync": {
+    "mode": "viseme"
+  },
+  "meta": {
+    "source": "v3_remap",
+    "script_lines": 5
+  }
+}

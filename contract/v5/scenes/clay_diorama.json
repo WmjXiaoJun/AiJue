@@ -1,0 +1,156 @@
+{
+  "id": "clay_diorama",
+  "label": "黏土微缩场景",
+  "description": "黏土定格微缩全景：一个圆角底座上的小世界（小屋、树、人物与篱笆），移轴与浅景深。",
+  "tags": [
+    "modern",
+    "slow_life",
+    "clay",
+    "diorama",
+    "miniature"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "seed": 20261064,
+  "layers": [
+    {
+      "type": "paper",
+      "layer": "background",
+      "color": "paper",
+      "mottle": 0.2
+    },
+    {
+      "type": "sky_gradient",
+      "layer": "background",
+      "top": "#F4E3C8",
+      "bottom": "#E8D2B0"
+    },
+    {
+      "type": "clay_objects",
+      "layer": "midground",
+      "kind": "plinth",
+      "count": 1,
+      "x": 0.5,
+      "y": 0.93,
+      "scale": 1.0,
+      "color": "clay",
+      "accent": "butter",
+      "seed": 3
+    },
+    {
+      "type": "clay_houses",
+      "layer": "midground",
+      "count": 2,
+      "y": 0.74,
+      "scale": 0.55,
+      "color": "clay",
+      "accent": "butter",
+      "seed": 5
+    },
+    {
+      "type": "clay_plants",
+      "layer": "midground",
+      "count": 4,
+      "y": 0.76,
+      "scale": 0.5,
+      "color": "sage",
+      "accent": "clay",
+      "seed": 2
+    },
+    {
+      "type": "clay_objects",
+      "layer": "midground",
+      "kind": "figures",
+      "count": 3,
+      "x": 0.5,
+      "y": 0.8,
+      "scale": 0.5,
+      "color": "clay",
+      "accent": "sage",
+      "seed": 11
+    },
+    {
+      "type": "clay_objects",
+      "layer": "midground",
+      "kind": "fence",
+      "count": 4,
+      "y": 0.8,
+      "color": "butter",
+      "accent": "clay",
+      "seed": 7
+    },
+    {
+      "type": "smoke",
+      "layer": "foreground",
+      "count": 2,
+      "opacity": 0.1
+    },
+    {
+      "type": "tilt_shift",
+      "layer": "foreground",
+      "focus_y": 0.76,
+      "strength": 0.7
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.182,
+      0.12,
+      0.456,
+      0.78
+    ],
+    "detail": [
+      0.34,
+      0.17,
+      0.32,
+      0.34
+    ],
+    "diorama": [
+      0.15,
+      0.12,
+      0.7,
+      0.52
+    ],
+    "host": [
+      0.35,
+      0.12,
+      0.3,
+      0.73
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.5,
+      0.82
+    ],
+    "guest_a": [
+      0.32,
+      0.82
+    ],
+    "guest_b": [
+      0.68,
+      0.82
+    ],
+    "figure_a": [
+      0.32,
+      0.82
+    ],
+    "figure_b": [
+      0.68,
+      0.82
+    ]
+  },
+  "variants": [
+    "cutaway",
+    "finished"
+  ],
+  "props": []
+}

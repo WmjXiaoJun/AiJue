@@ -1,0 +1,103 @@
+{
+  "id": "oil_salon",
+  "label": "文艺复兴油画圆桌",
+  "version": 1,
+  "description": "文艺复兴油画沙龙：厚涂笔触、明暗对照、金框与烛光，圆桌对谈像古典油画群像。",
+  "tags": [
+    "modern",
+    "roundtable",
+    "oil",
+    "renaissance",
+    "european"
+  ],
+  "technique": [
+    "oil_impasto"
+  ],
+  "palette": {
+    "bg": [
+      "#241808",
+      "#3B2814"
+    ],
+    "fg": [
+      "#EFE3CC",
+      "#D4C2A0"
+    ],
+    "accent": [
+      "#B08A3E",
+      "#D4AF5A"
+    ],
+    "paper": "#EFE3CC",
+    "shadow": "#120C06",
+    "highlight": "#FFF3D6",
+    "wine": "#6E1F1F",
+    "umber": "#4A3421",
+    "candle": "#E8B96A"
+  },
+  "texture": [
+    "canvas",
+    "oil_strokes",
+    "film_grain"
+  ],
+  "line": {
+    "style": "brush_edge",
+    "width": 3.2,
+    "color": "#2B1D12",
+    "jitter": 0.35,
+    "opacity": 0.7
+  },
+  "character_treatment": "oil",
+  "typography": {
+    "title_font": "gold_plaque",
+    "subtitle": "serif",
+    "lower_third": "gilded_plate",
+    "fallback_font": "DengXian",
+    "text_color": "#EFE3CC",
+    "seal_color": "#B08A3E",
+    "vertical": false,
+    "letter_spacing": 0.04
+  },
+  "transition": "gold_cut",
+  "audio": {
+    "bgm": "cello_salon",
+    "sfx": [
+      "candle_snuff",
+      "quill",
+      "wine_glass"
+    ],
+    "ambience": "chamber",
+    "ducking": 0.4
+  },
+  "h3": {
+    "style_prompt": "renaissance oil painting, chiaroscuro lighting, thick impasto brushstrokes, warm candlelight, deep umber shadows, ivory skin and antique gold, gilded frame, scholarly round table salon, museum oil canvas texture, no text",
+    "negative_prompt": "digital art, flat colors, anime, neon, watermark"
+  },
+  "finish": {
+    "brightness": 1.1,
+    "contrast": 1.05,
+    "saturation": 1.06,
+    "temperature": 0.12,
+    "vignette": 0.18,
+    "grain": 0.04,
+    "canvas": 0.06,
+    "emboss": 0.1,
+    "brush_strokes": 0.16,
+    "crackle": 0.06,
+    "gold_foil": 0.2,
+    "bloom": 0.12
+  },
+  "grade": {
+    "eq": "contrast=1.08:saturation=1.04:brightness=-0.02",
+    "colorbalance": "rs=0.05:gs=0.02:bs=-0.04",
+    "extra": ""
+  },
+  "packaging": {
+    "tag": "油画圆桌",
+    "tag_color": "#D4AF5A",
+    "bars": "gold_frame",
+    "frame": "gold",
+    "seal": "艺",
+    "seal_color": "#B08A3E",
+    "brand": "造片局 · 油画沙龙",
+    "watermark": true
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "id": "laozhou",
+  "label": "老周",
+  "era": "modern",
+  "persona": "造片局主持人，老练毒舌、控场一流；爱用冷幽默拆穿嘉宾的场面话。",
+  "role_pool": [
+    "host",
+    "narrator"
+  ],
+  "voice": {
+    "provider": "breeze",
+    "instruction": "42岁男性，成熟磁性，略带鼻音，半开玩笑的调侃语气，节奏稳",
+    "seed": 20262013,
+    "cfg_scale": 4.0
+  },
+  "appearance": {
+    "gender": "male",
+    "age": 42,
+    "skin": "#F2D6C3",
+    "hair": "#2B2B33",
+    "hair_style": "short_swept",
+    "eye": "#2B2B33",
+    "brow": "thick",
+    "beard": "stubble",
+    "outfit": {
+      "type": "suit",
+      "main": "#2F3A4F",
+      "accent": "#F5C518",
+      "hat": "none"
+    },
+    "accessories": [
+      "watch",
+      "mic"
+    ],
+    "head_ratio": 1.15,
+    "chibi": 0.25,
+    "eye_style": "sharp",
+    "face_ratio": 1.0,
+    "marks": [
+      "smile_lines"
+    ]
+  },
+  "poses": [
+    "front",
+    "side",
+    "point",
+    "think"
+  ],
+  "mouth": [
+    "closed",
+    "a",
+    "o",
+    "e",
+    "i",
+    "u",
+    "m"
+  ],
+  "style_overrides": {
+    "neon_toon": {
+      "line": 1.3
+    },
+    "film_interview": {
+      "line": 1.1
+    },
+    "noir_rain": {
+      "line": 1.2
+    },
+    "blueprint_lab": {
+      "line": 0.9
+    },
+    "candy_collage": {
+      "line": 1.2
+    }
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "id": "blueprint_lab",
+  "label": "科技蓝图",
+  "version": 1,
+  "description": "科技蓝图：深蓝图纸网格、白色工程线稿、橙色标注与数据可视化；线稿角色 + 参数弹窗包装。",
+  "tags": [
+    "modern",
+    "tech",
+    "blueprint",
+    "startup",
+    "diagram"
+  ],
+  "technique": [
+    "blueprint"
+  ],
+  "palette": {
+    "bg": [
+      "#0a2a4a",
+      "#123f66"
+    ],
+    "fg": [
+      "#e8f4ff",
+      "#a8cbe6"
+    ],
+    "accent": [
+      "#ff8c1a",
+      "#4fd1c5"
+    ],
+    "paper": "#0d3355",
+    "shadow": "#061c30",
+    "highlight": "#8fd3ff",
+    "grid": "#1d5a8c",
+    "paper_white": "#f4f8fb"
+  },
+  "texture": [
+    "grid",
+    "blueprint_lines",
+    "scanline_soft"
+  ],
+  "line": {
+    "style": "fine",
+    "width": 1.5,
+    "color": "#a8cbe6",
+    "jitter": 0.0,
+    "opacity": 0.85
+  },
+  "character_treatment": "blueprint",
+  "typography": {
+    "title_font": "mono_bold",
+    "subtitle": "data_caption",
+    "lower_third": "data_plate",
+    "text_color": "#e8f4ff",
+    "seal_color": "#ff8c1a",
+    "vertical": false,
+    "letter_spacing": 1.2
+  },
+  "transition": "blueprint_wipe",
+  "finish": {
+    "brightness": 1.0,
+    "contrast": 1.22,
+    "saturation": 1.18,
+    "temperature": -0.06,
+    "vignette": 0.2,
+    "grain": 0.02,
+    "scanlines": 0.02,
+    "chroma_shift": 0.0,
+    "bloom": 0.05,
+    "paper": 0.0,
+    "hatch": 0.1,
+    "edge_ink": 0.0,
+    "gold_foil": 0.0,
+    "silk_sheen": 0.0
+  },
+  "grade": {
+    "eq": "contrast=1.20:saturation=1.12:brightness=0.0",
+    "colorbalance": "bs=0.08:rs=-0.02",
+    "extra": ""
+  },
+  "audio": {
+    "bgm": "electronic_beat",
+    "sfx": [
+      "ui_click",
+      "data_woosh",
+      "marker_squeak"
+    ],
+    "ambience": "lab_hum",
+    "ducking": 0.55
+  },
+  "h3": {
+    "style_prompt": "engineering blueprint style boardroom, cyan blueprint line art on deep blue paper, white technical annotations, orange highlight markers, isometric diagrams, clean vector linework",
+    "negative_prompt": "photorealistic, painterly, warm colors, text artifacts",
+    "motion": "crisp push-in with diagram draw-on",
+    "guidance": 4.0
+  },
+  "packaging": {
+    "tag": "R&D LAB",
+    "tag_color": "#FF8C1A",
+    "bars": "thin",
+    "seal": "R&D",
+    "accent_bar": true,
+    "annotations": true,
+    "corner_marks": true,
+    "data_mono": true,
+    "subtitle_bg": "#061c30CC",
+    "accent_bar_color": "#ff8c1a",
+    "chapter_style": "spec_sheet",
+    "seal_color": "#FF8C1A"
+  }
+}

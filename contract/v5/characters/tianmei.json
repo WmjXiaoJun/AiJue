@@ -1,0 +1,76 @@
+{
+  "id": "tianmei",
+  "label": "甜妹",
+  "era": "modern",
+  "persona": "元气甜妹，情绪价值拉满；开心就直说，难过也直说，从不内耗。",
+  "role_pool": [
+    "guest_a",
+    "guest_b",
+    "host"
+  ],
+  "voice": {
+    "provider": "breeze",
+    "instruction": "20岁女性，甜美清亮，尾音上扬，笑意明显，语速轻快",
+    "seed": 20262016,
+    "cfg_scale": 4.4
+  },
+  "appearance": {
+    "gender": "female",
+    "age": 20,
+    "skin": "#FDE3D0",
+    "hair": "#C77B9E",
+    "hair_style": "twin_bun",
+    "eye": "#7A4FD0",
+    "brow": "soft",
+    "beard": "none",
+    "outfit": {
+      "type": "dress",
+      "main": "#FFB7C5",
+      "accent": "#FFF3F6",
+      "hat": "none"
+    },
+    "accessories": [
+      "hairclip",
+      "phone"
+    ],
+    "head_ratio": 1.18,
+    "chibi": 0.32,
+    "eye_style": "big",
+    "face_ratio": 1.0,
+    "marks": [
+      "freckles"
+    ]
+  },
+  "poses": [
+    "front",
+    "side",
+    "point",
+    "think"
+  ],
+  "mouth": [
+    "closed",
+    "a",
+    "o",
+    "e",
+    "i",
+    "u",
+    "m"
+  ],
+  "style_overrides": {
+    "neon_toon": {
+      "line": 1.3
+    },
+    "film_interview": {
+      "line": 1.1
+    },
+    "noir_rain": {
+      "line": 1.2
+    },
+    "blueprint_lab": {
+      "line": 0.9
+    },
+    "candy_collage": {
+      "line": 1.2
+    }
+  }
+}

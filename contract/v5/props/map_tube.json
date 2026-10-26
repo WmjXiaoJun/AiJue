@@ -1,0 +1,42 @@
+{
+  "id": "map_tube",
+  "label": "地图筒",
+  "kind": "map_tube",
+  "description": "装地图/诏令的皮筒",
+  "tags": [
+    "history",
+    "map",
+    "prop"
+  ],
+  "appearance": {
+    "shape": "tube",
+    "main": "#a8792b",
+    "accent": "#6b5334",
+    "material": "leather",
+    "size": [
+      0.14,
+      0.06
+    ]
+  },
+  "style": {
+    "default": {
+      "line": 1.0
+    },
+    "ink_chronicle": {
+      "line": 1.3,
+      "tint": "#1c1a16"
+    },
+    "woodblock_classic": {
+      "line": 1.5,
+      "tint": "#2b2b2b"
+    },
+    "parchment_case": {
+      "line": 1.1,
+      "tint": "#5a4a3a"
+    },
+    "museum_gold": {
+      "gold": 0.5,
+      "line": 0.9
+    }
+  }
+}

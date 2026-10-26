@@ -1,0 +1,205 @@
+{
+  "id": "war_council",
+  "label": "军议帐",
+  "description": "军帐：帐门 + 军旗 + 长矛 + 沙盘 + 案图 + 火把 + 烛光",
+  "tags": [
+    "history",
+    "ink",
+    "war"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "layers": [
+    {
+      "type": "canvas",
+      "layer": "background",
+      "color": "paper",
+      "thread": 6,
+      "crease": 0.35
+    },
+    {
+      "type": "screens",
+      "layer": "midground",
+      "x": 0.04,
+      "y": 0.05,
+      "w": 0.92,
+      "h": 0.32,
+      "panels": 4,
+      "style": "painted",
+      "color": "wood"
+    },
+    {
+      "type": "banners",
+      "layer": "midground",
+      "count": 4,
+      "x0": 0.08,
+      "x1": 0.92,
+      "y": 0.01,
+      "width": 0.05,
+      "height": 0.24,
+      "color": "accent",
+      "kind": "war",
+      "text": "军"
+    },
+    {
+      "type": "spears",
+      "layer": "midground",
+      "count": 22,
+      "y": 0.82,
+      "length": 0.26,
+      "color": "ink"
+    },
+    {
+      "type": "sand_table",
+      "layer": "midground",
+      "x": 0.12,
+      "y": 0.42,
+      "w": 0.76,
+      "h": 0.3,
+      "color": "shadow",
+      "hills": 24,
+      "flags": 8,
+      "variants": {
+        "night_raid": {
+          "flags": 10
+        },
+        "parley": {
+          "flags": 3,
+          "hills": 14
+        }
+      }
+    },
+    {
+      "type": "desk",
+      "layer": "midground",
+      "x": 0.08,
+      "y": 0.68,
+      "w": 0.84,
+      "h": 0.32,
+      "color": "wood",
+      "items": [
+        {
+          "type": "map",
+          "x": 0.4,
+          "y": 0.48
+        },
+        {
+          "type": "cup",
+          "x": 0.74,
+          "y": 0.34
+        },
+        {
+          "type": "seal",
+          "x": 0.58,
+          "y": 0.7
+        },
+        {
+          "type": "scroll",
+          "x": 0.86,
+          "y": 0.5
+        }
+      ]
+    },
+    {
+      "type": "torches",
+      "layer": "midground",
+      "count": 4,
+      "y": 0.36,
+      "x0": 0.06,
+      "x1": 0.94,
+      "size": 0.05,
+      "variants": {
+        "night_raid": {
+          "count": 5
+        },
+        "parley": {
+          "count": 2
+        }
+      }
+    },
+    {
+      "type": "smoke",
+      "layer": "foreground",
+      "count": 3,
+      "color": "shadow",
+      "y": 0.56,
+      "rise": 0.28,
+      "spread": 0.12,
+      "alpha": 80,
+      "variants": {
+        "night_raid": {
+          "alpha": 105,
+          "count": 4
+        },
+        "parley": {
+          "alpha": 50
+        }
+      }
+    },
+    {
+      "type": "candle_glow",
+      "layer": "midground",
+      "count": 3,
+      "y": 0.58,
+      "x0": 0.22,
+      "x1": 0.78,
+      "size": 0.045
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.28
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0,
+      0,
+      1,
+      1
+    ],
+    "table_top": [
+      0.18,
+      0.34,
+      0.64,
+      0.54
+    ],
+    "host_ots": [
+      0.02,
+      0.1,
+      0.46,
+      0.82
+    ],
+    "map_close": [
+      0.28,
+      0.4,
+      0.44,
+      0.36
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.2,
+      0.94
+    ],
+    "figure_a": [
+      0.78,
+      0.94
+    ],
+    "figure_b": [
+      0.52,
+      0.95
+    ]
+  },
+  "variants": [
+    "night_raid",
+    "parley"
+  ],
+  "depth": {
+    "background": 0.02,
+    "midground": 0.12,
+    "foreground": 0.3
+  }
+}

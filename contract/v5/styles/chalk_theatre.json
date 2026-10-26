@@ -1,0 +1,101 @@
+{
+  "id": "chalk_theatre",
+  "label": "粉笔素描剧场",
+  "version": 1,
+  "description": "粉笔素描剧场：绿黑板、白粉笔手绘线、红幕与粉笔灰，像在剧场黑板上现场画出来的小品。",
+  "tags": [
+    "modern",
+    "sketch",
+    "chalk",
+    "theatre",
+    "handdrawn"
+  ],
+  "technique": [
+    "chalk_sketch"
+  ],
+  "palette": {
+    "bg": [
+      "#22372C",
+      "#2E4A3A"
+    ],
+    "fg": [
+      "#F2F0E6",
+      "#D8D4C6"
+    ],
+    "accent": [
+      "#A32638",
+      "#E8C55A",
+      "#7FA6C9"
+    ],
+    "paper": "#2E4A3A",
+    "shadow": "#101913",
+    "highlight": "#FFFFFF",
+    "chalk": "#F2F0E6",
+    "curtain": "#A32638",
+    "board": "#22372C"
+  },
+  "texture": [
+    "chalk_dust",
+    "grid",
+    "paper_grain"
+  ],
+  "line": {
+    "style": "sketch",
+    "width": 2.2,
+    "color": "#F2F0E6",
+    "jitter": 0.4,
+    "opacity": 0.9
+  },
+  "character_treatment": "chalk",
+  "typography": {
+    "title_font": "variety_chalk",
+    "subtitle": "handwritten",
+    "lower_third": "chalk_board",
+    "fallback_font": "DengXian",
+    "text_color": "#F2F0E6",
+    "seal_color": "#A32638",
+    "vertical": false,
+    "letter_spacing": 0.05
+  },
+  "transition": "chalk_wipe",
+  "audio": {
+    "bgm": "live_drum",
+    "sfx": [
+      "chalk_tap",
+      "applause",
+      "curtain"
+    ],
+    "ambience": "theatre_backstage",
+    "ducking": 0.4
+  },
+  "h3": {
+    "style_prompt": "hand-drawn chalk sketch on a dark green blackboard, white chalk lines with dust smudges and cross-hatching, red curtain accents, theatre stage sketch, expressive hand lettering, rough sketchbook energy, no text",
+    "negative_prompt": "photo, realistic render, neon, glossy, watermark"
+  },
+  "finish": {
+    "brightness": 1.02,
+    "contrast": 1.12,
+    "saturation": 0.52,
+    "temperature": -0.03,
+    "vignette": 0.24,
+    "grain": 0.05,
+    "chalk_dust": 0.3,
+    "edge_ink": 0.16,
+    "hatch": 0.18
+  },
+  "grade": {
+    "eq": "contrast=1.04:saturation=0.88:brightness=0.0",
+    "colorbalance": "rs=-0.02:gs=0.02:bs=0.01",
+    "extra": ""
+  },
+  "packaging": {
+    "tag": "素描剧场",
+    "tag_color": "#F2F0E6",
+    "bars": "none",
+    "frame": "thin",
+    "seal": "演",
+    "seal_color": "#A32638",
+    "brand": "造片局 · 粉笔剧场",
+    "watermark": true
+  }
+}

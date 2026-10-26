@@ -1,0 +1,113 @@
+{
+  "id": "brick_wall",
+  "label": "砖墙霓虹",
+  "description": "80s 砖墙霓虹机位：粗糙砖纹、挂灯与霓虹字，适合脱口秀开场、吐嘈与单人独白。",
+  "tags": [
+    "modern",
+    "vhs",
+    "brick",
+    "neon",
+    "monologue"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "size": [
+    1600,
+    900
+  ],
+  "seed": 5521,
+  "layers": [
+    {
+      "type": "canvas",
+      "layer": "background",
+      "color": "shadow"
+    },
+    {
+      "type": "brick_wall",
+      "layer": "background",
+      "color": "brick",
+      "opacity": 1.0
+    },
+    {
+      "type": "neon_signs",
+      "layer": "midground",
+      "color": "accent",
+      "density": 0.55,
+      "seed": 5522
+    },
+    {
+      "type": "neon_tube",
+      "layer": "midground",
+      "color": "accent:0",
+      "x": 0.5,
+      "y": 0.2,
+      "length": 0.5
+    },
+    {
+      "type": "spotlights",
+      "layer": "midground",
+      "color": "accent:2",
+      "count": 1,
+      "opacity": 0.3
+    },
+    {
+      "type": "stage_floor",
+      "layer": "midground",
+      "color": "tape",
+      "horizon": 0.82
+    },
+    {
+      "type": "scanline",
+      "layer": "foreground",
+      "color": "shadow",
+      "opacity": 0.2
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.32
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.362,
+      0.19,
+      0.476,
+      0.78
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.5,
+      0.94
+    ],
+    "guest_a": [
+      0.7,
+      0.94
+    ],
+    "guest_b": [
+      0.68,
+      0.94
+    ],
+    "figure_a": [
+      0.7,
+      0.94
+    ],
+    "figure_b": [
+      0.68,
+      0.94
+    ]
+  },
+  "variants": [
+    "warm_lamp",
+    "neon_pink"
+  ]
+}

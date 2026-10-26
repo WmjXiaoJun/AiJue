@@ -1,0 +1,47 @@
+{
+  "id": "confetti",
+  "label": "彩带",
+  "kind": "confetti",
+  "description": "飘落的彩带与纸屑",
+  "tags": [
+    "modern",
+    "game",
+    "prop"
+  ],
+  "appearance": {
+    "shape": "confetti",
+    "main": "#ff5c9e",
+    "accent": "#ffd84d",
+    "material": "paper",
+    "size": [
+      0.3,
+      0.3
+    ]
+  },
+  "style": {
+    "default": {
+      "line": 1.0
+    },
+    "neon_toon": {
+      "line": 1.2,
+      "glow": 0.6
+    },
+    "noir_rain": {
+      "line": 1.1,
+      "tint": "#8a8a8a"
+    },
+    "oil_salon": {
+      "line": 1.3,
+      "tint": "#b08a3e"
+    },
+    "hologram_stage": {
+      "glow": 0.5
+    },
+    "film_interview": {
+      "tint": "#d9a56a"
+    },
+    "vhs_late_show": {
+      "glow": 0.25
+    }
+  }
+}

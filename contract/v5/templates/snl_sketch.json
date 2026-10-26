@@ -1,0 +1,166 @@
+{
+  "id": "snl_sketch",
+  "label": "周六夜现场",
+  "version": 5,
+  "description": "V5 模板：周六夜现场（风格 chalk_theatre）",
+  "tags": [
+    "v5",
+    "chalk_theatre"
+  ],
+  "style": "chalk_theatre",
+  "target_duration": 38,
+  "aspect": [
+    16,
+    9
+  ],
+  "cast": [
+    {
+      "role": "host",
+      "character": "dawei",
+      "name": "大魏"
+    },
+    {
+      "role": "figure_a",
+      "character": "laozhou",
+      "name": "老周"
+    },
+    {
+      "role": "figure_b",
+      "character": "ali",
+      "name": "阿栗"
+    }
+  ],
+  "acts": [
+    {
+      "id": "act01",
+      "name": "第 1 幕",
+      "scene": "chalk_stage",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 2.8,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    },
+    {
+      "id": "act02",
+      "name": "第 2 幕",
+      "scene": "sketch_backdrop",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "host",
+      "text": "老周，你这回又摸鱼摸到了哪一步？",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act03",
+      "name": "第 3 幕",
+      "scene": "costume_room_chalk",
+      "camera": "pan_right",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "figure_a",
+      "text": "figure_a：阿栗，咱俩不是商量好了嘛，每天半小时，偷偷摸摸。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act04",
+      "name": "第 4 幕",
+      "scene": "audience_sketch",
+      "camera": "handheld",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "host",
+      "text": "结果现在呢，监控里清清楚楚地看见你玩得不亦乐乎。",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act05",
+      "name": "第 5 幕",
+      "scene": "sketch_backdrop",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "figure_a",
+      "text": "figure_a：那咱俩不是一起进黑锅嘛，咱俩得顶着。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act06",
+      "name": "第 6 幕",
+      "scene": "costume_room_chalk",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "host",
+      "text": "阿栗，你咋不说话？",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act07",
+      "name": "第 7 幕",
+      "scene": "audience_sketch",
+      "camera": "pan_right",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "figure_b",
+      "text": "figure_b：我也就稍微刷刷朋友圈，老周你这把戏也太拙劣了吧。",
+      "characters": [
+        "figure_b"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act08",
+      "name": "第 8 幕",
+      "scene": "audience_sketch",
+      "camera": "handheld",
+      "camera_strength": 0.06,
+      "duration": 3.0,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    }
+  ],
+  "packaging": {
+    "subtitle": "chalk_theatre",
+    "transition": "chalk_theatre",
+    "title": "周六夜现场",
+    "end_card": "下期见"
+  },
+  "audio": {
+    "bgm": "live_drums",
+    "sfx": [
+      "whoosh",
+      "click"
+    ]
+  },
+  "lipsync": {
+    "mode": "viseme"
+  },
+  "meta": {
+    "source": "v3_remap",
+    "script_lines": 6
+  }
+}

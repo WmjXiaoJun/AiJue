@@ -1,0 +1,43 @@
+{
+  "id": "sandbox",
+  "label": "沙盘",
+  "kind": "sandbox",
+  "description": "军议用沙盘，插小旗与地形",
+  "tags": [
+    "history",
+    "war",
+    "map",
+    "prop"
+  ],
+  "appearance": {
+    "shape": "sandbox",
+    "main": "#c9b48a",
+    "accent": "#6b5334",
+    "material": "sand",
+    "size": [
+      0.26,
+      0.12
+    ]
+  },
+  "style": {
+    "default": {
+      "line": 1.0
+    },
+    "ink_chronicle": {
+      "line": 1.3,
+      "tint": "#1c1a16"
+    },
+    "woodblock_classic": {
+      "line": 1.5,
+      "tint": "#2b2b2b"
+    },
+    "parchment_case": {
+      "line": 1.1,
+      "tint": "#5a4a3a"
+    },
+    "museum_gold": {
+      "gold": 0.5,
+      "line": 0.9
+    }
+  }
+}

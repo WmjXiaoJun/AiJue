@@ -1,0 +1,150 @@
+{
+  "id": "display_case",
+  "label": "展柜特写",
+  "description": "文物展柜特写：大理石 + 地面网格 + 双聚光 + 玻璃展柜 + 金色铭牌",
+  "tags": [
+    "history",
+    "museum",
+    "artifact"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "layers": [
+    {
+      "type": "marble",
+      "layer": "background",
+      "color": "bg",
+      "veins": 6,
+      "sheen": 0.24,
+      "sheen_x": 0.42
+    },
+    {
+      "type": "grid",
+      "layer": "midground",
+      "perspective": 1,
+      "y_horizon": 0.52,
+      "vanish_x": 0.5,
+      "spacing": 0.07,
+      "alpha": 60,
+      "fade": 0.5
+    },
+    {
+      "type": "spotlights",
+      "layer": "foreground",
+      "count": 2,
+      "x0": 0.34,
+      "x1": 0.66,
+      "strength": 0.6,
+      "y_target": 0.84,
+      "spread": 0.16,
+      "color": "highlight",
+      "variants": {
+        "artifact": {
+          "strength": 0.68
+        },
+        "label_focus": {
+          "spread": 0.12,
+          "strength": 0.54
+        }
+      }
+    },
+    {
+      "type": "glass_case",
+      "layer": "midground",
+      "x": 0.3,
+      "y": 0.24,
+      "w": 0.4,
+      "h": 0.6,
+      "kind": "ding",
+      "label": "馆藏 001",
+      "artifact": {
+        "kind": "ding",
+        "w": 0.5,
+        "h": 0.42
+      },
+      "color": "metal",
+      "variants": {
+        "artifact": {
+          "label": "馆藏 001 · 青铜鼎"
+        },
+        "label_focus": {
+          "kind": "jade",
+          "label": "馆藏 002 · 玉璧",
+          "artifact": {
+            "kind": "jade",
+            "w": 0.46,
+            "h": 0.46
+          }
+        }
+      }
+    },
+    {
+      "type": "particles",
+      "layer": "foreground",
+      "count": 44,
+      "color": "highlight",
+      "size": 0.0016
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.34
+    },
+    {
+      "type": "grain",
+      "layer": "foreground",
+      "strength": 0.05
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0,
+      0,
+      1,
+      1
+    ],
+    "case_close": [
+      0.26,
+      0.16,
+      0.48,
+      0.7
+    ],
+    "label": [
+      0.3,
+      0.62,
+      0.4,
+      0.26
+    ],
+    "floor": [
+      0.1,
+      0.62,
+      0.8,
+      0.34
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.16,
+      0.98
+    ],
+    "figure_a": [
+      0.84,
+      0.98
+    ],
+    "figure_b": [
+      0.52,
+      0.99
+    ]
+  },
+  "variants": [
+    "artifact",
+    "label_focus"
+  ],
+  "depth": {
+    "background": 0.02,
+    "midground": 0.14,
+    "foreground": 0.32
+  }
+}

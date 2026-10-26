@@ -91,8 +91,29 @@ def clean_text(text: str) -> str:
     return t
 
 
-def voice_for(role: str) -> dict:
-    return VOICES.get(str(role or ""), VOICES[DEFAULT_VOICE])
+def voice_for(role: str, overrides: dict | None = None) -> dict:
+    voice = dict(VOICES.get(str(role or ""), VOICES[DEFAULT_VOICE]))
+    if isinstance(overrides, dict):
+        voice.update({k: v for k, v in overrides.items() if v is not None})
+    return voice
+
+
+def voice_spec_from_character(char: dict) -> dict:
+    """V5 角色定义 -> Breeze Voice Design 参数（instruction/seed/cfg_scale）。"""
+    voice = (char or {}).get("voice") if isinstance(char, dict) else None
+    if not isinstance(voice, dict):
+        return {}
+    spec: dict = {}
+    instruction = str(voice.get("instruction") or "").strip()
+    if instruction:
+        spec["instruction"] = instruction
+    if voice.get("seed") is not None:
+        spec["seed"] = int(voice["seed"])
+    if voice.get("cfg_scale") is not None:
+        spec["cfg_scale"] = float(voice["cfg_scale"])
+    if voice.get("label"):
+        spec["label"] = str(voice["label"])
+    return spec
 
 
 # ---------------------------------------------------------------------------
@@ -244,12 +265,13 @@ def _to_mix_wav(src: Path, dst: Path, duration: float | None = None) -> dict:
 
 def synthesize_batch(texts: list[str], role: str, *, out_dir: Path,
                      base: str | None = None, timeout: float = 900.0,
-                     cfg_scale: float | None = None, seed: int | None = None) -> list[dict]:
+                     cfg_scale: float | None = None, seed: int | None = None,
+                     voice_spec: dict | None = None) -> list[dict]:
     """单角色批量合成：返回 [{index, path(24k mono wav), duration, text}]。"""
     base = (base or DEFAULT_BASE).rstrip("/")
     if not texts:
         return []
-    voice = voice_for(role)
+    voice = voice_for(role, voice_spec)
     if not server_alive(base):
         raise BreezeTTSUnavailable(f"Breeze TTS 服务不可用: {base}（先 ensure_server/start_server）")
     results: list[dict] = []
@@ -265,12 +287,28 @@ def synthesize_batch(texts: list[str], role: str, *, out_dir: Path,
         if voice.get("instruction"):
             data["instruction"] = voice["instruction"]
         t0 = time.time()
-        try:
-            resp = httpx.post(f"{base}/v1/audio/speech/batch", data=data,
-                              timeout=httpx.Timeout(timeout, connect=10.0))
-            resp.raise_for_status()
-        except Exception as exc:  # noqa: BLE001
-            raise BreezeTTSUnavailable(f"Breeze TTS batch 请求失败: {exc}") from exc
+        resp = None
+        last_exc = None
+        for attempt in range(1, 13):
+            try:
+                resp = httpx.post(f"{base}/v1/audio/speech/batch", data=data,
+                                  timeout=httpx.Timeout(timeout, connect=10.0))
+                if resp.status_code == 409:
+                    # 单推理槽忙：等待后重试（最多约 60s）
+                    wait = min(8.0, 1.5 * attempt)
+                    LOG.info("Breeze 服务忙(409)，%.1fs 后重试（第 %d 次）", wait, attempt)
+                    time.sleep(wait)
+                    continue
+                resp.raise_for_status()
+                break
+            except Exception as exc:  # noqa: BLE001
+                last_exc = exc
+                raise BreezeTTSUnavailable(f"Breeze TTS batch 请求失败: {exc}") from exc
+        if resp is None:
+            raise BreezeTTSUnavailable(f"Breeze TTS batch 始终 409（服务忙）: {base}")
+        if resp.status_code != 200:
+            raise BreezeTTSUnavailable(
+                f"Breeze TTS batch HTTP {resp.status_code}: {resp.text[:300]}")
         sr = int(resp.headers.get("X-Sample-Rate") or SAMPLE_RATE)
         seg_bytes = [int(x) for x in str(resp.headers.get("X-Segment-Bytes") or "").split(",")
                      if x.strip()]
@@ -315,7 +353,8 @@ def synthesize_batch(texts: list[str], role: str, *, out_dir: Path,
 
 def synthesize(role_texts: dict[str, list[str]], out_dir: Path, *,
                base: str | None = None, timeout: float = 900.0,
-               auto_start: bool = True) -> list[dict]:
+               auto_start: bool = True,
+               voices: dict[str, dict] | None = None) -> list[dict]:
     """多角色合成：{role: [texts]} → 扁平结果列表（保持 role 内顺序）。"""
     base = (base or DEFAULT_BASE).rstrip("/")
     if not server_alive(base):
@@ -330,7 +369,8 @@ def synthesize(role_texts: dict[str, list[str]], out_dir: Path, *,
         if not cleaned:
             continue
         results.extend(synthesize_batch(cleaned, role, out_dir=out_dir, base=base,
-                                        timeout=timeout))
+                                        timeout=timeout,
+                                        voice_spec=(voices or {}).get(role)))
     return results
 
 

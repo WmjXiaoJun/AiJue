@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://zaopianju.local/contract/v5/schema/scene.schema.json",
+  "title": "V5 scene（分层绘景场景）",
+  "description": "场景 = 可分层绘制的指令（layers[]，primitive 由 pipeline/scene_render.py 注册）+ 机位窗 + 角色脚底锚点 + 变体。",
+  "type": "object",
+  "required": ["id", "layers"],
+  "properties": {
+    "id": { "$ref": "#/$defs/id" },
+    "label": { "type": "string", "minLength": 1 },
+    "description": { "type": "string" },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "aspect": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": { "type": "integer", "minimum": 1 },
+      "description": "画面比例，如 [16, 9]"
+    },
+    "size": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": { "type": "integer", "minimum": 64 },
+      "description": "内部渲染分辨率，如 [1600, 900]（可选，默认 1600x900）"
+    },
+    "seed": { "type": "integer", "description": "默认随机种子" },
+    "layers": {
+      "type": "array",
+      "minItems": 1,
+      "description": "绘制指令；type 必须是 scene_render 注册的 primitive（paper/mountains/route_arrows/…）；color 可写 #RRGGBB 或 palette token（如 accent:1 / shadow / glass）",
+      "items": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+          "layer": { "type": "string", "enum": ["background", "midground", "foreground"] },
+          "seed": { "type": "integer" },
+          "color": { "$ref": "#/$defs/colorRef" },
+          "palette": { "type": "string" },
+          "opacity": { "type": "number", "minimum": 0, "maximum": 1 },
+          "blend": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "camera_zones": {
+      "type": "object",
+      "minProperties": 1,
+      "description": "机位/取景窗：zone 名 → [x, y, w, h]（归一化）",
+      "additionalProperties": { "$ref": "#/$defs/window" }
+    },
+    "anchors": {
+      "type": "object",
+      "description": "角色脚底锚点：role 或 character id → [x, y]（归一化）",
+      "additionalProperties": { "$ref": "#/$defs/pair01" }
+    },
+    "variants": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "同名场景变体标签（如 campaign / treaty）"
+    },
+    "props": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/id" },
+      "description": "本场景引用的道具 id（contract/v5/props/）"
+    },
+    "background_image": {
+      "type": "string",
+      "description": "可选：直接使用一张背景图（相对仓库根或 contract/v5/）"
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{1,60}$"
+    },
+    "hex": {
+      "type": "string",
+      "pattern": "^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$"
+    },
+    "colorRef": {
+      "description": "#RRGGBB 颜色，或风格 palette token（如 shadow / highlight / glass / accent:1 / bg:1）",
+      "oneOf": [
+        { "$ref": "#/$defs/hex" },
+        { "type": "string", "pattern": "^[a-z][a-z0-9_]*(?::[0-9]+)?$" }
+      ]
+    },
+    "pair01": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": { "type": "number", "minimum": 0, "maximum": 1 }
+    },
+    "window": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": { "type": "number", "minimum": 0, "maximum": 1 }
+    }
+  }
+}

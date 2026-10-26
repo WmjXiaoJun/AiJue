@@ -1,0 +1,48 @@
+{
+  "id": "mic_stand",
+  "label": "立式麦",
+  "kind": "stand",
+  "description": "立式麦克风架",
+  "tags": [
+    "modern",
+    "stage",
+    "audio",
+    "prop"
+  ],
+  "appearance": {
+    "shape": "stand",
+    "main": "#1f2a3a",
+    "accent": "#a8a8b0",
+    "material": "metal",
+    "size": [
+      0.05,
+      0.34
+    ]
+  },
+  "style": {
+    "default": {
+      "line": 1.0
+    },
+    "neon_toon": {
+      "line": 1.2,
+      "glow": 0.6
+    },
+    "noir_rain": {
+      "line": 1.1,
+      "tint": "#8a8a8a"
+    },
+    "oil_salon": {
+      "line": 1.3,
+      "tint": "#b08a3e"
+    },
+    "hologram_stage": {
+      "glow": 0.5
+    },
+    "film_interview": {
+      "tint": "#d9a56a"
+    },
+    "vhs_late_show": {
+      "glow": 0.25
+    }
+  }
+}

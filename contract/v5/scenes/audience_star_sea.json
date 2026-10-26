@@ -1,0 +1,106 @@
+{
+  "id": "audience_star_sea",
+  "label": "观众星海",
+  "description": "观众星海：台下灯海与手机星光、舞台前沿逆光剪影，用于情绪反应与全场大合唱镜头。",
+  "tags": [
+    "modern",
+    "hologram",
+    "audience",
+    "concert",
+    "reaction"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "size": [
+    1600,
+    900
+  ],
+  "seed": 5431,
+  "layers": [
+    {
+      "type": "sky_gradient",
+      "layer": "background",
+      "top": "bg:0",
+      "bottom": "shadow"
+    },
+    {
+      "type": "audience_sea",
+      "layer": "background",
+      "color": "accent:1",
+      "density": 0.8,
+      "opacity": 0.85
+    },
+    {
+      "type": "spotlights",
+      "layer": "midground",
+      "color": "accent:0",
+      "count": 3,
+      "opacity": 0.4
+    },
+    {
+      "type": "particles",
+      "layer": "midground",
+      "color": "highlight",
+      "density": 0.6,
+      "opacity": 0.55
+    },
+    {
+      "type": "stage_floor",
+      "layer": "foreground",
+      "color": "shadow",
+      "horizon": 0.9,
+      "opacity": 0.7
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.3
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.082,
+      0.05,
+      0.896,
+      0.78
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.22,
+      0.8
+    ],
+    "guest_a": [
+      0.72,
+      0.76
+    ],
+    "guest_b": [
+      0.84,
+      0.76
+    ],
+    "figure_a": [
+      0.72,
+      0.76
+    ],
+    "figure_b": [
+      0.84,
+      0.76
+    ],
+    "performer": [
+      0.5,
+      0.78
+    ]
+  },
+  "variants": [
+    "ballad",
+    "drop"
+  ]
+}

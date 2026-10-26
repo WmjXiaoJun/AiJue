@@ -1,0 +1,175 @@
+{
+  "id": "scroll_split",
+  "label": "绢面双屏",
+  "description": "绢本双屏对垒：左右两卷绢面各成一境，中缝一道飞白贯穿，适合正反方分屏与观点对撞。",
+  "tags": [
+    "modern",
+    "debate",
+    "silk",
+    "split"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "seed": 20261027,
+  "layers": [
+    {
+      "type": "paper",
+      "layer": "background",
+      "palette": "silk",
+      "mottle": 0.3
+    },
+    {
+      "type": "silk_weave",
+      "layer": "background",
+      "opacity": 0.28,
+      "spacing": 0.016,
+      "angle": -10
+    },
+    {
+      "type": "gongbi_mountains",
+      "layer": "background",
+      "count": 3,
+      "color": "azurite",
+      "opacity": 0.55,
+      "seed": 13
+    },
+    {
+      "type": "silk_panels",
+      "layer": "midground",
+      "count": 2,
+      "x": 0.14,
+      "y": 0.1,
+      "w": 0.72,
+      "h": 0.78,
+      "color": "bg:1",
+      "accent": "shadow",
+      "gap": 0.02
+    },
+    {
+      "type": "ink_circle_stage",
+      "layer": "midground",
+      "x": 0.27,
+      "y": 0.78,
+      "r": 0.22,
+      "color": "fg",
+      "opacity": 0.28
+    },
+    {
+      "type": "ink_circle_stage",
+      "layer": "midground",
+      "x": 0.73,
+      "y": 0.78,
+      "r": 0.22,
+      "color": "fg",
+      "opacity": 0.28
+    },
+    {
+      "type": "silk_banner",
+      "layer": "midground",
+      "x": 0.03,
+      "y": 0.2,
+      "w": 0.07,
+      "h": 0.5,
+      "color": "accent",
+      "accent": "accent:1"
+    },
+    {
+      "type": "silk_banner",
+      "layer": "midground",
+      "x": 0.9,
+      "y": 0.2,
+      "w": 0.07,
+      "h": 0.5,
+      "color": "accent:1",
+      "accent": "accent"
+    },
+    {
+      "type": "flying_white",
+      "layer": "foreground",
+      "x": 0.5,
+      "y": 0.5,
+      "angle": 90,
+      "length": 0.92,
+      "color": "fg",
+      "opacity": 0.55,
+      "seed": 3
+    },
+    {
+      "type": "ink_crowd",
+      "layer": "foreground",
+      "rows": 1,
+      "per_row": 12,
+      "y_start": 0.95,
+      "color": "fg",
+      "opacity": 0.16,
+      "seed": 9
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.132,
+      0.15,
+      0.506,
+      0.78
+    ],
+    "detail": [
+      0.34,
+      0.21,
+      0.32,
+      0.34
+    ],
+    "left": [
+      0.0,
+      0.1,
+      0.5,
+      0.8
+    ],
+    "right": [
+      0.5,
+      0.1,
+      0.5,
+      0.8
+    ],
+    "center": [
+      0.35,
+      0.12,
+      0.3,
+      0.67
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.5,
+      0.86
+    ],
+    "figure_a": [
+      0.27,
+      0.84
+    ],
+    "figure_b": [
+      0.73,
+      0.84
+    ],
+    "guest_a": [
+      0.27,
+      0.84
+    ],
+    "guest_b": [
+      0.73,
+      0.84
+    ]
+  },
+  "variants": [
+    "round1",
+    "round2"
+  ],
+  "props": []
+}

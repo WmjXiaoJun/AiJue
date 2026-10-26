@@ -1,0 +1,48 @@
+{
+  "id": "coffee_mug",
+  "label": "咖啡杯",
+  "kind": "mug",
+  "description": "带把手咖啡杯，热气",
+  "tags": [
+    "modern",
+    "studio",
+    "life",
+    "prop"
+  ],
+  "appearance": {
+    "shape": "cup",
+    "main": "#f4f1e8",
+    "accent": "#8a5a3b",
+    "material": "ceramic",
+    "size": [
+      0.05,
+      0.06
+    ]
+  },
+  "style": {
+    "default": {
+      "line": 1.0
+    },
+    "neon_toon": {
+      "line": 1.2,
+      "glow": 0.6
+    },
+    "noir_rain": {
+      "line": 1.1,
+      "tint": "#8a8a8a"
+    },
+    "oil_salon": {
+      "line": 1.3,
+      "tint": "#b08a3e"
+    },
+    "hologram_stage": {
+      "glow": 0.5
+    },
+    "film_interview": {
+      "tint": "#d9a56a"
+    },
+    "vhs_late_show": {
+      "glow": 0.25
+    }
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "id": "dawei",
+  "label": "大魏",
+  "era": "modern",
+  "persona": "传统综艺导演，保守毒舌、金句多；一句“我从业三十年”就能噎住全场。",
+  "role_pool": [
+    "guest_b",
+    "expert",
+    "figure_b"
+  ],
+  "voice": {
+    "provider": "breeze",
+    "instruction": "52岁男性，低沉沙哑，慢条斯理，带一点说教味的冷幽默",
+    "seed": 20262015,
+    "cfg_scale": 3.8
+  },
+  "appearance": {
+    "gender": "male",
+    "age": 52,
+    "skin": "#E8C8B0",
+    "hair": "#1A1A1A",
+    "hair_style": "bald",
+    "eye": "#231A16",
+    "brow": "thick",
+    "beard": "short",
+    "outfit": {
+      "type": "jacket",
+      "main": "#20242B",
+      "accent": "#FF6B6B",
+      "hat": "none"
+    },
+    "accessories": [
+      "glasses"
+    ],
+    "head_ratio": 1.1,
+    "chibi": 0.15,
+    "eye_style": "narrow",
+    "face_ratio": 1.05
+  },
+  "poses": [
+    "front",
+    "side",
+    "point",
+    "think"
+  ],
+  "mouth": [
+    "closed",
+    "a",
+    "o",
+    "e",
+    "i",
+    "u",
+    "m"
+  ],
+  "style_overrides": {
+    "neon_toon": {
+      "line": 1.3
+    },
+    "film_interview": {
+      "line": 1.1
+    },
+    "noir_rain": {
+      "line": 1.2
+    },
+    "blueprint_lab": {
+      "line": 0.9
+    },
+    "candy_collage": {
+      "line": 1.2
+    }
+  }
+}

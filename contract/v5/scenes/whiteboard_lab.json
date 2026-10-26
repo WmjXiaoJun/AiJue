@@ -1,0 +1,155 @@
+{
+  "id": "whiteboard_lab",
+  "label": "白板实验室",
+  "description": "科技白板实验室：白板手绘流程、便利贴与桌面原型，蓝图蓝点缀，适合同步讲解与头脑风暴。",
+  "tags": [
+    "modern",
+    "blueprint",
+    "whiteboard",
+    "lab"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "size": [
+    1600,
+    900
+  ],
+  "seed": 5331,
+  "layers": [
+    {
+      "type": "canvas",
+      "layer": "background",
+      "color": "paper"
+    },
+    {
+      "type": "grid",
+      "layer": "background",
+      "color": "grid",
+      "spacing": 0.06,
+      "alpha": 70
+    },
+    {
+      "type": "whiteboard",
+      "layer": "midground",
+      "color": "paper_white",
+      "x": 0.22,
+      "y": 0.06,
+      "w": 0.56,
+      "h": 0.5
+    },
+    {
+      "type": "diagram_nodes",
+      "layer": "midground",
+      "color": "accent:0",
+      "x": 0.5,
+      "y": 0.3,
+      "size": 0.3,
+      "nodes": 6
+    },
+    {
+      "type": "sticky_notes",
+      "layer": "midground",
+      "color": "accent:1",
+      "x": 0.3,
+      "y": 0.2,
+      "size": 0.07
+    },
+    {
+      "type": "stage_floor",
+      "layer": "midground",
+      "color": "grid",
+      "horizon": 0.8
+    },
+    {
+      "type": "desk",
+      "layer": "midground",
+      "color": "fg:1",
+      "x": 0.16,
+      "y": 0.72,
+      "w": 0.62,
+      "h": 0.22,
+      "items": [
+        {
+          "type": "scroll",
+          "x": 0.3,
+          "y": 0.55
+        },
+        {
+          "type": "cup",
+          "x": 0.62,
+          "y": 0.55
+        },
+        {
+          "type": "brush",
+          "x": 0.8,
+          "y": 0.6
+        }
+      ]
+    },
+    {
+      "type": "monitor",
+      "layer": "midground",
+      "color": "accent:1",
+      "x": 0.82,
+      "y": 0.7,
+      "width": 0.16
+    },
+    {
+      "type": "diagram_nodes",
+      "layer": "foreground",
+      "color": "accent:0",
+      "x": 0.86,
+      "y": 0.26,
+      "size": 0.12,
+      "nodes": 4,
+      "opacity": 0.5
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.15
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.162,
+      0.21,
+      0.656,
+      0.78
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.3,
+      0.96
+    ],
+    "guest_a": [
+      0.66,
+      0.96
+    ],
+    "guest_b": [
+      0.68,
+      0.94
+    ],
+    "figure_a": [
+      0.66,
+      0.96
+    ],
+    "figure_b": [
+      0.68,
+      0.94
+    ]
+  },
+  "variants": [
+    "brainstorm",
+    "final_spec"
+  ]
+}

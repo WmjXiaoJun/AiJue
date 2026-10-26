@@ -1,0 +1,47 @@
+{
+  "id": "crt_tv",
+  "label": "雪花屏电视",
+  "kind": "crt_tv",
+  "description": "老式 CRT，雪花噪点",
+  "tags": [
+    "modern",
+    "retro",
+    "prop"
+  ],
+  "appearance": {
+    "shape": "crt",
+    "main": "#2b2b33",
+    "accent": "#8ef7ff",
+    "material": "glass",
+    "size": [
+      0.18,
+      0.16
+    ]
+  },
+  "style": {
+    "default": {
+      "line": 1.0
+    },
+    "neon_toon": {
+      "line": 1.2,
+      "glow": 0.6
+    },
+    "noir_rain": {
+      "line": 1.1,
+      "tint": "#8a8a8a"
+    },
+    "oil_salon": {
+      "line": 1.3,
+      "tint": "#b08a3e"
+    },
+    "hologram_stage": {
+      "glow": 0.5
+    },
+    "film_interview": {
+      "tint": "#d9a56a"
+    },
+    "vhs_late_show": {
+      "glow": 0.25
+    }
+  }
+}

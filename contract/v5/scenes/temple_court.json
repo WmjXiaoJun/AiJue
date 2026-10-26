@@ -1,0 +1,174 @@
+{
+  "id": "temple_court",
+  "label": "庙堂",
+  "description": "庙堂：连拱 + 立柱 + 长幡 + 香炉 + 供案 + 宫灯 + 香烟",
+  "tags": [
+    "history",
+    "temple",
+    "ritual"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "layers": [
+    {
+      "type": "paper",
+      "layer": "background",
+      "mottle": 0.5,
+      "edge": 0.45
+    },
+    {
+      "type": "arches",
+      "layer": "midground",
+      "count": 3,
+      "x0": 0.1,
+      "x1": 0.9,
+      "y": 0.16,
+      "height": 0.3,
+      "color": "stone",
+      "style": "round"
+    },
+    {
+      "type": "columns",
+      "layer": "midground",
+      "count": 4,
+      "x0": 0.12,
+      "x1": 0.88,
+      "y": 0.02,
+      "y_bottom": 0.86,
+      "width": 0.06,
+      "color": "accent",
+      "couplets": false
+    },
+    {
+      "type": "banners",
+      "layer": "midground",
+      "count": 4,
+      "x0": 0.16,
+      "x1": 0.84,
+      "y": 0.02,
+      "width": 0.034,
+      "height": 0.3,
+      "color": "accent",
+      "kind": "temple"
+    },
+    {
+      "type": "incense",
+      "layer": "midground",
+      "x": 0.5,
+      "y": 0.62,
+      "size": 0.1,
+      "color": "metal"
+    },
+    {
+      "type": "desk",
+      "layer": "midground",
+      "x": 0.3,
+      "y": 0.68,
+      "w": 0.4,
+      "h": 0.24,
+      "color": "wood",
+      "items": [
+        {
+          "type": "cup",
+          "x": 0.3,
+          "y": 0.55
+        },
+        {
+          "type": "scroll",
+          "x": 0.62,
+          "y": 0.5
+        }
+      ]
+    },
+    {
+      "type": "lanterns",
+      "layer": "midground",
+      "count": 4,
+      "y": 0.14,
+      "x0": 0.2,
+      "x1": 0.8,
+      "size": 0.026,
+      "color": "accent"
+    },
+    {
+      "type": "smoke",
+      "layer": "foreground",
+      "count": 2,
+      "color": "highlight",
+      "y": 0.6,
+      "rise": 0.26,
+      "spread": 0.1,
+      "alpha": 70,
+      "variants": {
+        "offering": {
+          "alpha": 85
+        },
+        "festival": {
+          "count": 3,
+          "alpha": 60
+        }
+      }
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.26
+    },
+    {
+      "type": "grain",
+      "layer": "foreground",
+      "strength": 0.04
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0,
+      0,
+      1,
+      1
+    ],
+    "altar": [
+      0.28,
+      0.44,
+      0.44,
+      0.5
+    ],
+    "incense_close": [
+      0.34,
+      0.34,
+      0.32,
+      0.44
+    ],
+    "banners_high": [
+      0.14,
+      0.02,
+      0.72,
+      0.42
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.2,
+      0.96
+    ],
+    "figure_a": [
+      0.8,
+      0.96
+    ],
+    "figure_b": [
+      0.5,
+      0.97
+    ]
+  },
+  "variants": [
+    "offering",
+    "festival"
+  ],
+  "depth": {
+    "background": 0.02,
+    "midground": 0.12,
+    "foreground": 0.3
+  }
+}

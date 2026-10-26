@@ -1,0 +1,167 @@
+{
+  "id": "stone_roundtable",
+  "label": "石桌圆桌",
+  "description": "古堡石桌密谈：石质圆桌、烛台与高背椅、拱顶与帷幔，适合投票与揭面时刻。",
+  "tags": [
+    "modern",
+    "traitors",
+    "baroque",
+    "roundtable",
+    "stone"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "seed": 20261043,
+  "layers": [
+    {
+      "type": "paper",
+      "layer": "background",
+      "color": "shadow",
+      "opacity": 1.0
+    },
+    {
+      "type": "stone_floor",
+      "layer": "background",
+      "y": 0.58,
+      "rows": 5,
+      "color": "stone",
+      "accent": "shadow",
+      "seed": 3
+    },
+    {
+      "type": "gothic_arch",
+      "layer": "midground",
+      "count": 3,
+      "color": "stone",
+      "accent": "accent",
+      "opacity": 0.85
+    },
+    {
+      "type": "drapery",
+      "layer": "midground",
+      "x": 0.0,
+      "y": 0.0,
+      "w": 0.16,
+      "h": 0.98,
+      "color": "velvet",
+      "accent": "accent",
+      "folds": 5
+    },
+    {
+      "type": "drapery",
+      "layer": "midground",
+      "x": 0.84,
+      "y": 0.0,
+      "w": 0.16,
+      "h": 0.98,
+      "color": "velvet",
+      "accent": "accent",
+      "folds": 5
+    },
+    {
+      "type": "chandelier_baroque",
+      "layer": "midground",
+      "x": 0.5,
+      "y": 0.16,
+      "scale": 0.3,
+      "candles": 7,
+      "color": "accent",
+      "glow": 0.55
+    },
+    {
+      "type": "oval_roundtable",
+      "layer": "midground",
+      "cx": 0.5,
+      "cy": 0.8,
+      "rx": 0.32,
+      "ry": 0.11,
+      "color": "stone",
+      "accent": "accent",
+      "cloth": false
+    },
+    {
+      "type": "candelabra",
+      "layer": "midground",
+      "x": 0.38,
+      "y": 0.73,
+      "scale": 0.12,
+      "candles": 3,
+      "color": "accent:1",
+      "glow": 0.5
+    },
+    {
+      "type": "candle_glow",
+      "layer": "foreground",
+      "count": 4,
+      "strength": 0.28,
+      "color": "candle"
+    },
+    {
+      "type": "smoke",
+      "layer": "foreground",
+      "count": 2,
+      "opacity": 0.18
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.102,
+      0.1,
+      0.536,
+      0.78
+    ],
+    "detail": [
+      0.34,
+      0.15,
+      0.32,
+      0.34
+    ],
+    "table": [
+      0.15,
+      0.12,
+      0.7,
+      0.37
+    ],
+    "host": [
+      0.35,
+      0.12,
+      0.3,
+      0.71
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.5,
+      0.8
+    ],
+    "guest_a": [
+      0.24,
+      0.8
+    ],
+    "guest_b": [
+      0.76,
+      0.8
+    ],
+    "figure_a": [
+      0.24,
+      0.8
+    ],
+    "figure_b": [
+      0.76,
+      0.8
+    ]
+  },
+  "variants": [
+    "vote",
+    "reveal"
+  ],
+  "props": []
+}

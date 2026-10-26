@@ -1,0 +1,165 @@
+{
+  "id": "river_fleet",
+  "label": "江面船队",
+  "description": "渡口江面：远山 + 水波 + 战船帆影 + 旗 + 船灯 + 江雾",
+  "tags": [
+    "history",
+    "river",
+    "war"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "layers": [
+    {
+      "type": "sky_gradient",
+      "layer": "background",
+      "top": "sky:0",
+      "bottom": "sky:1",
+      "horizon": 0.5,
+      "haze": 0.65,
+      "sun": {
+        "x": 0.76,
+        "y": 0.26,
+        "r": 0.045,
+        "color": "accent"
+      }
+    },
+    {
+      "type": "mountains",
+      "layer": "background",
+      "count": 3,
+      "y": 0.54,
+      "height": 0.28,
+      "color": "mid"
+    },
+    {
+      "type": "waves",
+      "layer": "midground",
+      "count": 16,
+      "y": 0.62,
+      "span": 0.34,
+      "amp": 0.006,
+      "freq": 4.5,
+      "color": "water",
+      "foam": 0.01
+    },
+    {
+      "type": "boats",
+      "layer": "midground",
+      "count": 4,
+      "y": 0.72,
+      "scale": 0.3,
+      "color": "wood",
+      "seed": 5,
+      "variants": {
+        "sailing": {
+          "count": 5
+        },
+        "anchored": {
+          "count": 3,
+          "y": 0.7
+        }
+      }
+    },
+    {
+      "type": "banners",
+      "layer": "midground",
+      "count": 3,
+      "x0": 0.18,
+      "x1": 0.86,
+      "y": 0.3,
+      "width": 0.035,
+      "height": 0.14,
+      "color": "accent",
+      "kind": "war"
+    },
+    {
+      "type": "lanterns",
+      "layer": "midground",
+      "count": 5,
+      "y": 0.42,
+      "x0": 0.2,
+      "x1": 0.8,
+      "size": 0.022,
+      "color": "accent"
+    },
+    {
+      "type": "smoke",
+      "layer": "foreground",
+      "count": 2,
+      "color": "highlight",
+      "y": 0.58,
+      "rise": 0.16,
+      "spread": 0.26,
+      "alpha": 55
+    },
+    {
+      "type": "particles",
+      "layer": "foreground",
+      "count": 30,
+      "color": "highlight",
+      "size": 0.0016
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.24
+    },
+    {
+      "type": "grain",
+      "layer": "foreground",
+      "strength": 0.05
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0,
+      0,
+      1,
+      1
+    ],
+    "fleet": [
+      0.18,
+      0.42,
+      0.64,
+      0.44
+    ],
+    "water_detail": [
+      0.04,
+      0.56,
+      0.92,
+      0.4
+    ],
+    "sails": [
+      0.12,
+      0.16,
+      0.5,
+      0.6
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.16,
+      0.95
+    ],
+    "figure_a": [
+      0.78,
+      0.95
+    ],
+    "figure_b": [
+      0.5,
+      0.96
+    ]
+  },
+  "variants": [
+    "sailing",
+    "anchored"
+  ],
+  "depth": {
+    "background": 0.03,
+    "midground": 0.14,
+    "foreground": 0.32
+  }
+}

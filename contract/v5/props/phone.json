@@ -1,0 +1,47 @@
+{
+  "id": "phone",
+  "label": "手机",
+  "kind": "phone",
+  "description": "竖屏手机，亮屏通知",
+  "tags": [
+    "modern",
+    "life",
+    "prop"
+  ],
+  "appearance": {
+    "shape": "phone",
+    "main": "#1c1c22",
+    "accent": "#e0453e",
+    "material": "glass",
+    "size": [
+      0.04,
+      0.08
+    ]
+  },
+  "style": {
+    "default": {
+      "line": 1.0
+    },
+    "neon_toon": {
+      "line": 1.2,
+      "glow": 0.6
+    },
+    "noir_rain": {
+      "line": 1.1,
+      "tint": "#8a8a8a"
+    },
+    "oil_salon": {
+      "line": 1.3,
+      "tint": "#b08a3e"
+    },
+    "hologram_stage": {
+      "glow": 0.5
+    },
+    "film_interview": {
+      "tint": "#d9a56a"
+    },
+    "vhs_late_show": {
+      "glow": 0.25
+    }
+  }
+}

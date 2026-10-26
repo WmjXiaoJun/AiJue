@@ -1,0 +1,77 @@
+{
+  "id": "mulan",
+  "label": "花木兰",
+  "era": "history",
+  "persona": "代父从军的女将，利落直爽，先行动后解释；看不惯空谈。",
+  "role_pool": [
+    "figure_a",
+    "figure_b",
+    "expert"
+  ],
+  "voice": {
+    "provider": "breeze",
+    "instruction": "24岁女性，清亮利落，中气足，英气爽快，语速偏快",
+    "seed": 20262008,
+    "cfg_scale": 4.2
+  },
+  "appearance": {
+    "gender": "female",
+    "age": 24,
+    "skin": "#f3d8be",
+    "hair": "#191919",
+    "hair_style": "ponytail",
+    "eye": "#2a241c",
+    "brow": "angled",
+    "beard": "none",
+    "outfit": {
+      "type": "armor",
+      "main": "#8a3b2e",
+      "accent": "#c9a227",
+      "hat": "helmet"
+    },
+    "accessories": [
+      "sword",
+      "bow"
+    ],
+    "head_ratio": 0.98,
+    "chibi": 0.2,
+    "eye_style": "determined",
+    "face_ratio": 0.98,
+    "marks": [
+      "freckles"
+    ]
+  },
+  "poses": [
+    "front",
+    "side",
+    "point",
+    "think"
+  ],
+  "mouth": [
+    "closed",
+    "a",
+    "o",
+    "e",
+    "i",
+    "u",
+    "m"
+  ],
+  "style_overrides": {
+    "ink_chronicle": {
+      "line": 1.3,
+      "shade": 0.6
+    },
+    "woodblock_classic": {
+      "line": 1.4,
+      "shade": 0.7
+    },
+    "parchment_case": {
+      "line": 1.1,
+      "shade": 0.5
+    },
+    "museum_gold": {
+      "line": 1.0,
+      "shade": 0.3
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "id": "custom_holo_gallery",
+  "label": "全息画廊（示例）",
+  "description": "示例自定义场景：宣纸底 + 地形等高线 + 全息网格 + 立柱 + 聚光，演示 layers/camera_zones/anchors 写法。",
+  "tags": ["custom", "example", "gallery", "hologram"],
+  "aspect": [16, 9],
+  "size": [1600, 900],
+  "seed": 2026,
+  "layers": [
+    { "type": "paper", "grain": 0.5 },
+    { "type": "terrain_contours", "seed": 11, "color": "#5a4a3a", "count": 18 },
+    { "type": "grid", "color": "#37e0d8", "opacity": 0.18, "step": 0.08 },
+    { "type": "columns", "count": 4, "color": "#efe6d3", "opacity": 0.85 },
+    { "type": "hologram_grid", "opacity": 0.22 },
+    { "type": "spotlights", "count": 2, "color": "#9ff5ef" },
+    { "type": "vignette", "strength": 0.25 },
+    { "type": "grain", "strength": 0.12 }
+  ],
+  "camera_zones": {
+    "wide": [0.0, 0.0, 1.0, 1.0],
+    "host_close": [0.3, 0.12, 0.4, 0.45],
+    "detail": [0.25, 0.2, 0.5, 0.55]
+  },
+  "anchors": {
+    "host": [0.5, 0.9]
+  },
+  "variants": ["dawn", "night"],
+  "props": []
+}

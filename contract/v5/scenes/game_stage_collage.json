@@ -1,0 +1,152 @@
+{
+  "id": "game_stage_collage",
+  "label": "糖果游戏舞台",
+  "description": "糖果拼贴游戏舞台：撕纸底板、彩色拼贴块、贴纸星爆、聚光与彩带，任务发布主舞台。",
+  "tags": [
+    "modern",
+    "game_show",
+    "collage",
+    "stage"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "seed": 20261051,
+  "layers": [
+    {
+      "type": "paper",
+      "layer": "background",
+      "color": "paper",
+      "mottle": 0.3
+    },
+    {
+      "type": "torn_paper",
+      "layer": "background",
+      "color": "paper",
+      "opacity": 0.9
+    },
+    {
+      "type": "collage_panels",
+      "layer": "background",
+      "count": 7,
+      "colors": [
+        "accent",
+        "accent:1",
+        "accent:2",
+        "purple"
+      ],
+      "seed": 21
+    },
+    {
+      "type": "halftone",
+      "layer": "midground",
+      "color": "fg",
+      "opacity": 0.12
+    },
+    {
+      "type": "stickers",
+      "layer": "midground",
+      "count": 6,
+      "color": "accent",
+      "seed": 4
+    },
+    {
+      "type": "sticker_burst",
+      "layer": "midground",
+      "count": 5,
+      "x": 0.5,
+      "y": 0.3,
+      "colors": [
+        "accent",
+        "accent:1",
+        "accent:2"
+      ],
+      "seed": 9
+    },
+    {
+      "type": "spotlights",
+      "layer": "foreground",
+      "count": 2,
+      "color": "highlight",
+      "strength": 0.5
+    },
+    {
+      "type": "confetti_rain",
+      "layer": "foreground",
+      "count": 80,
+      "colors": [
+        "accent",
+        "accent:1",
+        "accent:2",
+        "purple"
+      ],
+      "seed": 13
+    },
+    {
+      "type": "grid",
+      "layer": "foreground",
+      "color": "fg",
+      "opacity": 0.05
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.102,
+      0.16,
+      0.536,
+      0.78
+    ],
+    "detail": [
+      0.34,
+      0.21,
+      0.32,
+      0.34
+    ],
+    "stage": [
+      0.12,
+      0.12,
+      0.76,
+      0.77
+    ],
+    "host": [
+      0.3,
+      0.12,
+      0.338,
+      0.77
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.5,
+      0.86
+    ],
+    "guest_a": [
+      0.24,
+      0.86
+    ],
+    "guest_b": [
+      0.76,
+      0.86
+    ],
+    "figure_a": [
+      0.24,
+      0.86
+    ],
+    "figure_b": [
+      0.76,
+      0.86
+    ]
+  },
+  "variants": [
+    "round1",
+    "final"
+  ],
+  "props": []
+}

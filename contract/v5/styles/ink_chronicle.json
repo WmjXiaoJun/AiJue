@@ -1,0 +1,116 @@
+{
+  "id": "ink_chronicle",
+  "label": "水墨史书",
+  "version": 1,
+  "description": "水墨长卷：宣纸、飞白、淡彩、朱砂印章；历史夜话叙事风格",
+  "tags": [
+    "history",
+    "ink",
+    "chinese",
+    "2d"
+  ],
+  "technique": [
+    "ink_wash",
+    "rice_paper"
+  ],
+  "palette": {
+    "bg": [
+      "#e8dcc4",
+      "#d9cbb0"
+    ],
+    "fg": [
+      "#1c1a16",
+      "#3a352c"
+    ],
+    "accent": [
+      "#b23a2e",
+      "#c9a227"
+    ],
+    "paper": "#efe6d3",
+    "ink": "#24211c",
+    "mid": "#6f7d7a",
+    "shadow": "#8c8171",
+    "highlight": "#fbf6ea",
+    "seal": "#b23a2e",
+    "water": "#6b7f8a",
+    "wood": "#7a5a34",
+    "stone": "#8d8577",
+    "glow": "#d9b96a",
+    "gold": "#c9a227"
+  },
+  "texture": [
+    "paper_grain",
+    "ink_bleed"
+  ],
+  "line": {
+    "style": "brush_edge",
+    "width": 3,
+    "color": "#1c1a16",
+    "jitter": 0.6,
+    "opacity": 0.9
+  },
+  "character_treatment": "ink_brush",
+  "typography": {
+    "title_font": "serif",
+    "subtitle": "variety_ink",
+    "lower_third": "ink_seal",
+    "text_color": "#1c1a16",
+    "seal_color": "#b23a2e",
+    "vertical": true,
+    "letter_spacing": 2,
+    "line_chars": 8,
+    "font_ratio": 0.036,
+    "right_x": 0.955,
+    "margin_y": 0.07
+  },
+  "transition": "ink_wipe",
+  "audio": {
+    "bgm": "guqin",
+    "sfx": [
+      "taiko",
+      "paper_flip",
+      "ink_brush"
+    ],
+    "ambience": "wind_soft",
+    "ducking": 0.18
+  },
+  "h3": {
+    "style_prompt": "traditional Chinese ink-wash painting (shuimo) on rice paper, visible dry-brush strokes and ink bleed, restrained pale color washes, flat 2D illustration, elegant negative space, no 3D shading, no glossy highlight",
+    "negative_prompt": "3d render, photorealistic, glossy, neon, text, watermark",
+    "motion": "slow_pan",
+    "guidance": 5.0
+  },
+  "finish": {
+    "contrast": 1.05,
+    "saturation": 0.74,
+    "temperature": 0.05,
+    "paper": 0.18,
+    "edge_ink": 0.32,
+    "vignette": 0.18,
+    "grain": 0.05
+  },
+  "grade": {
+    "eq": "contrast=1.06:saturation=0.68:gamma=1.02",
+    "colorbalance": "rs=0.03:gs=0.01:bs=-0.02"
+  },
+  "packaging": {
+    "tag": "水墨史书",
+    "tag_color": "#b23a2e",
+    "bars": "thin",
+    "frame": "none",
+    "seal": "史",
+    "seal_color": "#b23a2e",
+    "brand": "造片局 · 历史夜话",
+    "watermark": true
+  },
+  "recommended_scenes": [
+    "ancient_map",
+    "war_council",
+    "battlefield",
+    "palace_hall",
+    "great_wall",
+    "river_fleet",
+    "scholar_study",
+    "temple_court"
+  ]
+}

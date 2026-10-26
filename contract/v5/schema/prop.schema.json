@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://zaopianju.local/contract/v5/schema/prop.schema.json",
+  "title": "V5 prop（道具）",
+  "description": "道具 = 可被场景/act/cast 引用的可视化物件：简单形状 + 配色（appearance）+ 各风格适配覆盖（style）+ 可选 layer 绘制指令。",
+  "type": "object",
+  "required": ["id", "label"],
+  "properties": {
+    "id": { "$ref": "#/$defs/id" },
+    "label": { "type": "string", "minLength": 1 },
+    "kind": {
+      "type": "string",
+      "minLength": 1,
+      "description": "scroll / bamboo_slips / seal / banner / torch / sandbox / ding / vase / jade / map_tube / arrow / tally / rods / mirror / bell / drum / bow / whip / edict / pendant / microphone / trophy / button / whiteboard / tablet / phone / mug / film_reel / cassette / blinds / candle / candlestick / wine_glass / mask / stand / confetti / pot / chalk / eraser / costume / crt_tv / part / headphones …"
+    },
+    "description": { "type": "string" },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "appearance": {
+      "type": "object",
+      "description": "简单形状 / 配色 / 材质 / 相对尺寸（程序化绘制的输入）",
+      "properties": {
+        "shape": {
+          "type": "string",
+          "minLength": 1,
+          "description": "scroll_roll / bamboo_stack / square_seal / rectangle_banner / flame / bowl / vase / disc / tube / arrow / tiger / sticks / mirror / bell / drum / bow / whip / paper / pendant / cylinder / cup / tin / blinds / candle / glass / mask / stand / confetti / pot / chalk / eraser / fabric / crt / box …"
+        },
+        "main": { "$ref": "#/$defs/hex" },
+        "accent": { "$ref": "#/$defs/hex" },
+        "detail": { "$ref": "#/$defs/hex" },
+        "material": { "type": "string", "description": "paper / bronze / jade / wood / silk / porcelain / metal / plastic / glass / clay / chalk / fabric …" },
+        "size": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": { "type": "number", "minimum": 0, "maximum": 4 },
+          "description": "相对画面尺寸 [w, h]（归一化系数，可 >1 表示可放大）"
+        },
+        "glow": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "additionalProperties": true
+    },
+    "style": {
+      "type": "object",
+      "description": "各风格适配覆盖：键可以是 style id（如 ink_chronicle）或风格族（ink/woodblock/parchment/museum/neon/noir/oil/film/vhs/hologram/clay/chalk/collage/blueprint/silk/baroque/modern/history），渲染器按当前 style 查找，找不到用 default",
+      "properties": {
+        "default": { "type": "object" }
+      },
+      "additionalProperties": { "type": "object" }
+    },
+    "layer": {
+      "type": "object",
+      "description": "可选：把道具作为一条场景绘制指令（type 由 scene_render 注册；未注册时渲染器报错）",
+      "properties": {
+        "type": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{1,60}$"
+    },
+    "hex": {
+      "type": "string",
+      "pattern": "^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$"
+    }
+  }
+}

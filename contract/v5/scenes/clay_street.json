@@ -1,0 +1,154 @@
+{
+  "id": "clay_street",
+  "label": "黏土街角",
+  "description": "黏土定格街角：奶油天空、陶土小屋、路灯与长椅、门口盆栽，温柔的微缩街道。",
+  "tags": [
+    "modern",
+    "slow_life",
+    "clay",
+    "street"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "seed": 20261063,
+  "layers": [
+    {
+      "type": "sky_gradient",
+      "layer": "background",
+      "top": "#F4E3C8",
+      "bottom": "#E8D2B0"
+    },
+    {
+      "type": "mountains",
+      "layer": "background",
+      "count": 2,
+      "color": "accent",
+      "opacity": 0.35
+    },
+    {
+      "type": "clay_houses",
+      "layer": "midground",
+      "count": 4,
+      "y": 0.72,
+      "color": "clay",
+      "accent": "butter",
+      "seed": 7
+    },
+    {
+      "type": "clay_objects",
+      "layer": "midground",
+      "kind": "street_lamp",
+      "count": 2,
+      "x": 0.2,
+      "y": 0.6,
+      "color": "clay",
+      "accent": "accent:2",
+      "seed": 3
+    },
+    {
+      "type": "clay_objects",
+      "layer": "midground",
+      "kind": "bench",
+      "count": 1,
+      "x": 0.55,
+      "y": 0.86,
+      "color": "clay",
+      "accent": "butter",
+      "seed": 5
+    },
+    {
+      "type": "clay_objects",
+      "layer": "midground",
+      "kind": "pots",
+      "count": 3,
+      "x": 0.8,
+      "y": 0.82,
+      "scale": 0.6,
+      "color": "clay",
+      "accent": "sage",
+      "seed": 8
+    },
+    {
+      "type": "clay_plants",
+      "layer": "midground",
+      "count": 6,
+      "y": 0.88,
+      "color": "sage",
+      "accent": "clay",
+      "seed": 21
+    },
+    {
+      "type": "smoke",
+      "layer": "foreground",
+      "count": 3,
+      "opacity": 0.12
+    },
+    {
+      "type": "tilt_shift",
+      "layer": "foreground",
+      "focus_y": 0.66,
+      "strength": 0.5
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.122,
+      0.18,
+      0.516,
+      0.78
+    ],
+    "detail": [
+      0.34,
+      0.23,
+      0.32,
+      0.34
+    ],
+    "street": [
+      0.1,
+      0.12,
+      0.8,
+      0.57
+    ],
+    "host": [
+      0.32,
+      0.12,
+      0.318,
+      0.79
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.5,
+      0.88
+    ],
+    "guest_a": [
+      0.26,
+      0.88
+    ],
+    "guest_b": [
+      0.74,
+      0.88
+    ],
+    "figure_a": [
+      0.26,
+      0.88
+    ],
+    "figure_b": [
+      0.74,
+      0.88
+    ]
+  },
+  "variants": [
+    "day",
+    "dusk"
+  ],
+  "props": []
+}

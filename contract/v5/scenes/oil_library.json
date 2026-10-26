@@ -1,0 +1,152 @@
+{
+  "id": "oil_library",
+  "label": "油画藏书厅",
+  "description": "油画藏书厅：高书架、拱窗、烛台与书案，暖褐金调，适合引经据典与私下密谈。",
+  "tags": [
+    "modern",
+    "roundtable",
+    "oil",
+    "library"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "seed": 20261032,
+  "layers": [
+    {
+      "type": "canvas",
+      "layer": "background",
+      "color": "shadow",
+      "opacity": 1.0
+    },
+    {
+      "type": "oil_strokes",
+      "layer": "background",
+      "count": 70,
+      "opacity": 0.3,
+      "seed": 19,
+      "colors": [
+        "umber",
+        "accent:1",
+        "wine"
+      ]
+    },
+    {
+      "type": "shelves",
+      "layer": "midground",
+      "count": 3,
+      "color": "umber",
+      "accent": "wine",
+      "opacity": 0.95
+    },
+    {
+      "type": "window_light",
+      "layer": "foreground",
+      "color": "highlight",
+      "count": 2,
+      "opacity": 0.4
+    },
+    {
+      "type": "arches",
+      "layer": "midground",
+      "count": 1,
+      "color": "umber",
+      "opacity": 0.8
+    },
+    {
+      "type": "candelabra",
+      "layer": "midground",
+      "x": 0.18,
+      "y": 0.28,
+      "scale": 0.22,
+      "candles": 5,
+      "color": "accent:1",
+      "glow": 0.5
+    },
+    {
+      "type": "desk",
+      "layer": "midground",
+      "x": 0.5,
+      "y": 0.8,
+      "w": 0.62,
+      "h": 0.18,
+      "color": "umber",
+      "accent": "accent"
+    },
+    {
+      "type": "candle_glow",
+      "layer": "foreground",
+      "count": 4,
+      "strength": 0.45,
+      "color": "candle"
+    },
+    {
+      "type": "gold_frame",
+      "layer": "foreground",
+      "width": 0.03,
+      "color": "accent",
+      "accent": "accent:1",
+      "ornate": true
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.262,
+      0.16,
+      0.496,
+      0.78
+    ],
+    "detail": [
+      0.46,
+      0.21,
+      0.32,
+      0.34
+    ],
+    "stacks": [
+      0.02,
+      0.08,
+      0.5,
+      0.86
+    ],
+    "desk": [
+      0.28,
+      0.12,
+      0.5,
+      0.2
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.62,
+      0.86
+    ],
+    "guest_a": [
+      0.4,
+      0.86
+    ],
+    "guest_b": [
+      0.84,
+      0.86
+    ],
+    "figure_a": [
+      0.4,
+      0.86
+    ],
+    "figure_b": [
+      0.84,
+      0.86
+    ]
+  },
+  "variants": [
+    "night",
+    "study"
+  ],
+  "props": []
+}

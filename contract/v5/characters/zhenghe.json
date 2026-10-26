@@ -1,0 +1,77 @@
+{
+  "id": "zhenghe",
+  "label": "郑和",
+  "era": "history",
+  "persona": "七下西洋的舰队统帅，胸襟开阔，谈海与远方；沉稳里带着商人式的精明。",
+  "role_pool": [
+    "host",
+    "figure_a",
+    "narrator"
+  ],
+  "voice": {
+    "provider": "breeze",
+    "instruction": "45岁男性，宽厚沉稳，中低音，带海风般的开阔感，语速稳",
+    "seed": 20262011,
+    "cfg_scale": 3.8
+  },
+  "appearance": {
+    "gender": "male",
+    "age": 45,
+    "skin": "#dcc0a0",
+    "hair": "#1b1b1b",
+    "hair_style": "ancient_guan",
+    "eye": "#2a241c",
+    "brow": "thick",
+    "beard": "short",
+    "outfit": {
+      "type": "official_robe",
+      "main": "#2f3f5a",
+      "accent": "#c9a227",
+      "hat": "eunuch_hat"
+    },
+    "accessories": [
+      "compass",
+      "scroll"
+    ],
+    "head_ratio": 1.02,
+    "chibi": 0.18,
+    "eye_style": "warm",
+    "face_ratio": 1.02,
+    "marks": [
+      "smile_lines"
+    ]
+  },
+  "poses": [
+    "front",
+    "side",
+    "point",
+    "think"
+  ],
+  "mouth": [
+    "closed",
+    "a",
+    "o",
+    "e",
+    "i",
+    "u",
+    "m"
+  ],
+  "style_overrides": {
+    "ink_chronicle": {
+      "line": 1.3,
+      "shade": 0.6
+    },
+    "woodblock_classic": {
+      "line": 1.4,
+      "shade": 0.7
+    },
+    "parchment_case": {
+      "line": 1.1,
+      "shade": 0.5
+    },
+    "museum_gold": {
+      "line": 1.0,
+      "shade": 0.3
+    }
+  }
+}

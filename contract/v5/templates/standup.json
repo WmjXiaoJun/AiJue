@@ -1,0 +1,166 @@
+{
+  "id": "standup",
+  "label": "脱口秀",
+  "version": 5,
+  "description": "V5 模板：脱口秀（风格 vhs_late_show）",
+  "tags": [
+    "v5",
+    "vhs_late_show"
+  ],
+  "style": "vhs_late_show",
+  "target_duration": 38,
+  "aspect": [
+    16,
+    9
+  ],
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "name": "老周"
+    },
+    {
+      "role": "figure_a",
+      "character": "pangzi",
+      "name": "胖子"
+    },
+    {
+      "role": "figure_b",
+      "character": "lengmian",
+      "name": "冷面"
+    }
+  ],
+  "acts": [
+    {
+      "id": "act01",
+      "name": "第 1 幕",
+      "scene": "comedy_club_vhs",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 2.8,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    },
+    {
+      "id": "act02",
+      "name": "第 2 幕",
+      "scene": "brick_wall",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "host",
+      "text": "今天咱们聊聊手机，你有没有觉得手机就像个定时炸弹？",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act03",
+      "name": "第 3 幕",
+      "scene": "dressing_room_vhs",
+      "camera": "handheld",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "figure_a",
+      "text": "那必须的，手机不响我还真觉得哪儿不对劲。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act04",
+      "name": "第 4 幕",
+      "scene": "city_vhs",
+      "camera": "pan_right",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "host",
+      "text": "对，就是那种响个不停，生怕漏了任何一条信息的感觉。",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act05",
+      "name": "第 5 幕",
+      "scene": "brick_wall",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "figure_b",
+      "text": "我还真琢磨过，要是手机突然没电了，是不是整个世界都会跟着安静几分？",
+      "characters": [
+        "figure_b"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act06",
+      "name": "第 6 幕",
+      "scene": "dressing_room_vhs",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "host",
+      "text": "那可不一定，没电了得找充电宝，还得担心别人给你发信息。",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act07",
+      "name": "第 7 幕",
+      "scene": "city_vhs",
+      "camera": "handheld",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "figure_a",
+      "text": "说到底，还不是因为手机里的朋友比现实中的多，多到天天要关注。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act08",
+      "name": "第 8 幕",
+      "scene": "city_vhs",
+      "camera": "pan_right",
+      "camera_strength": 0.06,
+      "duration": 3.0,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    }
+  ],
+  "packaging": {
+    "subtitle": "vhs_late_show",
+    "transition": "vhs_late_show",
+    "title": "脱口秀",
+    "end_card": "下期见"
+  },
+  "audio": {
+    "bgm": "vhs_funk",
+    "sfx": [
+      "whoosh",
+      "click"
+    ]
+  },
+  "lipsync": {
+    "mode": "viseme"
+  },
+  "meta": {
+    "source": "v3_remap",
+    "script_lines": 6
+  }
+}

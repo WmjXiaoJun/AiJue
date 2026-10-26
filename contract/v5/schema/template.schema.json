@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://zaopianju.local/contract/v5/schema/template.schema.json",
+  "title": "V5 template（风格 + cast + 场景路线 + 镜头/文案）",
+  "description": "模板 = 一个节目形态：绑定一个 style、一组 cast、按 act 组织的场景路线（scene/camera/line/beats）与包装。",
+  "type": "object",
+  "required": ["id", "label", "style", "target_duration", "cast", "acts"],
+  "properties": {
+    "id": { "$ref": "#/$defs/id" },
+    "label": { "type": "string", "minLength": 1 },
+    "description": { "type": "string" },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "style": { "$ref": "#/$defs/id", "description": "引用 contract/v5/styles/<id>.json" },
+    "style_overrides": {
+      "type": "object",
+      "description": "本模板对风格参数的覆盖（深合并到 style）",
+      "additionalProperties": true
+    },
+    "target_duration": {
+      "type": "number",
+      "minimum": 5,
+      "description": "目标成片时长（秒）；acts[].duration 之和建议与它误差 ≤15%"
+    },
+    "aspect": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": { "type": "integer", "minimum": 1 }
+    },
+    "cast": {
+      "type": "array",
+      "minItems": 1,
+      "description": "cast 成员：role 由模板定义，character 引用 characters/<id>.json；role 不可重复",
+      "items": {
+        "type": "object",
+        "required": ["role", "character"],
+        "properties": {
+          "role": { "type": "string", "pattern": "^[a-z][a-z0-9_]{0,30}$" },
+          "character": { "$ref": "#/$defs/id" },
+          "props": { "type": "array", "items": { "$ref": "#/$defs/id" } },
+          "wardrobe": { "type": "string" },
+          "voice": { "type": "object" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "acts": {
+      "type": "array",
+      "minItems": 1,
+      "description": "场景路线：每个 act 引一个 scene + 一个 camera + 一句台词归属",
+      "items": {
+        "type": "object",
+        "required": ["id", "duration", "scene", "camera", "line"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]{0,60}$" },
+          "label": { "type": "string" },
+          "duration": { "type": "number", "exclusiveMinimum": 0 },
+          "scene": { "$ref": "#/$defs/id", "description": "引用 scenes/<id>.json" },
+          "camera": {
+            "type": "string",
+            "minLength": 1,
+            "description": "push_in / pan_left / pan_right / static / dolly / orbit / crane …"
+          },
+          "camera_zone": { "type": "string", "description": "scene.camera_zones 中的取景窗名（可选）" },
+          "line": {
+            "type": "string",
+            "description": "本 act 台词归属的 cast role；空字符串表示无台词（B-roll/空镜）"
+          },
+          "beats": { "type": "array", "items": { "type": "string" } },
+          "characters": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "额外指定本 act 出场的 cast role 或 character id（可选；缺省=全 cast）"
+          },
+          "props": { "type": "array", "items": { "$ref": "#/$defs/id" } },
+          "transition": { "type": "string" },
+          "music": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "packaging": {
+      "type": "object",
+      "description": "包装：字幕样式/转场/片头标题等（建议填写）",
+      "properties": {
+        "subtitle": { "type": "string" },
+        "transition": { "type": "string" },
+        "title": { "type": "string" },
+        "lower_third": { "type": "string" },
+        "end_card": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "lipsync": {
+      "type": "object",
+      "properties": {
+        "mode": { "type": "string", "enum": ["musetalk", "wav2lip", "viseme", "off"] },
+        "provider": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "h3": {
+      "type": "object",
+      "description": "可选：H3 B-roll 镜头配置（V5 里对白不走 H3）",
+      "additionalProperties": true
+    },
+    "format": { "type": "string" }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{1,60}$"
+    }
+  }
+}

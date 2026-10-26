@@ -1,0 +1,125 @@
+{
+  "id": "backstage_neon",
+  "label": "后台走廊",
+  "description": "演播厅后台走廊：混凝土墙、灯带门框、烟雾与镜面反光，嘉宾上场前的过场空间。",
+  "tags": [
+    "modern",
+    "neon",
+    "backstage",
+    "corridor"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "size": [
+    1600,
+    900
+  ],
+  "seed": 5031,
+  "layers": [
+    {
+      "type": "sky_gradient",
+      "layer": "background",
+      "top": "shadow",
+      "bottom": "bg:0"
+    },
+    {
+      "type": "columns",
+      "layer": "background",
+      "color": "bg:1",
+      "count": 4,
+      "opacity": 0.9
+    },
+    {
+      "type": "neon_tube",
+      "layer": "midground",
+      "color": "accent:1",
+      "x": 0.26,
+      "y": 0.22,
+      "length": 0.18
+    },
+    {
+      "type": "neon_tube",
+      "layer": "midground",
+      "color": "accent:0",
+      "x": 0.74,
+      "y": 0.3,
+      "length": 0.16
+    },
+    {
+      "type": "screens",
+      "layer": "midground",
+      "color": "bg:1",
+      "x": 0.5,
+      "y": 0.36,
+      "size": 0.14
+    },
+    {
+      "type": "stage_floor",
+      "layer": "midground",
+      "color": "bg:1",
+      "horizon": 0.74
+    },
+    {
+      "type": "smoke",
+      "layer": "midground",
+      "color": "highlight",
+      "opacity": 0.16
+    },
+    {
+      "type": "neon_tube",
+      "layer": "foreground",
+      "color": "accent:2",
+      "x": 0.9,
+      "y": 0.6,
+      "length": 0.3,
+      "opacity": 0.4
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.32
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.242,
+      0.19,
+      0.576,
+      0.78
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.38,
+      0.9
+    ],
+    "guest_a": [
+      0.66,
+      0.9
+    ],
+    "guest_b": [
+      0.68,
+      0.94
+    ],
+    "figure_a": [
+      0.66,
+      0.9
+    ],
+    "figure_b": [
+      0.68,
+      0.94
+    ]
+  },
+  "variants": [
+    "before_show",
+    "power_cut"
+  ]
+}

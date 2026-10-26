@@ -1,0 +1,159 @@
+{
+  "id": "ink_arena",
+  "label": "墨圈擂台",
+  "description": "绢本墨圈擂台：以一大片淡墨圆环为台，飞白作势，双灯与印章收束，适合结辩/开杠特写。",
+  "tags": [
+    "modern",
+    "debate",
+    "silk",
+    "arena",
+    "close"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "seed": 20261029,
+  "layers": [
+    {
+      "type": "paper",
+      "layer": "background",
+      "palette": "silk",
+      "mottle": 0.28
+    },
+    {
+      "type": "silk_weave",
+      "layer": "background",
+      "opacity": 0.22,
+      "spacing": 0.02,
+      "angle": -16
+    },
+    {
+      "type": "gongbi_mountains",
+      "layer": "background",
+      "count": 2,
+      "color": "azurite",
+      "opacity": 0.78,
+      "seed": 17
+    },
+    {
+      "type": "gongbi_clouds",
+      "layer": "midground",
+      "count": 3,
+      "color": "accent:1",
+      "opacity": 0.4,
+      "seed": 6
+    },
+    {
+      "type": "silk_ground_wash",
+      "layer": "background",
+      "y": 0.7,
+      "color": "azurite"
+    },
+    {
+      "type": "ink_circle_stage",
+      "layer": "midground",
+      "x": 0.5,
+      "y": 0.8,
+      "r": 0.42,
+      "color": "fg",
+      "opacity": 0.62
+    },
+    {
+      "type": "flying_white",
+      "layer": "midground",
+      "x": 0.5,
+      "y": 0.35,
+      "angle": 8,
+      "length": 1.0,
+      "color": "fg",
+      "opacity": 0.28,
+      "seed": 5
+    },
+    {
+      "type": "silk_banner",
+      "layer": "midground",
+      "count": 2,
+      "x": 0.06,
+      "y": 0.12,
+      "w": 0.075,
+      "h": 0.62,
+      "color": "accent",
+      "accent": "accent:1"
+    },
+    {
+      "type": "seal_stamp",
+      "layer": "foreground",
+      "x": 0.84,
+      "y": 0.18,
+      "text": "辩",
+      "color": "accent",
+      "size": 0.08
+    },
+    {
+      "type": "scroll_rods",
+      "layer": "foreground",
+      "color": "shadow",
+      "accent": "accent:1"
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.162,
+      0.16,
+      0.476,
+      0.78
+    ],
+    "detail": [
+      0.34,
+      0.21,
+      0.32,
+      0.34
+    ],
+    "arena": [
+      0.15,
+      0.12,
+      0.7,
+      0.62
+    ],
+    "host": [
+      0.35,
+      0.12,
+      0.3,
+      0.77
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.5,
+      0.86
+    ],
+    "figure_a": [
+      0.3,
+      0.86
+    ],
+    "figure_b": [
+      0.7,
+      0.86
+    ],
+    "guest_a": [
+      0.3,
+      0.86
+    ],
+    "guest_b": [
+      0.7,
+      0.86
+    ]
+  },
+  "variants": [
+    "final",
+    "rebuttal"
+  ],
+  "props": []
+}

@@ -1,0 +1,76 @@
+{
+  "id": "caocao",
+  "label": "曹操",
+  "era": "history",
+  "persona": "魏王，雄猜多疑、杀伐果断，笑声里带着试探；喜欢用反问压人。",
+  "role_pool": [
+    "figure_a",
+    "figure_b",
+    "narrator"
+  ],
+  "voice": {
+    "provider": "breeze",
+    "instruction": "50岁男性，低沉浑厚，带一点沙哑和压迫感，笑意不达眼底",
+    "seed": 20262002,
+    "cfg_scale": 3.8
+  },
+  "appearance": {
+    "gender": "male",
+    "age": 50,
+    "skin": "#e8c9a8",
+    "hair": "#141414",
+    "hair_style": "ancient_guan",
+    "eye": "#241c18",
+    "brow": "thick",
+    "beard": "full",
+    "outfit": {
+      "type": "hanfu",
+      "main": "#2b1f1f",
+      "accent": "#8f2d2d",
+      "hat": "king_hat"
+    },
+    "accessories": [
+      "sword"
+    ],
+    "head_ratio": 1.0,
+    "chibi": 0.18,
+    "eye_style": "sharp",
+    "face_ratio": 1.05,
+    "marks": [
+      "scar_brow"
+    ]
+  },
+  "poses": [
+    "front",
+    "side",
+    "point",
+    "think"
+  ],
+  "mouth": [
+    "closed",
+    "a",
+    "o",
+    "e",
+    "i",
+    "u",
+    "m"
+  ],
+  "style_overrides": {
+    "ink_chronicle": {
+      "line": 1.3,
+      "shade": 0.6
+    },
+    "woodblock_classic": {
+      "line": 1.4,
+      "shade": 0.7
+    },
+    "parchment_case": {
+      "line": 1.1,
+      "shade": 0.5
+    },
+    "museum_gold": {
+      "line": 1.0,
+      "shade": 0.3
+    }
+  }
+}

@@ -1,0 +1,167 @@
+{
+  "id": "candle_gallery",
+  "label": "烛光长廊",
+  "description": "油画烛光长廊：连续拱券、两侧帷幔与烛台，纵深透视，适合密谋行走与画像镜头。",
+  "tags": [
+    "modern",
+    "roundtable",
+    "oil",
+    "gallery",
+    "candle"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "seed": 20261033,
+  "layers": [
+    {
+      "type": "canvas",
+      "layer": "background",
+      "color": "shadow",
+      "opacity": 1.0
+    },
+    {
+      "type": "oil_strokes",
+      "layer": "background",
+      "count": 80,
+      "opacity": 0.32,
+      "seed": 23,
+      "colors": [
+        "umber",
+        "wine",
+        "accent:1"
+      ]
+    },
+    {
+      "type": "arches",
+      "layer": "midground",
+      "count": 5,
+      "color": "shadow",
+      "opacity": 0.8
+    },
+    {
+      "type": "window_light",
+      "layer": "foreground",
+      "color": "highlight",
+      "count": 2,
+      "opacity": 0.3
+    },
+    {
+      "type": "drapery",
+      "layer": "midground",
+      "x": 0.0,
+      "y": 0.05,
+      "w": 0.16,
+      "h": 0.95,
+      "color": "wine",
+      "accent": "accent",
+      "folds": 4
+    },
+    {
+      "type": "drapery",
+      "layer": "midground",
+      "x": 0.84,
+      "y": 0.05,
+      "w": 0.16,
+      "h": 0.95,
+      "color": "wine",
+      "accent": "accent",
+      "folds": 4
+    },
+    {
+      "type": "candelabra",
+      "layer": "midground",
+      "x": 0.22,
+      "y": 0.42,
+      "scale": 0.2,
+      "candles": 5,
+      "color": "accent:1",
+      "glow": 0.5
+    },
+    {
+      "type": "candelabra",
+      "layer": "midground",
+      "x": 0.78,
+      "y": 0.42,
+      "scale": 0.2,
+      "candles": 5,
+      "color": "accent:1",
+      "glow": 0.5
+    },
+    {
+      "type": "candle_glow",
+      "layer": "foreground",
+      "count": 8,
+      "strength": 0.55,
+      "color": "candle"
+    },
+    {
+      "type": "gold_frame",
+      "layer": "foreground",
+      "width": 0.032,
+      "color": "accent",
+      "accent": "accent:1",
+      "ornate": true
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.162,
+      0.16,
+      0.476,
+      0.78
+    ],
+    "detail": [
+      0.34,
+      0.21,
+      0.32,
+      0.34
+    ],
+    "corridor": [
+      0.2,
+      0.1,
+      0.6,
+      0.85
+    ],
+    "portraits": [
+      0.0,
+      0.12,
+      0.35,
+      0.52
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.5,
+      0.86
+    ],
+    "guest_a": [
+      0.3,
+      0.86
+    ],
+    "guest_b": [
+      0.7,
+      0.86
+    ],
+    "figure_a": [
+      0.3,
+      0.86
+    ],
+    "figure_b": [
+      0.7,
+      0.86
+    ]
+  },
+  "variants": [
+    "dawn",
+    "midnight"
+  ],
+  "props": []
+}
