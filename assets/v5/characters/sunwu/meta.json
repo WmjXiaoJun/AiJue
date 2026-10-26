@@ -10,7 +10,7 @@
   "cfg": 5.5,
   "sampler": "euler_ancestral",
   "scheduler": "normal",
-  "seed": 42,
+  "seed": 43,
   "size": {
     "portrait": [
       832,
@@ -24,12 +24,11 @@
   "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, full body, multiple characters",
   "prompt": {
     "portrait": "masterpiece, best quality, anime style, solo, 1boy, male, mature male, black hair, black eyes, dark grey hanfu, olive accents, upper body, looking at viewer, centered composition, studio lighting, dark background, clean lineart, cel shading, vibrant colors, detailed face, topknot, black headband, short beard, moustache, steady dark eyes, dark green hanfu, brown leather belt, scroll in hand, sword at waist, calm composed expression, military strategist, chinese ancient setting, simple background",
-    "front": "masterpiece, best quality, anime style, solo, 1boy, male, mature male, black hair, black eyes, dark grey hanfu, olive accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, topknot, black headband, short beard, moustache, steady dark eyes, dark green hanfu, brown leather belt, scroll in hand, sword at waist, calm composed expression, military strategist, looking at viewer, pure white background, isolated on white background, no shadow, no scenery"
+    "front": "masterpiece, best quality, anime style, solo, 1boy, male, mature male, black hair, black eyes, dark grey hanfu, olive accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, topknot, black headband, short beard, moustache, steady dark eyes, dark green hanfu, brown leather belt, scroll in hand, sword at waist, calm composed expression, military strategist, looking at viewer, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference"
   },
-  "created_at": "2026-10-26T18:41:30",
-  "elapsed_sec": 27.8,
+  "created_at": "2026-10-26T19:08:37",
+  "elapsed_sec": 23.5,
   "files": {
-    "portrait": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\sunwu\\portrait.png",
     "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\sunwu\\front.png",
     "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\sunwu\\cutout.png"
   },
@@ -52,28 +51,38 @@
       "seed": 43,
       "width": 1024,
       "height": 1024,
-      "gen_sec": 16.1,
-      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, mature male, black hair, black eyes, dark grey hanfu, olive accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, topknot, black headband, short beard, moustache, steady dark eyes, dark green hanfu, brown leather belt, scroll in hand, sword at waist, calm composed expression, military strategist, looking at viewer, pure white background, isolated on white background, no shadow, no scenery",
-      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, multiple views, split screen, cropped, lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements",
+      "gen_sec": 22.4,
+      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, mature male, black hair, black eyes, dark grey hanfu, olive accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, topknot, black headband, short beard, moustache, steady dark eyes, dark green hanfu, brown leather belt, scroll in hand, sword at waist, calm composed expression, military strategist, looking at viewer, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, multiple views, split screen, cropped, lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan",
       "composition": "front",
-      "expression": null
+      "expression": null,
+      "ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\sunwu\\portrait.png",
+      "ip_adapter": {
+        "preset": "PLUS (high strength)",
+        "weight": 0.35,
+        "start_at": 0.0,
+        "end_at": 0.9
+      }
     }
   ],
-  "source": "imagegen",
-  "created_by": "pipeline/v5_art.generate_character_art",
+  "ip_adapter": {
+    "strength": 0.35,
+    "end_at": 0.9,
+    "weight_type": "style transfer"
+  },
+  "source": "imagegen_ref",
+  "seed_base": 43,
+  "attempts": 1,
+  "created_by": "pipeline/v5_art.generate_character_front",
   "status": "ok",
-  "prompt_source": "contract/v5/art/prompts.json#characters",
+  "portrait_ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\sunwu\\portrait.png",
+  "bg_mode": "white",
   "sizes": {
-    "portrait": [
-      832,
-      1216
-    ],
     "cutout": [
-      466,
-      981
+      536,
+      994
     ]
   },
-  "alpha_ratio": 0.507,
   "front_white": {
     "ok": true,
     "corners": [
@@ -84,15 +93,6 @@
           255
         ],
         "mean": 255.0,
-        "spread": 1.0
-      },
-      {
-        "rgb": [
-          255,
-          255,
-          255
-        ],
-        "mean": 254.9,
         "spread": 2.0
       },
       {
@@ -102,7 +102,7 @@
           255
         ],
         "mean": 255.0,
-        "spread": 1.0
+        "spread": 2.0
       },
       {
         "rgb": [
@@ -111,16 +111,24 @@
           255
         ],
         "mean": 255.0,
-        "spread": 1.0
+        "spread": 2.0
+      },
+      {
+        "rgb": [
+          255,
+          255,
+          255
+        ],
+        "mean": 255.0,
+        "spread": 0.0
       }
     ],
-    "white_ratio": 0.783
+    "white_ratio": 0.763
   },
-  "front_attempts": 1,
   "cutout_validation": {
     "ok": true,
-    "alpha0": 0.493,
-    "visible": 0.507,
+    "alpha0": 0.52,
+    "visible": 0.48,
     "corners_alpha": [
       0,
       0,
@@ -130,10 +138,10 @@
     "bbox": [
       8,
       8,
-      458,
-      973
+      528,
+      986
     ],
-    "aspect": 0.475,
+    "aspect": 0.539,
     "bbox_h_ratio": 0.984,
     "wash": {
       "removed": false,
@@ -142,66 +150,37 @@
     }
   },
   "face_norm": {
-    "score": 0.887,
+    "score": 0.85,
     "estimated": false,
     "source": "yunet",
     "bbox": [
-      0.41952789699570814,
-      0.07584097859327217,
-      0.598068669527897,
-      0.17471967380224263
+      0.46492537313432836,
+      0.06549295774647887,
+      0.6401119402985075,
+      0.1749496981891348
     ],
     "mouth": {
-      "cx": 0.5087768240343348,
-      "cy": 0.1529561671763507,
-      "w": 0.060729613733905584,
-      "h": 0.012976554536187564
+      "cx": 0.5525559701492537,
+      "cy": 0.15085513078470825,
+      "w": 0.05958955223880597,
+      "h": 0.014456740442655935
     },
     "eyes": {
-      "y": 0.11734964322120287,
-      "w": 0.03929184549356223,
+      "y": 0.11145875251509055,
+      "w": 0.0385634328358209,
       "cx": [
-        0.4659012875536481,
-        0.5516523605150214
+        0.5104850746268657,
+        0.5946082089552238
       ]
     },
-    "skin": "#fccd9e",
-    "lip": "#5b3a3a",
+    "skin": "#f7d8c0",
+    "lip": "#633a3a",
     "line": "#000000",
-    "face_w": 83.23
-  },
-  "face_portrait_norm": {
-    "score": 0.686,
-    "estimated": false,
-    "bbox": [
-      0.3784855769230769,
-      0.23018092105263155,
-      0.6191105769230769,
-      0.4389802631578947
-    ],
-    "mouth": {
-      "cx": 0.49881009615384614,
-      "cy": 0.39307565789473686,
-      "w": 0.07217548076923076,
-      "h": 0.022220394736842106
-    },
-    "eyes": {
-      "y": 0.3179029605263158,
-      "w": 0.052932692307692306,
-      "cx": [
-        0.4410697115384616,
-        0.5565504807692307
-      ]
-    },
-    "skin": "#edcdac",
-    "lip": "#4e3a3a",
-    "line": "#000000",
-    "face_w": 200.17
+    "face_w": 93.95
   },
   "prompts": {
-    "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, topknot, black headband, short beard, moustache, steady dark eyes, dark green hanfu, brown leather belt, scroll in hand, sword at waist, calm composed expression, military strategist, chinese ancient setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
-    "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, topknot, black headband, short beard, moustache, steady dark eyes, dark green hanfu, brown leather belt, scroll in hand, sword at waist, calm composed expression, military strategist, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery",
-    "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements"
+    "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, topknot, black headband, short beard, moustache, steady dark eyes, dark green hanfu, brown leather belt, scroll in hand, sword at waist, calm composed expression, military strategist, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference",
+    "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan"
   },
   "face_source": "yunet",
   "overlay_allowed": true

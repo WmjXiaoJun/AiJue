@@ -10,7 +10,7 @@
   "cfg": 5.5,
   "sampler": "euler_ancestral",
   "scheduler": "normal",
-  "seed": 42,
+  "seed": 47,
   "size": {
     "portrait": [
       832,
@@ -24,10 +24,10 @@
   "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, full body, multiple characters",
   "prompt": {
     "portrait": "masterpiece, best quality, anime style, solo, androgynous, black hair, lavender eyes, black cloak, blue accents, upper body, looking at viewer, centered composition, studio lighting, dark background, clean lineart, cel shading, vibrant colors, detailed face, 1person, hooded dark purple cloak, face hidden, dark face mask, glowing violet eyes, mysterious aura, dark, modern setting, simple background",
-    "front": "masterpiece, best quality, anime style, solo, androgynous, black hair, lavender eyes, black cloak, blue accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, 1person, hooded dark purple cloak, face hidden, dark face mask, glowing violet eyes, mysterious aura, dark, looking at viewer, pure white background, isolated on white background, no shadow, no scenery"
+    "front": "masterpiece, best quality, anime style, solo, androgynous, black hair, lavender eyes, black cloak, blue accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, 1person, hooded dark purple cloak, face hidden, dark face mask, glowing violet eyes, mysterious aura, dark, looking at viewer, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference"
   },
-  "created_at": "2026-10-26T18:37:57",
-  "elapsed_sec": 37.1,
+  "created_at": "2026-10-26T19:12:35",
+  "elapsed_sec": 14.3,
   "files": {
     "portrait": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\mystery_guest\\portrait.png",
     "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\mystery_guest\\front.png",
@@ -49,51 +49,56 @@
     {
       "tag": "front",
       "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\mystery_guest\\three_view/front.png",
-      "seed": 52,
+      "seed": 47,
       "width": 1024,
       "height": 1024,
-      "gen_sec": 14.2,
-      "prompt": "masterpiece, best quality, anime style, solo, androgynous, black hair, lavender eyes, black cloak, blue accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, 1person, hooded dark purple cloak, face hidden, dark face mask, glowing violet eyes, mysterious aura, dark, looking at viewer, pure white background, isolated on white background, no shadow, no scenery",
-      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, multiple views, split screen, cropped, lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, visible face, bright lighting, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements",
+      "gen_sec": 14.0,
+      "prompt": "masterpiece, best quality, anime style, solo, androgynous, black hair, lavender eyes, black cloak, blue accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, 1person, hooded dark purple cloak, face hidden, dark face mask, glowing violet eyes, mysterious aura, dark, looking at viewer, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, multiple views, split screen, cropped, lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, visible face, bright lighting, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan",
       "composition": "front",
-      "expression": null
+      "expression": null,
+      "ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\mystery_guest\\portrait.png",
+      "ip_adapter": {
+        "preset": "PLUS (high strength)",
+        "weight": 0.22,
+        "start_at": 0.0,
+        "end_at": 0.75
+      }
     }
   ],
-  "source": "imagegen",
-  "created_by": "pipeline/v5_art.generate_character_art",
+  "ip_adapter": {
+    "strength": 0.22,
+    "end_at": 0.75,
+    "weight_type": "style transfer"
+  },
+  "source": "imagegen_ref",
   "status": "ok",
-  "prompt_source": "contract/v5/art/prompts.json#characters",
+  "seed_base": 43,
+  "attempts": 3,
+  "created_by": "pipeline/v5_art.generate_character_front (repair)",
+  "portrait_ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\mystery_guest\\portrait.png",
+  "bg_mode": "white",
   "sizes": {
     "portrait": [
       832,
       1216
     ],
     "cutout": [
-      716,
-      975
+      859,
+      962
     ]
   },
-  "alpha_ratio": 0.434,
   "front_white": {
     "ok": true,
     "corners": [
       {
         "rgb": [
-          255,
-          255,
-          255
+          254,
+          254,
+          254
         ],
-        "mean": 255.0,
-        "spread": 1.0
-      },
-      {
-        "rgb": [
-          255,
-          255,
-          255
-        ],
-        "mean": 255.0,
-        "spread": 1.0
+        "mean": 254.3,
+        "spread": 4.0
       },
       {
         "rgb": [
@@ -110,17 +115,25 @@
           255,
           255
         ],
-        "mean": 254.9,
+        "mean": 254.8,
         "spread": 2.0
+      },
+      {
+        "rgb": [
+          255,
+          255,
+          255
+        ],
+        "mean": 254.9,
+        "spread": 1.0
       }
     ],
-    "white_ratio": 0.721
+    "white_ratio": 0.612
   },
-  "front_attempts": 1,
   "cutout_validation": {
     "ok": true,
-    "alpha0": 0.566,
-    "visible": 0.434,
+    "alpha0": 0.46,
+    "visible": 0.54,
     "corners_alpha": [
       0,
       0,
@@ -130,11 +143,11 @@
     "bbox": [
       8,
       8,
-      708,
-      967
+      851,
+      954
     ],
-    "aspect": 0.734,
-    "bbox_h_ratio": 0.984,
+    "aspect": 0.893,
+    "bbox_h_ratio": 0.983,
     "wash": {
       "removed": false,
       "color": null,
@@ -142,67 +155,34 @@
     }
   },
   "face_norm": {
-    "score": 0.0,
-    "estimated": true,
-    "source": "estimate",
+    "score": 0.45,
+    "estimated": false,
+    "source": "haar",
     "bbox": [
-      0.3527932960893855,
-      0.09005128205128204,
-      0.6527932960893854,
-      0.3
+      0.27357392316647267,
+      0.08523908523908524,
+      0.4330616996507567,
+      0.22765072765072766
     ],
     "mouth": {
-      "cx": 0.5027932960893855,
-      "cy": 0.25380512820512824,
-      "w": 0.10199720670391062,
-      "h": 0.0337025641025641
+      "cx": 0.3533178114086147,
+      "cy": 0.19632016632016633,
+      "w": 0.054225844004656576,
+      "h": 0.02178794178794179
     },
     "eyes": {
-      "y": 0.1782051282051282,
-      "w": 0.06600558659217877,
+      "y": 0.14505197505197504,
+      "w": 0.03508731082654249,
       "cx": [
-        0.43079608938547487,
-        0.5747905027932961
+        0.3150407450523865,
+        0.3915948777648428
       ]
     },
-    "skin": "#080d13",
-    "lip": "#443a3a",
-    "line": "#000000",
-    "face_w": 214.8
+    "skin": "#d9d0e1",
+    "lip": "#6a3a53",
+    "line": "#0b0a12",
+    "face_w": 137.0
   },
-  "face_portrait_norm": {
-    "score": 0.0,
-    "estimated": true,
-    "bbox": [
-      0.3,
-      0.18001644736842107,
-      0.7,
-      0.5199835526315789
-    ],
-    "mouth": {
-      "cx": 0.5,
-      "cy": 0.4451973684210526,
-      "w": 0.12000000000000001,
-      "h": 0.036949013157894735
-    },
-    "eyes": {
-      "y": 0.32279605263157896,
-      "w": 0.08800480769230769,
-      "cx": [
-        0.4040024038461538,
-        0.5959975961538462
-      ]
-    },
-    "skin": "#2410ce",
-    "lip": "#453a3a",
-    "line": "#000003",
-    "face_w": 332.8
-  },
-  "prompts": {
-    "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1person, hooded dark purple cloak, face hidden, dark face mask, glowing violet eyes, mysterious aura, dark, modern setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
-    "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1person, hooded dark purple cloak, face hidden, dark face mask, glowing violet eyes, mysterious aura, dark, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery",
-    "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, visible face, bright lighting, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements"
-  },
-  "face_source": "estimate",
+  "face_source": "haar",
   "overlay_allowed": false
 }

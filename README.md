@@ -146,3 +146,13 @@ FastAPI · SQLAlchemy · SQLite · Vite · React · TypeScript · FFmpeg 6.1 · 
 - **可自定义**：contract/v5/ 六类 JSON（styles/scenes/characters/props/templates/packs）+ custom/ 覆盖 + schema 校验 + CLI（python -m pipeline.v5_cli validate/list/export/preview）+ API（/api/v5/...），教程 docs/V5_CUSTOMIZATION.md。
 - **渲染**：python -m pipeline.cli render_v5 --template history_talk --duration 40；批量 python scripts/render_templates_v5.py --duration 40 --refresh；产物 outputs/templates_v5/{id}/。
 - 规模：**16 风格 / 61 场景 / 24 角色 / 44 道具 / 2 风格包**，契约 validate 0 error/0 warning。
+
+## V5.2 AI 美术升级 + V5 世界前端（2026-10-26）
+
+> 规划/报告：docs/PLAN_V5_2_ART_FRONTEND.md、docs/V5_2_REPORT.md；场景美术：docs/V5_2_SCENE_ART.md；前端：docs/V5_2_FRONTEND.md；验收：docs/V5_2_ACCEPTANCE.md。
+
+- **美术全面换成 AI 动漫资产**：SDXL Animagine XL 4.0 生成 24 角色立绘（portrait + 全身白底 front + 泛洪抠图 cutout；front 用 IP-Adapter 以 portrait 为参考保证同画风）与 61 场景 plate（1280×720，无人物动漫背景；历史 13 场景含古地图/战场/军帐/宫殿/博物馆/考古/关隘等）；最早的 laozhou/ali/dawei 沿用 V3 资产。
+- **16 风格保留**：style_v5.apply_finish 对 AI plate/立绘做 16 种强风格化（水墨/版刻/羊皮纸/博物馆/霓虹/全息/VHS/胶片/黑色电影/油画/巴洛克/蓝图/糖果拼贴/黏土/粉笔/绢本），16 部成片风格可辨。
+- **V5 世界前端**：http://127.0.0.1:8090/#/v5（React 工作台新增页）：成片画廊（播放/QC/时间线）、风格墙、场景库、角色库（AI 立绘 + 固定声音试听/修改/重建声音锁）、渲染面板（提交后台渲染 + 进度/取消）；API /api/v5/outputs、/media/v5/*、/api/v5/voice/{id}、/api/v5/render*。
+- 渲染：python scripts/render_templates_v5.py --duration 40 --refresh；单部 python -m pipeline.cli render_v5 --template history_talk --duration 40。
+- 资产：ssets/v5/characters/<id>/（24）、ssets/v5/scenes/<id>.png+json（61）；提示词 contract/v5/art/prompts.json；复现 python scripts/gen_v5_scene_art.py、python scripts/gen_v5_character_art.py（front: scripts/regen_v5_character_fronts.py）。

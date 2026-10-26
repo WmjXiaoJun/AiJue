@@ -10,7 +10,7 @@
   "cfg": 5.5,
   "sampler": "euler_ancestral",
   "scheduler": "normal",
-  "seed": 42,
+  "seed": 43,
   "size": {
     "portrait": [
       832,
@@ -24,12 +24,11 @@
   "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, full body, multiple characters",
   "prompt": {
     "portrait": "masterpiece, best quality, anime style, solo, 1boy, male, mature male, black hair, black eyes, cream robe, olive accents, cheerful, smile, upper body, looking at viewer, centered composition, studio lighting, dark background, clean lineart, cel shading, vibrant colors, detailed face, hair bun, futou hat, long beard, goatee, warm dark eyes, long eyebrows, green sash, brush in hand, scroll in hand, cheerful warm smile, relaxed literary scholar, chinese ancient setting, simple background",
-    "front": "masterpiece, best quality, anime style, solo, 1boy, male, mature male, black hair, black eyes, cream robe, olive accents, cheerful, smile, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, hair bun, futou hat, long beard, goatee, warm dark eyes, long eyebrows, green sash, brush in hand, scroll in hand, cheerful warm smile, relaxed literary scholar, looking at viewer, pure white background, isolated on white background, no shadow, no scenery"
+    "front": "masterpiece, best quality, anime style, solo, 1boy, male, mature male, black hair, black eyes, cream robe, olive accents, cheerful, smile, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, hair bun, futou hat, long beard, goatee, warm dark eyes, long eyebrows, green sash, brush in hand, scroll in hand, cheerful warm smile, relaxed literary scholar, looking at viewer, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference"
   },
-  "created_at": "2026-10-26T18:42:02",
-  "elapsed_sec": 32.2,
+  "created_at": "2026-10-26T19:09:01",
+  "elapsed_sec": 23.3,
   "files": {
-    "portrait": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\sushi\\portrait.png",
     "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\sushi\\front.png",
     "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\sushi\\cutout.png"
   },
@@ -52,28 +51,38 @@
       "seed": 43,
       "width": 1024,
       "height": 1024,
-      "gen_sec": 16.3,
-      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, mature male, black hair, black eyes, cream robe, olive accents, cheerful, smile, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, hair bun, futou hat, long beard, goatee, warm dark eyes, long eyebrows, green sash, brush in hand, scroll in hand, cheerful warm smile, relaxed literary scholar, looking at viewer, pure white background, isolated on white background, no shadow, no scenery",
-      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, multiple views, split screen, cropped, lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements",
+      "gen_sec": 22.1,
+      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, mature male, black hair, black eyes, cream robe, olive accents, cheerful, smile, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, hair bun, futou hat, long beard, goatee, warm dark eyes, long eyebrows, green sash, brush in hand, scroll in hand, cheerful warm smile, relaxed literary scholar, looking at viewer, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, multiple views, split screen, cropped, lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan",
       "composition": "front",
-      "expression": null
+      "expression": null,
+      "ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\sushi\\portrait.png",
+      "ip_adapter": {
+        "preset": "PLUS (high strength)",
+        "weight": 0.35,
+        "start_at": 0.0,
+        "end_at": 0.9
+      }
     }
   ],
-  "source": "imagegen",
-  "created_by": "pipeline/v5_art.generate_character_art",
+  "ip_adapter": {
+    "strength": 0.35,
+    "end_at": 0.9,
+    "weight_type": "style transfer"
+  },
+  "source": "imagegen_ref",
+  "seed_base": 43,
+  "attempts": 1,
+  "created_by": "pipeline/v5_art.generate_character_front",
   "status": "ok",
-  "prompt_source": "contract/v5/art/prompts.json#characters",
+  "portrait_ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\sushi\\portrait.png",
+  "bg_mode": "white",
   "sizes": {
-    "portrait": [
-      832,
-      1216
-    ],
     "cutout": [
-      769,
-      1005
+      802,
+      1006
     ]
   },
-  "alpha_ratio": 0.486,
   "front_white": {
     "ok": true,
     "corners": [
@@ -83,7 +92,7 @@
           255,
           255
         ],
-        "mean": 254.6,
+        "mean": 254.9,
         "spread": 2.0
       },
       {
@@ -93,7 +102,16 @@
           255
         ],
         "mean": 254.9,
-        "spread": 3.0
+        "spread": 2.0
+      },
+      {
+        "rgb": [
+          255,
+          255,
+          255
+        ],
+        "mean": 255.0,
+        "spread": 0.0
       },
       {
         "rgb": [
@@ -103,24 +121,14 @@
         ],
         "mean": 255.0,
         "spread": 1.0
-      },
-      {
-        "rgb": [
-          255,
-          255,
-          255
-        ],
-        "mean": 254.9,
-        "spread": 2.0
       }
     ],
-    "white_ratio": 0.656
+    "white_ratio": 0.582
   },
-  "front_attempts": 1,
   "cutout_validation": {
     "ok": true,
-    "alpha0": 0.514,
-    "visible": 0.486,
+    "alpha0": 0.432,
+    "visible": 0.568,
     "corners_alpha": [
       0,
       0,
@@ -130,10 +138,10 @@
     "bbox": [
       8,
       8,
-      761,
-      997
+      794,
+      998
     ],
-    "aspect": 0.765,
+    "aspect": 0.797,
     "bbox_h_ratio": 0.984,
     "wash": {
       "removed": false,
@@ -142,67 +150,38 @@
     }
   },
   "face_norm": {
-    "score": 0.614,
+    "score": 0.45,
     "estimated": false,
-    "source": "yunet_headcrop",
+    "source": "haar",
     "bbox": [
-      0.49544863459037713,
-      0.11293532338308458,
-      0.6390117035110533,
-      0.22955223880597014
+      0.628428927680798,
+      0.10139165009940358,
+      0.7556109725685786,
+      0.20278330019880716
     ],
     "mouth": {
-      "cx": 0.5672431729518855,
-      "cy": 0.2039004975124378,
-      "w": 0.0488036410923277,
-      "h": 0.01680597014925373
+      "cx": 0.6920199501246883,
+      "cy": 0.18047713717693836,
+      "w": 0.04324189526184539,
+      "h": 0.0155168986083499
     },
     "eyes": {
-      "y": 0.16192039800995023,
-      "w": 0.03157347204161248,
+      "y": 0.1439761431411531,
+      "w": 0.027980049875311722,
       "cx": [
-        0.5327958387516255,
-        0.6016905071521457
+        0.6614962593516209,
+        0.7225436408977556
       ]
     },
-    "skin": "#d5b697",
-    "lip": "#6d3d3a",
-    "line": "#000000",
-    "face_w": 110.38
-  },
-  "face_portrait_norm": {
-    "score": 0.0,
-    "estimated": true,
-    "bbox": [
-      0.3,
-      0.18001644736842107,
-      0.7,
-      0.5199835526315789
-    ],
-    "mouth": {
-      "cx": 0.5,
-      "cy": 0.4451973684210526,
-      "w": 0.12000000000000001,
-      "h": 0.036949013157894735
-    },
-    "eyes": {
-      "y": 0.32279605263157896,
-      "w": 0.08800480769230769,
-      "cx": [
-        0.4040024038461538,
-        0.5959975961538462
-      ]
-    },
-    "skin": "#ecbf84",
-    "lip": "#8a4a42",
-    "line": "#010101",
-    "face_w": 332.8
+    "skin": "#dfc2b6",
+    "lip": "#6c3a3e",
+    "line": "#030101",
+    "face_w": 102.0
   },
   "prompts": {
-    "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, hair bun, futou hat, long beard, goatee, warm dark eyes, long eyebrows, cream robe, green sash, brush in hand, scroll in hand, cheerful warm smile, relaxed literary scholar, chinese ancient setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
-    "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, hair bun, futou hat, long beard, goatee, warm dark eyes, long eyebrows, cream robe, green sash, brush in hand, scroll in hand, cheerful warm smile, relaxed literary scholar, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery",
-    "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements"
+    "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, hair bun, futou hat, long beard, goatee, warm dark eyes, long eyebrows, cream robe, green sash, brush in hand, scroll in hand, cheerful warm smile, relaxed literary scholar, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference",
+    "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan"
   },
-  "face_source": "yunet_headcrop",
+  "face_source": "haar",
   "overlay_allowed": true
 }

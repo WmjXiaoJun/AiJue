@@ -10,7 +10,7 @@
   "cfg": 5.5,
   "sampler": "euler_ancestral",
   "scheduler": "normal",
-  "seed": 42,
+  "seed": 47,
   "size": {
     "portrait": [
       832,
@@ -24,12 +24,11 @@
   "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, full body, multiple characters",
   "prompt": {
     "portrait": "masterpiece, best quality, anime style, solo, 1girl, female, young adult female, magenta hair, purple eyes, soft eyebrows, peach dress, dress, white accents, upper body, looking at viewer, centered composition, studio lighting, dark background, clean lineart, cel shading, vibrant colors, detailed face, pink hair, double buns, twin buns, big purple eyes, pink dress, hair clip, smartphone in hand, cute big smile, cheerful sweet girl, freckles, modern setting, simple background",
-    "front": "masterpiece, best quality, anime style, solo, 1girl, female, young adult female, magenta hair, purple eyes, soft eyebrows, peach dress, dress, white accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, pink hair, double buns, twin buns, big purple eyes, pink dress, hair clip, smartphone in hand, cute big smile, cheerful sweet girl, freckles, looking at viewer, pure white background, isolated on white background, no shadow, no scenery"
+    "front": "masterpiece, best quality, anime style, solo, 1girl, female, young adult female, magenta hair, purple eyes, soft eyebrows, peach dress, dress, white accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, pink hair, double buns, twin buns, big purple eyes, pink dress, hair clip, smartphone in hand, cute big smile, cheerful sweet girl, freckles, looking at viewer, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference"
   },
-  "created_at": "2026-10-26T18:42:30",
-  "elapsed_sec": 27.6,
+  "created_at": "2026-10-26T19:09:53",
+  "elapsed_sec": 52.7,
   "files": {
-    "portrait": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\tianmei\\portrait.png",
     "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\tianmei\\front.png",
     "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\tianmei\\cutout.png"
   },
@@ -49,42 +48,52 @@
     {
       "tag": "front",
       "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\tianmei\\three_view/front.png",
-      "seed": 43,
+      "seed": 47,
       "width": 1024,
       "height": 1024,
-      "gen_sec": 10.1,
-      "prompt": "masterpiece, best quality, anime style, solo, 1girl, female, young adult female, magenta hair, purple eyes, soft eyebrows, peach dress, dress, white accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, pink hair, double buns, twin buns, big purple eyes, pink dress, hair clip, smartphone in hand, cute big smile, cheerful sweet girl, freckles, looking at viewer, pure white background, isolated on white background, no shadow, no scenery",
-      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, multiple views, split screen, cropped, lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements",
+      "gen_sec": 14.0,
+      "prompt": "masterpiece, best quality, anime style, solo, 1girl, female, young adult female, magenta hair, purple eyes, soft eyebrows, peach dress, dress, white accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, pink hair, double buns, twin buns, big purple eyes, pink dress, hair clip, smartphone in hand, cute big smile, cheerful sweet girl, freckles, looking at viewer, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, multiple views, split screen, cropped, lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan",
       "composition": "front",
-      "expression": null
+      "expression": null,
+      "ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\tianmei\\portrait.png",
+      "ip_adapter": {
+        "preset": "PLUS (high strength)",
+        "weight": 0.22,
+        "start_at": 0.0,
+        "end_at": 0.75
+      }
     }
   ],
-  "source": "imagegen",
-  "created_by": "pipeline/v5_art.generate_character_art",
+  "ip_adapter": {
+    "strength": 0.22,
+    "end_at": 0.75,
+    "weight_type": "style transfer"
+  },
+  "source": "imagegen_ref",
+  "seed_base": 43,
+  "attempts": 3,
+  "created_by": "pipeline/v5_art.generate_character_front",
   "status": "ok",
-  "prompt_source": "contract/v5/art/prompts.json#characters",
+  "portrait_ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\tianmei\\portrait.png",
+  "bg_mode": "white",
   "sizes": {
-    "portrait": [
-      832,
-      1216
-    ],
     "cutout": [
-      476,
-      894
+      698,
+      988
     ]
   },
-  "alpha_ratio": 0.408,
   "front_white": {
     "ok": true,
     "corners": [
       {
         "rgb": [
+          254,
           255,
-          255,
-          255
+          254
         ],
-        "mean": 254.9,
-        "spread": 3.0
+        "mean": 254.3,
+        "spread": 4.0
       },
       {
         "rgb": [
@@ -92,17 +101,8 @@
           255,
           255
         ],
-        "mean": 254.9,
+        "mean": 254.8,
         "spread": 3.0
-      },
-      {
-        "rgb": [
-          255,
-          255,
-          255
-        ],
-        "mean": 254.9,
-        "spread": 2.0
       },
       {
         "rgb": [
@@ -112,15 +112,23 @@
         ],
         "mean": 255.0,
         "spread": 1.0
+      },
+      {
+        "rgb": [
+          255,
+          255,
+          255
+        ],
+        "mean": 254.9,
+        "spread": 3.0
       }
     ],
-    "white_ratio": 0.846
+    "white_ratio": 0.739
   },
-  "front_attempts": 1,
   "cutout_validation": {
     "ok": true,
-    "alpha0": 0.592,
-    "visible": 0.408,
+    "alpha0": 0.568,
+    "visible": 0.432,
     "corners_alpha": [
       0,
       0,
@@ -130,79 +138,54 @@
     "bbox": [
       8,
       8,
-      468,
-      886
+      690,
+      980
     ],
-    "aspect": 0.532,
-    "bbox_h_ratio": 0.982,
+    "aspect": 0.706,
+    "bbox_h_ratio": 0.984,
     "wash": {
-      "removed": false,
-      "color": null,
-      "ratio": 0.0
+      "removed": true,
+      "ratio": 0.063,
+      "color": [
+        230,
+        160,
+        206
+      ]
     }
   },
   "face_norm": {
-    "score": 0.727,
+    "score": 0.45,
     "estimated": false,
-    "source": "yunet",
+    "source": "haar",
     "bbox": [
-      0.3691176470588235,
-      0.07192393736017896,
-      0.5529411764705882,
-      0.18982102908277404
+      0.3681948424068768,
+      0.11032388663967611,
+      0.4799426934097421,
+      0.18927125506072875
     ],
     "mouth": {
-      "cx": 0.4609663865546218,
-      "cy": 0.16390380313199104,
-      "w": 0.06247899159663865,
-      "h": 0.014966442953020135
+      "cx": 0.42406876790830944,
+      "cy": 0.17190283400809717,
+      "w": 0.03799426934097421,
+      "h": 0.0120748987854251
     },
     "eyes": {
-      "y": 0.12145413870246084,
-      "w": 0.04042016806722689,
+      "y": 0.1434817813765182,
+      "w": 0.024584527220630373,
       "cx": [
-        0.4168697478991597,
-        0.5050630252100841
+        0.39724928366762174,
+        0.4508882521489972
       ]
     },
-    "skin": "#fcdec1",
-    "lip": "#a56462",
-    "line": "#1c1229",
-    "face_w": 87.47
-  },
-  "face_portrait_norm": {
-    "score": 0.0,
-    "estimated": true,
-    "bbox": [
-      0.3,
-      0.18001644736842107,
-      0.7,
-      0.5199835526315789
-    ],
-    "mouth": {
-      "cx": 0.5,
-      "cy": 0.4451973684210526,
-      "w": 0.12000000000000001,
-      "h": 0.036949013157894735
-    },
-    "eyes": {
-      "y": 0.32279605263157896,
-      "w": 0.08800480769230769,
-      "cx": [
-        0.4040024038461538,
-        0.5959975961538462
-      ]
-    },
-    "skin": "#fbddcd",
-    "lip": "#7e4057",
-    "line": "#010106",
-    "face_w": 332.8
+    "skin": "#fef2e7",
+    "lip": "#6d3b50",
+    "line": "#08040a",
+    "face_w": 78.0
   },
   "prompts": {
-    "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1girl, female, young adult female, pink hair, double buns, twin buns, big purple eyes, soft eyebrows, pink dress, white accents, hair clip, smartphone in hand, cute big smile, cheerful sweet girl, freckles, modern setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
-    "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1girl, female, young adult female, pink hair, double buns, twin buns, big purple eyes, soft eyebrows, pink dress, white accents, hair clip, smartphone in hand, cute big smile, cheerful sweet girl, freckles, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery",
-    "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements"
+    "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1girl, female, young adult female, pink hair, double buns, twin buns, big purple eyes, soft eyebrows, pink dress, white accents, hair clip, smartphone in hand, cute big smile, cheerful sweet girl, freckles, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference",
+    "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan"
   },
-  "face_source": "yunet",
+  "face_source": "haar",
   "overlay_allowed": true
 }

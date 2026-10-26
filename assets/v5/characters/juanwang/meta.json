@@ -10,7 +10,7 @@
   "cfg": 5.5,
   "sampler": "euler_ancestral",
   "scheduler": "normal",
-  "seed": 42,
+  "seed": 45,
   "size": {
     "portrait": [
       832,
@@ -24,12 +24,11 @@
   "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, full body, multiple characters",
   "prompt": {
     "portrait": "masterpiece, best quality, anime style, solo, 1boy, male, adult male, black hair, black eyes, white shirt, shirt, blue accents, upper body, looking at viewer, centered composition, studio lighting, dark background, clean lineart, cel shading, vibrant colors, detailed face, young adult male, undercut, dark eyes, tired eyes, dark circles, angled eyebrows, blue necktie, laptop in hand, coffee cup, anxious hardworking expression, office worker, modern setting, simple background",
-    "front": "masterpiece, best quality, anime style, solo, 1boy, male, adult male, black hair, black eyes, white shirt, shirt, blue accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, young adult male, undercut, dark eyes, tired eyes, dark circles, angled eyebrows, blue necktie, laptop in hand, coffee cup, anxious hardworking expression, office worker, looking at viewer, pure white background, isolated on white background, no shadow, no scenery"
+    "front": "masterpiece, best quality, anime style, solo, 1boy, male, adult male, black hair, black eyes, white shirt, shirt, blue accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, young adult male, undercut, dark eyes, tired eyes, dark circles, angled eyebrows, blue necktie, laptop in hand, coffee cup, anxious hardworking expression, office worker, looking at viewer, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference"
   },
-  "created_at": "2026-10-26T18:35:32",
-  "elapsed_sec": 21.7,
+  "created_at": "2026-10-26T19:01:31",
+  "elapsed_sec": 61.6,
   "files": {
-    "portrait": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\juanwang\\portrait.png",
     "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\juanwang\\front.png",
     "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\juanwang\\cutout.png"
   },
@@ -49,31 +48,41 @@
     {
       "tag": "front",
       "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\juanwang\\three_view/front.png",
-      "seed": 43,
+      "seed": 45,
       "width": 1024,
       "height": 1024,
-      "gen_sec": 10.1,
-      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, adult male, black hair, black eyes, white shirt, shirt, blue accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, young adult male, undercut, dark eyes, tired eyes, dark circles, angled eyebrows, blue necktie, laptop in hand, coffee cup, anxious hardworking expression, office worker, looking at viewer, pure white background, isolated on white background, no shadow, no scenery",
-      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, multiple views, split screen, cropped, lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements",
+      "gen_sec": 28.0,
+      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, adult male, black hair, black eyes, white shirt, shirt, blue accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, young adult male, undercut, dark eyes, tired eyes, dark circles, angled eyebrows, blue necktie, laptop in hand, coffee cup, anxious hardworking expression, office worker, looking at viewer, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, multiple views, split screen, cropped, lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan",
       "composition": "front",
-      "expression": null
+      "expression": null,
+      "ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\juanwang\\portrait.png",
+      "ip_adapter": {
+        "preset": "PLUS (high strength)",
+        "weight": 0.25,
+        "start_at": 0.0,
+        "end_at": 0.8
+      }
     }
   ],
-  "source": "imagegen",
-  "created_by": "pipeline/v5_art.generate_character_art",
+  "ip_adapter": {
+    "strength": 0.25,
+    "end_at": 0.8,
+    "weight_type": "style transfer"
+  },
+  "source": "imagegen_ref",
+  "seed_base": 43,
+  "attempts": 2,
+  "created_by": "pipeline/v5_art.generate_character_front",
   "status": "ok",
-  "prompt_source": "contract/v5/art/prompts.json#characters",
+  "portrait_ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\juanwang\\portrait.png",
+  "bg_mode": "white",
   "sizes": {
-    "portrait": [
-      832,
-      1216
-    ],
     "cutout": [
-      418,
-      985
+      320,
+      1000
     ]
   },
-  "alpha_ratio": 0.444,
   "front_white": {
     "ok": true,
     "corners": [
@@ -83,7 +92,7 @@
           255,
           255
         ],
-        "mean": 254.9,
+        "mean": 255.0,
         "spread": 2.0
       },
       {
@@ -101,7 +110,7 @@
           255,
           255
         ],
-        "mean": 254.9,
+        "mean": 255.0,
         "spread": 2.0
       },
       {
@@ -110,17 +119,16 @@
           255,
           255
         ],
-        "mean": 254.9,
-        "spread": 3.0
+        "mean": 255.0,
+        "spread": 2.0
       }
     ],
-    "white_ratio": 0.873
+    "white_ratio": 0.885
   },
-  "front_attempts": 1,
   "cutout_validation": {
     "ok": true,
-    "alpha0": 0.556,
-    "visible": 0.444,
+    "alpha0": 0.469,
+    "visible": 0.531,
     "corners_alpha": [
       0,
       0,
@@ -130,11 +138,11 @@
     "bbox": [
       8,
       8,
-      410,
-      977
+      312,
+      993
     ],
-    "aspect": 0.424,
-    "bbox_h_ratio": 0.984,
+    "aspect": 0.32,
+    "bbox_h_ratio": 0.985,
     "wash": {
       "removed": false,
       "color": null,
@@ -142,66 +150,37 @@
     }
   },
   "face_norm": {
-    "score": 0.828,
+    "score": 0.871,
     "estimated": false,
     "source": "yunet",
     "bbox": [
-      0.3861244019138756,
-      0.06700507614213198,
-      0.6401913875598086,
-      0.20781725888324873
+      0.2840625,
+      0.0571,
+      0.5415625000000001,
+      0.1832
     ],
     "mouth": {
-      "cx": 0.5130622009569378,
-      "cy": 0.17681218274111674,
-      "w": 0.08638755980861244,
-      "h": 0.01649746192893401
+      "cx": 0.41278125,
+      "cy": 0.15544,
+      "w": 0.08746875,
+      "h": 0.0126
     },
     "eyes": {
-      "y": 0.12614213197969543,
-      "w": 0.05590909090909091,
+      "y": 0.11003,
+      "w": 0.05659375,
       "cx": [
-        0.45208133971291864,
-        0.5740430622009569
+        0.35103125,
+        0.47453124999999996
       ]
     },
-    "skin": "#f3a780",
-    "lip": "#8a4640",
-    "line": "#000000",
-    "face_w": 106.22
-  },
-  "face_portrait_norm": {
-    "score": 0.0,
-    "estimated": true,
-    "bbox": [
-      0.3,
-      0.18001644736842107,
-      0.7,
-      0.5199835526315789
-    ],
-    "mouth": {
-      "cx": 0.5,
-      "cy": 0.4451973684210526,
-      "w": 0.12000000000000001,
-      "h": 0.036949013157894735
-    },
-    "eyes": {
-      "y": 0.32279605263157896,
-      "w": 0.08800480769230769,
-      "cx": [
-        0.4040024038461538,
-        0.5959975961538462
-      ]
-    },
-    "skin": "#fdd096",
-    "lip": "#8c4a46",
-    "line": "#020206",
-    "face_w": 332.8
+    "skin": "#f4d1bb",
+    "lip": "#985958",
+    "line": "#211c23",
+    "face_w": 82.33
   },
   "prompts": {
-    "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, young adult male, black hair, undercut, dark eyes, tired eyes, dark circles, angled eyebrows, white shirt, blue necktie, laptop in hand, coffee cup, anxious hardworking expression, office worker, modern setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
-    "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, young adult male, black hair, undercut, dark eyes, tired eyes, dark circles, angled eyebrows, white shirt, blue necktie, laptop in hand, coffee cup, anxious hardworking expression, office worker, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery",
-    "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements"
+    "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, young adult male, black hair, undercut, dark eyes, tired eyes, dark circles, angled eyebrows, white shirt, blue necktie, laptop in hand, coffee cup, anxious hardworking expression, office worker, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference",
+    "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, ancient clothing, hanfu, chinese armor, crown, historical costume, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan"
   },
   "face_source": "yunet",
   "overlay_allowed": true

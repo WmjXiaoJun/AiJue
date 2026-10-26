@@ -10,7 +10,7 @@
   "cfg": 5.5,
   "sampler": "euler_ancestral",
   "scheduler": "normal",
-  "seed": 42,
+  "seed": 47,
   "size": {
     "portrait": [
       832,
@@ -24,12 +24,11 @@
   "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, full body, multiple characters",
   "prompt": {
     "portrait": "masterpiece, best quality, anime style, solo, 1boy, male, adult male, black hair, black eyes, cream hanfu, grey accents, upper body, looking at viewer, centered composition, studio lighting, dark background, clean lineart, cel shading, vibrant colors, detailed face, mature male, long black hair, loose hair, short beard, bright dark eyes, white hanfu, blue trim, wine flagon in hand, sword at waist, free-spirited cheerful expression, romantic poet, chinese ancient setting, simple background",
-    "front": "masterpiece, best quality, anime style, solo, 1boy, male, adult male, black hair, black eyes, cream hanfu, grey accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, mature male, long black hair, loose hair, short beard, bright dark eyes, white hanfu, blue trim, wine flagon in hand, sword at waist, free-spirited cheerful expression, romantic poet, looking at viewer, pure white background, isolated on white background, no shadow, no scenery"
+    "front": "masterpiece, best quality, anime style, solo, 1boy, male, adult male, black hair, black eyes, cream hanfu, grey accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, mature male, long black hair, loose hair, short beard, bright dark eyes, white hanfu, blue trim, wine flagon in hand, sword at waist, free-spirited cheerful expression, romantic poet, looking at viewer, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference"
   },
-  "created_at": "2026-10-26T18:36:26",
-  "elapsed_sec": 21.5,
+  "created_at": "2026-10-26T19:03:24",
+  "elapsed_sec": 62.6,
   "files": {
-    "portrait": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\libai\\portrait.png",
     "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\libai\\front.png",
     "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\libai\\cutout.png"
   },
@@ -49,42 +48,52 @@
     {
       "tag": "front",
       "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\libai\\three_view/front.png",
-      "seed": 43,
+      "seed": 47,
       "width": 1024,
       "height": 1024,
-      "gen_sec": 10.1,
-      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, adult male, black hair, black eyes, cream hanfu, grey accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, mature male, long black hair, loose hair, short beard, bright dark eyes, white hanfu, blue trim, wine flagon in hand, sword at waist, free-spirited cheerful expression, romantic poet, looking at viewer, pure white background, isolated on white background, no shadow, no scenery",
-      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, multiple views, split screen, cropped, lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements",
+      "gen_sec": 16.3,
+      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, adult male, black hair, black eyes, cream hanfu, grey accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, mature male, long black hair, loose hair, short beard, bright dark eyes, white hanfu, blue trim, wine flagon in hand, sword at waist, free-spirited cheerful expression, romantic poet, looking at viewer, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, multiple views, split screen, cropped, lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan",
       "composition": "front",
-      "expression": null
+      "expression": null,
+      "ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\libai\\portrait.png",
+      "ip_adapter": {
+        "preset": "PLUS (high strength)",
+        "weight": 0.22,
+        "start_at": 0.0,
+        "end_at": 0.75
+      }
     }
   ],
-  "source": "imagegen",
-  "created_by": "pipeline/v5_art.generate_character_art",
+  "ip_adapter": {
+    "strength": 0.22,
+    "end_at": 0.75,
+    "weight_type": "style transfer"
+  },
+  "source": "imagegen_ref",
+  "seed_base": 43,
+  "attempts": 3,
+  "created_by": "pipeline/v5_art.generate_character_front",
   "status": "ok",
-  "prompt_source": "contract/v5/art/prompts.json#characters",
+  "portrait_ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\libai\\portrait.png",
+  "bg_mode": "white",
   "sizes": {
-    "portrait": [
-      832,
-      1216
-    ],
     "cutout": [
-      525,
-      907
+      834,
+      971
     ]
   },
-  "alpha_ratio": 0.465,
   "front_white": {
     "ok": true,
     "corners": [
       {
         "rgb": [
           255,
-          255,
+          254,
           255
         ],
-        "mean": 254.9,
-        "spread": 1.0
+        "mean": 254.5,
+        "spread": 3.0
       },
       {
         "rgb": [
@@ -102,7 +111,7 @@
           255
         ],
         "mean": 254.9,
-        "spread": 1.0
+        "spread": 2.0
       },
       {
         "rgb": [
@@ -110,17 +119,16 @@
           255,
           255
         ],
-        "mean": 255.0,
-        "spread": 2.0
+        "mean": 254.9,
+        "spread": 3.0
       }
     ],
-    "white_ratio": 0.916
+    "white_ratio": 0.679
   },
-  "front_attempts": 1,
   "cutout_validation": {
     "ok": true,
-    "alpha0": 0.535,
-    "visible": 0.465,
+    "alpha0": 0.577,
+    "visible": 0.423,
     "corners_alpha": [
       0,
       0,
@@ -130,11 +138,11 @@
     "bbox": [
       8,
       8,
-      517,
-      899
+      834,
+      963
     ],
-    "aspect": 0.579,
-    "bbox_h_ratio": 0.982,
+    "aspect": 0.859,
+    "bbox_h_ratio": 0.984,
     "wash": {
       "removed": false,
       "color": null,
@@ -142,66 +150,37 @@
     }
   },
   "face_norm": {
-    "score": 0.823,
+    "score": 0.841,
     "estimated": false,
     "source": "yunet",
     "bbox": [
-      0.43238095238095237,
-      0.04564498346196251,
-      0.5857142857142857,
-      0.1570011025358324
+      0.2810551558752998,
+      0.05077239958805355,
+      0.3808153477218226,
+      0.15468589083419154
     ],
     "mouth": {
-      "cx": 0.5089904761904762,
-      "cy": 0.13248070562293274,
-      "w": 0.05213333333333334,
-      "h": 0.0135832414553473
+      "cx": 0.3308752997601918,
+      "cy": 0.13184346035015448,
+      "w": 0.03392086330935252,
+      "h": 0.013110195674562307
     },
     "eyes": {
-      "y": 0.09239250275633958,
-      "w": 0.03373333333333334,
+      "y": 0.09440782698249228,
+      "w": 0.02194244604316547,
       "cx": [
-        0.4721714285714285,
-        0.5457904761904763
+        0.3069304556354916,
+        0.3548201438848921
       ]
     },
-    "skin": "#f3cf9b",
-    "lip": "#633a3a",
-    "line": "#000001",
-    "face_w": 80.51
-  },
-  "face_portrait_norm": {
-    "score": 0.0,
-    "estimated": true,
-    "bbox": [
-      0.3,
-      0.18001644736842107,
-      0.7,
-      0.5199835526315789
-    ],
-    "mouth": {
-      "cx": 0.5,
-      "cy": 0.4451973684210526,
-      "w": 0.12000000000000001,
-      "h": 0.036949013157894735
-    },
-    "eyes": {
-      "y": 0.32279605263157896,
-      "w": 0.08800480769230769,
-      "cx": [
-        0.4040024038461538,
-        0.5959975961538462
-      ]
-    },
-    "skin": "#fee7c2",
-    "lip": "#7d4441",
-    "line": "#000000",
-    "face_w": 332.8
+    "skin": "#fcd3ae",
+    "lip": "#734342",
+    "line": "#020204",
+    "face_w": 83.2
   },
   "prompts": {
-    "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, long black hair, loose hair, short beard, bright dark eyes, white hanfu, blue trim, wine flagon in hand, sword at waist, free-spirited cheerful expression, romantic poet, chinese ancient setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
-    "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, long black hair, loose hair, short beard, bright dark eyes, white hanfu, blue trim, wine flagon in hand, sword at waist, free-spirited cheerful expression, romantic poet, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery",
-    "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements"
+    "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, long black hair, loose hair, short beard, bright dark eyes, white hanfu, blue trim, wine flagon in hand, sword at waist, free-spirited cheerful expression, romantic poet, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference",
+    "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan"
   },
   "face_source": "yunet",
   "overlay_allowed": true

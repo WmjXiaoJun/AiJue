@@ -10,7 +10,7 @@
   "cfg": 5.5,
   "sampler": "euler_ancestral",
   "scheduler": "normal",
-  "seed": 42,
+  "seed": 47,
   "size": {
     "portrait": [
       832,
@@ -23,11 +23,10 @@
   },
   "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, full body, multiple characters",
   "prompt": {
-    "portrait": "masterpiece, best quality, anime style, solo, 1boy, male, middle-aged man, black hair, black eyes, thick eyebrows, black hanfu, crimson accents, scar on eyebrow, upper body, looking at viewer, centered composition, studio lighting, dark background, clean lineart, cel shading, vibrant colors, detailed face, mature male, chinese hair bun, black king hat, full beard, sharp dark eyes, dark red and black hanfu, gold belt, sword at waist, ambitious smirk, commanding warlord, chinese ancient setting, simple background",
-    "front": "masterpiece, best quality, anime style, solo, 1boy, male, middle-aged man, black hair, black eyes, thick eyebrows, black hanfu, crimson accents, scar on eyebrow, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, mature male, chinese hair bun, black king hat, full beard, sharp dark eyes, dark red and black hanfu, gold belt, sword at waist, ambitious smirk, commanding warlord, looking at viewer, pure white background, isolated on white background, no shadow, no scenery"
+    "front": "masterpiece, best quality, anime style, solo, 1boy, male, middle-aged man, black hair, black eyes, thick eyebrows, black hanfu, crimson accents, scar on eyebrow, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, mature male, chinese hair bun, black king hat, full beard, sharp dark eyes, dark red and black hanfu, gold belt, sword at waist, ambitious smirk, commanding warlord, looking at viewer, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference"
   },
-  "created_at": "2026-10-26T18:34:44",
-  "elapsed_sec": 28.2,
+  "created_at": "2026-10-26T18:56:15",
+  "elapsed_sec": 41.2,
   "files": {
     "portrait": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\caocao\\portrait.png",
     "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\caocao\\front.png",
@@ -35,32 +34,27 @@
   },
   "images": [
     {
-      "tag": "portrait",
-      "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\caocao\\portrait.png",
-      "seed": 42,
-      "width": 832,
-      "height": 1216,
-      "gen_sec": 10.2,
-      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, middle-aged man, black hair, black eyes, thick eyebrows, black hanfu, crimson accents, scar on eyebrow, upper body, looking at viewer, centered composition, studio lighting, dark background, clean lineart, cel shading, vibrant colors, detailed face, mature male, chinese hair bun, black king hat, full beard, sharp dark eyes, dark red and black hanfu, gold belt, sword at waist, ambitious smirk, commanding warlord, chinese ancient setting, simple background",
-      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, full body, multiple characters, lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone",
-      "composition": "portrait",
-      "expression": null
-    },
-    {
       "tag": "front",
-      "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\caocao\\three_view/front.png",
-      "seed": 43,
+      "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\tmp\\v52_art\\front_ref_pilot\\caocao\\three_view/front.png",
+      "seed": 47,
       "width": 1024,
       "height": 1024,
-      "gen_sec": 16.3,
-      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, middle-aged man, black hair, black eyes, thick eyebrows, black hanfu, crimson accents, scar on eyebrow, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, mature male, chinese hair bun, black king hat, full beard, sharp dark eyes, dark red and black hanfu, gold belt, sword at waist, ambitious smirk, commanding warlord, looking at viewer, pure white background, isolated on white background, no shadow, no scenery",
-      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, multiple views, split screen, cropped, lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements",
+      "gen_sec": 12.0,
+      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, middle-aged man, black hair, black eyes, thick eyebrows, black hanfu, crimson accents, scar on eyebrow, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, mature male, chinese hair bun, black king hat, full beard, sharp dark eyes, dark red and black hanfu, gold belt, sword at waist, ambitious smirk, commanding warlord, looking at viewer, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, multiple views, split screen, cropped, lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan",
       "composition": "front",
-      "expression": null
+      "expression": null,
+      "ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\caocao\\portrait.png",
+      "ip_adapter": {
+        "preset": "PLUS (high strength)",
+        "weight": 0.22,
+        "start_at": 0.0,
+        "end_at": 0.75
+      }
     }
   ],
-  "source": "imagegen",
-  "created_by": "pipeline/v5_art.generate_character_art",
+  "source": "imagegen_ref",
+  "created_by": "pipeline/v5_art.generate_character_front",
   "status": "ok",
   "prompt_source": "contract/v5/art/prompts.json#characters",
   "sizes": {
@@ -69,8 +63,8 @@
       1216
     ],
     "cutout": [
-      493,
-      960
+      431,
+      979
     ]
   },
   "alpha_ratio": 0.436,
@@ -83,16 +77,16 @@
           255,
           255
         ],
-        "mean": 255.0,
-        "spread": 1.0
+        "mean": 254.7,
+        "spread": 3.0
       },
       {
         "rgb": [
           255,
-          255,
+          254,
           255
         ],
-        "mean": 254.9,
+        "mean": 254.5,
         "spread": 3.0
       },
       {
@@ -102,7 +96,7 @@
           255
         ],
         "mean": 255.0,
-        "spread": 2.0
+        "spread": 0.0
       },
       {
         "rgb": [
@@ -110,17 +104,17 @@
           255,
           255
         ],
-        "mean": 255.0,
+        "mean": 254.9,
         "spread": 1.0
       }
     ],
-    "white_ratio": 0.807
+    "white_ratio": 0.784
   },
   "front_attempts": 1,
   "cutout_validation": {
     "ok": true,
-    "alpha0": 0.564,
-    "visible": 0.436,
+    "alpha0": 0.453,
+    "visible": 0.547,
     "corners_alpha": [
       0,
       0,
@@ -130,11 +124,11 @@
     "bbox": [
       8,
       8,
-      485,
-      952
+      423,
+      971
     ],
-    "aspect": 0.514,
-    "bbox_h_ratio": 0.983,
+    "aspect": 0.44,
+    "bbox_h_ratio": 0.984,
     "wash": {
       "removed": false,
       "color": null,
@@ -142,33 +136,33 @@
     }
   },
   "face_norm": {
-    "score": 0.45,
+    "score": 0.824,
     "estimated": false,
-    "source": "haar",
+    "source": "yunet",
     "bbox": [
-      0.3752535496957404,
-      0.15833333333333333,
-      0.6693711967545639,
-      0.309375
+      0.5403712296983759,
+      0.11511746680286006,
+      0.7109048723897912,
+      0.20408580183861083
     ],
     "mouth": {
-      "cx": 0.5223123732251521,
-      "cy": 0.27614583333333337,
-      "w": 0.09999999999999999,
-      "h": 0.023114583333333334
+      "cx": 0.6256380510440834,
+      "cy": 0.1845250255362615,
+      "w": 0.058027842227378196,
+      "h": 0.011501532175689479
     },
     "eyes": {
-      "y": 0.22177083333333333,
-      "w": 0.06470588235294117,
+      "y": 0.15250255362614915,
+      "w": 0.037563805104408356,
       "cx": [
-        0.45172413793103444,
-        0.5929006085192698
+        0.5846635730858469,
+        0.6666125290023202
       ]
     },
-    "skin": "#fdd5ae",
-    "lip": "#583a3a",
-    "line": "#000001",
-    "face_w": 145.0
+    "skin": "#f7dcc9",
+    "lip": "#905e63",
+    "line": "#211f30",
+    "face_w": 73.57
   },
   "face_portrait_norm": {
     "score": 0.0,
@@ -199,10 +193,18 @@
     "face_w": 332.8
   },
   "prompts": {
-    "portrait_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, chinese hair bun, black king hat, full beard, sharp dark eyes, thick eyebrows, dark red and black hanfu, gold belt, sword at waist, ambitious smirk, commanding warlord, chinese ancient setting, looking at viewer, upper body, centered composition, studio lighting, dark background, simple background",
-    "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, chinese hair bun, black king hat, full beard, sharp dark eyes, thick eyebrows, dark red and black hanfu, gold belt, sword at waist, ambitious smirk, commanding warlord, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery",
-    "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements"
+    "front_tags": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1boy, male, mature male, black hair, chinese hair bun, black king hat, full beard, sharp dark eyes, thick eyebrows, dark red and black hanfu, gold belt, sword at waist, ambitious smirk, commanding warlord, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference",
+    "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan"
   },
-  "face_source": "haar",
-  "overlay_allowed": true
+  "face_source": "yunet",
+  "overlay_allowed": true,
+  "ip_adapter": {
+    "strength": 0.22,
+    "end_at": 0.75,
+    "weight_type": "style transfer"
+  },
+  "seed_base": 43,
+  "attempts": 3,
+  "portrait_ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\caocao\\portrait.png",
+  "bg_mode": "white"
 }

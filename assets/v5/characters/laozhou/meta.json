@@ -73,5 +73,18 @@
     "face_w": 74.52
   },
   "face_source": "yunet",
-  "overlay_allowed": true
+  "overlay_allowed": true,
+  "source": "v3_reuse",
+  "portrait": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\laozhou\\portrait.png",
+  "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\laozhou\\front.png",
+  "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\laozhou\\cutout.png",
+  "cutout_size": [
+    293,
+    961
+  ],
+  "portrait_size": [
+    832,
+    1216
+  ],
+  "note": "复用最早 3 个角色（SDXL 动漫立绘 + 泛洪抠图），V5.2 保持不动（用户认可）"
 }

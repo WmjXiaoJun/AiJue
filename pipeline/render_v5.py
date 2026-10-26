@@ -231,6 +231,33 @@ def tts_and_pace(plan: dict, catalog: dict, paths: dict, prog, force: bool = Fal
                     "cfg_scale": char_specs[cid]["cfg_scale"]}
               for cid in role_texts}
 
+    # 3) 配音：只合成缓存缺失的句子（voice clone），写缓存与 meta 证据
+    if prog:
+        prog(8, f"配音：{sum(len(v) for v in pending.values())} 句 / "
+                f"{len(role_texts)} 角色（voice clone）")
+    if pending:
+        results = tts_breeze.synthesize(pending, raw_dir, auto_start=False,
+                                        voices=voices, refs=refs)
+        for item in results:
+            cid = item["role"]
+            key = f"{cid}|{char_specs[cid]['key']}|{item['text']}"
+            cache[key] = {"path": item["path"], "duration": item["duration"],
+                          "provider": item.get("provider", "breeze"),
+                          "seed": item.get("seed"),
+                          "voice": item.get("voice", ""),
+                          "voice_id": char_specs[cid]["voice_id"],
+                          "voice_key": char_specs[cid]["key"],
+                          "ref": refs.get(cid, (None, ""))[0] or ""}
+        utils.write_json(cache_path, cache)
+    meta = plan.setdefault("meta", {})
+    meta["voice_provider"] = "breeze"
+    meta["voices"] = [
+        {"character": cid, "voice_id": char_specs[cid]["voice_id"],
+         "key": char_specs[cid]["key"], "seed": char_specs[cid]["seed"],
+         "ref": locks[cid].get("wav") or "",
+         "ref_cached": bool(locks[cid].get("cached"))}
+        for cid in role_texts]
+
     # 4) 每镜：语音时长 → 镜头时长；音轨 wav（48k stereo，voice 起点 +0.10s）
     total = 0.0
     for shot in shots:

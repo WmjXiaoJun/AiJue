@@ -60,7 +60,9 @@ FRONT_REF_PROMPT = ("highly detailed full body illustration, intricate clothing 
 FRONT_REF_NEGATIVE = ("flat color, simple cartoon, vector art, chibi, plain, "
                       "grey background, dark background, gradient background, "
                       "decorative background, halo, oversized prop, giant fan, "
-                      "fan behind, canopy, umbrella, wings, background fan")
+                      "fan behind, canopy, umbrella, wings, background fan, "
+                      "circular background, round backdrop, oval background, "
+                      "colored circle, pastel circle, background circle")
 FRONT_REF_IP = {"ip_strength": 0.35, "ip_end_at": 0.90,
                 "ip_weight_type": "style transfer"}
 # 参考模式强度回退表（第一档 strongest，白底/装饰物不达标则降档重试）
@@ -78,7 +80,8 @@ TOL = 18
 WHITE_CORNER = 238   # front 四角白底阈值（RGB 均值 >=238 且色差 <=12）
 FACE_MIN_SCORE = 0.3
 # cutout 质量门限（Lead P1：alpha0 0.3-0.6、bbox 高度 >=60% 画面、四角 alpha=0）
-CUTOUT_ALPHA0_RANGE = (0.30, 0.60)
+# 注：front-ref 精细立绘可能有宽披风/裙摆，前景占比低 → 上限放宽到 0.72
+CUTOUT_ALPHA0_RANGE = (0.30, 0.72)
 CUTOUT_MIN_BBOX_H = 0.55
 OVERLAY_MIN_FACE_W = 30.0   # 渲染后脸宽 < 30px 不叠口型/眨眼（Lead 拍板：中景 0.62H 需可见）
 _FACE_MODEL = REPO / "local_models" / "lipsync_models" / "yunet" / "face_detection_yunet_2023mar.onnx"
@@ -151,6 +154,40 @@ def mouth_shapes() -> list[str]:
 # ---------------------------------------------------------------------------
 # 1. 抠图：白底泛洪 + 孤立色块清理 + 边缘羽化
 # ---------------------------------------------------------------------------
+def remove_ground_blobs(im: Image.Image) -> tuple[Image.Image, dict]:
+    """删除人物脚下/背景残留的“地面圆斑/色块”（IP-Adapter 偶尔画出的装饰圆盘）。
+
+    只删：面积≥1%、贴画面底部（top>0.72H）、宽≥35%画宽、高<28%画高 的宽扁组件。
+    正常裙摆/披风从上半身连下来，top 不会这么低，不会被误删。
+    """
+    info = {"removed": 0, "components": []}
+    try:
+        import cv2
+    except Exception:  # noqa: BLE001
+        return im, info
+    arr = np.array(im.convert("RGBA"))
+    alpha = arr[:, :, 3]
+    h, w = alpha.shape[:2]
+    binary = (alpha > 16).astype(np.uint8)
+    n, labels, stats, _ = cv2.connectedComponentsWithStats(binary, connectivity=8)
+    total = float(h * w)
+    drop = np.zeros_like(binary)
+    for idx in range(1, n):
+        area = float(stats[idx, cv2.CC_STAT_AREA])
+        cw = float(stats[idx, cv2.CC_STAT_WIDTH])
+        ch = float(stats[idx, cv2.CC_STAT_HEIGHT])
+        top = float(stats[idx, cv2.CC_STAT_TOP])
+        if (area / total >= 0.01 and top > h * 0.72 and cw >= w * 0.35
+                and ch < h * 0.28):
+            drop |= (labels == idx)
+            info["components"].append([int(stats[idx, 0]), int(top), int(cw), int(ch)])
+    if drop.any():
+        arr[:, :, 3] = np.where(drop > 0, 0, alpha)
+        info["removed"] = int(drop.sum())
+        return Image.fromarray(arr, "RGBA"), info
+    return im, info
+
+
 def remove_white(im: Image.Image, with_report: bool = False):
     """白底泛洪抠图（scripts/make_2d_cutouts.remove_white 的工程化版本）。
 
@@ -190,6 +227,10 @@ def remove_white(im: Image.Image, with_report: bool = False):
     alpha = np.where(seen, 0, 255).astype(np.uint8)
     out = Image.fromarray(np.dstack([rgb.astype(np.uint8), alpha]), "RGBA")
     out, wash = remove_wide_wash(out)
+    out, ground = remove_ground_blobs(out)
+    if ground.get("removed"):
+        wash = dict(wash or {})
+        wash["ground"] = ground
     al = out.getchannel("A").filter(ImageFilter.GaussianBlur(0.8))
     out.putalpha(al)
     out = clean_islands(out)
@@ -317,12 +358,16 @@ def _wide_artifact(front: Image.Image) -> dict | None:
         top = float(stats[idx, cv2.CC_STAT_TOP])
         if area / total < 0.02 or cw / w < 0.40 or ch / h < 0.12 or top / h > 0.45:
             continue
+        # 背景装饰物（扇子/光环/墨块）是“宽扁”的；盔甲/披风/皇冠是“高瘦”的，不能误杀
+        if ch > 0 and cw / ch < 1.30:
+            continue
         mask = labels == idx
         med_sat = float(np.median(sat[mask])) if mask.any() else 0.0
-        if med_sat >= 80:
+        low_sat_wide = (med_sat >= 60 and ch > 0 and cw / ch >= 1.60)
+        if med_sat >= 80 or low_sat_wide:
             return {"area_ratio": round(area / total, 3),
                     "bbox": [int(stats[idx, 0]), int(top), int(cw), int(ch)],
-                    "sat": round(med_sat, 1)}
+                    "sat": round(med_sat, 1), "low_sat_wide": bool(low_sat_wide)}
     return None
 
 
@@ -587,31 +632,38 @@ def _haar_cascade():
 
 
 def _detect_face_haar(img: Image.Image) -> dict | None:
-    """Haar 正面脸兜底（对动漫大眼脸也有一定召回）；带几何 sanity 过滤。"""
+    """Haar 正面脸兜底（多参数扫描 + 几何 sanity），对动漫大眼脸召回更好。"""
     try:
         import cv2
         arr = np.asarray(img.convert("RGB"))
         h, w = arr.shape[:2]
         gray = cv2.cvtColor(np.ascontiguousarray(arr), cv2.COLOR_RGB2GRAY)
-        faces = _haar_cascade().detectMultiScale(gray, scaleFactor=1.08,
-                                                 minNeighbors=4, minSize=(40, 40))
+        faces = []
+        for sf, mn in ((1.05, 3), (1.05, 4), (1.08, 4)):
+            found = _haar_cascade().detectMultiScale(
+                gray, scaleFactor=sf, minNeighbors=mn, minSize=(30, 30))
+            if found is not None and len(found):
+                faces.extend(found.tolist())
     except Exception:  # noqa: BLE001
         return None
     cands = []
     for x, y, fw, fh in faces:
         cx, cy = x + fw / 2.0, y + fh / 2.0
-        if cy > h * 0.42 or fh < h * 0.04 or fh > h * 0.40:
+        # 全身立绘脸只可能在画面上部；尺寸/比例合理性过滤
+        if cy > h * 0.38 or fh < h * 0.04 or fh > h * 0.32:
             continue
-        if not (0.6 <= fw / max(1.0, fh) <= 1.45):
+        if not (0.6 <= fw / max(1.0, fh) <= 1.5):
+            continue
+        if not (0.06 * w <= fw <= 0.40 * w):
             continue
         cands.append({"bbox": (float(x), float(y), float(x + fw), float(y + fh)),
                       "score": 0.45, "landmarks": [], "estimated": False,
-                      "source": "haar", "_area": fw * fh})
+                      "source": "haar", "_rank": fw * fh})
     if not cands:
         return None
-    cands.sort(key=lambda d: d["_area"], reverse=True)
+    cands.sort(key=lambda d: d["_rank"], reverse=True)
     best = cands[0]
-    best.pop("_area", None)
+    best.pop("_rank", None)
     return best
 
 def _estimate_face(img: Image.Image, kind: str = "cutout") -> dict:
@@ -1195,6 +1247,37 @@ def generate_character_art(character_id: str, outdir: str | Path | None = None,
     return character_art(cid)
 
 
+def _make_white_reference(portrait: str | Path, dest: str | Path) -> Path | None:
+    """把 portrait 去背景后贴到白底，作为 IP-Adapter 的“干净参考图”。
+
+    解决 portrait 背景里的圆形/色块被 front 复制的问题（如 xueba 的浅蓝圆）。
+    失败返回 None（调用方继续用原 portrait）。
+    """
+    try:
+        im = Image.open(portrait).convert("RGBA")
+        if _white_ratio(im) >= 0.45:
+            return Path(portrait)
+        cut, _info = remove_background_robust(im)
+        arr = np.array(cut)
+        visible = float((arr[:, :, 3] > 16).mean())
+        if cut.getbbox() is None or not (0.06 <= visible <= 0.65):
+            return None
+        W, H = im.size
+        canvas = Image.new("RGBA", (W, H), (255, 255, 255, 255))
+        pw, ph = cut.size
+        scale = min(W * 0.90 / max(1, pw), H * 0.95 / max(1, ph))
+        sprite = cut.resize((max(1, int(pw * scale)), max(1, int(ph * scale))),
+                            Image.LANCZOS)
+        canvas.alpha_composite(sprite, ((W - sprite.width) // 2,
+                                        (H - sprite.height) // 2))
+        dest = Path(dest)
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        canvas.convert("RGB").save(dest)
+        return dest
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def generate_character_front(character_id: str, outdir: str | Path | None = None,
                              *, ref: str | Path | None = None, seed: int = 43,
                              force: bool = True, prompt_extra: str | None = None,
@@ -1245,9 +1328,14 @@ def generate_character_front(character_id: str, outdir: str | Path | None = None
             raise V5ArtError(f"{cid}: front-ref 生成 {tries - 1} 次仍不达标: {errors[-2:]}")
         strength, end_at = FRONT_REF_SCHEDULE[min(tries - 1, len(FRONT_REF_SCHEDULE) - 1)]
         s = seed + 2 * (tries - 1)
+        ref_for_try = ref_path
+        if tries >= 2:
+            white_ref = _make_white_reference(ref_path, base / "ref_white.png")
+            if white_ref is not None:
+                ref_for_try = white_ref
         _run_imagegen(spec_path, base, "three_view", s, front_tags, style=style,
                       negative_extra=front_negative, views="front",
-                      ref=str(ref_path), ip_strength=strength, ip_end_at=end_at,
+                      ref=str(ref_for_try), ip_strength=strength, ip_end_at=end_at,
                       ip_weight_type="style transfer")
         if not three_front.is_file():
             raise V5ArtError(f"{cid}: imagegen 未产出 three_view/front.png")
@@ -1276,7 +1364,8 @@ def generate_character_front(character_id: str, outdir: str | Path | None = None
             chosen = {"front": front_img, "cutout": cutout, "white": white,
                       "validation": validation, "mode": mode,
                       "ip": {"strength": strength, "end_at": end_at,
-                             "weight_type": "style transfer"}, "seed": s}
+                             "weight_type": "style transfer"}, "seed": s,
+                      "ref_used": str(ref_for_try)}
         else:
             errors.append(f"seed={s} white_ratio={white.get('white_ratio')} "
                           f"validation={validation}")
@@ -1303,6 +1392,7 @@ def generate_character_front(character_id: str, outdir: str | Path | None = None
         "created_by": "pipeline/v5_art.generate_character_front",
         "status": "ok",
         "portrait_ref": str(ref_path),
+        "ref_used": chosen.get("ref_used"),
         "ip_adapter": ip_used,
         "bg_mode": bg_mode,
         "files": {"front": str(front), "cutout": str(cutout_path)},
@@ -1395,6 +1485,23 @@ def _face_detected(norm: dict | None) -> bool:
             or src in ("haar", "yunet_headcrop"))
 
 
+def _skin_like(hex_color) -> bool:
+    """估算几何的肤色合理性（r>g>b 且偏暖），避免把口型画到衣服/胸甲上。"""
+    try:
+        r, g, b = _rgb(hex_color, (0, 0, 0))
+    except Exception:  # noqa: BLE001
+        return False
+    luma = 0.299 * r + 0.587 * g + 0.114 * b
+    return (r >= g >= b) and (r - b) >= 18 and 60 <= luma <= 252
+
+
+def _overlay_geom_ok(norm: dict | None) -> bool:
+    """overlay 几何是否可信：检测成功直接可信；估算时要求肤色合理。"""
+    if _face_detected(norm):
+        return True
+    return _skin_like((norm or {}).get("skin"))
+
+
 def _char_overlay_allowed(char_spec: dict) -> bool:
     """机器/蒙面/兜帽类角色不叠口型/眨眼（估算几何不可靠且本来无可见嘴）。"""
     app = (char_spec or {}).get("appearance") or {}
@@ -1458,7 +1565,8 @@ def render_art_character(char, style, size=(512, 768), pose: str = "front",
         face_w_px = None
         if norm:
             face_w_px = (norm["bbox"][2] - norm["bbox"][0]) * cw * scale
-        overlay_allowed = _char_overlay_allowed(char_spec)
+        overlay_allowed = (_char_overlay_allowed(char_spec)
+                           and _overlay_geom_ok(norm))
         if overlay_allowed and mouth != "closed":
             canvas = apply_mouth(canvas, mouth, geom=geom, face_w=face_w_px)
         if overlay_allowed and blink:
