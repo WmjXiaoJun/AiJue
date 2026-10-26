@@ -15,28 +15,28 @@
   ],
   "palette": {
     "bg": [
-      "#e8dcc4",
-      "#d9cbb0"
+      "#ececec",
+      "#deded8"
     ],
     "fg": [
-      "#1c1a16",
-      "#3a352c"
+      "#14181c",
+      "#232a30"
     ],
     "accent": [
       "#b23a2e",
       "#c9a227"
     ],
-    "paper": "#efe6d3",
-    "ink": "#24211c",
-    "mid": "#6f7d7a",
-    "shadow": "#8c8171",
-    "highlight": "#fbf6ea",
+    "paper": "#f4f4f0",
+    "ink": "#1b1f24",
+    "mid": "#7c8790",
+    "shadow": "#9aa0a4",
+    "highlight": "#ffffff",
     "seal": "#b23a2e",
-    "water": "#6b7f8a",
-    "wood": "#7a5a34",
-    "stone": "#8d8577",
-    "glow": "#d9b96a",
-    "gold": "#c9a227"
+    "water": "#5f7480",
+    "wood": "#6f6f6a",
+    "stone": "#a7a7a2",
+    "glow": "#b23a2e",
+    "gold": "#a8873a"
   },
   "texture": [
     "paper_grain",
@@ -81,17 +81,17 @@
     "guidance": 5.0
   },
   "finish": {
-    "contrast": 1.05,
-    "saturation": 0.74,
-    "temperature": 0.05,
-    "paper": 0.18,
-    "edge_ink": 0.32,
-    "vignette": 0.18,
-    "grain": 0.05
+    "contrast": 1.08,
+    "saturation": 0.5,
+    "temperature": -0.04,
+    "paper": 0.12,
+    "edge_ink": 0.36,
+    "vignette": 0.16,
+    "grain": 0.04
   },
   "grade": {
-    "eq": "contrast=1.06:saturation=0.68:gamma=1.02",
-    "colorbalance": "rs=0.03:gs=0.01:bs=-0.02"
+    "eq": "contrast=1.10:saturation=0.42:gamma=1.00:brightness=0.01",
+    "colorbalance": "rs=-0.02:bs=0.05:gs=0.01"
   },
   "packaging": {
     "tag": "水墨史书",

@@ -122,6 +122,29 @@ contract/v5/
 汇总：**16/16 QC PASS**；时长 29.94–44.34s；1280×720/25fps。
 
 
+
+| # | 模板 | 风格 | 时长(s) | 镜头 | 场景数 | QC |
+|---|---|---|---|---|---|---|
+| 1 | classics | woodblock_classic | 39.11 | 9 | 4 | ✅ |
+| 2 | history_mystery | parchment_case | 39.43 | 9 | 4 | ✅ |
+| 3 | history_talk | ink_chronicle | 43.75 | 9 | 5 | ✅ |
+| 4 | hot_ones | film_interview | 41.54 | 8 | 4 | ✅ |
+| 5 | masked_singer | hologram_stage | 39.30 | 8 | 4 | ✅ |
+| 6 | mystery | noir_rain | 29.94 | 8 | 4 | ✅ |
+| 7 | national_treasure | museum_gold | 40.74 | 8 | 4 | ✅ |
+| 8 | qipashuo | silk_arena | 43.62 | 8 | 4 | ✅ |
+| 9 | roundtable | oil_salon | 44.34 | 8 | 3 | ✅ |
+| 10 | shark_tank | blueprint_lab | 31.24 | 7 | 4 | ✅ |
+| 11 | slow_life | clay_diorama | 41.38 | 8 | 4 | ✅ |
+| 12 | snl_sketch | chalk_theatre | 38.18 | 8 | 4 | ✅ |
+| 13 | standup | vhs_late_show | 43.70 | 8 | 4 | ✅ |
+| 14 | taskmaster | candy_collage | 34.18 | 8 | 4 | ✅ |
+| 15 | tonight_show | neon_toon | 41.19 | 9 | 4 | ✅ |
+| 16 | traitors | baroque_candle | 34.02 | 8 | 4 | ✅ |
+
+汇总：**16/16 QC PASS**；时长 29.94–44.34s；1280×720/25fps。
+
+
 ## 6. 复现
 
 ```powershell
