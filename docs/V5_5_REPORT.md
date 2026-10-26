@@ -46,3 +46,11 @@
 - `pipeline/motion2d.py`（pose_timeline/表演/walk_in）、`pipeline/render_v5.py`（台词→姿态、`V55_PERFORM`）
 - `tmp/v55_*`（自测/对比/H3 demo）
 - 文档：`docs/PLAN_V5_5_3D_ACTIONS.md`、本报告
+
+## 5. 实测结果（第三轮重渲完成，2026-10-26 21:29）
+
+- **16/16 成片已带角色表演重渲**：QC 16/16 PASS；`tests/test_v5_4_acceptance.py` **119 passed**；`pipeline/tests` **186 passed**；剪辑/分镜/转场硬门保持全过（时长公式 / per-cut / storyboard 16/16）。
+- **角色表演生效**：说话角色出现前倾 / 重心移动 / 偶发点头，首出场镜 walk_in；不同帧角色区像素差可见（约 2-6%），修复后无旋转/斜切/大小跳变（抽帧复核 `tmp/v55_final_frames.png`）。
+- **姿态变体资产状态**：48/48 已生成（24 角色 × point/think），但 motion2d V5.5.1 质量门（bbox aspect 0.18-0.85、倾角 ≤6°、内容高 ≥front 0.72）把现有 AI 姿态图判为不合格（imagegen 姿态多为斜向动态构图，倾角 8-20°）→ 运行时自动回退 front + 体态表演，**未出现坏帧**。下一步：用 "upright standing pointing/thinking" prompt 重生成 24×2 姿态后即可启用真实手势立绘（无需改 motion2d/render_v5）。
+- **3D/H3 混合 demo**：`tmp/v55_hybrid/final_h3_demo.mp4`（41-44s，tonight_show 3 个对白镜真 H3 运动 + 其余 2D）；对比图 `tmp/v55_2d_vs_3d.png`；单镜 2-3.2 分钟 GPU。技术链路已跑通；代价是 H3 会重绘细节（偶发多出人物/画风漂），需 prompt/参考调优后再全量 rollout。
+
