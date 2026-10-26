@@ -992,6 +992,15 @@ def _run_render(args) -> int:
             "voice_info": voice_info, "legacy": False,
         }
         LOG.info("镜头音轨（V4 自然语速）: %d 镜", len(audio_results))
+        # Breeze TTS 与 H3 不能同时驻留 12GB 显卡：配音完成后释放 TTS 服务显存
+        if voice_info.get("provider") == "breeze" and \
+                str(os.environ.get("BREEZE_TTS_KEEP", "")).lower() not in ("1", "true", "yes"):
+            try:
+                from . import tts_breeze
+                tts_breeze.stop_server()
+                LOG.info("已停止 Breeze TTS 服务（释放显存给 H3）")
+            except Exception as exc:  # noqa: BLE001
+                LOG.warning("停止 Breeze TTS 服务失败（继续渲染）: %s", exc)
     else:
         audio_info = prepare_audio(plan, paths["workdir"], prog, force)
 

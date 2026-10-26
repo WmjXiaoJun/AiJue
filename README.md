@@ -125,3 +125,14 @@ FastAPI · SQLAlchemy · SQLite · Vite · React · TypeScript · FFmpeg 6.1 · 
 - **成片**：16 模板各 30-45s 全 H3 demo（累计 84 个 H3 镜头、84 个全局唯一 prompt_id、blackdetect=0）→ `outputs/templates_v3/`；重点模板 5 分钟版 → `outputs/templates_v3/tonight_show_5min/final.mp4`。
 - **复现**：`python -m pipeline.template_v3 --validate contract/templates_v3 --expect 16`；`python scripts/render_templates_v3.py --h3 comfy --duration 30`；`python -m pytest tests/test_v3_acceptance.py -q`。
 - 说明：预演用 `--h3 previs`（静态首帧，QC 标 previs 不交付）；静态只允许片头/片尾卡片。本链路不使用 Blender。
+
+## V4 语音与剪辑（Breeze TTS 2 + OpenFilm 式时间线，2026-10-26）
+
+> 规划/报告：`docs/PLAN_V4_AUDIO_EDIT.md`、`docs/V4_REPORT.md`。
+
+- **语音**：本地部署 **Breeze TTS 2**（官方 PyTorch 权重，Voice Design 三角色音色；`scripts/tts_server.py` 管理服务，端口 7861）；失败自动回退 edge-tts。
+- **自然语速**：先配音、再按语音时长确定镜头长度（H3 17k+5 帧网格 + lead/tail），**彻底移除 atempo 加速**；长句自动切分多镜，不再截断。
+- **剪辑**：`timeline.json`（V1 视频 / A1 语音 / A2 音乐 / A3 音效 / S1 字幕 五轨）+ `timeline.html` 预览；`pipeline/edit_v4.py` 可独立从时间线重渲（非破坏剪辑）；BGM sidechain ducking、两遍响度目标 -16 LUFS。
+- **QC 增量**：`audio_pace` 硬门（atempo=1.0 / 无截断 / 语音装进镜头）。
+- **复现**：`python scripts/tts_server.py start` → `python -m pipeline.cli render_v3 --template tonight_show --duration 40 --h3 comfy --force`；A/B 对照加 `--legacy-audio`。
+- 说明：Breeze TTS 2 权重为 research / non-commercial 许可（demo 用途；商用需 BreezeBlue 授权）。
