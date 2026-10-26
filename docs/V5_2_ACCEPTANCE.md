@@ -2,22 +2,22 @@
 
 > 验收口径：Lead V5.2 任务书 + `docs/PLAN_V5_2_ART_FRONTEND.md` / `docs/V5_2_SCENE_ART.md` /
 > `docs/V5_2_FRONTEND.md`；上一版：`docs/V5_ACCEPTANCE.md`（V5 固定声音版 16/16）。
-> 生成时间：2026-10-26 19:57（由 `tmp/qa/gen_v5_2_doc.py` 依据真实产物生成，可重复运行）
+> 生成时间：2026-10-26 20:00（由 `tmp/qa/gen_v5_2_doc.py` 依据真实产物生成，可重复运行）
 > 验收人：qa-verifier（独立于 V5.2 开发；**只读 outputs/assets/contract/frontend，不启动渲染/浏览器**）。
 
 ## 0. 结论摘要
 
 | 项 | 状态 |
 |---|---|
-| V5.2 16 部成片（AI 美术 + 固定声音） | ⏳ 进行中：15/16 可验收 |
+| V5.2 16 部成片（AI 美术 + 固定声音） | ✅ 16/16 全部通过 |
 | 场景 AI plate 资产 | ✅ 61/61（PNG 1280×720 + meta prompt_id/seed） |
 | 角色 AI 资产 | ✅ 24/24（portrait/front/cutout + meta） |
-| 渲染链路用 AI 美术 | ⏳ |
+| 渲染链路用 AI 美术 | ✅ 16/16（scene renderer meta.art=plate + plate 图层；角色走 AI 立绘） |
 | 历史场景内容 | ✅ 13/13 history 场景 prompt 含历史关键词 |
 | V5 前端绑定（dist + API） | ✅ dist 构建 + `/api/v5/outputs`16/`voices`24/媒体 200 |
 | `curl_evidence` 证据 | ✅ 30/30 |
-| **V5.2 终门（`pytest tests/test_v5_2_acceptance.py -q`）** | ⏳ 批量完成后跑 |
-| 回归不退化（时长/QC/voice_fixed/P1 头部/风格矩阵） | ⏳ |
+| **V5.2 终门（`pytest tests/test_v5_2_acceptance.py -q`）** | ✅ 见 §8 回归记录 |
+| 回归不退化（时长/QC/voice_fixed/P1 头部/风格矩阵） | ✅ 16/16 |
 | 契约 | ✅ validate_catalog 0 errors/0 warnings |
 
 ## 1. 验收命令（可复跑）
@@ -144,7 +144,7 @@ python tmp/qa/gen_v5_2_doc.py
 | 1 | `tonight_show` | neon_toon（霓虹卡通） | 43.11s / 43.11s | 3/3 | 3/3 | -16.10 / -1.47 | ✅ | ✅ | ✅ |
 | 2 | `shark_tank` | blueprint_lab（科技蓝图） | 33.8s / 33.81s | 4/4 | 3/3 | -15.21 / -1.48 | ✅ | ✅ | ✅ |
 | 3 | `masked_singer` | hologram_stage（全息舞台） | 44.7s / 44.7s | 4/4 | 3/3 | -15.88 / -1.52 | ✅ | ✅ | ✅ |
-| 4 | `standup` | ⏳ pending(evidence_stale) | — | — | — | — | — | — | — |
+| 4 | `standup` | vhs_late_show（80s VHS） | 42.66s / 42.66s | 3/3 | 3/3 | -16.11 / -1.49 | ✅ | ✅ | ✅ |
 | 5 | `taskmaster` | candy_collage（糖果拼贴综艺） | 35.06s / 35.06s | 4/4 | 3/3 | -15.54 / -1.43 | ✅ | ✅ | ✅ |
 | 6 | `traitors` | baroque_candle（巴洛克烛光古堡） | 40.42s / 40.42s | 4/4 | 3/3 | -15.69 / -1.50 | ✅ | ✅ | ✅ |
 | 7 | `snl_sketch` | chalk_theatre（粉笔素描剧场） | 40.58s / 40.58s | 4/4 | 3/3 | -16.01 / -2.48 | ✅ | ✅ | ✅ |
@@ -171,12 +171,12 @@ python tmp/qa/gen_v5_2_doc.py
 | `tonight_show` | neon_toon | 0.0859 |
 | `shark_tank` | blueprint_lab | 0.1054 |
 | `masked_singer` | hologram_stage | 0.0965 |
-| `standup` | vhs_late_show | 0.0723 |
+| `standup` | vhs_late_show | 0.0625 |
 | `taskmaster` | candy_collage | 0.0897 |
 | `traitors` | baroque_candle | 0.0821 |
 | `snl_sketch` | chalk_theatre | 0.0805 |
 | `roundtable` | oil_salon | 0.1341 |
-| `hot_ones` | film_interview | 0.0736 |
+| `hot_ones` | film_interview | 0.0586 |
 | `qipashuo` | silk_arena | 0.0868 |
 | `slow_life` | clay_diorama | 0.0568 |
 | `history_talk` | ink_chronicle | 0.133 |
@@ -201,16 +201,16 @@ python tmp/qa/gen_v5_2_doc.py
 | `classics` | AI 历史 plate：宫殿/神庙/档案库/书斋（版刻黑线+亮黄纸） | AI 立绘（木刻 finish，坐姿官员/立像可辨） | 坐姿/近景可辨 | ✅ 通过（P1 裁头已修复复验） |
 | `history_mystery` | AI 历史 plate：古地图/档案库/发掘现场/长城（羊皮纸褐调） | AI 立绘（羊皮纸 finish） | 中景一般 | ✅ 通过 |
 | `history_talk` | AI 历史 plate：军帐/战场/宫殿/书斋/古地图（灯笼/军旗/沙盘/卷轴） | AI 立绘（冷灰墨 finish，偏剪影但可辨） | 军帐/宫殿 close-medium 可辨 | ✅ 通过（P1 裁头已修复复验） |
-| `hot_ones` | 暖光胶片访谈室/厨房/胶片墙 AI plate | AI anime 立绘（胶片颗粒） | 中景可见 | ✅ 通过（contact sheet 中白色帧为 fadewhite 转场中点，非缺陷） |
+| `hot_ones` | 暖光胶片访谈室/厨房/胶片墙 AI plate（film/VHS 8 张 plate 配色修正后重渲，色温偏暖正常） | AI anime 立绘（胶片颗粒） | 中景可见 | ✅ 通过（film plate 配色已修正） |
 | `masked_singer` | 全息舞台/镜面房/光门 AI plate（紫青全息光） | AI 立绘（全息高对比） | 中景一般 | ✅ 通过 |
-| `mystery` | AI 雨夜街道/黑色办公室 AI plate（百叶窗高对比） | AI 立绘（noir 黑白 finish） | 中景一般 | ✅ 通过 |
+| `mystery` | AI 雨夜街道/黑色办公室 AI plate（百叶窗高对比） | AI 立绘（lengmian 黑西装+墨镜可辨；noir 黑白 finish） | 中景一般 | ✅ 通过（lengmian 修复） |
 | `national_treasure` | AI 博物馆/展柜/宫殿 AI plate（金黑展陈） | AI 立绘（博物馆金 finish） | 展柜特写为主，中景一般 | ✅ 通过 |
 | `qipashuo` | 绢本设色辩论场/朝堂 AI plate（祥云/织锦/屏风） | AI 立绘（丝绸/勾线 finish） | 中景一般 | ✅ 通过 |
 | `roundtable` | 油画图书馆/圆桌 AI plate（油画笔触） | AI 立绘（油画 finish） | 中景一般 | ✅ 通过 |
 | `shark_tank` | 蓝图创投板/白板实验室 AI plate（蓝图网格/图板） | AI 立绘（蓝图风格 finish） | 中景一般 | ✅ 通过 |
 | `slow_life` | 黏土微缩厨房/庭院/小镇 AI plate（黏土质感） | AI 立绘（黏土 finish） | 中景一般 | ✅ 通过 |
 | `snl_sketch` | 粉笔舞台/后台 AI plate（粉笔线稿） | AI 立绘（粉笔 finish） | 中景一般 | ✅ 通过 |
-| `standup` | VHS 脱口秀俱乐部/后台 AI plate（复古色偏+噪点） | AI 立绘（VHS 风格） | 中景一般 | ✅ 通过 |
+| `standup` | VHS 脱口秀俱乐部/后台 AI plate（配色修正后砖墙/city VHS 色温正常） | AI 立绘（lengmian 黑西装+墨镜已修复可辨；VHS 风格） | 中景可见 | ✅ 通过（VHS plate + lengmian 均修复） |
 | `taskmaster` | 糖果拼贴道具桌/游戏舞台 AI plate（高饱和拼贴） | AI 立绘（拼贴风） | 中景一般 | ✅ 通过 |
 | `tonight_show` | 霓虹深夜演播室/后台/街景 AI plate（霓虹灯牌、几何窗格） | AI anime 主持/嘉宾立绘（彩色） | 中景可见但偏小 | ✅ 通过 |
 | `traitors` | 烛光古堡/长廊 AI plate（暗调烛光） | AI 立绘（暗调但可辨） | 暗场偏弱 | ✅ 通过 |
@@ -218,10 +218,10 @@ python tmp/qa/gen_v5_2_doc.py
 ## 8. 回归记录与遗留
 
 - 复现/回归记录由 QA 在 freeze 后填写：`tmp/qa/final_regression_v5_2.json`
-- **V5.2 验收**：43 passed / 0 skipped / 0 failed（16 模板 × 原硬门 + 美术资产/运行链路 + 前端 + 风格矩阵 + P1 头部；含 P1 修复后全量重渲）
+- **V5.2 验收**：43 passed / 0 skipped / 0 failed（16 模板 × 原硬门 + 美术资产/运行链路 + 前端 + 风格矩阵 + P1 头部；含 P1 修复后全量重渲 + film/VHS plate 修正重渲）
 - **V5 回归**：187 passed / 1 skipped（回归 V5 全量，skip=lip_sync 未启用）
 - **美术资产/前端单测**：43 passed（16 模板回归 + 资产 + 运行链路 + 前端 + 风格矩阵 + P1 头部，0 skipped）
-- **全量 tests**：692 passed / 1 skipped（tests/ 全量，含 V5.2 43 项）
+- **全量 tests**：692 passed / 1 skipped（tests/ 全量，含 V5.2 43 项；skip=lip_sync 未启用）
 - `batch_report_v5.json`：✅ {"ok": true, "total": 16, "passed": 16}
 
 ### 遗留 P2（不阻塞交付）
