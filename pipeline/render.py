@@ -15,7 +15,9 @@ from __future__ import annotations
 
 import json
 import logging
+import math
 import os
+import re
 import shutil
 import subprocess
 import time
@@ -701,6 +703,198 @@ def _run_ffmpeg_progress(args: list, cwd: Path, prog, pct0: float, pct1: float,
     prog(pct1, label)
 
 
+LOUDNORM_TP = -1.5
+LOUDNORM_LRA = 11
+LOUDNORM_MIN_I = -70.0
+# 成片响度验收区间（与 qc_v3 一致；编码后闭环校正到收紧区间）
+LOUDNESS_GATE_RANGE = (-17.0, -15.0)
+LOUDNESS_TIGHT_RANGE = (-16.8, -15.2)
+LOUDNESS_MAX_FIX_ROUNDS = 2
+
+
+def measure_loudness(path: Path | str, *, target_i: float | None = None,
+                     target_tp: float = LOUDNORM_TP, lra: float = LOUDNORM_LRA,
+                     timeout: float = 600) -> dict | None:
+    """两遍 loudnorm 的第一遍：单遍分析，返回 measured_I/TP/LRA/thresh/offset。
+
+    失败（ffmpeg 错误 / 无 JSON / 非法值）返回 None，调用方回退单遍动态 loudnorm。
+    """
+    target_i = config.LUFS_TARGET if target_i is None else target_i
+    af = f"loudnorm=I={target_i}:TP={target_tp}:LRA={lra}:print_format=json"
+    try:
+        proc = utils.run(
+            [config.FFMPEG_BIN, "-hide_banner", "-nostats", "-i", str(path),
+             "-af", af, "-f", "null", os.devnull],
+            check=False, timeout=timeout)
+    except Exception as exc:  # noqa: BLE001
+        LOG.warning("响度测量失败 %s: %s", path, exc)
+        return None
+    match = re.search(r"\{[^{}]*\"input_i\"[^{}]*\}", proc.stderr or "", re.S)
+    if not match:
+        return None
+    try:
+        data = json.loads(match.group(0))
+    except ValueError:
+        return None
+
+    def _num(key: str, default=float("nan")) -> float:
+        try:
+            return float(data[key])
+        except (KeyError, TypeError, ValueError):
+            return default
+
+    info = {"i": _num("input_i"), "tp": _num("input_tp"),
+            "lra": _num("input_lra"), "thresh": _num("input_thresh"),
+            "offset": _num("target_offset", 0.0), "raw": data}
+    if not all(math.isfinite(info[k]) for k in ("i", "tp", "lra", "thresh")):
+        return None
+    if info["i"] < LOUDNORM_MIN_I:  # 纯静音/无有效音频
+        return None
+    return info
+
+
+def _loudnorm_filter(measured: dict | None = None,
+                     target_i: float | None = None) -> str:
+    """两遍 loudnorm 的第二遍滤镜：有测量值用 linear=true 精确对齐，否则动态模式。"""
+    target_i = config.LUFS_TARGET if target_i is None else target_i
+    base = f"loudnorm=I={target_i}:TP={LOUDNORM_TP}:LRA={LOUDNORM_LRA}"
+    if not measured:
+        return base
+    return (base
+            + f":measured_I={measured['i']:.2f}"
+            + f":measured_TP={measured['tp']:.2f}"
+            + f":measured_LRA={measured['lra']:.2f}"
+            + f":measured_thresh={measured['thresh']:.2f}"
+            + f":offset={measured['offset']:.2f}:linear=true")
+
+
+def loudness_ok(info: dict | None, *, tight: bool = True) -> bool:
+    """响度是否达标（tight=True 用收紧区间，供编码后闭环判断）。"""
+    if not info:
+        return False
+    low, high = LOUDNESS_TIGHT_RANGE if tight else LOUDNESS_GATE_RANGE
+    return low <= float(info["i"]) <= high and float(info["tp"]) <= -1.0
+
+
+def enforce_loudness(out: Path, *, max_rounds: int = LOUDNESS_MAX_FIX_ROUNDS,
+                     prog=None) -> dict | None:
+    """编码后响度闭环：不达标时用当前测量值做动态两遍 loudnorm 音轨修正。
+
+    - 只重编码音频（视频 -c:v copy），修正后重新测量；
+    - 最多 max_rounds 轮，返回最终测量值（失败返回最后一次测量或 None）。
+    这样可以兜住 loudnorm 两遍在高 LRA/稀疏内容上的残余偏差（如 classics 单遍欠调）。
+    """
+    out = Path(out)
+    info = measure_loudness(out)
+    for round_no in range(1, max(0, int(max_rounds)) + 1):
+        if not info or loudness_ok(info):
+            break
+        raw = info.get("raw") or {}
+        try:
+            thresh = float(raw.get("input_thresh", -20.0))
+            offset = float(raw.get("target_offset", 0.0))
+        except (TypeError, ValueError):
+            thresh, offset = -20.0, 0.0
+        filt = (f"{_loudnorm_filter(None)}"
+                f":measured_I={info['i']:.2f}"
+                f":measured_TP={info['tp']:.2f}"
+                f":measured_LRA={info['lra']:.2f}"
+                f":measured_thresh={thresh:.2f}"
+                f":offset={offset:.2f}:linear=false"
+                f",aresample={config.SAMPLE_RATE}")
+        tmp = out.with_name(out.stem + ".loudfix" + out.suffix)
+        try:
+            utils.ffmpeg([
+                "-i", str(out), "-c:v", "copy", "-af", filt,
+                "-c:a", "aac", "-b:a", config.AUDIO_BITRATE,
+                "-ar", str(config.SAMPLE_RATE), "-ac", "2",
+                "-movflags", "+faststart", "-y", str(tmp),
+            ])
+            tmp.replace(out)
+        except Exception as exc:  # noqa: BLE001
+            LOG.warning("响度闭环修正第 %d 轮失败: %s", round_no, exc)
+            try:
+                tmp.unlink(missing_ok=True)
+            except OSError:
+                pass
+            break
+        LOG.info("响度闭环修正第 %d 轮：%.2f → 重新测量中", round_no, info["i"])
+        info = measure_loudness(out)
+    return info
+
+
+def _audio_mix_inputs(bgm: Path | None, transition_sfx: Path | None,
+                      total_duration: float,
+                      duck_bgm: bool) -> tuple[list, list, str]:
+    """旁白 + BGM（可 ducking）+ 转场音效的混音图（不含 loudnorm）。
+
+    返回 (inputs, filter_complex, 输出标签)；旁白固定为第一个输入（audio/narration.wav）。
+    """
+    inputs = ["-i", "audio/narration.wav"]
+    fc: list[str] = []
+    next_idx = 1
+    bgm_idx = None
+    tsx_idx = None
+    if bgm is not None:
+        inputs += ["-stream_loop", "-1", "-i", str(bgm)]
+        bgm_idx = next_idx
+        next_idx += 1
+    if transition_sfx is not None:
+        inputs += ["-i", str(transition_sfx)]
+        tsx_idx = next_idx
+        next_idx += 1
+    if bgm_idx is None and tsx_idx is None:
+        fc.append("[0:a]volume=1.0[a]")
+        return inputs, fc, "a"
+    if duck_bgm and bgm_idx is not None:
+        # V4：旁白触发 BGM sidechain ducking（对话时自动压低音乐）
+        fc.append("[0:a]volume=1.0,asplit=2[nar][narkey]")
+        fc.append(
+            f"[{bgm_idx}:a]volume={config.BGM_VOLUME},"
+            f"atrim=0:{total_duration:.3f},"
+            f"afade=t=in:st=0:d=2,"
+            f"afade=t=out:st={max(0.0, total_duration - 4.0):.3f}:d=4,"
+            f"aformat=sample_rates={config.SAMPLE_RATE}:channel_layouts=stereo[bg]"
+        )
+        fc.append("[bg][narkey]sidechaincompress=threshold=0.035:ratio=6:"
+                  "attack=15:release=350:makeup=1.0[bgd]")
+        parts = ["[nar]", "[bgd]"]
+    else:
+        fc.append("[0:a]volume=1.0[nar]")
+        parts = ["[nar]"]
+        if bgm_idx is not None:
+            fc.append(
+                f"[{bgm_idx}:a]volume={config.BGM_VOLUME},"
+                f"atrim=0:{total_duration:.3f},"
+                f"afade=t=in:st=0:d=2,"
+                f"afade=t=out:st={max(0.0, total_duration - 4.0):.3f}:d=4[bg]"
+            )
+            parts.append("[bg]")
+    if tsx_idx is not None:
+        fc.append(f"[{tsx_idx}:a]volume=0.85,atrim=0:{total_duration:.3f}[tsx]")
+        parts.append("[tsx]")
+    fc.append("".join(parts)
+              + f"amix=inputs={len(parts)}:duration=first:normalize=0[a]")
+    return inputs, fc, "a"
+
+
+def render_mix_wav(workdir: Path | str, bgm: Path | None,
+                   transition_sfx: Path | None, total_duration: float,
+                   duck_bgm: bool = False) -> Path:
+    """两遍 loudnorm 第一遍：把最终混音（旁白/BGM/SFX/ducking）渲成 f32 wav 供测量。"""
+    workdir = Path(workdir)
+    mix = workdir / "audio" / "_final_mix.wav"
+    utils.ensure_dir(mix.parent)
+    inputs, fc, label = _audio_mix_inputs(bgm, transition_sfx, total_duration, duck_bgm)
+    utils.ffmpeg(inputs + [
+        "-filter_complex", ";".join(fc), "-map", f"[{label}]",
+        "-t", f"{total_duration:.3f}",
+        "-ar", str(config.SAMPLE_RATE), "-ac", "2",
+        "-c:a", "pcm_f32le", str(mix),
+    ], cwd=workdir)
+    return mix
+
+
 def final_encode(workdir: Path, out: Path, total_duration: float, fps: int,
                  width: int, height: int, bgm: Path | None, has_ass: bool,
                  prog, pct0: float, pct1: float,
@@ -708,7 +902,6 @@ def final_encode(workdir: Path, out: Path, total_duration: float, fps: int,
                  grade_filter: str | None = None,
                  packaging_filter: str | None = None,
                  duck_bgm: bool = False) -> None:
-    inputs = ["-i", "video_raw.mp4", "-i", "audio/narration.wav"]
     fc: list[str] = []
     video_parts: list[str] = []
     if grade_filter:
@@ -721,56 +914,82 @@ def final_encode(workdir: Path, out: Path, total_duration: float, fps: int,
         fc.append("[0:v]" + ",".join(video_parts) + "[v]")
     else:
         fc.append("[0:v]null[v]")
-    next_idx = 2
-    bgm_idx = None
-    tsx_idx = None
-    if bgm is not None:
-        inputs += ["-stream_loop", "-1", "-i", str(bgm)]
-        bgm_idx = next_idx
-        next_idx += 1
-    if transition_sfx is not None:
-        inputs += ["-i", str(transition_sfx)]
-        tsx_idx = next_idx
-        next_idx += 1
-    if bgm_idx is None and tsx_idx is None:
-        fc.append(
-            "[1:a]volume=1.0,"
-            f"loudnorm=I={config.LUFS_TARGET}:TP=-1.5:LRA=11,"
-            f"aresample={config.SAMPLE_RATE}[a]"
-        )
+
+    # ---- 两遍 loudnorm（PLAN_V4 §2.3）----
+    # 第一遍：把最终混音（旁白/BGM ducking/SFX）渲成 f32 wav 并测量；
+    # 第二遍：用 measured_* + target_offset + linear=true 精确对齐 -16 LUFS。
+    # 单遍动态 loudnorm 在高 LRA 内容（如 classics）会欠调约 2dB，故必须两遍。
+    mix_path: Path | None = None
+    measured: dict | None = None
+    try:
+        mix_path = render_mix_wav(workdir, bgm, transition_sfx, total_duration,
+                                  duck_bgm)
+        measured = measure_loudness(mix_path)
+        if measured is None:
+            LOG.warning("两遍 loudnorm 测量失败，回退单遍动态 loudnorm: %s", mix_path)
+    except Exception as exc:  # noqa: BLE001
+        LOG.warning("两遍 loudnorm 混音失败，回退单遍动态 loudnorm: %s", exc)
+        mix_path = None
+    if mix_path is not None:
+        inputs = ["-i", "video_raw.mp4", "-i", str(mix_path)]
+        fc.append(f"[1:a]{_loudnorm_filter(measured)},"
+                  f"aresample={config.SAMPLE_RATE}[a]")
+        LOG.info("两遍 loudnorm：%s → %s",
+                 ("measured_I=%.2f measured_TP=%.2f offset=%.2f"
+                  % (measured["i"], measured["tp"], measured["offset"]))
+                 if measured else "测量缺失（动态兜底）", str(mix_path))
     else:
-        if duck_bgm and bgm_idx is not None:
-            # V4：旁白触发 BGM sidechain ducking（对话时自动压低音乐）
-            fc.append("[1:a]volume=1.0,asplit=2[nar][narkey]")
+        # 回退：旧单遍动态 loudnorm 混音链（保证异常时仍能出片）
+        inputs = ["-i", "video_raw.mp4", "-i", "audio/narration.wav"]
+        next_idx = 2
+        bgm_idx = None
+        tsx_idx = None
+        if bgm is not None:
+            inputs += ["-stream_loop", "-1", "-i", str(bgm)]
+            bgm_idx = next_idx
+            next_idx += 1
+        if transition_sfx is not None:
+            inputs += ["-i", str(transition_sfx)]
+            tsx_idx = next_idx
+            next_idx += 1
+        if bgm_idx is None and tsx_idx is None:
             fc.append(
-                f"[{bgm_idx}:a]volume={config.BGM_VOLUME},"
-                f"atrim=0:{total_duration:.3f},"
-                f"afade=t=in:st=0:d=2,"
-                f"afade=t=out:st={max(0.0, total_duration - 4.0):.3f}:d=4,"
-                f"aformat=sample_rates={config.SAMPLE_RATE}:channel_layouts=stereo[bg]"
+                "[1:a]volume=1.0,"
+                f"{_loudnorm_filter(None)},"
+                f"aresample={config.SAMPLE_RATE}[a]"
             )
-            fc.append("[bg][narkey]sidechaincompress=threshold=0.035:ratio=6:"
-                      "attack=15:release=350:makeup=1.0[bgd]")
-            parts = ["[nar]", "[bgd]"]
         else:
-            fc.append("[1:a]volume=1.0[nar]")
-            parts = ["[nar]"]
-            if bgm_idx is not None:
+            if duck_bgm and bgm_idx is not None:
+                fc.append("[1:a]volume=1.0,asplit=2[nar][narkey]")
                 fc.append(
                     f"[{bgm_idx}:a]volume={config.BGM_VOLUME},"
                     f"atrim=0:{total_duration:.3f},"
                     f"afade=t=in:st=0:d=2,"
-                    f"afade=t=out:st={max(0.0, total_duration - 4.0):.3f}:d=4[bg]"
+                    f"afade=t=out:st={max(0.0, total_duration - 4.0):.3f}:d=4,"
+                    f"aformat=sample_rates={config.SAMPLE_RATE}:channel_layouts=stereo[bg]"
                 )
-                parts.append("[bg]")
-        if tsx_idx is not None:
-            fc.append(f"[{tsx_idx}:a]volume=0.85,atrim=0:{total_duration:.3f}[tsx]")
-            parts.append("[tsx]")
-        fc.append(
-            "".join(parts) + f"amix=inputs={len(parts)}:duration=first:normalize=0,"
-            f"loudnorm=I={config.LUFS_TARGET}:TP=-1.5:LRA=11,"
-            f"aresample={config.SAMPLE_RATE}[a]"
-        )
+                fc.append("[bg][narkey]sidechaincompress=threshold=0.035:ratio=6:"
+                          "attack=15:release=350:makeup=1.0[bgd]")
+                parts = ["[nar]", "[bgd]"]
+            else:
+                fc.append("[1:a]volume=1.0[nar]")
+                parts = ["[nar]"]
+                if bgm_idx is not None:
+                    fc.append(
+                        f"[{bgm_idx}:a]volume={config.BGM_VOLUME},"
+                        f"atrim=0:{total_duration:.3f},"
+                        f"afade=t=in:st=0:d=2,"
+                        f"afade=t=out:st={max(0.0, total_duration - 4.0):.3f}:d=4[bg]"
+                    )
+                    parts.append("[bg]")
+            if tsx_idx is not None:
+                fc.append(f"[{tsx_idx}:a]volume=0.85,atrim=0:{total_duration:.3f}[tsx]")
+                parts.append("[tsx]")
+            fc.append(
+                "".join(parts) + f"amix=inputs={len(parts)}:duration=first:normalize=0,"
+                f"{_loudnorm_filter(None)},"
+                f"aresample={config.SAMPLE_RATE}[a]"
+            )
     args = inputs + [
         "-filter_complex", ";".join(fc),
         "-map", "[v]", "-map", "[a]",
@@ -785,6 +1004,17 @@ def final_encode(workdir: Path, out: Path, total_duration: float, fps: int,
     ]
     _run_ffmpeg_progress(args, workdir, prog, pct0, pct1, total_duration,
                          "编码成片")
+    # 编码后响度闭环：两遍 loudnorm 在高 LRA/稀疏内容上仍可能有残余偏差，
+    # 这里按实测值做最多两轮音轨修正（视频 copy），保证 -17~-15 LUFS / TP≤-1.0。
+    try:
+        info = enforce_loudness(out)
+        if info:
+            LOG.info("成片响度: integrated %.2f LUFS / TP %.2f dBTP",
+                     info["i"], info["tp"])
+        else:
+            LOG.warning("成片响度测量失败（QC loudness 将标红）")
+    except Exception as exc:  # noqa: BLE001
+        LOG.warning("成片响度闭环异常（保留已编码成片）: %s", exc)
 
 
 # --------------------------------------------------------------------------

@@ -33,6 +33,11 @@ DURATION_TOLERANCE = 0.6
 SUBTITLE_MIN_COVERAGE = 0.6
 BLACKDETECT_VF = "blackdetect=d=0.1:pix_th=0.10:pic_th=0.98"
 NON_SUBTITLE_STYLES = {"chapter", "punch", "lower", "brand"}
+# V4 响度硬门（PLAN_V4_AUDIO_EDIT.md §2.4/§5）
+LOUDNESS_RANGE = (-17.0, -15.0)
+LOUDNESS_TP_MAX = -1.0
+LOUDNESS_TARGET_TP = -1.5
+LOUDNESS_LRA = 11
 
 
 # ---------------------------------------------------------------------------
@@ -101,6 +106,33 @@ def blackdetect_count(video: Path | str, timeout: float = 600) -> tuple[int, str
     err = proc.stderr or ""
     starts = re.findall(r"black_start:([0-9.]+)", err)
     return len(starts), err[-600:]
+
+
+def measure_loudness(video: Path | str, *, target_i: float | None = None,
+                     target_tp: float = LOUDNESS_TARGET_TP,
+                     lra: float = LOUDNESS_LRA,
+                     timeout: float = 600) -> dict | None:
+    """独立测量成片 integrated LUFS / true peak（ffmpeg loudnorm 单遍分析）。"""
+    target_i = config.LUFS_TARGET if target_i is None else target_i
+    af = f"loudnorm=I={target_i}:TP={target_tp}:LRA={lra}:print_format=json"
+    try:
+        proc = utils.run(
+            [config.FFMPEG_BIN, "-hide_banner", "-nostats", "-i", str(video),
+             "-af", af, "-f", "null", os.devnull],
+            check=False, timeout=timeout)
+    except Exception as exc:  # noqa: BLE001
+        return {"ok": False, "error": str(exc)}
+    match = re.search(r"\{[^{}]*\"input_i\"[^{}]*\}", proc.stderr or "", re.S)
+    if not match:
+        return {"ok": False, "error": "loudnorm 未返回 JSON"}
+    try:
+        data = json.loads(match.group(0))
+        return {"ok": True, "i": float(data["input_i"]),
+                "tp": float(data["input_tp"]), "lra": float(data["input_lra"]),
+                "thresh": float(data.get("input_thresh", "nan")),
+                "raw": data}
+    except (KeyError, TypeError, ValueError) as exc:
+        return {"ok": False, "error": f"loudnorm JSON 解析失败: {exc}"}
 
 
 # ---------------------------------------------------------------------------
@@ -417,6 +449,29 @@ def evaluate(*, video, plan, shot_metas, template, subtitles=None,
             True, "legacy 路径：无 V4 语音节奏信息（跳过）", skipped=True,
             voice_shots=0)
 
+    # 12) 响度（V4 硬门：integrated LUFS -17~-15，true peak ≤ -1.0 dBTP）
+    loud = None
+    if video.is_file():
+        try:
+            loud = measure_loudness(video)
+        except Exception as exc:  # noqa: BLE001
+            loud = {"ok": False, "error": str(exc)}
+    lufs = tp = lra = None
+    if not loud or not loud.get("ok"):
+        checks["loudness"] = _check(
+            False,
+            f"响度测量失败：{(loud or {}).get('error') or '成片不存在'}",
+            loudness=None, true_peak=None)
+    else:
+        lufs, tp, lra = loud["i"], loud["tp"], loud["lra"]
+        low, high = LOUDNESS_RANGE
+        loud_ok = (low <= lufs <= high) and (tp <= LOUDNESS_TP_MAX)
+        checks["loudness"] = _check(
+            loud_ok,
+            f"integrated {lufs:.2f} LUFS / true peak {tp:.2f} dBTP"
+            f"（要求 {low:g}~{high:g} LUFS、TP ≤ {LOUDNESS_TP_MAX:g}）",
+            loudness=lufs, true_peak=tp, lra=lra)
+
     ok = all(item["ok"] for item in checks.values())
     previs = not h3_require
     stats = {
@@ -442,6 +497,10 @@ def evaluate(*, video, plan, shot_metas, template, subtitles=None,
         "speech_driven": bool((plan or {}).get("meta", {}).get("speech_driven")),
         "atempo_max": 1.0,
         "truncated_shots": trunc_bad,
+        "lufs": lufs,
+        "true_peak": tp,
+        "lra": lra,
+        "loudness_ok": bool((checks.get("loudness") or {}).get("ok")),
         "elapsed_sec": round(time.time() - t0, 1),
     }
     report = {
