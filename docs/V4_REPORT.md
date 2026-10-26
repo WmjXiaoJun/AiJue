@@ -68,7 +68,32 @@
 - 整片对照：`outputs/v3_legacy_audio/{id}/final_v3_edge.mp4` vs `outputs/templates_v3/{id}/final.mp4`
 - 音色基频（中位估算）：Breeze laozhou 82Hz / ali 164Hz / dawei 104Hz；V3 edge 95/136/153Hz（dawei 反而偏高，角色区分弱）
 
-## 3. 时间线格式（OpenFilm 式）
+### 2.5 响度修复（批量抽检发现：单遍 loudnorm 欠调）
+
+批量 V4 首版（09:33 启动的进程加载了修复前代码）暴露出**单遍 loudnorm 在稀疏/音乐床内容上欠调**：
+
+| 模板 | 修复前 LUFS | 修复后 LUFS | 方法 |
+|---|---|---|---|
+| classics | -18.15（越界） | **-16.30** / TP -1.47 | workdir 重建 + 两遍 loudnorm |
+| hot_ones | -17.53（越界） | **-16.28** / TP -1.47 | 同上 |
+| mystery | -17.13（越界） | **-16.09** / TP -1.50 | 同上 |
+| tonight_show / history_talk / history_mystery / masked_singer | 已达标 | -15.73 / -16.77 / -15.81 / 范围内 | — |
+
+修复链路（render-dev）：
+1. `pipeline/render.py::final_encode` 改为**两遍 loudnorm**：先把最终混音（旁白+BGM ducking+SFX）渲成 f32 wav → `loudnorm print_format=json` 测量 → 以 measured_I/TP/LRA/thresh + target_offset + `linear=true` 应用；编码后再做 ≤2 轮**闭环校正**（只重编码音频，`-c:v copy`）。
+2. `pipeline/qc_v3.py` 新增 `loudness` 硬门（-17~-15 LUFS、TP ≤ -1.0），qc_report 带 `loudness` check 与 stats。
+3. `scripts/fix_loudness.py`：不占 GPU 修复已落盘成片（优先 workdir 重建、复用生产剪辑/字幕/包装/混音；无 workdir 时仅音频重封装），修复后全量重评 QC 并回写 qc_report，自动备份 `final.preloud.mp4`。
+4. 批量结束后统一 `--root outputs/templates_v3 --fix` 全量收口（已达标自动 skip）。
+
+## 2.6 V4 硬门（QA 独立验收口径）
+
+- `duration`：与 plan 实际时长差 ≤0.6s（语音驱动后以 plan 为准）
+- `audio_pace`：atempo 全 1.0、truncated=[]、语音+lead/tail 装进镜头
+- `voice`：provider=breeze、voice_map 与配音文件齐全
+- `timeline`：version=4、五轨 V1/A1/A2/A3/S1 覆盖、V1 时间连续、A1 对齐、A2 duck
+- `loudness`：integrated -17~-15 LUFS、TP ≤ -1.0（QA 独立 ffmpeg 测量，与 qc_report 差 ≤0.6dB）
+- `H3`：非卡片镜 100% h3=true、workflow 05、prompt_id 唯一、seed/ref_image/action 齐、fallbacks=[]
+- `blackdetect`=0、字幕覆盖=1.0、1280×720/25fps/有音轨
 
 `outputs/templates_v3/{id}/timeline.json`：
 

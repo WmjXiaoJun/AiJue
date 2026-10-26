@@ -48,13 +48,14 @@ def _ffmpeg(args):
 def make_color_video(path: Path, *, duration: float = 2.0, width: int = 1280,
                      height: int = 720, fps: int = 25, black: bool = False,
                      audio: bool = True) -> Path:
-    """生成测试用成片（默认 testsrc2 + 正弦音轨，blackdetect=0）。"""
+    """生成测试用成片（默认 testsrc2 + 正弦音轨，归一化到 -16 LUFS，blackdetect=0）。"""
     utils.ensure_dir(Path(path).parent)
     src = "color=c=black:s={}x{}:r={}".format(width, height, fps) if black else \
         "testsrc2=size={}x{}:rate={}".format(width, height, fps)
     args = ["-f", "lavfi", "-i", src]
     if audio:
-        args += ["-f", "lavfi", "-i", "sine=frequency=440:sample_rate=48000"]
+        args += ["-f", "lavfi", "-i", "sine=frequency=440:sample_rate=48000",
+                 "-af", "loudnorm=I=-16:TP=-1.5:LRA=11"]
     args += ["-t", f"{duration:.3f}", "-c:v", "libx264", "-preset", "ultrafast",
              "-pix_fmt", "yuv420p"]
     args += ["-c:a", "aac", "-shortest", "-y", str(path)]
