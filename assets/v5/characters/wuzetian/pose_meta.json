@@ -4,27 +4,27 @@
     "id": "wuzetian",
     "pose": "point",
     "source": "imagegen_pose",
-    "created_at": "2026-10-26T21:06:07",
-    "elapsed_sec": 15.2,
-    "seed": 43,
-    "seed_base": 43,
+    "created_at": "2026-10-26T22:41:42",
+    "elapsed_sec": 49.0,
+    "seed": 53,
+    "seed_base": 49,
     "ip_adapter": {
-      "strength": 0.35,
-      "end_at": 0.9,
+      "strength": 0.22,
+      "end_at": 0.75,
       "weight_type": "style transfer"
     },
     "bg_mode": "white",
-    "ref_used": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\wuzetian\\portrait.png",
+    "ref_used": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\wuzetian\\pose_point\\ref_white.png",
     "portrait_ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\wuzetian\\portrait.png",
-    "prompt_id": "1b7012fc-d36b-4d4a-bc7f-66e70282439e",
+    "prompt_id": "475b0057-7fdd-497c-91a7-7de81ed53589",
     "files": {
       "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\wuzetian\\pose_point\\front.png",
       "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\wuzetian\\cutout_point.png"
     },
     "sizes": {
       "cutout": [
-        974,
-        1019
+        408,
+        976
       ]
     },
     "front_white": {
@@ -32,21 +32,12 @@
       "corners": [
         {
           "rgb": [
-            254,
-            254,
-            254
-          ],
-          "mean": 253.9,
-          "spread": 4.0
-        },
-        {
-          "rgb": [
             255,
             255,
             255
           ],
-          "mean": 254.8,
-          "spread": 2.0
+          "mean": 255.0,
+          "spread": 1.0
         },
         {
           "rgb": [
@@ -63,16 +54,25 @@
             255,
             255
           ],
-          "mean": 254.7,
-          "spread": 2.0
+          "mean": 255.0,
+          "spread": 1.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 255.0,
+          "spread": 1.0
         }
       ],
-      "white_ratio": 0.563
+      "white_ratio": 0.802
     },
     "cutout_validation": {
       "ok": true,
-      "alpha0": 0.517,
-      "visible": 0.483,
+      "alpha0": 0.469,
+      "visible": 0.531,
       "corners_alpha": [
         0,
         0,
@@ -82,138 +82,10 @@
       "bbox": [
         8,
         8,
-        966,
-        1012
+        400,
+        968
       ],
-      "aspect": 0.956,
-      "bbox_h_ratio": 0.985,
-      "wash": {
-        "removed": false,
-        "color": null,
-        "ratio": 0.0
-      }
-    },
-    "face_norm": {
-      "score": 0.826,
-      "estimated": false,
-      "source": "yunet",
-      "bbox": [
-        0.47084188911704317,
-        0.10176643768400392,
-        0.5513347022587269,
-        0.21187438665358194
-      ],
-      "mouth": {
-        "cx": 0.5110780287474332,
-        "cy": 0.1876251226692836,
-        "w": 0.027392197125256673,
-        "h": 0.011786064769381746
-      },
-      "eyes": {
-        "y": 0.14801766437684005,
-        "w": 0.01772073921971253,
-        "cx": [
-          0.491735112936345,
-          0.5304106776180698
-        ]
-      },
-      "skin": "#fbe7db",
-      "lip": "#8c5651",
-      "line": "#2a1d1d",
-      "face_w": 78.47
-    },
-    "prompts": {
-      "front": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1girl, female, mature female, black hair, high chignon, phoenix crown, ornate gold hairpins, soft eyebrows, phoenix eyes, crimson imperial robe, gold embroidery, jade pendant, fan, regal graceful expression, empress, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference, dynamic gesture, one arm extended to the side, index finger pointing, explaining pose, confident body language, weight on one leg, action pose",
-      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan, circular background, round backdrop, oval background, colored circle, pastel circle, background circle, sitting, upper body only, half body, cropped at waist, close-up, zoomed in, hands in pockets, static stiff pose, barefoot, bare feet"
-    }
-  },
-  "updated_at": "2026-10-26T21:13:48",
-  "think": {
-    "id": "wuzetian",
-    "pose": "think",
-    "source": "imagegen_pose",
-    "created_at": "2026-10-26T21:13:48",
-    "elapsed_sec": 13.3,
-    "seed": 43,
-    "seed_base": 43,
-    "ip_adapter": {
-      "strength": 0.35,
-      "end_at": 0.9,
-      "weight_type": "style transfer"
-    },
-    "bg_mode": "white",
-    "ref_used": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\wuzetian\\portrait.png",
-    "portrait_ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\wuzetian\\portrait.png",
-    "prompt_id": "7a2c6e6f-7fb7-4d16-8ae7-049bd2a47cc6",
-    "files": {
-      "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\wuzetian\\pose_think\\front.png",
-      "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\wuzetian\\cutout_think.png"
-    },
-    "sizes": {
-      "cutout": [
-        952,
-        1018
-      ]
-    },
-    "front_white": {
-      "ok": true,
-      "corners": [
-        {
-          "rgb": [
-            254,
-            254,
-            253
-          ],
-          "mean": 253.6,
-          "spread": 4.0
-        },
-        {
-          "rgb": [
-            255,
-            255,
-            255
-          ],
-          "mean": 254.8,
-          "spread": 2.0
-        },
-        {
-          "rgb": [
-            255,
-            255,
-            255
-          ],
-          "mean": 254.8,
-          "spread": 2.0
-        },
-        {
-          "rgb": [
-            254,
-            254,
-            254
-          ],
-          "mean": 254.2,
-          "spread": 3.0
-        }
-      ],
-      "white_ratio": 0.551
-    },
-    "cutout_validation": {
-      "ok": true,
-      "alpha0": 0.482,
-      "visible": 0.518,
-      "corners_alpha": [
-        0,
-        0,
-        0,
-        0
-      ],
-      "bbox": [
-        8,
-        8,
-        944,
-        1010
-      ],
-      "aspect": 0.935,
+      "aspect": 0.418,
       "bbox_h_ratio": 0.984,
       "wash": {
         "removed": false,
@@ -221,38 +93,198 @@
         "ratio": 0.0
       }
     },
+    "pose_gate": {
+      "ok": true,
+      "reason": "",
+      "aspect": 0.408,
+      "torso_tilt": 0.0,
+      "height_ratio": 0.956,
+      "feet_width_ratio": 0.397
+    },
+    "pose_gate_strict": {
+      "ok": true,
+      "reason": "",
+      "aspect": 0.408,
+      "torso_tilt": 0.0,
+      "height_ratio": 0.956,
+      "feet_width_ratio": 0.397
+    },
     "face_norm": {
-      "score": 0.839,
+      "score": 0.836,
       "estimated": false,
       "source": "yunet",
       "bbox": [
-        0.4573529411764706,
-        0.09852652259332023,
-        0.5298319327731092,
-        0.19106090373280943
+        0.4411764705882353,
+        0.10788934426229507,
+        0.6036764705882354,
+        0.19487704918032786
       ],
       "mouth": {
-        "cx": 0.4935924369747899,
-        "cy": 0.1706777996070727,
-        "w": 0.024642857142857143,
-        "h": 0.01037328094302554
+        "cx": 0.5224019607843137,
+        "cy": 0.1757172131147541,
+        "w": 0.055318627450980394,
+        "h": 0.01040983606557377
       },
       "eyes": {
-        "y": 0.13736738703339882,
-        "w": 0.015945378151260504,
+        "y": 0.1443954918032787,
+        "w": 0.035784313725490194,
         "cx": [
-          0.4761974789915966,
-          0.5109978991596639
+          0.48335784313725494,
+          0.5614705882352942
         ]
       },
-      "skin": "#f3e2d7",
-      "lip": "#7c4e4d",
-      "line": "#160e0d",
-      "face_w": 69.01
+      "skin": "#fee2db",
+      "lip": "#976563",
+      "line": "#2d2321",
+      "face_w": 66.38
     },
     "prompts": {
-      "front": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1girl, female, mature female, black hair, high chignon, phoenix crown, ornate gold hairpins, soft eyebrows, phoenix eyes, crimson imperial robe, gold embroidery, jade pendant, fan, regal graceful expression, empress, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference, thoughtful pose, one hand on chin, other arm crossed under it, contemplative, head slightly tilted, relaxed stance",
-      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan, circular background, round backdrop, oval background, colored circle, pastel circle, background circle, sitting, upper body only, half body, cropped at waist, close-up, zoomed in, hands in pockets, static stiff pose, barefoot, bare feet"
+      "front": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1girl, female, mature female, black hair, high chignon, phoenix crown, ornate gold hairpins, soft eyebrows, phoenix eyes, crimson imperial robe, gold embroidery, jade pendant, fan, regal graceful expression, empress, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference, standing straight upright, feet planted together, torso vertical, body facing viewer, only one arm raised to chest with index finger pointing forward, other arm relaxed at side, no leaning, no stride, no wide stance, static standing gesture, full body",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan, circular background, round backdrop, oval background, colored circle, pastel circle, background circle, sitting, crouching, lying, leaning, running, walking, wide stance, jump, jumping, dynamic pose, torso tilt, slanted body, diagonal composition, action pose, arms spread wide, arms raised high, tilted frame, sideways body, legs apart, upper body only, half body, cropped at waist, close-up, zoomed in, hands in pockets, barefoot, bare feet"
+    }
+  },
+  "updated_at": "2026-10-26T22:41:42",
+  "think": {
+    "id": "wuzetian",
+    "pose": "think",
+    "source": "imagegen_pose",
+    "created_at": "2026-10-26T22:30:19",
+    "elapsed_sec": 95.5,
+    "seed": 53,
+    "seed_base": 43,
+    "ip_adapter": {
+      "strength": 0.22,
+      "end_at": 0.75,
+      "weight_type": "style transfer"
+    },
+    "bg_mode": "white",
+    "ref_used": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\wuzetian\\pose_think\\ref_white.png",
+    "portrait_ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\wuzetian\\portrait.png",
+    "prompt_id": "e03d01dc-8c22-4c04-bfc7-c6ad5ae4a1ad",
+    "files": {
+      "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\wuzetian\\pose_think\\front.png",
+      "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\wuzetian\\cutout_think.png"
+    },
+    "sizes": {
+      "cutout": [
+        429,
+        1009
+      ]
+    },
+    "front_white": {
+      "ok": true,
+      "corners": [
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 255.0,
+          "spread": 1.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 254.9,
+          "spread": 2.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 255.0,
+          "spread": 1.0
+        },
+        {
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "mean": 255.0,
+          "spread": 1.0
+        }
+      ],
+      "white_ratio": 0.796
+    },
+    "cutout_validation": {
+      "ok": true,
+      "alpha0": 0.497,
+      "visible": 0.503,
+      "corners_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "bbox": [
+        8,
+        8,
+        421,
+        1001
+      ],
+      "aspect": 0.425,
+      "bbox_h_ratio": 0.984,
+      "wash": {
+        "removed": false,
+        "color": null,
+        "ratio": 0.0
+      }
+    },
+    "pose_gate": {
+      "ok": true,
+      "reason": "",
+      "aspect": 0.416,
+      "torso_tilt": 0.0,
+      "height_ratio": 0.989,
+      "feet_width_ratio": 0.413
+    },
+    "pose_gate_strict": {
+      "ok": true,
+      "reason": "",
+      "aspect": 0.416,
+      "torso_tilt": 0.0,
+      "height_ratio": 0.989,
+      "feet_width_ratio": 0.413
+    },
+    "face_norm": {
+      "score": 0.838,
+      "estimated": false,
+      "source": "yunet_headcrop",
+      "bbox": [
+        0.3897435897435897,
+        0.11407333994053517,
+        0.6111888111888112,
+        0.22556987115956392
+      ],
+      "mouth": {
+        "cx": 0.5003962703962703,
+        "cy": 0.20106045589692764,
+        "w": 0.07529137529137528,
+        "h": 0.014400396432111
+      },
+      "eyes": {
+        "y": 0.1609117938553023,
+        "w": 0.04871794871794871,
+        "cx": [
+          0.44724941724941725,
+          0.5535431235431235
+        ]
+      },
+      "skin": "#e6d8d2",
+      "lip": "#88554e",
+      "line": "#262424",
+      "face_w": 94.99
+    },
+    "prompts": {
+      "front": "masterpiece, best quality, anime style, clean lineart, cel shading, vibrant colors, detailed face, 1girl, female, mature female, black hair, high chignon, phoenix crown, ornate gold hairpins, soft eyebrows, phoenix eyes, crimson imperial robe, gold embroidery, jade pendant, fan, regal graceful expression, empress, looking at viewer, full body, front view, standing, arms at sides, simple background, white background, plain background, full body, standing, simple background, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference, standing straight upright, feet planted together, torso vertical, body facing viewer, one hand on chin with elbow close to body, other arm relaxed, no leaning, no stride, no wide stance, static standing gesture, full body",
+      "negative": "lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan, circular background, round backdrop, oval background, colored circle, pastel circle, background circle, sitting, crouching, lying, leaning, running, walking, wide stance, jump, jumping, dynamic pose, torso tilt, slanted body, diagonal composition, action pose, arms spread wide, arms raised high, tilted frame, sideways body, legs apart, upper body only, half body, cropped at waist, close-up, zoomed in, hands in pockets, barefoot, bare feet"
     }
   }
 }

@@ -10,7 +10,7 @@
   "cfg": 5.5,
   "sampler": "euler_ancestral",
   "scheduler": "normal",
-  "seed": 53,
+  "seed": 49,
   "size": {
     "portrait": [
       832,
@@ -25,8 +25,8 @@
   "prompt": {
     "front": "masterpiece, best quality, anime style, solo, 1boy, male, mature male, black hair, black eyes, cream hanfu, teal accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, chinese hair bun, lun jin headwear, long beard, goatee, long black eyebrows, dark eyes, ivory hanfu, wide sleeves, blue trim, white feather fan in hand, calm wise expression, gentle smile, looking at viewer, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference, standing straight upright, feet planted together, torso vertical, body facing viewer, only one arm raised to chest with index finger pointing forward, other arm relaxed at side, no leaning, no stride, no wide stance, static standing gesture"
   },
-  "created_at": "2026-10-26T22:01:47",
-  "elapsed_sec": 12.3,
+  "created_at": "2026-10-26T22:34:15",
+  "elapsed_sec": 12.2,
   "files": {
     "portrait": null,
     "three_view": {
@@ -40,10 +40,10 @@
     {
       "tag": "front",
       "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\zhuge\\pose_point\\three_view/front.png",
-      "seed": 53,
+      "seed": 49,
       "width": 1024,
       "height": 1024,
-      "gen_sec": 12.0,
+      "gen_sec": 12.1,
       "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, mature male, black hair, black eyes, cream hanfu, teal accents, full body, front view, standing, arms at sides, simple background, white background, plain background, clean lineart, cel shading, vibrant colors, detailed face, chinese hair bun, lun jin headwear, long beard, goatee, long black eyebrows, dark eyes, ivory hanfu, wide sleeves, blue trim, white feather fan in hand, calm wise expression, gentle smile, looking at viewer, pure white background, isolated on white background, no shadow, no scenery, highly detailed full body illustration, intricate clothing folds, detailed shading, same character as reference, standing straight upright, feet planted together, torso vertical, body facing viewer, only one arm raised to chest with index finger pointing forward, other arm relaxed at side, no leaning, no stride, no wide stance, static standing gesture",
       "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, multiple views, split screen, cropped, lowres, bad anatomy, bad hands, extra fingers, missing fingers, text, watermark, logo, signature, multiple characters, photorealistic, 3d render, realistic, cropped, modern clothing, suit, necktie, hoodie, t-shirt, sneakers, glasses, wristwatch, smartphone, background, scenery, gradient background, ink splatter, teal, shadow on ground, multiple views, cropped, water splash, color wash, paint splatter, background elements, flat color, simple cartoon, vector art, chibi, plain, grey background, dark background, gradient background, decorative background, halo, oversized prop, giant fan, fan behind, canopy, umbrella, wings, background fan, circular background, round backdrop, oval background, colored circle, pastel circle, background circle, sitting, crouching, lying, leaning, running, walking, wide stance, jump, jumping, dynamic pose, torso tilt, slanted body, diagonal composition, action pose, arms spread wide, arms raised high, tilted frame, sideways body, legs apart, upper body only, half body, cropped at waist, close-up, zoomed in, hands in pockets, barefoot, bare feet",
       "composition": "front",

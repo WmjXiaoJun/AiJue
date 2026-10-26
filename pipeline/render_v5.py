@@ -634,11 +634,22 @@ def render_shot_clips(plan: dict, catalog: dict, style: dict, paths: dict,
             char = _character(catalog, char_id)
             mouth = []
             if role == shot.get("role") and str(shot.get("line") or "").strip():
+                shot_line = str(shot["line"])
                 try:
-                    mouth = characters_v5.viseme_timeline(str(shot["line"]), dur,
-                                                          lead=LEAD_SEC)
-                except Exception:  # noqa: BLE001
+                    from . import mouth_sync
+                    audio_for_mouth = str(shot.get("audio") or "")
+                    if audio_for_mouth:
+                        mouth = mouth_sync.envelope_timeline(audio_for_mouth, FPS,
+                                                             shot_line)
+                except Exception as exc:  # noqa: BLE001
+                    LOG.warning("音频口型失败（回退文本 viseme）: %s", exc)
                     mouth = []
+                if not mouth:
+                    try:
+                        mouth = characters_v5.viseme_timeline(shot_line, dur,
+                                                              lead=LEAD_SEC)
+                    except Exception:  # noqa: BLE001
+                        mouth = []
             anchor = (layers.get("anchors") or {}).get(role)
             zone_rect = cam.get("zone") if isinstance(cam, dict) else None
             if anchor:
