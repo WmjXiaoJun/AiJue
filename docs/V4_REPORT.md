@@ -179,3 +179,11 @@ python -m pytest pipeline/tests/test_v4_audio.py -q
 3. 自然语速使镜头变长（单镜 5.2–10.1s），H3 生成成本约 +20-30%；demo 总时长随台词自然伸缩，V4 按目标时长自动裁掉尾部多余 H3 镜。
 4. 时间线渲染器（`edit_v4`）与主渲染在字幕样式上略有差异（主路径用 ass_builder 综艺包装，edit_v4 用简洁字幕样式）；主交付以 render_v3 成片为准。
 5. OpenFilm 本体（Node/Chromium 渲染网页影片）未接入本仓库成片链路，仅借鉴其“轨道/片段/媒体片段/at”的时间线模型；如需真正用 OpenFilm Studio 编辑，可将 timeline 作为导出中间态再做映射。
+6. **生产链路未走 `edit_v4.render_timeline`**：`render_v3` 的 V4 路径仍是 `assemble_video + final_encode`，
+   `timeline.json/html` 目前是描述性产物（QA 已实测“纯 timeline 重渲”输出 43.28s/LUFS -15.75 可用）。
+   另：timeline A2 `gain=0.22` 与 `config.BGM_VOLUME=0.075` 未打通，duck 参数在 `final_encode` 内硬编码 →
+   属剪辑层契约完整性风险，记为 V4.1 后续（本轮不修）。
+7. `tonight_show_5min` 五分钟版仍是 **V3（edge-tts）音频**，未用 Breeze 重渲（57 镜 × 长台词 ≈ 3h+ GPU）。
+   复现命令：`python -m pipeline.cli render_v3 --template tonight_show --duration 300 --h3 comfy --force --out outputs/templates_v3/tonight_show_5min`。
+8. 批量修复备份 `outputs/templates_v3/*/final.preloud.mp4`（16 个，约 171MB）保留用于回滚，QA 终验通过后可删。
+
