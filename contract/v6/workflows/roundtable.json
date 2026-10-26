@@ -32,6 +32,21 @@
       "desc": "固定音色 TTS + 语速/停顿适配"
     },
     {
+      "id": "art",
+      "agent": "art_director",
+      "tool": "generate_art",
+      "depends": [
+        "story"
+      ],
+      "enabled": false,
+      "optional": true,
+      "params": {
+        "character": "",
+        "poses": []
+      },
+      "desc": "生成/重建角色美术资产（GPU，默认关闭）"
+    },
+    {
       "id": "editorial",
       "agent": "editor",
       "tool": "plan_editing",

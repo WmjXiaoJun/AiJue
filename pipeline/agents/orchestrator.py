@@ -92,6 +92,7 @@ def run_template(template_id: str, *, duration: float = 40.0, seed: int = 202611
           stages=[s["id"] for s in (workflow.get("stages") or [])])
     persist()
     todo = _expand(workflow.get("stages") or [], stages, start)
+    explicit = {str(x).strip() for x in (stages or []) if str(x).strip()}
     done: set[str] = set()
     failed = False
     for stage in todo:
@@ -106,12 +107,13 @@ def run_template(template_id: str, *, duration: float = 40.0, seed: int = 202611
             record.update(status="skipped", error=f"依赖未完成: {missing}")
             event("skip", stage=sid, reason=record["error"])
             continue
-        if not stage.get("enabled", True):
+        if not stage.get("enabled", True) and sid not in explicit:
             record.update(status="skipped", error="工作流中已禁用")
             event("skip", stage=sid, reason="disabled")
             continue
         if dry_run:
             record.update(status="planned")
+            done.add(sid)
             event("plan", stage=sid, tool=stage.get("tool"))
             continue
         record["started"] = time.strftime("%H:%M:%S")

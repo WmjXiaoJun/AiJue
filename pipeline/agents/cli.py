@@ -76,8 +76,8 @@ def cmd_edit(args) -> int:
         payload = json.loads(args.json)
     if args.value is not None:
         payload = args.value
-    res = apply_op(args.template, args.op, character=args.char, value=payload,
-                   json=payload, stage=args.stage)
+    res = apply_op(args.template, args.op, character=args.char, pose=args.pose,
+                   value=payload, json=payload, stage=args.stage)
     _print(res)
     return 0
 
@@ -122,9 +122,10 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("edit", help="智能体修改（声音/剪辑/模板/工作流）")
     p.add_argument("--template", required=True)
     p.add_argument("--op", required=True,
-                   choices=["set_voice", "patch_editorial", "patch_template",
+                   choices=["set_voice", "set_pose", "patch_editorial", "patch_template",
                             "patch_workflow", "set_stage_param", "reset_workflow"])
     p.add_argument("--char", default=None)
+    p.add_argument("--pose", default=None)
     p.add_argument("--stage", default=None)
     p.add_argument("--value", default=None)
     p.add_argument("--json", default=None)

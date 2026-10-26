@@ -22,7 +22,7 @@ V6 用 **智能体 + 可编辑工作流 + 增量重跑 + 验收门** 把这件�
 | producer | workflow/run/report | 编排、增量重跑范围、交付汇总 |
 | story_architect | `build_story` | 模板 → 分镜脚本/台词/节奏（`pipeline/v5_story.py`） |
 | voice_director | `synthesize_voices`, `set_voice` | 固定音色 TTS（Breeze）、音色切换 |
-| art_director | `generate_art`, `set_pose` | 角色/场景 AI 资产（预留） |
+| art_director | `generate_art`, `set_pose`, `list_art` | 角色/场景 AI 资产、姿态资产启停（`contract/v6/art/pose_policy.json`，`characters_v5` 运行时遵守） |
 | editor | `plan_editing`, `build_storyboard`, `patch_editorial` | 剪辑档案、分镜表 |
 | video_director | `render_shots`, `render_h3` | 17 运镜 2D 渲染 / H3 图生视频 hero 镜 |
 | qa | `evaluate_qc` | QC 16 项硬门 + 抽帧 |
@@ -66,6 +66,7 @@ python -m pipeline.agents run --template history_talk --duration 40 --goal "端�
 python -m pipeline.agents run --template history_talk --stages shots,assemble,qc   # 增量
 python -m pipeline.agents run --template tonight_show --start editorial            # 从某阶段起
 python -m pipeline.agents edit --template classics --op set_voice --char guanyu --value legacy_v4_laozhou
+python -m pipeline.agents edit --template classics --op set_pose --char zhuge --pose point --json '{"enabled": false}'
 python -m pipeline.agents edit --template classics --op patch_editorial --json-file tmp/patch.json
 python -m pipeline.agents edit --template classics --op patch_workflow --json '{"enable":["h3"]}'
 python -m pipeline.agents status --template history_talk

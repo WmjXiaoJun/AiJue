@@ -15,6 +15,7 @@ V6_CONTRACT = REPO / "contract" / "v6"
 #: 各操作影响的阶段（用于增量重跑建议）
 AFFECTED: dict[str, list[str]] = {
     "set_voice": ["voice", "shots", "assemble", "storyboard", "qc", "publish"],
+    "set_pose": ["shots", "assemble", "storyboard", "qc", "publish"],
     "patch_editorial": ["editorial", "shots", "assemble", "storyboard", "qc", "publish"],
     "patch_template": ["story", "voice", "editorial", "shots", "assemble",
                        "storyboard", "qc", "publish"],
@@ -61,6 +62,13 @@ def set_voice(template: str, character: str, value: str) -> dict:
             "affected_stages": AFFECTED["set_voice"],
             "rerun": f"python -m pipeline.agents run --template {template} "
                      f"--stages {','.join(AFFECTED['set_voice'])}"}
+
+
+def set_pose(template: str, character: str, pose: str, enabled: bool = True) -> dict:
+    """美术：按角色/姿态启停姿态资产（写入 contract/v6/art/pose_policy.json）。"""
+    from .art import set_pose as _set_pose
+    return _set_pose(None, {"character": character, "pose": pose,
+                            "enabled": bool(enabled)})
 
 
 def patch_editorial(template: str, patch: dict) -> dict:
@@ -133,6 +141,15 @@ def apply_op(template: str, op: str, **kwargs) -> dict:
     if op == "set_voice":
         return set_voice(template, str(kwargs.get("character") or ""),
                          str(kwargs.get("value") or ""))
+    if op == "set_pose":
+        value = kwargs.get("value")
+        enabled = True
+        if isinstance(value, dict):
+            enabled = bool(value.get("enabled", True))
+        elif isinstance(value, str):
+            enabled = value.strip().lower() not in ("0", "false", "off", "no")
+        return set_pose(template, str(kwargs.get("character") or ""),
+                        str(kwargs.get("pose") or ""), enabled)
     if op == "patch_editorial":
         return patch_editorial(template, kwargs.get("json") or {})
     if op == "patch_template":

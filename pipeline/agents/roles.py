@@ -29,7 +29,7 @@ ROLES: dict[str, dict] = {
     "art_director": {
         "id": "art_director", "name": "美术指导", "emoji": "🎨",
         "desc": "角色/场景 AI 资产与风格一致性；姿态/表情资产",
-        "tools": ["generate_art", "set_pose"],
+        "tools": ["generate_art", "set_pose", "list_art"],
         "prompt": "你是美术指导。角色资产在 assets/v5/characters/<id>/，场景在 assets/v5/scenes/<id>.png；"
                   "风格由 style_v5 统一后处理；新增角色/场景必须过白底/alpha/尺寸校验。",
     },

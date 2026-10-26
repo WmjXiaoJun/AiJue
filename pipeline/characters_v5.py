@@ -1996,6 +1996,15 @@ def art_character(char) -> dict:
         return {"id": str(spec.get("id") or char), "exists": False, "error": str(exc)}
 
 
+def _pose_policy_allowed(char_spec: dict, pose: str) -> bool:
+    """V6：智能体 set_pose 策略（contract/v6/art/pose_policy.json）→ 是否允许姿态资产。"""
+    try:
+        from .agents.art import pose_allowed
+        return bool(pose_allowed(str((char_spec or {}).get("id") or ""), pose))
+    except Exception:  # noqa: BLE001
+        return True
+
+
 def _render_art_character(char_spec: dict, style_spec: dict, size: tuple[int, int],
                           pose: str, mouth: str, blink: bool):
     """AI 立绘渲染；无资产/异常返回 None（调用方回退程序化）。"""
@@ -2005,6 +2014,8 @@ def _render_art_character(char_spec: dict, style_spec: dict, size: tuple[int, in
     try:
         import os as _os
         if _os.environ.get("MOTION2D_POSE_ART", "").strip().lower() in ("off", "0", "false", "no"):
+            pose = "front"
+        elif not _pose_policy_allowed(char_spec, pose):
             pose = "front"
         return mod.render_art_character(char_spec, style_spec, size, pose, mouth, bool(blink))
     except Exception:  # noqa: BLE001
@@ -2034,6 +2045,8 @@ def render_character(char, style, size=DEFAULT_SIZE, pose: str = "front",
     try:
         import os as _os
         if _os.environ.get("MOTION2D_POSE_ART", "").strip().lower() in ("off", "0", "false", "no"):
+            pose = "front"
+        elif not _pose_policy_allowed(char_spec, pose):
             pose = "front"
     except Exception:  # noqa: BLE001
         pass

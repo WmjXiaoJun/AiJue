@@ -194,6 +194,12 @@ def write_report(ctx: StageContext, params: dict | None = None) -> dict:
 TOOLS: dict[str, dict] = {
     "build_story": {"fn": build_story, "agent": "story_architect",
                     "desc": "模板 → 分镜脚本/台词/节奏（episode.json）"},
+    "generate_art": {"fn": None, "agent": "art_director",
+                     "desc": "生成/重建角色 AI 立绘与姿态资产（GPU，默认跳过已有）"},
+    "set_pose": {"fn": None, "agent": "art_director",
+                 "desc": "设置角色姿态资产启用策略（contract/v6/art/pose_policy.json）"},
+    "list_art": {"fn": None, "agent": "art_director",
+                 "desc": "列出角色/场景资产状态"},
     "synthesize_voices": {"fn": synthesize_voices, "agent": "voice_director",
                           "desc": "固定音色 TTS + 语速/停顿（音色缓存）"},
     "plan_editing": {"fn": plan_editing, "agent": "editor",
@@ -217,7 +223,15 @@ def call_tool(name: str, ctx: StageContext, params: dict | None = None) -> dict:
     tool = TOOLS.get(str(name))
     if not tool:
         raise KeyError(f"未知工具: {name}；可用: {sorted(TOOLS)}")
-    return tool["fn"](ctx, params or {})
+    fn = tool.get("fn")
+    if fn is None:
+        # 美术类工具按需延迟导入（避免 agents 包循环引用）
+        from . import art as art_mod
+        fn = {"generate_art": art_mod.generate_art,
+              "set_pose": art_mod.set_pose,
+              "list_art": art_mod.list_art}[str(name)]
+        tool["fn"] = fn
+    return fn(ctx, params or {})
 
 
 def new_context(template_id: str, *, duration: float = 40.0, seed: int = 20261101,

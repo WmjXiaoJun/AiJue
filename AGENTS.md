@@ -10,7 +10,7 @@
 | producer（制片人） | 编排工作流、决定重跑范围、汇总交付 | workflow/run/report |
 | story_architect（编剧） | 模板 → 分镜脚本、台词、节奏 | build_story |
 | voice_director（声音导演） | 角色音色、TTS、语速/停顿 | synthesize_voices, set_voice |
-| art_director（美术） | 角色/场景 AI 资产、风格一致性 | generate_art, set_pose |
+| art_director（美术） | 角色/场景 AI 资产、风格一致性、姿态资产启停 | generate_art, set_pose, list_art |
 | editor（剪辑师） | 剪辑档案（景别/运镜/转场/J-L）、分镜表 | plan_editing, build_storyboard, patch_editorial |
 | video_director（视频导演） | 2D 动效渲染 / H3 hero 镜 | render_shots, render_h3 |
 | qa（质检） | QC 硬门、抽帧、验收报告 | evaluate_qc |
