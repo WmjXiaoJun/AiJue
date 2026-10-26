@@ -85,6 +85,7 @@ export interface V5CastMember {
 export interface V5TemplateSummary {
   id: string;
   label: string;
+  tags?: string[];
   style?: string;
   target_duration?: number;
   cast?: V5CastMember[];
@@ -246,14 +247,41 @@ function qs(params: Record<string, string | number | boolean | undefined | null>
 
 const enc = encodeURIComponent;
 
+export interface V5ItemResponse {
+  ok: boolean;
+  kind: string;
+  id: string;
+  item: Record<string, unknown>;
+  custom?: boolean;
+  source?: string;
+  base?: string;
+  custom_path?: string;
+}
+
+export interface V5PutResponse {
+  ok: boolean;
+  kind: string;
+  id: string;
+  path?: string;
+  dry_run?: boolean;
+  validated?: boolean;
+  write_mode?: string;
+  warnings?: unknown[];
+}
+
 export const v5api = {
   outputs: (includeCustom = false) =>
     request<V5OutputsResponse>("/v5/outputs" + qs({ include_custom: includeCustom ? "true" : undefined })),
   catalog: () => request<V5CatalogResponse>("/v5/catalog"),
   /** 读单个对象（内建 + custom 合并后的完整 JSON） */
   item: (kind: string, id: string) =>
-    request<{ ok: boolean; kind: string; id: string; item: Record<string, unknown>; custom?: boolean }>(
-      "/v5/" + enc(kind) + "/" + enc(id)
+    request<V5ItemResponse>("/v5/" + enc(kind) + "/" + enc(id)),
+  /** 保存 custom 覆盖（dryRun=true 只校验不落盘；校验失败抛 V5ApiError，message 含 errors） */
+  putItem: (kind: string, id: string, item: Record<string, unknown>, dryRun = false) =>
+    request<V5PutResponse>(
+      "/v5/" + enc(kind) + "/" + enc(id) + (dryRun ? "?dry_run=true" : ""),
+      { method: "PUT", body: JSON.stringify({ item, dry_run: dryRun }) },
+      60000
     ),
   voices: () => request<V5VoicesResponse>("/v5/voices"),
   characterVoice: (character: string) =>

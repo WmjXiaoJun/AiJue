@@ -602,3 +602,269 @@
   .v5-form-row { grid-template-columns: 1fr; }
   .v5-field-check { padding-top: 0; }
 }
+
+/* ============================================================
+   模板库（Templates.tsx）：模板卡 + 7 步工作流 + 编辑 JSON 弹层
+   ============================================================ */
+.v5-mono { font-family: var(--font-mono); letter-spacing: 0.02em; }
+
+.v5-tpl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 14px;
+}
+.v5-tpl-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.18s var(--ease), transform 0.18s var(--ease);
+}
+.v5-tpl-card:hover { border-color: var(--line-strong); transform: translateY(-2px); }
+.v5-tpl-main {
+  text-align: left;
+  background: transparent;
+  border: 0;
+  color: var(--text);
+  padding: 12px 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  cursor: pointer;
+}
+.v5-tpl-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.v5-tpl-title { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.v5-tpl-title b { font-size: 15px; }
+.v5-tpl-title .v5-muted { font-size: 11px; }
+.v5-tpl-head-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.v5-tpl-desc {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-dim);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.v5-tpl-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  font-size: 11.5px;
+  color: var(--text-dim);
+}
+.v5-tpl-meta span { display: inline-flex; align-items: center; gap: 4px; }
+.v5-tpl-tags { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; }
+.v5-tpl-flow {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-wrap: wrap;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line-soft);
+}
+.v5-tpl-flow-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  color: var(--text-dim);
+  padding: 1px 6px 1px 2px;
+  border-radius: 999px;
+}
+.v5-tpl-flow-step i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(245, 197, 24, 0.16);
+  color: var(--accent);
+  font-style: normal;
+  font-size: 9.5px;
+  font-family: var(--font-mono);
+}
+.v5-tpl-previews { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.v5-tpl-avatars { display: flex; gap: 4px; }
+.v5-tpl-avatar {
+  width: 30px;
+  height: 38px;
+  border-radius: 6px;
+  object-fit: cover;
+  object-position: top center;
+  border: 1px solid var(--line-strong);
+  background: #0a0d14;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--accent);
+}
+.v5-tpl-scene-thumbs { display: flex; gap: 4px; margin-left: auto; }
+.v5-tpl-scene-thumb {
+  width: 64px;
+  height: 36px;
+  border-radius: 5px;
+  object-fit: cover;
+  border: 1px solid var(--line-soft);
+  background: #0a0d14;
+}
+.v5-tpl-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 8px 14px 12px;
+  border-top: 1px solid var(--line-soft);
+}
+
+/* ---------------- 模板详情（工作流） ---------------- */
+.v5-modal-xl { width: min(1180px, 96vw); }
+.v5-tpl-head-actions { display: flex; align-items: center; gap: 8px; }
+.v5-tpl-detail { display: flex; flex-direction: column; gap: 14px; }
+.v5-tpl-detail-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.v5-tpl-detail-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.v5-flow-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.v5-flow-step {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.02);
+  overflow: hidden;
+}
+.v5-flow-step-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--line-soft);
+  flex-wrap: wrap;
+}
+.v5-flow-step-head b { font-size: 13px; }
+.v5-flow-step-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 11px;
+  font-weight: 700;
+}
+.v5-flow-step-icon { color: var(--cyan); display: inline-flex; }
+.v5-flow-step-body { padding: 10px 12px; }
+
+.v5-act-list { display: flex; flex-direction: column; gap: 3px; max-height: 220px; overflow: auto; }
+.v5-act-row {
+  display: grid;
+  grid-template-columns: 52px 1.1fr 88px 44px 92px 1.4fr;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 6px;
+  border-radius: 5px;
+  font-size: 11.5px;
+  color: var(--text-dim);
+}
+.v5-act-row:hover { background: rgba(255, 255, 255, 0.03); }
+.v5-act-id, .v5-act-scene { font-family: var(--font-mono); }
+.v5-act-line { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.v5-flow-cast { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; }
+.v5-flow-cast-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-soft);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+}
+.v5-flow-cast-card:hover { border-color: var(--accent); }
+.v5-flow-avatar {
+  width: 34px;
+  height: 42px;
+  border-radius: 6px;
+  object-fit: cover;
+  object-position: top center;
+  background: #0a0d14;
+  flex-shrink: 0;
+}
+.v5-flow-cast-main { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.v5-flow-cast-main b { font-size: 12.5px; }
+.v5-flow-cast-main .v5-muted { font-size: 10.5px; }
+.v5-flow-cast-voice { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-size: 10.5px; }
+.v5-flow-cast-voice .v5-qc { padding: 0 6px; font-size: 9.5px; }
+.v5-flow-scenes { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.v5-flow-scene { display: flex; flex-direction: column; gap: 3px; }
+.v5-flow-scene-img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 5px;
+  border: 1px solid var(--line-soft);
+  background: #0a0d14;
+}
+.v5-flow-scene-label { font-size: 11px; color: var(--text-dim); }
+.v5-flow-avatars { display: flex; gap: 10px; flex-wrap: wrap; }
+.v5-flow-portrait { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11.5px; }
+.v5-flow-portrait-img {
+  width: 74px;
+  height: 96px;
+  object-fit: cover;
+  object-position: top center;
+  border-radius: 7px;
+  border: 1px solid var(--line-strong);
+  background: #0a0d14;
+}
+.v5-flow-packaging { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.v5-flow-mix { display: flex; flex-direction: column; gap: 6px; }
+.v5-flow-qc { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+/* ---------------- 编辑模板 JSON ---------------- */
+.v5-tpl-edit { display: flex; flex-direction: column; gap: 10px; }
+.v5-json-editor {
+  width: 100%;
+  min-height: 420px;
+  max-height: 52vh;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.55;
+  white-space: pre;
+  tab-size: 2;
+}
+.v5-json-error {
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 96, 96, 0.4);
+  background: rgba(255, 96, 96, 0.08);
+  max-height: 160px;
+  overflow: auto;
+}
+.v5-json-ok {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(56, 201, 139, 0.35);
+  background: rgba(56, 201, 139, 0.08);
+  color: var(--green);
+  font-size: 12px;
+}
+
+@media (max-width: 1100px) {
+  .v5-tpl-grid { grid-template-columns: 1fr; }
+  .v5-act-row { grid-template-columns: 46px 1fr 80px 40px; }
+  .v5-act-row .v5-act-line, .v5-act-row .v5-ellipsis { display: none; }
+  .v5-flow-packaging { grid-template-columns: 1fr; }
+}

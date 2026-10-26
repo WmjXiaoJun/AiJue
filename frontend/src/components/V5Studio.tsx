@@ -1,19 +1,20 @@
-// V5 世界：把 V5 能力（成片/风格/场景/角色/渲染）绑定进工作台
+// V5 世界：把 V5 能力（成片/模板/风格/场景/角色/渲染）绑定进工作台
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { V5CatalogResponse, V5Output } from "../lib/v5";
 import { v5api } from "../lib/v5";
 import { useToast } from "./Toast";
-import { IconFilm, IconGrid, IconPalette, IconRefresh, IconSpark, IconUser } from "./icons";
+import { IconFilm, IconGrid, IconPalette, IconRefresh, IconSpark, IconTemplate, IconUser } from "./icons";
 import { Spinner } from "./ui";
 import { Gallery } from "./v5/Gallery";
+import { Templates } from "./v5/Templates";
 import { StyleWall } from "./v5/StyleWall";
 import { SceneLibrary } from "./v5/SceneLibrary";
 import { CharacterLibrary } from "./v5/CharacterLibrary";
 import { RenderPanel } from "./v5/RenderPanel";
 
-type V5Tab = "gallery" | "styles" | "scenes" | "characters" | "render";
+type V5Tab = "gallery" | "templates" | "styles" | "scenes" | "characters" | "render";
 
-const TAB_KEYS: V5Tab[] = ["gallery", "styles", "scenes", "characters", "render"];
+const TAB_KEYS: V5Tab[] = ["gallery", "templates", "styles", "scenes", "characters", "render"];
 
 /** 子 tab 与 hash 双向同步（#/v5/gallery、#/v5/scenes… 可直接打开/截图） */
 function tabFromHash(): V5Tab {
@@ -28,6 +29,7 @@ function hashForTab(tab: V5Tab): string {
 
 const TABS: { key: V5Tab; label: string; icon: ReactNode }[] = [
   { key: "gallery", label: "成片画廊", icon: <IconFilm size={15} /> },
+  { key: "templates", label: "模板库", icon: <IconTemplate size={15} /> },
   { key: "styles", label: "风格墙", icon: <IconPalette size={15} /> },
   { key: "scenes", label: "场景库", icon: <IconGrid size={15} /> },
   { key: "characters", label: "角色库", icon: <IconUser size={15} /> },
@@ -44,6 +46,7 @@ export function V5Studio() {
   const [loading, setLoading] = useState(true);
   const [outputsLoading, setOutputsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [presetTemplate, setPresetTemplate] = useState<string | null>(null);
 
   const setTab = useCallback((next: V5Tab) => {
     setTabState(next);
@@ -115,6 +118,14 @@ export function V5Studio() {
     [catalog]
   );
 
+  const openRenderWithTemplate = useCallback(
+    (templateId: string) => {
+      setPresetTemplate(templateId);
+      setTab("render");
+    },
+    [setTab]
+  );
+
   const renderBody = () => {
     if (tab === "gallery") {
       return (
@@ -128,6 +139,17 @@ export function V5Studio() {
         />
       );
     }
+    if (tab === "templates") {
+      return (
+        <Templates
+          catalog={catalog}
+          outputs={outputs}
+          loading={loading}
+          onOpenRender={openRenderWithTemplate}
+          onOpenCharacters={() => setTab("characters")}
+        />
+      );
+    }
     if (tab === "styles") return <StyleWall catalog={catalog} loading={loading} />;
     if (tab === "scenes") return <SceneLibrary catalog={catalog} loading={loading} />;
     if (tab === "characters") return <CharacterLibrary catalog={catalog} loading={loading} />;
@@ -137,6 +159,7 @@ export function V5Studio() {
         outputs={outputs}
         loading={outputsLoading}
         onRendered={() => void loadOutputs()}
+        presetTemplate={presetTemplate}
       />
     );
   };

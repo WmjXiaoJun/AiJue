@@ -19,7 +19,6 @@ interface FormState {
   h3_price_per_second: string;
   h3_provider: string;
   comfyui_url: string;
-  workflow_template: string;
 }
 
 interface PublishForm {
@@ -144,7 +143,6 @@ const EMPTY_FORM: FormState = {
   h3_price_per_second: "0.09",
   h3_provider: "local",
   comfyui_url: "",
-  workflow_template: "",
 };
 
 function toForm(settings: Settings): FormState {
@@ -156,7 +154,6 @@ function toForm(settings: Settings): FormState {
     h3_price_per_second: String(settings.h3_price_per_second ?? 0.09),
     h3_provider: settings.h3_provider === "metaso" ? "metaso" : "local",
     comfyui_url: settings.comfyui_url || "",
-    workflow_template: settings.workflow_template || "",
   };
 }
 
@@ -166,7 +163,6 @@ export function SettingsModal({ open, onClose, health }: Props) {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [voiceMap, setVoiceMap] = useState<Record<string, string> | null>(null);
   const [metasoKeyConfigured, setMetasoKeyConfigured] = useState<boolean | null>(null);
   const [h3ProviderSupported, setH3ProviderSupported] = useState(true);
   const [publish, setPublish] = useState<PublishForm>(EMPTY_PUBLISH);
@@ -184,7 +180,6 @@ export function SettingsModal({ open, onClose, health }: Props) {
     try {
       const settings = await api.settings();
       setForm(toForm(settings));
-      setVoiceMap(settings.voice_map || null);
       setMetasoKeyConfigured(typeof settings.metaso_key_configured === "boolean" ? settings.metaso_key_configured : null);
       setH3ProviderSupported(typeof settings.h3_provider === "string");
       const hasPublishConfig =
@@ -255,7 +250,6 @@ export function SettingsModal({ open, onClose, health }: Props) {
       tts_provider: form.tts_provider,
       h3_price_per_second: Number(form.h3_price_per_second) || 0.09,
       comfyui_url: form.comfyui_url,
-      workflow_template: form.workflow_template,
     };
     const publishPatch: Partial<Settings> = {
       upload_post_username: publish.username.trim(),
@@ -289,7 +283,6 @@ export function SettingsModal({ open, onClose, health }: Props) {
         }
       }
       setForm(toForm(next));
-      setVoiceMap(next.voice_map || null);
       if (typeof next.metaso_key_configured === "boolean") setMetasoKeyConfigured(next.metaso_key_configured);
       if (typeof next.llm_provider === "string" || typeof next.llm_api_key_configured === "boolean") {
         setLlmSupported(true);
@@ -721,18 +714,6 @@ export function SettingsModal({ open, onClose, health }: Props) {
           )}
         </div>
 
-        <Field label="工作流模板（API 格式）">
-          <textarea
-            className="textarea mono"
-            rows={4}
-            value={form.workflow_template}
-            onChange={(event) => update("workflow_template", event.target.value)}
-            placeholder="ComfyUI workflow_template"
-          />
-        </Field>
-        <Field label="声音映射" hint="来自后端 voice_map，只读展示">
-          <pre className="code-block">{voiceMap ? JSON.stringify(voiceMap, null, 2) : "—"}</pre>
-        </Field>
         <div className="form-note">
           <IconRefresh size={13} /> 修改生成模式后，新任务按新设置执行；已排队任务不回溯。
         </div>

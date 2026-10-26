@@ -11,11 +11,13 @@ interface Props {
   outputs: V5Output[];
   loading: boolean;
   onRendered: () => void;
+  /** 「模板库 → 用此模板渲染」时预选模板 */
+  presetTemplate?: string | null;
 }
 
 const TERMINAL: V5RenderJob["status"][] = ["done", "failed", "canceled"];
 
-export function RenderPanel({ catalog, outputs, loading, onRendered }: Props) {
+export function RenderPanel({ catalog, outputs, loading, onRendered, presetTemplate }: Props) {
   const notify = useToast();
   const [template, setTemplate] = useState("tonight_show");
   const [duration, setDuration] = useState(40);
@@ -33,6 +35,14 @@ export function RenderPanel({ catalog, outputs, loading, onRendered }: Props) {
       if (first) setTemplate(first.id);
     }
   }, [catalog, template]);
+
+  // 模板库「用此模板渲染」→ 预选模板
+  useEffect(() => {
+    if (!presetTemplate) return;
+    if (!catalog || catalog.templates.some((item) => item.id === presetTemplate)) {
+      setTemplate(presetTemplate);
+    }
+  }, [presetTemplate, catalog]);
 
   const refreshRecent = useCallback(async () => {
     try {

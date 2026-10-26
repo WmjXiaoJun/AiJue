@@ -2,20 +2,45 @@
 
 > 目标：把 V5 全量能力（16 成片 / 17 风格 / 61 场景 / 25 角色 / 44 道具 / 渲染）接进现有 React 工作台。
 > 该页面与原有「项目 → 剧集 → 六个 tab」工作流并存，不改变既有接口与页面。
+> V5.3 追加：新增「模板库」tab（每个模板的风格/工作流/角色/场景可见可改），并删除设置里的 V3/V4 旧「工作流模板/声音映射」面板。
 > 计划：`docs/PLAN_V5_2_ART_FRONTEND.md` §4；契约：`contract/v5/`；接口：`docs/V5_INTERFACES.md`。
 
 ## 1. 页面结构（`#/v5`）
 
 入口：左侧栏 **「V5 世界」**（Sidebar nav，deep link：`http://127.0.0.1:8090/#/v5`）。
-页面顶部：标题 + 实时规模（成片/风格/场景/角色/模板/道具）+ 刷新；子 tab 支持 deep link：
+页面顶部：标题 + 实时规模（成片/风格/场景/角色/模板/道具）+ 刷新；子 tab 支持 deep link（顺序：成片画廊 / 模板库 / 风格墙 / 场景库 / 角色库 / 渲染）：
 
 | 子 tab | 深链 | 功能 |
 |---|---|---|
 | 成片画廊 | `#/v5/gallery` | 已渲染模板卡（封面/风格 badge/时长/分辨率/镜头数/QC 通过·检查数），点击播放 `<video>`；打开 timeline.html / qc_report.json；可切换「含自定义示例」 |
+| 模板库 | `#/v5/templates` | 16+1 模板卡：风格（标签+色板）/时长/tags/description；**本模板工作流 7 步**（① 分镜 acts→shots ② 固定声音 TTS：cast→voice_id ③ 场景 AI plate+style finish ④ 角色 AI 立绘+口型 ⑤ motion2d 镜头动画 ⑥ 字幕/包装 ⑦ 混音/QC）；角色卡（AI 立绘/voice_id/seed → 链角色库）；场景缩略图；按钮：工作流详情 / 播放成片 / 时间线 / **编辑模板 JSON**（GET/PUT，dry_run 校验或保存 custom 覆盖）/ **用此模板渲染**（跳渲染 tab 并预选） |
 | 风格墙 | `#/v5/styles` | 17 风格卡：色板 swatch、技法、角色处理、转场、标签、custom 标识；点击弹层看完整 style JSON（纹理/线条/audio/h3 prompt）+ 代表场景渲染预览 |
 | 场景库 | `#/v5/scenes` | 61 场景网格：AI plate 缩略图（未生成时回退程序化渲染）、9/10 层、机位数、标签；搜索 + tag 过滤 + 按风格调色预览；详情弹层（大图/layers/camera_zones/anchors/描述） |
 | 角色库 | `#/v5/characters` | 25 角色卡：AI 立绘（缺失 → 程序化预览 → 首字占位）、性别/年龄/role_pool、固定 voice_id + seed、声音锁状态；**试听**（POST preview → 播 `/media/v5/voice/<id>.wav`）；**改声音**（voice_id 预设下拉 + seed/cfg_scale/instruction → PUT 保存 → **重建声音锁**，提示需重渲）；**重建锁** |
 | 渲染 | `#/v5/render` | 模板下拉/时长/force → `POST /api/v5/render` → 轮询 `GET /api/v5/render/{job}` 显示状态/进度条/日志尾/最近任务；完成自动刷新画廊；可取消 |
+
+### 1.1 模板库（V5.3 新增，`#/v5/templates`）
+
+用户需求：「每个模板有自己的工作流/场景/角色，要能在前端看到、能改」。
+
+- **列表**：17 张模板卡（16 内建 + `custom_holo_talk`），每卡显示 label/id、风格 badge + 色板、时长/acts/角色数/场景数/成片时长、tags、description、
+  7 步工作流缩略条（**① 分镜 ② TTS ③ 场景 ④ 立绘 ⑤ 镜头 ⑥ 包装 ⑦ QC**）、cast 头像条、场景缩略图条；
+- **工作流详情弹层**（点「工作流」或深链 `#/v5/templates/<id>`）：
+  - ① acts 列表（scene/camera/duration/台词 role/镜头文字/B-roll）与 `acts → shots` 数；
+  - ② cast 角色 → `voice_id + seed + 声音锁`（点击跳角色库改声音）；
+  - ③ 场景去重后缩略图（`/media/v5/scenes/<id>.png`，缺失回退程序化预览）+ style finish；
+  - ④ 角色 AI 立绘 + lipsync 模式；⑤ camera 分布与平均 camera_strength；⑥ style typography + template packaging；⑦ 混音（bgm/sfx/ducking）+ 成片 QC/时长/分辨率；
+- **编辑模板 JSON**（深链 `#/v5/templates/<id>?edit=1`）：`GET /api/v5/templates/{id}` 取合并后的完整 JSON → 编辑 →「只校验（dry_run）」或「保存为 custom 覆盖」（PUT `/api/v5/templates/{id}`，后端 schema/引用校验，失败显示 errors，成功后刷新）；
+- **用此模板渲染**：跳转渲染 tab 并把模板下拉预选为该模板。
+
+### 1.2 设置弹窗清理（V5.3）
+
+设置里属于 V3/V4 旧管线（ComfyUI H3 workflow + edge-tts voice_map）的两块已删除：
+
+- ❌「工作流模板（API 格式）」textarea（`form.workflow_template`）
+- ❌「声音映射」（`voiceMap` 只读 `<pre>`）
+
+`SettingsModal.tsx` 同时清掉 state/form/save payload 中的 `workflow_template` 与 `voiceMap` 读写；**后端 Settings API 与 `types.ts` 字段保持不动**（V3/V4 兼容）。其余设置（生成模式/分辨率/TTS/H3/上传/LLM）不变。
 
 ## 2. 文件清单（本次新增/修改）
 

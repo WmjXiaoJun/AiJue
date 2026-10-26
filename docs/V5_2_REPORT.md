@@ -51,3 +51,38 @@ contract/v5/art/prompts.json   # 24 角色 + 61 场景 SDXL prompt/negative（�
 2. 16 风格 finish 后个别画面偏暗/高对比（ink/museum），如有具体镜头可调 `_ai_plate_finish` 强度。
 3. 前端渲染 job 内存态、单并发（服务重启历史丢失，产物保留）；试听/声音锁依赖 Breeze TTS（未启动 503 toast）。
 4. 角色立绘为 AI 生成（SDXL），个别细节（手/道具）可能有瑕疵，可单角色重生成（~25s）。
+
+## 6. 每模板工作流 / 场景 / 角色（V5.3 起）
+
+> 用户要求「每个模板有不同的工作流、不同的场景、不同的角色」。V5 中每个模板的 `contract/v5/templates/<id>.json` **就是该模板的工作流定义**：`style`（风格）+ `cast`（角色/固定声音）+ `acts`（分幕/场景/镜头/台词）+ `packaging`（片头尾/字幕/tag/seal）+ `audio`（BGM/SFX）+ `lipsync`；渲染时走同一引擎但参数完全不同。
+
+| # | 模板 | 风格 | 场景数 | 角色（voice_id） | 时长 |
+|---|---|---|---|---|---|
+| 1 | 典籍（classics） | 版刻典籍（woodblock_classic） | 4 | 老周（legacy_v4_laozhou）、司马迁（historian_kezhi）、苏轼（scholar_wenrun） | 38s |
+| 2 | 历史悬案（history_mystery） | 羊皮纸档案（parchment_case） | 4 | 老周（legacy_v4_laozhou）、张骞（envoy_jianyi）、司马迁（historian_kezhi） | 38s |
+| 3 | 历史夜话（history_talk） | 水墨史书（ink_chronicle） | 5 | 老周（legacy_v4_laozhou）、曹操（emperor_yazhong）、诸葛亮（strategist_qinglang） | 38s |
+| 4 | 热辣对话（hot_ones） | 暖光胶片访谈（film_interview） | 4 | 阿栗（legacy_v4_ali）、甜妹（bright_female）、大魏（legacy_v4_dawei） | 38s |
+| 5 | 蒙面歌手（masked_singer） | 全息舞台（hologram_stage） | 4 | 老周（legacy_v4_laozhou）、阿栗（legacy_v4_ali）、甜妹（bright_female） | 38s |
+| 6 | 悬疑现场（mystery） | 黑色电影（noir_rain） | 4 | 老周（legacy_v4_laozhou）、冷面（cool_male）、神秘嘉宾（mystery_low） | 38s |
+| 7 | 国宝（national_treasure） | 博物馆金黑（museum_gold） | 4 | 老周（legacy_v4_laozhou）、苏轼（scholar_wenrun）、武则天（empress_weiyi） | 38s |
+| 8 | 奇葩说（qipashuo） | 绢本设色辩论（silk_arena） | 4 | 老周（legacy_v4_laozhou）、诸葛亮（strategist_qinglang）、花木兰（heroine_sashuang） | 38s |
+| 9 | 圆桌派（roundtable） | 文艺复兴油画圆桌（oil_salon） | 3 | 老周（legacy_v4_laozhou）、苏轼（scholar_wenrun）、李白（poet_haofang） | 38s |
+| 10 | 创投路演（shark_tank） | 科技蓝图（blueprint_lab） | 4 | 老周（legacy_v4_laozhou）、制片（steady_male）、学霸（young_male） | 38s |
+| 11 | 慢生活（slow_life） | 黏土定格慢生活（clay_diorama） | 4 | 阿栗（legacy_v4_ali）、甜妹（bright_female）、胖子（warm_male） | 38s |
+| 12 | 周六夜现场（snl_sketch） | 粉笔素描剧场（chalk_theatre） | 4 | 大魏（legacy_v4_dawei）、老周（legacy_v4_laozhou）、阿栗（legacy_v4_ali） | 38s |
+| 13 | 脱口秀（standup） | 80s VHS（vhs_late_show） | 4 | 老周（legacy_v4_laozhou）、胖子（warm_male）、冷面（cool_male） | 38s |
+| 14 | 任务大师（taskmaster） | 糖果拼贴综艺（candy_collage） | 4 | 老周（legacy_v4_laozhou）、胖子（warm_male）、甜妹（bright_female） | 38s |
+| 15 | 美式深夜秀（tonight_show） | 霓虹卡通（neon_toon） | 4 | 老周（legacy_v4_laozhou）、阿栗（legacy_v4_ali）、卷王（fast_male） | 38s |
+| 16 | 叛徒圆桌（traitors） | 巴洛克烛光古堡（baroque_candle） | 4 | 老周（legacy_v4_laozhou）、武则天（empress_weiyi）、曹操（emperor_yazhong） | 38s |
+
+唯一性：**16/16 风格唯一、16/16 场景集合唯一、16/16 演员组合唯一**（V5.3 调整 hot_ones/tonight_show/qipashuo 三个模板的 cast 后达成）。
+
+每模板工作流步骤（同一套 7 步，但每步参数来自该模板）：
+1. 分镜：`acts → shots`（场景、镜头运动、台词、b-roll/卡片）
+2. 配音：按 `cast` 角色取 `voice_id` → 固定声音锁 + Voice Clone（每角色固定音色）
+3. 场景：该模板 `acts[].scene` 对应的 AI plate → `style_v5.apply_finish` 风格化 + 程序化 mid/fg/暗角
+4. 角色：AI 立绘（cutout）+ `apply_finish(kind=character)` + 口型/眨眼 overlay
+5. 动画：motion2d 视差/推拉摇移/景深/出入场（镜头来自 acts.camera）
+6. 字幕/包装：该风格 `typography` + `packaging`（tag/seal/bars/片头片尾卡）
+7. 混音/QC：该模板 `audio`（BGM/SFX）+ loudnorm + qc_v5 硬门
+
