@@ -48,18 +48,20 @@
 backend/app/routers/v5_studio.py      # 新增：outputs / media / voice PUT / render job
 backend/app/main.py                   # +2 行（import + include_router，studio 先于 catalog 注册）
 frontend/src/lib/v5.ts                # 新增：V5 类型 + API 封装 + 媒体/预览 URL helper
-frontend/src/components/V5Studio.tsx  # 新增：页面壳（标题/规模/tabs/数据加载/deep link）
+frontend/src/components/V5Studio.tsx  # 页面壳（标题/规模/tabs/数据加载/deep link；V5.3 加「模板库」）
 frontend/src/components/v5/shared.tsx        # 多级回退图片/色板/标签/QC 徽标/视频弹层
 frontend/src/components/v5/Gallery.tsx       # 成片画廊
+frontend/src/components/v5/Templates.tsx     # V5.3 模板库（模板卡/7 步工作流/编辑 JSON/跳渲染）
 frontend/src/components/v5/StyleWall.tsx     # 风格墙 + 详情弹层
 frontend/src/components/v5/SceneLibrary.tsx  # 场景库（搜索/tag/风格预览/详情）
 frontend/src/components/v5/CharacterLibrary.tsx # 角色库 + 声音试听
 frontend/src/components/v5/VoiceEditor.tsx   # 改声音弹层（PUT + 重建声音锁）
-frontend/src/components/v5/RenderPanel.tsx   # 渲染提交 + job 轮询
-frontend/src/styles/v5.css            # 新增样式（全部 v5- 前缀，复用设计变量）
+frontend/src/components/v5/RenderPanel.tsx   # 渲染提交 + job 轮询（支持外部预选模板）
+frontend/src/styles/v5.css            # 样式（v5- 前缀，复用设计变量；含模板库/工作流/JSON 编辑器）
 frontend/src/App.tsx                  # +v5 view mode + #/v5 路由；原有 projects/workspace 不变
 frontend/src/components/Sidebar.tsx   # +「V5 世界」入口（active 态）
 frontend/src/components/TopBar.tsx    # +v5 面包屑（其余分支不变）
+frontend/src/components/SettingsModal.tsx # V5.3 删除「工作流模板/声音映射」旧面板（仅 UI）
 frontend/src/main.tsx                 # +import v5.css
 ```
 
@@ -78,6 +80,8 @@ frontend/src/main.tsx                 # +import v5.css
 | GET | `/api/v5/render` | 最近 job 列表 + 当前 running |
 | GET | `/api/v5/render/{job_id}` | job 状态：`status=queued/running/done/failed/canceled`、`progress 0-100`（解析子进程 `PROGRESS n` 行）、`log_tail`（≤240 行）、`elapsed/returncode/error/result` |
 | DELETE | `/api/v5/render/{job_id}` | 取消（terminate 子进程，状态置 canceled） |
+| GET | `/api/v5/templates/{id}` | 模板完整 JSON（内建 + custom 合并）：`cast/acts/packaging/audio/lipsync/meta` 等（V5.3 模板库用） |
+| PUT | `/api/v5/templates/{id}?dry_run=` | 保存模板 custom 覆盖：`{"item": {...}}`；`dry_run=true` 只做 schema+引用校验（400 返回 `{message, kind, id, errors, warnings}`）。partial 覆盖语义：缺省键沿用内建值 |
 
 > 既有 V5 契约 API（`/api/v5/catalog`、`/{kind}/{id}`、`/validate`、`/preview/...`、`/voices`、`/voice/*/preview|lock`）由 `v5_catalog.py` 提供，本次未改动。
 
@@ -87,7 +91,9 @@ frontend/src/main.tsx                 # +import v5.css
 - **404 容错 / 占位**：`SmartImage` 依次尝试 `AI 资产 → 程序化 preview API → 占位`（onError 自动切下一档）；美术资产未生成的场景/角色不会白屏。
 - **声音**：角色库批量拉 `GET /api/v5/voice/{id}`（25 个并行）展示 voice_id/seed/lock；「试听」先 POST 生成 wav 再播 `/media/v5/voice/<id>.wav?t=...`；「改声音」PUT 后展示 `needs_relock` 提示并可直接「重建声音锁」。
 - **渲染 job**：提交后 1.5s 轮询；`done` 自动刷新画廊并 toast；`failed` 显示错误 + 日志尾；离开页面轮询随组件卸载停止，job 在服务端继续。
-- **deep link**：`#/v5/<tab>` 双向同步（切 tab 用 history.replaceState），便于分享/截图。
+- **deep link**：`#/v5/<tab>` 双向同步（切 tab 用 history.replaceState），便于分享/截图；模板库支持 `#/v5/templates/<id>[/?edit=1]` 直达详情/编辑弹层。
+- **模板库（V5.3）**：列表批量加载 17 个模板完整 JSON（catalog 摘要 + `GET /templates/{id}`）；详情打开时并行补 cast 声音（`GET /voice/{character}`）与 style 详情；「编辑 JSON」本地 `JSON.parse` 先挡语法错误，PUT 失败直接展示后端 `errors`；「用此模板渲染」通过 `V5Studio` 的 `presetTemplate` 传给渲染面板预选。
+- **设置清理（V5.3）**：`SettingsModal` 删除「工作流模板（API 格式）」「声音映射」两块及其 state/form/save 字段；后端 API 不动。
 - **不破坏原工作台**：`App.tsx` 只新增 `view.mode="v5"` 分支；projects / workspace 渲染分支与 Sidebar/TopBar 原有 props 保持不变（仅新增可选 props）。
 
 ## 5. 启动 / 构建
@@ -108,14 +114,14 @@ cd frontend && npm run build
 python -m pipeline.v5_cli validate
 ```
 
-构建结果（本次）：
+构建结果（V5.3 末次）：
 ```
 > tsc --noEmit && vite build
-✓ 78 modules transformed.
+✓ 79 modules transformed.
 dist/index.html                   0.59 kB
-dist/assets/index-CQCI5vMd.css  122.96 kB │ gzip:  20.48 kB
-dist/assets/index-CxDpLa8g.js   369.88 kB │ gzip: 115.17 kB
-✓ built in 823ms
+dist/assets/index-LnfDir3k.css  129.38 kB │ gzip:  21.36 kB
+dist/assets/index-CNJUdq8T.js   386.52 kB │ gzip: 119.46 kB
+✓ built in 616ms
 ```
 
 ## 6. 自测证据（`tmp/v52_frontend/`）
@@ -134,14 +140,38 @@ dist/assets/index-CxDpLa8g.js   369.88 kB │ gzip: 115.17 kB
 - `POST /api/v5/render`：非法模板 400；合法 → 202 job；并发第二个 → 409；`GET /api/v5/render/{id}` 有状态/进度/日志；`DELETE` 取消成功；取消后 tonight_show final.mp4 未被覆盖
 - 证据文件：`tmp/v52_frontend/evidence/{outputs,outputs_custom,voices,voice_laozhou_before,voice_laozhou_put,render_start,render_job,render_list,render_cancel,summary}.json`
 
+### 6.1b 模板库 / 设置清理证据（V5.3，对 8090）
+
+`python tmp/v52_frontend/templates_evidence.py http://127.0.0.1:8090` → **8/8 PASS**（`evidence/templates_summary.json`）：
+- `GET /api/v5/catalog` templates=17（16 内建 + custom）
+- `GET /api/v5/templates/history_talk`：9 acts / 3 cast / style ink_chronicle，含 `cast/acts/packaging/audio/lipsync/meta`
+- `GET /api/v5/templates/custom_holo_talk`：`custom=true`
+- `PUT /api/v5/templates/history_talk?dry_run=true` 合法 → 200 `validated`（**未写盘**）
+- PUT `acts` 缺必填字段 → **400 + errors**；PUT 场景引用不存在 → **400**（不落盘）
+
+`python tmp/v52_frontend/settings_check.py`（CDP 点击设置 + 文本断言）→ **7/7 PASS**（`evidence/settings_panel_check.json`）：
+- 设置弹窗已打开；`工作流模板` / `声音映射` / `h3_roundtable` 均**不再出现**；生成模式/分辨率等基础设置仍在；截图 `settings_modal_clean.png`
+
+`python tmp/v52_frontend/templates_ui_check.py`（CDP 交互）→ **12/12 PASS**（`evidence/templates_ui_check.json`）：
+- tab 顺序 `成片画廊 → 模板库`；**17 个模板卡**；卡片含 7 步工作流缩略
+- 详情弹层 **7 步工作流**、acts 列表、场景缩略图、cast 声音卡、角色 AI 立绘
+- 编辑 JSON 弹层加载完整模板 JSON，含 dry_run/保存按钮
+- 「用此模板渲染」跳渲染 tab 且**模板下拉预选正确**
+
 ### 6.2 页面截图（Chrome headless，8090 托管 dist）
 
 > 截图重拍于 **2026-10-26 19:35（16 部 AI 美术全量重渲、16/16 QC PASS 之后）**：
 > 成片封面为新 AI 场景/角色，角色立绘全部 AI 美术，场景库 plate 为新 AI 绘景。
+> 模板库/设置截图于 V5.3（20:0x）补拍，均为当前 8090 最新 dist。
 
 | 截图 | 内容 |
 |---|---|
 | `tmp/v52_frontend/screenshots/v5_gallery.png` | 成片画廊：16 卡 AI poster/风格/时长/QC/播放/时间线/QC |
+| `tmp/v52_frontend/screenshots/v5_templates.png` | **模板库列表**：17 卡（风格/时长/tags/description/7 步工作流缩略/cast/场景缩略/按钮） |
+| `tmp/v52_frontend/screenshots/v5_template_detail.png` | **模板工作流详情**（history_talk）：① 分镜 acts 表 ② cast→voice_id/seed/锁 ③ 场景 AI plate ④ 角色立绘… |
+| `tmp/v52_frontend/screenshots/v5_template_edit.png` | **编辑模板 JSON 弹层**：完整 JSON 编辑器 + 只校验(dry_run) / 保存为 custom 覆盖 |
+| `tmp/v52_frontend/screenshots/v5_template_jump_render.png` | 「用此模板渲染」→ 渲染 tab 且模板已预选（典籍 · woodblock_classic） |
+| `tmp/v52_frontend/screenshots/settings_modal_clean.png` | **设置弹窗（清理后）**：无「工作流模板/声音映射」旧面板 |
 | `tmp/v52_frontend/screenshots/v5_styles.png` | 风格墙：17 风格色板/技法/转场/标签 |
 | `tmp/v52_frontend/screenshots/v5_scenes.png` | 场景库：61 场景（AI plate）+ 搜索/tag/风格选择 |
 | `tmp/v52_frontend/screenshots/v5_characters.png` | 角色库：AI 立绘/声音锁/voice+seed/试听/改声音/重建锁 |
@@ -162,14 +192,17 @@ dist/assets/index-CxDpLa8g.js   369.88 kB │ gzip: 115.17 kB
 - 场景缩略图首次滚动会调 `/api/v5/preview/scene/<id>`（程序化渲染，约 0.2-0.6s/张），已加 `side preview`/`loading=lazy`；美术 plate 全量后不再需要；
 - `/api/v5/outputs` 默认只返回 catalog 内建模板（16）；自定义示例用「含自定义示例」开关或 `?include_custom=true`；
 - 渲染任务写内存（服务重启后历史 job 丢失，产物文件保留）；单并发是设计约束（GPU/TTS 串行）；
-- 声音「试听/重建锁」依赖 Breeze TTS 服务，未启动时接口返回 503，前端 toast 提示（不阻塞页面其他功能）。
+- 声音「试听/重建锁」依赖 Breeze TTS 服务，未启动时接口返回 503，前端 toast 提示（不阻塞页面其他功能）；
+- 模板 JSON 编辑采用 **partial 覆盖**语义：只写想改的键（`PUT` 的 item 作为 custom 片段深合并到内建模板）；保存后需重渲对应模板成片才生效；删除某个键不能通过「不写」实现（需整体替换该字段或直接改 contract 源文件）。
 
 ## 8. 验收清单
 
-- [x] `cd frontend && npm run build` 通过（tsc --noEmit + vite build）
+- [x] `cd frontend && npm run build` 通过（tsc --noEmit + vite build，79 modules）
 - [x] `/api/v5/outputs` 16 条、字段齐全（`evidence/outputs.json`）
 - [x] `/media/v5/...` 播放/时间线/QC/封面可访问 + 防路径穿越
-- [x] 页面可浏览：画廊/风格墙/场景库/角色库/渲染（截图 6 张，AI 美术全量重渲后重拍）
+- [x] 页面可浏览：画廊/模板库/风格墙/场景库/角色库/渲染
+- [x] 模板库：17 卡、7 步工作流可见、角色/场景展示、编辑 JSON（dry_run/保存）、跳渲染预选（CDP 12/12）
+- [x] 设置弹窗已删除「工作流模板/声音映射」旧面板（CDP 7/7 + 截图）
 - [x] 声音：读取/试听（依赖 TTS 服务）/改声音 PUT/重建锁按钮
 - [x] 渲染：提交 job → 轮询进度/日志 → 取消；完成自动刷新
 - [x] 原 projects/workspace 页面无回归（截图 + 原有测试）
