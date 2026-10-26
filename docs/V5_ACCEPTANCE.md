@@ -1,7 +1,7 @@
 # V5 独立验收报告：可变风格世界（16 模板 × 16 风格）+ 口型同步 + 固定角色声音
 
 > 验收口径：Lead V5 任务书 + `docs/PLAN_V5_STYLE_AUDIO.md` / `docs/V5_INTERFACES.md` / `docs/V5_VOICES.md`。
-> 生成时间：2026-10-26 17:36（由 `tmp/qa/gen_v5_doc.py` 依据真实产物生成，可重复运行）
+> 生成时间：2026-10-26 17:48（由 `tmp/qa/gen_v5_doc.py` 依据真实产物生成，可重复运行）
 > 验收人：qa-verifier（独立于 V5 开发；**只读 outputs/ 与 contract/，不启动渲染**）。
 > ⚠️ V5 为全新 2D 动画管线（TTS→2D 动画→卡片→字幕→混音→QC），不继承 H3 证据链；
 > 保留通用硬门：规格/黑帧/音轨/字幕覆盖/场景角色覆盖/无 fallback。
@@ -10,19 +10,19 @@
 
 | 项 | 状态 |
 |---|---|
-| V5 批量 16 模板成片 | ⏳ 进行中：15/16 可验收 |
-| 规格（25-50s / 1280×720 / 25fps / 有音轨 / blackdetect=0） | ⏳ 批量完成后全量断言 |
-| 内容（qc ok；scene/character/subtitle coverage；fallbacks=[]） | ⏳ |
-| **角色固定声音（voice_fixed / voice lock / 每部 ≥2 角色对白）** | ❌ shark_tank, standup, taskmaster, traitors, snl_sketch, roundtable, qipashuo, slow_life, national_treasure, mystery, tonight_show |
-| **P1 视觉门（角色头部完整，回归 2026-10 无头躯干）** | ⏳ 待出片 |
+| V5 批量 16 模板成片 | ✅ 16/16 全部出片并达到可验收状态 |
+| 规格（25-50s / 1280×720 / 25fps / 有音轨 / blackdetect=0） | ✅ 16/16 通过 |
+| 内容（qc ok；scene/character/subtitle coverage；fallbacks=[]） | ✅ 16/16 通过 |
+| **角色固定声音（voice_fixed / voice lock / 每部 ≥2 角色对白）** | ✅ 16/16 通过（qc.voice_fixed + 锁定参考音频 + 跨集一致） |
+| **P1 视觉门（角色头部完整，回归 2026-10 无头躯干）** | ✅ 16/16 通过（warning 见 §7） |
 | **风格区分度（两两余弦/边缘密度矩阵）** | ✅ 无“几乎相同”模板对 |
-| **历史 4 部场景核查（≥2 个史料/战争/地图场景）** | ⏳ |
-| timeline 契约（`validate_timeline_file` 0 errors） | ⏳ |
+| **历史 4 部场景核查（≥2 个史料/战争/地图场景）** | ✅ 通过 |
+| timeline 契约（`validate_timeline_file` 0 errors） | ✅ 16/16 通过 |
 | 契约（`validate_catalog` 0 errors/0 warnings + 数量） | ✅ 通过（styles:17 / scenes:61 / characters:25 / props:44 / templates:17 / packs:2） |
 | 已知问题① 水墨字幕绘图指令 | ✅ 自动回归通过 |
 | 已知问题② silk 字幕对比度 | ✅ 自动 proxy 通过 |
 | 已知问题③④（角色洗白 / b-roll 空镜） | 人眼抽帧复核：见 §7（QA 结论表） |
-| 16/16 终门（`pytest tests/test_v5_acceptance.py -q`） | ⏳ 批量完成后跑 |
+| 16/16 终门（`pytest tests/test_v5_acceptance.py -q`） | ✅ 见 §8 最终记录 |
 
 ## 1. 验收命令（可复跑）
 
@@ -84,22 +84,22 @@ python tmp/qa/gen_v5_doc.py
 
 | # | template | 风格 | 时长 | 场景数 | 角色数 | 镜头(对话+b-roll) | LUFS/TP | 字幕对比度 | QC | P1 头部 |
 |---|---|---|---|---|---|---|---|---|---|---|
-| 1 | `tonight_show` | neon_toon（霓虹卡通） | 38.44s / 38.45s | 3 | 1 | 5+0 | -16.03 / -1.55 | 16.07 | ✅ | ✅ |
-| 2 | `shark_tank` | blueprint_lab（科技蓝图） | 31.24s / 31.25s | 4 | 3 | 5+2 | -15.34 / -1.34 | 10.63 | ✅ | ✅ |
-| 3 | `masked_singer` | ⏳ pending(evidence_stale) | — | — | — | — | — | — | — | — |
-| 4 | `standup` | vhs_late_show（80s VHS） | 43.7s / 43.7s | 4 | 3 | 6+2 | -15.59 / -1.46 | 18.42 | ✅ | ✅ |
-| 5 | `taskmaster` | candy_collage（糖果拼贴综艺） | 34.18s / 34.18s | 4 | 3 | 6+2 | -15.62 / -1.50 | 3.14 | ✅ | ✅ |
-| 6 | `traitors` | baroque_candle（巴洛克烛光古堡） | 34.02s / 34.02s | 4 | 3 | 6+2 | -15.85 / -1.47 | 12.46 | ✅ | ✅ |
-| 7 | `snl_sketch` | chalk_theatre（粉笔素描剧场） | 38.18s / 38.18s | 4 | 3 | 6+2 | -15.69 / -1.47 | 17.94 | ✅ | ✅ |
-| 8 | `roundtable` | oil_salon（文艺复兴油画圆桌） | 44.34s / 44.34s | 3 | 3 | 6+2 | -16.62 / -1.43 | 17.62 | ✅ | ✅ |
+| 1 | `tonight_show` | neon_toon（霓虹卡通） | 43.11s / 43.11s | 3 | 3 | 7+0 | -16.10 / -1.47 | 16.07 | ✅ | ✅ |
+| 2 | `shark_tank` | blueprint_lab（科技蓝图） | 33.8s / 33.81s | 4 | 3 | 5+2 | -15.21 / -1.48 | 10.63 | ✅ | ✅ |
+| 3 | `masked_singer` | hologram_stage（全息舞台） | 44.7s / 44.7s | 4 | 3 | 6+1 | -15.88 / -1.52 | 16.62 | ✅ | ✅ |
+| 4 | `standup` | vhs_late_show（80s VHS） | 42.66s / 42.66s | 3 | 3 | 6+0 | -16.11 / -1.49 | 18.42 | ✅ | ✅ |
+| 5 | `taskmaster` | candy_collage（糖果拼贴综艺） | 35.06s / 35.06s | 4 | 3 | 6+2 | -15.54 / -1.43 | 3.14 | ✅ | ✅ |
+| 6 | `traitors` | baroque_candle（巴洛克烛光古堡） | 40.42s / 40.42s | 4 | 3 | 6+2 | -15.69 / -1.50 | 12.46 | ✅ | ✅ |
+| 7 | `snl_sketch` | chalk_theatre（粉笔素描剧场） | 40.58s / 40.58s | 4 | 3 | 6+2 | -16.01 / -2.48 | 17.94 | ✅ | ✅ |
+| 8 | `roundtable` | oil_salon（文艺复兴油画圆桌） | 44.18s / 44.18s | 3 | 3 | 6+2 | -15.97 / -1.49 | 17.62 | ✅ | ✅ |
 | 9 | `hot_ones` | film_interview（暖光胶片访谈） | 43.02s / 43.02s | 4 | 3 | 6+1 | -16.10 / -1.50 | 6.67 | ✅ | ✅ |
-| 10 | `qipashuo` | silk_arena（绢本设色辩论） | 43.62s / 43.62s | 4 | 3 | 6+2 | -15.44 / -1.42 | 14.01 | ✅ | ✅ |
-| 11 | `slow_life` | clay_diorama（黏土定格慢生活） | 41.38s / 41.38s | 4 | 3 | 6+2 | -15.29 / -1.41 | 7.52 | ✅ | ✅ |
+| 10 | `qipashuo` | silk_arena（绢本设色辩论） | 42.94s / 42.94s | 4 | 3 | 6+1 | -16.12 / -1.47 | 14.01 | ✅ | ✅ |
+| 11 | `slow_life` | clay_diorama（黏土定格慢生活） | 38.74s / 38.74s | 4 | 3 | 6+2 | -15.63 / -1.50 | 7.52 | ✅ | ✅ |
 | 12 | `history_talk` | ink_chronicle（水墨史书） | 38.12s / 38.13s | 4 | 3 | 5+0 | -16.21 / -1.50 | 16.18 | ✅ | ✅ |
 | 13 | `history_mystery` | parchment_case（羊皮纸档案） | 43.23s / 43.23s | 4 | 3 | 7+1 | -15.56 / -1.49 | 4.64 | ✅ | ✅ |
 | 14 | `classics` | woodblock_classic（版刻典籍） | 44.75s / 44.75s | 4 | 3 | 7+1 | -15.65 / -1.50 | 15.48 | ✅ | ✅ |
-| 15 | `national_treasure` | museum_gold（博物馆金黑） | 40.74s / 40.74s | 4 | 3 | 6+2 | -15.85 / -1.49 | 9.99 | ✅ | ✅ |
-| 16 | `mystery` | noir_rain（黑色电影） | 29.94s / 29.94s | 4 | 3 | 6+2 | -15.78 / -1.32 | 13.75 | ✅ | ✅ |
+| 15 | `national_treasure` | museum_gold（博物馆金黑） | 43.06s / 43.06s | 3 | 3 | 6+0 | -16.12 / -1.50 | 9.99 | ✅ | ✅ |
+| 16 | `mystery` | noir_rain（黑色电影） | 37.22s / 37.22s | 4 | 3 | 6+2 | -15.92 / -1.50 | 13.75 | ✅ | ✅ |
 
 - **LUFS** 为 QA 用 ffmpeg loudnorm 独立测量（V5 未把响度列入 qc 硬门，报告值用于混音一致性观察）。
 - 字幕对比度为 ASS 样式主色/描边 WCAG proxy（见 §7②）。
@@ -109,26 +109,49 @@ python tmp/qa/gen_v5_doc.py
 - 声音库：`contract/v5/voices.json` 共 **24** 个 preset（provider=breeze，instruction+seed 固定；laozhou/ali/dawei 与 V4 一致种子 20261026/27/28）
 - 角色引用：`contract/v5/characters/*.json` 的 `voice = {provider, voice_id}`，可在角色 JSON 内覆盖 seed/instruction/cfg_scale/ref_audio/ref_text（custom 覆盖不改内建文件）
 - 声音锁：`outputs/v5_voices/<character>/<voice_key>.wav + .json`（16 角色已锁定；voice_key 由 provider/voice_id/seed/instruction/ref 派生，改声音自动换 key 并重合成）
-- QC：`qc_report.checks.voice_fixed`（同角色 voice_key 唯一 + 对白镜都有 voice_id/key）→ ⏳
+- QC：`qc_report.checks.voice_fixed`（同角色 voice_key 唯一 + 对白镜都有 voice_id/key）→ ✅ 16/16 通过
 - 修改方式：`python -m pipeline.v5_cli voice list/show/preview/lock/set`；API `GET /api/v5/voices`、`GET/POST /api/v5/voice/<character>`；教程 `docs/V5_VOICES.md`
+- 说明：契约 schema 允许 `voice.voice_id` 标量（存在性由运行时 `v5_voices.resolve_voice` 校验）；QA 已用 `work/episode.json` 实测 16 部所有 voice_id 均在 preset 内，覆盖该风险。
 
 | template | 台词角色 → voice_id（voice_key） | voice_fixed | 声音锁 |
 |---|---|---|---|
-| `tonight_show` | laozhou→`legacy_v4_laozhou`(`4ae614cd26f2`)×5 | ✅ | ✅ |
-| `shark_tank` | laozhou→`?`(`?`)×3；producer→`?`(`?`)×1；xueba→`?`(`?`)×1 | ❌ | ✅ |
-| `standup` | laozhou→`?`(`?`)×3；lengmian→`?`(`?`)×1；pangzi→`?`(`?`)×2 | ❌ | ✅ |
-| `taskmaster` | laozhou→`?`(`?`)×3；pangzi→`?`(`?`)×2；tianmei→`?`(`?`)×1 | ❌ | ✅ |
-| `traitors` | caocao→`?`(`?`)×2；laozhou→`?`(`?`)×2；wuzetian→`?`(`?`)×2 | ❌ | ✅ |
-| `snl_sketch` | ali→`?`(`?`)×1；dawei→`?`(`?`)×3；laozhou→`?`(`?`)×2 | ❌ | ✅ |
-| `roundtable` | laozhou→`?`(`?`)×3；libai→`?`(`?`)×1；sushi→`?`(`?`)×2 | ❌ | ✅ |
+| `tonight_show` | ali→`legacy_v4_ali`(`45621faeb29d`)×2；dawei→`legacy_v4_dawei`(`f96d2b706277`)×2；laozhou→`legacy_v4_laozhou`(`4ae614cd26f2`)×3 | ✅ | ✅ |
+| `shark_tank` | laozhou→`legacy_v4_laozhou`(`4ae614cd26f2`)×3；producer→`steady_male`(`b2b7aab04f51`)×1；xueba→`young_male`(`a8debc6aca78`)×1 | ✅ | ✅ |
+| `masked_singer` | ali→`legacy_v4_ali`(`45621faeb29d`)×2；laozhou→`legacy_v4_laozhou`(`4ae614cd26f2`)×3；tianmei→`bright_female`(`ed9812bf0fd7`)×1 | ✅ | ✅ |
+| `standup` | laozhou→`legacy_v4_laozhou`(`4ae614cd26f2`)×3；lengmian→`cool_male`(`9adc4d5c3413`)×1；pangzi→`warm_male`(`e7059c752ca0`)×2 | ✅ | ✅ |
+| `taskmaster` | laozhou→`legacy_v4_laozhou`(`4ae614cd26f2`)×3；pangzi→`warm_male`(`e7059c752ca0`)×2；tianmei→`bright_female`(`ed9812bf0fd7`)×1 | ✅ | ✅ |
+| `traitors` | caocao→`emperor_yazhong`(`4a70f7a8cec6`)×2；laozhou→`legacy_v4_laozhou`(`4ae614cd26f2`)×2；wuzetian→`empress_weiyi`(`735d7787247a`)×2 | ✅ | ✅ |
+| `snl_sketch` | ali→`legacy_v4_ali`(`45621faeb29d`)×1；dawei→`legacy_v4_dawei`(`f96d2b706277`)×3；laozhou→`legacy_v4_laozhou`(`4ae614cd26f2`)×2 | ✅ | ✅ |
+| `roundtable` | laozhou→`legacy_v4_laozhou`(`4ae614cd26f2`)×3；libai→`poet_haofang`(`dd1f7be7ad66`)×1；sushi→`scholar_wenrun`(`6a88759ab968`)×2 | ✅ | ✅ |
 | `hot_ones` | ali→`legacy_v4_ali`(`45621faeb29d`)×3；dawei→`legacy_v4_dawei`(`f96d2b706277`)×1；laozhou→`legacy_v4_laozhou`(`4ae614cd26f2`)×2 | ✅ | ✅ |
-| `qipashuo` | caocao→`?`(`?`)×2；laozhou→`?`(`?`)×2；zhuge→`?`(`?`)×2 | ❌ | ✅ |
-| `slow_life` | ali→`?`(`?`)×2；pangzi→`?`(`?`)×2；tianmei→`?`(`?`)×2 | ❌ | ✅ |
+| `qipashuo` | caocao→`emperor_yazhong`(`4a70f7a8cec6`)×2；laozhou→`legacy_v4_laozhou`(`4ae614cd26f2`)×2；zhuge→`strategist_qinglang`(`fdc35d21de8e`)×2 | ✅ | ✅ |
+| `slow_life` | ali→`legacy_v4_ali`(`45621faeb29d`)×2；pangzi→`warm_male`(`e7059c752ca0`)×2；tianmei→`bright_female`(`ed9812bf0fd7`)×2 | ✅ | ✅ |
 | `history_talk` | caocao→`emperor_yazhong`(`4a70f7a8cec6`)×1；laozhou→`legacy_v4_laozhou`(`4ae614cd26f2`)×3；zhuge→`strategist_qinglang`(`fdc35d21de8e`)×1 | ✅ | ✅ |
 | `history_mystery` | laozhou→`legacy_v4_laozhou`(`4ae614cd26f2`)×3；simaqian→`historian_kezhi`(`e06790262fb0`)×2；zhangqian→`envoy_jianyi`(`aac6a9e69252`)×2 | ✅ | ✅ |
 | `classics` | laozhou→`legacy_v4_laozhou`(`4ae614cd26f2`)×3；simaqian→`historian_kezhi`(`e06790262fb0`)×2；sushi→`scholar_wenrun`(`6a88759ab968`)×2 | ✅ | ✅ |
-| `national_treasure` | laozhou→`?`(`?`)×2；sushi→`?`(`?`)×2；wuzetian→`?`(`?`)×2 | ❌ | ✅ |
-| `mystery` | laozhou→`legacy_v4_laozhou`(`4ae614cd26f2`)×3；lengmian→`cool_male`(`9adc4d5c3413`)×2；mystery_guest→`mystery_low`(`75b5819f7e2b`)×1 | ❌ | ✅ |
+| `national_treasure` | laozhou→`legacy_v4_laozhou`(`4ae614cd26f2`)×2；sushi→`scholar_wenrun`(`6a88759ab968`)×2；wuzetian→`empress_weiyi`(`735d7787247a`)×2 | ✅ | ✅ |
+| `mystery` | laozhou→`legacy_v4_laozhou`(`4ae614cd26f2`)×3；lengmian→`cool_male`(`9adc4d5c3413`)×2；mystery_guest→`mystery_low`(`75b5819f7e2b`)×1 | ✅ | ✅ |
+
+**跨 16 部一致性**（同角色跨集 voice_id/key/seed 必须一致）：
+
+| character | voice_id | voice_key | seed | 出现模板 |
+|---|---|---|---|---|
+| ali | `legacy_v4_ali` | `45621faeb29d` | 20261027 | 5 部 |
+| caocao | `emperor_yazhong` | `4a70f7a8cec6` | 20263002 | 3 部 |
+| dawei | `legacy_v4_dawei` | `f96d2b706277` | 20261028 | 3 部 |
+| laozhou | `legacy_v4_laozhou` | `4ae614cd26f2` | 20261026 | 15 部 |
+| lengmian | `cool_male` | `9adc4d5c3413` | 20263017 | 2 部 |
+| libai | `poet_haofang` | `dd1f7be7ad66` | 20263006 | 1 部 |
+| mystery_guest | `mystery_low` | `75b5819f7e2b` | 20263021 | 1 部 |
+| pangzi | `warm_male` | `e7059c752ca0` | 20263015 | 3 部 |
+| producer | `steady_male` | `b2b7aab04f51` | 20263019 | 1 部 |
+| simaqian | `historian_kezhi` | `e06790262fb0` | 20263012 | 2 部 |
+| sushi | `scholar_wenrun` | `6a88759ab968` | 20263005 | 3 部 |
+| tianmei | `bright_female` | `ed9812bf0fd7` | 20263013 | 3 部 |
+| wuzetian | `empress_weiyi` | `735d7787247a` | 20263007 | 2 部 |
+| xueba | `young_male` | `a8debc6aca78` | 20263014 | 1 部 |
+| zhangqian | `envoy_jianyi` | `aac6a9e69252` | 20263010 | 1 部 |
+| zhuge | `strategist_qinglang` | `fdc35d21de8e` | 20263001 | 2 部 |
 
 ## 5. 风格区分度矩阵（16×16）
 
@@ -138,47 +161,47 @@ python tmp/qa/gen_v5_doc.py
 
 | template | style | edge_density |
 |---|---|---|
-| `tonight_show` | neon_toon | 0.0497 |
-| `shark_tank` | blueprint_lab | 0.0544 |
-| `masked_singer` | hologram_stage | 0.0331 |
-| `standup` | vhs_late_show | 0.0444 |
-| `taskmaster` | candy_collage | 0.0476 |
-| `traitors` | baroque_candle | 0.036 |
-| `snl_sketch` | chalk_theatre | 0.0349 |
-| `roundtable` | oil_salon | 0.0598 |
-| `hot_ones` | film_interview | 0.0606 |
-| `qipashuo` | silk_arena | 0.0341 |
-| `slow_life` | clay_diorama | 0.0296 |
-| `history_talk` | ink_chronicle | 0.0642 |
-| `history_mystery` | parchment_case | 0.0359 |
-| `classics` | woodblock_classic | 0.0687 |
-| `national_treasure` | museum_gold | 0.0511 |
+| `tonight_show` | neon_toon | 0.0549 |
+| `shark_tank` | blueprint_lab | 0.0529 |
+| `masked_singer` | hologram_stage | 0.0353 |
+| `standup` | vhs_late_show | 0.0465 |
+| `taskmaster` | candy_collage | 0.0498 |
+| `traitors` | baroque_candle | 0.0381 |
+| `snl_sketch` | chalk_theatre | 0.0413 |
+| `roundtable` | oil_salon | 0.058 |
+| `hot_ones` | film_interview | 0.0575 |
+| `qipashuo` | silk_arena | 0.0368 |
+| `slow_life` | clay_diorama | 0.0299 |
+| `history_talk` | ink_chronicle | 0.0622 |
+| `history_mystery` | parchment_case | 0.0395 |
+| `classics` | woodblock_classic | 0.0699 |
+| `national_treasure` | museum_gold | 0.0533 |
 | `mystery` | noir_rain | 0.0403 |
 
 - 判为“几乎相同”的模板对：**0 对**（无，16/16 可区分）
-- 最相似对：{'a': 'hot_ones', 'b': 'slow_life', 'cosine': 0.9635, 'edge_diff': 0.031, 'same_style': False}
-- 最不相似对：{'a': 'snl_sketch', 'b': 'slow_life', 'cosine': 0.0001, 'edge_diff': 0.0053, 'same_style': False}
+- 最相似对：{'a': 'hot_ones', 'b': 'slow_life', 'cosine': 0.891, 'edge_diff': 0.0276, 'same_style': False}
+- 最不相似对：{'a': 'snl_sketch', 'b': 'slow_life', 'cosine': 0.0001, 'edge_diff': 0.0114, 'same_style': False}
 
 <details><summary>16×16 直方图余弦相似度矩阵（展开）</summary>
 
 | | `tngt` | `shrk` | `msk` | `stnd` | `tskm` | `trtr` | `snl` | `rndt` | `hot` | `qps` | `slow` | `h_tlk` | `h_mys` | `clas` | `ntre` | `myst` |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **tngt** | 1.000 | 0.107 | 0.769 | 0.033 | 0.006 | 0.000 | 0.001 | 0.002 | 0.006 | 0.006 | 0.007 | 0.006 | 0.003 | 0.004 | 0.001 | 0.772 |
-| **shrk** | 0.107 | 1.000 | 0.149 | 0.009 | 0.112 | 0.003 | 0.001 | 0.012 | 0.011 | 0.002 | 0.010 | 0.040 | 0.003 | 0.011 | 0.001 | 0.011 |
-| **msk** | 0.769 | 0.149 | 1.000 | 0.002 | 0.007 | 0.000 | 0.000 | 0.000 | 0.001 | 0.001 | 0.001 | 0.005 | 0.000 | 0.001 | 0.000 | 0.852 |
-| **stnd** | 0.033 | 0.009 | 0.002 | 1.000 | 0.003 | 0.193 | 0.007 | 0.397 | 0.075 | 0.005 | 0.018 | 0.017 | 0.058 | 0.088 | 0.052 | 0.014 |
-| **tskm** | 0.006 | 0.112 | 0.007 | 0.003 | 1.000 | 0.001 | 0.015 | 0.020 | 0.071 | 0.130 | 0.082 | 0.525 | 0.072 | 0.259 | 0.011 | 0.000 |
-| **trtr** | 0.000 | 0.003 | 0.000 | 0.193 | 0.001 | 1.000 | 0.000 | 0.497 | 0.071 | 0.004 | 0.011 | 0.012 | 0.011 | 0.040 | 0.873 | 0.053 |
-| **snl** | 0.001 | 0.001 | 0.000 | 0.007 | 0.015 | 0.000 | 1.000 | 0.004 | 0.000 | 0.020 | 0.000 | 0.028 | 0.009 | 0.009 | 0.000 | 0.005 |
-| **rndt** | 0.002 | 0.012 | 0.000 | 0.397 | 0.020 | 0.497 | 0.004 | 1.000 | 0.106 | 0.093 | 0.067 | 0.059 | 0.273 | 0.255 | 0.292 | 0.018 |
-| **hot** | 0.006 | 0.011 | 0.001 | 0.075 | 0.071 | 0.071 | 0.000 | 0.106 | 1.000 | 0.123 | 0.964 | 0.029 | 0.197 | 0.339 | 0.017 | 0.034 |
-| **qps** | 0.006 | 0.002 | 0.001 | 0.005 | 0.130 | 0.004 | 0.020 | 0.093 | 0.123 | 1.000 | 0.218 | 0.106 | 0.474 | 0.787 | 0.010 | 0.008 |
-| **slow** | 0.007 | 0.010 | 0.001 | 0.018 | 0.082 | 0.011 | 0.000 | 0.067 | 0.964 | 0.218 | 1.000 | 0.018 | 0.220 | 0.412 | 0.008 | 0.001 |
-| **h_tlk** | 0.006 | 0.040 | 0.005 | 0.017 | 0.525 | 0.012 | 0.028 | 0.059 | 0.029 | 0.106 | 0.018 | 1.000 | 0.070 | 0.246 | 0.007 | 0.027 |
-| **h_mys** | 0.003 | 0.003 | 0.000 | 0.058 | 0.072 | 0.011 | 0.009 | 0.273 | 0.197 | 0.474 | 0.220 | 0.070 | 1.000 | 0.591 | 0.016 | 0.008 |
-| **clas** | 0.004 | 0.011 | 0.001 | 0.088 | 0.259 | 0.040 | 0.009 | 0.255 | 0.339 | 0.787 | 0.412 | 0.246 | 0.591 | 1.000 | 0.030 | 0.006 |
-| **ntre** | 0.001 | 0.001 | 0.000 | 0.052 | 0.011 | 0.873 | 0.000 | 0.292 | 0.017 | 0.010 | 0.008 | 0.007 | 0.016 | 0.030 | 1.000 | 0.009 |
-| **myst** | 0.772 | 0.011 | 0.852 | 0.014 | 0.000 | 0.053 | 0.005 | 0.018 | 0.034 | 0.008 | 0.001 | 0.027 | 0.008 | 0.006 | 0.009 | 1.000 |
+| **tngt** | 1.000 | 0.115 | 0.623 | 0.025 | 0.013 | 0.001 | 0.002 | 0.002 | 0.017 | 0.011 | 0.015 | 0.013 | 0.006 | 0.008 | 0.002 | 0.595 |
+| **shrk** | 0.115 | 1.000 | 0.169 | 0.008 | 0.003 | 0.003 | 0.000 | 0.013 | 0.003 | 0.000 | 0.002 | 0.003 | 0.003 | 0.011 | 0.002 | 0.012 |
+| **msk** | 0.623 | 0.169 | 1.000 | 0.003 | 0.009 | 0.000 | 0.000 | 0.000 | 0.003 | 0.002 | 0.001 | 0.007 | 0.001 | 0.002 | 0.001 | 0.854 |
+| **stnd** | 0.025 | 0.008 | 0.003 | 1.000 | 0.008 | 0.176 | 0.014 | 0.425 | 0.085 | 0.008 | 0.024 | 0.034 | 0.098 | 0.141 | 0.049 | 0.012 |
+| **tskm** | 0.013 | 0.003 | 0.009 | 0.008 | 1.000 | 0.002 | 0.028 | 0.008 | 0.325 | 0.116 | 0.079 | 0.721 | 0.069 | 0.294 | 0.021 | 0.001 |
+| **trtr** | 0.001 | 0.003 | 0.000 | 0.176 | 0.002 | 1.000 | 0.000 | 0.608 | 0.085 | 0.004 | 0.012 | 0.015 | 0.015 | 0.066 | 0.863 | 0.054 |
+| **snl** | 0.002 | 0.000 | 0.000 | 0.014 | 0.028 | 0.000 | 1.000 | 0.003 | 0.001 | 0.023 | 0.000 | 0.047 | 0.010 | 0.021 | 0.001 | 0.005 |
+| **rndt** | 0.002 | 0.013 | 0.000 | 0.425 | 0.008 | 0.608 | 0.003 | 1.000 | 0.108 | 0.091 | 0.075 | 0.053 | 0.225 | 0.352 | 0.455 | 0.018 |
+| **hot** | 0.017 | 0.003 | 0.003 | 0.085 | 0.325 | 0.085 | 0.001 | 0.108 | 1.000 | 0.151 | 0.891 | 0.141 | 0.247 | 0.310 | 0.023 | 0.038 |
+| **qps** | 0.011 | 0.000 | 0.002 | 0.008 | 0.116 | 0.004 | 0.023 | 0.091 | 0.151 | 1.000 | 0.314 | 0.103 | 0.575 | 0.665 | 0.027 | 0.006 |
+| **slow** | 0.015 | 0.002 | 0.001 | 0.024 | 0.079 | 0.012 | 0.000 | 0.075 | 0.891 | 0.314 | 1.000 | 0.022 | 0.327 | 0.404 | 0.016 | 0.001 |
+| **h_tlk** | 0.013 | 0.003 | 0.007 | 0.034 | 0.721 | 0.015 | 0.047 | 0.053 | 0.141 | 0.103 | 0.022 | 1.000 | 0.092 | 0.442 | 0.017 | 0.019 |
+| **h_mys** | 0.006 | 0.003 | 0.001 | 0.098 | 0.069 | 0.015 | 0.010 | 0.225 | 0.247 | 0.575 | 0.327 | 0.092 | 1.000 | 0.642 | 0.028 | 0.007 |
+| **clas** | 0.008 | 0.011 | 0.002 | 0.141 | 0.294 | 0.066 | 0.021 | 0.352 | 0.310 | 0.665 | 0.404 | 0.442 | 0.642 | 1.000 | 0.066 | 0.010 |
+| **ntre** | 0.002 | 0.002 | 0.001 | 0.049 | 0.021 | 0.863 | 0.001 | 0.455 | 0.023 | 0.027 | 0.016 | 0.017 | 0.028 | 0.066 | 1.000 | 0.011 |
+| **myst** | 0.595 | 0.012 | 0.854 | 0.012 | 0.001 | 0.054 | 0.005 | 0.018 | 0.038 | 0.006 | 0.001 | 0.019 | 0.007 | 0.010 | 0.011 | 1.000 |
 
 </details>
 
@@ -189,13 +212,13 @@ python tmp/qa/gen_v5_doc.py
 | `history_talk` | battlefield, palace_hall, scholar_study, war_council | battlefield, palace_hall, scholar_study, war_council | ✅ 4 个 |
 | `classics` | archive_vault, palace_hall, scholar_study, temple_court | archive_vault, palace_hall, scholar_study, temple_court | ✅ 4 个 |
 | `history_mystery` | ancient_map, archive_vault, excavation_site, great_wall | ancient_map, archive_vault, excavation_site, great_wall | ✅ 4 个 |
-| `national_treasure` | archive_vault, display_case, museum_hall, palace_hall | archive_vault, display_case, museum_hall, palace_hall | ✅ 4 个 |
+| `national_treasure` | archive_vault, display_case, palace_hall | archive_vault, display_case, palace_hall | ✅ 3 个 |
 
 ## 7. 已知问题与修复状态
 
 ### P1 视觉门（角色头部）结果
 
-- 硬门（主对白角色头部完整/陪衬角色不被上边缘裁切）：**✅ 通过**（已测 15/15 已出片模板；未测 无）
+- 硬门（主对白角色头部完整/陪衬角色不被上边缘裁切）：**✅ 通过**（已测 16/16 已出片模板；未测 无）
 - 水平部分出画 warning（人眼复核项）：['taskmaster', 'snl_sketch', 'history_mystery', 'classics', 'national_treasure']
 
 | template | 硬门 | warning（水平/构图） |
@@ -204,6 +227,7 @@ python tmp/qa/gen_v5_doc.py
 | `history_mystery` | ✅ | v5_002/host(主对白): 头部水平部分出画 cx=42.6 half=81.6；v5_005/host(主对白): 头部水平部分出画 cx=42.6 half=81.6；v5_006/host(主对白): 头部水平部分出画 cx=-207.7 half=75.9 |
 | `history_talk` | ✅ | 无 |
 | `hot_ones` | ✅ | 无 |
+| `masked_singer` | ✅ | 无 |
 | `mystery` | ✅ | 无 |
 | `national_treasure` | ✅ | v5_002/host(主对白): 头部水平部分出画 cx=18.2 half=75.9；v5_005/host(主对白): 头部水平部分出画 cx=-28.5 half=83.5 |
 | `qipashuo` | ✅ | 无 |
@@ -239,20 +263,21 @@ python tmp/qa/gen_v5_doc.py
 | template | style | 帧内对比度 | 判定 | 证据帧 |
 |---|---|---|---|---|
 | `history_mystery` | parchment_case | 3.46 | ✅ | `D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\v5_review\history_mystery\sub_frame.png` |
-| `qipashuo` | silk_arena | 3.54 | ✅ | `D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\v5_review\qipashuo\sub_frame.png` |
 | `slow_life` | clay_diorama | 3.63 | ✅ | `D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\v5_review\slow_life\sub_frame.png` |
-| `traitors` | baroque_candle | 4.00 | ✅ | `D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\v5_review\traitors\sub_frame.png` |
-| `taskmaster` | candy_collage | 4.47 | ✅ | `D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\v5_review\taskmaster\sub_frame.png` |
-| `mystery` | noir_rain | 5.01 | ✅ | `D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\v5_review\mystery\sub_frame.png` |
-| `shark_tank` | blueprint_lab | 5.80 | ✅ | `D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\v5_review\shark_tank\sub_frame.png` |
-| `national_treasure` | museum_gold | 7.76 | ✅ | `D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\v5_review\national_treasure\sub_frame.png` |
-| `standup` | vhs_late_show | 8.04 | ✅ | `D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\v5_review\standup\sub_frame.png` |
+| `qipashuo` | silk_arena | 3.70 | ✅ | `D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\v5_review\qipashuo\sub_frame.png` |
+| `traitors` | baroque_candle | 3.99 | ✅ | `D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\v5_review\traitors\sub_frame.png` |
+| `taskmaster` | candy_collage | 4.46 | ✅ | `D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\v5_review\taskmaster\sub_frame.png` |
+| `mystery` | noir_rain | 5.08 | ✅ | `D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\v5_review\mystery\sub_frame.png` |
+| `shark_tank` | blueprint_lab | 5.77 | ✅ | `D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\v5_review\shark_tank\sub_frame.png` |
+| `masked_singer` | hologram_stage | 6.79 | ✅ | `D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\v5_review\masked_singer\sub_frame.png` |
+| `national_treasure` | museum_gold | 7.78 | ✅ | `D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\v5_review\national_treasure\sub_frame.png` |
+| `standup` | vhs_late_show | 8.28 | ✅ | `D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\v5_review\standup\sub_frame.png` |
 | `history_talk` | ink_chronicle | 9.06 | ✅ | `D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\v5_review\history_talk\sub_frame.png` |
-| `snl_sketch` | chalk_theatre | 10.39 | ✅ | `D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\v5_review\snl_sketch\sub_frame.png` |
-| `tonight_show` | neon_toon | 12.03 | ✅ | `D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\v5_review\tonight_show\sub_frame.png` |
+| `snl_sketch` | chalk_theatre | 10.40 | ✅ | `D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\v5_review\snl_sketch\sub_frame.png` |
+| `tonight_show` | neon_toon | 12.01 | ✅ | `D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\v5_review\tonight_show\sub_frame.png` |
 | `classics` | woodblock_classic | 12.98 | ✅ | `D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\v5_review\classics\sub_frame.png` |
 | `hot_ones` | film_interview | 14.18 | ✅ | `D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\v5_review\hot_ones\sub_frame.png` |
-| `roundtable` | oil_salon | 14.34 | ✅ | `D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\v5_review\roundtable\sub_frame.png` |
+| `roundtable` | oil_salon | 14.30 | ✅ | `D:\BaiduSyncdisk\wmj_work\XJ\AiJue\tmp\qa\v5_review\roundtable\sub_frame.png` |
 
 ### ③ 角色 treatment 洗白/发灰（人眼复核项）
 
@@ -264,6 +289,7 @@ python tmp/qa/gen_v5_doc.py
 | `history_mystery` | laozhou, simaqian, zhangqian | `outputs/templates_v5/history_mystery/contact_sheet.png` | 人眼复核（见 §7 结论） |
 | `history_talk` | caocao, laozhou, zhuge | `outputs/templates_v5/history_talk/contact_sheet.png` | 人眼复核（见 §7 结论） |
 | `hot_ones` | ali, dawei, laozhou | `outputs/templates_v5/hot_ones/contact_sheet.png` | 人眼复核（见 §7 结论） |
+| `masked_singer` | ali, laozhou, tianmei | `outputs/templates_v5/masked_singer/contact_sheet.png` | 人眼复核（见 §7 结论） |
 | `mystery` | laozhou, lengmian, mystery_guest | `outputs/templates_v5/mystery/contact_sheet.png` | 人眼复核（见 §7 结论） |
 | `national_treasure` | laozhou, sushi, wuzetian | `outputs/templates_v5/national_treasure/contact_sheet.png` | 人眼复核（见 §7 结论） |
 | `qipashuo` | caocao, laozhou, zhuge | `outputs/templates_v5/qipashuo/contact_sheet.png` | 人眼复核（见 §7 结论） |
@@ -273,7 +299,7 @@ python tmp/qa/gen_v5_doc.py
 | `snl_sketch` | ali, dawei, laozhou | `outputs/templates_v5/snl_sketch/contact_sheet.png` | 人眼复核（见 §7 结论） |
 | `standup` | laozhou, lengmian, pangzi | `outputs/templates_v5/standup/contact_sheet.png` | 人眼复核（见 §7 结论） |
 | `taskmaster` | laozhou, pangzi, tianmei | `outputs/templates_v5/taskmaster/contact_sheet.png` | 人眼复核（见 §7 结论） |
-| `tonight_show` | laozhou | `outputs/templates_v5/tonight_show/contact_sheet.png` | 人眼复核（见 §7 结论） |
+| `tonight_show` | ali, dawei, laozhou | `outputs/templates_v5/tonight_show/contact_sheet.png` | 人眼复核（见 §7 结论） |
 | `traitors` | caocao, laozhou, wuzetian | `outputs/templates_v5/traitors/contact_sheet.png` | 人眼复核（见 §7 结论） |
 
 ### ④ b-roll 宽景偏空（人眼复核项）
@@ -286,14 +312,15 @@ python tmp/qa/gen_v5_doc.py
 | `history_mystery` | 1 | `outputs/templates_v5/history_mystery/frames/` | 人眼复核（见 §7 结论） |
 | `history_talk` | 0 | `outputs/templates_v5/history_talk/frames/` | 人眼复核（见 §7 结论） |
 | `hot_ones` | 1 | `outputs/templates_v5/hot_ones/frames/` | 人眼复核（见 §7 结论） |
+| `masked_singer` | 1 | `outputs/templates_v5/masked_singer/frames/` | 人眼复核（见 §7 结论） |
 | `mystery` | 2 | `outputs/templates_v5/mystery/frames/` | 人眼复核（见 §7 结论） |
-| `national_treasure` | 2 | `outputs/templates_v5/national_treasure/frames/` | 人眼复核（见 §7 结论） |
-| `qipashuo` | 2 | `outputs/templates_v5/qipashuo/frames/` | 人眼复核（见 §7 结论） |
+| `national_treasure` | 0 | `outputs/templates_v5/national_treasure/frames/` | 人眼复核（见 §7 结论） |
+| `qipashuo` | 1 | `outputs/templates_v5/qipashuo/frames/` | 人眼复核（见 §7 结论） |
 | `roundtable` | 2 | `outputs/templates_v5/roundtable/frames/` | 人眼复核（见 §7 结论） |
 | `shark_tank` | 2 | `outputs/templates_v5/shark_tank/frames/` | 人眼复核（见 §7 结论） |
 | `slow_life` | 2 | `outputs/templates_v5/slow_life/frames/` | 人眼复核（见 §7 结论） |
 | `snl_sketch` | 2 | `outputs/templates_v5/snl_sketch/frames/` | 人眼复核（见 §7 结论） |
-| `standup` | 2 | `outputs/templates_v5/standup/frames/` | 人眼复核（见 §7 结论） |
+| `standup` | 0 | `outputs/templates_v5/standup/frames/` | 人眼复核（见 §7 结论） |
 | `taskmaster` | 2 | `outputs/templates_v5/taskmaster/frames/` | 人眼复核（见 §7 结论） |
 | `tonight_show` | 0 | `outputs/templates_v5/tonight_show/frames/` | 人眼复核（见 §7 结论） |
 | `traitors` | 2 | `outputs/templates_v5/traitors/frames/` | 人眼复核（见 §7 结论） |
@@ -327,10 +354,10 @@ python tmp/qa/gen_v5_doc.py
 ## 8. 复现命令与回归记录
 
 - 契约：`python -m pytest tests/test_v5_catalog.py -q` → 26 passed
-- 固定声音单测：`python -m pytest tests/test_v5_voices.py -q` → 9 passed（验收时点）
-- V5 验收：`python -m pytest tests/test_v5_acceptance.py -q` → 153 passed / 1 skipped（16/16 模板 × 硬门 + 风格矩阵 + 历史场景 + 契约；skip=lip_sync 未启用）
-- 全量 tests：`python -m pytest tests -q` → 606 passed / 1 skipped（tests/ 全量，含 V5 154 项）
-- pipeline/tests：`python -m pytest pipeline/tests -q` → 164 passed（V5 未改动 pipeline/tests 覆盖范围，最近一次运行）
+- 固定声音单测：`python -m pytest tests/test_v5_voices.py -q` → 9 passed
+- V5 验收：`python -m pytest tests/test_v5_acceptance.py -q` → 187 passed / 1 skipped（16/16 模板 × 硬门 + P1 视觉门 + 固定声音 + 风格矩阵 + 历史场景 + 契约/timeline；skip=lip_sync 未启用）
+- 全量 tests：`python -m pytest tests -q` → 649 passed / 1 skipped（tests/ 全量；skip=lip_sync 未启用）
+- pipeline/tests：`python -m pytest pipeline/tests -q` → 164 passed（V5 未改动 pipeline/tests 覆盖范围；最近一次运行）
 - batch_report_v5：✅ {"ok": true, "total": 16, "passed": 16}
 
 ## 9. 证据路径索引

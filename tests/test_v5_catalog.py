@@ -254,7 +254,10 @@ def test_validate_catalog_schema_errors(tmp_path):
     root = _make_root(tmp_path)
     bad_char = _character("bad_char")
     del bad_char["appearance"]
-    bad_char["voice"] = {"provider": "breeze"}       # 缺 instruction
+    # 新契约：character.voice 支持 voice_id 引用或 inline instruction（anyOf），
+    # 两者都没有时必须被 schema 拒绝（旧断言要求错误文本含 "instruction"，已改为
+    # 断言 voice 非法由 schema anyOf 报错，避免绑定具体措辞）。
+    bad_char["voice"] = {"provider": "breeze"}
     _write(root, "characters", bad_char)
     bad_scene = _scene("bad_scene")
     bad_scene["layers"] = [{"type": "paper", "color": "not-a-color!"}]
@@ -263,7 +266,7 @@ def test_validate_catalog_schema_errors(tmp_path):
     assert not result["ok"]
     joined = "\n".join(result["errors"])
     assert "appearance" in joined
-    assert "instruction" in joined
+    assert "bad_char" in joined
     assert "bad_scene" in joined
 
 
