@@ -197,8 +197,9 @@ def evaluate(*, video: Path, plan: dict, qc_extra: dict | None = None,
         windows = {}
         for shot in body_shots:
             dur = float(shot.get("duration") or 0.0)
-            windows[str(shot.get("id"))] = (cursor, cursor + dur)
-            cursor += dur
+            start = float(shot.get("_edit_start", cursor))
+            windows[str(shot.get("id"))] = (start, start + dur)
+            cursor = start + dur
 
         dialog = [s2 for s2 in body_shots if s2.get("line")]
         missing = []

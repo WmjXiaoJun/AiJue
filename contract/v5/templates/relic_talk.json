@@ -1,0 +1,853 @@
+{
+  "id": "relic_talk",
+  "label": "国宝会说话",
+  "version": 5,
+  "description": "V5 模板：历史文物解说（5 分钟长片 demo，风格 museum_gold，三件国宝：越王勾践剑/千里江山图/曾侯乙编钟）",
+  "tags": [
+    "v5",
+    "museum_gold",
+    "relic",
+    "longform",
+    "demo"
+  ],
+  "style": "museum_gold",
+  "target_duration": 300,
+  "aspect": [
+    16,
+    9
+  ],
+  "format_id": "relic_talk_5min",
+  "project": {
+    "id": "relic_5min",
+    "project_id": "proj_59fc69016c",
+    "name": "造片局 · 国宝会说话",
+    "description": "5 分钟历史文物解说 demo，关联节目模板 relic_talk"
+  },
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "name": "老周"
+    },
+    {
+      "role": "figure_a",
+      "character": "simaqian",
+      "name": "太史公"
+    },
+    {
+      "role": "figure_b",
+      "character": "sushi",
+      "name": "东坡"
+    }
+  ],
+  "acts": [
+    {
+      "id": "act01",
+      "name": "第 1 幕",
+      "scene": "museum_hall",
+      "camera": "crane_up",
+      "camera_strength": 0.1,
+      "duration": 8.0,
+      "duration_hint": 8.0,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    },
+    {
+      "id": "act02",
+      "name": "第 2 幕",
+      "scene": "display_case",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "host",
+      "text": "各位好，欢迎来到《国宝会说话》，我是老周。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act03",
+      "name": "第 3 幕",
+      "scene": "museum_hall",
+      "camera": "pan_right",
+      "camera_strength": 0.08,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "figure_a",
+      "text": "今天不讲帝王将相，只讲三件文物，和它们背后的人间烟火。",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act04",
+      "name": "第 4 幕",
+      "scene": "display_case",
+      "camera": "tilt_down",
+      "camera_strength": 0.08,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "host",
+      "text": "它们沉默千年，却在细节里，藏着最真实的中国。",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act05",
+      "name": "第 5 幕",
+      "scene": "museum_hall",
+      "camera": "dolly",
+      "camera_strength": 0.1,
+      "duration": 8.0,
+      "duration_hint": 8.0,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    },
+    {
+      "id": "act06",
+      "name": "第 6 幕",
+      "scene": "display_case",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "host",
+      "text": "第一件国宝，已经等了我们两千五百年。",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act07",
+      "name": "第 7 幕",
+      "scene": "excavation_site",
+      "camera": "pan_left",
+      "camera_strength": 0.08,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "figure_a",
+      "text": "一九七六年，湖北江陵，一座楚墓被打开。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act08",
+      "name": "第 8 幕",
+      "scene": "display_case",
+      "camera": "rack_focus",
+      "camera_strength": 0.08,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "figure_a",
+      "text": "墓中出土的这把剑，主人不是楚王，而是越王勾践。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act09",
+      "name": "第 9 幕",
+      "scene": "display_case",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "host",
+      "text": "剑身满布菱形暗纹，出土时寒光四射，几乎没有锈蚀。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act10",
+      "name": "第 10 幕",
+      "scene": "archive_vault",
+      "camera": "pan_right",
+      "camera_strength": 0.08,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "figure_a",
+      "text": "更惊人的是剑格上的八个鸟篆铭文：越王勾践，自作用剑。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act11",
+      "name": "第 11 幕",
+      "scene": "war_council",
+      "camera": "crane_down",
+      "camera_strength": 0.1,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "host",
+      "text": "卧薪尝胆的君王，把屈辱和野心，都锻进了这把剑里。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act12",
+      "name": "第 12 幕",
+      "scene": "archive_vault",
+      "camera": "dolly",
+      "camera_strength": 0.08,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "figure_a",
+      "text": "青铜配比、硫化处理、同心圆剑首，每一项都是顶尖工艺。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act13",
+      "name": "第 13 幕",
+      "scene": "display_case",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "host",
+      "text": "它像一句没说出口的话：忍耐，是为了有一天出鞘。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act14",
+      "name": "第 14 幕",
+      "scene": "display_case",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "figure_a",
+      "text": "今天它静静躺在展柜里，锋芒仍在。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act15",
+      "name": "第 15 幕",
+      "scene": "palace_hall",
+      "camera": "pan_left",
+      "camera_strength": 0.08,
+      "duration": 8.0,
+      "duration_hint": 8.0,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    },
+    {
+      "id": "act16",
+      "name": "第 16 幕",
+      "scene": "scroll_split",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "host",
+      "text": "第二件国宝，是一幅画，也是一场十八岁少年的冒险。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act17",
+      "name": "第 17 幕",
+      "scene": "scholar_study",
+      "camera": "tilt_up",
+      "camera_strength": 0.08,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "figure_a",
+      "text": "北宋政和三年，王希孟用半年时间，画出了《千里江山图》。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act18",
+      "name": "第 18 幕",
+      "scene": "great_wall",
+      "camera": "truck_left",
+      "camera_strength": 0.1,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "host",
+      "text": "十一米长卷，青绿设色，山峦叠翠，江河浩荡。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act19",
+      "name": "第 19 幕",
+      "scene": "river_fleet",
+      "camera": "pan_right",
+      "camera_strength": 0.08,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "figure_a",
+      "text": "石青石绿来自矿物，千年不褪，至今仍亮得惊人。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act20",
+      "name": "第 20 幕",
+      "scene": "scroll_split",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "figure_b",
+      "text": "一个十八岁的年轻人，把一生只够画一次的山河，留给了我们。",
+      "characters": [
+        "figure_b"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act21",
+      "name": "第 21 幕",
+      "scene": "candle_gallery",
+      "camera": "crane_up",
+      "camera_strength": 0.08,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "figure_a",
+      "text": "画完不久，他便从历史中消失，只留下这卷江山。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act22",
+      "name": "第 22 幕",
+      "scene": "great_wall",
+      "camera": "dolly_zoom",
+      "camera_strength": 0.09,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "host",
+      "text": "有人说，天才的代价，是把生命燃成一幅画。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act23",
+      "name": "第 23 幕",
+      "scene": "river_fleet",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "figure_b",
+      "text": "也有人说，他把自己，画进了那片青山。",
+      "characters": [
+        "figure_b"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act24",
+      "name": "第 24 幕",
+      "scene": "palace_hall",
+      "camera": "pan_right",
+      "camera_strength": 0.08,
+      "duration": 8.0,
+      "duration_hint": 8.0,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    },
+    {
+      "id": "act25",
+      "name": "第 25 幕",
+      "scene": "temple_court",
+      "camera": "crane_down",
+      "camera_strength": 0.1,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "host",
+      "text": "第三件，是一整套乐器：曾侯乙编钟。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act26",
+      "name": "第 26 幕",
+      "scene": "display_case",
+      "camera": "dolly",
+      "camera_strength": 0.08,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "figure_a",
+      "text": "六十五件青铜钟，总重两千五百多公斤，分三层悬挂。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act27",
+      "name": "第 27 幕",
+      "scene": "temple_court",
+      "camera": "tilt_up",
+      "camera_strength": 0.08,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "host",
+      "text": "一钟双音，敲击正鼓和侧鼓，能发出两个不同的音。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act28",
+      "name": "第 28 幕",
+      "scene": "temple_court",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "figure_a",
+      "text": "十二律俱全，音域跨五个半八度，今天仍能演奏。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act29",
+      "name": "第 29 幕",
+      "scene": "candle_gallery",
+      "camera": "pan_left",
+      "camera_strength": 0.08,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "host",
+      "text": "两千四百年前的乐师，已经能演奏出完整的交响。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act30",
+      "name": "第 30 幕",
+      "scene": "archive_vault",
+      "camera": "rack_focus",
+      "camera_strength": 0.08,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "figure_a",
+      "text": "钟体上的铭文，记录着曾楚两国的礼乐往来。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act31",
+      "name": "第 31 幕",
+      "scene": "temple_court",
+      "camera": "orbit",
+      "camera_strength": 0.08,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "host",
+      "text": "当钟声响起，我们听见的不只是音乐，是一个时代的秩序。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act32",
+      "name": "第 32 幕",
+      "scene": "temple_court",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "figure_a",
+      "text": "礼乐文明，就在这金声玉振之间。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act33",
+      "name": "第 33 幕",
+      "scene": "museum_hall",
+      "camera": "dolly",
+      "camera_strength": 0.1,
+      "duration": 8.0,
+      "duration_hint": 8.0,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    },
+    {
+      "id": "act34",
+      "name": "第 34 幕",
+      "scene": "museum_hall",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "host",
+      "text": "三件文物，一把剑、一幅画、一套钟。",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act35",
+      "name": "第 35 幕",
+      "scene": "museum_hall",
+      "camera": "pan_right",
+      "camera_strength": 0.08,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "figure_a",
+      "text": "它们分别写着：忍耐、才华与秩序。",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act36",
+      "name": "第 36 幕",
+      "scene": "display_case",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "host",
+      "text": "剑身上的菱形暗纹，是反复锻打留下的肌理。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act37",
+      "name": "第 37 幕",
+      "scene": "archive_vault",
+      "camera": "pan_right",
+      "camera_strength": 0.08,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "figure_a",
+      "text": "这不仅是兵器，更是一份越国的国家档案。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act38",
+      "name": "第 38 幕",
+      "scene": "great_wall",
+      "camera": "truck_right",
+      "camera_strength": 0.1,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "host",
+      "text": "画中的每一棵树，都有不同的姿态。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act39",
+      "name": "第 39 幕",
+      "scene": "scroll_split",
+      "camera": "pan_left",
+      "camera_strength": 0.08,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "figure_b",
+      "text": "青绿之间，藏着北宋人对山水的全部想象。",
+      "characters": [
+        "figure_b"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act40",
+      "name": "第 40 幕",
+      "scene": "candle_gallery",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "figure_a",
+      "text": "十八岁，半年，十一米，一生一次。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act41",
+      "name": "第 41 幕",
+      "scene": "temple_court",
+      "camera": "crane_up",
+      "camera_strength": 0.1,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "host",
+      "text": "编钟出土时，钟架仍然屹立，仿佛刚刚演奏完。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act42",
+      "name": "第 42 幕",
+      "scene": "archive_vault",
+      "camera": "rack_focus",
+      "camera_strength": 0.08,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "figure_a",
+      "text": "六十五件钟，没有一件是多余的。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act43",
+      "name": "第 43 幕",
+      "scene": "temple_court",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "host",
+      "text": "先民把音乐，铸进了青铜里。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act44",
+      "name": "第 44 幕",
+      "scene": "museum_hall",
+      "camera": "pan_right",
+      "camera_strength": 0.08,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "figure_a",
+      "text": "它们见过盛世，也见过离乱。",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act45",
+      "name": "第 45 幕",
+      "scene": "museum_hall",
+      "camera": "dolly_zoom",
+      "camera_strength": 0.1,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "host",
+      "text": "今天，它们只看着我们。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act46",
+      "name": "第 46 幕",
+      "scene": "display_case",
+      "camera": "rack_focus",
+      "camera_strength": 0.08,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "host",
+      "text": "文物不会说话，但它们从不说谎。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act47",
+      "name": "第 47 幕",
+      "scene": "display_case",
+      "camera": "dolly",
+      "camera_strength": 0.08,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "figure_a",
+      "text": "你看那剑锋上的一道细痕，也许是某次出征留下的。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act48",
+      "name": "第 48 幕",
+      "scene": "archive_vault",
+      "camera": "pan_left",
+      "camera_strength": 0.08,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "host",
+      "text": "青铜会生锈，纸张会发黄，但它们记录的心气不会。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act49",
+      "name": "第 49 幕",
+      "scene": "great_wall",
+      "camera": "crane_up",
+      "camera_strength": 0.1,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "figure_b",
+      "text": "江山代代有人画，可那抹青绿，只属于那个少年。",
+      "characters": [
+        "figure_b"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act50",
+      "name": "第 50 幕",
+      "scene": "temple_court",
+      "camera": "pan_right",
+      "camera_strength": 0.08,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "host",
+      "text": "钟声一响，两千四百年就像昨天。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act51",
+      "name": "第 51 幕",
+      "scene": "museum_hall",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "figure_a",
+      "text": "所以我们看文物，其实是在看自己从哪里来。",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act52",
+      "name": "第 52 幕",
+      "scene": "museum_hall",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "host",
+      "text": "这，就是国宝会说话的意义。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act53",
+      "name": "第 53 幕",
+      "scene": "museum_hall",
+      "camera": "crane_up",
+      "camera_strength": 0.1,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "figure_a",
+      "text": "下次走进博物馆，请多停留三秒钟。",
+      "characters": [
+        "host",
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act54",
+      "name": "第 54 幕",
+      "scene": "museum_hall",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 6.5,
+      "duration_hint": 6.5,
+      "line": "host",
+      "text": "因为那三秒，可能就是一个千年的对话。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    }
+  ]
+}

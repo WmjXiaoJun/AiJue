@@ -825,6 +825,19 @@ def assemble(plan: dict, catalog: dict, style: dict, paths: dict, prog) -> dict:
     render_total = plan["meta"].get("_render_total") or total
     if narration is None:
         narration = render_mod.concat_audio(shots, paths["workdir"], render_total)
+    # final_encode/render_mix_wav 固定读 audio/narration.wav；把本次混音结果同步过去，
+    # 避免新模板（无历史缓存）最终编码报 "Error opening input file audio/narration.wav"。
+    try:
+        import shutil as _shutil
+        narr_target = Path(paths["workdir"]) / "audio" / "narration.wav"
+        if narration and Path(narration).is_file() and \
+                Path(narration).resolve() != narr_target.resolve():
+            utils.ensure_dir(narr_target.parent)
+            _shutil.copy2(narration, narr_target)
+            LOG.info("narration 同步: %s -> %s", narration, narr_target)
+            narration = str(narr_target)
+    except Exception as exc:  # noqa: BLE001
+        LOG.warning("narration 同步失败: %s", exc)
     bgm = None
     try:
         from . import v5_audio
