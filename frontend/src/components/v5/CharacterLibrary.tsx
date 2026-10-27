@@ -150,7 +150,7 @@ export function CharacterLibrary({ catalog, loading }: Props) {
               <div className="v5-char-portrait">
                 <SmartImage
                   sources={[
-                    characterArtUrl(character.id, "portrait_real.png"),
+                    characterArtUrl(character.id, "portrait_25d.png"),
                     characterArtUrl(character.id, "portrait.png"),
                     characterPreviewUrl(character.id, styleId),
                   ]}

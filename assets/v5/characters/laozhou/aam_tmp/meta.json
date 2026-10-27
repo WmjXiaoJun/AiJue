@@ -1,0 +1,42 @@
+{
+  "id": "laozhou",
+  "name": "老周",
+  "title": "造片局主持人，老练毒舌、控场一流；爱用冷幽默拆穿嘉宾的场面话。",
+  "persona": "造片局主持人，老练毒舌、控场一流；爱用冷幽默拆穿嘉宾的场面话。",
+  "mode": "portrait",
+  "style": "anime",
+  "model": "AAM_XL_Anime_Mix.safetensors",
+  "steps": 28,
+  "cfg": 5.5,
+  "sampler": "euler_ancestral",
+  "scheduler": "normal",
+  "seed": 77,
+  "size": "896x1344",
+  "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, full body, multiple characters",
+  "prompt": {
+    "portrait": "masterpiece, best quality, anime style, solo, 1boy, male, mature male, black hair, short hair, swept bangs, black eyes, thick eyebrows, stubble, navy blue suit, business suit, necktie, white shirt, formal, gold accents, wristwatch, confident expression, smirk, confident, looking at viewer, upper body, centered composition, studio lighting, dark background, 2.5d semi-realistic anime, detailed face, detailed skin shading, glossy lips, detailed eyes, soft cinematic lighting, korean beauty, elegant, high detail, 8k, clean lineart, vibrant colors"
+  },
+  "created_at": "2026-10-27T10:06:36",
+  "elapsed_sec": 12.3,
+  "files": {
+    "portrait": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\laozhou\\aam_tmp\\portrait.png",
+    "three_view": {},
+    "expressions": {},
+    "scene": null,
+    "sheet": null
+  },
+  "images": [
+    {
+      "tag": "portrait",
+      "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\laozhou\\aam_tmp\\portrait.png",
+      "seed": 77,
+      "width": 896,
+      "height": 1344,
+      "gen_sec": 12.0,
+      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, mature male, black hair, short hair, swept bangs, black eyes, thick eyebrows, stubble, navy blue suit, business suit, necktie, white shirt, formal, gold accents, wristwatch, confident expression, smirk, confident, looking at viewer, upper body, centered composition, studio lighting, dark background, 2.5d semi-realistic anime, detailed face, detailed skin shading, glossy lips, detailed eyes, soft cinematic lighting, korean beauty, elegant, high detail, 8k, clean lineart, vibrant colors",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, full body, multiple characters, photo, photorealistic, real human, flat, low detail, text, watermark, deformed, extra fingers, bad hands",
+      "composition": "portrait",
+      "expression": null
+    }
+  ]
+}

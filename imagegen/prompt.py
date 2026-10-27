@@ -267,6 +267,20 @@ STYLE_PRESETS = {
                      "flat colors", "sketch", "painting", "cgi", "3d render",
                      "doll", "plastic skin"],
     },
+    "stylized_25d": {
+        "prefix": ["masterpiece", "best quality", "2.5D anime character",
+                   "3D anime render", "cel-shaded CG", "stylized game character",
+                   "ultra detailed character art", "detailed skin shading",
+                   "korean beauty", "elegant fashion", "solo"],
+        "suffix": ["highly detailed face", "detailed makeup", "detailed costume",
+                   "soft cinematic lighting", "depth of field", "8k",
+                   "sharp focus", "beautiful detailed eyes"],
+        "negative": ["photorealistic", "real human", "photo", "realistic photo",
+                     "live action", "photography", "realistic skin pores",
+                     "anime screencap", "flat 2d", "cartoon", "chibi",
+                     "sketch", "low detail", "doll", "plastic skin", "deformed",
+                     "extra limbs", "bad hands"],
+    },
 }
 
 NEGATIVE_BASE = ["lowres", "bad anatomy", "bad hands", "text", "watermark",

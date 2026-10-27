@@ -1,0 +1,11 @@
+{
+  "character": "lengmian",
+  "model": "AAM_XL_Anime_Mix.safetensors",
+  "seed": 77,
+  "size": "896x1344",
+  "prompt_extra": "2.5D semi-realistic anime, detailed face, detailed skin shading, glossy lips, detailed eyes, soft cinematic lighting, korean beauty, elegant, high detail, 8k, masterpiece, best quality",
+  "negative_extra": "photo, photorealistic, real human, flat, low detail, text, watermark, deformed, extra fingers, bad hands",
+  "file": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\lengmian\\portrait_25d.png",
+  "seconds": 12.3,
+  "generated_at": "2026-10-27T10:06:48"
+}
