@@ -1245,6 +1245,12 @@ def character_art(character_id: str, art: dict | None = None) -> dict:
     cid = str(character_id or "")
     paths = _asset_paths(cid, art)
     cutout = paths["cutout"]
+    # V6.3：角色画风变体（V5_CHAR_VARIANT=25d 时优先 cutout_25d.png，缺失回退原 cutout）
+    variant = str(os.environ.get("V5_CHAR_VARIANT", "") or "").strip().lower()
+    if variant:
+        vp = Path(paths["dir"]) / f"cutout_{variant}.png"
+        if vp.is_file():
+            cutout = vp
     meta = _read_json(paths["meta"], {}) or {}
     info = {
         "id": cid,

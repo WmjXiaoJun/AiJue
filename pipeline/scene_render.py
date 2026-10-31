@@ -93,6 +93,12 @@ def _scene_plate_path(scene: dict) -> Path | None:
     sid = str(scene.get("id") or scene.get("scene") or "").strip()
     if not sid:
         return None
+    # V6.3：场景画风变体（V5_SCENE_VARIANT=25d 时优先 <scene>_25d.png）
+    variant = str(os.environ.get("V5_SCENE_VARIANT", "") or "").strip().lower()
+    if variant:
+        vp = Path(SCENE_ART_DIR) / f"{sid}_{variant}.png"
+        if vp.is_file():
+            return vp
     p = Path(SCENE_ART_DIR) / f"{sid}.png"
     return p if p.is_file() else None
 
