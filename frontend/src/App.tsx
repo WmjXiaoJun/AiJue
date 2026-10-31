@@ -10,6 +10,7 @@ import { SettingsModal } from "./components/SettingsModal";
 import { TemplateModal } from "./components/TemplateModal";
 import { NewProjectModal } from "./components/NewProjectModal";
 import { V5Studio } from "./components/V5Studio";
+import { CinemaStudio } from "./components/cinema/CinemaStudio";
 import { BrandMark, IconRefresh } from "./components/icons";
 import { Spinner } from "./components/ui";
 
@@ -20,11 +21,15 @@ const TAB_KEYS: TabKey[] = ["script", "assets", "storyboard", "generate", "finis
 type ViewState =
   | { mode: "projects" }
   | { mode: "workspace"; project: Project; episode: Episode }
-  | { mode: "v5" };
+  | { mode: "v5" }
+  | { mode: "cinema" };
 
-function parseHash(): { eid?: string; tab: TabKey; v5?: boolean } {
+function parseHash(): { eid?: string; tab: TabKey; v5?: boolean; cinema?: boolean } {
   const raw = window.location.hash.replace(/^#\/?/, "");
   const parts = raw.split("/").filter(Boolean);
+  if (parts[0] === "cinema") {
+    return { tab: "script", cinema: true };
+  }
   if (parts[0] === "v5") {
     return { tab: "script", v5: true };
   }
@@ -80,7 +85,9 @@ function Shell() {
         setOffline(false);
         lastSyncRef.current = Date.now();
         const route = parseHash();
-        if (route.v5) {
+        if (route.cinema) {
+          setView({ mode: "cinema" });
+        } else if (route.v5) {
           setView({ mode: "v5" });
         } else if (route.eid) {
           const episode = await api.episode(route.eid);
@@ -146,6 +153,11 @@ function Shell() {
   useEffect(() => {
     const onHash = () => {
       const route = parseHash();
+      if (route.cinema) {
+        setView({ mode: "cinema" });
+        setTab("script");
+        return;
+      }
       if (route.v5) {
         setView({ mode: "v5" });
         setTab("script");
@@ -255,6 +267,14 @@ function Shell() {
     if (window.location.hash !== "#/v5") window.location.hash = "#/v5";
   }, []);
 
+  const openCinema = useCallback(() => {
+    setView({ mode: "cinema" });
+    setEpisodes(null);
+    setTab("script");
+    setTaskStats({ activeJobs: 0, cost: 0 });
+    if (window.location.hash !== "#/cinema/overview") window.location.hash = "#/cinema/overview";
+  }, []);
+
   const handleSynced = useCallback((stats: { activeJobs: number; cost: number }) => {
     lastSyncRef.current = Date.now();
     setTaskStats(stats);
@@ -320,6 +340,10 @@ function Shell() {
     );
   }
 
+  if (view.mode === "cinema") {
+    return <CinemaStudio onExit={goHome} />;
+  }
+
   return (
     <div className="app-shell">
       <Sidebar
@@ -329,6 +353,7 @@ function Shell() {
         health={health}
         activeV5={view.mode === "v5"}
         onV5={openV5}
+        onCinema={openCinema}
         onHome={goHome}
         onSelectProject={(project) => void openProject(project)}
         onTemplates={() => setModal("templates")}

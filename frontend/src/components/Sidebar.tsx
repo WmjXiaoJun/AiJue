@@ -1,7 +1,7 @@
 import type { Health, Project } from "../types";
 import { fmtMoney, label, PROJECT_STATUS_LABEL } from "../lib/format";
 import { templateLabel } from "../lib/templates";
-import { BrandMark, IconPlus, IconProjects, IconSettings, IconSpark, IconTemplate } from "./icons";
+import { BrandMark, IconFilm, IconPlus, IconProjects, IconSettings, IconSpark, IconTemplate } from "./icons";
 import { StatusBadge } from "./ui";
 
 interface Props {
@@ -10,7 +10,9 @@ interface Props {
   offline: boolean;
   health: Health | null;
   activeV5?: boolean;
+  activeCinema?: boolean;
   onV5?: () => void;
+  onCinema?: () => void;
   onHome: () => void;
   onSelectProject: (project: Project) => void;
   onTemplates: () => void;
@@ -24,7 +26,9 @@ export function Sidebar({
   offline,
   health,
   activeV5 = false,
+  activeCinema = false,
   onV5,
+  onCinema,
   onHome,
   onSelectProject,
   onTemplates,
@@ -79,6 +83,16 @@ export function Sidebar({
       </div>
 
       <nav className="rail-nav">
+        <button
+          type="button"
+          className={"rail-link" + (activeCinema ? " active" : "")}
+          onClick={onCinema}
+          title="Cinema Studio：3D 电影制片（镜头台 / 生成 / 剪辑 / QC）"
+        >
+          <IconFilm size={17} />
+          <span>Cinema 3D</span>
+          <span className="rail-link-badge">新</span>
+        </button>
         <button
           type="button"
           className={"rail-link" + (activeV5 ? " active" : "")}
