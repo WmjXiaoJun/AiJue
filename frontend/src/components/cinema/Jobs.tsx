@@ -380,10 +380,10 @@ export function CinemaJobs() {
         <div className="cm-empty cm-jobs-empty">
           <div className="cm-jobs-empty-title">暂无任务：去镜头台选镜生成，或在剪辑台合成</div>
           <div className="cm-jobs-empty-actions">
-            <a className="cm-btn cm-btn-ghost" href="#/cinema/shots">
+            <a className="cm-btn" href="#/cinema/shots">
               去镜头台
             </a>
-            <a className="cm-btn cm-btn-ghost" href="#/cinema/assemble">
+            <a className="cm-btn" href="#/cinema/assemble">
               去剪辑台
             </a>
           </div>

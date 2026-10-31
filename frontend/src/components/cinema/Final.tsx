@@ -399,7 +399,7 @@ export function CinemaFinal() {
           <p className="cm-final-empty-hint">
             完成一次剪辑台合成后，这里会播放最新成片并展示 QC 指标与抽帧证据。
           </p>
-          <a className="cm-btn cm-btn-ghost" href="#/cinema/assemble">
+          <a className="cm-btn" href="#/cinema/assemble">
             去剪辑台合成
           </a>
         </div>

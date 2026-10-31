@@ -1250,7 +1250,7 @@
   padding: 40px 6px;
 }
 
-/* Lightbox */
+/* Lightbox（portal 到 body，CSS 变量不在 .cm-app 作用域内，颜色/字体需 fallback） */
 .cm-final-lightbox {
   position: fixed;
   inset: 0;
@@ -1261,6 +1261,7 @@
   padding: 48px;
   background: rgba(3, 4, 6, 0.88);
   backdrop-filter: blur(8px);
+  font-family: var(--font-body, "DengXian", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif);
   cursor: zoom-out;
   animation: cm-final-fade 0.18s ease both;
 }
@@ -1305,6 +1306,7 @@
 }
 
 .cm-final-lightbox-cap {
+  font-family: var(--font-mono, "Consolas", "SF Mono", "JetBrains Mono", monospace);
   font-size: 10px;
   letter-spacing: 0.1em;
   color: var(--c-sub, #9a958a);
