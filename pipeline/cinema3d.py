@@ -76,7 +76,7 @@ def clip_duration(dur: float) -> int:
     return max(4, min(15, int(math.ceil(float(dur) - 1e-6))))
 
 
-def compose_prompt(briefs: dict, shot: dict) -> str:
+def compose_prompt(briefs: dict, shot: dict, local_extra: str = "") -> str:
     b = next((x for x in briefs["shots"] if x["id"] == shot["id"]), None)
     if b is None:
         raise SystemExit(f"briefs 缺少镜头 {shot['id']}")
@@ -96,6 +96,8 @@ def compose_prompt(briefs: dict, shot: dict) -> str:
         parts.append(f"Camera: {b['camera']}.")
     parts.append("The motion is natural, cinematic and continuous, with rich physical materials, "
                  "volumetric light and shallow depth of field.")
+    if local_extra:
+        parts.append(local_extra.rstrip(".") + ".")
     parts.append(briefs["negative"] + ".")
     desc = " ".join(parts)
     amb = b.get("ambience") or "quiet cinematic ambience"

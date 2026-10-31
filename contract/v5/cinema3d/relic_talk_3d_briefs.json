@@ -2,7 +2,7 @@
  "template": "relic_talk",
  "version": 1,
  "style_lock": "High-end 3D animated feature film shot, cinematic CGI with physically based materials, volumetric light, shallow depth of field, filmic warm amber and mineral blue-green color grading, rich physical detail, 16:9 widescreen",
- "negative": "no text, no subtitles, no captions, no watermark, no logo, no UI, no extra people unless described, no distorted anatomy, no deformed faces, no plastic toy look",
+ "negative": "no text, no subtitles, no captions, no watermark, no logo, no UI, no western architecture, no gothic arches, no church bell, no chandeliers, no oil paintings, no church, no cross-guard sword, no katana, no modern museum, no white display panels, no bright ceiling lights, no modern objects, no extra people unless described, no distorted anatomy, no deformed faces, no plastic toy look",
  "chars": {
   "curator": "the museum curator: a gentle elderly Chinese man with a long white beard and hair tied in a topknot, wearing a dark indigo Hanfu robe with a wide sash",
   "goujian": "King Goujian of Yue: a young ancient Chinese king with sharp determined eyes, short black beard, wearing bronze scale armor over a dark red robe and a dark gold cloak",
@@ -11,8 +11,8 @@
   "marquis": "Marquis Yi of Zeng: a Zhou dynasty nobleman with a short beard, wearing a bronze-decorated ceremonial robe with jade pendants and a tall bronze crown"
  },
  "env": {
-  "museum": "inside a grand Chinese museum at golden hour: dark lacquered columns with gold leaf capitals, warm volumetric sunbeams through tall lattice windows, polished dark stone floor, glass display cases, drifting dust motes",
-  "case": "a dark museum gallery with a single black stone pedestal and a glass display case lit by one dramatic overhead spotlight, deep shadows around it",
+  "museum": "inside a grand traditional Chinese museum at golden hour: dark red lacquered columns with gold leaf capitals, warm volumetric sunbeams through tall lattice windows, polished dark stone floor, glass display cases, drifting dust motes, deep shadows",
+  "case": "a dark traditional Chinese museum gallery with red lacquered columns and tall lattice windows, a single black stone pedestal and glass display case lit by one warm dramatic overhead spotlight, deep shadows, no modern ceiling lights",
   "excavation": "a 1976 archaeological excavation in Jiangling, Hubei: a Chu tomb pit with earthen walls, a massive wooden coffin emerging from mud, kerosene lanterns, archaeologists in 1970s work clothes and straw hats",
   "tomb": "inside a freshly opened ancient Chu tomb: damp earthen walls, wooden chambers, lantern light, bronze artifacts emerging from wet earth",
   "forge": "an ancient Chinese bronze foundry: clay piece-molds lined up, a furnace glowing orange, molten bronze in a crucible, craftsmen in leather aprons and head cloths",
@@ -37,7 +37,8 @@
    "subject": "A grand museum hall at dawn: sunlight sweeps slowly across the floor from tall windows, dust drifting, and in the far distance three glass cases glow softly; the camera glides forward through the colonnade toward them",
    "camera": "slow crane-down glide, revealing the scale of the hall",
    "env": "museum",
-   "ambience": "quiet museum room tone, soft deep hum, faint morning birds outside"
+   "ambience": "quiet museum room tone, soft deep hum, faint morning birds outside",
+   "local_setting_key": "museum"
   },
   {
    "id": "v5_002",
@@ -47,7 +48,8 @@
    "chars": [
     "curator"
    ],
-   "ambience": "measured footsteps on stone, quiet room tone"
+   "ambience": "measured footsteps on stone, quiet room tone",
+   "local_setting_key": "museum"
   },
   {
    "id": "v5_003",
@@ -57,56 +59,64 @@
    "chars": [
     "curator"
    ],
-   "ambience": "quiet room tone, a soft breath, distant echo"
+   "ambience": "quiet room tone, a soft breath, distant echo",
+   "local_setting_key": "museum"
   },
   {
    "id": "v5_004",
-   "subject": "Extreme detail of a glass display case: reflections of museum windows slide across the glass, and through the reflection we glimpse the dark engraved bronze of an ancient sword; dust motes suspended in a shaft of light",
+   "subject": "Extreme detail of a glass display case in a dark traditional Chinese museum gallery: reflections of lattice windows slide across the glass, and through the reflection we glimpse an ancient Chinese bronze sword with a dark rhombic-patterned blade and a flat guard lying on black stone inside the case; dust motes suspended in a shaft of warm light",
    "camera": "slow rack focus from the glass reflection to the sword inside",
    "env": "case",
-   "ambience": "hushed room tone, a faint metallic shimmer"
+   "ambience": "hushed room tone, a faint metallic shimmer",
+   "local_setting_key": "case"
   },
   {
    "id": "v5_005",
    "subject": "Museum galleries at dawn before opening: a caretaker silhouette in the far distance draws a curtain, and a long blade of sunlight crosses the empty floor toward a distant display case, dust rising",
    "camera": "slow lateral pan across the empty gallery",
    "env": "museum",
-   "ambience": "echoing empty hall, soft cloth and footsteps far away"
+   "ambience": "echoing empty hall, soft cloth and footsteps far away",
+   "local_setting_key": "museum"
   },
   {
    "id": "v5_006",
    "subject": "The Sword of Goujian: an ancient Chinese double-edged bronze sword with a dark grey-green patinated blade densely covered in a fine black rhombic grid pattern, an inlaid gold hilt, and eight bird-seal characters on the guard; it rests on black stone inside a glass display case, and a single spotlight catches its polished edge, glinting coldly after two thousand five hundred years",
    "camera": "extremely slow push-in toward the blade",
    "env": "case",
-   "ambience": "low room tone, a delicate metallic ring"
+   "ambience": "low room tone, a delicate metallic ring",
+   "local_setting_key": "case"
   },
   {
    "id": "v5_007",
    "subject": "The 1976 excavation of a Chu tomb at dusk: archaeologists in 1970s work clothes lower a kerosene lantern into a deep muddy pit; the lid of a massive wooden coffin is being lifted as mist drifts over the earth",
    "camera": "crane down from the rim of the pit into the excavation",
    "env": "excavation",
-   "ambience": "wind over the dig, scraping earth, hushed voices, a rope creaking"
+   "ambience": "wind over the dig, scraping earth, hushed voices, a rope creaking",
+   "local_setting_key": "excavation"
   },
   {
    "id": "v5_008",
    "subject": "Inside the newly opened tomb, a bronze sword covered in wet earth lies on a wooden tray under lantern light; gloved hands gently brush soil away from the blade, revealing a gleam of bronze",
    "camera": "top-down slow push toward the sword",
    "env": "tomb",
-   "ambience": "soft brushing, water dripping, tense silence"
+   "ambience": "soft brushing, water dripping, tense silence",
+   "local_setting_key": "tomb"
   },
   {
    "id": "v5_009",
    "subject": "Extreme macro of the Sword of Goujian's blade: a dark bronze surface densely covered with a fine black rhombic grid pattern, the polished edge shining silver-bronze against the dark pattern, raking light revealing the ancient forging texture, still almost uncorroded",
    "camera": "slow macro glide along the blade edge",
    "env": "case",
-   "ambience": "metallic shimmer, barely audible room tone"
+   "ambience": "metallic shimmer, barely audible room tone",
+   "local_setting_key": "case"
   },
   {
    "id": "v5_010",
    "subject": "Extreme close-up of the sword's guard: eight ancient bird-seal characters are inlaid in gold on dark bronze, and the light rakes across them so each stroke flares for a moment; the focus breathes slowly across the inscription",
    "camera": "slow orbit with rack focus across the inscriptions",
    "env": "case",
-   "ambience": "quiet room tone, a soft metallic whisper"
+   "ambience": "quiet room tone, a soft metallic whisper",
+   "local_setting_key": "case"
   },
   {
    "id": "v5_011",
@@ -123,7 +133,8 @@
    "subject": "Inside an ancient bronze foundry: molten bronze is poured into clay piece-molds, sparks spiral upward, craftsmen's silhouettes move behind the glow; on a bench, a finished bronze sword cools beside rows of clay molds",
    "camera": "slow lateral dolly across the foundry floor, from the pour to the finished blade",
    "env": "forge",
-   "ambience": "roaring furnace, hissing metal, distant hammer blows"
+   "ambience": "roaring furnace, hissing metal, distant hammer blows",
+   "local_setting_key": "forge"
   },
   {
    "id": "v5_013",
@@ -140,7 +151,8 @@
    "subject": "The Sword of Goujian in its glass case; the faint reflection of a young visitor's face is pressed close to the glass, eyes wide, while the ancient blade remains perfectly still in the spotlight",
    "camera": "slow orbit around the case with the reflection drifting across the glass",
    "env": "case",
-   "ambience": "museum room tone, distant footsteps, a soft breath"
+   "ambience": "museum room tone, distant footsteps, a soft breath",
+   "local_setting_key": "case"
   },
   {
    "id": "v5_015",
@@ -157,7 +169,8 @@
    "chars": [
     "curator"
    ],
-   "ambience": "footsteps, room tone, a distant soft chime"
+   "ambience": "footsteps, room tone, a distant soft chime",
+   "local_setting_key": "museum"
   },
   {
    "id": "v5_017",
@@ -167,7 +180,8 @@
    "chars": [
     "ximeng"
    ],
-   "ambience": "stone grinding on porcelain, a brush on paper, quiet birds outside"
+   "ambience": "stone grinding on porcelain, a brush on paper, quiet birds outside",
+   "local_setting_key": "song_studio"
   },
   {
    "id": "v5_018",
@@ -191,7 +205,8 @@
    "chars": [
     "ximeng"
    ],
-   "ambience": "a quiet room, brush resting on porcelain, distant wind"
+   "ambience": "a quiet room, brush resting on porcelain, distant wind",
+   "local_setting_key": "song_studio"
   },
   {
    "id": "v5_021",
@@ -212,14 +227,16 @@
    "subject": "The camera pushes into the painted surface of the blue-green scroll; the paper texture dissolves into a living 3D world of azurite mountains and jade rivers; a tiny figure in a pale blue robe stands on a painted wooden bridge far ahead",
    "camera": "continuous smooth push-in from the painting surface into the landscape world",
    "env": "landscape",
-   "ambience": "wind rising, a distant river, a soft magical shimmer"
+   "ambience": "wind rising, a distant river, a soft magical shimmer",
+   "local_setting_key": "landscape"
   },
   {
    "id": "v5_024",
    "subject": "A living blue-green mountain world: mist drifts between azurite peaks, a jade river carries small boats, and the distant figure in a pale blue robe walks slowly across a wooden bridge, tiny but alive",
    "camera": "slow aerial crane over the river toward the bridge",
    "env": "landscape",
-   "ambience": "river flow, wind in pines, distant birds"
+   "ambience": "river flow, wind in pines, distant birds",
+   "local_setting_key": "landscape"
   },
   {
    "id": "v5_025",
@@ -230,83 +247,93 @@
   },
   {
    "id": "v5_026",
-   "subject": "Low-angle tracking shot along the three tiers of the Zenghouyi bells: rows of bronze bells pass the lens, their surfaces glinting warm and green with age; lacquered beams and bronze fittings slide by",
-   "camera": "lateral tracking dolly at bell height",
+   "subject": "The Zenghouyi bianzhong: a clearly readable three-tier lacquered wooden rack holding sixty-five bronze bells of different sizes, guarded by bronze warrior supports; the camera is at eye level and slowly tracks along the three tiers so the layers are clear, warm torchlight glinting on the bronze, deep shadows around",
+   "camera": "eye-level lateral tracking dolly along the three tiers, the whole rack structure readable",
    "env": "zeng_temple",
-   "ambience": "metallic hum, soft footsteps, a distant echo"
+   "ambience": "metallic hum, soft footsteps, a distant echo",
+   "local_setting_key": "zeng_temple"
   },
   {
    "id": "v5_027",
    "subject": "Close-up of a bronze bell: a wooden mallet strikes the center of the bell with a clear tone, then moves to strike the side, producing a different, higher tone; the bronze trembles and dust lifts from the lacquered beam",
    "camera": "slow push-in on the bell and mallet, slight macro",
    "env": "zeng_temple",
-   "ambience": "two clear bell tones, one deep and one bright, ringing in a stone hall"
+   "ambience": "two clear bell tones, one deep and one bright, ringing in a stone hall",
+   "local_setting_key": "zeng_temple"
   },
   {
    "id": "v5_028",
    "subject": "A row of Zhou dynasty court musicians in dark red robes raise their wooden mallets and strike the bronze bells in unison; the camera tracks along the row, catching each motion in rhythm",
-   "camera": "lateral dolly along the row of musicians",
+   "camera": "wide lateral dolly along the row from a distance, the musicians read as a moving frieze, faces small",
    "env": "zeng_temple",
    "chars": [
     "musicians"
    ],
-   "ambience": "a full ensemble of bronze bells with long stone-hall reverb"
+   "ambience": "a full ensemble of bronze bells with long stone-hall reverb",
+   "local_setting_key": "zeng_temple"
   },
   {
    "id": "v5_029",
    "subject": "A wide shot of the complete bell ensemble performing in the great temple hall: rows of bells, rows of musicians, torchlight and incense smoke, the air itself seeming to vibrate with sound",
-   "camera": "slow rising crane shot revealing the whole hall",
+   "camera": "very wide slow rising crane shot, the whole hall and the ensemble in frame, figures small",
    "env": "zeng_temple",
    "chars": [
     "musicians",
     "marquis"
    ],
-   "ambience": "layered bronze bells and drums, deep hall reverb"
+   "ambience": "layered bronze bells and drums, deep hall reverb",
+   "local_setting_key": "zeng_temple"
   },
   {
    "id": "v5_030",
    "subject": "Macro shot of the bronze inscription on a bell: ancient Chinese characters are engraved deep into the bronze, and a raking light travels along the lines, revealing the text stroke by stroke",
    "camera": "slow glide along the inscription with rack focus",
    "env": "zeng_temple, close on the bell surface",
-   "ambience": "quiet bronze resonance, a soft metallic whisper"
+   "ambience": "quiet bronze resonance, a soft metallic whisper",
+   "local_setting_key": "zeng_temple"
   },
   {
    "id": "v5_031",
    "subject": "A symmetrical composition down the axis of the bell hall: the three-tier bell rack on one side, the row of musicians on the other, distant banners; one deep bell tone rolls through the hall and light ripples subtly across the bronze",
-   "camera": "slow symmetrical dolly forward down the axis",
+   "camera": "wide symmetrical dolly forward, the musicians small in the great hall",
    "env": "zeng_temple",
    "chars": [
     "musicians"
    ],
-   "ambience": "one deep bell tone with a very long reverb, then silence"
+   "ambience": "one deep bell tone with a very long reverb, then silence",
+   "local_setting_key": "zeng_temple"
   },
   {
    "id": "v5_032",
    "subject": "Golden light floods the dark hall; the bell rack stands silhouetted in the glow, and fine golden particles drift through the air like the sound made visible",
    "camera": "slow pull back and rise",
    "env": "zeng_temple filled with golden light",
-   "ambience": "a single resonant bell fading into silence, air moving"
+   "ambience": "a single resonant bell fading into silence, air moving",
+   "local_setting_key": "zeng_temple"
   },
   {
    "id": "v5_033",
    "subject": "The museum at night: the sword, the scroll and the bells glow in three connected galleries; a night guard's silhouette walks slowly through the distant corridor, his footsteps alone in the great silence",
    "camera": "slow glide from one case to the next along the gallery",
    "env": "museum at night, dim security lights, deep shadows",
-   "ambience": "night room tone, a distant walkie-talkie click, echoing footsteps"
+   "ambience": "night room tone, a distant walkie-talkie click, echoing footsteps",
+   "local_setting_key": "museum"
   },
   {
    "id": "v5_034",
    "subject": "One wide composition linking three illuminated displays: the bronze sword in its case on the left, the blue-green scroll in the center, the three-tier bell rack on the right; the camera moves slowly forward as if reading them from left to right",
    "camera": "slow forward dolly across the three displays",
    "env": "a vast museum gallery arranged with three illuminated exhibits",
-   "ambience": "quiet room tone, a soft musical shimmer of air"
+   "ambience": "quiet room tone, a soft musical shimmer of air",
+   "local_setting_key": "museum"
   },
   {
    "id": "v5_035",
    "subject": "A slow rack focus across three symbolic details arranged in depth: the cold glint of the sword's edge in the foreground, a fresh blue-green brush stroke on silk in the middle, and the trembling surface of a struck bell in the distance",
    "camera": "very slow rack focus from foreground to background",
    "env": "a dark studio-museum with the three artifacts arranged at different depths, single warm light",
-   "ambience": "three subtle textures of sound: metal, brush, bronze hum"
+   "ambience": "three subtle textures of sound: metal, brush, bronze hum",
+   "local_setting_key": "museum"
   },
   {
    "id": "v5_036",
@@ -320,7 +347,8 @@
    "subject": "An archive table lit by one lamp: a bronze sword lies beside a bundle of ancient bamboo slips; a scholar's hand in a dark brown sleeve rests gently on the slips, as if connecting the weapon to its written history",
    "camera": "top-down slow push across the table",
    "env": "archive",
-   "ambience": "paper and bamboo rustle, a quiet room, a far-off temple bell"
+   "ambience": "paper and bamboo rustle, a quiet room, a far-off temple bell",
+   "local_setting_key": "archive"
   },
   {
    "id": "v5_038",
@@ -338,7 +366,7 @@
   },
   {
    "id": "v5_040",
-   "subject": "Close on the young painter's hands: one hand holds the fine brush, the other steadies the silk; his eyes are almost too close to the painting as he adds a single stroke of azurite; candlelight trembles on his face",
+   "subject": "Extreme close-up of an 18-year-old painter's hands in pale blue sleeves: one hand steadies the silk scroll, the other holds a fine brush as it lays down a single stroke of azurite blue; a pigment bowl glows beside the hand and candlelight trembles on the silk; the face is out of frame",
    "camera": "intimate close-up, slow push from hands to eyes",
    "env": "song_studio at night, warm candlelight",
    "chars": [
@@ -372,21 +400,24 @@
    "subject": "The three exhibits reflected in a dark polished floor: sword, scroll and bells stand in their pools of light while a slow shadow of a passing visitor glides across the reflections",
    "camera": "slow pull back along the floor level",
    "env": "museum at night, polished black floor, three lit displays",
-   "ambience": "deep room tone, a distant echo of footsteps"
+   "ambience": "deep room tone, a distant echo of footsteps",
+   "local_setting_key": "museum"
   },
   {
    "id": "v5_045",
    "subject": "A small crowd of museum visitors seen from behind stands before the three illuminated displays; their faces are out of frame, only silhouettes of heads and shoulders, and their stillness conveys quiet awe",
    "camera": "slow push-in from behind the crowd toward the displays",
    "env": "museum during visiting hours, warm light",
-   "ambience": "hushed crowd, soft footsteps, a child whispering"
+   "ambience": "hushed crowd, soft footsteps, a child whispering",
+   "local_setting_key": "museum"
   },
   {
    "id": "v5_046",
    "subject": "An elegant composition of the three artifacts in one frame: the bronze sword, the blue-green scroll and a single bronze bell, each in its own pool of warm light with dark space between them; the glass reflects a faint young face",
    "camera": "slow orbit around the composition",
    "env": "a dark exhibition room with three separate spotlights",
-   "ambience": "quiet room tone, a soft metallic shimmer"
+   "ambience": "quiet room tone, a soft metallic shimmer",
+   "local_setting_key": "museum"
   },
   {
    "id": "v5_047",
@@ -400,7 +431,8 @@
    "subject": "A dim museum storage room: bronze patina blooms green on a vessel, old paper yellows at the edges of a scroll, dust lies thick on shelves; one warm lamp reveals the beauty in decay",
    "camera": "slow lateral pan across the shelves",
    "env": "a dark museum archive storage with shelves and covered artifacts",
-   "ambience": "quiet storage room, soft air, a distant clock ticking"
+   "ambience": "quiet storage room, soft air, a distant clock ticking",
+   "local_setting_key": "museum"
   },
   {
    "id": "v5_049",
@@ -424,37 +456,55 @@
    "chars": [
     "curator"
    ],
-   "ambience": "room tone, hushed footsteps, a calm breath"
+   "ambience": "room tone, hushed footsteps, a calm breath",
+   "local_setting_key": "museum"
   },
   {
    "id": "v5_052",
    "subject": "The three displays glow in the darkness like constellations; the camera cranes up and back to reveal the whole gallery, each case a warm point of light in the vast dark",
    "camera": "slow crane up and back, wide reveal",
    "env": "a vast dark museum hall with three glowing displays",
-   "ambience": "warm room tone, a faint distant chime"
+   "ambience": "warm room tone, a faint distant chime",
+   "local_setting_key": "museum"
   },
   {
    "id": "v5_053",
    "subject": "A single visitor stands motionless before a display case, fully absorbed; other visitors pass behind as soft motion blur, and the still figure becomes the only sharp thing in the world",
    "camera": "slow push-in on the standing visitor from behind",
    "env": "museum during visiting hours, motion blur crowds",
-   "ambience": "soft crowd murmur, footsteps fading"
+   "ambience": "soft crowd murmur, footsteps fading",
+   "local_setting_key": "museum"
   },
   {
    "id": "v5_054",
    "subject": "Close on the ancient bronze sword's polished edge serving as a dark mirror: the reflection of a modern visitor's face slowly shifts into the reflection of an ancient king in bronze armor, then returns to the present, and the dark bronze catches a final glint",
    "camera": "very slow push-in on the blade surface",
    "env": "case, close on the blade acting as a dark mirror",
-   "ambience": "a metallic shimmer, distant war drums rising and fading into silence"
+   "ambience": "a metallic shimmer, distant war drums rising and fading into silence",
+   "local_setting_key": "museum"
   },
   {
    "id": "v5_card_end",
    "style": "cinematic end title shot, dark and elegant",
-   "subject": "The museum lights dim one by one; only a single bronze bell silhouette remains, and fine golden dust drifts down through the last beam of light before the screen falls into darkness",
+   "subject": "The lights of a dark traditional Chinese museum hall dim one by one; only a single Chinese bianzhong bronze bell (almond-shaped body, flat mouth, suspended from a dark lacquered wooden beam) remains silhouetted in one last warm spotlight, and fine golden dust drifts down through the beam before the screen falls into darkness",
    "camera": "very slow pull-back into darkness",
-   "env": "a dark museum hall, one last spotlight and a distant bell silhouette",
+   "env": "a dark traditional Chinese museum hall with red lacquered columns, one last warm spotlight, deep shadows, no church, no chandelier",
    "ambience": "a single bell tone decaying into deep silence",
-   "dur_hint": 4.0
+   "dur_hint": 4.0,
+   "local_setting_key": "museum"
   }
- ]
+ ],
+ "local_style_suffix": "Warm cinematic lighting with deep shadows, rich physically based materials, volumetric light, shallow depth of field, filmic color grade; avoid flat neutral lighting and bright modern interiors",
+ "local_setting": {
+  "museum": "the entire visible environment is a dark ancient Chinese museum hall with red lacquered columns, lattice windows, warm dramatic spotlights and deep shadows; no modern gallery, no white walls, no ceiling light strips",
+  "case": "the entire visible environment is a dark ancient Chinese museum gallery with red lacquered columns, one warm dramatic spotlight and deep shadows; no modern gallery, no white walls",
+  "excavation": "the entire visible environment is a muddy ancient tomb excavation at dusk with earthen walls and kerosene lantern light; ancient rural landscape, no museum",
+  "tomb": "the entire visible environment is the inside of a damp ancient tomb with earthen walls and lantern light; no museum",
+  "forge": "the entire visible environment is a dark ancient Chinese bronze foundry with a glowing furnace, clay molds and firelit shadows; no modern workshop",
+  "song_studio": "the entire visible environment is a Northern Song painting studio with rice-paper windows, wooden desks and candlelight; no modern furniture, no modern gallery",
+  "landscape": "the entire visible environment is the living blue-green painted world: azurite mountains, jade rivers, mist and painted texture with real 3D depth; no museum, no modern room",
+  "greatwall": "the entire visible environment is an epic ancient blue-green mountain landscape with the Great Wall, rivers and golden mist; no museum",
+  "zeng_temple": "the entire visible environment is a dark ancient Chinese temple hall with red lacquered columns, rows of bronze bells, torches and deep shadows; no modern museum, no white display panels",
+  "archive": "the entire visible environment is a dark ancient Chinese archive room with bamboo slips, bronze vessels and a single oil lamp; no modern museum"
+ }
 }

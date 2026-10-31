@@ -24,8 +24,13 @@
 6. 字幕：本模块新写雅致款 ASS（SimSun 宋体系正文、KaiTi 片头/片尾、淡金细描边、底部
    安全区），不吃旧 ``final.ass``；片头主/副标题、三件国宝章节小标（左上角）、片尾
    「下期见」；片尾淡出用顶层黑色矩形 ``\\fad`` 实现（文字一起淡出，不额外重编码）；
-7. 报告：``<work>/final_report.json``（ffprobe/响度/blackdetect/字幕覆盖/每镜时长偏差/
-   时间线核对）+ ``frames_final/`` 8 张 + ``contact_sheet.png``（4×2）。
+7. 统一影调（默认开 ``--unify-look``）：解决云端 1344×768 锐利镜头与本地 H3
+   768×432/1024×576 略软镜头混剪的质感差——逐镜 normalize 阶段按源分辨率分档
+   ``unsharp``（锐利源 0.35 / 软源 1.0，实测校准见 ``SHARPEN_CALIBRATION``），
+   整片再走 ``eq+colorbalance+vignette+noise`` 统一色调（暖金高光/青绿暗部）、
+   轻暗角、极轻颗粒；参数与校准结论写进 final_report.json；
+8. 报告：``<work>/final_report.json``（ffprobe/响度/blackdetect/字幕覆盖/每镜时长偏差/
+   时间线核对/统一影调参数）+ ``frames_final/`` 8 张 + ``contact_sheet.png``（4×2）。
 
 默认路径（都可以用参数覆盖）::
 
@@ -83,10 +88,58 @@ SERIF_FONT_SOURCES = (
 )
 CARD_DISSOLVE = 0.5
 CHAPTER_DISSOLVE = 0.4
-CLIP_VERSION = "cinema3d-v2"
+CLIP_VERSION = "cinema3d-v4"
 MIN_SOURCE_BYTES = 2000
 FRAME_COUNT = 8
 REPORT_NAME = "final_report.json"
+#: 统一影调（云端 1344×768 锐 vs 本地 768×432/1024×576 软 混剪的一致性处理）
+#: 逐镜 unsharp：云端镜头轻锐化，本地低分辨率镜头多一档；整片再走统一色调/暗角/极轻颗粒
+SHARPEN_CLOUD = 0.35
+SHARPEN_LOCAL = 1.00
+SOFT_SOURCE_MAX_WIDTH = 1200   # 源宽度 < 1200 视为「本地软素材」
+#: sharpen 档位实测校准（2026-10-31，本地 H3 第一批素材到达后）
+#: 方法：云端 v5_014 帧降采样 768×432 再 bicubic 升回 1280×720 模拟本地软素材，
+#: 扫描 unsharp=5:5:X:5:5:0，用梯度能量(Tenengrad)/Laplacian 方差对齐云端处理档位，
+#: 再用真实本地 v5_015 帧复核无过锐/晕轮。结论：本地取 1.0（≈54.8，与云端 0.35 的
+#: ≈55.5 基本一致）；0.85 偏软、1.15 以上边缘开始过锐。
+SHARPEN_CALIBRATION = {
+    "method": ("云端 v5_014 帧 → 768×432 → 1280×720（bicubic，模拟本地 H3 分辨率损失）"
+               "扫描 unsharp 档位，梯度能量对齐云端处理档位；真实本地 v5_015 帧复核"),
+    "tenengrad": {
+        "cloud_raw": 45.11, "cloud_us0.35": 55.54, "soft_raw": 37.29,
+        "soft_us0.85": 51.44, "soft_us1.00": 54.82, "soft_us1.15": 58.50,
+    },
+    "laplacian_var": {
+        "cloud_raw": 36.33, "cloud_us0.35": 55.75, "soft_raw": 19.50,
+        "soft_us0.85": 38.82, "soft_us1.00": 44.48, "soft_us1.15": 51.87,
+    },
+    "conclusion": ("本地软素材 unsharp=1.0 后梯度能量≈54.8，与云端镜头 unsharp=0.35 "
+                   "后≈55.5 基本一致；<0.85 偏软，>1.15 出现边缘过锐/晕轮，故取 1.0。"),
+    "date": "2026-10-31",
+    "evidence": "tmp/v61_3d/_sharpen2/compare.png + _sharpen2/calibration.json",
+}
+#: 逐镜微调色（QA warn 镜头的定向修复；不改变全片统一影调基线）
+#: 依据 tmp/v61_3d/qa_review.md：v5_015 本地偏平/塑料 → 压暗+提对比；
+#: v5_024 画中世界过饱和 → 降饱和+轻压暗；v5_026/027/028 现代白展板/钟墙 →
+#: 压暗背景+轻降饱和。只对列出的镜头生效，其余镜头不额外调色。
+SHOT_GRADE = {
+    "v5_015": "eq=contrast=1.16:brightness=-0.055:saturation=1.02,"
+              "colorbalance=rs=0.020:bs=-0.020",
+    "v5_023": "eq=contrast=1.05:brightness=-0.020:saturation=0.97",
+    "v5_024": "eq=contrast=1.06:brightness=-0.030:saturation=0.82",
+    "v5_026": "eq=contrast=1.07:brightness=-0.035:saturation=0.94",
+    "v5_027": "eq=contrast=1.06:brightness=-0.030:saturation=0.94",
+    "v5_028": "eq=contrast=1.05:brightness=-0.025:saturation=0.95",
+}
+#: 逐镜源片入点（秒）：只能跳过片头且须保证剩余素材 ≥ 镜长（不足会冻结末帧）
+#: v5_023 起始是「现代白墙美术馆」，跳过 0.7s（源 5.875s，镜长 5.17s，余量 0.705s）
+SHOT_SOURCE_OFFSETS = {"v5_023": 0.70}
+UNIFY_FILTER = (
+    "eq=contrast=1.035:saturation=1.05:brightness=-0.004,"
+    "colorbalance=rs=0.015:bs=-0.020:rm=0.010:bm=-0.010:rh=0.020:bh=-0.035,"
+    "vignette=angle=0.38,"
+    "noise=alls=3:allf=t+u"
+)
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_EPISODE3D = REPO_ROOT / "outputs/templates_v5/relic_talk_3d/work/episode3d.json"
 DEFAULT_SHOTS_DIR = REPO_ROOT / "outputs/templates_v5/relic_talk_3d/shots"
@@ -418,7 +471,7 @@ def compute_starts(durations: list[float],
 # ---------------------------------------------------------------------------
 def normalize_entry(entry: dict, work: Path, fps: int, width: int, height: int,
                     render_frames: int, nominal_frames: int,
-                    force: bool = False) -> dict:
+                    force: bool = False, apply_adjust: bool = True) -> dict:
     """把源镜头标准化到成片规格；clip 长 = (nominal + dissolve 尾部延长) 帧。"""
     sid = entry["id"]
     frames = max(1, int(render_frames))
@@ -427,8 +480,25 @@ def normalize_entry(entry: dict, work: Path, fps: int, width: int, height: int,
     clips_dir = utils.ensure_dir(work / "clips")
     dst = clips_dir / f"{sid}.mp4"
     meta_path = clips_dir / f"{sid}.meta.json"
+    # 源分辨率分档（云端 1344×768 锐 / 本地 768×432、1024×576 软）→ 逐镜锐化档位
+    source = entry.get("source")
+    source_width = 0
+    source_tier = "black"
+    sharpen = 0.0
+    if source:
+        try:
+            source_width = int((entry.get("_source_probe")
+                                or utils.probe_video(source)).get("width") or 0)
+        except Exception:  # noqa: BLE001
+            source_width = 0
+        source_tier = "soft" if 0 < source_width < SOFT_SOURCE_MAX_WIDTH else "sharp"
+        sharpen = SHARPEN_LOCAL if source_tier == "soft" else SHARPEN_CLOUD
+    # QA 定向微调：逐镜调色 / 源片入点（默认开，--no-shot-grade 可关）
+    grade = SHOT_GRADE.get(sid) if apply_adjust else None
+    source_offset = float(SHOT_SOURCE_OFFSETS.get(sid, 0.0)) if apply_adjust else 0.0
     digest = utils.sha1_text(sid, entry.get("source_fp"), frames, nominal_frames,
-                             width, height, fps, CLIP_VERSION)
+                             width, height, fps, sharpen, grade or "",
+                             source_offset, CLIP_VERSION)
     if not force and _valid_file(dst, 1000):
         meta = utils.read_json(meta_path) or {}
         if meta.get("hash") == digest:
@@ -440,23 +510,37 @@ def normalize_entry(entry: dict, work: Path, fps: int, width: int, height: int,
                         "render_frames": frames,
                         "actual_duration": round(actual, 4),
                         "deviation": round(actual - target, 4),
-                        "reused": True}
+                        "source_tier": source_tier,
+                        "source_width": source_width,
+                        "sharpen": sharpen, "shot_grade": grade,
+                        "source_offset": source_offset, "reused": True}
 
-    source = entry.get("source")
     if source:
-        vf = (
-            f"scale={width}:{height}:force_original_aspect_ratio=increase,"
-            f"crop={width}:{height},setsar=1,fps={fps},"
-            f"tpad=stop_mode=clone:stop_duration={target + 2.0:.3f},"
-            f"trim=0:{target:.6f},setpts=PTS-STARTPTS,format=yuv420p"
-        )
-        utils.ffmpeg([
-            "-i", str(source), "-vf", vf,
-            "-frames:v", str(frames), "-an",
-            "-c:v", "libx264", "-preset", "veryfast", "-crf", "18",
-            "-pix_fmt", "yuv420p", "-r", str(fps),
-            "-movflags", "+faststart", str(dst),
-        ])
+        us = f"unsharp=5:5:{sharpen:.2f}:5:5:0.0"
+        parts = [
+            f"scale={width}:{height}:force_original_aspect_ratio=increase",
+            f"crop={width}:{height}",
+            "setsar=1",
+            f"fps={fps}",
+        ]
+        if grade:
+            parts.append(grade)
+        parts += [
+            us,
+            f"tpad=stop_mode=clone:stop_duration={target + 2.0:.3f}",
+            f"trim=0:{target:.6f}",
+            "setpts=PTS-STARTPTS",
+            "format=yuv420p",
+        ]
+        args = []
+        if source_offset > 0.001:
+            args += ["-ss", f"{source_offset:.3f}"]
+        args += ["-i", str(source), "-vf", ",".join(parts),
+                 "-frames:v", str(frames), "-an",
+                 "-c:v", "libx264", "-preset", "veryfast", "-crf", "18",
+                 "-pix_fmt", "yuv420p", "-r", str(fps),
+                 "-movflags", "+faststart", str(dst)]
+        utils.ffmpeg(args)
     else:  # 卡片黑底兜底
         utils.ffmpeg([
             "-f", "lavfi", "-i",
@@ -474,6 +558,9 @@ def normalize_entry(entry: dict, work: Path, fps: int, width: int, height: int,
         "nominal_frames": nominal_frames, "frames": frames,
         "actual": actual, "source": str(source or ""),
         "source_kind": entry.get("source_kind"),
+        "source_tier": source_tier, "source_width": source_width,
+        "sharpen": sharpen, "shot_grade": grade,
+        "source_offset": source_offset,
         "spec": f"{width}x{height}@{fps}", "version": CLIP_VERSION,
     })
     if abs(deviation) > 0.05:
@@ -483,16 +570,20 @@ def normalize_entry(entry: dict, work: Path, fps: int, width: int, height: int,
             "nominal_duration": nominal_target,
             "nominal_frames": nominal_frames, "render_frames": frames,
             "actual_duration": round(actual, 4), "deviation": deviation,
-            "reused": False}
+            "source_tier": source_tier, "source_width": source_width,
+            "sharpen": sharpen, "shot_grade": grade,
+            "source_offset": source_offset, "reused": False}
 
 
 def normalize_all(entries: list[dict], plan: dict, work: Path, fps: int,
-                  width: int, height: int, force: bool = False) -> list[dict]:
+                  width: int, height: int, force: bool = False,
+                  apply_adjust: bool = True) -> list[dict]:
     out: list[dict] = []
     for i, entry in enumerate(entries):
         out.append(normalize_entry(
             entry, work, fps, width, height,
-            plan["render_frames"][i], plan["nominal_frames"][i], force))
+            plan["render_frames"][i], plan["nominal_frames"][i], force,
+            apply_adjust=apply_adjust))
         if (i + 1) % 10 == 0 or i + 1 == len(entries):
             _step(f"标准化镜头 {i + 1}/{len(entries)}")
     return out
@@ -887,9 +978,11 @@ def build_ass(entries: list[dict], starts: list[float], work: Path,
 # 7) 成片编码 + 报告 + 抽帧
 # ---------------------------------------------------------------------------
 def encode_final(work: Path, out: Path, total: float, fps: int, width: int,
-                 height: int, bgm: Path | None) -> dict:
+                 height: int, bgm: Path | None,
+                 grade_filter: str | None = None) -> dict:
     out.parent.mkdir(parents=True, exist_ok=True)
-    _step(f"最终编码（{total:.2f}s / {width}x{height}@{fps} / BGM ducking / ASS）")
+    _step(f"最终编码（{total:.2f}s / {width}x{height}@{fps} / BGM ducking / ASS"
+          f"{' / 统一影调' if grade_filter else ''}）")
     last = {"pct": -10.0}
 
     def prog(pct: float, msg: str = "") -> None:
@@ -900,10 +993,12 @@ def encode_final(work: Path, out: Path, total: float, fps: int, width: int,
     t0 = time.time()
     render_mod.final_encode(
         work, out, total, fps, width, height, bgm,
-        has_ass=True, prog=prog, pct0=0, pct1=100, duck_bgm=True)
+        has_ass=True, prog=prog, pct0=0, pct1=100,
+        grade_filter=grade_filter, duck_bgm=True)
     elapsed = round(time.time() - t0, 1)
     _step(f"编码完成：{out}（{elapsed}s）")
-    return {"elapsed_sec": elapsed, "bgm_ducking": True, "ass": True}
+    return {"elapsed_sec": elapsed, "bgm_ducking": True, "ass": True,
+            "grade_filter": grade_filter}
 
 
 _BLACK_RE = re.compile(
@@ -1021,19 +1116,24 @@ def make_contact_sheet(frames: list[dict], out_png: Path, cols: int = 4,
 
 
 def _source_freeze(entry: dict) -> dict:
-    """计算 dissolve 尾部延长所需素材：源片多余时长 / 需克隆末帧的 freeze 时长。"""
-    ext_sec = float(entry.get("target_duration") or 0.0) - \
-        float(entry.get("nominal_duration") or 0.0)
-    source_extra = 0.0
+    """源片时长达标分析：多余素材 / dissolve 延长 / 素材不足（冻结末帧）秒数。"""
+    nominal = float(entry.get("nominal_duration") or 0.0)
+    target = float(entry.get("target_duration") or nominal)
+    ext_sec = max(0.0, target - nominal)
+    source_dur = 0.0
     if entry.get("source"):
         try:
-            source_extra = max(0.0, utils.probe_duration(entry["source"])
-                               - float(entry["nominal_duration"]))
+            source_dur = utils.probe_duration(entry["source"])
         except Exception:  # noqa: BLE001
-            source_extra = 0.0
-    return {"extension_sec": round(max(0.0, ext_sec), 4),
+            source_dur = 0.0
+    source_extra = max(0.0, source_dur - nominal)
+    shortfall = max(0.0, nominal - source_dur) if source_dur > 0 else 0.0
+    return {"extension_sec": round(ext_sec, 4),
+            "source_duration": round(source_dur, 4),
             "source_extra_sec": round(source_extra, 4),
-            "freeze_sec": round(max(0.0, ext_sec - source_extra), 4)}
+            "shortfall_sec": round(shortfall, 4),
+            "freeze_sec": round(max(0.0, nominal + ext_sec - source_dur), 4)
+            if source_dur > 0 else 0.0}
 
 
 def build_report(*, out: Path, episode_path: Path, shots_dir: Path, work: Path,
@@ -1044,7 +1144,9 @@ def build_report(*, out: Path, episode_path: Path, shots_dir: Path, work: Path,
                  narration_stats: dict, ambience, ambience_db: float | None,
                  bgm: Path | None, media: dict, loudness: dict | None,
                  black: dict, frames: list[dict], sheet: dict,
-                 timeline_shots: list[dict], edit_stats: dict) -> dict:
+                 timeline_shots: list[dict], edit_stats: dict,
+                 unify_look: bool = True,
+                 unify_filter: str | None = None) -> dict:
     starts = plan["starts"]
     total = plan["total"]
     clip_dev = [abs(float(e.get("deviation") or 0.0)) for e in norm_entries]
@@ -1079,9 +1181,24 @@ def build_report(*, out: Path, episode_path: Path, shots_dir: Path, work: Path,
          "freeze_sec": _source_freeze(norm_entries[i]).get("freeze_sec")}
         for i, b in enumerate(boundaries) if not b.get("cut")
     ]
+    # 源素材时长分析（reuse 镜头需 ≥ episode 镜长；不足靠冻结末帧补齐 → 报告列出）
+    freeze_info = {e["id"]: _source_freeze(e) for e in norm_entries}
+    short_sources = [
+        {"id": e["id"], "nominal": round(float(e["nominal_duration"]), 4),
+         "source_duration": info["source_duration"],
+         "shortfall_sec": info["shortfall_sec"]}
+        for e in norm_entries
+        for info in [freeze_info[e["id"]] if e["id"] in freeze_info else {}]
+        if info.get("shortfall_sec", 0.0) > 0.05
+    ]
     warn: list[str] = []
     if missing:
         warn.append(f"缺失镜头 {len(missing)} 个（pilot/生成未完成，已跳过顺接）")
+    if short_sources:
+        detail = "、".join(f"{s['id']}(-{s['shortfall_sec']:.2f}s)"
+                          for s in short_sources[:12])
+        warn.append(f"{len(short_sources)} 个镜头源素材短于镜长 >50ms，靠冻结末帧补齐："
+                    f"{detail}")
     if abs(media.get("duration", 0.0) - total) > 0.3:
         warn.append(f"成片时长 {media.get('duration')}s 与目标 {total:.2f}s 偏差 >0.3s")
     if abs(total - sum(plan["nominal"])) > 0.2:
@@ -1118,8 +1235,51 @@ def build_report(*, out: Path, episode_path: Path, shots_dir: Path, work: Path,
             "transitions_requested": args.transitions,
             "transitions_used": timeline_mode,
             "ambience_db": ambience_db,
+            "unify_look": unify_look,
+            "shot_grade": bool(getattr(args, "shot_grade", True)),
             "fade_out_sec": ass_stats.get("fade_out_sec"),
             "episode_total_duration": episode.get("total_duration"),
+        },
+        "shot_adjust": {
+            "enabled": bool(getattr(args, "shot_grade", True)),
+            "grade_map": SHOT_GRADE,
+            "source_offsets": SHOT_SOURCE_OFFSETS,
+            "applied": [{"id": e["id"], "grade": e.get("shot_grade"),
+                         "source_offset": e.get("source_offset") or 0.0}
+                        for e in norm_entries
+                        if e.get("shot_grade")
+                        or float(e.get("source_offset") or 0.0) > 0.0],
+            "note": ("QA warn 镜头的定向修复（依据 tmp/v61_3d/qa_review.md："
+                     "v5_015 压暗提对比、v5_024 降饱和、v5_026/027/028 压暗降饱和、"
+                     "v5_023 跳过现代白墙开头 0.7s）；不影响全片统一影调基线，"
+                     "其余镜头只走统一影调。"),
+        },
+        "unify_look": {
+            "enabled": bool(unify_look),
+            "filter": unify_filter if unify_look else None,
+            "components": {
+                "color_curve": ("eq=contrast=1.035:saturation=1.05:"
+                                "brightness=-0.004 + colorbalance "
+                                "rs/bs/rm/bm/rh/bh=0.015/-0.020/0.010/-0.010/"
+                                "0.020/-0.035（暖金高光 + 青绿暗部）"),
+                "vignette": "angle=0.38（ffmpeg vignette，轻于默认 PI/5）",
+                "grain": "noise=alls=3:allf=t+u（极轻颗粒）",
+                "sharpen": {
+                    "sharp_source": SHARPEN_CLOUD,
+                    "soft_source": SHARPEN_LOCAL,
+                    "soft_source_max_width": SOFT_SOURCE_MAX_WIDTH,
+                    "note": "逐镜 normalize 阶段 unsharp=5:5:X:5:5:0（本地软素材 1.0 档）",
+                    "calibration": SHARPEN_CALIBRATION,
+                },
+            },
+            "source_tiers": {
+                "sharp": sum(1 for e in norm_entries
+                             if e.get("source_tier") == "sharp"),
+                "soft": sum(1 for e in norm_entries
+                            if e.get("source_tier") == "soft"),
+                "black": sum(1 for e in norm_entries
+                             if e.get("source_tier") == "black"),
+            },
         },
         "timeline": {
             "shots_included": len(entries),
@@ -1164,12 +1324,18 @@ def build_report(*, out: Path, episode_path: Path, shots_dir: Path, work: Path,
             "mean_abs_deviation": mean_clip_dev,
             "nominal_max_abs_deviation": max_nom_dev,
             "nominal_mean_abs_deviation": mean_nom_dev,
+            "short_sources": short_sources,
             "items": [{"id": e["id"], "target": round(e["nominal_duration"], 4),
                        "nominal_episode": round(float(e["duration"]), 4),
                        "probe": round(e["actual_duration"], 4),
                        "deviation": round(e["deviation"], 4),
                        "source": e["source_kind"],
-                       **_source_freeze(e)}
+                       "source_tier": e.get("source_tier"),
+                       "source_width": e.get("source_width"),
+                       "sharpen": e.get("sharpen"),
+                       "shot_grade": e.get("shot_grade"),
+                       "source_offset": e.get("source_offset") or 0.0,
+                       **freeze_info.get(e["id"], {})}
                       for e in norm_entries],
         },
         "video_edit": edit_stats,
@@ -1258,7 +1424,9 @@ def run(args) -> int:
           f"{sum(1 for b in boundaries if not b.get('cut'))} 个 dissolve")
 
     norm_entries = normalize_all(entries, plan, work, fps, width, height,
-                                 force=bool(getattr(args, "force", False)))
+                                 force=bool(getattr(args, "force", False)),
+                                 apply_adjust=bool(getattr(args, "shot_grade",
+                                                          True)))
 
     # 视频
     video = assemble_video(norm_entries, boundaries, work, fps, width, height,
@@ -1291,12 +1459,19 @@ def run(args) -> int:
           f"章节 {ass_stats['chapter_events'] // 2} / "
           f"事件 {ass_stats['total_events']}）")
 
-    # BGM + 编码
+    # BGM + 编码（统一影调：色调曲线/暗角/极轻颗粒 + 逐镜锐化已在 normalize 阶段做）
     catalog = v5_catalog.load_catalog()
     style = (catalog.get("styles") or {}).get("museum_gold") or {}
     bgm = v5_audio.ensure_bgm(style, work)
     _step(f"BGM：{bgm}")
-    edit_stats = encode_final(work, out, total, fps, width, height, bgm)
+    unify = bool(getattr(args, "unify_look", True))
+    grade_filter = UNIFY_FILTER if unify else None
+    cloud_n = sum(1 for e in norm_entries if e.get("source_tier") == "sharp")
+    soft_n = sum(1 for e in norm_entries if e.get("source_tier") == "soft")
+    _step(f"统一影调：{'on' if unify else 'off'}（锐利源 {cloud_n} / 软源 "
+          f"{soft_n}；unsharp {SHARPEN_CLOUD}/{SHARPEN_LOCAL}）")
+    edit_stats = encode_final(work, out, total, fps, width, height, bgm,
+                              grade_filter=grade_filter)
 
     # 报告要素
     media = measure_media(out)
@@ -1327,7 +1502,8 @@ def run(args) -> int:
         narration_stats=narration_stats, ambience=ambience,
         ambience_db=ambience_db if ambience_on else None, bgm=bgm,
         media=media, loudness=loudness, black=black, frames=frames,
-        sheet=sheet, timeline_shots=timeline_shots, edit_stats=edit_stats)
+        sheet=sheet, timeline_shots=timeline_shots, edit_stats=edit_stats,
+        unify_look=unify, unify_filter=grade_filter)
     report["elapsed_sec"] = round(time.time() - t_start, 1)
     report_path = work / REPORT_NAME
     _json_write(report_path, report)
@@ -1375,6 +1551,14 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--no-ambience", action="store_true", help="关闭 H3 原声环境床")
     p.add_argument("--fade-out", type=float, default=DEFAULT_FADE_OUT,
                    help="片尾淡出到黑秒数（默认 1.0；0 关闭）")
+    p.add_argument("--unify-look", action=argparse.BooleanOptionalAction,
+                   default=True,
+                   help="统一影调（默认开）：逐镜锐化 + 整片色调曲线/轻暗角/极轻颗粒；"
+                        "--no-unify-look 关闭")
+    p.add_argument("--shot-grade", action=argparse.BooleanOptionalAction,
+                   default=True,
+                   help="QA 定向逐镜微调色/入点（默认开；仅对 SHOT_GRADE/"
+                        "SHOT_SOURCE_OFFSETS 中列出的镜头生效）")
     p.add_argument("--transitions", choices=("auto", "cut", "cinema", "episode",
                                              "cards"),
                    default="auto",
