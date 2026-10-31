@@ -81,7 +81,7 @@ GET  /workers               -> {comfyui:bool, comfyui_queue:int, metaso_key:bool
 
 | 层 | 交付 | 验证 |
 |---|---|---|
-| 后端 | `backend/app/routers/cinema3d.py`：10 个 `/api/cinema/*` 端点 + 线程任务队列（生成/剪辑/取消/日志/进度/落盘） | 28/28 TestClient + 28/28 真实 HTTP；真实 `assemble` 任务端到端成功（325.2s / 0 黑帧 / -15.98 LUFS / 60 字幕事件） |
+| 后端 | `backend/app/routers/cinema3d.py`：10 个 `/api/cinema/*` 端点 + 线程任务队列（生成/剪辑/取消/日志/进度/落盘；briefs 缓存按 mtime 失效、响应 no-store、复用镜 `reuse_src`） | 28/28 TestClient + 28/28 真实 HTTP；`PATCH brief → GET 立即生效` 8/8；真实 `assemble` 任务端到端成功（325.2s / 0 黑帧 / -15.98 LUFS / 60 字幕事件） |
 | 前端 | `#/cinema` 五页：总览 / 镜头台（56 镜筛选/抽屉/播放/编辑 brief/批量生成）/ 生成队列（Worker 状态+实时日志）/ 剪辑台（参数+进度）/ 成片 & QC（播放器+6 项 QC+抽帧+下载） | `tsc --noEmit` 0 error；`vite build` 通过；headless Chrome 截图 5 页 + 抽屉；CDP 实测「打开抽屉 → 改 subject → 保存 brief」toast 成功 |
 | 导航 | 旧平台侧栏新增「Cinema 3D」入口；`#/cinema/<tab>` 独立全屏工作室 | 截图确认 |
 | 数据 | 真实数据：56/56 镜、云端 22 / 本地 9 / 复用 25 / 缺失 0、成片 5:25 / 96.0MB | API `/overview` `/shots` `/report` `/workers` |

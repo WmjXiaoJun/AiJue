@@ -22,6 +22,7 @@
 
 from __future__ import annotations
 
+import copy
 import json
 import logging
 import os
@@ -38,7 +39,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Response
 from pydantic import BaseModel
 
 from .. import config, jobs, models
@@ -212,16 +213,43 @@ def _episode_total_duration(episode: Dict[str, Any]) -> float:
     return round(total, 2)
 
 
-_BRIEFS_LOCK = threading.Lock()  # 保护 briefs JSON 的读-改-写（PATCH 并发安全）
+_BRIEFS_LOCK = threading.RLock()  # 保护 briefs JSON 的读-改-写（PATCH 并发安全）
+# briefs 读缓存：键 = (mtime_ns, size)。PATCH 写入后显式失效 + 换成新内容，
+# 文件被外部改动（如管线重写 briefs）也会因 mtime 变化自动失效 —— 永不返回旧 prompt。
+_BRIEFS_CACHE: Dict[str, Any] = {"key": None, "data": None}
+
+
+def _briefs_stat_key() -> Optional[Tuple[int, int]]:
+    try:
+        st = BRIEFS_PATH.stat()
+    except OSError:
+        return None
+    return (st.st_mtime_ns, st.st_size)
+
+
+def _invalidate_briefs_cache() -> None:
+    """PATCH 成功后调用：清空 briefs 缓存（读接口下一次一定拿到新值）。"""
+    with _BRIEFS_LOCK:
+        _BRIEFS_CACHE["key"] = None
+        _BRIEFS_CACHE["data"] = None
 
 
 def _load_briefs() -> Dict[str, Any]:
+    """读 briefs 合同（按 mtime+size 校验的进程内缓存，返回只读视图）。"""
+    key = _briefs_stat_key()
+    with _BRIEFS_LOCK:
+        cached = _BRIEFS_CACHE.get("data")
+        if cached is not None and _BRIEFS_CACHE.get("key") == key:
+            return cached
     data = _read_json(BRIEFS_PATH, "镜头 brief 合同")
     if not isinstance(data, dict) or not isinstance(data.get("shots"), list):
         raise HTTPException(
             status_code=500,
             detail="镜头 brief 合同缺失或格式不正确：contract/v5/cinema3d/relic_talk_3d_briefs.json",
         )
+    with _BRIEFS_LOCK:
+        _BRIEFS_CACHE["key"] = key
+        _BRIEFS_CACHE["data"] = data
     return data
 
 
@@ -857,7 +885,8 @@ class CinemaAssembleRequest(BaseModel):
 # GET /overview
 # --------------------------------------------------------------------------- #
 @router.get("/overview")
-def get_overview() -> Dict[str, Any]:
+def get_overview(response: Response) -> Dict[str, Any]:
+    response.headers["Cache-Control"] = "no-store, max-age=0"
     episode = _load_episode()
     episode_shots = [shot for shot in episode.get("shots") or [] if isinstance(shot, dict)]
     return {
@@ -885,7 +914,9 @@ def _kind_of(shot: Dict[str, Any]) -> str:
 
 
 @router.get("/shots")
-def get_shots() -> Dict[str, Any]:
+def get_shots(response: Response) -> Dict[str, Any]:
+    # 禁止浏览器/代理缓存：PATCH brief 后刷新页面必须看到最新 prompt
+    response.headers["Cache-Control"] = "no-store, max-age=0"
     episode = _load_episode()
     briefs_index = _brief_index(_load_briefs())
     reuse_index = _load_reuse_index()
@@ -901,6 +932,8 @@ def get_shots() -> Dict[str, Any]:
         valid, _probed = validity.get(sid, (False, 0.0))
         scene = shot.get("scene")
         edit_start = shot.get("_edit_start")
+        reuse_entry = reuse_index.get(sid) or {}
+        reuse_src = str(reuse_entry.get("src")) if reuse_entry.get("src") else None
         shots.append(
             {
                 "id": sid,
@@ -915,6 +948,8 @@ def get_shots() -> Dict[str, Any]:
                 "scene": str(scene) if scene else None,
                 "edit_start": round(float(edit_start or 0.0), 3),
                 "meta": meta,
+                # 复用镜的母素材 id（来自 reuse_map.json，如 v5_054 -> v5_013）；非复用镜为 null
+                "reuse_src": reuse_src,
                 "brief": _brief_view(briefs_index.get(sid)),
             }
         )
@@ -943,7 +978,8 @@ def patch_shot(sid: str, payload: CinemaShotPatch) -> Dict[str, Any]:
         patch["chars"] = [str(item) for item in patch["chars"]]
 
     with _BRIEFS_LOCK:  # 同一时刻只允许一个 PATCH 写 briefs，避免并发覆盖
-        briefs = _load_briefs()
+        # 深拷贝缓存内容再改，避免污染其它读请求正在使用的缓存对象
+        briefs = copy.deepcopy(_load_briefs())
         target = None
         for item in briefs.get("shots") or []:
             if isinstance(item, dict) and str(item.get("id")) == sid:
@@ -952,8 +988,16 @@ def patch_shot(sid: str, payload: CinemaShotPatch) -> Dict[str, Any]:
         if target is None:
             raise HTTPException(status_code=404, detail=f"镜头 brief 不存在：{sid}")
         target.update(patch)
-        _write_json_atomic(BRIEFS_PATH, briefs)
+        try:
+            _write_json_atomic(BRIEFS_PATH, briefs)
+        finally:
+            # 无论写入是否抛错都先失效：下一次 GET /shots 必定重新读盘，不会看到旧 prompt
+            _invalidate_briefs_cache()
+        # 把刚写入的新内容直接放回缓存（键 = 新文件 mtime+size），读接口立刻可见
+        _BRIEFS_CACHE["key"] = _briefs_stat_key()
+        _BRIEFS_CACHE["data"] = briefs
         view = _brief_view(target)
+    logger.info("PATCH /api/cinema/shots/%s 已写回 briefs：%s", sid, ", ".join(sorted(patch)))
     return {"brief": view}
 
 
@@ -1056,7 +1100,8 @@ def start_assemble(payload: CinemaAssembleRequest) -> Dict[str, str]:
 # GET /jobs  /jobs/{id}  POST /jobs/{id}/cancel
 # --------------------------------------------------------------------------- #
 @router.get("/jobs")
-def list_jobs() -> Dict[str, Any]:
+def list_jobs(response: Response) -> Dict[str, Any]:
+    response.headers["Cache-Control"] = "no-store, max-age=0"
     return {"jobs": _sorted_public_jobs(MAX_JOBS_LISTED)}
 
 
@@ -1069,7 +1114,8 @@ def _find_job(job_id: str) -> Dict[str, Any]:
 
 
 @router.get("/jobs/{job_id}")
-def get_job(job_id: str) -> Dict[str, Any]:
+def get_job(job_id: str, response: Response) -> Dict[str, Any]:
+    response.headers["Cache-Control"] = "no-store, max-age=0"
     return _public_job(_find_job(job_id))
 
 
@@ -1140,7 +1186,8 @@ def _build_qc(report: Dict[str, Any]) -> Dict[str, Any]:
 
 
 @router.get("/report")
-def get_report() -> Dict[str, Any]:
+def get_report(response: Response) -> Dict[str, Any]:
+    response.headers["Cache-Control"] = "no-store, max-age=0"
     report = _read_json(REPORT_PATH, "剪辑报告", default=None)
     report_data = report if isinstance(report, dict) else None
     frames: List[str] = []
@@ -1164,7 +1211,8 @@ COMFYUI_QUEUE_URL = "http://127.0.0.1:8188/queue"
 
 
 @router.get("/workers")
-def get_workers() -> Dict[str, Any]:
+def get_workers(response: Response) -> Dict[str, Any]:
+    response.headers["Cache-Control"] = "no-store, max-age=0"
     comfyui = False
     comfyui_queue = 0
     try:

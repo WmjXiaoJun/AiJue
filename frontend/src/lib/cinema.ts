@@ -31,6 +31,8 @@ export interface CinemaShot {
   scene?: string;
   edit_start: number;
   meta: Record<string, unknown>;
+  /** 复用镜头的母素材 id（后端 /shots 提供） */
+  reuse_src?: string | null;
   brief: CinemaBrief;
 }
 
