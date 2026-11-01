@@ -1,0 +1,123 @@
+{
+  "id": "convenience_store",
+  "label": "24 小时便利店",
+  "description": "真实 24 小时便利店门口：玻璃门、店内明亮白光、货架、街边台阶，夜里是整条街最暖的一块光。",
+  "tags": [
+    "modern",
+    "realistic",
+    "street",
+    "convenience_store",
+    "night"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "size": [
+    1600,
+    900
+  ],
+  "seed": 71703,
+  "layers": [
+    {
+      "type": "canvas",
+      "layer": "background",
+      "color": "bg:1"
+    },
+    {
+      "type": "glass_wall",
+      "layer": "background",
+      "color": "highlight",
+      "opacity": 0.55
+    },
+    {
+      "type": "shelves",
+      "layer": "background",
+      "color": "paper",
+      "x": 0.5,
+      "y": 0.4,
+      "opacity": 0.65
+    },
+    {
+      "type": "neon_signs",
+      "layer": "midground",
+      "color": "accent:1",
+      "opacity": 0.75
+    },
+    {
+      "type": "desk",
+      "layer": "midground",
+      "color": "wood",
+      "x": 0.62,
+      "y": 0.86,
+      "width": 0.4
+    },
+    {
+      "type": "stage_floor",
+      "layer": "midground",
+      "color": "bg:0",
+      "opacity": 0.85
+    },
+    {
+      "type": "street_lamp",
+      "layer": "foreground",
+      "color": "highlight",
+      "x": 0.08,
+      "opacity": 0.6
+    },
+    {
+      "type": "bokeh",
+      "layer": "background",
+      "color": "highlight",
+      "density": 0.2,
+      "opacity": 0.2
+    },
+    {
+      "type": "grain",
+      "layer": "foreground",
+      "opacity": 0.32
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.26
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.18,
+      0.1,
+      0.64,
+      0.84
+    ],
+    "close": [
+      0.3,
+      0.08,
+      0.42,
+      0.66
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.42,
+      0.96
+    ],
+    "figure_a": [
+      0.58,
+      0.96
+    ],
+    "figure_b": [
+      0.52,
+      0.95
+    ]
+  },
+  "variants": [
+    "late"
+  ]
+}

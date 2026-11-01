@@ -6,7 +6,7 @@
 // 后端端点未就绪（404）时：优雅报错 + 重试，并用 16 个模板的 id/label 作占位顺序（不伪造进度）。
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { errorText, mediaUrl } from "../../lib/api";
+import { ApiError, errorText, mediaUrl } from "../../lib/api";
 import {
   TEMPLATE_3D_SEEDS,
   TEMPLATE_3D_TOTAL,
@@ -14,6 +14,7 @@ import {
   cinemaApi,
   fmtDuration,
   fmtSize,
+  isRealTemplate,
   templateClipPercent,
   templateStatusDot,
   type CinemaTemplate,
@@ -37,6 +38,8 @@ import "../../styles/cinema-templates.css";
 const POLL_IDLE_MS = 3000;
 const POLL_BUSY_MS = 2000;
 
+type TemplateKindFilter = "all" | "classic" | "real";
+
 interface CardItem {
   seed: CinemaTemplateSeed;
   template: CinemaTemplate | null;
@@ -49,6 +52,16 @@ function pad2(value: number): string {
 function clockText(date: Date | null): string {
   if (!date) return "";
   return `${pad2(date.getHours())}:${pad2(date.getMinutes())}:${pad2(date.getSeconds())}`;
+}
+
+/** 生成 / 合成提交失败时的友好文案（尤其 409：已有进行中的任务） */
+function submitErrorText(action: "生成" | "合成", err: unknown): string {
+  if (err instanceof ApiError) {
+    if (err.status === 409) return `${action}冲突：该模板/队列已有进行中的任务（409），等当前任务结束后再提交`;
+    if (err.status === 429) return `${action}提交过于频繁（429），稍后再试`;
+    if (err.status === 404) return `${action}接口未就绪（404）`;
+  }
+  return `提交${action}失败：${errorText(err)}`;
 }
 
 /** 有全部镜头（或已有成片）才允许合成 */
@@ -89,6 +102,7 @@ export function CinemaTemplates() {
   const [busyAction, setBusyAction] = useState<string | null>(null);
   const [playing, setPlaying] = useState<CinemaTemplate | null>(null);
   const [detailId, setDetailId] = useState<string | null>(null);
+  const [kindFilter, setKindFilter] = useState<TemplateKindFilter>("all");
 
   const aliveRef = useRef(true);
   const inFlightRef = useRef(false);
@@ -147,7 +161,15 @@ export function CinemaTemplates() {
 
   const cards = useMemo(() => mergeCards(data), [data]);
   const summary = data?.summary ?? null;
-  const totalTemplates = summary?.total || TEMPLATE_3D_TOTAL;
+  // V17：总数动态化（后端新增 real_* 模板后自动变 19；接口失败时回落到 16 个占位种子）
+  const totalTemplates = summary?.total || cards.length || TEMPLATE_3D_TOTAL;
+  const realCount = useMemo(() => cards.filter((item) => isRealTemplate(item.seed.id)).length, [cards]);
+  const classicCount = Math.max(0, cards.length - realCount);
+  const filteredCards = useMemo(() => {
+    if (kindFilter === "real") return cards.filter((item) => isRealTemplate(item.seed.id));
+    if (kindFilter === "classic") return cards.filter((item) => !isRealTemplate(item.seed.id));
+    return cards;
+  }, [cards, kindFilter]);
   const clipsDone = summary?.clips_done ?? 0;
   const clipsTotal = summary?.clips_total ?? 0;
   const overallPct = clipsTotal > 0 ? Math.round((clipsDone / clipsTotal) * 100) : 0;
@@ -158,7 +180,13 @@ export function CinemaTemplates() {
     summary?.pending ?? Math.max(0, totalTemplates - doneCount - generatingCount - generatedCount);
   const failedCount =
     summary?.failed ?? cards.filter((item) => item.template?.status === "assemble_failed").length;
+  const assembleReadyCount = useMemo(() => cards.filter((item) => canAssemble(item.template)).length, [cards]);
   const placeholderOnly = !data || data.templates.length === 0;
+  const kindFilters: { id: TemplateKindFilter; label: string; count: number }[] = [
+    { id: "all", label: "全部", count: cards.length },
+    { id: "classic", label: "原 16 模板", count: classicCount },
+    { id: "real", label: "写实新模板", count: realCount },
+  ];
 
   const refresh = useCallback(async () => {
     setRefreshing(true);
@@ -173,7 +201,7 @@ export function CinemaTemplates() {
   /** 有 running 任务时禁止重复提交（给 toast 而不是静默） */
   const blockedByJobs = useCallback((): boolean => {
     if ((data?.jobs?.active ?? 0) > 0) {
-      notify("已有进行中的生成任务（GPU 串行），等当前任务结束后再提交", "info");
+      notify("已有进行中的生成 / 合成任务（GPU 串行），等当前任务结束后再提交", "info");
       return true;
     }
     return false;
@@ -201,7 +229,7 @@ export function CinemaTemplates() {
         notify(`已提交 3D 生成任务${res?.job_id ? " · " + String(res.job_id).slice(0, 8) : ""}`, "success");
         await load(true);
       } catch (err) {
-        notify("提交生成失败：" + errorText(err), "error");
+        notify(submitErrorText("生成", err), "error");
       } finally {
         if (aliveRef.current) setBusyAction(null);
       }
@@ -212,6 +240,7 @@ export function CinemaTemplates() {
   const submitAssemble = useCallback(
     async (ids: string[] | "all") => {
       if (busyAction) return;
+      if (blockedByJobs()) return;
       const names =
         ids === "all"
           ? "全部已就绪的模板"
@@ -224,12 +253,12 @@ export function CinemaTemplates() {
         notify(`已提交合成任务${res?.job_id ? " · " + String(res.job_id).slice(0, 8) : ""}`, "success");
         await load(true);
       } catch (err) {
-        notify("提交合成失败：" + errorText(err), "error");
+        notify(submitErrorText("合成", err), "error");
       } finally {
         if (aliveRef.current) setBusyAction(null);
       }
     },
-    [busyAction, cards, load, notify],
+    [blockedByJobs, busyAction, cards, load, notify],
   );
 
   const openCard = useCallback((item: CardItem) => {
@@ -249,7 +278,7 @@ export function CinemaTemplates() {
           <div className="cm-kicker">TEMPLATE STUDIO · 3D</div>
           <h1 className="cm-h1">模板库 · 3D</h1>
           <p className="cm-sub">
-            {TEMPLATE_3D_TOTAL} 个模板 · 后台生成中 {generatingCount}/{totalTemplates} · 共{" "}
+            {totalTemplates} 个模板 · 3D 就绪 {doneCount}/{totalTemplates} · 生成中 {generatingCount} · 共{" "}
             {clipsTotal > 0 ? clipsTotal : "—"} 镜
             <span className="cm-tpl-live" title={syncedAt ? `最近同步 ${clockText(syncedAt)}` : "等待首次同步"}>
               <i className={"cm-status-dot " + (pollingBusy ? "is-running" : "is-done")} />
@@ -263,16 +292,24 @@ export function CinemaTemplates() {
             className={"cm-btn cm-btn-primary cm-btn-sm" + (genBlocked ? " is-dim" : "")}
             onClick={() => void submitGenerate("all")}
             aria-disabled={genBlocked}
-            title={genBlocked ? "已有进行中的生成任务" : "为全部 16 个模板排入 3D 生成队列"}
+            disabled={genBlocked}
+            title={genBlocked ? "已有进行中的生成 / 合成任务，等当前任务结束" : `为全部 ${totalTemplates} 个模板排入 3D 生成队列（含待生成的新模板）`}
           >
             {busyAction === "generate:all" ? <Spinner size={13} /> : <IconSpark size={14} />} 全部生成
           </button>
           <button
             type="button"
-            className={"cm-btn cm-btn-sm" + (busyAction ? " is-dim" : "")}
+            className={"cm-btn cm-btn-sm" + (busyAction || activeJobs > 0 || assembleReadyCount === 0 ? " is-dim" : "")}
             onClick={() => void submitAssemble("all")}
-            aria-disabled={busyAction !== null}
-            title="把已生成全部镜头的模板排入剪辑合成"
+            aria-disabled={busyAction !== null || activeJobs > 0 || assembleReadyCount === 0}
+            disabled={busyAction !== null || activeJobs > 0 || assembleReadyCount === 0}
+            title={
+              activeJobs > 0
+                ? "已有进行中的生成 / 合成任务，等当前任务结束"
+                : assembleReadyCount === 0
+                  ? "暂无「镜头已全部就绪」的模板可合成"
+                  : `把 ${assembleReadyCount} 个镜头就绪的模板排入剪辑合成`
+            }
           >
             {busyAction === "assemble:all" ? <Spinner size={13} /> : <IconFilm size={14} />} 全部合成
           </button>
@@ -343,13 +380,34 @@ export function CinemaTemplates() {
         </div>
       </section>
 
+      <div className="cm-tpl-filter">
+        <div className="tpl-seg" role="group" aria-label="模板分类筛选">
+          {kindFilters.map((filter) => (
+            <button
+              key={filter.id}
+              type="button"
+              className={kindFilter === filter.id ? "is-active" : ""}
+              onClick={() => setKindFilter(filter.id)}
+              aria-pressed={kindFilter === filter.id}
+            >
+              {filter.label}
+              <span className="tpl-seg-count">{filter.count}</span>
+            </button>
+          ))}
+        </div>
+        <span className="cm-tpl-filter-note cm-mono">
+          显示 {filteredCards.length} / {cards.length}
+          {realCount > 0 ? ` · 写实 ${realCount} 支` : ""}
+        </span>
+      </div>
+
       {placeholderOnly && (
         <div className="cm-tpl-notice">
           <IconAlert size={15} />
           <span>
             后端 <b className="cm-mono">/api/cinema/templates</b> 暂未返回数据：
-            下面按 16 个模板的固定顺序占位，进度留空，接口连通后自动填充。
-            模板 3D 生成由后台 GPU 串行执行（本地 ComfyUI H3，约 3–4 小时跑完 16 个模板）。
+            下面按 {TEMPLATE_3D_TOTAL} 个原模板的固定顺序占位，进度留空，接口连通后自动填充（后端新增模板会自动追加）。
+            模板 3D 生成由后台 GPU 串行执行（本地 ComfyUI H3）。
           </span>
         </div>
       )}
@@ -364,13 +422,22 @@ export function CinemaTemplates() {
         <div className="cm-empty cm-tpl-empty">
           <span>模板库还没有任何模板数据</span>
           <span className="cm-subtle" style={{ fontSize: 11.5 }}>
-            后台跑 `python -m pipeline.templates3d --generate --templates all` 后这里会出现 16 张模板卡
+            后台跑 `python -m pipeline.templates3d --generate --templates all` 后这里会按模板总数生成卡片
+          </span>
+        </div>
+      )}
+
+      {cards.length > 0 && filteredCards.length === 0 && (
+        <div className="cm-empty cm-tpl-empty">
+          <span>该分类下暂无模板</span>
+          <span className="cm-subtle" style={{ fontSize: 11.5 }}>
+            切回「全部」查看 {cards.length} 个模板（写实新模板在后台生成 3D 样片前会显示「待生成」）
           </span>
         </div>
       )}
 
       <div className="cm-tpl-grid">
-        {cards.map((item) => (
+        {filteredCards.map((item) => (
           <TemplateCard
             key={item.seed.id}
             item={item}
@@ -438,7 +505,10 @@ function TemplateCard({
   const pct = templateClipPercent(template);
   const statusLabel = status ? TEMPLATE_STATUS_LABEL[status] : "接口未就绪";
   const cardClass =
-    "cm-tpl-card" + (status ? " is-" + status : " is-unknown") + (hasFinal ? " is-3d-final" : "");
+    "cm-tpl-card" +
+    (status ? " is-" + status : " is-unknown") +
+    (hasFinal ? " is-3d-final" : "") +
+    (isRealTemplate(seed.id) ? " is-real" : "");
   const generateKey = template ? `generate:${template.id}` : "";
   const assembleKey = template ? `assemble:${template.id}` : "";
   const generateLabel = template?.status === "done" ? "重生成" : "生成";
@@ -489,6 +559,7 @@ function TemplateCard({
           <span className="cm-tpl-style" title={style}>
             {style}
           </span>
+          {isRealTemplate(seed.id) && <span className="tpl-real-badge">写实</span>}
           <span className="cm-tpl-en">{seed.en}</span>
         </div>
 
@@ -538,8 +609,17 @@ function TemplateCard({
             type="button"
             className={"cm-btn cm-btn-sm cm-btn-ghost" + (genBlocked ? " is-dim" : "")}
             onClick={() => template && onGenerate(template)}
+            disabled={!template || busyAction === generateKey}
             aria-disabled={!canGenerate || genBlocked}
-            title={genBlocked ? "已有进行中的生成任务" : `提交「${label}」3D 生成`}
+            title={
+              !template
+                ? "模板进度接口未就绪，无法提交生成"
+                : genBlocked
+                  ? "已有进行中的生成任务，等当前任务结束"
+                  : template.status === "pending"
+                    ? `该模板尚未生成 3D：提交「${label}」生成队列入队`
+                    : `提交「${label}」3D 生成`
+            }
           >
             {busyAction === generateKey ? <Spinner size={11} /> : null}
             {generateLabel}
@@ -714,12 +794,20 @@ function TemplateDrawer({
         </header>
 
         <div className="cm-tpl-drawer-body">
-          {error && (
+          {error && !detail && (
             <div className="cm-tpl-detail-empty">
-              <p style={{ margin: "0 0 10px" }}>模板详情读取失败：{error}</p>
-              <button type="button" className="cm-btn cm-btn-sm" onClick={() => void load(false)}>
-                重试
-              </button>
+              <b style={{ color: "var(--c-gold-soft)" }}>尚未生成 3D 成片</b>
+              <p style={{ margin: "8px 0 12px" }}>
+                模板 <span className="cm-mono">{seedId}</span> 还没有 3D 镜头产物，或详情接口暂不可用：{error}
+              </p>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button type="button" className="cm-btn cm-btn-sm" onClick={() => void load(false)}>
+                  重试读取
+                </button>
+                <button type="button" className="cm-btn cm-btn-sm cm-btn-primary" onClick={() => onGenerate(seedId)}>
+                  <IconSpark size={13} /> 去生成 3D
+                </button>
+              </div>
             </div>
           )}
 
@@ -727,6 +815,15 @@ function TemplateDrawer({
 
           {detail && (
             <>
+              {(detail.status === "pending" || (clips.total === 0 && !hasFinal)) && (
+                <div className="cm-tpl-detail-empty" style={{ marginBottom: 14 }}>
+                  <b style={{ color: "var(--c-gold-soft)" }}>尚未生成 3D</b>
+                  <p style={{ margin: "8px 0 0" }}>
+                    该模板（{isRealTemplate(seedId) ? "写实新模板" : "新增模板"}）还没有 3D 镜头，
+                    用下方「生成」排入 3D 生成队列，镜头全部就绪后再「合成」成片。
+                  </p>
+                </div>
+              )}
               <div className="cm-tpl-detail-stats">
                 <div className="cm-tpl-detail-cell">
                   <span>Clips</span>
@@ -798,9 +895,10 @@ function TemplateDrawer({
             type="button"
             className="cm-btn cm-btn-sm cm-btn-primary"
             onClick={() => onGenerate(seedId)}
-            disabled={!detail}
+            title={detail?.status === "pending" || !detail ? "该模板尚未生成 3D：提交生成" : "重新生成 3D 镜头"}
           >
-            <IconSpark size={13} /> {detail?.status === "done" ? "重生成" : "生成"}
+            <IconSpark size={13} />{" "}
+            {detail?.status === "done" ? "重生成" : detail?.status === "pending" || !detail ? "生成 3D" : "生成"}
           </button>
           <button
             type="button"

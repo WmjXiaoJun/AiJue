@@ -122,7 +122,7 @@ export function V5Styles({ catalog, templates3d, loading, error, onRefresh }: V5
             {stats.covered}
             <small>/ {stats.total}</small>
           </div>
-          <div className="st-kpi-hint">被 16 模板引用的风格</div>
+          <div className="st-kpi-hint">被模板引用的风格</div>
         </div>
         <div className="st-kpi">
           <span className="st-kpi-label">Custom</span>

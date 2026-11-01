@@ -1,0 +1,167 @@
+{
+  "id": "real_kitchen",
+  "label": "深夜食堂",
+  "version": 5,
+  "description": "V5 写实模板：深夜食堂（夜晚家庭厨房，风格 film_interview）",
+  "tags": [
+    "v5",
+    "film_interview",
+    "realistic"
+  ],
+  "style": "film_interview",
+  "target_duration": 34,
+  "aspect": [
+    16,
+    9
+  ],
+  "cast": [
+    {
+      "role": "host",
+      "character": "real_host",
+      "name": "沈舟"
+    },
+    {
+      "role": "figure_a",
+      "character": "real_kitchen_regular",
+      "name": "阿凯"
+    },
+    {
+      "role": "figure_b",
+      "character": "real_kitchen_chef",
+      "name": "老赵"
+    }
+  ],
+  "acts": [
+    {
+      "id": "act01",
+      "name": "第 1 幕",
+      "scene": "kitchen_stove",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 4.8,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true,
+      "visual": "A gas stove in a real home kitchen at night, blue flame under a wok, steam rising, warm tungsten light, the camera pushes in on the sizzling pan."
+    },
+    {
+      "id": "act02",
+      "name": "第 2 幕",
+      "scene": "kitchen_home",
+      "camera": "dolly",
+      "camera_strength": 0.1,
+      "duration": 5.712,
+      "line": "host",
+      "text": "深夜的厨房，是这座城市最后的客厅，谁都能坐。",
+      "characters": [
+        "host"
+      ],
+      "broll": false,
+      "visual": "Medium shot of a 38-year-old Chinese man in a dark coat standing in a warm home kitchen at night, steam and hanging lamp above the stove, he speaks to camera."
+    },
+    {
+      "id": "act03",
+      "name": "第 3 幕",
+      "scene": "kitchen_stove",
+      "camera": "handheld",
+      "camera_strength": 0.12,
+      "duration": 4.8,
+      "line": "figure_b",
+      "text": "开火就行，想吃啥说一声，锅里正热着。",
+      "characters": [
+        "figure_b"
+      ],
+      "broll": false,
+      "visual": "A 48-year-old Chinese chef in a dark apron stands at the stove stirring a wok, steam rising, warm hood light on his weathered face as he speaks to camera."
+    },
+    {
+      "id": "act04",
+      "name": "第 4 幕",
+      "scene": "kitchen_table",
+      "camera": "dolly",
+      "camera_strength": 0.1,
+      "duration": 4.6,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true,
+      "visual": "A wooden kitchen table with bowls of food, steam curling under a warm pendant lamp, chopsticks resting on a bowl, the camera glides across the table."
+    },
+    {
+      "id": "act05",
+      "name": "第 5 幕",
+      "scene": "kitchen_table",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 5.232,
+      "line": "figure_a",
+      "text": "加完班闻到这口热气，才觉得自己又活过来了。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false,
+      "visual": "A 26-year-old Chinese man in a grey hoodie and glasses sits at the kitchen table, steam rising from the bowl in front of him, warm lamp light, he speaks to camera and smiles."
+    },
+    {
+      "id": "act06",
+      "name": "第 6 幕",
+      "scene": "kitchen_home",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 5.112,
+      "line": "host",
+      "text": "一日三餐认真吃，就是普通人最了不起的坚持。",
+      "characters": [
+        "host"
+      ],
+      "broll": false,
+      "visual": "Medium-close shot of the host leaning against the kitchen counter at night, warm lamp light and steam around him, he speaks to camera then looks toward the table."
+    }
+  ],
+  "scenes": [
+    {
+      "id": "kitchen_home",
+      "label": "家庭厨房",
+      "description": "真实家庭厨房的夜晚：吊灯暖光、灶台与锅、橱柜、小餐桌，有生活痕迹的厨房。"
+    },
+    {
+      "id": "kitchen_table",
+      "label": "厨房餐桌",
+      "description": "真实厨房小餐桌：木桌、热汤热菜、头顶暖灯、蒸汽升起，适合坐下吃饭的对谈。"
+    },
+    {
+      "id": "kitchen_stove",
+      "label": "灶台特写",
+      "description": "真实家用灶台：灶火、炒锅、升腾的热气、抽油烟机的暖光，适合做饭与食物 B-roll。"
+    }
+  ],
+  "closing_broll": {
+    "id": "v5_007",
+    "scene": "kitchen_home",
+    "camera": "crane_up",
+    "duration": 4.2,
+    "visual": "Final wide shot of the small home kitchen at night: warm light, steam, two bowls on the table, the window reflecting city lights, the camera slowly rises."
+  },
+  "packaging": {
+    "subtitle": "film_interview",
+    "transition": "film_interview",
+    "title": "深夜食堂",
+    "end_card": "下期见"
+  },
+  "audio": {
+    "bgm": "jazz_piano",
+    "sfx": [
+      "whoosh",
+      "click"
+    ]
+  },
+  "lipsync": {
+    "mode": "viseme"
+  },
+  "meta": {
+    "source": "v17_real_templates",
+    "script_lines": 4,
+    "note": "夜晚家庭厨房：灶台 / 餐桌 / 暖灯"
+  }
+}

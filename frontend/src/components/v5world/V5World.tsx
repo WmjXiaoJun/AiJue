@@ -1,11 +1,11 @@
 // V5 World（#/v5/<tab>）· 外壳：Cinema Studio 设计语言的全屏 V5 世界
 // 6 个子页：成片画廊 / 模板库 / 风格墙 / 场景库 / 角色库 / 渲染台。
-// 数据：GET /api/v5/catalog、GET /api/v5/outputs、GET /api/cinema/templates（16 模板 3D 成片）。
+// 数据：GET /api/v5/catalog、GET /api/cinema/templates（3D 成片；V17 起含 real_* 新模板，数量动态）
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { V5CatalogResponse } from "../../lib/v5";
 import { v5api } from "../../lib/v5";
 import type { CinemaTemplate } from "../../lib/cinema";
-import { cinemaApi } from "../../lib/cinema";
+import { TEMPLATE_3D_TOTAL, cinemaApi } from "../../lib/cinema";
 import { useToast } from "../Toast";
 import { Spinner } from "../ui";
 import {
@@ -41,11 +41,11 @@ interface TabMeta {
 }
 
 const TAB_META: Record<V5WorldTab, TabMeta> = {
-  gallery: { label: "成片画廊", en: "GALLERY", no: "01", desc: "16 支成片 · 3D 电影版优先", icon: <IconFilm size={17} /> },
-  templates: { label: "模板库", en: "TEMPLATES", no: "02", desc: "16 模板 · 风格/时长/画幅/幕结构", icon: <IconTemplate size={17} /> },
-  styles: { label: "风格墙", en: "STYLES", no: "03", desc: "17 种视觉风格 · 色板/技法", icon: <IconPalette size={17} /> },
-  scenes: { label: "场景库", en: "SCENES", no: "04", desc: "61 个分层绘景场景", icon: <IconGrid size={17} /> },
-  characters: { label: "角色库", en: "CHARACTERS", no: "05", desc: "25 个固定声音角色", icon: <IconUser size={17} /> },
+  gallery: { label: "成片画廊", en: "GALLERY", no: "01", desc: "3D 成片画廊 · 电影版优先", icon: <IconFilm size={17} /> },
+  templates: { label: "模板库", en: "TEMPLATES", no: "02", desc: "V5 模板 · 风格/时长/画幅/幕结构", icon: <IconTemplate size={17} /> },
+  styles: { label: "风格墙", en: "STYLES", no: "03", desc: "视觉风格 · 色板/技法", icon: <IconPalette size={17} /> },
+  scenes: { label: "场景库", en: "SCENES", no: "04", desc: "分层绘景场景", icon: <IconGrid size={17} /> },
+  characters: { label: "角色库", en: "CHARACTERS", no: "05", desc: "固定声音角色", icon: <IconUser size={17} /> },
   render: { label: "渲染台", en: "RENDER", no: "06", desc: "选模板 + 时长 → render_v5 任务", icon: <IconSpark size={17} /> },
 };
 
@@ -57,7 +57,7 @@ function tabFromHash(): V5WorldTab {
 
 export interface V5PageProps {
   catalog: V5CatalogResponse | null;
-  /** 16 模板 3D 成片（key = 模板 id；GET /api/cinema/templates，唯一成片数据源） */
+  /** 3D 成片（key = 模板 id；GET /api/cinema/templates，唯一成片数据源；V17 起含 real_* 新模板） */
   templates3d: Record<string, CinemaTemplate>;
   loading: boolean;
   error: string;
@@ -166,7 +166,7 @@ export function V5World({ onExit, onCinema }: { onExit: () => void; onCinema: ()
       props: catalog?.props?.length || 0,
       templates: templates.length,
       threeDDone: threeD.filter((item) => item.final?.exists).length,
-      threeDExpected: threeD.length || 16,
+      threeDExpected: threeD.length || TEMPLATE_3D_TOTAL,
       threeDClipsDone: threeD.reduce((sum, item) => sum + (item.clips.done || 0), 0),
       threeDClipsTotal: threeD.reduce((sum, item) => sum + (item.clips.total || 0), 0),
     };

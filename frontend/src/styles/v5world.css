@@ -848,3 +848,35 @@ select.v5w-select { height: 34px; padding: 0 10px; font-size: 12px; }
   .v5w-char-grid { grid-template-columns: 1fr; }
   .v5w-modal-title { font-size: 17px; }
 }
+
+/* =========================================================================
+   V17 · V5 模板库：分类筛选 / 写实新模板徽章 / 3D 待生成
+   ========================================================================= */
+.v5w-tpl-filter { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-left: auto; }
+.v5w-tpl-filter .tpl-seg button { height: 22px; font-size: 9px; }
+
+.v5w-tpl-title .tpl-real-badge { flex: 0 0 auto; height: 16px; }
+
+.v5w-tpl-pending {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 20px;
+  padding: 0 8px;
+  border: 1px solid rgba(201, 162, 39, 0.35);
+  border-radius: 4px;
+  background: rgba(8, 9, 13, 0.72);
+  color: var(--c-gold-soft);
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.1em;
+  backdrop-filter: blur(4px);
+}
+
+@media (max-width: 860px) {
+  .v5w-tpl-filter { width: 100%; margin-left: 0; }
+}
+

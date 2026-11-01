@@ -1,10 +1,10 @@
 // V5 World · 成片画廊（3D-only）
-// 旧 16 支 2D 模板成片已归档到 outputs/_archive_v5_2d_finals/，「最早的视频成片」不再展示；
-// 本页唯一数据源：GET /api/cinema/templates（16 模板 3D 电影版），只播放 /media/templates_3d/<id>/final.mp4。
+// 旧 2D 成片已归档到 outputs/_archive_v5_2d_finals/，「最早的视频成片」不再展示；
+// 本页唯一数据源：GET /api/cinema/templates（V17 起含 real_* 新模板，数量/状态动态），只播放 /media/templates_3d/<id>/final.mp4。
 import { useEffect, useMemo, useState } from "react";
 import { mediaSrc } from "../../lib/v5";
 import type { CinemaTemplate } from "../../lib/cinema";
-import { fmtDuration, fmtSize } from "../../lib/cinema";
+import { TEMPLATE_3D_TOTAL, fmtDuration, fmtSize, isRealTemplate } from "../../lib/cinema";
 import type { V5PageProps } from "./V5World";
 import { IconAlert, IconClose, IconDownload, IconExternal, IconFilm, IconPlay, IconRefresh, IconSearch } from "../icons";
 import { Spinner } from "../ui";
@@ -59,6 +59,8 @@ export function V5Gallery({ catalog, templates3d, loading, error, onRefresh }: V
     const clipsTotal = templates.reduce((sum, template) => sum + (template.clips.total || 0), 0);
     return { total: templates.length, ready: ready.length, duration, size, clipsDone, clipsTotal };
   }, [templates]);
+  // 接口失败/无数据时用原 16 模板兜底展示（有数据时数量动态，含 real_* 新模板）
+  const displayTotal = stats.total || TEMPLATE_3D_TOTAL;
 
   useEffect(() => {
     if (!playing) return;
@@ -76,7 +78,7 @@ export function V5Gallery({ catalog, templates3d, loading, error, onRefresh }: V
           <span className="cm-kicker">GALLERY · 3D 成片画廊</span>
           <h1 className="cm-h1">成片画廊</h1>
           <p className="cm-sub">
-            {stats.total} 支模板的 3D 电影版 · 已就绪 {stats.ready}/{stats.total} · 本地 ComfyUI H3 全量重制 · 点击封面播放
+            {displayTotal} 支模板的 3D 电影版 · 已就绪 {stats.ready}/{displayTotal} · 本地 ComfyUI H3 全量重制 · 点击封面播放
           </p>
         </div>
         <div className="cm-head-actions">
@@ -95,7 +97,7 @@ export function V5Gallery({ catalog, templates3d, loading, error, onRefresh }: V
           <span className="st-kpi-label">3D Films</span>
           <div className="st-kpi-value is-gold">
             {stats.ready}
-            <small>/ {stats.total || 16}</small>
+            <small>/ {displayTotal}</small>
           </div>
           <div className="st-kpi-hint">3D 电影版已就绪</div>
         </div>
@@ -105,7 +107,7 @@ export function V5Gallery({ catalog, templates3d, loading, error, onRefresh }: V
             {fmtDuration(stats.duration)}
             <small>合计</small>
           </div>
-          <div className="st-kpi-hint">16 支 3D 成片总时长</div>
+          <div className="st-kpi-hint">已就绪 3D 成片总时长</div>
         </div>
         <div className="st-kpi">
           <span className="st-kpi-label">Volume</span>
@@ -225,6 +227,7 @@ function FilmCard({
       <div className="v5w-film-body">
         <div className="v5w-film-title">
           <b>{template.label}</b>
+          {isRealTemplate(template.id) && <span className="tpl-real-badge">写实</span>}
           <span className="cm-mono v5w-muted">{template.id}</span>
         </div>
         <div className="v5w-film-meta">

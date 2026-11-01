@@ -107,7 +107,7 @@ export function V5Scenes({ catalog, loading, error, onRefresh }: V5PageProps) {
             {stats.used}
             <small>/ {stats.total}</small>
           </div>
-          <div className="st-kpi-hint">被 16 模板引用</div>
+          <div className="st-kpi-hint">被模板引用</div>
         </div>
         <div className="st-kpi">
           <span className="st-kpi-label">Layers</span>

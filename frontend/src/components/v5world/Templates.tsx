@@ -1,15 +1,17 @@
-// V5 World · 模板库：16 个 AI 微综艺模板（风格 / 时长 / 画幅 / 幕结构 / 卡司），
+// V5 World · 模板库：V5 模板（风格 / 时长 / 画幅 / 幕结构 / 卡司；V17 起含 real_* 写实新模板，数量动态）
 // 可播放 3D 电影版、查看逐幕详情、一键进入渲染台。
 import { useEffect, useMemo, useState } from "react";
 import type { V5TemplateSummary } from "../../lib/v5";
 import { mediaSrc, previewUrl, v5api } from "../../lib/v5";
 import type { CinemaTemplate } from "../../lib/cinema";
-import { fmtDuration } from "../../lib/cinema";
+import { fmtDuration, isRealTemplate } from "../../lib/cinema";
 import type { V5PageProps } from "./V5World";
 import { IconAlert, IconClose, IconFilm, IconPlay, IconRefresh, IconSearch, IconSpark } from "../icons";
 import { Spinner } from "../ui";
 
 const HIDDEN_TEMPLATE_IDS = new Set(["relic_talk", "relic_talk_3d", "custom_holo_talk"]);
+
+type TemplateKindFilter = "all" | "classic" | "real";
 
 interface TemplateDetail {
   aspect?: number[];
@@ -21,6 +23,7 @@ interface TemplateDetail {
 export function V5Templates({ catalog, templates3d, loading, error, onRefresh, onRenderTemplate }: V5PageProps) {
   const [search, setSearch] = useState("");
   const [styleFilter, setStyleFilter] = useState("all");
+  const [kindFilter, setKindFilter] = useState<TemplateKindFilter>("all");
   const [detailId, setDetailId] = useState<string | null>(null);
 
   const styleLabel = useMemo(() => {
@@ -32,12 +35,39 @@ export function V5Templates({ catalog, templates3d, loading, error, onRefresh, o
   const templates = useMemo<V5TemplateSummary[]>(() => {
     const all = catalog?.templates || [];
     const show = all.filter((item) => !HIDDEN_TEMPLATE_IDS.has(item.id) && !item.custom);
-    return show.length ? show : all.filter((item) => !item.custom);
-  }, [catalog]);
+    const base = show.length ? show : all.filter((item) => !item.custom);
+    // V17：cinema 3D 模板里已出现、但 V5 catalog 尚未收录的写实新模板（real_*）补入展示，
+    // 这样模板数量与 3D 状态和 Cinema 侧一致（无 3D 时显示「待生成」，详情提示 V5 合同待补）。
+    const known = new Set(base.map((item) => item.id));
+    const extras: V5TemplateSummary[] = [];
+    for (const [id, tpl] of Object.entries(templates3d)) {
+      if (known.has(id) || HIDDEN_TEMPLATE_IDS.has(id) || !isRealTemplate(id)) continue;
+      extras.push({
+        id,
+        label: tpl.label || id,
+        style: tpl.style || "",
+        target_duration: 0,
+        act_ids: [],
+        act_count: 0,
+        cast: [],
+        scene_route: [],
+        tags: [],
+      });
+    }
+    return [...base, ...extras];
+  }, [catalog, templates3d]);
+
+  const realCount = useMemo(
+    () => templates.filter((item) => isRealTemplate(item.id)).length,
+    [templates],
+  );
+  const classicCount = Math.max(0, templates.length - realCount);
 
   const filtered = useMemo(() => {
     const keyword = search.trim().toLowerCase();
     return templates.filter((item) => {
+      if (kindFilter === "real" && !isRealTemplate(item.id)) return false;
+      if (kindFilter === "classic" && isRealTemplate(item.id)) return false;
       if (styleFilter !== "all" && item.style !== styleFilter) return false;
       if (!keyword) return true;
       const text = [item.id, item.label, item.style, ...(item.tags || []), ...(item.cast || []).map((cast) => cast.character)]
@@ -46,7 +76,7 @@ export function V5Templates({ catalog, templates3d, loading, error, onRefresh, o
         .toLowerCase();
       return text.includes(keyword);
     });
-  }, [search, styleFilter, templates]);
+  }, [kindFilter, search, styleFilter, templates]);
 
   const stats = useMemo(() => {
     const ready3d = templates.filter((item) => {
@@ -68,8 +98,9 @@ export function V5Templates({ catalog, templates3d, loading, error, onRefresh, o
           <span className="cm-kicker">TEMPLATES · 模板库</span>
           <h1 className="cm-h1">模板库</h1>
           <p className="cm-sub">
-            {stats.total} 个 AI 微综艺模板 · 3D 电影版 {stats.ready3d}/{stats.total} · 共 {stats.totalActs} 幕 · 平均{" "}
+            {stats.total} 个 V5 模板 · 3D 电影版 {stats.ready3d}/{stats.total} · 共 {stats.totalActs} 幕 · 平均{" "}
             {stats.avgDuration.toFixed(0)}s
+            {realCount > 0 ? ` · 写实 ${realCount} 支` : ""}
           </p>
         </div>
         <div className="cm-head-actions">
@@ -137,6 +168,26 @@ export function V5Templates({ catalog, templates3d, loading, error, onRefresh, o
             </option>
           ))}
         </select>
+        <div className="v5w-tpl-filter">
+          <div className="tpl-seg" role="group" aria-label="模板分类筛选">
+            {([
+              { id: "all" as TemplateKindFilter, label: "全部", count: templates.length },
+              { id: "classic" as TemplateKindFilter, label: "原 16 模板", count: classicCount },
+              { id: "real" as TemplateKindFilter, label: "写实新模板", count: realCount },
+            ]).map((filter) => (
+              <button
+                key={filter.id}
+                type="button"
+                className={kindFilter === filter.id ? "is-active" : ""}
+                onClick={() => setKindFilter(filter.id)}
+                aria-pressed={kindFilter === filter.id}
+              >
+                {filter.label}
+                <span className="tpl-seg-count">{filter.count}</span>
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="st-toolbar-right">
           <span className="v5w-count cm-mono">
             {filtered.length} / {templates.length}
@@ -172,10 +223,17 @@ export function V5Templates({ catalog, templates3d, loading, error, onRefresh, o
             const preview = previewUrl("templates", template.id, undefined, "640x360");
             const sources = ready3d ? [poster3d, preview] : [preview];
             return (
-              <article key={template.id} className={"v5w-tpl-card" + (ready3d ? " is-3d" : "")}>
+              <article
+                key={template.id}
+                className={
+                  "v5w-tpl-card" +
+                  (ready3d ? " is-3d" : "") +
+                  (isRealTemplate(template.id) ? " is-real" : "")
+                }
+              >
                 <div className="v5w-tpl-poster">
                   <PosterImage sources={sources} alt={template.label} className="v5w-tpl-img" fallback={template.label.slice(0, 2)} />
-                  {ready3d && <span className="v5w-badge3d">3D</span>}
+                  {ready3d ? <span className="v5w-badge3d">3D</span> : <span className="v5w-tpl-pending">3D 待生成</span>}
                   <span className="v5w-tpl-scene-route" title={(template.scene_route || []).join(" → ")}>
                     {(template.scene_route || [])
                       .slice(0, 4)
@@ -186,6 +244,7 @@ export function V5Templates({ catalog, templates3d, loading, error, onRefresh, o
                 <div className="v5w-tpl-body">
                   <div className="v5w-tpl-title">
                     <b>{template.label}</b>
+                    {isRealTemplate(template.id) && <span className="tpl-real-badge">写实</span>}
                     <span className="cm-mono v5w-muted">{template.id}</span>
                   </div>
                   <div className="v5w-tpl-meta">
@@ -323,10 +382,24 @@ function TemplateDetailModal({
               <Spinner size={15} /> 正在读取模板合同…
             </div>
           ) : error ? (
-            <div className="cm-error">
-              <IconAlert size={15} />
-              <span>模板详情读取失败：{error}</span>
-            </div>
+            isRealTemplate(id) ? (
+              <div className="v5w-empty">
+                <IconFilm size={26} />
+                <b style={{ color: "var(--c-gold-soft)", fontSize: 13, letterSpacing: "0.04em" }}>写实新模板 · 3D 待生成</b>
+                <p className="v5w-detail-desc">
+                  该模板的 V5 逐幕合同尚未提供（catalog 暂未收录），3D 样片也还在待生成队列；
+                  可在 Cinema 模板库查看进度并提交生成。
+                </p>
+                <a className="cm-btn cm-btn-sm" href="#/cinema/templates">
+                  <IconFilm size={12} /> 去 Cinema 模板库
+                </a>
+              </div>
+            ) : (
+              <div className="cm-error">
+                <IconAlert size={15} />
+                <span>模板详情读取失败：{error}</span>
+              </div>
+            )
           ) : (
             <>
               <p className="v5w-detail-desc">{detail?.description || "该模板没有描述"}</p>

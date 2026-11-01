@@ -489,8 +489,10 @@ export interface CinemaTemplateSeed {
   style: string;
 }
 
-/** 16 个 V5 模板的稳定顺序（与 pipeline/templates3d.py 的 TEMPLATES 一致）。
- *  后端模板库接口未就绪/缺项时，用它作占位顺序与 label 兜底 —— 不伪造任何进度数据。 */
+/** 原 16 个 V5 模板的稳定顺序（与 pipeline/templates3d.py 的 TEMPLATES 一致）。
+ *  只作为「接口未就绪/缺项」时的占位顺序与 label 兜底；后端新增模板（如 real_*）由
+ *  normalizeTemplatesResponse 动态返回、页面按 summary.total / templates.length 渲染，
+ *  这里不预置新增模板、也不伪造任何进度数据。 */
 export const TEMPLATE_3D_SEEDS: CinemaTemplateSeed[] = [
   { id: "tonight_show", label: "美式深夜秀", en: "TONIGHT SHOW", style: "neon_toon" },
   { id: "classics", label: "典籍", en: "CLASSICS", style: "woodblock_classic" },
@@ -511,6 +513,12 @@ export const TEMPLATE_3D_SEEDS: CinemaTemplateSeed[] = [
 ];
 
 export const TEMPLATE_3D_TOTAL = TEMPLATE_3D_SEEDS.length;
+
+/** V17 新增「写实人物场景」模板（real_street / real_cafe / real_kitchen …）识别：
+ *  以 id 前缀 real_ 为准，页面据此展示「写实」徽章与分类筛选。 */
+export function isRealTemplate(id: string | null | undefined): boolean {
+  return /^real_/i.test(String(id || "").trim());
+}
 
 export const TEMPLATE_STATUS_LABEL: Record<CinemaTemplateStatus, string> = {
   pending: "待生成",

@@ -1,0 +1,167 @@
+{
+  "id": "real_cafe",
+  "label": "咖啡对谈",
+  "version": 5,
+  "description": "V5 写实模板：咖啡对谈（白天咖啡馆对谈，风格 film_interview）",
+  "tags": [
+    "v5",
+    "film_interview",
+    "realistic"
+  ],
+  "style": "film_interview",
+  "target_duration": 34,
+  "aspect": [
+    16,
+    9
+  ],
+  "cast": [
+    {
+      "role": "host",
+      "character": "real_host",
+      "name": "沈舟"
+    },
+    {
+      "role": "figure_a",
+      "character": "real_cafe_owner",
+      "name": "周岚"
+    },
+    {
+      "role": "figure_b",
+      "character": "real_cafe_regular",
+      "name": "高远"
+    }
+  ],
+  "acts": [
+    {
+      "id": "act01",
+      "name": "第 1 幕",
+      "scene": "cafe_corner",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 4.8,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true,
+      "visual": "Morning light through a cafe window, dust motes in the air, a wooden table with two cups of coffee, the camera slowly pushes in from the window."
+    },
+    {
+      "id": "act02",
+      "name": "第 2 幕",
+      "scene": "cafe_corner",
+      "camera": "dolly",
+      "camera_strength": 0.1,
+      "duration": 5.808,
+      "line": "host",
+      "text": "上午的咖啡馆最适合聊天，光刚好，人也刚好。",
+      "characters": [
+        "host"
+      ],
+      "broll": false,
+      "visual": "Medium shot of a 38-year-old Chinese man in a dark coat sitting by the cafe window, warm daylight on his face, he speaks to camera while a cup of coffee steams on the wooden table."
+    },
+    {
+      "id": "act03",
+      "name": "第 3 幕",
+      "scene": "cafe_counter",
+      "camera": "handheld",
+      "camera_strength": 0.12,
+      "duration": 5.16,
+      "line": "figure_a",
+      "text": "开店五年，最常听见的一句话就是：再坐一会儿。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false,
+      "visual": "A 32-year-old Chinese woman with long hair in a sage shirt stands behind the cafe counter pouring a hand-drip coffee, warm pendant light above, she looks up and speaks to camera."
+    },
+    {
+      "id": "act04",
+      "name": "第 4 幕",
+      "scene": "cafe_counter",
+      "camera": "dolly",
+      "camera_strength": 0.1,
+      "duration": 4.6,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true,
+      "visual": "A barista pulls an espresso shot behind a wooden counter, steam rises, warm pendant lights over the bar, the camera glides along the counter past cups and coffee beans."
+    },
+    {
+      "id": "act05",
+      "name": "第 5 幕",
+      "scene": "cafe_sofa",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 5.232,
+      "line": "figure_b",
+      "text": "每周来三次，一杯手冲坐一下午，比开会管用。",
+      "characters": [
+        "figure_b"
+      ],
+      "broll": false,
+      "visual": "A 45-year-old Chinese man with glasses and a goatee sits on an old cafe sofa, holding a coffee cup, afternoon light from the side, he speaks to camera with a relaxed laugh."
+    },
+    {
+      "id": "act06",
+      "name": "第 6 幕",
+      "scene": "cafe_corner",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 4.944,
+      "line": "host",
+      "text": "咖啡不解决问题，它只是让人有勇气再想一遍。",
+      "characters": [
+        "host"
+      ],
+      "broll": false,
+      "visual": "Medium-close shot of the host at the cafe window, coffee cup in hand, soft daylight and blurred street outside; he speaks calmly to camera, then looks out of the window."
+    }
+  ],
+  "scenes": [
+    {
+      "id": "cafe_corner",
+      "label": "咖啡馆窗边座位",
+      "description": "真实咖啡馆窗边：木桌、咖啡杯、窗外的街与树影、上午斜射的自然光，安静适合聊天。"
+    },
+    {
+      "id": "cafe_counter",
+      "label": "咖啡馆吧台",
+      "description": "真实咖啡馆吧台：木吧台、咖啡机、吊灯、蒸汽、背后摆满豆罐与杯子，适合手冲与 B-roll。"
+    },
+    {
+      "id": "cafe_sofa",
+      "label": "咖啡馆沙发角",
+      "description": "真实咖啡馆沙发角：旧沙发、矮桌、暖灯、绿植，适合长时间对谈。"
+    }
+  ],
+  "closing_broll": {
+    "id": "v5_007",
+    "scene": "cafe_corner",
+    "camera": "pull_out",
+    "duration": 4.2,
+    "visual": "Final wide shot of the cafe corner in golden afternoon light: two empty cups, a hand turning a page, dust motes drifting, the camera slowly pulls back."
+  },
+  "packaging": {
+    "subtitle": "film_interview",
+    "transition": "film_interview",
+    "title": "咖啡对谈",
+    "end_card": "下期见"
+  },
+  "audio": {
+    "bgm": "jazz_piano",
+    "sfx": [
+      "whoosh",
+      "click"
+    ]
+  },
+  "lipsync": {
+    "mode": "viseme"
+  },
+  "meta": {
+    "source": "v17_real_templates",
+    "script_lines": 4,
+    "note": "白天咖啡馆对谈：窗边木桌 / 吧台 / 暖光"
+  }
+}

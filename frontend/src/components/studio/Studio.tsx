@@ -222,7 +222,7 @@ export function ProjectStudio({
             </button>
           ))}
           <div className="st-tabbar-right">
-            <a className="st-tab-link" href="#/cinema/templates" title="16 个模板的 3D 样片与制作进度">
+            <a className="st-tab-link" href="#/cinema/templates" title="模板的 3D 样片与制作进度">
               Cinema 3D ↗
             </a>
             <button type="button" className="st-tab-link" onClick={onBack}>

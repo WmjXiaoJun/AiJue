@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { V5RenderJob } from "../../lib/v5";
 import { v5api } from "../../lib/v5";
 import { fmtDuration, fmtSize } from "../../lib/cinema";
+import { TEMPLATE_3D_TOTAL } from "../../lib/cinema";
 import type { CinemaTemplate } from "../../lib/cinema";
 import type { V5PageProps } from "./V5World";
 import { IconAlert, IconCheck, IconFilm, IconPlay, IconRefresh, IconSpark } from "../icons";
@@ -204,7 +205,7 @@ export function V5Render({
           <h1 className="cm-h1">渲染台</h1>
           <p className="cm-sub">
             选模板 + 目标时长 → 提交 render_v5 后台任务（单并发）· {templates.length} 个模板可选 · 3D 电影版已就绪{" "}
-            {readyCount}/{total3d || 16}
+            {readyCount}/{total3d || TEMPLATE_3D_TOTAL}
           </p>
         </div>
         <div className="cm-head-actions">
@@ -227,7 +228,7 @@ export function V5Render({
           <span className="st-kpi-label">3D Ready</span>
           <div className="st-kpi-value is-jade">
             {readyCount}
-            <small>/ {total3d || 16}</small>
+            <small>/ {total3d || TEMPLATE_3D_TOTAL}</small>
           </div>
           <div className="st-kpi-hint">3D 电影版已就绪</div>
         </div>

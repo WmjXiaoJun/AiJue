@@ -55,11 +55,11 @@ export function CinemaStudio({ onExit }: { onExit: () => void }) {
     } catch {
       setWorkers(null);
     }
-    // 顶栏「模板 3D x/16」：模板库接口未就绪时静默降级（页面内另有完整错误态）
+    // 顶栏「模板 3D x/总数」：模板库接口未就绪时静默降级（页面内另有完整错误态）
     try {
       setTplSummary((await cinemaApi.templates()).summary);
     } catch {
-      /* 保持上一次统计 */
+      /* 保持上一次统计；首次失败时用 TEMPLATE_3D_TOTAL 兜底显示 */
     }
   }, []);
 
@@ -99,6 +99,8 @@ export function CinemaStudio({ onExit }: { onExit: () => void }) {
   const total = shots?.total ?? 56;
   const finalDur = overview?.final?.duration ?? 0;
   const activeJobs = overview?.jobs?.active ?? 0;
+  // V17：模板总数动态（后端新增 real_* 后自动 19；接口失败时保留原 16 fallback）
+  const tplTotal = tplSummary?.total || TEMPLATE_3D_TOTAL;
 
   const envState = useMemo(() => {
     if (!workers) return { label: "环境检测中", cls: "is-warn" as const };
@@ -186,13 +188,13 @@ export function CinemaStudio({ onExit }: { onExit: () => void }) {
               <b
                 style={{
                   color:
-                    tplSummary && tplSummary.done > 0 && tplSummary.done >= (tplSummary.total || TEMPLATE_3D_TOTAL)
+                    tplSummary && tplSummary.done > 0 && tplSummary.done >= tplTotal
                       ? "var(--c-jade)"
                       : "var(--c-gold-soft)",
                 }}
-                title="16 模板 3D 化完成数"
+                title={`${tplTotal} 个模板的 3D 化完成数`}
               >
-                {tplSummary ? `${tplSummary.done}/${tplSummary.total || TEMPLATE_3D_TOTAL}` : `—/${TEMPLATE_3D_TOTAL}`}
+                {tplSummary ? `${tplSummary.done}/${tplTotal}` : `—/${TEMPLATE_3D_TOTAL}`}
               </b>
               <span>模板 3D</span>
             </div>

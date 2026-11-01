@@ -1,0 +1,78 @@
+{
+ "template": "real_kitchen",
+ "style": "film_interview",
+ "look": "photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look",
+ "mode": "semantic",
+ "shots": [
+  {
+   "id": "v5_001",
+   "kind": "broll",
+   "scene": "kitchen_stove",
+   "duration": 4.8,
+   "line": "",
+   "semantic_visual": "",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in close on a real gas stove with a wok and rising steam. The camera surveys the space, atmospheric and cinematic. Camera: slow push-in toward the subject. photorealistic cinematic live-action quality, realistic human skin and materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: kitchen room tone, sizzling oil, a quiet night. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_002",
+   "kind": "dialogue",
+   "scene": "kitchen_home",
+   "duration": 5.712,
+   "line": "深夜的厨房，是这座城市最后的客厅，谁都能坐。",
+   "semantic_visual": "Wide shot of a warm, lived-in home kitchen at night; a man sits alone at a small table under a hanging lamp, empty chairs around him, soft amber light and quiet inviting mood.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. Featuring a real 38-year-old Chinese man, black hair, wearing a black coat with gold accents, with watch. The shot shows the idea through visible action: Wide shot of a warm, lived-in home kitchen at night; a man sits alone at a small table under a hanging lamp, empty chairs around him, soft amber light and quiet inviting mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. photorealistic cinematic live-action quality, realistic human skin and materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: kitchen room tone, sizzling oil, a quiet night. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_003",
+   "kind": "dialogue",
+   "scene": "kitchen_stove",
+   "duration": 4.8,
+   "line": "开火就行，想吃啥说一声，锅里正热着。",
+   "semantic_visual": "Close shot of a gas stove flame under a wok, steam rising into warm range-hood light; a weathered hand lifts the lid as glistening food sizzles, cozy and appetizing mood.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in close on a real gas stove with a wok and rising steam. Featuring a real 48-year-old Chinese man, black hair, wearing a black apron with red-brown accents. The shot shows the idea through visible action: Close shot of a gas stove flame under a wok, steam rising into warm range-hood light; a weathered hand lifts the lid as glistening food sizzles, cozy and appetizing mood.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: subtle handheld camera drift. photorealistic cinematic live-action quality, realistic human skin and materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: kitchen room tone, sizzling oil, a quiet night. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_004",
+   "kind": "broll",
+   "scene": "kitchen_table",
+   "duration": 4.6,
+   "line": "",
+   "semantic_visual": "",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real kitchen table with bowls of food, steam rising, warm lamp above. The camera surveys the space, atmospheric and cinematic. Camera: slow dolly move through the space. photorealistic cinematic live-action quality, realistic human skin and materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: kitchen room tone, sizzling oil, a quiet night. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_005",
+   "kind": "dialogue",
+   "scene": "kitchen_table",
+   "duration": 5.232,
+   "line": "加完班闻到这口热气，才觉得自己又活过来了。",
+   "semantic_visual": "Medium shot of a tired young man in work clothes sitting at a wooden table, steam curling from a hot bowl before him; he closes his eyes and breathes in, warm lamplight, relieved mood.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real kitchen table with bowls of food, steam rising, warm lamp above. Featuring a real 26-year-old Chinese man, spiky black hair, wearing a grey hoodie with purple accents, with glasses. The shot shows the idea through visible action: Medium shot of a tired young man in work clothes sitting at a wooden table, steam curling from a hot bowl before him; he closes his eyes and breathes in, warm lamplight, relieved mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. photorealistic cinematic live-action quality, realistic human skin and materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: kitchen room tone, sizzling oil, a quiet night. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_006",
+   "kind": "dialogue",
+   "scene": "kitchen_home",
+   "duration": 5.112,
+   "line": "一日三餐认真吃，就是普通人最了不起的坚持。",
+   "semantic_visual": "Wide shot of a modest home kitchen at night; a man sets a simple steaming meal on the table, pauses, then sits down to eat alone, warm pendant light, calm and earnest mood.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. Featuring a real 38-year-old Chinese man, black hair, wearing a black coat with gold accents, with watch. The shot shows the idea through visible action: Wide shot of a modest home kitchen at night; a man sets a simple steaming meal on the table, pauses, then sits down to eat alone, warm pendant light, calm and earnest mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. photorealistic cinematic live-action quality, realistic human skin and materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: kitchen room tone, sizzling oil, a quiet night. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_007",
+   "kind": "broll",
+   "scene": "kitchen_home",
+   "duration": 4.2,
+   "line": "",
+   "semantic_visual": "",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. The camera surveys the space, atmospheric and cinematic. Camera: slow crane rise. photorealistic cinematic live-action quality, realistic human skin and materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: kitchen room tone, sizzling oil, a quiet night. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  }
+ ]
+}

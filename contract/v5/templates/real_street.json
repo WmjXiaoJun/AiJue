@@ -1,0 +1,167 @@
+{
+  "id": "real_street",
+  "label": "城市夜访",
+  "version": 5,
+  "description": "V5 写实模板：城市夜访（夜间街头采访，风格 film_interview）",
+  "tags": [
+    "v5",
+    "film_interview",
+    "realistic"
+  ],
+  "style": "film_interview",
+  "target_duration": 35,
+  "aspect": [
+    16,
+    9
+  ],
+  "cast": [
+    {
+      "role": "host",
+      "character": "real_host",
+      "name": "沈舟"
+    },
+    {
+      "role": "figure_a",
+      "character": "real_street_runner",
+      "name": "陈野"
+    },
+    {
+      "role": "figure_b",
+      "character": "real_street_owner",
+      "name": "李静"
+    }
+  ],
+  "acts": [
+    {
+      "id": "act01",
+      "name": "第 1 幕",
+      "scene": "subway_exit",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 4.8,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true,
+      "visual": "Wide establishing shot at 11pm: the stairway mouth of a subway station glows warm, a stream of tired commuters climbs up into the neon night, the camera slowly pushes in through light drizzle."
+    },
+    {
+      "id": "act02",
+      "name": "第 2 幕",
+      "scene": "street_night",
+      "camera": "dolly",
+      "camera_strength": 0.1,
+      "duration": 4.944,
+      "line": "host",
+      "text": "这么晚还在街上走的人，心里多半都装着点事儿。",
+      "characters": [
+        "host"
+      ],
+      "broll": false,
+      "visual": "Medium shot of a 38-year-old Chinese man in a dark wool coat standing at the curb under a street lamp, speaking to camera; wet asphalt reflects red and cyan neon signs, passersby blur in the background."
+    },
+    {
+      "id": "act03",
+      "name": "第 3 幕",
+      "scene": "street_night",
+      "camera": "handheld",
+      "camera_strength": 0.14,
+      "duration": 5.424,
+      "line": "figure_a",
+      "text": "刚下班，出来走一走，才觉得这一天属于自己。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false,
+      "visual": "Close medium shot of a 27-year-old Chinese programmer in a grey hoodie and headphones, walking slowly along the wet street, neon light sliding across his tired face as he speaks."
+    },
+    {
+      "id": "act04",
+      "name": "第 4 幕",
+      "scene": "convenience_store",
+      "camera": "dolly",
+      "camera_strength": 0.1,
+      "duration": 4.6,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true,
+      "visual": "A 24-hour convenience store on a street corner, bright white interior light spilling onto the sidewalk, a customer pushes the glass door open, the camera glides past the entrance."
+    },
+    {
+      "id": "act05",
+      "name": "第 5 幕",
+      "scene": "convenience_store",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.0,
+      "line": "figure_b",
+      "text": "夜里的便利店最诚实，谁饿了、谁睡不着，全写在脸上。",
+      "characters": [
+        "figure_b"
+      ],
+      "broll": false,
+      "visual": "Inside the convenience store, a 34-year-old Chinese woman in a green work jacket behind the counter speaks while arranging goods; warm fluorescent light, shelves of snacks behind her."
+    },
+    {
+      "id": "act06",
+      "name": "第 6 幕",
+      "scene": "street_night",
+      "camera": "pan_left",
+      "camera_strength": 0.1,
+      "duration": 6.144,
+      "line": "host",
+      "text": "所以别怕晚归，街灯和便利店的热咖啡，都替我们留着。",
+      "characters": [
+        "host"
+      ],
+      "broll": false,
+      "visual": "Medium-wide shot of the host standing alone at the empty street corner, street lamps and the convenience store glowing behind him, he speaks to camera and gives a small smile."
+    }
+  ],
+  "scenes": [
+    {
+      "id": "street_night",
+      "label": "城市夜景街道",
+      "description": "真实中国城市夜景街道：湿沥青反光、霓虹招牌、路灯、远处行人与车流；适合街头采访与夜归 B-roll。"
+    },
+    {
+      "id": "subway_exit",
+      "label": "地铁口",
+      "description": "真实地铁站出入口：台阶、暖黄灯光、晚高峰后的人流、街边霓虹与广告灯箱。"
+    },
+    {
+      "id": "convenience_store",
+      "label": "24 小时便利店",
+      "description": "真实 24 小时便利店门口：玻璃门、店内明亮白光、货架、街边台阶，夜里是整条街最暖的一块光。"
+    }
+  ],
+  "closing_broll": {
+    "id": "v5_007",
+    "scene": "street_night",
+    "camera": "crane_up",
+    "duration": 4.2,
+    "visual": "Final wide shot rising above the night street: neon signs, wet asphalt and one late taxi passing, the city keeps its lights on."
+  },
+  "packaging": {
+    "subtitle": "film_interview",
+    "transition": "film_interview",
+    "title": "城市夜访",
+    "end_card": "下期见"
+  },
+  "audio": {
+    "bgm": "jazz_piano",
+    "sfx": [
+      "whoosh",
+      "click"
+    ]
+  },
+  "lipsync": {
+    "mode": "viseme"
+  },
+  "meta": {
+    "source": "v17_real_templates",
+    "script_lines": 4,
+    "note": "夜间城市街头采访：便利店门口 / 地铁口 / 霓虹街"
+  }
+}

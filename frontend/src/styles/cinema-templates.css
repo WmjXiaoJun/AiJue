@@ -913,3 +913,32 @@
   .cm-tpl-poster.is-generating::before,
   .v5-3d-entry-dot { animation: none; }
 }
+
+/* =========================================================================
+   V17 · 模板分类筛选 / 写实新模板
+   ========================================================================= */
+.cm-tpl-filter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 2px 0 14px;
+}
+.cm-tpl-filter-note {
+  margin-left: auto;
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  color: var(--c-mut);
+  white-space: nowrap;
+}
+
+/* 写实新模板（real_*）：卡片描边与占位渐变做一点区分，配合 .tpl-real-badge */
+.cm-tpl-card.is-real { border-color: rgba(201, 162, 39, 0.22); }
+.cm-tpl-card.is-real .cm-tpl-poster-fallback {
+  background:
+    radial-gradient(120% 120% at 20% 10%, rgba(201, 162, 39, 0.16), transparent 60%),
+    linear-gradient(160deg, rgba(28, 31, 40, 0.96), rgba(11, 13, 18, 0.98));
+}
+.cm-tpl-card.is-real .cm-tpl-poster-fallback i { color: var(--c-gold-soft); }
+.cm-tpl-card.is-real .cm-tpl-tags .tpl-real-badge { flex: none; }
+

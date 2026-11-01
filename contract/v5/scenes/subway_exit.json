@@ -1,0 +1,115 @@
+{
+  "id": "subway_exit",
+  "label": "地铁口",
+  "description": "真实地铁站出入口：台阶、暖黄灯光、晚高峰后的人流、街边霓虹与广告灯箱。",
+  "tags": [
+    "modern",
+    "realistic",
+    "street",
+    "subway",
+    "night"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "size": [
+    1600,
+    900
+  ],
+  "seed": 71702,
+  "layers": [
+    {
+      "type": "canvas",
+      "layer": "background",
+      "color": "bg:0"
+    },
+    {
+      "type": "sky_gradient",
+      "layer": "background",
+      "color": "shadow",
+      "opacity": 0.8
+    },
+    {
+      "type": "light_tunnel",
+      "layer": "background",
+      "color": "highlight",
+      "x": 0.5,
+      "y": 0.56,
+      "opacity": 0.75
+    },
+    {
+      "type": "arches",
+      "layer": "midground",
+      "color": "shadow",
+      "opacity": 0.55
+    },
+    {
+      "type": "stage_floor",
+      "layer": "midground",
+      "color": "bg:1",
+      "opacity": 0.9
+    },
+    {
+      "type": "crowd",
+      "layer": "midground",
+      "color": "shadow",
+      "opacity": 0.3
+    },
+    {
+      "type": "bokeh",
+      "layer": "background",
+      "color": "highlight",
+      "density": 0.25,
+      "opacity": 0.22
+    },
+    {
+      "type": "grain",
+      "layer": "foreground",
+      "opacity": 0.35
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.28
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.18,
+      0.1,
+      0.64,
+      0.84
+    ],
+    "close": [
+      0.3,
+      0.08,
+      0.42,
+      0.66
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.42,
+      0.94
+    ],
+    "figure_a": [
+      0.58,
+      0.95
+    ],
+    "figure_b": [
+      0.5,
+      0.95
+    ]
+  },
+  "variants": [
+    "rush_hour",
+    "late"
+  ]
+}

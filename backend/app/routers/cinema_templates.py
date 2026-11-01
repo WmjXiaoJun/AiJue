@@ -82,8 +82,8 @@ router = APIRouter(prefix="/api/cinema/templates", tags=["cinema-templates"])
 # --------------------------------------------------------------------------- #
 # 常量
 # --------------------------------------------------------------------------- #
-#: pipeline/templates3d.py 的 16 个模板（顺序即看板展示顺序）
-TEMPLATES: List[str] = [
+#: 历史 16 个模板（仅当 pipeline / contract 都读不到时兜底；正常路径见 _discover_template_ids）
+_LEGACY_TEMPLATE_IDS: List[str] = [
     "tonight_show",
     "classics",
     "history_talk",
@@ -101,7 +101,19 @@ TEMPLATES: List[str] = [
     "traitors",
     "history_mystery",
 ]
-TEMPLATE_SET = frozenset(TEMPLATES)
+
+#: V17 新增「写实人物场景」模板的桥接种子：
+#: 优先从 pipeline.templates3d.TEMPLATES / contract/v5/templates 动态发现；
+#: 若两者都尚未落地新 id，用这份种子保证看板先显示 19 项（真实来源出现后按 id 去重，种子自动失效）。
+_V17_REAL_TEMPLATE_BRIDGE: Tuple[str, ...] = ("real_street", "real_cafe", "real_kitchen")
+_REAL_TEMPLATE_PREFIX = "real_"
+_TEMPLATE_ID_RE = re.compile(r"^[a-z][a-z0-9_]{1,60}$")
+#: contract/v5/templates/<id>.json 还没落地时的临时中文名（有 contract 时以 contract 为准）
+_FALLBACK_TEMPLATE_LABELS: Dict[str, str] = {
+    "real_street": "城市夜访（写实）",
+    "real_cafe": "咖啡对谈（写实）",
+    "real_kitchen": "深夜食堂（写实）",
+}
 
 #: 模板级状态（progress.json 的 status 字段）
 STATUS_PENDING = "pending"
@@ -125,6 +137,80 @@ V5_ROOT = config.OUTPUTS_DIR / "templates_v5"
 BRIEFS_DIR = config.CONTRACT_DIR / "v5" / "cinema3d" / "templates3d"
 V5_TEMPLATE_CONTRACTS = config.CONTRACT_DIR / "v5" / "templates"
 
+
+def _pipeline_template_ids() -> List[str]:
+    """读 `pipeline.templates3d.TEMPLATES`（Lead 新增模板会追加在这里；失败返回 []）。"""
+    repo_root = Path(__file__).resolve().parents[3]
+    try:
+        if str(repo_root) not in sys.path:
+            sys.path.insert(0, str(repo_root))
+        from pipeline import templates3d  # noqa: PLC0415 - 延迟 import，避免影响服务启动
+
+        raw = getattr(templates3d, "TEMPLATES", None) or []
+        ids = [str(item).strip() for item in raw if str(item).strip()]
+        if ids:
+            logger.info("模板 3D 看板：从 pipeline.templates3d 读到 %d 个模板", len(ids))
+        return ids
+    except Exception as exc:  # noqa: BLE001 - pipeline 不可用时回落 contract/兜底
+        logger.warning("读取 pipeline.templates3d.TEMPLATES 失败（回落 contract/兜底）：%s", exc)
+        return []
+
+
+def _contract_template_ids() -> List[str]:
+    """从 `contract/v5/templates/*.json` 发现 3D 看板模板。
+
+    - 已有 3D 产物/3D brief（outputs/templates_3d/<id>、<id>.json 或 <id>_semantic.json）的模板；
+    - `real_*` 前缀（V17 写实人物场景模板约定）即使 3D 产物尚未生成也纳入。
+    """
+    if not V5_TEMPLATE_CONTRACTS.is_dir():
+        return []
+    found: List[str] = []
+    for path in sorted(V5_TEMPLATE_CONTRACTS.glob("*.json")):
+        tid = path.stem
+        if not _TEMPLATE_ID_RE.fullmatch(tid):
+            continue
+        if tid.startswith(_REAL_TEMPLATE_PREFIX):
+            found.append(tid)
+            continue
+        has_3d = (
+            (T3D_ROOT / tid).is_dir()
+            or (BRIEFS_DIR / f"{tid}.json").is_file()
+            or (BRIEFS_DIR / f"{tid}_semantic.json").is_file()
+        )
+        if has_3d:
+            found.append(tid)
+    return found
+
+
+def _discover_template_ids() -> List[str]:
+    """动态模板列表：pipeline.templates3d 优先 → contract/v5/templates → 历史 16 兜底。
+
+    顺序稳定（pipeline 顺序优先，contract 发现的新模板追加），并去重/校验 id 合法性。
+    """
+    ids: List[str] = list(_pipeline_template_ids())
+    for tid in _contract_template_ids():
+        if tid not in ids:
+            ids.append(tid)
+    if not ids:
+        ids = list(_LEGACY_TEMPLATE_IDS)
+    # V17：pipeline 与 contract 都尚未落地新模板时，桥接种子保证 19 项可先展示
+    for tid in _V17_REAL_TEMPLATE_BRIDGE:
+        if tid not in ids:
+            ids.append(tid)
+    seen = set()
+    result: List[str] = []
+    for tid in ids:
+        if tid in seen or not _TEMPLATE_ID_RE.fullmatch(tid):
+            continue
+        seen.add(tid)
+        result.append(tid)
+    logger.info("模板 3D 看板：%d 个模板（%s）", len(result), ",".join(result))
+    return result
+
+
+TEMPLATES: List[str] = _discover_template_ids()
+TEMPLATE_SET = frozenset(TEMPLATES)
+
 POSTER_FILENAME = "poster.jpg"
 MIN_SHOT_BYTES = 100 * 1024  # 有效镜头文件最小体积（与 pipeline/templates3d.py 一致）
 FINAL_CACHE_TTL = 5.0  # 成片 ffprobe 缓存秒数
@@ -133,8 +219,8 @@ DEFAULT_RESOLUTION = "768x432"
 #: 任务 kind（与 cinema3d.py 共用 _JOBS；这里补上中文标签）
 KIND_TEMPLATES_GENERATE = "templates_generate"
 KIND_TEMPLATES_ASSEMBLE = "templates_assemble"
-JOB_KIND_LABEL.setdefault(KIND_TEMPLATES_GENERATE, "16 模板 3D 生成")
-JOB_KIND_LABEL.setdefault(KIND_TEMPLATES_ASSEMBLE, "16 模板 3D 合成")
+JOB_KIND_LABEL.setdefault(KIND_TEMPLATES_GENERATE, "模板 3D 生成")
+JOB_KIND_LABEL.setdefault(KIND_TEMPLATES_ASSEMBLE, "模板 3D 合成")
 
 #: 生成任务互斥范围：本模板生成 + 原 relic 3D 的本地/云端生成（同一块 GPU）
 GENERATE_CONFLICT_KINDS = ("generate_local", "generate_cloud", KIND_TEMPLATES_GENERATE)
@@ -230,12 +316,16 @@ def _template_contract(tid: str) -> Dict[str, Any]:
 
 def _template_label(tid: str) -> str:
     label = str(_template_contract(tid).get("label") or "").strip()
-    return label or tid
+    return label or _FALLBACK_TEMPLATE_LABELS.get(tid, tid)
 
 
 def _template_style(tid: str) -> Optional[str]:
     style = _template_contract(tid).get("style")
-    return str(style) if style else None
+    if style:
+        return str(style)
+    # 新模板 contract 尚未落地时，语义 brief 里的 style 也可用
+    semantic_style = _load_semantic(tid).get("style")
+    return str(semantic_style) if semantic_style else None
 
 
 def _load_briefs(tid: str) -> Dict[str, Any]:
@@ -243,12 +333,28 @@ def _load_briefs(tid: str) -> Dict[str, Any]:
     return data if isinstance(data, dict) else {}
 
 
+def _load_semantic(tid: str) -> Dict[str, Any]:
+    """逐镜语义 brief（V17 写实模板/语义重做版）：`contract/v5/cinema3d/templates3d/<tid>_semantic.json`。"""
+    data = _JSON_CACHE.get(BRIEFS_DIR / f"{tid}_semantic.json")
+    return data if isinstance(data, dict) else {}
+
+
 def _expected_clip_total(tid: str) -> int:
-    """期望生成镜头数（不含 card）：优先 briefs，回落旧 v5 episode.json。"""
+    """期望生成镜头数（不含 card）：优先 briefs，其次 semantic briefs，最后旧 v5 episode.json。"""
     briefs = _load_briefs(tid)
     shots = briefs.get("shots")
     if isinstance(shots, list):
         total = sum(1 for item in shots if isinstance(item, dict) and item.get("prompt"))
+        if total:
+            return total
+    semantic = _load_semantic(tid)
+    semantic_shots = semantic.get("shots")
+    if isinstance(semantic_shots, list):
+        total = sum(
+            1
+            for item in semantic_shots
+            if isinstance(item, dict) and str(item.get("kind") or "").lower() != "card"
+        )
         if total:
             return total
     episode = _JSON_CACHE.get(V5_ROOT / tid / "work" / "episode.json")
@@ -484,6 +590,59 @@ def _old_poster_url(tid: str) -> Optional[str]:
     return None
 
 
+#: contract 模板里可能声明的海报字段（V17 新模板/后续模板可直接在 JSON 里挂图）
+_CONTRACT_POSTER_KEYS = (
+    "poster",
+    "poster_url",
+    "cover",
+    "cover_url",
+    "thumbnail",
+    "thumbnail_url",
+    "image",
+    "image_url",
+    "preview",
+    "preview_url",
+)
+
+
+def _resolve_served_media_url(raw: Any) -> Optional[str]:
+    """把 contract 里的图片路径/URL 解析成 `/media/...`（只有 outputs/ 内文件可被静态服务）。"""
+    text = str(raw or "").strip()
+    if not text:
+        return None
+    if text.startswith(f"{config.MEDIA_URL_PREFIX}/"):
+        return text
+    path = Path(text)
+    candidates = [path] if path.is_absolute() else [config.REPO_ROOT / text, config.OUTPUTS_DIR / text]
+    for candidate in candidates:
+        try:
+            if not candidate.is_file() or candidate.stat().st_size <= 0:
+                continue
+            relative = candidate.resolve().relative_to(config.OUTPUTS_DIR.resolve())
+            return _media_url(relative.as_posix())
+        except (OSError, ValueError):
+            continue
+    return None
+
+
+def _contract_poster_url(tid: str) -> Optional[str]:
+    """contract/v5/templates/<id>.json 内声明的海报（无 3D 海报时的回落之一）。"""
+    contract = _template_contract(tid)
+    for key in _CONTRACT_POSTER_KEYS:
+        url = _resolve_served_media_url(contract.get(key))
+        if url:
+            return url
+    for parent_key in ("packaging", "meta", "assets"):
+        parent = contract.get(parent_key)
+        if not isinstance(parent, dict):
+            continue
+        for key in _CONTRACT_POSTER_KEYS:
+            url = _resolve_served_media_url(parent.get(key))
+            if url:
+                return url
+    return None
+
+
 def _generate_poster(tid: str) -> bool:
     """用 ffmpeg 从 final.mp4 抽一帧做海报（同目录临时文件 + os.replace 原子落盘）。"""
     final = _final_path(tid)
@@ -567,7 +726,7 @@ def _enqueue_poster(tid: str) -> None:
 
 def _poster_url(tid: str, final_exists: bool, allow_generate: bool) -> Optional[str]:
     """海报 URL：优先 3D poster.jpg；成片已出但海报未生成时抽帧（列表异步/详情同步）；
-    成片还没出来时回落到旧 2D 产物，避免卡片空图。"""
+    成片还没出来时回落到 contract 声明的海报 / 旧 2D 产物；都没有返回 None（前端显示占位，不 500）。"""
     if _poster_exists(tid):
         return _t3d_media(tid, POSTER_FILENAME)
     if final_exists:
@@ -576,7 +735,7 @@ def _poster_url(tid: str, final_exists: bool, allow_generate: bool) -> Optional[
                 return _t3d_media(tid, POSTER_FILENAME)
         else:
             _enqueue_poster(tid)
-    return _old_poster_url(tid)
+    return _contract_poster_url(tid) or _old_poster_url(tid)
 
 
 def _report_url(tid: str) -> Optional[str]:
@@ -730,6 +889,8 @@ def _shot_status(kind: str, clip: Dict[str, Any], valid: bool) -> str:
 def _shots_detail(tid: str, progress: Dict[str, Any]) -> List[Dict[str, Any]]:
     briefs = _load_briefs(tid)
     brief_shots = briefs.get("shots") if isinstance(briefs.get("shots"), list) else []
+    semantic = _load_semantic(tid)
+    semantic_shots = semantic.get("shots") if isinstance(semantic.get("shots"), list) else []
     episode = _JSON_CACHE.get(V5_ROOT / tid / "work" / "episode.json")
     episode_index: Dict[str, Dict[str, Any]] = {}
     if isinstance(episode, dict) and isinstance(episode.get("shots"), list):
@@ -737,8 +898,14 @@ def _shots_detail(tid: str, progress: Dict[str, Any]) -> List[Dict[str, Any]]:
             if isinstance(item, dict) and item.get("id") is not None:
                 episode_index[str(item["id"])] = item
     source: List[Dict[str, Any]] = []
+    source_kind = "episode"
     if brief_shots:
         source = [item for item in brief_shots if isinstance(item, dict)]
+        source_kind = "briefs"
+    elif semantic_shots:
+        # V17 新模板/语义版：shots 来自 <tid>_semantic.json（可能只有语义字段，无落盘镜头）
+        source = [item for item in semantic_shots if isinstance(item, dict)]
+        source_kind = "semantic"
     else:
         source = list(episode_index.values())
 
@@ -772,26 +939,33 @@ def _shots_detail(tid: str, progress: Dict[str, Any]) -> List[Dict[str, Any]]:
         planned = item.get("duration")
         if planned is None:
             planned = fallback.get("duration")
+        if planned is None and raw_kind == "card":
+            # 卡片镜在 briefs/semantic 里没有 duration：按 v5 惯例 1.4/1.6s
+            planned = 1.4 if "title" in sid else 1.6
         try:
             planned_duration = round(float(planned), 3) if planned is not None else 0.0
         except (TypeError, ValueError):
             planned_duration = 0.0
         scene = item.get("scene") or fallback.get("scene")
-        shots.append(
-            {
-                "id": sid,
-                "kind": raw_kind,
-                "scene": str(scene) if scene else None,
-                "duration": planned_duration,
-                "status": status,
-                "url": _t3d_media(tid, f"shots/{sid}.mp4"),
-                "valid": bool(valid),
-                "seconds": round(float(probed), 2) if probed else None,
-                "prompt_id": clip.get("prompt_id"),
-                "error": str(clip.get("error"))[:400] if clip.get("error") else None,
-                "meta": _shot_meta_view(tid, sid, clip),
-            }
-        )
+        entry: Dict[str, Any] = {
+            "id": sid,
+            "kind": raw_kind,
+            "scene": str(scene) if scene else None,
+            "duration": planned_duration,
+            "status": status,
+            "url": _t3d_media(tid, f"shots/{sid}.mp4"),
+            "valid": bool(valid),
+            "seconds": round(float(probed), 2) if probed else None,
+            "prompt_id": clip.get("prompt_id"),
+            "error": str(clip.get("error"))[:400] if clip.get("error") else None,
+            "meta": _shot_meta_view(tid, sid, clip),
+        }
+        if source_kind == "semantic":
+            # 语义 brief 的额外字段：前端抽屉可直接展示「台词 / 语义画面 / 景别」
+            for extra in ("line", "semantic_visual", "framing"):
+                if item.get(extra):
+                    entry[extra] = item[extra]
+        shots.append(entry)
     return shots
 
 
@@ -1388,7 +1562,7 @@ def start_generate(payload: TemplateGenerateRequest) -> Dict[str, Any]:
         _mode="generate",
         _timeout=GENERATE_TIMEOUT_SECONDS,
         _templates=list(tids),
-        message=f"16 模板 3D 生成排队中（{len(tids)} 个模板）",
+        message=f"模板 3D 生成排队中（{len(tids)} 个模板）",
         templates=list(tids),
         force=force,
         resolution=resolution,
@@ -1443,7 +1617,7 @@ def start_assemble(payload: TemplateAssembleRequest) -> Dict[str, Any]:
                 status_code=409,
                 detail=(
                     f"后台 assemble-watch 守护正在运行（PID {watcher_pids[0]}），"
-                    "force 合成会和守护抢同一个成片；请等守护结束（16 模板全部 done 后自动退出）再 force 合成"
+                    "force 合成会和守护抢同一个成片；请等守护结束（全部模板 done 后自动退出）再 force 合成"
                 ),
             )
         if watcher_pids:
@@ -1461,7 +1635,7 @@ def start_assemble(payload: TemplateAssembleRequest) -> Dict[str, Any]:
         _mode="assemble",
         _timeout=ASSEMBLE_TIMEOUT_SECONDS,
         _templates=list(tids),
-        message=f"16 模板 3D 合成排队中（{len(tids)} 个模板）",
+        message=f"模板 3D 合成排队中（{len(tids)} 个模板）",
         templates=list(tids),
         force=force,
         dry_run=dry_run,
@@ -1507,5 +1681,5 @@ def get_template(tid: str, response: Response) -> Dict[str, Any]:
     progress = _load_progress()
     view = _template_view(key, progress, allow_poster_generate=True)
     view["shots"] = _shots_detail(key, progress)
-    view["look"] = _load_briefs(key).get("look")
+    view["look"] = _load_briefs(key).get("look") or _load_semantic(key).get("look")
     return view

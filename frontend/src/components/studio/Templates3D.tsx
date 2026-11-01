@@ -1,6 +1,6 @@
 // V11 Project Studio · 06 3D 模板（3D TEMPLATE）
-// 项目节目模板 ↔ 16 模板 3D 样片打通，全部真实 API：
-// - GET  /api/cinema/templates                16 模板总表 + summary + jobs
+// 项目节目模板 ↔ 模板 3D 样片打通，全部真实 API：
+// - GET  /api/cinema/templates                模板总表 + summary + jobs
 // - GET  /api/cinema/templates/{tid}          当前模板详情（逐镜 / 成片 / QC）
 // - GET  /media/templates_3d/{tid}/report.json 成片 probe（分辨率 / 帧率 / 转场 / BGM）
 // - POST /api/cinema/templates/generate       重新生成该模板 3D（本地 GPU）
@@ -443,7 +443,7 @@ export function StudioTemplates3D({ project, episode, onProjectFormatChange }: T
             {refreshing ? <Spinner size={13} /> : <IconRefresh size={14} />}
             {refreshing ? "刷新中…" : "刷新"}
           </button>
-          <a className="cm-btn cm-btn-primary" href={LIBRARY_HREF} title="打开 Cinema Studio 的 16 模板 3D 制作进度页">
+          <a className="cm-btn cm-btn-primary" href={LIBRARY_HREF} title="打开 Cinema Studio 的模板 3D 制作进度页">
             <IconExternal size={14} />
             Cinema 模板库
           </a>
@@ -462,7 +462,7 @@ export function StudioTemplates3D({ project, episode, onProjectFormatChange }: T
             {doneCount === null ? "—" : doneCount}
             <small>/ {totalTemplates}</small>
           </div>
-          <div className="st-kpi-hint">16 支 3D 电影感样片</div>
+          <div className="st-kpi-hint">共 {totalTemplates} 个 3D 模板 · 已完成 {doneCount === null ? "—" : doneCount}</div>
         </div>
         <div className="st-kpi">
           <span className="st-kpi-label">3D 镜头</span>
@@ -491,7 +491,7 @@ export function StudioTemplates3D({ project, episode, onProjectFormatChange }: T
           <IconAlert size={15} />
           <span>
             模板库接口失败：{error}
-            {loaded ? "" : "（下方为 16 模板占位结构，3D 进度不可用）"}
+            {loaded ? "" : "（下方为模板占位结构，3D 进度不可用）"}
           </span>
           <button type="button" className="cm-btn cm-btn-sm" onClick={() => void refreshAll()}>
             重试
@@ -503,7 +503,7 @@ export function StudioTemplates3D({ project, episode, onProjectFormatChange }: T
         <section className="st-panel">
           <div className="st-panel-body">
             <div className="st-loading">
-              <Spinner size={14} /> 读取 16 模板 3D 数据…
+              <Spinner size={14} /> 读取模板 3D 数据…
             </div>
           </div>
         </section>
@@ -536,7 +536,7 @@ export function StudioTemplates3D({ project, episode, onProjectFormatChange }: T
                     当前项目模板（<span className="cm-mono">{formatId || "—"}</span>）没有对应的 3D 模板
                   </span>
                   <span className="st-hint">
-                    16 个 3D 模板对应 format_id = &lt;模板 id&gt;{FORMAT_SUFFIX}；可在下方网格把项目切到有 3D 样片的模板。
+                    {totalTemplates} 个 3D 模板对应 format_id = &lt;模板 id&gt;{FORMAT_SUFFIX}；可在下方网格把项目切到有 3D 样片的模板。
                   </span>
                   <a className="cm-btn cm-btn-sm" href={LIBRARY_HREF}>
                     去模板库
@@ -695,7 +695,7 @@ export function StudioTemplates3D({ project, episode, onProjectFormatChange }: T
               {!currentTemplateId ? (
                 <div className="st-empty">
                   <span>当前项目模板没有对应的 3D 模板</span>
-                  <span className="st-hint">在下方 16 模板网格里切换到有 3D 样片的模板后再查看 QC。</span>
+                  <span className="st-hint">在下方模板网格里切换到有 3D 样片的模板后再查看 QC。</span>
                   <a className="cm-btn cm-btn-sm" href={LIBRARY_HREF}>
                     去模板库
                   </a>
@@ -785,11 +785,11 @@ export function StudioTemplates3D({ project, episode, onProjectFormatChange }: T
             </div>
           </section>
 
-          {/* ---------------- 3. 16 模板切换网格 ---------------- */}
+          {/* ---------------- 3. 模板切换网格 ---------------- */}
           <section className="st-panel">
             <div className="st-panel-head">
               <div>
-                <h3 className="st-panel-title">16 模板 · 3D 成片</h3>
+                <h3 className="st-panel-title">{totalTemplates} 模板 · 3D 成片</h3>
                 <p className="st-panel-sub">点击海报预览 3D 样片 · 切换为本项目模板 · 重新生成 3D</p>
               </div>
               <div className="st-panel-right">
@@ -908,7 +908,7 @@ export function StudioTemplates3D({ project, episode, onProjectFormatChange }: T
                   <b>
                     {clipsTotal === null ? "—" : clipsTotal} 镜 × {totalTemplates} 模板
                   </b>
-                  <em>16 支 31–42s 演示片，含字幕 / BGM / 风格包装 / 统一 loudnorm</em>
+                  <em>31–42s 演示片，含字幕 / BGM / 风格包装 / 统一 loudnorm</em>
                 </div>
                 <div className="st-tpl3d-note">
                   <span className="st-kpi-label">当前状态</span>
@@ -964,11 +964,11 @@ export function StudioTemplates3D({ project, episode, onProjectFormatChange }: T
               </table>
 
               <ul className="st-tpl3d-rules">
-                <li>3D 模板样片是 16 个节目模板统一重制的 31–42s 演示片，不是当期成片；当期成片请在「成片房」渲染。</li>
+                <li>3D 模板样片是节目模板统一重制的 31–42s 演示片，不是当期成片；当期成片请在「成片房」渲染。</li>
                 <li>
                   切换项目模板只改 <span className="cm-mono">format_id</span>，不会自动重建已写的台本 / 分镜 / 资产。
                 </li>
-                <li>重新生成占用本地 GPU（16 模板全量约 120 镜、2–2.5 小时），同一时间只允许一个 3D 生成 / 合成任务。</li>
+                <li>重新生成占用本地 GPU（全量模板约 2–2.5 小时），同一时间只允许一个 3D 生成 / 合成任务。</li>
               </ul>
             </div>
           </section>

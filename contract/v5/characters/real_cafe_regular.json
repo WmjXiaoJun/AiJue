@@ -1,0 +1,60 @@
+{
+  "id": "real_cafe_regular",
+  "label": "高远",
+  "era": "modern",
+  "realistic": true,
+  "tags": [
+    "v5",
+    "modern",
+    "realistic",
+    "cafe"
+  ],
+  "persona": "建筑设计师，中年转行做木工；话多但真诚，爱把人生比作结构，说一半会自己笑。",
+  "bio": "45 岁，咖啡馆常客，每周来三次的熟客。",
+  "role_pool": [
+    "figure_b",
+    "guest_b",
+    "expert"
+  ],
+  "voice": {
+    "provider": "edge",
+    "voice_id": "zh-CN-YunjianNeural",
+    "instruction": "45 岁男性，浑厚放松，语速中等，带笑意"
+  },
+  "appearance": {
+    "gender": "male",
+    "age": 45,
+    "skin": "#E2BE9C",
+    "hair": "#4B4A47",
+    "hair_style": "short_swept",
+    "eye": "#322821",
+    "brow": "thick",
+    "beard": "goatee",
+    "outfit": {
+      "type": "shirt",
+      "main": "#5A6A78",
+      "accent": "#C97B3D",
+      "shirt": "#EDE8DE"
+    },
+    "accessories": [
+      "glasses",
+      "watch"
+    ],
+    "marks": []
+  },
+  "poses": [
+    "front",
+    "side",
+    "sit",
+    "talk"
+  ],
+  "mouth": [
+    "closed",
+    "a",
+    "o",
+    "e",
+    "i",
+    "u",
+    "m"
+  ]
+}

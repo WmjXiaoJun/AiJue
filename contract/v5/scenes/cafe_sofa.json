@@ -1,0 +1,130 @@
+{
+  "id": "cafe_sofa",
+  "label": "咖啡馆沙发角",
+  "description": "真实咖啡馆沙发角：旧沙发、矮桌、暖灯、绿植，适合长时间对谈。",
+  "tags": [
+    "modern",
+    "realistic",
+    "cafe",
+    "sofa",
+    "cozy"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "size": [
+    1600,
+    900
+  ],
+  "seed": 71706,
+  "layers": [
+    {
+      "type": "canvas",
+      "layer": "background",
+      "color": "paper"
+    },
+    {
+      "type": "window_light",
+      "layer": "background",
+      "color": "highlight",
+      "x": 0.68,
+      "y": 0.3,
+      "size": 0.5,
+      "opacity": 0.45
+    },
+    {
+      "type": "curtains",
+      "layer": "foreground",
+      "color": "accent:1",
+      "x": 0.08,
+      "opacity": 0.45
+    },
+    {
+      "type": "sofa_set",
+      "layer": "midground",
+      "color": "accent:1",
+      "x": 0.5,
+      "y": 0.8,
+      "opacity": 0.9
+    },
+    {
+      "type": "desk",
+      "layer": "midground",
+      "color": "wood",
+      "x": 0.48,
+      "y": 0.92,
+      "width": 0.4
+    },
+    {
+      "type": "desk_lamp",
+      "layer": "midground",
+      "color": "highlight",
+      "x": 0.26,
+      "y": 0.4,
+      "opacity": 0.65
+    },
+    {
+      "type": "shelves",
+      "layer": "background",
+      "color": "wood",
+      "x": 0.86,
+      "y": 0.44,
+      "opacity": 0.5
+    },
+    {
+      "type": "bokeh",
+      "layer": "background",
+      "color": "highlight",
+      "density": 0.24,
+      "opacity": 0.22
+    },
+    {
+      "type": "grain",
+      "layer": "foreground",
+      "opacity": 0.3
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.24
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.18,
+      0.1,
+      0.64,
+      0.84
+    ],
+    "close": [
+      0.3,
+      0.08,
+      0.42,
+      0.66
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.36,
+      0.95
+    ],
+    "figure_a": [
+      0.6,
+      0.95
+    ],
+    "figure_b": [
+      0.64,
+      0.95
+    ]
+  },
+  "variants": [
+    "afternoon"
+  ]
+}

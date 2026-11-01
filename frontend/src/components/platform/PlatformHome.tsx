@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Episode, Job, Project } from "../../types";
 import { api, mediaUrl } from "../../lib/api";
-import { cinemaApi } from "../../lib/cinema";
+import { cinemaApi, isRealTemplate } from "../../lib/cinema";
 import type { CinemaTemplate, CinemaTemplatesResponse } from "../../lib/cinema";
 import { TEMPLATES, templateLabel } from "../../lib/templates";
 import { EPISODE_STATUS_TEXT, JOB_TYPE_TEXT, fmtDateTime, relativeTime, isActiveJob } from "../../lib/studio";
@@ -140,6 +140,7 @@ export function PlatformHome({
 
   const tplSummary = tpl?.summary;
   const tplDone = tplSummary?.done ?? 0;
+  // V17：3D 模板总数动态（16 → 19+）；接口失败时保留原 16 fallback
   const tplTotal = tplSummary?.total ?? 16;
   const activeJobs = jobs.filter(isActiveJob).length;
 
@@ -337,7 +338,7 @@ export function PlatformHome({
                   <button type="button" className="pl-project pl-project-new" onClick={() => setNewOpen(true)}>
                     <IconPlus />
                     <b>新建项目</b>
-                    <span>从 16 个节目模板开始</span>
+                    <span>从 {TEMPLATES.length} 个节目模板开始</span>
                   </button>
                 </div>
               </section>
@@ -345,7 +346,7 @@ export function PlatformHome({
               <div className="pl-two-col">
                 <section className="pl-panel">
                   <div className="pl-sec-head">
-                    <h2 className="pl-h2">16 模板 · 3D 影库</h2>
+                    <h2 className="pl-h2">{tplTotal} 模板 · 3D 影库</h2>
                     <span className="pl-sec-sub">已完成 {tplDone}/{tplTotal}</span>
                     <a className="cm-btn cm-btn-ghost cm-btn-sm pl-sec-action" href="#/cinema/templates">
                       全部 {tplTotal} 支 →
@@ -360,11 +361,23 @@ export function PlatformHome({
                           ) : (
                             <span className="pl-tpl-letter">{String(item.label || "?").slice(0, 1)}</span>
                           )}
-                          <span className={`pl-tpl-badge ${item.status === "done" ? "is-done" : ""}`}>
-                            {item.status === "done" ? "3D" : `${item.clips?.done ?? 0}/${item.clips?.total ?? 0}`}
+                          <span
+                            className={
+                              "pl-tpl-badge " +
+                              (item.status === "done" ? "is-done" : item.status === "pending" ? "is-pending" : "")
+                            }
+                          >
+                            {item.status === "done"
+                              ? "3D"
+                              : item.status === "pending"
+                                ? "待生成"
+                                : `${item.clips?.done ?? 0}/${item.clips?.total ?? 0}`}
                           </span>
                         </div>
-                        <div className="pl-tpl-name">{item.label}</div>
+                        <div className="pl-tpl-name-line">
+                          <div className="pl-tpl-name">{item.label}</div>
+                          {isRealTemplate(item.id) && <span className="tpl-real-badge">写实</span>}
+                        </div>
                         <div className="pl-tpl-sub cm-mono">{item.id}</div>
                       </a>
                     ))}

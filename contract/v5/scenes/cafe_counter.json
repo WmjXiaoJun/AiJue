@@ -1,0 +1,121 @@
+{
+  "id": "cafe_counter",
+  "label": "咖啡馆吧台",
+  "description": "真实咖啡馆吧台：木吧台、咖啡机、吊灯、蒸汽、背后摆满豆罐与杯子，适合手冲与 B-roll。",
+  "tags": [
+    "modern",
+    "realistic",
+    "cafe",
+    "counter",
+    "warm"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "size": [
+    1600,
+    900
+  ],
+  "seed": 71705,
+  "layers": [
+    {
+      "type": "canvas",
+      "layer": "background",
+      "color": "bg:1"
+    },
+    {
+      "type": "shelves",
+      "layer": "background",
+      "color": "wood",
+      "x": 0.5,
+      "y": 0.34,
+      "opacity": 0.8
+    },
+    {
+      "type": "kitchen_counter",
+      "layer": "midground",
+      "color": "wood",
+      "x": 0.5,
+      "y": 0.78,
+      "opacity": 0.95
+    },
+    {
+      "type": "monitor",
+      "layer": "midground",
+      "color": "paper",
+      "x": 0.18,
+      "y": 0.62,
+      "opacity": 0.5
+    },
+    {
+      "type": "desk_lamp",
+      "layer": "midground",
+      "color": "highlight",
+      "x": 0.5,
+      "y": 0.2,
+      "opacity": 0.7
+    },
+    {
+      "type": "smoke",
+      "layer": "foreground",
+      "color": "paper",
+      "opacity": 0.25
+    },
+    {
+      "type": "bokeh",
+      "layer": "background",
+      "color": "highlight",
+      "density": 0.3,
+      "opacity": 0.24
+    },
+    {
+      "type": "grain",
+      "layer": "foreground",
+      "opacity": 0.3
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.24
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.18,
+      0.1,
+      0.64,
+      0.84
+    ],
+    "close": [
+      0.3,
+      0.08,
+      0.42,
+      0.66
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.42,
+      0.95
+    ],
+    "figure_a": [
+      0.56,
+      0.95
+    ],
+    "figure_b": [
+      0.62,
+      0.95
+    ]
+  },
+  "variants": [
+    "morning",
+    "afternoon"
+  ]
+}
