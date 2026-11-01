@@ -19,3 +19,8 @@ backend/data/llm.env
 
 # local model weights (Breeze TTS 2 etc.)
 local_models/
+
+# runtime database side files（不入库，db 主文件保留）
+backend/data/*.db-wal
+backend/data/*.db-shm
+backend/data/jobs/

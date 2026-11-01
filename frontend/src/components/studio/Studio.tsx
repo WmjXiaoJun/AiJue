@@ -1,0 +1,266 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { Episode, Job, Project, Shot } from "../../types";
+import type { StudioTabKey } from "../../lib/studio";
+import { STUDIO_TABS, EPISODE_STATUS_TEXT, fmtClock, fmtMoney, isActiveJob, studioApi, toneOfStatus } from "../../lib/studio";
+import { useToast } from "../Toast";
+import { Spinner } from "../ui";
+import { StudioScripts } from "./Scripts";
+import { StudioAssets } from "./Assets";
+import { StudioStoryboard } from "./Storyboard";
+import { StudioRender } from "./Render";
+import { StudioFinishing } from "./Finishing";
+import "../../styles/studio.css";
+
+interface Props {
+  project: Project;
+  episode: Episode;
+  episodes: Episode[];
+  tab: StudioTabKey;
+  onTabChange: (tab: StudioTabKey) => void;
+  onBack: () => void;
+  onEpisodeUpdate: (episode: Episode) => void;
+  onSwitchEpisode: (eid: string) => void;
+}
+
+export function ProjectStudio({
+  project,
+  episode: initialEpisode,
+  episodes,
+  tab,
+  onTabChange,
+  onBack,
+  onEpisodeUpdate,
+  onSwitchEpisode,
+}: Props) {
+  const notify = useToast();
+  const [episode, setEpisode] = useState<Episode>(initialEpisode);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [shots, setShots] = useState<Shot[]>([]);
+  const [costTotal, setCostTotal] = useState<number>(Number(initialEpisode.cost) || 0);
+  const [refreshing, setRefreshing] = useState(false);
+  const [switching, setSwitching] = useState(false);
+  const episodeIdRef = useRef(initialEpisode.id);
+
+  useEffect(() => {
+    if (episodeIdRef.current !== initialEpisode.id) {
+      episodeIdRef.current = initialEpisode.id;
+      setEpisode(initialEpisode);
+      setSwitching(false);
+    } else {
+      setEpisode(initialEpisode);
+    }
+  }, [initialEpisode]);
+
+  const applyEpisode = useCallback(
+    (next: Episode) => {
+      setEpisode(next);
+      onEpisodeUpdate(next);
+    },
+    [onEpisodeUpdate],
+  );
+
+  const loadOverview = useCallback(async () => {
+    const [jobsRes, shotsRes, costRes] = await Promise.allSettled([
+      studioApi.jobs({ episode_id: episode.id }),
+      studioApi.shots(episode.id),
+      studioApi.costs(episode.id),
+    ]);
+    if (jobsRes.status === "fulfilled") setJobs(jobsRes.value);
+    if (shotsRes.status === "fulfilled") setShots(shotsRes.value);
+    if (costRes.status === "fulfilled") setCostTotal(Number(costRes.value.total) || 0);
+  }, [episode.id]);
+
+  useEffect(() => {
+    void loadOverview();
+  }, [loadOverview]);
+
+  const shotsReady = useMemo(
+    () => shots.filter((item) => ["ready", "done", "rendering", "generated"].includes(String(item.status || "").toLowerCase())).length,
+    [shots],
+  );
+  const shotsTotal = shots.length || episode.shots_total || 0;
+
+  const activeJobs = useMemo(() => jobs.filter(isActiveJob).length, [jobs]);
+
+  useEffect(() => {
+    if (!activeJobs) return;
+    const timer = window.setInterval(() => {
+      void loadOverview();
+    }, 2500);
+    return () => window.clearInterval(timer);
+  }, [activeJobs, loadOverview]);
+
+  const refresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      const [ep, list, shotList, costs] = await Promise.all([
+        studioApi.episode(episode.id),
+        studioApi.jobs({ episode_id: episode.id }),
+        studioApi.shots(episode.id),
+        studioApi.costs(episode.id),
+      ]);
+      applyEpisode(ep);
+      setJobs(list);
+      setShots(shotList);
+      setCostTotal(Number(costs.total) || 0);
+      notify("已刷新期数与任务", "success");
+    } catch (err) {
+      notify("刷新失败：" + (err instanceof Error ? err.message : String(err)), "error");
+    } finally {
+      setRefreshing(false);
+    }
+  }, [applyEpisode, episode.id, notify]);
+
+  const tabMeta = STUDIO_TABS.find((t) => t.key === tab) || STUDIO_TABS[0];
+
+  const tabProps = { project, episode, onEpisode: applyEpisode, onNavigate: onTabChange };
+
+  return (
+    <div className="cm-app st-app">
+      <div className="st-main">
+        <header className="st-topbar">
+          <button type="button" className="st-back" onClick={onBack} title="返回项目列表">
+            <IconChevronLeft /> 平台
+          </button>
+
+          <div className="st-head-main">
+            <div className="st-breadcrumb">
+              <span>{project.name}</span>
+              <span>/</span>
+              <b>第 {episode.no} 期</b>
+              <span>/</span>
+              <span>{tabMeta.en}</span>
+            </div>
+            <div className="st-ep-row">
+              <h1 className="st-ep-title">{episode.title || project.name + " · 第 " + episode.no + " 期"}</h1>
+              {episodes.length > 1 && (
+                <select
+                  className="st-ep-select"
+                  value={episode.id}
+                  disabled={switching}
+                  onChange={(e) => {
+                    setSwitching(true);
+                    onSwitchEpisode(e.target.value);
+                  }}
+                  title="切换期数"
+                >
+                  {episodes.map((ep) => (
+                    <option key={ep.id} value={ep.id}>
+                      第 {ep.no} 期 · {ep.title || ep.id}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+            <div className="st-top-meta">
+              <span className={"st-tag " + (toneOfStatus(episode.status) === "jade" ? "is-jade" : toneOfStatus(episode.status) === "gold" ? "is-gold" : toneOfStatus(episode.status) === "red" ? "is-red" : "is-slate")}>
+                <Dot />
+                {EPISODE_STATUS_TEXT[episode.status] || episode.status}
+              </span>
+              <span className="st-tag is-slate cm-mono">目标 {fmtClock(episode.target_duration)}</span>
+              {episode.resolution && <span className="st-tag is-slate cm-mono">{episode.resolution}</span>}
+              {episode.aspect && <span className="st-tag is-slate cm-mono">{episode.aspect}</span>}
+              <span className="st-tag is-slate cm-mono">{project.format_id}</span>
+            </div>
+          </div>
+
+          <div className="st-top-stats">
+            <div className="st-stat">
+              <b className={shotsTotal > 0 && shotsReady >= shotsTotal ? "is-jade" : ""}>{shotsTotal}</b>
+              <span>镜头</span>
+            </div>
+            <div className="st-stat-divider" />
+            <div className="st-stat">
+              <b>{fmtClock(episode.target_duration)}</b>
+              <span>目标时长</span>
+            </div>
+            <div className="st-stat-divider" />
+            <div className="st-stat">
+              <b className="is-gold">{fmtMoney(costTotal)}</b>
+              <span>已花费</span>
+            </div>
+            <div className="st-stat-divider" />
+            <div className="st-stat">
+              <b className={activeJobs ? "is-gold" : "is-jade"}>{activeJobs}</b>
+              <span>进行中任务</span>
+            </div>
+          </div>
+
+          <div className="st-top-actions">
+            <button type="button" className="cm-icon-btn" onClick={() => void refresh()} title="刷新型数/任务">
+              {refreshing ? <Spinner size={13} /> : <IconRefresh />}
+            </button>
+          </div>
+        </header>
+
+        <nav className="st-tabbar">
+          {STUDIO_TABS.map((item) => (
+            <button
+              key={item.key}
+              type="button"
+              className={"st-tab" + (tab === item.key ? " is-active" : "")}
+              onClick={() => onTabChange(item.key)}
+              title={item.desc}
+            >
+              <span className="st-tab-no">{item.no}</span>
+              <span className="st-tab-label">{item.label}</span>
+              <span className="st-tab-en">{item.en}</span>
+            </button>
+          ))}
+          <div className="st-tabbar-right">
+            <a className="st-tab-link" href="#/cinema/templates" title="16 个模板的 3D 样片与制作进度">
+              Cinema 3D ↗
+            </a>
+            <button type="button" className="st-tab-link" onClick={onBack}>
+              返回平台
+            </button>
+          </div>
+        </nav>
+
+        <main className="st-content">
+          {tab === "script" ? (
+            <StudioScripts {...tabProps} />
+          ) : tab === "assets" ? (
+            <StudioAssets {...tabProps} />
+          ) : tab === "storyboard" ? (
+            <StudioStoryboard {...tabProps} />
+          ) : tab === "generate" ? (
+            <StudioRender {...tabProps} />
+          ) : (
+            <StudioFinishing {...tabProps} />
+          )}
+        </main>
+      </div>
+    </div>
+  );
+}
+
+/* 内联图标 */
+const S = {
+  width: 16,
+  height: 16,
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 1.6,
+  strokeLinecap: "round" as const,
+  strokeLinejoin: "round" as const,
+};
+function IconChevronLeft() {
+  return (
+    <svg {...S} width={14} height={14}>
+      <path d="M14 6 8 12l6 6" />
+    </svg>
+  );
+}
+function IconRefresh() {
+  return (
+    <svg {...S}>
+      <path d="M20 12a8 8 0 1 1-2.6-5.9" />
+      <path d="M20 4.5V9h-4.5" />
+    </svg>
+  );
+}
+function Dot() {
+  return <i style={{ width: 6, height: 6, borderRadius: 99, background: "currentColor", boxShadow: "0 0 8px currentColor" }} />;
+}

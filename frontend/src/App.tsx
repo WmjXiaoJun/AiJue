@@ -5,7 +5,7 @@ import { ToastProvider, useToast } from "./components/Toast";
 import { Sidebar } from "./components/Sidebar";
 import { TopBar } from "./components/TopBar";
 import { ProjectList } from "./components/ProjectList";
-import { Workspace } from "./components/Workspace";
+import { ProjectStudio } from "./components/studio/Studio";
 import { SettingsModal } from "./components/SettingsModal";
 import { TemplateModal } from "./components/TemplateModal";
 import { NewProjectModal } from "./components/NewProjectModal";
@@ -275,6 +275,11 @@ function Shell() {
     if (window.location.hash !== "#/cinema/overview") window.location.hash = "#/cinema/overview";
   }, []);
 
+  const applyEpisodeUpdate = useCallback((next: Episode) => {
+    setView((prev) => (prev.mode === "workspace" ? { ...prev, episode: next } : prev));
+    setEpisodes((prev) => (prev ? prev.map((item) => (item.id === next.id ? next : item)) : prev));
+  }, []);
+
   const handleSynced = useCallback((stats: { activeJobs: number; cost: number }) => {
     lastSyncRef.current = Date.now();
     setTaskStats(stats);
@@ -344,11 +349,27 @@ function Shell() {
     return <CinemaStudio onExit={goHome} />;
   }
 
+  if (view.mode === "workspace") {
+    return (
+      <ProjectStudio
+        key={view.episode.id}
+        project={view.project}
+        episode={view.episode}
+        episodes={episodes || [view.episode]}
+        tab={tab}
+        onTabChange={changeTab}
+        onBack={goHome}
+        onEpisodeUpdate={applyEpisodeUpdate}
+        onSwitchEpisode={switchEpisode}
+      />
+    );
+  }
+
   return (
     <div className="app-shell">
       <Sidebar
         projects={projects || []}
-        activeProjectId={view.mode === "workspace" ? view.project.id : null}
+        activeProjectId={null}
         offline={offline}
         health={health}
         activeV5={view.mode === "v5"}
@@ -389,21 +410,7 @@ function Shell() {
               onOpenProject={(project) => void openProject(project)}
               onNewProject={() => setModal("newProject")}
             />
-          ) : (
-            <Workspace
-              key={view.episode.id}
-              project={view.project}
-              episode={view.episode}
-              episodes={episodes || [view.episode]}
-              tab={tab}
-              offline={offline}
-              onTabChange={changeTab}
-              onBack={goHome}
-              onStats={handleSynced}
-              onSwitchEpisode={switchEpisode}
-              onCreateEpisode={createEpisode}
-            />
-          )}
+          ) : null}
         </main>
       </div>
 
