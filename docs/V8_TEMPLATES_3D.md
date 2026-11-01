@@ -33,9 +33,27 @@ python -m pipeline.templates3d --status
 - 旧 **V5 世界 → 成片画廊**：有 3D 成片的模板显示金色「3D」徽章、播放 3D 版、时长用 3D 版，可「切换 2D 原版」；新增「16 模板 3D 制作进度 → #/cinema/templates」入口。
 - 顶栏统计新增「模板 3D x/16」。
 
-## 4. 验收
+## 4. 验收（已完成）
 
-（待 16 支全部完成后填入：每支时长/大小/QC 抽查 + 模板库截图 + 画廊截图）
+**16/16 模板全部生成并剪辑完成**（2026-11-01 14:58–17:35，本地 ComfyUI H3，120 个镜头，零失败）：
+
+| 模板 | id | 时长 | 大小 | 模板 | id | 时长 | 大小 |
+|---|---|---|---|---|---|---|---|
+| 美式深夜秀 | tonight_show | 41.61s | 17.5MB | 典籍 | classics | 42.25s | 18.0MB |
+| 历史夜话 | history_talk | 36.13s | 11.5MB | 蒙面歌手 | masked_singer | 41.70s | 20.9MB |
+| 圆桌派 | roundtable | 41.78s | 14.9MB | 国宝 | national_treasure | 41.06s | 13.4MB |
+| 热辣对话 | hot_ones | 38.58s | 12.2MB | 悬疑现场 | mystery | 34.82s | 11.4MB |
+| 奇葩说 | qipashuo | 35.72s | 11.9MB | 创投路演 | shark_tank | 31.51s | 14.6MB |
+| 慢生活 | slow_life | 35.74s | 13.1MB | 周六夜现场 | snl_sketch | 38.53s | 11.9MB |
+| 脱口秀 | standup | 41.31s | 11.1MB | 任务大师 | taskmaster | 32.66s | 12.3MB |
+| 叛徒圆桌 | traitors | 37.92s | 14.9MB | 历史悬案 | history_mystery | 40.83s | 12.6MB |
+
+全部 **1280×720 / 25fps / H.264+AAC**，时长与旧 2D 版逐支一致（复用原时间线与旁白 TTS），每支含字幕、BGM、风格包装、统一 loudnorm。
+
+- API：`GET /api/cinema/templates` → `{total:16, done:16, assembled:16, clips_done:120, clips_total:120}`
+- 前端：Cinema Studio「模板库 · 3D」16/16 已完成、总进度 100%；V5 世界成片画廊 16 支全部显示 3D 版（金色「3D」徽章 + 3D 时长 + 3D 海报），可「切换 2D 原版」。
+- 证据：`tmp/v8/16_templates_3d_montage.png`（16 支各一帧）、`tmp/v8/finals/<id>.png`（逐支 8 帧）、`tmp/v8/ui/templates_done.png`、`tmp/v8/ui/v5_gallery_done.png`、`outputs/templates_3d/<id>/report.json`。
+
 
 ## 5. 已知边界
 

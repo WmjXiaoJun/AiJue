@@ -11,6 +11,13 @@
 - 逐镜 brief contract/v5/cinema3d/templates3d/<id>.json
 - 模板元数据 contract/v5/templates/<id>.json（label 中文 / style）
 
+状态判定「产物为准」：`progress.json` 由后台生成进程与 assemble-watch 同时读写（生成进程用内存
+副本整份覆盖，会把已剪辑完成的 done 冲回 generated），因此：
+- `final.mp4` 存在且 ffprobe 时长>0（或 final+report.json 都在）-> `status="done"`（覆盖 progress）；
+- `final.mp4` 缺失 -> 仍按 progress（generated / assemble_failed），report.json 不单独回填 done；
+- summary 里同时给 `done`（状态统计）与 `assembled`（final 真实存在的模板数）。
+轻量 `/status` 用同样的产物优先规则（只 stat，不 ffprobe）。
+
 端点：
   GET  /api/cinema/templates                 16 个模板总览（含 summary / jobs）
   GET  /api/cinema/templates/status          轻量轮询版（不 ffprobe、不生成海报，3s 轮询用）
@@ -137,6 +144,9 @@ ASSEMBLE_CONFLICT_KINDS = ("assemble", KIND_TEMPLATES_ASSEMBLE)
 GENERATE_TIMEOUT_SECONDS = 12 * 3600  # 120 镜 × 最长 40 分钟，兜底 12h
 ASSEMBLE_TIMEOUT_SECONDS = 3 * 3600
 
+#: 轻量轮询判定 final「已合成」前，要求文件至少这么多秒没被写过（避免读到 assemble 写一半的 mp4）
+FINAL_SETTLE_SECONDS = 20.0
+
 #: 旧 2D 产物里可复用的海报/剧照（按优先级）
 OLD_POSTER_CANDIDATES = (
     "poster.png",
@@ -259,6 +269,47 @@ def _normalize_status(raw: Any) -> str:
     return text if text in ALLOWED_STATUSES else STATUS_PENDING
 
 
+def _path_nonempty(path: Path) -> bool:
+    try:
+        return path.is_file() and path.stat().st_size > 0
+    except OSError:
+        return False
+
+
+def _artifact_done_full(final_info: Dict[str, Any], report_exists: bool) -> bool:
+    """产物为准（列表/详情，可用 ffprobe 真实时长）。
+
+    progress.json 有双写竞争 —— 后台生成进程会用启动时的内存副本整份覆盖，
+    把 assemble-watch 写入的 done 冲回 generated。所以「已合成」以真实产物判定：
+    - final.mp4 存在且 ffprobe 时长 > 0 -> done；
+    - final.mp4 存在 + report.json 存在（ffprobe 暂时读不出时长的兜底）-> done；
+    - final.mp4 缺失 -> 不看 report，仍按 progress（generated / assemble_failed）。
+    """
+    if not final_info.get("exists"):
+        return False
+    if float(final_info.get("duration") or 0.0) > 0.0:
+        return True
+    return bool(report_exists)
+
+
+def _artifact_done_light(final_path: Path) -> bool:
+    """产物为准（轻量轮询，只 stat 不 ffprobe）。
+
+    与完整版同样的规则：final.mp4 存在且非空才算已合成；report.json 存在但 final 缺失不回填。
+    额外加 20s settle：assemble 正把 final.mp4 写到一半时（文件已存在、mtime 很新、report 未写），
+    不要提前显示「已完成」，否则前端会去播一个没写完的 mp4。
+    """
+    if not _path_nonempty(final_path):
+        return False
+    if _path_nonempty(final_path.parent / "report.json"):
+        return True
+    try:
+        age = time.time() - final_path.stat().st_mtime
+    except OSError:
+        return False
+    return age >= FINAL_SETTLE_SECONDS
+
+
 def _clip_counts(tid: str, state: Dict[str, Any]) -> Tuple[int, int]:
     clips = state.get("clips") if isinstance(state.get("clips"), dict) else {}
     raw_done = state.get("done")
@@ -285,13 +336,17 @@ def _progress_percent(status: str, done: int, total: int) -> float:
     return round(max(0.0, min(100.0, pct)), 1)
 
 
-def _template_state(tid: str, progress: Dict[str, Any]) -> Dict[str, Any]:
+def _template_state(
+    tid: str,
+    progress: Dict[str, Any],
+    artifact_done: bool = False,
+) -> Dict[str, Any]:
     raw = progress.get(tid) if isinstance(progress, dict) else None
     state = raw if isinstance(raw, dict) else {}
     status = _normalize_status(state.get("status"))
     done, total = _clip_counts(tid, state)
     # 兜底：progress 里没登记但逐镜片已经在盘上（例如写盘失败/历史产物）
-    if status == STATUS_PENDING and done <= 0:
+    if status == STATUS_PENDING and done <= 0 and not artifact_done:
         shots_dir = T3D_ROOT / tid / "shots"
         if shots_dir.is_dir():
             existing = sum(
@@ -306,14 +361,25 @@ def _template_state(tid: str, progress: Dict[str, Any]) -> Dict[str, Any]:
                 status = STATUS_GENERATING
     if status == STATUS_PENDING and done > 0:
         status = STATUS_GENERATING
+    # 产物优先：final.mp4 可播放（或 final+report 都在）即视为已合成完成，
+    # 覆盖 progress 里被并发写回旧的 generated / assemble_failed。
+    if artifact_done:
+        status = STATUS_DONE
+        if total > 0:
+            done = total  # 成片存在 => 逐镜必然都已入库；progress 的 done 可能被旧副本覆盖
+        elif done > 0:
+            total = done
     updated = state.get("updated")
     error = state.get("error")
+    if artifact_done:
+        error = None  # 产物已合成时不再展示旧的剪辑失败信息
     return {
         "status": status,
         "progress": _progress_percent(status, done, total),
         "clips": {"done": done, "total": total},
         "updated": str(updated) if updated else None,
         "error": str(error)[:800] if error else None,
+        "assembled": bool(artifact_done),
     }
 
 
@@ -328,6 +394,8 @@ def _summary(states: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
     return {
         "total": total,
         "done": done,
+        # 已合成（产物为准）：final.mp4 真实存在的模板数（含 progress 尚未回写 done 的）
+        "assembled": sum(1 for item in states if item.get("assembled")),
         "generating": generating,
         "generated": generated,
         "assemble_failed": assemble_failed,
@@ -530,18 +598,22 @@ def _template_view(
     final_info: Optional[Dict[str, Any]] = None,
     allow_poster_generate: bool = False,
 ) -> Dict[str, Any]:
-    state = _template_state(tid, progress)
     final = final_info if final_info is not None else _final_info(tid)
+    report_url = _report_url(tid)
+    # 产物为准：progress.json 有双写竞争，final 可播放（或 final+report 都在）即视为 done
+    artifact_done = _artifact_done_full(final, report_url is not None)
+    state = _template_state(tid, progress, artifact_done=artifact_done)
     return {
         "id": tid,
         "label": _template_label(tid),
         "style": _template_style(tid),
         "status": state["status"],
+        "assembled": state["assembled"],
         "progress": state["progress"],
         "clips": state["clips"],
         "final": final,
         "poster_url": _poster_url(tid, bool(final.get("exists")), allow_poster_generate),
-        "report_url": _report_url(tid),
+        "report_url": report_url,
         "error": state["error"],
         "updated": state["updated"],
     }
@@ -572,19 +644,22 @@ def _jobs_info() -> Dict[str, Any]:
 def _status_rows(progress: Dict[str, Any]) -> List[Dict[str, Any]]:
     rows: List[Dict[str, Any]] = []
     for tid in TEMPLATES:
-        state = _template_state(tid, progress)
-        try:
-            final_exists = _final_path(tid).is_file()
-        except OSError:
-            final_exists = False
+        final_exists = _path_nonempty(_final_path(tid))
+        report_exists = _path_nonempty(T3D_ROOT / tid / "report.json")
+        # 轻量版同样以产物为准（只 stat）：final 写完即 done，覆盖 progress 的双写旧状态
+        state = _template_state(
+            tid, progress, artifact_done=_artifact_done_light(_final_path(tid))
+        )
         rows.append(
             {
                 "id": tid,
                 "label": _template_label(tid),
                 "status": state["status"],
+                "assembled": state["assembled"],
                 "progress": state["progress"],
                 "clips": state["clips"],
                 "final_exists": final_exists,
+                "report_exists": report_exists,
                 "updated": state["updated"],
             }
         )
