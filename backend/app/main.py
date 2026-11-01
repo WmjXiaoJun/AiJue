@@ -1829,6 +1829,50 @@ def _publish_video_candidates(episode: models.Episode, lang: str, version: str) 
     return deduped
 
 
+def _outputs_relative(path: Path) -> str:
+    """outputs 下文件的相对路径（跨目录发布/检查时用于展示，失败回退文件名）。"""
+    try:
+        return path.resolve().relative_to(config.OUTPUTS_DIR.resolve()).as_posix()
+    except (ValueError, OSError):
+        return path.name
+
+
+def resolve_episode_video(eid: str, render_url: Optional[str]) -> Optional[Path]:
+    """解析一集要发布的成片文件（返回 outputs 下真实存在的文件；找不到返回 None）。
+
+    取片优先级（与 PRD 对齐）：
+    1. `render_url` 以 `/media/` 开头 → 映射 `outputs/<render_url 去掉 /media/>`，
+       文件存在且 >0 字节则用它（覆盖 3D/relic 等产物不在 outputs/episodes/<eid>/ 的情况）；
+    2. 回退 `outputs/episodes/<eid>/final.mp4`；
+    3. 都不可用 → None（由调用方决定 400 / preflight fail）。
+    只做本地 Path 判断，不发 HTTP；用 resolve 后相对 outputs 校验，防路径穿越。
+    """
+    outputs_root = Path(config.OUTPUTS_DIR)
+    media_prefix = f"{config.MEDIA_URL_PREFIX}/"
+    raw = str(render_url or "").strip()
+    if raw.startswith(media_prefix):
+        relative = raw[len(media_prefix):]
+        candidate = (outputs_root / relative).resolve()
+        try:
+            candidate.relative_to(outputs_root.resolve())
+            inside_outputs = True
+        except (ValueError, OSError):
+            inside_outputs = False
+        if inside_outputs:
+            try:
+                if candidate.is_file() and candidate.stat().st_size > 0:
+                    return candidate
+            except OSError:
+                pass
+    fallback = outputs_root / "episodes" / str(eid) / "final.mp4"
+    try:
+        if fallback.is_file() and fallback.stat().st_size > 0:
+            return fallback
+    except OSError:
+        pass
+    return None
+
+
 def _localized_publish_meta(episode: models.Episode, lang: str) -> Dict[str, Any]:
     if not lang or lang == "zh":
         return {}
@@ -2001,34 +2045,30 @@ def _publish_preflight_checks(
             f"已配置 {publish_cfg['username_masked']} · {'/'.join(publish_cfg['platforms'])}",
         )
 
-    # 5) 视频可访问：与 POST /episodes/{eid}/publish 同一条取片逻辑（集目录 final.mp4 /
-    #    localized/<lang>/final.mp4），只 Path 判断存在性与大小，不真的发 HTTP。
-    candidates = _publish_video_candidates(episode, "zh", "final")
-    video_path = next((path for path in candidates if path.is_file()), None)
+    # 5) 视频可访问：与 POST /episodes/{eid}/publish 统一走 resolve_episode_video()
+    #    （render_url 优先，其次集目录 final.mp4），只 Path 判断存在性与大小，不真的发 HTTP。
+    video_path = resolve_episode_video(episode.id, episode.render_url)
     if video_path is None:
-        expected = candidates[0]
-        detail = f"成片文件不存在：{expected}"
-        if render_path is not None:
-            try:
-                same_file = render_path.resolve() == expected.resolve()
-            except OSError:
-                same_file = True
-            if not same_file:
-                detail += (
-                    f"；render_url 指向 {render_url} 可访问，"
-                    f"但发布接口读取集目录成片（需渲染到 outputs/episodes/{episode.id}/final.mp4）"
-                )
-        add("video", "视频可访问", "fail", detail, "成片文件不可访问（发布接口读取集目录成片）")
+        expected = _publish_video_candidates(episode, "zh", "final")[0]
+        detail = f"成片文件不存在：{_outputs_relative(expected)}"
+        if render_url:
+            detail += f"（render_url={render_url} 也未解析到 outputs 下有效文件）"
+        add("video", "视频可访问", "fail", detail, "成片文件不可访问（render_url / 集目录成片均不存在）")
     else:
         try:
             size = int(video_path.stat().st_size)
         except OSError:
             size = 0
-        media_url = config.media_url(video_path)
+        relative_path = _outputs_relative(video_path)
         if size <= 0:
-            add("video", "视频可访问", "fail", f"成片文件为空：{media_url}", "成片文件为空")
+            add("video", "视频可访问", "fail", f"成片文件为空：{relative_path}", "成片文件为空")
         else:
-            add("video", "视频可访问", "pass", f"{size / 1024 / 1024:.1f}MB {media_url}")
+            add(
+                "video",
+                "视频可访问",
+                "pass",
+                f"{size / 1024 / 1024:.1f}MB {relative_path}",
+            )
 
     return checks, warnings, publish_cfg
 
@@ -2096,18 +2136,25 @@ def publish_episode(
     if privacy not in ("public", "unlisted", "private"):
         raise HTTPException(status_code=400, detail="privacy 只能是 public / unlisted / private")
 
-    video_path = next(
-        (candidate for candidate in _publish_video_candidates(episode, lang, version) if candidate.is_file()),
-        None,
-    )
+    candidates = _publish_video_candidates(episode, lang, version)
+    if lang == "zh" and version == "final":
+        # 默认发布（中文终版）：统一走 resolve_episode_video —— render_url 优先，
+        # 覆盖 3D/relic 等成片不在 outputs/episodes/<eid>/ 的情况。
+        video_path = resolve_episode_video(episode.id, episode.render_url)
+    else:
+        # 多语种/动态版仍先按语言/版本取片；取不到再回退到统一解析（保持原行为）
+        video_path = next((candidate for candidate in candidates if candidate.is_file()), None)
+        if video_path is None:
+            video_path = resolve_episode_video(episode.id, episode.render_url)
     if video_path is None:
-        expected = _publish_video_candidates(episode, lang, version)
-        raise HTTPException(
-            status_code=400,
-            detail="待发布视频不存在（请先渲染"
+        detail = (
+            "待发布视频不存在（请先渲染"
             + ("动态版" if version == "dynamic" else "")
-            + f"）：{expected[0]}",
+            + f"）：{_outputs_relative(candidates[0])}"
         )
+        if episode.render_url:
+            detail += f"（render_url={episode.render_url} 也未解析到 outputs 下有效文件）"
+        raise HTTPException(status_code=400, detail=detail)
 
     api_key = config.publish_key()
     configured = bool(api_key and setting.upload_post_username and setting.upload_post_enabled)

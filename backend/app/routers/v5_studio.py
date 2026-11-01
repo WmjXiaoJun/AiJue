@@ -3,7 +3,8 @@
 
 挂载在既有 V5 契约 API 之外，路径前缀独立：
 - `GET  /api/v5/outputs`                    扫描 outputs/templates_v5/*/ → 成片画廊数据
-- `GET  /media/v5/{template}/{file}`        安全返回 final.mp4 / timeline.html / qc_report.json / style_report.json / contact_sheet.png
+  （返回的媒体 URL 为真实路径 `/media/templates_v5/<id>/<file>`，由主应用 `/media` 静态挂载）
+- `GET  /media/v5/{template}/{file}`        安全返回 final.mp4 / timeline.html / qc_report.json / style_report.json / contact_sheet.png（兼容旧前端，保留）
 - `GET  /media/v5/characters/{id}/{file}`   角色 AI 立绘（assets/v5/characters/<id>/portrait.png 等，缺失 404）
 - `GET  /media/v5/scenes/{file}`            场景 AI plate（assets/v5/scenes/<id>.png，缺失 404）
 - `GET  /media/v5/voice/{id}.wav`           角色声音试听产物（tmp/v5_voice/<id>.wav）
@@ -128,10 +129,27 @@ def _now() -> str:
 # ---------------------------------------------------------------------------
 # 成片画廊
 # ---------------------------------------------------------------------------
-def _url_if(path: Path | None, template: str) -> str | None:
-    if path is None or not path.is_file():
+def _template_media_url(template: str, relative: str) -> str:
+    """模板产物的真实媒体地址。
+
+    outputs/ 被主应用挂载在 `/media`，所以模板产物真实地址是
+    `/media/templates_v5/<template>/<relative>`（旧 `/media/v5/<template>/...`
+    路由仍保留兼容，但 API 返回值统一给真实路径，前端/浏览器直接可用、HEAD 也可用）。
+    """
+    rel = str(relative).replace(os.sep, "/").lstrip("/")
+    return f"{config.MEDIA_URL_PREFIX}/templates_v5/{template}/{rel}"
+
+
+def _template_file_url(template: str, path: Path | None, relative: str) -> str | None:
+    """文件存在且非空时返回真实 /media 地址，否则 None。"""
+    if path is None:
         return None
-    return f"/media/v5/{template}/{path.name}"
+    try:
+        if not path.is_file() or path.stat().st_size <= 0:
+            return None
+    except OSError:
+        return None
+    return _template_media_url(template, relative)
 
 
 def _summarize_output(template_id: str, out_dir: Path, catalog: dict) -> dict:
@@ -177,8 +195,10 @@ def _summarize_output(template_id: str, out_dir: Path, catalog: dict) -> dict:
 
     final_path = out_dir / "final.mp4"
     poster_path = out_dir / "contact_sheet.png"
+    poster_rel = "contact_sheet.png"
     if not poster_path.is_file():
         poster_path = out_dir / "frames" / "frame_01.png"
+        poster_rel = "frames/frame_01.png"
     qc_ok = bool(qc.get("ok")) if qc else None
     checks = qc.get("checks") if isinstance(qc.get("checks"), dict) else {}
     checks_ok = sum(1 for item in checks.values()
@@ -203,13 +223,17 @@ def _summarize_output(template_id: str, out_dir: Path, catalog: dict) -> dict:
         "shots": shots,
         "scenes": scenes,
         "characters": characters,
-        "final_url": _url_if(final_path, template_id),
-        "timeline_url": _url_if(out_dir / "timeline.html", template_id),
-        "qc_url": _url_if(out_dir / "qc_report.json", template_id),
-        "style_report_url": _url_if(out_dir / "style_report.json", template_id),
-        "poster_url": f"/media/v5/{template_id}/"
-                      + (poster_path.name if poster_path.name == "contact_sheet.png"
-                         else f"frames/{poster_path.name}") if poster_path.is_file() else None,
+        "final_url": _template_file_url(template_id, final_path, "final.mp4"),
+        "timeline_url": _template_file_url(
+            template_id, out_dir / "timeline.html", "timeline.html"
+        ),
+        "qc_url": _template_file_url(
+            template_id, out_dir / "qc_report.json", "qc_report.json"
+        ),
+        "style_report_url": _template_file_url(
+            template_id, out_dir / "style_report.json", "style_report.json"
+        ),
+        "poster_url": _template_file_url(template_id, poster_path, poster_rel),
         "mtime": mtime,
         "dir": str(out_dir),
     }
@@ -307,7 +331,7 @@ def _enrich_storyboard(template: str, data: dict) -> dict:
                 continue
             if target.suffix.lower() in (".png", ".jpg", ".jpeg", ".webp"):
                 if TEMPLATE_MEDIA_RE.match(relative):
-                    thumbnail_url = f"/media/v5/{template}/{relative}"
+                    thumbnail_url = _template_media_url(template, relative)
                 thumbnail_rel = relative
                 break
         if thumbnail_rel:
@@ -319,10 +343,12 @@ def _enrich_storyboard(template: str, data: dict) -> dict:
     data["shots"] = shots
     png = out_dir / "storyboard.png"
     html = out_dir / "storyboard.html"
-    data["storyboard_png_url"] = (f"/media/v5/{template}/storyboard.png"
-                                  if png.is_file() else None)
-    data["storyboard_html_url"] = (f"/media/v5/{template}/storyboard.html"
-                                   if html.is_file() else None)
+    data["storyboard_png_url"] = _template_file_url(
+        template, png, "storyboard.png"
+    )
+    data["storyboard_html_url"] = _template_file_url(
+        template, html, "storyboard.html"
+    )
     # timeline.json 的 edit 轨（若渲染已接入 V5.4）
     timeline = _read_json_file(out_dir / "timeline.json")
     edit_track = None
@@ -587,8 +613,10 @@ def _reader(job_id: str, proc: subprocess.Popen) -> None:
         if final_path.is_file():
             job.setdefault("result", {})
             if isinstance(job["result"], dict):
-                job["result"].setdefault("final_url",
-                                         f"/media/v5/{job.get('template')}/final.mp4")
+                job["result"].setdefault(
+                    "final_url",
+                    _template_media_url(str(job.get("template") or ""), "final.mp4"),
+                )
     else:
         job["status"] = "failed"
         job["error"] = job.get("error") or f"渲染进程退出码 {code}"
