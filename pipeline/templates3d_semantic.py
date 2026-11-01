@@ -111,7 +111,7 @@ def build_semantic_briefs(tid: str, catalog: dict, episode: dict, template: dict
         for role in roles:
             cid = (episode["meta"]["cast"][role] or {}).get("character")
             if cid:
-                desc = base.character_desc(catalog, cid)
+                desc = base.character_desc(catalog, cid, realistic=bool(style.get("realistic")))
                 if desc not in chars:
                     chars.append(desc)
         beat = beat_map.get(sid) or {}
@@ -129,9 +129,10 @@ def build_semantic_briefs(tid: str, catalog: dict, episode: dict, template: dict
         if not cam:
             cam = "slow cinematic camera move"
         char_part = (" Featuring " + "; ".join(chars) + ".") if chars else ""
+        quality = ("photorealistic cinematic live-action quality, realistic human skin and materials, "
+                   if style.get("realistic") else "3D animated feature film quality, rich physical materials, ")
         desc = (f"[Shot 1] {style['look']}. Set in {scene_desc}.{char_part} {action}"
-                f"Camera: {cam}. Rich physical materials, volumetric light, shallow depth of field, "
-                f"3D animated feature film quality. {NEGATIVE}.")
+                f"Camera: {cam}. {quality}volumetric light, shallow depth of field. {NEGATIVE}.")
         briefs.append({
             "id": sid,
             "kind": "dialogue" if is_dialogue else "broll",

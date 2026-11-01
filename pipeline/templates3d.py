@@ -37,6 +37,7 @@ TEMPLATES = [
     "tonight_show", "classics", "history_talk", "masked_singer", "roundtable",
     "national_treasure", "hot_ones", "mystery", "qipashuo", "shark_tank",
     "slow_life", "snl_sketch", "standup", "taskmaster", "traitors", "history_mystery",
+    "real_street", "real_cafe", "real_kitchen",
 ]
 
 # 每模板的 3D 影调 + 场景（key 与 v5 场景 id 对齐）
@@ -198,6 +199,40 @@ STYLE3D = {
         },
         "ambience": "dusty room tone, a distant wind",
     },
+
+    "real_street": {
+        "look": "photorealistic cinematic live-action documentary, real Chinese city street at night, natural skin texture, practical neon lights, handheld 35mm film look, shallow depth of field, realistic human faces",
+        "realistic": True,
+        "scenes": {
+            "street_night": "a real Chinese city street at night, wet asphalt, neon shop signs, pedestrians in the background",
+            "subway_exit": "the mouth of a subway station at night, warm lights from the stairs, people walking past",
+            "convenience_store": "the entrance of a 24-hour convenience store, bright interior light spilling onto the sidewalk",
+            "cafe_corner": "a real cafe corner by a window, warm pendant lights and coffee cups",
+        },
+        "ambience": "city night room tone, distant traffic and footsteps",
+    },
+    "real_cafe": {
+        "look": "photorealistic cinematic live-action, real warm cafe interior in daytime, natural window light, realistic human faces and skin, 35mm film look, shallow depth of field",
+        "realistic": True,
+        "scenes": {
+            "cafe_corner": "a real cafe corner by a window, wooden table, coffee cups and morning light",
+            "cafe_counter": "a real cafe counter with an espresso machine and a barista in the background",
+            "cafe_sofa": "a cozy sofa seat in a real cafe, warm lamps and plants",
+            "cafe_window": "a rainy cafe window with reflections, people talking over coffee",
+        },
+        "ambience": "cafe room tone, low chatter, cups and espresso machine",
+    },
+    "real_kitchen": {
+        "look": "photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look",
+        "realistic": True,
+        "scenes": {
+            "kitchen_home": "a real home kitchen at night, warm lights, vegetables and a wok on the stove",
+            "kitchen_table": "a real kitchen table with bowls of food, steam rising, warm lamp above",
+            "kitchen_window": "a kitchen window at night with city lights outside, reflection of the room",
+            "kitchen_stove": "close on a real gas stove with a wok and rising steam",
+        },
+        "ambience": "kitchen room tone, sizzling oil, a quiet night",
+    },
 }
 
 CAM_PHRASE = {
@@ -277,7 +312,7 @@ def _color(px: str) -> str:
     return "navy"
 
 
-def character_desc(catalog: dict, cid: str) -> str:
+def character_desc(catalog: dict, cid: str, realistic: bool = False) -> str:
     ch = (catalog.get("characters") or {}).get(cid) or {}
     ap = ch.get("appearance") or {}
     gender = "man" if ap.get("gender") == "male" else ("woman" if ap.get("gender") == "female" else "person")
@@ -293,6 +328,8 @@ def character_desc(catalog: dict, cid: str) -> str:
     if style and style not in ("none", "short swept"):
         hair_part = f"{style} {hair} hair"
     desc = f"a stylized 3D animated {gender} in {decade} {age0(age)}0s, {hair_part}, wearing a {ocolor} {otype}"
+    if realistic:
+        desc = f"a real {age}-year-old Chinese {gender}, {hair_part}, wearing a {ocolor} {otype}"
     if accent not in ("grey", "black", "white"):
         desc += f" with {accent} accents"
     acc = [str(a).replace("_", " ") for a in (ap.get("accessories") or []) if a]
