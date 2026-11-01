@@ -48,9 +48,9 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+async function request<T>(path: string, init?: RequestInit, timeoutMs = 20000): Promise<T> {
   const controller = new AbortController();
-  const timer = window.setTimeout(() => controller.abort(), 20000);
+  const timer = window.setTimeout(() => controller.abort(), timeoutMs);
   let res: Response;
   try {
     res = await fetch(API_BASE + path, {
@@ -268,7 +268,7 @@ export const api = {
     const res = await request<GenerateScriptResult | Job>("/projects/" + pid + "/generate-script", {
       method: "POST",
       body: JSON.stringify(body),
-    });
+    }, 60000);
     if (res && typeof (res as GenerateScriptResult).script === "string") return res as GenerateScriptResult;
     const job = res as Job;
     if (job && typeof job.id === "string") {

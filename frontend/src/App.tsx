@@ -6,6 +6,7 @@ import { Sidebar } from "./components/Sidebar";
 import { TopBar } from "./components/TopBar";
 import { ProjectList } from "./components/ProjectList";
 import { ProjectStudio } from "./components/studio/Studio";
+import { PlatformHome } from "./components/platform/PlatformHome";
 import { SettingsModal } from "./components/SettingsModal";
 import { TemplateModal } from "./components/TemplateModal";
 import { NewProjectModal } from "./components/NewProjectModal";
@@ -365,6 +366,20 @@ function Shell() {
     );
   }
 
+  if (view.mode === "projects") {
+    return (
+      <PlatformHome
+        projects={projects || []}
+        offline={offline}
+        onOpenProject={(project) => void openProject(project)}
+        onOpenCinema={openCinema}
+        onOpenV5={openV5}
+        onProjectCreated={(project) => void handleProjectCreated(project)}
+        onRefreshProjects={() => void loadProjects()}
+      />
+    );
+  }
+
   return (
     <div className="app-shell">
       <Sidebar
@@ -372,7 +387,7 @@ function Shell() {
         activeProjectId={null}
         offline={offline}
         health={health}
-        activeV5={view.mode === "v5"}
+        activeV5
         onV5={openV5}
         onCinema={openCinema}
         onHome={goHome}
@@ -402,15 +417,7 @@ function Shell() {
         )}
 
         <main className="app-content">
-          {view.mode === "v5" ? (
-            <V5Studio />
-          ) : view.mode === "projects" ? (
-            <ProjectList
-              projects={projects || []}
-              onOpenProject={(project) => void openProject(project)}
-              onNewProject={() => setModal("newProject")}
-            />
-          ) : null}
+          <V5Studio />
         </main>
       </div>
 

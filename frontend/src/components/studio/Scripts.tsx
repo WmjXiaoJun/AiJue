@@ -479,6 +479,9 @@ export function StudioScripts({ project, episode, onEpisode, onNavigate }: Studi
                 {generating ? <Spinner size={14} /> : <IconSpark size={15} />}
                 {generating ? "正在生成台本…" : "生成台本"}
               </button>
+              {generating && (
+                <p className="st-hint st-script-gen-hint">AI 正在写台本，通常 3–10 秒，最长约 60 秒；请勿重复点击。</p>
+              )}
 
               {genError && (
                 <div className="st-error st-script-error">
