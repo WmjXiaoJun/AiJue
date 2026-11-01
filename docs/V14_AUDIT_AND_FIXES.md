@@ -85,3 +85,33 @@ python -m pipeline.templates3d_semantic --template tonight_show --lipsync-only
 2. 角色一致性目前是「同一角色描述 + 概念图」，跨镜仍会换脸；要彻底解决需参考图条件（见方案表 C）。
 3. 老 2D 链路代码与旧 V5 面板仍在仓库（V5 世界已全 3D-only），可后续整体删除；`components.css` 重复样式 V15 清理。
 4. Upload-Post 等用户连接社交账号后再回来做（真实发布）。
+
+
+## 9. 16 模板全量重做：已完成（2026-11-02 02:04）
+
+> 用户确认「全量跑」。tonight_show 作为试点先完成（21:38），其余 15 个模板用三阶段流水线（`pipeline/templates3d_pipeline.py`：A 全部生成 → B 统一口型 → C 剪辑+海报）跑完。
+
+**结果 16/16 全部重建：语义画面 + MuseTalk 口型（97 个对话镜）+ 重新剪辑 + 新海报**
+
+| 模板 | 时长 | 大小 | 口型镜 | 模板 | 时长 | 大小 | 口型镜 |
+|---|---|---|---|---|---|---|---|
+| tonight_show | 41.61s | 16.9MB | 7 | classics | 42.25s | 19.1MB | 7 |
+| history_talk | 36.13s | 11.8MB | 5 | masked_singer | 41.70s | 20.6MB | 6 |
+| roundtable | 41.78s | 13.7MB | 6 | national_treasure | 41.06s | 13.0MB | 6 |
+| hot_ones | 38.58s | 12.9MB | 6 | mystery | 34.82s | 9.7MB | 6 |
+| qipashuo | 35.72s | 12.4MB | 6 | shark_tank | 31.51s | 14.1MB | 5 |
+| slow_life | 35.74s | 13.0MB | 6 | snl_sketch | 38.53s | 12.1MB | 6 |
+| standup | 41.31s | 14.0MB | 6 | taskmaster | 32.66s | 13.0MB | 6 |
+| traitors | 37.92s | 14.7MB | 6 | history_mystery | 40.83s | 13.8MB | 7 |
+
+全部 **1280×720 / 25fps / H.264+AAC**，时长与旧版一致；合计 224.8MB、97 个对话镜完成口型同步。
+
+- 校验脚本：`tmp/v14/verify_final.py` → 16/16 ok（时长/分辨率/音轨/海报/口型镜数）；16 帧总览 `tmp/v14/16_templates_v14_montage.png`；旧 vs 新对比 `tmp/v14/before_after_v14.png`（旧版备份在 `outputs/_archive_v14_before_semantic/`）。
+- 模板库页面：`tmp/v14/templates_v14_done.png`（16/16 已完成、海报全部更新）。
+- 执行插曲：ComfyUI 偶发在模型动态加载时长时间卡住（5–15 分钟无 compute），已重启 ComfyUI（UTF-8 环境变量避免日志 emoji 崩溃）并改用三阶段流水线，避免每模板重复卸载/重载模型；总耗时约 4.5 小时（含两轮卡顿和重启）。
+- 语义重生成数据：`contract/v5/cinema3d/templates3d/<id>_semantic.json`（含每镜台词 → 英文画面描述映射）。
+
+### 后续可继续（未做）
+1. 角色一致性长期方案（参考图条件/IPAdapter，2–4 天开发）。
+2. 旧 2D 链路代码/旧 V5 面板/`components.css` 冗余清理（V15）。
+3. Upload-Post 真实发布（等用户连接社交账号）。

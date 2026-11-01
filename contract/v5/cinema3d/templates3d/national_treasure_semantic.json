@@ -1,0 +1,78 @@
+{
+ "template": "national_treasure",
+ "style": "museum_gold",
+ "look": "grand 3D museum film, dark lacquered columns, gold display cases, volumetric light",
+ "mode": "semantic",
+ "shots": [
+  {
+   "id": "v5_card_title",
+   "kind": "card",
+   "prompt": null
+  },
+  {
+   "id": "v5_002",
+   "kind": "dialogue",
+   "scene": "display_case",
+   "duration": 8.37,
+   "line": "苏轼、武则天，咱们今天聊一聊关于青铜鼎和《清明上河图》的故事。",
+   "semantic_visual": "A museum guide gestures toward a glowing glass display case holding an ancient bronze ding and a rolled silk scroll, warm gold spotlights casting long shadows across the marble floor.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a black stone pedestal with a glass display case under a single spotlight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: A museum guide gestures toward a glowing glass display case holding an ancient bronze ding and a rolled silk scroll, warm gold spotlights casting long shadows across the marble floor.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow crane descend. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet museum room tone, faint metallic shimmer. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_003",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 5.33,
+   "line": "哦？这可是两件国宝啊，背后肯定有不少故事。",
+   "semantic_visual": "Two figures lean closer to a dim archive vault shelf, eyes wide with curiosity as golden light spills over an antique scroll and a bronze vessel behind glass.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a dark museum archive with bronze vessels and sealed scrolls. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Two figures lean closer to a dim archive vault shelf, eyes wide with curiosity as golden light spills over an antique scroll and a bronze vessel behind glass.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow rack focus between foreground and background. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet museum room tone, faint metallic shimmer. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_004",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 6.53,
+   "line": "没错，这青铜鼎可是商朝的宝贝，承载着古人的智慧。",
+   "semantic_visual": "A regal woman in Tang-dynasty robes extends a hand toward a towering bronze tripod cauldron, its ornate patterns gleaming under amber palace lanterns.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a grand Chinese palace hall with gold details and silk banners. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A regal woman in Tang-dynasty robes extends a hand toward a towering bronze tripod cauldron, its ornate patterns gleaming under amber palace lanterns.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow orbiting camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet museum room tone, faint metallic shimmer. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_005",
+   "kind": "dialogue",
+   "scene": "display_case",
+   "duration": 8.61,
+   "line": "没错，还有《清明上河图》描绘的北宋繁华，两件宝贝都是宝。",
+   "semantic_visual": "The guide sweeps an arm between a bronze ding and an unrolled painted scroll of a bustling river city, both bathed in soft museum spotlight.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a black stone pedestal with a glass display case under a single spotlight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The guide sweeps an arm between a bronze ding and an unrolled painted scroll of a bustling river city, both bathed in soft museum spotlight.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow crane descend. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet museum room tone, faint metallic shimmer. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_006",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 5.89,
+   "line": "那我先来问个问题，苏轼你对青铜鼎研究多深？",
+   "semantic_visual": "A robed scholar turns toward the guide, tilting his head in a questioning pose, the bronze cauldron reflected faintly in the glass beside him.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a dark museum archive with bronze vessels and sealed scrolls. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed scholar turns toward the guide, tilting his head in a questioning pose, the bronze cauldron reflected faintly in the glass beside him.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow rack focus between foreground and background. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet museum room tone, faint metallic shimmer. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_007",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 5.33,
+   "line": "还好啦，你武则天研究国宝也是个中高手。",
+   "semantic_visual": "The regal woman smiles with a modest shrug, gesturing gracefully toward an ornate bronze vessel as warm palace light glints off her jewelry.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a grand Chinese palace hall with gold details and silk banners. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: The regal woman smiles with a modest shrug, gesturing gracefully toward an ornate bronze vessel as warm palace light glints off her jewelry.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow pull-back revealing the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet museum room tone, faint metallic shimmer. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_card_end",
+   "kind": "card",
+   "prompt": null
+  }
+ ]
+}

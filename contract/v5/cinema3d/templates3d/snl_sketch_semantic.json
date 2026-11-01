@@ -1,0 +1,98 @@
+{
+ "template": "snl_sketch",
+ "style": "chalk_theatre",
+ "look": "chalk-drawn theatre 3D animation, blackboard textures, spotlight, hand-drawn props",
+ "mode": "semantic",
+ "shots": [
+  {
+   "id": "v5_card_title",
+   "kind": "card",
+   "prompt": null
+  },
+  {
+   "id": "v5_001",
+   "kind": "broll",
+   "scene": "chalk_stage",
+   "duration": 2.6,
+   "line": "",
+   "semantic_visual": "",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] chalk-drawn theatre 3D animation, blackboard textures, spotlight, hand-drawn props. Set in a stage made of chalk drawings on a blackboard, a single spotlight. The camera surveys the space, atmospheric and cinematic. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: theatre hush, distant laughter. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_002",
+   "kind": "dialogue",
+   "scene": "sketch_backdrop",
+   "duration": 5.33,
+   "line": "老周，你这回又摸鱼摸到了哪一步？",
+   "semantic_visual": "Chalk-drawn theatre stage, a man in a rumpled shirt leans toward a colleague at a desk, gesturing at a small fish-shaped doodle on a clipboard. Soft chalk-dust lighting, playful accusatory mood.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] chalk-drawn theatre 3D animation, blackboard textures, spotlight, hand-drawn props. Set in a hand-drawn sketch backdrop with chalk clouds and props. Featuring a stylized 3D animated man in his 50s, bald black hair, wearing a black jacket with red-brown accents, with glasses; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Chalk-drawn theatre stage, a man in a rumpled shirt leans toward a colleague at a desk, gesturing at a small fish-shaped doodle on a clipboard. Soft chalk-dust lighting, playful accusatory mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: smooth lateral pan. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: theatre hush, distant laughter. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_003",
+   "kind": "dialogue",
+   "scene": "costume_room_chalk",
+   "duration": 7.65,
+   "line": "figure_a：阿栗，咱俩不是商量好了嘛，每天半小时，偷偷摸摸。",
+   "semantic_visual": "In a chalk-textured costume room, two figures whisper close together, one holding a tiny drawn clock showing half an hour. Hangers and fabric racks surround them, dim warm light, conspiratorial mood.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] chalk-drawn theatre 3D animation, blackboard textures, spotlight, hand-drawn props. Set in a backstage costume room drawn in chalk, mirrors and racks. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: In a chalk-textured costume room, two figures whisper close together, one holding a tiny drawn clock showing half an hour. Hangers and fabric racks surround them, dim warm light, conspiratorial mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: theatre hush, distant laughter. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_004",
+   "kind": "dialogue",
+   "scene": "audience_sketch",
+   "duration": 5.97,
+   "line": "结果现在呢，监控里清清楚楚地看见你玩得不亦乐乎。",
+   "semantic_visual": "A chalk-style monitor screen fills the stage backdrop, showing a figure gleefully playing a game. A man points at the screen, eyebrows raised, audience silhouettes in soft chalk behind him.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] chalk-drawn theatre 3D animation, blackboard textures, spotlight, hand-drawn props. Set in a theatre audience in warm dark, faces lit by a chalk stage. Featuring a stylized 3D animated man in his 50s, bald black hair, wearing a black jacket with red-brown accents, with glasses; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A chalk-style monitor screen fills the stage backdrop, showing a figure gleefully playing a game. A man points at the screen, eyebrows raised, audience silhouettes in soft chalk behind him.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: quick whip pan. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: theatre hush, distant laughter. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_005",
+   "kind": "dialogue",
+   "scene": "sketch_backdrop",
+   "duration": 6.29,
+   "line": "figure_a：那咱俩不是一起进黑锅嘛，咱俩得顶着。",
+   "semantic_visual": "Two chalk figures stand shoulder to shoulder under a large drawn black pot hanging above them, bracing together. Stage backdrop of chalk scenery, low warm spotlight, comedic defiant mood.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] chalk-drawn theatre 3D animation, blackboard textures, spotlight, hand-drawn props. Set in a hand-drawn sketch backdrop with chalk clouds and props. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Two chalk figures stand shoulder to shoulder under a large drawn black pot hanging above them, bracing together. Stage backdrop of chalk scenery, low warm spotlight, comedic defiant mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: theatre hush, distant laughter. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_006",
+   "kind": "dialogue",
+   "scene": "costume_room_chalk",
+   "duration": 2.13,
+   "line": "阿栗，你咋不说话？",
+   "semantic_visual": "Costume room with chalk-textured racks, a man turns to a silent figure frozen mid-gesture holding a phone. Dusty chalk lighting, awkward expectant mood.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] chalk-drawn theatre 3D animation, blackboard textures, spotlight, hand-drawn props. Set in a backstage costume room drawn in chalk, mirrors and racks. Featuring a stylized 3D animated man in his 50s, bald black hair, wearing a black jacket with red-brown accents, with glasses; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Costume room with chalk-textured racks, a man turns to a silent figure frozen mid-gesture holding a phone. Dusty chalk lighting, awkward expectant mood.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: theatre hush, distant laughter. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_007",
+   "kind": "dialogue",
+   "scene": "audience_sketch",
+   "duration": 5.01,
+   "line": "figure_b：我也就稍微刷刷朋友圈，老周你这把戏也太拙劣了吧。",
+   "semantic_visual": "A figure scrolls a chalk-drawn phone with tiny feed images, smirking while glancing at a clumsy drawn trap nearby. Audience sketch stage, cool chalk light, smug amused mood.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] chalk-drawn theatre 3D animation, blackboard textures, spotlight, hand-drawn props. Set in a theatre audience in warm dark, faces lit by a chalk stage. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: A figure scrolls a chalk-drawn phone with tiny feed images, smirking while glancing at a clumsy drawn trap nearby. Audience sketch stage, cool chalk light, smug amused mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: theatre hush, distant laughter. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_008",
+   "kind": "broll",
+   "scene": "audience_sketch",
+   "duration": 2.6,
+   "line": "",
+   "semantic_visual": "",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] chalk-drawn theatre 3D animation, blackboard textures, spotlight, hand-drawn props. Set in a theatre audience in warm dark, faces lit by a chalk stage. The camera surveys the space, atmospheric and cinematic. Camera: slow pull-back revealing the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: theatre hush, distant laughter. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_card_end",
+   "kind": "card",
+   "prompt": null
+  }
+ ]
+}

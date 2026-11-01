@@ -1,0 +1,98 @@
+{
+ "template": "traitors",
+ "style": "baroque_candle",
+ "look": "baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow",
+ "mode": "semantic",
+ "shots": [
+  {
+   "id": "v5_card_title",
+   "kind": "card",
+   "prompt": null
+  },
+  {
+   "id": "v5_001",
+   "kind": "broll",
+   "scene": "castle_hall_baroque",
+   "duration": 2.6,
+   "line": "",
+   "semantic_visual": "",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a baroque castle hall with a long stone table and candelabras. The camera surveys the space, atmospheric and cinematic. Camera: slow crane rise. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_002",
+   "kind": "dialogue",
+   "scene": "candle_corridor",
+   "duration": 5.17,
+   "line": "烛光摇曳，武则天与曹操对视，气氛紧张",
+   "semantic_visual": "Flickering candlelight casts long shadows across a stone corridor as two robed figures lock eyes, tension thick in the air. Golden baroque glow, deep chiaroscuro, wary mood.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a long castle corridor lined with hundreds of candles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: Flickering candlelight casts long shadows across a stone corridor as two robed figures lock eyes, tension thick in the air. Golden baroque glow, deep chiaroscuro, wary mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_003",
+   "kind": "dialogue",
+   "scene": "stone_roundtable",
+   "duration": 5.65,
+   "line": "我武则天何许人也？你曹操可是深谙权谋啊。",
+   "semantic_visual": "A regal woman in ornate robes leans forward over a stone roundtable, chin raised, one hand gesturing sharply toward a stern armored man opposite her. Candlelight glints on carved stone.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a round stone table in a candlelit hall, heavy drapery. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: A regal woman in ornate robes leans forward over a stone roundtable, chin raised, one hand gesturing sharply toward a stern armored man opposite her. Candlelight glints on carved stone.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_004",
+   "kind": "dialogue",
+   "scene": "crypt",
+   "duration": 7.01,
+   "line": "那咱俩得来个真心话大冒险，试探试探对方。",
+   "semantic_visual": "A bearded warlord in dark armor smirks and slides a small carved token across a crypt table toward his rival, candle flames wavering between them. Dusty stone vaults, conspiratorial mood.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A bearded warlord in dark armor smirks and slides a small carved token across a crypt table toward his rival, candle flames wavering between them. Dusty stone vaults, conspiratorial mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_005",
+   "kind": "dialogue",
+   "scene": "candle_corridor",
+   "duration": 5.65,
+   "line": "就怕这冒险，一不小心就成了千古遗恨。",
+   "semantic_visual": "An old adviser hovers at the edge of a candlelit corridor, brow furrowed, one hand raised as if to warn. Shadows stretch and tremble along the stone walls, ominous mood.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a long castle corridor lined with hundreds of candles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: An old adviser hovers at the edge of a candlelit corridor, brow furrowed, one hand raised as if to warn. Shadows stretch and tremble along the stone walls, ominous mood.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow crane rise. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_006",
+   "kind": "dialogue",
+   "scene": "stone_roundtable",
+   "duration": 3.65,
+   "line": "放心，我武某人从不轻易下结论。",
+   "semantic_visual": "The regal woman settles back in her chair at the stone roundtable, palm raised in calm reassurance, candlelight steady on her composed face. Carved pillars loom behind her.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a round stone table in a candlelit hall, heavy drapery. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The regal woman settles back in her chair at the stone roundtable, palm raised in calm reassurance, candlelight steady on her composed face. Carved pillars loom behind her.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_007",
+   "kind": "dialogue",
+   "scene": "crypt",
+   "duration": 5.09,
+   "line": "那咱俩就从你开始，你先来。",
+   "semantic_visual": "The bearded warlord extends an open hand across the crypt table, inviting his rival to begin, candle flames reflected in his sharp gaze. Grim stone walls, challenging mood.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: The bearded warlord extends an open hand across the crypt table, inviting his rival to begin, candle flames reflected in his sharp gaze. Grim stone walls, challenging mood.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_008",
+   "kind": "broll",
+   "scene": "crypt",
+   "duration": 2.6,
+   "line": "",
+   "semantic_visual": "",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. The camera surveys the space, atmospheric and cinematic. Camera: slow pull-back revealing the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_card_end",
+   "kind": "card",
+   "prompt": null
+  }
+ ]
+}

@@ -1,0 +1,88 @@
+{
+ "template": "shark_tank",
+ "style": "blueprint_lab",
+ "look": "blue-lit 3D startup pitch film, glass and blueprint walls, holographic charts",
+ "mode": "semantic",
+ "shots": [
+  {
+   "id": "v5_card_title",
+   "kind": "card",
+   "prompt": null
+  },
+  {
+   "id": "v5_001",
+   "kind": "broll",
+   "scene": "pitch_boardroom",
+   "duration": 2.6,
+   "line": "",
+   "semantic_visual": "",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] blue-lit 3D startup pitch film, glass and blueprint walls, holographic charts. Set in a glass boardroom with blue light, a long table and city lights. The camera surveys the space, atmospheric and cinematic. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet electronics hum, a low room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_002",
+   "kind": "dialogue",
+   "scene": "blueprint_wall",
+   "duration": 5.41,
+   "line": "figure_a，你们的AI工具能做些什么？",
+   "semantic_visual": "A figure stands before a glowing blueprint wall, gesturing toward holographic diagrams of tools and workflows that pulse with blue light. Cool lab lighting, curious and inquisitive mood.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] blue-lit 3D startup pitch film, glass and blueprint walls, holographic charts. Set in a wall of glowing blueprints and diagrams in a dark lab. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 30s, low bun black hair, wearing a black blazer with gold accents, with clipboard and headset. The shot shows the idea through visible action: A figure stands before a glowing blueprint wall, gesturing toward holographic diagrams of tools and workflows that pulse with blue light. Cool lab lighting, curious and inquisitive mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow rack focus between foreground and background. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet electronics hum, a low room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_003",
+   "kind": "dialogue",
+   "scene": "whiteboard_lab",
+   "duration": 4.21,
+   "line": "figure_b，它可以自动生成脚本，还能优化内容，提高效率！",
+   "semantic_visual": "A figure sweeps a hand across a whiteboard lab, and animated script pages and content blocks assemble themselves in midair. Bright clinical light, energetic and confident atmosphere.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] blue-lit 3D startup pitch film, glass and blueprint walls, holographic charts. Set in a whiteboard lab covered in diagrams, blue monitor glow. Featuring a stylized 3D animated woman in her 30s, low bun black hair, wearing a black blazer with gold accents, with clipboard and headset. The shot shows the idea through visible action: A figure sweeps a hand across a whiteboard lab, and animated script pages and content blocks assemble themselves in midair. Bright clinical light, energetic and confident atmosphere.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow rack focus between foreground and background. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet electronics hum, a low room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_004",
+   "kind": "dialogue",
+   "scene": "prototype_lab",
+   "duration": 9.01,
+   "line": "哇，听起来很有前景，但市场这么竞争激烈，你们有什么特别的吗？",
+   "semantic_visual": "A figure leans forward over a prototype lab bench, surrounded by competing glowing product models crowding the space. Dim rim lighting, tense and challenging mood.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] blue-lit 3D startup pitch film, glass and blueprint walls, holographic charts. Set in a prototype lab with robotic arms and glowing screens. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 30s, low bun black hair, wearing a black blazer with gold accents, with clipboard and headset. The shot shows the idea through visible action: A figure leans forward over a prototype lab bench, surrounded by competing glowing product models crowding the space. Dim rim lighting, tense and challenging mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet electronics hum, a low room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_005",
+   "kind": "dialogue",
+   "scene": "blueprint_wall",
+   "duration": 4.29,
+   "line": "我们有独家算法，可以根据用户需求精准调整，效果杠杠的！",
+   "semantic_visual": "A figure points at a blueprint wall where a glowing algorithm flowchart reshapes itself around a user silhouette. Sharp blue light, proud and assured mood.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] blue-lit 3D startup pitch film, glass and blueprint walls, holographic charts. Set in a wall of glowing blueprints and diagrams in a dark lab. Featuring a stylized 3D animated man in his 20s, neat short black hair, wearing a white cardigan with navy accents, with glasses and book. The shot shows the idea through visible action: A figure points at a blueprint wall where a glowing algorithm flowchart reshapes itself around a user silhouette. Sharp blue light, proud and assured mood.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow rack focus between foreground and background. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet electronics hum, a low room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_006",
+   "kind": "dialogue",
+   "scene": "whiteboard_lab",
+   "duration": 2.69,
+   "line": "数据支持一下吗？",
+   "semantic_visual": "A figure taps a whiteboard lab surface, and rising bar charts and data curves light up across it. Clean cool lighting, expectant and probing atmosphere.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] blue-lit 3D startup pitch film, glass and blueprint walls, holographic charts. Set in a whiteboard lab covered in diagrams, blue monitor glow. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 30s, low bun black hair, wearing a black blazer with gold accents, with clipboard and headset. The shot shows the idea through visible action: A figure taps a whiteboard lab surface, and rising bar charts and data curves light up across it. Clean cool lighting, expectant and probing atmosphere.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet electronics hum, a low room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_007",
+   "kind": "broll",
+   "scene": "prototype_lab",
+   "duration": 2.6,
+   "line": "",
+   "semantic_visual": "",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] blue-lit 3D startup pitch film, glass and blueprint walls, holographic charts. Set in a prototype lab with robotic arms and glowing screens. The camera surveys the space, atmospheric and cinematic. Camera: slow pull-back revealing the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet electronics hum, a low room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_card_end",
+   "kind": "card",
+   "prompt": null
+  }
+ ]
+}

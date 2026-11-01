@@ -1,0 +1,68 @@
+{
+ "template": "history_talk",
+ "style": "ink_chronicle",
+ "look": "cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze",
+ "mode": "semantic",
+ "shots": [
+  {
+   "id": "v5_card_title",
+   "kind": "card",
+   "prompt": null
+  },
+  {
+   "id": "v5_002",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 10.13,
+   "line": "今天把官渡之战摊在地图上，换个问法：如果曹操输了，历史会怎么走？",
+   "semantic_visual": "An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow crane descend. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: wind outside, a quiet candle flame. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_003",
+   "kind": "dialogue",
+   "scene": "battlefield",
+   "duration": 8.45,
+   "line": "我输不起，因为我的粮道只有一条，烧了就什么都没了。",
+   "semantic_visual": "A lone supply road winds along a dark river under moonlight, a single line of grain carts exposed and vulnerable, distant torchlight threatening from the hills.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a misty ancient battlefield at dawn, broken banners and spears in the mud. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A lone supply road winds along a dark river under moonlight, a single line of grain carts exposed and vulnerable, distant torchlight threatening from the hills.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: wind outside, a quiet candle flame. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_004",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 3.33,
+   "line": "可你赢了，也只是把乱世推迟了二十年。",
+   "semantic_visual": "A robed strategist stands in a vast palace hall, pale light through tall pillars, a long shadow stretching across polished stone as he gazes at an empty throne.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient Chinese palace hall at night, candles and deep shadows. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed strategist stands in a vast palace hall, pale light through tall pillars, a long shadow stretching across polished stone as he gazes at an empty throne.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow rack focus between foreground and background. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: wind outside, a quiet candle flame. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_005",
+   "kind": "dialogue",
+   "scene": "scholar_study",
+   "duration": 4.13,
+   "line": "地图上这条线，就是两个人的生死线。",
+   "semantic_visual": "Close view of a brush tracing a thin ink line across an old map, the line glowing faintly red, two small carved figures standing at either end.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a moonlit study with scroll maps and hanging brushes. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Close view of a brush tracing a thin ink line across an old map, the line glowing faintly red, two small carved figures standing at either end.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: wind outside, a quiet candle flame. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_006",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 9.09,
+   "line": "先看这张地图，许攸投奔那晚，乌巢的粮仓就在这条河边。",
+   "semantic_visual": "A night map spreads beside a river of ink, tiny granary models clustered on the bank, a hooded figure approaching a flickering campfire in the distance.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A night map spreads beside a river of ink, tiny granary models clustered on the bank, a hooded figure approaching a flickering campfire in the distance.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow pull-back revealing the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: wind outside, a quiet candle flame. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_card_end",
+   "kind": "card",
+   "prompt": null
+  }
+ ]
+}

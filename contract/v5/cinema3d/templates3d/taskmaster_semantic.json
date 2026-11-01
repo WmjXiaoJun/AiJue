@@ -1,0 +1,98 @@
+{
+ "template": "taskmaster",
+ "style": "candy_collage",
+ "look": "playful candy-colored 3D game show, giant props, confetti, bright studio lights",
+ "mode": "semantic",
+ "shots": [
+  {
+   "id": "v5_card_title",
+   "kind": "card",
+   "prompt": null
+  },
+  {
+   "id": "v5_001",
+   "kind": "broll",
+   "scene": "game_stage_collage",
+   "duration": 2.6,
+   "line": "",
+   "semantic_visual": "",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a bright game stage with oversized props and painted panels. The camera surveys the space, atmospheric and cinematic. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: bright studio room tone, distant applause. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_002",
+   "kind": "dialogue",
+   "scene": "prop_table",
+   "duration": 5.33,
+   "line": "胖子，你这次能不能不靠吃东西逗笑裁判？",
+   "semantic_visual": "A stout man eyes a long table of glossy candy props while a stern older man gestures toward a judge's panel, camera gliding across colorful collage textures. Bright studio lighting, playful tension.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a table covered with playful props, prizes and paper cutouts. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A stout man eyes a long table of glossy candy props while a stern older man gestures toward a judge's panel, camera gliding across colorful collage textures. Bright studio lighting, playful tension.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: bright studio room tone, distant applause. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_003",
+   "kind": "dialogue",
+   "scene": "leaderboard_collage",
+   "duration": 3.01,
+   "line": "那可不行，我的笑点只在美食上。",
+   "semantic_visual": "The stout man pats his round belly and points at a towering leaderboard of candy cutouts, shaking his head with a smug grin. Pastel collage backdrop, warm cheerful glow.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a glowing leaderboard wall in a playful studio. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The stout man pats his round belly and points at a towering leaderboard of candy cutouts, shaking his head with a smug grin. Pastel collage backdrop, warm cheerful glow.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: bright studio room tone, distant applause. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_004",
+   "kind": "dialogue",
+   "scene": "confetti_stage",
+   "duration": 4.29,
+   "line": "那甜妹，你准备好了吗？",
+   "semantic_visual": "The older host turns to a young woman in a candy-colored dress standing on a confetti-strewn stage, extending a hand as paper scraps drift down. Festive lighting, expectant mood.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The older host turns to a young woman in a candy-colored dress standing on a confetti-strewn stage, extending a hand as paper scraps drift down. Festive lighting, expectant mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: bright studio room tone, distant applause. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_005",
+   "kind": "dialogue",
+   "scene": "prop_table",
+   "duration": 4.05,
+   "line": "准备好了，不过我可不想被胖哥吃掉。",
+   "semantic_visual": "The young woman nods firmly while glancing sideways at the stout man, who licks his lips near a table of oversized sweets. Tension and humor under soft stage lights.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a table covered with playful props, prizes and paper cutouts. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: The young woman nods firmly while glancing sideways at the stout man, who licks his lips near a table of oversized sweets. Tension and humor under soft stage lights.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: bright studio room tone, distant applause. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_006",
+   "kind": "dialogue",
+   "scene": "leaderboard_collage",
+   "duration": 6.45,
+   "line": "放心，这次不许吃，只能逗！",
+   "semantic_visual": "The host raises a palm flatly between the two contestants, shaking his finger, while the leaderboard collage glitters behind them. Bright even lighting, comedic authority.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a glowing leaderboard wall in a playful studio. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The host raises a palm flatly between the two contestants, shaking his finger, while the leaderboard collage glitters behind them. Bright even lighting, comedic authority.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: bright studio room tone, distant applause. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_007",
+   "kind": "dialogue",
+   "scene": "confetti_stage",
+   "duration": 3.73,
+   "line": "那还不简单，给他们来点糖果拼贴吧。",
+   "semantic_visual": "The stout man grins and tosses handfuls of colorful candy pieces into the air, which stick into a swirling collage across the confetti stage. Vibrant playful lighting, joyful chaos.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The stout man grins and tosses handfuls of colorful candy pieces into the air, which stick into a swirling collage across the confetti stage. Vibrant playful lighting, joyful chaos.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: quick whip pan. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: bright studio room tone, distant applause. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_008",
+   "kind": "broll",
+   "scene": "confetti_stage",
+   "duration": 2.6,
+   "line": "",
+   "semantic_visual": "",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. The camera surveys the space, atmospheric and cinematic. Camera: slow pull-back revealing the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: bright studio room tone, distant applause. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_card_end",
+   "kind": "card",
+   "prompt": null
+  }
+ ]
+}

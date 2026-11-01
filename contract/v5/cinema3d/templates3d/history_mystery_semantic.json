@@ -1,0 +1,98 @@
+{
+ "template": "history_mystery",
+ "style": "parchment_case",
+ "look": "parchment-and-brass 3D archival film, dusty light, old maps, magnifiers",
+ "mode": "semantic",
+ "shots": [
+  {
+   "id": "v5_card_title",
+   "kind": "card",
+   "prompt": null
+  },
+  {
+   "id": "v5_001",
+   "kind": "broll",
+   "scene": "excavation_site",
+   "duration": 2.6,
+   "line": "",
+   "semantic_visual": "",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] parchment-and-brass 3D archival film, dusty light, old maps, magnifiers. Set in an archaeological excavation at dusk, lanterns and mist. The camera surveys the space, atmospheric and cinematic. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: dusty room tone, a distant wind. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_002",
+   "kind": "dialogue",
+   "scene": "ancient_map",
+   "duration": 6.37,
+   "line": "张骞出使西域，走了十三年，中间失踪的那些年到底发生了什么？",
+   "semantic_visual": "A weathered parchment map of Central Asia on a wooden table, a fingertip tracing a long route that fades into a blank dusty expanse; warm candlelight flickers over scattered sand grains.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] parchment-and-brass 3D archival film, dusty light, old maps, magnifiers. Set in a dim room with a huge ancient map, brass compasses and candlelight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, topknot black hair, wearing a amber traveler robe with navy accents, with staff and scroll. The shot shows the idea through visible action: A weathered parchment map of Central Asia on a wooden table, a fingertip tracing a long route that fades into a blank dusty expanse; warm candlelight flickers over scattered sand grains.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: dusty room tone, a distant wind. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_003",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 3.01,
+   "line": "地图上这段空白，比任何答案都更吓人。",
+   "semantic_visual": "A cloaked envoy stands before an ancient archive shelf, staring at a map with a torn blank gap; dim amber light and drifting dust create a tense, ominous mood.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] parchment-and-brass 3D archival film, dusty light, old maps, magnifiers. Set in an archive vault with dusty shelves of old case files. Featuring a stylized 3D animated man in his 40s, topknot black hair, wearing a amber traveler robe with navy accents, with staff and scroll. The shot shows the idea through visible action: A cloaked envoy stands before an ancient archive shelf, staring at a map with a torn blank gap; dim amber light and drifting dust create a tense, ominous mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: dusty room tone, a distant wind. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_004",
+   "kind": "dialogue",
+   "scene": "great_wall",
+   "duration": 5.73,
+   "line": "考古现场只找到了半枚铜印，剩下的都被风沙埋了。",
+   "semantic_visual": "At a windswept archaeological dig near a crumbling wall, a half bronze seal lies in sand while swirling dust buries the surrounding tools and trenches.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] parchment-and-brass 3D archival film, dusty light, old maps, magnifiers. Set in the Great Wall winding over misty blue-green mountains. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a amber robe with red-brown accents, with brush and scroll; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: At a windswept archaeological dig near a crumbling wall, a half bronze seal lies in sand while swirling dust buries the surrounding tools and trenches.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow rack focus between foreground and background. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: dusty room tone, a distant wind. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_005",
+   "kind": "dialogue",
+   "scene": "ancient_map",
+   "duration": 5.89,
+   "line": "今天，我们把这条线索重新拼起来。",
+   "semantic_visual": "Hands carefully align fragments of a worn map on a table, connecting scattered lines into one route as warm lamplight glows across the parchment.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] parchment-and-brass 3D archival film, dusty light, old maps, magnifiers. Set in a dim room with a huge ancient map, brass compasses and candlelight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Hands carefully align fragments of a worn map on a table, connecting scattered lines into one route as warm lamplight glows across the parchment.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: dusty room tone, a distant wind. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_006",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 6.29,
+   "line": "这块残片上只有三个字，却把时间线往前推了四百年。",
+   "semantic_visual": "A cracked bronze fragment rests on dark velvet under a focused beam, its worn surface catching light as a gloved hand gently turns it over.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] parchment-and-brass 3D archival film, dusty light, old maps, magnifiers. Set in an archive vault with dusty shelves of old case files. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, topknot black hair, wearing a amber traveler robe with navy accents, with staff and scroll. The shot shows the idea through visible action: A cracked bronze fragment rests on dark velvet under a focused beam, its worn surface catching light as a gloved hand gently turns it over.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: smooth lateral pan. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: dusty room tone, a distant wind. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_007",
+   "kind": "dialogue",
+   "scene": "great_wall",
+   "duration": 4.05,
+   "line": "我走过的那条路，风沙会把脚印抹掉，但抹不掉方向。",
+   "semantic_visual": "A lone traveler walks a desert road as wind erases footprints behind him, yet his shadow stretches straight toward a distant horizon under pale sky.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] parchment-and-brass 3D archival film, dusty light, old maps, magnifiers. Set in the Great Wall winding over misty blue-green mountains. Featuring a stylized 3D animated man in his 40s, topknot black hair, wearing a amber traveler robe with navy accents, with staff and scroll. The shot shows the idea through visible action: A lone traveler walks a desert road as wind erases footprints behind him, yet his shadow stretches straight toward a distant horizon under pale sky.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: dusty room tone, a distant wind. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_008",
+   "kind": "dialogue",
+   "scene": "ancient_map",
+   "duration": 6.29,
+   "line": "而这正是记录的意义：让后来的人知道有人走过。",
+   "semantic_visual": "An ancient scribe brushes ink across a bamboo scroll in a lamplit study, the steady strokes forming a record as dust motes drift through golden light.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] parchment-and-brass 3D archival film, dusty light, old maps, magnifiers. Set in a dim room with a huge ancient map, brass compasses and candlelight. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a amber robe with red-brown accents, with brush and scroll; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: An ancient scribe brushes ink across a bamboo scroll in a lamplit study, the steady strokes forming a record as dust motes drift through golden light.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow pull-back revealing the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: dusty room tone, a distant wind. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_card_end",
+   "kind": "card",
+   "prompt": null
+  }
+ ]
+}

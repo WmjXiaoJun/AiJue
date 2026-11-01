@@ -207,9 +207,19 @@ def main(argv=None) -> int:
         except Exception as exc:  # noqa: BLE001
             print(f"  lipsync {sid} error: {type(exc).__name__}: {exc}", flush=True)
 
+    def free_comfy_vram() -> None:
+        try:
+            import httpx
+            httpx.post("http://127.0.0.1:8188/free",
+                       json={"unload_models": True, "free_memory": True}, timeout=15)
+            print("  已释放 ComfyUI 显存（给 MuseTalk 让路）", flush=True)
+        except Exception as exc:  # noqa: BLE001
+            print("  释放显存失败（继续）:", exc, flush=True)
+
     todo = [s for s in briefs["shots"] if s.get("prompt")]
     if args.lipsync_only:
         print("=== 仅口型同步（复用已有 3D 镜头）===", flush=True)
+        free_comfy_vram()
         for i, shot in enumerate(todo, 1):
             print(f"[{i}/{len(todo)}]", end=" ", flush=True)
             apply_lipsync(shot)
@@ -220,7 +230,11 @@ def main(argv=None) -> int:
             print(f"[{i}/{len(todo)}] {shot['id']} {res.get('status')} {res.get('seconds', 0)}s", flush=True)
             if res.get("status") == "failed":
                 print("  error:", res.get("error"), flush=True)
-            else:
+        # 两阶段：全部生成完再统一做口型，避免 ComfyUI 占满显存导致 MuseTalk 卡住
+        if args.lipsync != "none":
+            print("=== 统一口型同步（MuseTalk）===", flush=True)
+            free_comfy_vram()
+            for i, shot in enumerate(todo, 1):
                 apply_lipsync(shot)
     if not args.skip_assemble:
         print("=== 剪辑 ===", flush=True)

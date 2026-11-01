@@ -1,0 +1,98 @@
+{
+ "template": "classics",
+ "style": "woodblock_classic",
+ "look": "high-end 3D animated historical Chinese film, ink-black wood, gold leaf, candlelight, volumetric dust",
+ "mode": "semantic",
+ "shots": [
+  {
+   "id": "v5_card_title",
+   "kind": "card",
+   "prompt": null
+  },
+  {
+   "id": "v5_001",
+   "kind": "broll",
+   "scene": "scholar_study",
+   "duration": 2.6,
+   "line": "",
+   "semantic_visual": "",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] high-end 3D animated historical Chinese film, ink-black wood, gold leaf, candlelight, volumetric dust. Set in a candlelit scholar's study with scrolls, ink stones and a wooden desk. The camera surveys the space, atmospheric and cinematic. Camera: slow crane rise. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet hall room tone, a distant bronze bell. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_002",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 8.53,
+   "line": "有人说《史记》是史书，也有人说它是文学，你们怎么看？",
+   "semantic_visual": "In a dim archive vault, an old man gestures toward a worn wooden scroll case while two robed figures listen; carved shelves recede into shadow, warm lantern light flickers across ancient woodblock textures.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] high-end 3D animated historical Chinese film, ink-black wood, gold leaf, candlelight, volumetric dust. Set in an ancient Chinese archive hall with towering shelves of bamboo slips and scrolls, warm lamp light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a amber robe with red-brown accents, with brush and scroll. The shot shows the idea through visible action: In a dim archive vault, an old man gestures toward a worn wooden scroll case while two robed figures listen; carved shelves recede into shadow, warm lantern light flickers across ancient woodblock textures.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow rack focus between foreground and background. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet hall room tone, a distant bronze bell. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_003",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 4.77,
+   "line": "我写的时候只想让人记住人，不是记住年份。",
+   "semantic_visual": "A robed historian bends over bamboo slips with brush in hand, his face lit by a single flame; around him fade painted faces of ordinary people, not calendar marks, in a vast palace hall.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] high-end 3D animated historical Chinese film, ink-black wood, gold leaf, candlelight, volumetric dust. Set in a grand ancient Chinese palace hall with red lacquer columns, silk banners and bronze braziers. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a amber robe with red-brown accents, with brush and scroll. The shot shows the idea through visible action: A robed historian bends over bamboo slips with brush in hand, his face lit by a single flame; around him fade painted faces of ordinary people, not calendar marks, in a vast palace hall.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet hall room tone, a distant bronze bell. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_004",
+   "kind": "dialogue",
+   "scene": "temple_court",
+   "duration": 5.81,
+   "line": "读《史记》像照镜子，照见的是我们自己的软肋。",
+   "semantic_visual": "In a temple courtyard, a poet gazes into a bronze mirror held near a stone basin; reflected light reveals a cracked, weathered face, and drifting incense smoke softens the carved pillars.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] high-end 3D animated historical Chinese film, ink-black wood, gold leaf, candlelight, volumetric dust. Set in an ancient temple courtyard with bronze bells, stone steps and incense smoke. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: In a temple courtyard, a poet gazes into a bronze mirror held near a stone basin; reflected light reveals a cracked, weathered face, and drifting incense smoke softens the carved pillars.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: smooth lateral pan. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet hall room tone, a distant bronze bell. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_005",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 4.29,
+   "line": "所以它两千年后还在被翻烂。",
+   "semantic_visual": "An old man lifts a scroll so frayed its edges crumble into dust; lamplight catches countless worn pages stacked around him in the vault, each corner soft and darkened by time.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] high-end 3D animated historical Chinese film, ink-black wood, gold leaf, candlelight, volumetric dust. Set in an ancient Chinese archive hall with towering shelves of bamboo slips and scrolls, warm lamp light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: An old man lifts a scroll so frayed its edges crumble into dust; lamplight catches countless worn pages stacked around him in the vault, each corner soft and darkened by time.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow rack focus between foreground and background. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet hall room tone, a distant bronze bell. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_006",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 6.29,
+   "line": "那你们写人物的时候，会不会故意留下疑点？",
+   "semantic_visual": "In a palace hall, an old man leans forward, pointing at a half-finished portrait scroll; a historian pauses mid-brush, leaving a deliberate blank space on the silk.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] high-end 3D animated historical Chinese film, ink-black wood, gold leaf, candlelight, volumetric dust. Set in a grand ancient Chinese palace hall with red lacquer columns, silk banners and bronze braziers. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a amber robe with red-brown accents, with brush and scroll. The shot shows the idea through visible action: In a palace hall, an old man leans forward, pointing at a half-finished portrait scroll; a historian pauses mid-brush, leaving a deliberate blank space on the silk.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet hall room tone, a distant bronze bell. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_007",
+   "kind": "dialogue",
+   "scene": "temple_court",
+   "duration": 5.01,
+   "line": "会。史书写不满的地方，正是后人反复读的地方。",
+   "semantic_visual": "A historian sets down his brush beside a scroll with an unfinished margin; in the temple courtyard, empty space glows faintly, inviting unseen readers to lean closer.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] high-end 3D animated historical Chinese film, ink-black wood, gold leaf, candlelight, volumetric dust. Set in an ancient temple courtyard with bronze bells, stone steps and incense smoke. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a amber robe with red-brown accents, with brush and scroll. The shot shows the idea through visible action: A historian sets down his brush beside a scroll with an unfinished margin; in the temple courtyard, empty space glows faintly, inviting unseen readers to lean closer.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: smooth lateral pan. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet hall room tone, a distant bronze bell. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_008",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 4.45,
+   "line": "所以读《史记》像破案，越读越觉得人心难写。",
+   "semantic_visual": "In the archive vault, a poet traces a finger along a worn scroll as if following clues; scattered pages and a guttering lamp cast shifting shadows, suggesting a puzzle slowly unfolding.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] high-end 3D animated historical Chinese film, ink-black wood, gold leaf, candlelight, volumetric dust. Set in an ancient Chinese archive hall with towering shelves of bamboo slips and scrolls, warm lamp light. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: In the archive vault, a poet traces a finger along a worn scroll as if following clues; scattered pages and a guttering lamp cast shifting shadows, suggesting a puzzle slowly unfolding.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow pull-back revealing the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet hall room tone, a distant bronze bell. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_card_end",
+   "kind": "card",
+   "prompt": null
+  }
+ ]
+}

@@ -1,0 +1,78 @@
+{
+ "template": "standup",
+ "style": "vhs_late_show",
+ "look": "retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain",
+ "mode": "semantic",
+ "shots": [
+  {
+   "id": "v5_card_title",
+   "kind": "card",
+   "prompt": null
+  },
+  {
+   "id": "v5_002",
+   "kind": "dialogue",
+   "scene": "brick_wall",
+   "duration": 8.21,
+   "line": "今天咱们聊聊手机，你有没有觉得手机就像个定时炸弹？",
+   "semantic_visual": "A comedian on a dim brick-wall stage holds a smartphone up like a ticking bomb, its screen glowing red, while vintage VHS grain ripples across the smoky club lighting.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a comedy club stage with a red brick wall and a microphone stand. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A comedian on a dim brick-wall stage holds a smartphone up like a ticking bomb, its screen glowing red, while vintage VHS grain ripples across the smoky club lighting.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: club room tone, a distant laugh. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_003",
+   "kind": "dialogue",
+   "scene": "dressing_room_vhs",
+   "duration": 4.05,
+   "line": "那必须的，手机不响我还真觉得哪儿不对劲。",
+   "semantic_visual": "A heavyset man in a cramped dressing room stares at a silent phone on the makeup counter, frowning and tapping his foot as neon light flickers over him.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a retro dressing room with bulb mirrors and a worn sofa. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A heavyset man in a cramped dressing room stares at a silent phone on the makeup counter, frowning and tapping his foot as neon light flickers over him.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: club room tone, a distant laugh. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_004",
+   "kind": "dialogue",
+   "scene": "city_vhs",
+   "duration": 6.53,
+   "line": "对，就是那种响个不停，生怕漏了任何一条信息的感觉。",
+   "semantic_visual": "A night city street glows with stacked neon signs while a lone figure walks hurriedly, phone buzzing nonstop in hand, headlights streaking past in VHS haze.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a VHS-lit city street at night, warm tungsten signs. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A night city street glows with stacked neon signs while a lone figure walks hurriedly, phone buzzing nonstop in hand, headlights streaking past in VHS haze.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: club room tone, a distant laugh. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_005",
+   "kind": "dialogue",
+   "scene": "brick_wall",
+   "duration": 6.37,
+   "line": "我还真琢磨过，要是手机突然没电了，是不是整个世界都会跟着安静几分？",
+   "semantic_visual": "A deadpan performer stands motionless before the brick wall as his phone screen fades to black; the room dims and the crowd stills in sudden quiet.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a comedy club stage with a red brick wall and a microphone stand. Featuring a stylized 3D animated man in his 30s, slick back black hair, wearing a black turtleneck with purple accents, with sunglasses. The shot shows the idea through visible action: A deadpan performer stands motionless before the brick wall as his phone screen fades to black; the room dims and the crowd stills in sudden quiet.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: club room tone, a distant laugh. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_006",
+   "kind": "dialogue",
+   "scene": "dressing_room_vhs",
+   "duration": 7.17,
+   "line": "那可不一定，没电了得找充电宝，还得担心别人给你发信息。",
+   "semantic_visual": "In the dressing room, a man rummages frantically through drawers for a power bank, cables tangled around his arms, a dying phone blinking nearby.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a retro dressing room with bulb mirrors and a worn sofa. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: In the dressing room, a man rummages frantically through drawers for a power bank, cables tangled around his arms, a dying phone blinking nearby.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: smooth lateral pan. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: club room tone, a distant laugh. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_007",
+   "kind": "dialogue",
+   "scene": "city_vhs",
+   "duration": 7.33,
+   "line": "说到底，还不是因为手机里的朋友比现实中的多，多到天天要关注。",
+   "semantic_visual": "A crowded city crosswalk glows with countless phone screens held by pedestrians, their faces lit blue, while the lone heavyset man watches from the curb.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a VHS-lit city street at night, warm tungsten signs. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A crowded city crosswalk glows with countless phone screens held by pedestrians, their faces lit blue, while the lone heavyset man watches from the curb.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow pull-back revealing the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: club room tone, a distant laugh. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_card_end",
+   "kind": "card",
+   "prompt": null
+  }
+ ]
+}
