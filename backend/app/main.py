@@ -28,6 +28,7 @@ from sqlalchemy.orm import Session
 from . import character_files, concept_files, config, jobs, llm, models, schemas, script_parser, seed
 from .db import SessionLocal, get_db, init_db
 from .routers import cinema3d as cinema3d_router
+from .routers import cinema_templates as cinema_templates_router
 from .routers import v5_catalog as v5_catalog_router
 from .routers import v5_studio as v5_studio_router
 from .routers import v6_agent as v6_agent_router
@@ -2162,6 +2163,8 @@ app.include_router(v5_catalog_router.router)
 app.include_router(v6_agent_router.router)
 # V7 Cinema Studio API（/api/cinema/*，3D 电影制片工作台）
 app.include_router(cinema3d_router.router)
+# V8 16 模板 3D 化 API（/api/cinema/templates/*，复用 cinema3d 的任务队列）
+app.include_router(cinema_templates_router.router)
 
 config.OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
 app.mount(

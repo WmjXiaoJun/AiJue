@@ -1,0 +1,107 @@
+{
+ "template": "history_mystery",
+ "style": "parchment_case",
+ "look": "parchment-and-brass 3D archival film, dusty light, old maps, magnifiers",
+ "shots": [
+  {
+   "id": "v5_card_title",
+   "kind": "card",
+   "prompt": null
+  },
+  {
+   "id": "v5_001",
+   "kind": "broll",
+   "scene": "excavation_site",
+   "duration": 2.6,
+   "roles": [],
+   "line": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] parchment-and-brass 3D archival film, dusty light, old maps, magnifiers. Set in an archaeological excavation at dusk, lanterns and mist. Camera: slow push-in toward the subject. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: dusty room tone, a distant wind. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_002",
+   "kind": "dialogue",
+   "scene": "ancient_map",
+   "duration": 6.37,
+   "roles": [
+    "host",
+    "figure_a"
+   ],
+   "line": "张骞出使西域，走了十三年，中间失踪的那些年到底发生了什么？",
+   "prompt": "integrated_multimodal_description: [Shot 1] parchment-and-brass 3D archival film, dusty light, old maps, magnifiers. Set in a dim room with a huge ancient map, brass compasses and candlelight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, topknot black hair, wearing a amber traveler robe with navy accents, with staff and scroll. an archivist studies an ancient map by candlelight. Camera: slow dolly move through the space. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: dusty room tone, a distant wind. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_003",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 3.01,
+   "roles": [
+    "figure_a"
+   ],
+   "line": "地图上这段空白，比任何答案都更吓人。",
+   "prompt": "integrated_multimodal_description: [Shot 1] parchment-and-brass 3D archival film, dusty light, old maps, magnifiers. Set in an archive vault with dusty shelves of old case files. Featuring a stylized 3D animated man in his 40s, topknot black hair, wearing a amber traveler robe with navy accents, with staff and scroll. the guest speaks and gestures, framed in a medium shot. Camera: slow cinematic camera move. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: dusty room tone, a distant wind. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_004",
+   "kind": "dialogue",
+   "scene": "great_wall",
+   "duration": 5.73,
+   "roles": [
+    "figure_b",
+    "host"
+   ],
+   "line": "考古现场只找到了半枚铜印，剩下的都被风沙埋了。",
+   "prompt": "integrated_multimodal_description: [Shot 1] parchment-and-brass 3D archival film, dusty light, old maps, magnifiers. Set in the Great Wall winding over misty blue-green mountains. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a amber robe with red-brown accents, with brush and scroll; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. an archivist studies an ancient map by candlelight. Camera: slow rack focus between foreground and background. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: dusty room tone, a distant wind. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_005",
+   "kind": "dialogue",
+   "scene": "ancient_map",
+   "duration": 5.89,
+   "roles": [
+    "host"
+   ],
+   "line": "今天，我们把这条线索重新拼起来。",
+   "prompt": "integrated_multimodal_description: [Shot 1] parchment-and-brass 3D archival film, dusty light, old maps, magnifiers. Set in a dim room with a huge ancient map, brass compasses and candlelight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. an archivist studies an ancient map by candlelight. Camera: slow dolly move through the space. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: dusty room tone, a distant wind. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_006",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 6.29,
+   "roles": [
+    "host",
+    "figure_a"
+   ],
+   "line": "这块残片上只有三个字，却把时间线往前推了四百年。",
+   "prompt": "integrated_multimodal_description: [Shot 1] parchment-and-brass 3D archival film, dusty light, old maps, magnifiers. Set in an archive vault with dusty shelves of old case files. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, topknot black hair, wearing a amber traveler robe with navy accents, with staff and scroll. an archivist studies an ancient map by candlelight. Camera: smooth lateral pan. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: dusty room tone, a distant wind. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_007",
+   "kind": "dialogue",
+   "scene": "great_wall",
+   "duration": 4.05,
+   "roles": [
+    "figure_a"
+   ],
+   "line": "我走过的那条路，风沙会把脚印抹掉，但抹不掉方向。",
+   "prompt": "integrated_multimodal_description: [Shot 1] parchment-and-brass 3D archival film, dusty light, old maps, magnifiers. Set in the Great Wall winding over misty blue-green mountains. Featuring a stylized 3D animated man in his 40s, topknot black hair, wearing a amber traveler robe with navy accents, with staff and scroll. the guest speaks and gestures, framed in a medium shot. Camera: slow push-in toward the subject. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: dusty room tone, a distant wind. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_008",
+   "kind": "dialogue",
+   "scene": "ancient_map",
+   "duration": 6.29,
+   "roles": [
+    "figure_b",
+    "host"
+   ],
+   "line": "而这正是记录的意义：让后来的人知道有人走过。",
+   "prompt": "integrated_multimodal_description: [Shot 1] parchment-and-brass 3D archival film, dusty light, old maps, magnifiers. Set in a dim room with a huge ancient map, brass compasses and candlelight. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a amber robe with red-brown accents, with brush and scroll; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. an archivist studies an ancient map by candlelight. Camera: slow pull-back revealing the space. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: dusty room tone, a distant wind. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_card_end",
+   "kind": "card",
+   "prompt": null
+  }
+ ]
+}

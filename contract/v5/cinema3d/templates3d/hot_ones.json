@@ -1,0 +1,104 @@
+{
+ "template": "hot_ones",
+ "style": "film_interview",
+ "look": "warm 35mm film look 3D animated interview, amber practical lights, soft bokeh",
+ "shots": [
+  {
+   "id": "v5_card_title",
+   "kind": "card",
+   "prompt": null
+  },
+  {
+   "id": "v5_001",
+   "kind": "broll",
+   "scene": "interview_sofa",
+   "duration": 2.6,
+   "roles": [],
+   "line": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a cozy interview lounge with leather sofas and warm lamps. Camera: slow push-in toward the subject. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: soft room tone, rain on glass. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_002",
+   "kind": "dialogue",
+   "scene": "cafe_window",
+   "duration": 6.69,
+   "roles": [
+    "host",
+    "figure_a"
+   ],
+   "line": "老周，你这回可真够辣的，和大魏聊中年人的体面，这话题我可是听新鲜了。",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm cafe by a rainy window, amber pendant lights and bokeh. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. two friends talk on a sofa, warm lamplight between them. Camera: slow dolly move through the space. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: soft room tone, rain on glass. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_003",
+   "kind": "dialogue",
+   "scene": "kitchen_film",
+   "duration": 5.17,
+   "roles": [
+    "figure_a"
+   ],
+   "line": "是啊，咱们这辈人，年轻时拼事业，现在该拼点啥？",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm film-lit kitchen with copper pots and steam. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. the guest speaks and gestures, framed in a medium shot. Camera: slow rack focus between foreground and background. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: soft room tone, rain on glass. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_004",
+   "kind": "dialogue",
+   "scene": "film_strip",
+   "duration": 6.05,
+   "roles": [
+    "host",
+    "figure_a"
+   ],
+   "line": "对了大魏，你这回是怎么看的？",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. two friends talk on a sofa, warm lamplight between them. Camera: slow rack focus between foreground and background. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: soft room tone, rain on glass. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_005",
+   "kind": "dialogue",
+   "scene": "cafe_window",
+   "duration": 6.29,
+   "roles": [
+    "figure_b"
+   ],
+   "line": "我觉得啊，老周说的没错，体面不光是面子，更是生活的质量。",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm cafe by a rainy window, amber pendant lights and bokeh. Featuring a stylized 3D animated man in his 50s, bald black hair, wearing a black jacket with red-brown accents, with glasses. the guest speaks and gestures, framed in a medium shot. Camera: slow dolly move through the space. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: soft room tone, rain on glass. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_006",
+   "kind": "dialogue",
+   "scene": "kitchen_film",
+   "duration": 4.45,
+   "roles": [
+    "host",
+    "figure_a"
+   ],
+   "line": "那你们俩的体面，是不是也体现在这节目上呢？",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm film-lit kitchen with copper pots and steam. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. two friends talk on a sofa, warm lamplight between them. Camera: slow rack focus between foreground and background. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: soft room tone, rain on glass. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_007",
+   "kind": "dialogue",
+   "scene": "film_strip",
+   "duration": 4.13,
+   "roles": [
+    "figure_a"
+   ],
+   "line": "这节目确实挺接地气儿的，咱们聊的就是生活里的真事儿。",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. the guest speaks and gestures, framed in a medium shot. Camera: slow push-in toward the subject. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: soft room tone, rain on glass. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_008",
+   "kind": "broll",
+   "scene": "film_strip",
+   "duration": 2.6,
+   "roles": [],
+   "line": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. Camera: slow pull-back revealing the space. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: soft room tone, rain on glass. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_card_end",
+   "kind": "card",
+   "prompt": null
+  }
+ ]
+}

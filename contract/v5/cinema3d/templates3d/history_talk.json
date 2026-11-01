@@ -1,0 +1,75 @@
+{
+ "template": "history_talk",
+ "style": "ink_chronicle",
+ "look": "cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze",
+ "shots": [
+  {
+   "id": "v5_card_title",
+   "kind": "card",
+   "prompt": null
+  },
+  {
+   "id": "v5_002",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 10.13,
+   "roles": [
+    "host",
+    "figure_a"
+   ],
+   "line": "今天把官渡之战摊在地图上，换个问法：如果曹操输了，历史会怎么走？",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. figures in dark ancient robes discuss beside a sand table. Camera: slow crane descend. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: wind outside, a quiet candle flame. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_003",
+   "kind": "dialogue",
+   "scene": "battlefield",
+   "duration": 8.45,
+   "roles": [
+    "figure_a"
+   ],
+   "line": "我输不起，因为我的粮道只有一条，烧了就什么都没了。",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a misty ancient battlefield at dawn, broken banners and spears in the mud. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. the guest speaks and gestures, framed in a medium shot. Camera: slow push-in toward the subject. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: wind outside, a quiet candle flame. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_004",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 3.33,
+   "roles": [
+    "figure_b",
+    "host"
+   ],
+   "line": "可你赢了，也只是把乱世推迟了二十年。",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient Chinese palace hall at night, candles and deep shadows. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. figures in dark ancient robes discuss beside a sand table. Camera: slow rack focus between foreground and background. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: wind outside, a quiet candle flame. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_005",
+   "kind": "dialogue",
+   "scene": "scholar_study",
+   "duration": 4.13,
+   "roles": [
+    "host"
+   ],
+   "line": "地图上这条线，就是两个人的生死线。",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a moonlit study with scroll maps and hanging brushes. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. figures in dark ancient robes discuss beside a sand table. Camera: slow push-in toward the subject. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: wind outside, a quiet candle flame. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_006",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 9.09,
+   "roles": [
+    "host",
+    "figure_a"
+   ],
+   "line": "先看这张地图，许攸投奔那晚，乌巢的粮仓就在这条河边。",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. figures in dark ancient robes discuss beside a sand table. Camera: slow pull-back revealing the space. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: wind outside, a quiet candle flame. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_card_end",
+   "kind": "card",
+   "prompt": null
+  }
+ ]
+}

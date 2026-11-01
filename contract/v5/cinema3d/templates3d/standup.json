@@ -1,0 +1,86 @@
+{
+ "template": "standup",
+ "style": "vhs_late_show",
+ "look": "retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain",
+ "shots": [
+  {
+   "id": "v5_card_title",
+   "kind": "card",
+   "prompt": null
+  },
+  {
+   "id": "v5_002",
+   "kind": "dialogue",
+   "scene": "brick_wall",
+   "duration": 8.21,
+   "roles": [
+    "host",
+    "figure_a"
+   ],
+   "line": "今天咱们聊聊手机，你有没有觉得手机就像个定时炸弹？",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a comedy club stage with a red brick wall and a microphone stand. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. a comedian speaks into a microphone on a small stage. Camera: slow cinematic camera move. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: club room tone, a distant laugh. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_003",
+   "kind": "dialogue",
+   "scene": "dressing_room_vhs",
+   "duration": 4.05,
+   "roles": [
+    "figure_a"
+   ],
+   "line": "那必须的，手机不响我还真觉得哪儿不对劲。",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a retro dressing room with bulb mirrors and a worn sofa. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. the guest speaks and gestures, framed in a medium shot. Camera: slow dolly move through the space. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: club room tone, a distant laugh. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_004",
+   "kind": "dialogue",
+   "scene": "city_vhs",
+   "duration": 6.53,
+   "roles": [
+    "host",
+    "figure_a"
+   ],
+   "line": "对，就是那种响个不停，生怕漏了任何一条信息的感觉。",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a VHS-lit city street at night, warm tungsten signs. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. a comedian speaks into a microphone on a small stage. Camera: slow cinematic camera move. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: club room tone, a distant laugh. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_005",
+   "kind": "dialogue",
+   "scene": "brick_wall",
+   "duration": 6.37,
+   "roles": [
+    "figure_b"
+   ],
+   "line": "我还真琢磨过，要是手机突然没电了，是不是整个世界都会跟着安静几分？",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a comedy club stage with a red brick wall and a microphone stand. Featuring a stylized 3D animated man in his 30s, slick back black hair, wearing a black turtleneck with purple accents, with sunglasses. the guest speaks and gestures, framed in a medium shot. Camera: slow push-in toward the subject. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: club room tone, a distant laugh. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_006",
+   "kind": "dialogue",
+   "scene": "dressing_room_vhs",
+   "duration": 7.17,
+   "roles": [
+    "host",
+    "figure_a"
+   ],
+   "line": "那可不一定，没电了得找充电宝，还得担心别人给你发信息。",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a retro dressing room with bulb mirrors and a worn sofa. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. a comedian speaks into a microphone on a small stage. Camera: smooth lateral pan. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: club room tone, a distant laugh. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_007",
+   "kind": "dialogue",
+   "scene": "city_vhs",
+   "duration": 7.33,
+   "roles": [
+    "figure_a"
+   ],
+   "line": "说到底，还不是因为手机里的朋友比现实中的多，多到天天要关注。",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a VHS-lit city street at night, warm tungsten signs. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. the guest speaks and gestures, framed in a medium shot. Camera: slow pull-back revealing the space. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: club room tone, a distant laugh. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_card_end",
+   "kind": "card",
+   "prompt": null
+  }
+ ]
+}

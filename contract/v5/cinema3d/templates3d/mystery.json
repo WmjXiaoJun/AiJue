@@ -1,0 +1,104 @@
+{
+ "template": "mystery",
+ "style": "noir_rain",
+ "look": "film-noir 3D animation, rain, venetian-blind shadows, single hanging lamp, smoke",
+ "shots": [
+  {
+   "id": "v5_card_title",
+   "kind": "card",
+   "prompt": null
+  },
+  {
+   "id": "v5_001",
+   "kind": "broll",
+   "scene": "noir_office",
+   "duration": 2.6,
+   "roles": [],
+   "line": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] film-noir 3D animation, rain, venetian-blind shadows, single hanging lamp, smoke. Set in a noir detective office at night, rain on the window, venetian blinds. Camera: slow push-in toward the subject. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: rain on the window, a distant siren. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_002",
+   "kind": "dialogue",
+   "scene": "rainy_street",
+   "duration": 7.17,
+   "roles": [
+    "host",
+    "figure_a"
+   ],
+   "line": "今晚的雨真大，咱们就一起揭开这雨夜的谜团",
+   "prompt": "integrated_multimodal_description: [Shot 1] film-noir 3D animation, rain, venetian-blind shadows, single hanging lamp, smoke. Set in a rainy night street with neon reflections and fog. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, slick back black hair, wearing a black turtleneck with purple accents, with sunglasses. a detective paces beside a desk with case files. Camera: smooth lateral pan. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: rain on the window, a distant siren. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_003",
+   "kind": "dialogue",
+   "scene": "interrogation_room",
+   "duration": 3.41,
+   "roles": [
+    "figure_a"
+   ],
+   "line": "我在那栋老宅里等了她一整夜",
+   "prompt": "integrated_multimodal_description: [Shot 1] film-noir 3D animation, rain, venetian-blind shadows, single hanging lamp, smoke. Set in a dim interrogation room with a single hanging lamp and venetian blind shadows. Featuring a stylized 3D animated man in his 30s, slick back black hair, wearing a black turtleneck with purple accents, with sunglasses. the guest speaks and gestures, framed in a medium shot. Camera: slow cinematic camera move. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: rain on the window, a distant siren. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_004",
+   "kind": "dialogue",
+   "scene": "police_archive",
+   "duration": 3.89,
+   "roles": [
+    "host",
+    "figure_a"
+   ],
+   "line": "那你说说，那晚到底发生了什么",
+   "prompt": "integrated_multimodal_description: [Shot 1] film-noir 3D animation, rain, venetian-blind shadows, single hanging lamp, smoke. Set in a police archive with rows of files and a desk lamp. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, slick back black hair, wearing a black turtleneck with purple accents, with sunglasses. a detective paces beside a desk with case files. Camera: slow dolly move through the space. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: rain on the window, a distant siren. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_005",
+   "kind": "dialogue",
+   "scene": "rainy_street",
+   "duration": 6.05,
+   "roles": [
+    "figure_b"
+   ],
+   "line": "雨声掩盖了一切，只留下空荡荡的走廊",
+   "prompt": "integrated_multimodal_description: [Shot 1] film-noir 3D animation, rain, venetian-blind shadows, single hanging lamp, smoke. Set in a rainy night street with neon reflections and fog. Featuring a stylized 3D animated person in her 30s, hood black hair, wearing a black cloak with purple accents, with mask and glow. the guest speaks and gestures, framed in a medium shot. Camera: smooth lateral pan. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: rain on the window, a distant siren. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_006",
+   "kind": "dialogue",
+   "scene": "interrogation_room",
+   "duration": 3.65,
+   "roles": [
+    "figure_a",
+    "host"
+   ],
+   "line": "她消失在走廊尽头，却再也没有出现",
+   "prompt": "integrated_multimodal_description: [Shot 1] film-noir 3D animation, rain, venetian-blind shadows, single hanging lamp, smoke. Set in a dim interrogation room with a single hanging lamp and venetian blind shadows. Featuring a stylized 3D animated man in his 30s, slick back black hair, wearing a black turtleneck with purple accents, with sunglasses; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. a detective paces beside a desk with case files. Camera: slow dolly move through the space. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: rain on the window, a distant siren. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_007",
+   "kind": "dialogue",
+   "scene": "police_archive",
+   "duration": 4.85,
+   "roles": [
+    "host"
+   ],
+   "line": "雨夜之后，真相只在你我心中",
+   "prompt": "integrated_multimodal_description: [Shot 1] film-noir 3D animation, rain, venetian-blind shadows, single hanging lamp, smoke. Set in a police archive with rows of files and a desk lamp. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. a detective paces beside a desk with case files. Camera: slow dolly move through the space. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: rain on the window, a distant siren. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_008",
+   "kind": "broll",
+   "scene": "police_archive",
+   "duration": 2.6,
+   "roles": [],
+   "line": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] film-noir 3D animation, rain, venetian-blind shadows, single hanging lamp, smoke. Set in a police archive with rows of files and a desk lamp. Camera: slow pull-back revealing the space. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: rain on the window, a distant siren. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_card_end",
+   "kind": "card",
+   "prompt": null
+  }
+ ]
+}

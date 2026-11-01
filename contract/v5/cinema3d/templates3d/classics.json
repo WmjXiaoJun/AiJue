@@ -1,0 +1,107 @@
+{
+ "template": "classics",
+ "style": "woodblock_classic",
+ "look": "high-end 3D animated historical Chinese film, ink-black wood, gold leaf, candlelight, volumetric dust",
+ "shots": [
+  {
+   "id": "v5_card_title",
+   "kind": "card",
+   "prompt": null
+  },
+  {
+   "id": "v5_001",
+   "kind": "broll",
+   "scene": "scholar_study",
+   "duration": 2.6,
+   "roles": [],
+   "line": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] high-end 3D animated historical Chinese film, ink-black wood, gold leaf, candlelight, volumetric dust. Set in a candlelit scholar's study with scrolls, ink stones and a wooden desk. Camera: slow crane rise. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: quiet hall room tone, a distant bronze bell. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_002",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 8.53,
+   "roles": [
+    "host",
+    "figure_a"
+   ],
+   "line": "有人说《史记》是史书，也有人说它是文学，你们怎么看？",
+   "prompt": "integrated_multimodal_description: [Shot 1] high-end 3D animated historical Chinese film, ink-black wood, gold leaf, candlelight, volumetric dust. Set in an ancient Chinese archive hall with towering shelves of bamboo slips and scrolls, warm lamp light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a amber robe with red-brown accents, with brush and scroll. a scholar stands among the scrolls and speaks with quiet authority. Camera: slow rack focus between foreground and background. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: quiet hall room tone, a distant bronze bell. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_003",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 4.77,
+   "roles": [
+    "figure_a"
+   ],
+   "line": "我写的时候只想让人记住人，不是记住年份。",
+   "prompt": "integrated_multimodal_description: [Shot 1] high-end 3D animated historical Chinese film, ink-black wood, gold leaf, candlelight, volumetric dust. Set in a grand ancient Chinese palace hall with red lacquer columns, silk banners and bronze braziers. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a amber robe with red-brown accents, with brush and scroll. the guest speaks and gestures, framed in a medium shot. Camera: slow cinematic camera move. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: quiet hall room tone, a distant bronze bell. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_004",
+   "kind": "dialogue",
+   "scene": "temple_court",
+   "duration": 5.81,
+   "roles": [
+    "figure_b",
+    "host"
+   ],
+   "line": "读《史记》像照镜子，照见的是我们自己的软肋。",
+   "prompt": "integrated_multimodal_description: [Shot 1] high-end 3D animated historical Chinese film, ink-black wood, gold leaf, candlelight, volumetric dust. Set in an ancient temple courtyard with bronze bells, stone steps and incense smoke. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. a scholar stands among the scrolls and speaks with quiet authority. Camera: smooth lateral pan. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: quiet hall room tone, a distant bronze bell. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_005",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 4.29,
+   "roles": [
+    "host"
+   ],
+   "line": "所以它两千年后还在被翻烂。",
+   "prompt": "integrated_multimodal_description: [Shot 1] high-end 3D animated historical Chinese film, ink-black wood, gold leaf, candlelight, volumetric dust. Set in an ancient Chinese archive hall with towering shelves of bamboo slips and scrolls, warm lamp light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. a scholar stands among the scrolls and speaks with quiet authority. Camera: slow rack focus between foreground and background. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: quiet hall room tone, a distant bronze bell. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_006",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 6.29,
+   "roles": [
+    "host",
+    "figure_a"
+   ],
+   "line": "那你们写人物的时候，会不会故意留下疑点？",
+   "prompt": "integrated_multimodal_description: [Shot 1] high-end 3D animated historical Chinese film, ink-black wood, gold leaf, candlelight, volumetric dust. Set in a grand ancient Chinese palace hall with red lacquer columns, silk banners and bronze braziers. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a amber robe with red-brown accents, with brush and scroll. a scholar stands among the scrolls and speaks with quiet authority. Camera: slow dolly move through the space. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: quiet hall room tone, a distant bronze bell. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_007",
+   "kind": "dialogue",
+   "scene": "temple_court",
+   "duration": 5.01,
+   "roles": [
+    "figure_a"
+   ],
+   "line": "会。史书写不满的地方，正是后人反复读的地方。",
+   "prompt": "integrated_multimodal_description: [Shot 1] high-end 3D animated historical Chinese film, ink-black wood, gold leaf, candlelight, volumetric dust. Set in an ancient temple courtyard with bronze bells, stone steps and incense smoke. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a amber robe with red-brown accents, with brush and scroll. the guest speaks and gestures, framed in a medium shot. Camera: smooth lateral pan. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: quiet hall room tone, a distant bronze bell. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_008",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 4.45,
+   "roles": [
+    "figure_b",
+    "host"
+   ],
+   "line": "所以读《史记》像破案，越读越觉得人心难写。",
+   "prompt": "integrated_multimodal_description: [Shot 1] high-end 3D animated historical Chinese film, ink-black wood, gold leaf, candlelight, volumetric dust. Set in an ancient Chinese archive hall with towering shelves of bamboo slips and scrolls, warm lamp light. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. a scholar stands among the scrolls and speaks with quiet authority. Camera: slow pull-back revealing the space. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: quiet hall room tone, a distant bronze bell. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_card_end",
+   "kind": "card",
+   "prompt": null
+  }
+ ]
+}

@@ -1,0 +1,104 @@
+{
+ "template": "traitors",
+ "style": "baroque_candle",
+ "look": "baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow",
+ "shots": [
+  {
+   "id": "v5_card_title",
+   "kind": "card",
+   "prompt": null
+  },
+  {
+   "id": "v5_001",
+   "kind": "broll",
+   "scene": "castle_hall_baroque",
+   "duration": 2.6,
+   "roles": [],
+   "line": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a baroque castle hall with a long stone table and candelabras. Camera: slow crane rise. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_002",
+   "kind": "dialogue",
+   "scene": "candle_corridor",
+   "duration": 5.17,
+   "roles": [
+    "host",
+    "figure_a"
+   ],
+   "line": "烛光摇曳，武则天与曹操对视，气氛紧张",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a long castle corridor lined with hundreds of candles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. guests sit around a candlelit stone table in a castle hall. Camera: slow cinematic camera move. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_003",
+   "kind": "dialogue",
+   "scene": "stone_roundtable",
+   "duration": 5.65,
+   "roles": [
+    "figure_a"
+   ],
+   "line": "我武则天何许人也？你曹操可是深谙权谋啊。",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a round stone table in a candlelit hall, heavy drapery. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. the guest speaks and gestures, framed in a medium shot. Camera: slow cinematic camera move. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_004",
+   "kind": "dialogue",
+   "scene": "crypt",
+   "duration": 7.01,
+   "roles": [
+    "figure_b",
+    "host"
+   ],
+   "line": "那咱俩得来个真心话大冒险，试探试探对方。",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. guests sit around a candlelit stone table in a castle hall. Camera: slow push-in toward the subject. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_005",
+   "kind": "dialogue",
+   "scene": "candle_corridor",
+   "duration": 5.65,
+   "roles": [
+    "host"
+   ],
+   "line": "就怕这冒险，一不小心就成了千古遗恨。",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a long castle corridor lined with hundreds of candles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. guests sit around a candlelit stone table in a castle hall. Camera: slow crane rise. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_006",
+   "kind": "dialogue",
+   "scene": "stone_roundtable",
+   "duration": 3.65,
+   "roles": [
+    "figure_a",
+    "host"
+   ],
+   "line": "放心，我武某人从不轻易下结论。",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a round stone table in a candlelit hall, heavy drapery. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. guests sit around a candlelit stone table in a castle hall. Camera: slow push-in toward the subject. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_007",
+   "kind": "dialogue",
+   "scene": "crypt",
+   "duration": 5.09,
+   "roles": [
+    "figure_b"
+   ],
+   "line": "那咱俩就从你开始，你先来。",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. the guest speaks and gestures, framed in a medium shot. Camera: slow push-in toward the subject. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_008",
+   "kind": "broll",
+   "scene": "crypt",
+   "duration": 2.6,
+   "roles": [],
+   "line": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. Camera: slow pull-back revealing the space. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_card_end",
+   "kind": "card",
+   "prompt": null
+  }
+ ]
+}

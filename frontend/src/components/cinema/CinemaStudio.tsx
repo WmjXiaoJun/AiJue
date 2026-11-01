@@ -1,23 +1,26 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { CinemaOverview, CinemaTab, CinemaWorkers } from "../../lib/cinema";
-import { cinemaApi } from "../../lib/cinema";
+import type { CinemaOverview, CinemaTab, CinemaTemplatesSummary, CinemaWorkers } from "../../lib/cinema";
+import { TEMPLATE_3D_TOTAL, cinemaApi } from "../../lib/cinema";
 import { useToast } from "../Toast";
 import { Spinner } from "../ui";
+import { IconTemplate } from "../icons";
 import { CinemaOverviewPage } from "./Overview";
+import { CinemaTemplates } from "./Templates";
 import { CinemaShots } from "./Shots";
 import { CinemaJobs } from "./Jobs";
 import { CinemaAssemble } from "./Assemble";
 import { CinemaFinal } from "./Final";
 import "../../styles/cinema.css";
 
-const TAB_KEYS: CinemaTab[] = ["overview", "shots", "jobs", "assemble", "final"];
+const TAB_KEYS: CinemaTab[] = ["overview", "templates", "shots", "jobs", "assemble", "final"];
 
 const TAB_META: Record<CinemaTab, { label: string; en: string; no: string; icon: JSX.Element }> = {
   overview: { label: "总览", en: "OVERVIEW", no: "01", icon: <IconGrid /> },
-  shots: { label: "镜头台", en: "SHOT WORKBENCH", no: "02", icon: <IconFrames /> },
-  jobs: { label: "生成队列", en: "RENDER QUEUE", no: "03", icon: <IconPulse /> },
-  assemble: { label: "剪辑台", en: "EDIT & MASTER", no: "04", icon: <IconSliders /> },
-  final: { label: "成片 & QC", en: "DELIVERY", no: "05", icon: <IconPlay /> },
+  templates: { label: "模板库 · 3D", en: "TEMPLATE STUDIO", no: "02", icon: <IconTemplate size={17} /> },
+  shots: { label: "镜头台", en: "SHOT WORKBENCH", no: "03", icon: <IconFrames /> },
+  jobs: { label: "生成队列", en: "RENDER QUEUE", no: "04", icon: <IconPulse /> },
+  assemble: { label: "剪辑台", en: "EDIT & MASTER", no: "05", icon: <IconSliders /> },
+  final: { label: "成片 & QC", en: "DELIVERY", no: "06", icon: <IconPlay /> },
 };
 
 function tabFromHash(): CinemaTab {
@@ -31,6 +34,7 @@ export function CinemaStudio({ onExit }: { onExit: () => void }) {
   const [tab, setTab] = useState<CinemaTab>(() => tabFromHash());
   const [overview, setOverview] = useState<CinemaOverview | null>(null);
   const [workers, setWorkers] = useState<CinemaWorkers | null>(null);
+  const [tplSummary, setTplSummary] = useState<CinemaTemplatesSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [refreshing, setRefreshing] = useState(false);
@@ -50,6 +54,12 @@ export function CinemaStudio({ onExit }: { onExit: () => void }) {
       setWorkers(await cinemaApi.workers());
     } catch {
       setWorkers(null);
+    }
+    // 顶栏「模板 3D x/16」：模板库接口未就绪时静默降级（页面内另有完整错误态）
+    try {
+      setTplSummary((await cinemaApi.templates()).summary);
+    } catch {
+      /* 保持上一次统计 */
     }
   }, []);
 
@@ -172,6 +182,20 @@ export function CinemaStudio({ onExit }: { onExit: () => void }) {
               <b style={{ color: activeJobs ? "var(--c-gold)" : "var(--c-jade)" }}>{activeJobs}</b>
               <span>进行中任务</span>
             </div>
+            <div className="cm-top-stat">
+              <b
+                style={{
+                  color:
+                    tplSummary && tplSummary.done > 0 && tplSummary.done >= (tplSummary.total || TEMPLATE_3D_TOTAL)
+                      ? "var(--c-jade)"
+                      : "var(--c-gold-soft)",
+                }}
+                title="16 模板 3D 化完成数"
+              >
+                {tplSummary ? `${tplSummary.done}/${tplSummary.total || TEMPLATE_3D_TOTAL}` : `—/${TEMPLATE_3D_TOTAL}`}
+              </b>
+              <span>模板 3D</span>
+            </div>
           </div>
 
           <div className="cm-top-actions">
@@ -207,6 +231,8 @@ export function CinemaStudio({ onExit }: { onExit: () => void }) {
             </div>
           ) : tab === "overview" ? (
             <CinemaOverviewPage overview={overview} onNavigate={navigate} />
+          ) : tab === "templates" ? (
+            <CinemaTemplates />
           ) : tab === "shots" ? (
             <CinemaShots />
           ) : tab === "jobs" ? (

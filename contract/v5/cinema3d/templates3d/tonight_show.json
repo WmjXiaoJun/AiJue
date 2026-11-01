@@ -1,0 +1,116 @@
+{
+ "template": "tonight_show",
+ "style": "neon_toon",
+ "look": "glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field",
+ "shots": [
+  {
+   "id": "v5_card_title",
+   "kind": "card",
+   "prompt": null
+  },
+  {
+   "id": "v5_001",
+   "kind": "broll",
+   "scene": "neon_skyline",
+   "duration": 2.6,
+   "roles": [],
+   "line": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a rooftop terrace at night overlooking a neon megacity skyline, glowing signs and floating light. Camera: slow cinematic camera move. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_002",
+   "kind": "dialogue",
+   "scene": "late_night_studio",
+   "duration": 8.21,
+   "roles": [
+    "host",
+    "guest_a"
+   ],
+   "line": "欢迎回到造片局，今天聊一个得罪人的话题：AI 主持人会不会抢走我们的饭碗。",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a glossy late-night talk show set with a curved desk, guest armchairs, warm spotlights and a neon city backdrop. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. the host leans on the desk and gestures while the guest laughs. Camera: slow cinematic camera move. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_003",
+   "kind": "dialogue",
+   "scene": "backstage_neon",
+   "duration": 5.25,
+   "roles": [
+    "guest_a"
+   ],
+   "line": "我先说结论：会抢走念稿的，抢不走临场反应的。",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a backstage corridor lined with glowing bulbs and mirrors. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. the guest speaks and gestures, framed in a medium shot. Camera: slow cinematic camera move. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_004",
+   "kind": "dialogue",
+   "scene": "neon_alley",
+   "duration": 3.41,
+   "roles": [
+    "guest_b",
+    "host"
+   ],
+   "line": "观众要的从来不是正确答案，而是被逗笑的那一下。",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a narrow neon-lit alley after rain, reflections on wet pavement. Featuring a stylized 3D animated man in his 20s, under cut black hair, wearing a white shirt with navy accents, with laptop and coffee; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. the host leans on the desk and gestures while the guest laughs. Camera: quick whip pan. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_005",
+   "kind": "dialogue",
+   "scene": "late_night_studio",
+   "duration": 6.77,
+   "roles": [
+    "host"
+   ],
+   "line": "所以别怕 AI，先怕自己写的稿子像 AI。",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a glossy late-night talk show set with a curved desk, guest armchairs, warm spotlights and a neon city backdrop. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. the host leans on the desk and gestures while the guest laughs. Camera: slow cinematic camera move. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_006",
+   "kind": "dialogue",
+   "scene": "backstage_neon",
+   "duration": 4.13,
+   "roles": [
+    "guest_a",
+    "host"
+   ],
+   "line": "而且它不会累，凌晨三点还能给我写十个开场白。",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a backstage corridor lined with glowing bulbs and mirrors. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. the host leans on the desk and gestures while the guest laughs. Camera: quick whip pan. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_007",
+   "kind": "dialogue",
+   "scene": "neon_alley",
+   "duration": 6.21,
+   "roles": [
+    "host"
+   ],
+   "line": "可观众半夜打开电视，想看的不是完美，是有人陪。",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a narrow neon-lit alley after rain, reflections on wet pavement. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. the host leans on the desk and gestures while the guest laughs. Camera: slow cinematic camera move. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_008",
+   "kind": "dialogue",
+   "scene": "late_night_studio",
+   "duration": 2.53,
+   "roles": [
+    "guest_b",
+    "host"
+   ],
+   "line": "那就让 AI 写稿，让真人负责翻车和救场。",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a glossy late-night talk show set with a curved desk, guest armchairs, warm spotlights and a neon city backdrop. Featuring a stylized 3D animated man in his 20s, under cut black hair, wearing a white shirt with navy accents, with laptop and coffee; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. the host leans on the desk and gestures while the guest laughs. Camera: slow push-in toward the subject. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_009",
+   "kind": "broll",
+   "scene": "neon_alley",
+   "duration": 2.6,
+   "roles": [],
+   "line": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a narrow neon-lit alley after rain, reflections on wet pavement. Camera: slow push-in toward the subject. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_card_end",
+   "kind": "card",
+   "prompt": null
+  }
+ ]
+}

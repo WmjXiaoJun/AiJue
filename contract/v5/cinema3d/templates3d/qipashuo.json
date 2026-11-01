@@ -1,0 +1,104 @@
+{
+ "template": "qipashuo",
+ "style": "silk_arena",
+ "look": "dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights",
+ "shots": [
+  {
+   "id": "v5_card_title",
+   "kind": "card",
+   "prompt": null
+  },
+  {
+   "id": "v5_001",
+   "kind": "broll",
+   "scene": "silk_debate_hall",
+   "duration": 2.6,
+   "roles": [],
+   "line": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate hall draped in pale silk, dramatic spotlights and microphone stands. Camera: slow push-in toward the subject. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: hall reverb, a tense hush. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_002",
+   "kind": "dialogue",
+   "scene": "scroll_split",
+   "duration": 3.57,
+   "roles": [
+    "figure_a",
+    "host"
+   ],
+   "line": "曹孟德，你可是个狡猾的奸雄啊！",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a long hanging scroll backdrop illuminated by stage lights. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. a debater at a glowing podium makes a point. Camera: slow orbiting camera move. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: hall reverb, a tense hush. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_003",
+   "kind": "dialogue",
+   "scene": "court_audience",
+   "duration": 5.97,
+   "roles": [
+    "host"
+   ],
+   "line": "没错没错，诸葛亮同志你俩都是史上有名的风云人物！",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate arena audience in warm shadow, faces lit by stage light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. a debater at a glowing podium makes a point. Camera: slow dolly move through the space. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: hall reverb, a tense hush. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_004",
+   "kind": "dialogue",
+   "scene": "ink_arena",
+   "duration": 4.77,
+   "roles": [
+    "figure_b",
+    "host"
+   ],
+   "line": "脸皮薄点才容易出人头地嘛，我曹操就是个活生生的例子！",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. Featuring a stylized 3D animated woman in her 20s, ponytail black hair, wearing a red-brown armor with gold accents, with sword and bow; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. a debater at a glowing podium makes a point. Camera: slow push-in toward the subject. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: hall reverb, a tense hush. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_005",
+   "kind": "dialogue",
+   "scene": "scroll_split",
+   "duration": 6.05,
+   "roles": [
+    "figure_a"
+   ],
+   "line": "哼，你那脸皮薄得跟纸一样，哪比得上我蜀国的仁德之师？",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a long hanging scroll backdrop illuminated by stage lights. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan. the guest speaks and gestures, framed in a medium shot. Camera: slow orbiting camera move. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: hall reverb, a tense hush. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_006",
+   "kind": "dialogue",
+   "scene": "court_audience",
+   "duration": 4.69,
+   "roles": [
+    "host",
+    "figure_a"
+   ],
+   "line": "有理有据，这辩论真是精彩！",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate arena audience in warm shadow, faces lit by stage light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan. a debater at a glowing podium makes a point. Camera: quick whip pan. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: hall reverb, a tense hush. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_007",
+   "kind": "dialogue",
+   "scene": "ink_arena",
+   "duration": 5.17,
+   "roles": [
+    "figure_b"
+   ],
+   "line": "仁德？你诸葛亮可是个小心眼，连庞统都忌惮三分！",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. Featuring a stylized 3D animated woman in her 20s, ponytail black hair, wearing a red-brown armor with gold accents, with sword and bow. the guest speaks and gestures, framed in a medium shot. Camera: slow rack focus between foreground and background. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: hall reverb, a tense hush. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_008",
+   "kind": "broll",
+   "scene": "ink_arena",
+   "duration": 2.6,
+   "roles": [],
+   "line": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. Camera: slow pull-back revealing the space. The motion is natural and cinematic, with rich physical materials, volumetric light and shallow depth of field. 3D animated feature film quality. no text, no subtitles, no watermark, no logo, no extra people, no distorted faces, no deformed hands, no plastic toy look.\n\noverall_soundscape: hall reverb, a tense hush. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_card_end",
+   "kind": "card",
+   "prompt": null
+  }
+ ]
+}
