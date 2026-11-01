@@ -32,6 +32,14 @@ class ProjectCreate(BaseModel):
     aspect: str = "16:9"
 
 
+class ProjectUpdate(BaseModel):
+    """PATCH /projects/{pid}：workspace「3D 模板」页切换节目模板用。"""
+
+    name: Optional[str] = None
+    format_id: Optional[str] = None
+    aspect: Optional[str] = None
+
+
 class EpisodeOut(ORMModel):
     id: str
     project_id: str
@@ -453,6 +461,31 @@ class PublishConfigOut(BaseModel):
     youtube_privacy: str = "unlisted"
     limits: Dict[str, Any] = Field(default_factory=dict)
     brand: Dict[str, Any] = Field(default_factory=dict)
+
+
+class PublishPreflightCheck(BaseModel):
+    id: str
+    label: str
+    status: str  # pass | warn | fail
+    detail: str = ""
+
+
+class PublishPreflightConfig(BaseModel):
+    configured: bool = False
+    enabled: bool = False
+    platforms: List[str] = Field(default_factory=list)
+    username_masked: Optional[str] = None
+
+
+class PublishPreflightOut(BaseModel):
+    """GET /episodes/{eid}/publish/preflight：发布前检查（不真的发 HTTP/不写库）。"""
+
+    episode_id: str
+    ok: bool
+    publishable: bool
+    checks: List[PublishPreflightCheck] = Field(default_factory=list)
+    config: PublishPreflightConfig
+    warnings: List[str] = Field(default_factory=list)
 
 
 # ---------------- 多语种本地化（contract/LOCALIZATION.md） ----------------

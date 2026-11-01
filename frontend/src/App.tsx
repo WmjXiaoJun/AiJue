@@ -2,22 +2,16 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { api, errorText } from "./lib/api";
 import type { Episode, Health, Project } from "./types";
 import { ToastProvider, useToast } from "./components/Toast";
-import { Sidebar } from "./components/Sidebar";
-import { TopBar } from "./components/TopBar";
-import { ProjectList } from "./components/ProjectList";
 import { ProjectStudio } from "./components/studio/Studio";
 import { PlatformHome } from "./components/platform/PlatformHome";
-import { SettingsModal } from "./components/SettingsModal";
-import { TemplateModal } from "./components/TemplateModal";
-import { NewProjectModal } from "./components/NewProjectModal";
-import { V5Studio } from "./components/V5Studio";
+import { V5World } from "./components/v5world/V5World";
 import { CinemaStudio } from "./components/cinema/CinemaStudio";
 import { BrandMark, IconRefresh } from "./components/icons";
 import { Spinner } from "./components/ui";
 
-export type TabKey = "script" | "assets" | "storyboard" | "generate" | "finish";
+export type TabKey = "script" | "assets" | "storyboard" | "generate" | "finish" | "templates3d";
 
-const TAB_KEYS: TabKey[] = ["script", "assets", "storyboard", "generate", "finish"];
+const TAB_KEYS: TabKey[] = ["script", "assets", "storyboard", "generate", "finish", "templates3d"];
 
 type ViewState =
   | { mode: "projects" }
@@ -62,7 +56,6 @@ function Shell() {
   const [view, setView] = useState<ViewState>({ mode: "projects" });
   const [episodes, setEpisodes] = useState<Episode[] | null>(null);
   const [tab, setTab] = useState<TabKey>("script");
-  const [modal, setModal] = useState<null | "settings" | "templates" | "newProject">(null);
   const [taskStats, setTaskStats] = useState<{ activeJobs: number; cost: number }>({ activeJobs: 0, cost: 0 });
   const [retrying, setRetrying] = useState(false);
 
@@ -294,7 +287,6 @@ function Shell() {
 
   const handleProjectCreated = useCallback(
     async (project: Project) => {
-      setModal(null);
       notify("项目「" + project.name + "」已创建", "success");
       try {
         await loadProjects();
@@ -380,58 +372,9 @@ function Shell() {
     );
   }
 
-  return (
-    <div className="app-shell">
-      <Sidebar
-        projects={projects || []}
-        activeProjectId={null}
-        offline={offline}
-        health={health}
-        activeV5
-        onV5={openV5}
-        onCinema={openCinema}
-        onHome={goHome}
-        onSelectProject={(project) => void openProject(project)}
-        onTemplates={() => setModal("templates")}
-        onSettings={() => setModal("settings")}
-        onNewProject={() => setModal("newProject")}
-      />
+  if (view.mode === "v5") {
+    return <V5World onExit={goHome} onCinema={openCinema} />;
+  }
 
-      <div className="app-main">
-        <TopBar
-          view={view}
-          offline={offline}
-          health={health}
-          taskStats={taskStats}
-          onOpenJobs={() => changeTab("generate")}
-          onOpenCosts={() => changeTab("finish")}
-          onSettings={() => setModal("settings")}
-          onHome={goHome}
-        />
-
-        {offline && (
-          <div className="offline-banner">
-            <i className="live-dot offline" />
-            后端连接已断开，正在自动重连…（页面保留最后一次数据）
-          </div>
-        )}
-
-        <main className="app-content">
-          <V5Studio />
-        </main>
-      </div>
-
-      <SettingsModal open={modal === "settings"} onClose={() => setModal(null)} health={health} />
-      <TemplateModal
-        open={modal === "templates"}
-        onClose={() => setModal(null)}
-        onUse={() => setModal("newProject")}
-      />
-      <NewProjectModal
-        open={modal === "newProject"}
-        onClose={() => setModal(null)}
-        onCreated={(project) => void handleProjectCreated(project)}
-      />
-    </div>
-  );
+  return null;
 }

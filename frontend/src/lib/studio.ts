@@ -1,6 +1,6 @@
 // Project Studio（V9 项目工作台）类型 / 常量 / API 包装。
 // 设计文档：docs/V9_PROJECT_STUDIO.md；后端沿用现有 /api 端点。
-import { api, errorText, mediaUrl } from "./api";
+import { API_BASE, api, errorText, mediaUrl } from "./api";
 import type {
   Asset,
   Character,
@@ -16,7 +16,7 @@ import type {
   ShotVersion,
 } from "../types";
 
-export type StudioTabKey = "script" | "assets" | "storyboard" | "generate" | "finish";
+export type StudioTabKey = "script" | "assets" | "storyboard" | "generate" | "finish" | "templates3d";
 
 export const STUDIO_TABS: { key: StudioTabKey; no: string; label: string; en: string; desc: string }[] = [
   { key: "script", no: "01", label: "编剧间", en: "SCRIPT", desc: "台本 / AI 生成 / 分镜脚本" },
@@ -24,7 +24,14 @@ export const STUDIO_TABS: { key: StudioTabKey; no: string; label: string; en: st
   { key: "storyboard", no: "03", label: "分镜台", en: "STORYBOARD", desc: "镜头 / 台词 / 视觉 / 版本" },
   { key: "generate", no: "04", label: "生成台", en: "RENDER", desc: "任务队列 / 进度 / 费用" },
   { key: "finish", no: "05", label: "成片房", en: "FINISHING", desc: "成片 / 渲染 / 出海 / 发布" },
+  { key: "templates3d", no: "06", label: "3D 模板", en: "3D TEMPLATE", desc: "项目模板 / 16 模板 3D / 切换" },
 ];
+
+/** 项目 format_id 与 16 个 3D 模板 id 的换算后缀（national_treasure_5min ↔ national_treasure） */
+export const TPL3D_FORMAT_SUFFIX = "_5min";
+
+/** Cinema Studio「16 模板 3D 制作进度」入口 */
+export const TPL3D_LIBRARY_HREF = "#/cinema/templates";
 
 export interface StudioTabProps {
   project: Project;
@@ -177,6 +184,22 @@ export async function waitJob(
   return last || ({} as Job);
 }
 
+export interface PublishPreflightCheck {
+  id: string;
+  label: string;
+  status: "pass" | "warn" | "fail" | string;
+  detail?: string;
+}
+
+export interface PublishPreflight {
+  episode_id: string;
+  ok: boolean;
+  publishable: boolean;
+  checks: PublishPreflightCheck[];
+  config?: PublishConfig;
+  warnings?: string[];
+}
+
 // ---------------- API 包装（沿用 /api） ----------------
 export const studioApi = {
   project: (pid: string): Promise<Project> => api.project(pid),
@@ -225,6 +248,15 @@ export const studioApi = {
   publishConfig: (): Promise<PublishConfig> => api.publishConfig(),
   publishEpisode: api.publishEpisode,
   publishes: (eid: string): Promise<PublishRecord[]> => api.publishes(eid),
+  publishPreflight: async (eid: string): Promise<PublishPreflight> => {
+    const res = await fetch(API_BASE + "/episodes/" + eid + "/publish/preflight");
+    const data = (await res.json().catch(() => ({}))) as { detail?: unknown } & PublishPreflight;
+    if (!res.ok) {
+      const detail = typeof data.detail === "string" ? data.detail : "发布前检查失败";
+      throw new Error(detail);
+    }
+    return data;
+  },
   settings: api.settings,
 };
 

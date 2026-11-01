@@ -1,0 +1,607 @@
+/* =========================================================================
+   Project Studio · studio-3d（V11 · 06 3D 模板）
+   项目节目模板 ↔ 16 模板 3D 样片：海报 / 成片播放 / QC / 切换 / 重新生成。
+   通用元件（st-page / st-panel / st-kpis / st-tag / st-player / st-empty …）见 studio.css。
+   本文件只放 st-tpl3d-* 页面专属样式。
+   ========================================================================= */
+
+.st-tpl3d-error {
+  margin: 0 0 16px;
+}
+
+/* KPI 里展示模板名（KaiTi，不用 mono 大数字） */
+.st-tpl3d-kpi-name {
+  font-family: var(--font-display);
+  font-size: 19px;
+  letter-spacing: 0.04em;
+}
+
+/* ---------------- 1. 当前模板大卡 ---------------- */
+.st-tpl3d-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: stretch;
+}
+
+.st-tpl3d-hero-poster {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid var(--c-line-strong);
+  border-radius: 11px;
+  overflow: hidden;
+  background: #0a0d12;
+  cursor: zoom-in;
+  aspect-ratio: 16 / 9;
+  transition: border-color 0.18s ease;
+}
+.st-tpl3d-hero-poster:disabled {
+  cursor: default;
+}
+.st-tpl3d-hero-poster img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.st-tpl3d-hero-poster:not(:disabled):hover {
+  border-color: rgba(201, 162, 39, 0.55);
+}
+
+.st-tpl3d-hero-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  color: var(--c-mut);
+  background:
+    radial-gradient(120% 120% at 18% 0%, rgba(201, 162, 39, 0.16), transparent 62%),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.016) 0 10px, transparent 10px 20px),
+    #0b0e13;
+}
+.st-tpl3d-hero-fallback b {
+  font-family: var(--font-display);
+  font-size: 19px;
+  letter-spacing: 0.08em;
+  color: var(--c-gold-soft);
+}
+
+.st-tpl3d-hero-badges {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  pointer-events: none;
+}
+
+.st-tpl3d-hero-badges .st-tag {
+  backdrop-filter: blur(5px);
+  box-shadow: 0 6px 18px -10px rgba(0, 0, 0, 0.9);
+}
+
+.st-tpl3d-play-badge {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgba(229, 198, 109, 0.6);
+  background: rgba(8, 10, 14, 0.62);
+  color: var(--c-gold-soft);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+}
+
+.st-tpl3d-hero-info {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  min-width: 0;
+  padding: 2px 2px 0;
+}
+
+.st-tpl3d-hero-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 27px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--c-text);
+}
+
+.st-tpl3d-hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.st-tpl3d-hero-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.st-tpl3d-hero-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding: 9px 12px;
+  border: 1px solid var(--c-line);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.018);
+}
+.st-tpl3d-hero-stat span {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--c-mut);
+}
+.st-tpl3d-hero-stat b {
+  font-family: var(--font-mono);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--c-text);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.st-tpl3d-hero-look {
+  margin: 2px 0 0;
+}
+
+.st-tpl3d-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+/* 成片播放器 */
+.st-tpl3d-player {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--c-line);
+}
+
+.st-tpl3d-player-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+/* ---------------- 2. 3D QC ---------------- */
+.st-tpl3d-qc {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.st-tpl3d-qc-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--c-line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.st-tpl3d-qc-item b {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--c-text);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.st-tpl3d-qc-item em {
+  font-style: normal;
+  font-size: 10.5px;
+  color: var(--c-mut);
+  line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.st-tpl3d-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.st-tpl3d-shot-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--c-line);
+}
+
+/* ---------------- 3. 16 模板网格 ---------------- */
+.st-tpl3d-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.st-tpl3d-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border: 1px solid var(--c-line);
+  border-radius: 11px;
+  background: linear-gradient(180deg, rgba(19, 22, 29, 0.92), rgba(11, 13, 18, 0.92));
+  overflow: hidden;
+  transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+}
+.st-tpl3d-card:hover {
+  border-color: var(--c-line-strong);
+  transform: translateY(-2px);
+  box-shadow: 0 22px 44px -28px rgba(0, 0, 0, 0.9);
+}
+.st-tpl3d-card.is-current {
+  border-color: rgba(229, 198, 109, 0.55);
+  box-shadow: inset 0 0 0 1px rgba(201, 162, 39, 0.16), 0 18px 40px -30px rgba(201, 162, 39, 0.7);
+}
+
+.st-tpl3d-poster {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid var(--c-line);
+  background: #0a0d12;
+  cursor: zoom-in;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+.st-tpl3d-poster:disabled {
+  cursor: default;
+}
+.st-tpl3d-poster img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+.st-tpl3d-poster:not(:disabled):hover img {
+  transform: scale(1.035);
+}
+
+.st-tpl3d-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  height: 100%;
+  color: var(--c-mut);
+  background:
+    radial-gradient(120% 120% at 18% 0%, rgba(201, 162, 39, 0.12), transparent 62%),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.014) 0 8px, transparent 8px 16px),
+    #0b0e13;
+}
+.st-tpl3d-fallback b {
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  color: var(--c-gold-soft);
+}
+
+/* 状态角标 / 当前徽章（深底保证亮色海报上可读） */
+.st-tpl3d-card .st-tpl3d-poster .st-tpl3d-status {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  height: 21px;
+  padding: 0 8px;
+  font-size: 9.5px;
+  background: rgba(5, 7, 10, 0.76);
+  border-color: rgba(201, 162, 39, 0.35);
+  backdrop-filter: blur(5px);
+}
+
+.st-tpl3d-current-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  height: 21px;
+  padding: 0 9px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(229, 198, 109, 0.7);
+  background: rgba(201, 162, 39, 0.9);
+  color: #171203;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  box-shadow: 0 6px 16px -8px rgba(201, 162, 39, 0.9);
+}
+
+.st-tpl3d-card .st-tpl3d-poster .st-tpl3d-play-badge {
+  right: 8px;
+  bottom: 8px;
+  width: 32px;
+  height: 32px;
+}
+
+.st-tpl3d-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px 4px;
+  min-width: 0;
+}
+
+.st-tpl3d-card-name {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--c-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.st-tpl3d-card-sub {
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  color: var(--c-mut);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.st-tpl3d-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  color: var(--c-sub);
+}
+
+.st-tpl3d-card-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 7px;
+}
+.st-tpl3d-card-progress .cm-progress {
+  flex: 1 1 auto;
+}
+.st-tpl3d-card-progress .st-hint {
+  flex: 0 0 auto;
+  font-size: 9.5px;
+}
+
+.st-tpl3d-card-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 8px 12px 12px;
+  margin-top: auto;
+}
+.st-tpl3d-card-actions .cm-btn {
+  flex: 1 1 auto;
+  padding: 0 8px;
+  font-size: 10.5px;
+  gap: 5px;
+  height: 27px;
+}
+
+/* ---------------- 4. 制作说明 / 画幅对照 ---------------- */
+.st-tpl3d-note-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.st-tpl3d-note {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 13px 15px;
+  border: 1px solid var(--c-line);
+  border-radius: 10px;
+  background: rgba(201, 162, 39, 0.03);
+}
+.st-tpl3d-note b {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--c-text);
+}
+.st-tpl3d-note em {
+  font-style: normal;
+  font-size: 10.5px;
+  line-height: 1.6;
+  color: var(--c-mut);
+}
+
+.st-tpl3d-compare {
+  margin-top: 16px;
+}
+.st-tpl3d-compare thead th {
+  position: static;
+}
+.st-tpl3d-compare tbody td {
+  cursor: default;
+}
+.st-tpl3d-compare tbody tr:hover {
+  background: transparent;
+}
+.st-tpl3d-compare tbody td:first-child {
+  color: var(--c-sub);
+  white-space: nowrap;
+}
+.st-tpl3d-compare tbody td:last-child {
+  color: var(--c-text);
+}
+
+.st-tpl3d-rules {
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.st-tpl3d-rules li {
+  position: relative;
+  padding-left: 16px;
+  font-size: 11.5px;
+  line-height: 1.85;
+  color: var(--c-sub);
+}
+.st-tpl3d-rules li::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  color: var(--c-gold);
+  opacity: 0.7;
+}
+
+/* ---------------- 5. 3D 样片预览 ---------------- */
+.st-tpl3d-preview {
+  position: fixed;
+  inset: 0;
+  z-index: 85;
+  display: grid;
+  place-items: center;
+  padding: 4vh 4vw;
+  background: rgba(2, 3, 5, 0.9);
+  backdrop-filter: blur(5px);
+  animation: st-fade 0.16s ease;
+}
+
+.st-tpl3d-preview-body {
+  width: min(1020px, 94vw);
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--c-line-strong);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #12151b, #0a0c11);
+  box-shadow: 0 50px 140px -40px rgba(0, 0, 0, 0.95);
+  overflow: hidden;
+}
+
+.st-tpl3d-preview-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 0 0 auto;
+}
+
+.st-tpl3d-preview-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--c-text);
+}
+
+.st-tpl3d-preview-stage {
+  flex: 1 1 auto;
+  min-height: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--c-line);
+  background: #000;
+}
+.st-tpl3d-preview-stage video {
+  display: block;
+  width: 100%;
+  max-height: 66vh;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+.st-tpl3d-preview-stage .st-empty {
+  border: 0;
+  min-height: 220px;
+}
+
+.st-tpl3d-preview-actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.st-tpl3d-preview-buttons {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ---------------- 响应式 ---------------- */
+@media (max-width: 1380px) {
+  .st-tpl3d-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .st-tpl3d-qc {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1080px) {
+  .st-tpl3d-hero-grid {
+    grid-template-columns: 1fr;
+  }
+  .st-tpl3d-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .st-tpl3d-note-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .st-tpl3d-grid {
+    grid-template-columns: 1fr;
+  }
+  .st-tpl3d-qc {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .st-tpl3d-preview {
+    padding: 2vh 2vw;
+  }
+}

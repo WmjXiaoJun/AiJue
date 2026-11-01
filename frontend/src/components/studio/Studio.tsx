@@ -9,6 +9,7 @@ import { StudioAssets } from "./Assets";
 import { StudioStoryboard } from "./Storyboard";
 import { StudioRender } from "./Render";
 import { StudioFinishing } from "./Finishing";
+import { StudioTemplates3D } from "./Templates3D";
 import "../../styles/studio.css";
 
 interface Props {
@@ -16,7 +17,8 @@ interface Props {
   episode: Episode;
   episodes: Episode[];
   tab: StudioTabKey;
-  onTabChange: (tab: StudioTabKey) => void;
+  /** method 语法保持与 App 的 TabKey 回调双向兼容（V11 新增 templates3d 由 Studio 内部接管） */
+  onTabChange(tab: StudioTabKey): void;
   onBack: () => void;
   onEpisodeUpdate: (episode: Episode) => void;
   onSwitchEpisode: (eid: string) => void;
@@ -39,7 +41,12 @@ export function ProjectStudio({
   const [costTotal, setCostTotal] = useState<number>(Number(initialEpisode.cost) || 0);
   const [refreshing, setRefreshing] = useState(false);
   const [switching, setSwitching] = useState(false);
+  /** 3D 模板页切换节目模板后，同步顶栏 format_id chip（App 侧 project 暂不重取） */
+  const [projectFormatOverride, setProjectFormatOverride] = useState<string | null>(null);
   const episodeIdRef = useRef(initialEpisode.id);
+
+  const activeTab: StudioTabKey = tab;
+  const displayFormatId = projectFormatOverride || project.format_id;
 
   useEffect(() => {
     if (episodeIdRef.current !== initialEpisode.id) {
@@ -111,9 +118,16 @@ export function ProjectStudio({
     }
   }, [applyEpisode, episode.id, notify]);
 
-  const tabMeta = STUDIO_TABS.find((t) => t.key === tab) || STUDIO_TABS[0];
+  const handleTabChange = useCallback((next: StudioTabKey) => onTabChange(next), [onTabChange]);
 
-  const tabProps = { project, episode, onEpisode: applyEpisode, onNavigate: onTabChange };
+  const tabMeta = STUDIO_TABS.find((t) => t.key === activeTab) || STUDIO_TABS[0];
+
+  const tabProps = {
+    project: { ...project, format_id: displayFormatId },
+    episode,
+    onEpisode: applyEpisode,
+    onNavigate: handleTabChange,
+  };
 
   return (
     <div className="cm-app st-app">
@@ -160,7 +174,7 @@ export function ProjectStudio({
               <span className="st-tag is-slate cm-mono">目标 {fmtClock(episode.target_duration)}</span>
               {episode.resolution && <span className="st-tag is-slate cm-mono">{episode.resolution}</span>}
               {episode.aspect && <span className="st-tag is-slate cm-mono">{episode.aspect}</span>}
-              <span className="st-tag is-slate cm-mono">{project.format_id}</span>
+              <span className="st-tag is-slate cm-mono">{displayFormatId}</span>
             </div>
           </div>
 
@@ -198,8 +212,8 @@ export function ProjectStudio({
             <button
               key={item.key}
               type="button"
-              className={"st-tab" + (tab === item.key ? " is-active" : "")}
-              onClick={() => onTabChange(item.key)}
+              className={"st-tab" + (activeTab === item.key ? " is-active" : "")}
+              onClick={() => handleTabChange(item.key)}
               title={item.desc}
             >
               <span className="st-tab-no">{item.no}</span>
@@ -218,14 +232,16 @@ export function ProjectStudio({
         </nav>
 
         <main className="st-content">
-          {tab === "script" ? (
+          {activeTab === "script" ? (
             <StudioScripts {...tabProps} />
-          ) : tab === "assets" ? (
+          ) : activeTab === "assets" ? (
             <StudioAssets {...tabProps} />
-          ) : tab === "storyboard" ? (
+          ) : activeTab === "storyboard" ? (
             <StudioStoryboard {...tabProps} />
-          ) : tab === "generate" ? (
+          ) : activeTab === "generate" ? (
             <StudioRender {...tabProps} />
+          ) : activeTab === "templates3d" ? (
+            <StudioTemplates3D {...tabProps} onProjectFormatChange={setProjectFormatOverride} />
           ) : (
             <StudioFinishing {...tabProps} />
           )}

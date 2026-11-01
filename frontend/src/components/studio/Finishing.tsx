@@ -4,7 +4,7 @@
 //       POST /episodes/{id}/render|export|localize|publish、POST /jobs/{id}/retry。
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CostReport, Job, Localization, PublishConfig, PublishRecord } from "../../types";
-import type { StudioTabProps } from "../../lib/studio";
+import type { PublishPreflight, StudioTabProps } from "../../lib/studio";
 import {
   EPISODE_STATUS_TEXT,
   JOB_STATUS_TEXT,
@@ -129,6 +129,9 @@ export function StudioFinishing({ episode, onEpisode, onNavigate }: StudioTabPro
   const [publishes, setPublishes] = useState<PublishRecord[] | null>(null);
   const [recordsError, setRecordsError] = useState("");
   const [config, setConfig] = useState<PublishConfig | null>(null);
+  const [preflight, setPreflight] = useState<PublishPreflight | null>(null);
+  const [preflightBusy, setPreflightBusy] = useState(false);
+  const [preflightError, setPreflightError] = useState("");
   const [configError, setConfigError] = useState("");
   const [costs, setCosts] = useState<CostReport | null>(null);
 
@@ -332,6 +335,22 @@ export function StudioFinishing({ episode, onEpisode, onNavigate }: StudioTabPro
   const renderActive = Boolean(latestRender && isActiveJob(latestRender));
   const exportActive = Boolean(latestExport && isActiveJob(latestExport));
   const publishActive = Boolean(latestPublish && isActiveJob(latestPublish));
+  const loadPreflight = useCallback(async () => {
+    setPreflightBusy(true);
+    try {
+      setPreflight(await studioApi.publishPreflight(episode.id));
+      setPreflightError("");
+    } catch (err) {
+      setPreflightError(errorText(err));
+    } finally {
+      setPreflightBusy(false);
+    }
+  }, [episode.id]);
+
+  useEffect(() => {
+    void loadPreflight();
+  }, [loadPreflight]);
+
   const configured = Boolean(config?.configured && config?.enabled !== false);
 
   const readyLocs = useMemo(
@@ -948,6 +967,40 @@ export function StudioFinishing({ episode, onEpisode, onNavigate }: StudioTabPro
                   <span className={"st-tag " + (configured ? "is-jade" : "is-gold")}>
                     {configured ? "Upload-Post 已连接" : "Upload-Post 未配置"}
                   </span>
+                </div>
+                <div className="st-pf">
+                  <div className="st-pf-head">
+                    <span className="st-pf-title">发布前检查</span>
+                    {preflight && (
+                      <span className={"st-tag " + (preflight.publishable ? "is-jade" : "is-gold")}>
+                        {preflight.publishable ? "可以发布" : preflight.ok ? "配置未就绪" : "存在阻断项"}
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      className="cm-btn cm-btn-ghost cm-btn-sm st-pf-btn"
+                      onClick={() => void loadPreflight()}
+                      disabled={preflightBusy}
+                    >
+                      {preflightBusy ? <Spinner size={12} /> : <IconRefresh size={12} />}
+                      重新检查
+                    </button>
+                  </div>
+                  {preflightError && <p className="st-hint is-error">检查失败：{preflightError}</p>}
+                  {preflight && (
+                    <ul className="st-pf-list">
+                      {preflight.checks.map((item) => (
+                        <li key={item.id} className={"st-pf-item is-" + item.status}>
+                          <i className="st-pf-dot" />
+                          <span className="st-pf-label">{item.label}</span>
+                          <span className="st-pf-detail">{item.detail || "—"}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {preflight && preflight.warnings && preflight.warnings.length > 0 && (
+                    <p className="st-hint st-pf-warn">{preflight.warnings.join("；")}</p>
+                  )}
                 </div>
                 {configError && <p className="st-hint is-error">发布配置读取失败：{configError}</p>}
                 {config && !configured && (

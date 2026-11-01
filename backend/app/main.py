@@ -16,7 +16,7 @@ import logging
 import re
 import shutil
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -53,10 +53,15 @@ STYLE_PRESETS = {"3d_toon", "3d_cel", "2d_cel", "2d_paint", "anime", "guoman"}
 DEFAULT_STYLE = "3d_toon"
 # 多语种本地化支持语言（MVP en/es，另支持 ja/ko/pt；fr/de/ar 预留）
 SUPPORTED_LANGS = ["en", "es", "ja", "ko", "pt"]
+# 项目画幅（PATCH /projects/{pid} 校验；与前端工作台可选项一致）
+PROJECT_ASPECTS = ("16:9", "9:16", "1:1")
 # 一键发布（contract/PUBLISHING.md）
 PUBLISH_PLATFORMS = ["youtube", "tiktok", "instagram"]
 PUBLISH_LANGS = ["zh", "en", "es", "ja", "ko", "pt"]
 DEFAULT_PUBLISH_HASHTAGS = ["#造片局", "#AI微综艺", "#Zaopianju", "#AIVariety", "#AIGenerated"]
+# 发布前检查：标题建议长度 / 本地化语言中文名
+PUBLISH_TITLE_MAX_CHARS = 100
+LOCALIZATION_LANG_LABELS = {"en": "英语", "es": "西语", "ja": "日语", "ko": "韩语", "pt": "葡语"}
 # LLM 台本生成 JSON Schema（附带 example 供 mock provider 直接使用）
 SCRIPT_JSON_SCHEMA: Dict[str, Any] = {
     "type": "object",
@@ -536,6 +541,64 @@ def create_project(payload: schemas.ProjectCreate, db: Session = Depends(get_db)
 @router.get("/projects/{pid}", response_model=schemas.ProjectOut)
 def get_project(pid: str, db: Session = Depends(get_db)):
     return _get_or_404(db, models.Project, pid, "项目")
+
+
+@router.patch("/projects/{pid}", response_model=schemas.ProjectOut)
+def patch_project(
+    pid: str,
+    payload: schemas.ProjectUpdate,
+    db: Session = Depends(get_db),
+):
+    """更新项目名称 / 节目模板 / 画幅（工作台「3D 模板」页切换模板用）。
+
+    只接受 name / format_id / aspect 且至少传一个；format_id 必须是
+    contract/formats/*.json 里真实存在的节目模板（否则 400，避免项目指向不存在的模板）。
+    """
+    project = _get_or_404(db, models.Project, pid, "项目")
+    changes = {
+        key: value
+        for key, value in payload.model_dump(exclude_unset=True).items()
+        if value is not None
+    }
+    if not changes:
+        raise HTTPException(
+            status_code=400,
+            detail="没有可更新的字段（name / format_id / aspect 至少传一个）",
+        )
+
+    # 先全部校验、再统一赋值，避免部分字段非法时污染 session
+    new_name: Optional[str] = None
+    new_format_id: Optional[str] = None
+    new_aspect: Optional[str] = None
+    if "name" in changes:
+        new_name = str(changes["name"]).strip()
+        if not new_name:
+            raise HTTPException(status_code=400, detail="项目名称不能为空")
+        if len(new_name) > 200:
+            raise HTTPException(
+                status_code=400,
+                detail=f"项目名称过长：{len(new_name)} 字（最多 200 字）",
+            )
+    if "format_id" in changes:
+        new_format_id = str(changes["format_id"]).strip()
+        if not new_format_id or not _load_format(new_format_id):
+            raise HTTPException(status_code=400, detail=f"未知节目模板: {new_format_id}")
+    if "aspect" in changes:
+        new_aspect = str(changes["aspect"]).strip()
+        if new_aspect not in PROJECT_ASPECTS:
+            raise HTTPException(
+                status_code=400,
+                detail=f"不支持的画幅: {new_aspect}；可选 {' / '.join(PROJECT_ASPECTS)}",
+            )
+
+    if new_name is not None:
+        project.name = new_name
+    if new_format_id is not None:
+        project.format_id = new_format_id
+    if new_aspect is not None:
+        project.aspect = new_aspect
+    db.commit()
+    return project
 
 
 @router.get("/projects/{pid}/episodes", response_model=List[schemas.EpisodeOut])
@@ -1809,8 +1872,8 @@ def _mask_username(username: str) -> str:
     return text[:2] + "***"
 
 
-@router.get("/publish/config", response_model=schemas.PublishConfigOut)
-def publish_config(db: Session = Depends(get_db)):
+def _publish_config_values(db: Session) -> Dict[str, Any]:
+    """发布配置读取（`GET /publish/config` 与发布前检查共用，不回传明文 key）。"""
     setting = seed.get_settings(db)
     api_key = config.publish_key()
     username = setting.upload_post_username or ""
@@ -1826,6 +1889,174 @@ def publish_config(db: Session = Depends(get_db)):
             "title": setting.publish_brand_title or "造片局 · AI微综艺",
             "hashtags": DEFAULT_PUBLISH_HASHTAGS,
         },
+    }
+
+
+@router.get("/publish/config", response_model=schemas.PublishConfigOut)
+def publish_config(db: Session = Depends(get_db)):
+    return _publish_config_values(db)
+
+
+def _format_mmss(seconds: float) -> str:
+    total = int(round(max(0.0, float(seconds or 0.0))))
+    minutes, secs = divmod(total, 60)
+    return f"{minutes}:{secs:02d}"
+
+
+def _publish_preflight_checks(
+    episode: models.Episode, db: Session
+) -> Tuple[List[Dict[str, Any]], List[str], Dict[str, Any]]:
+    """发布前检查（纯读：DB 查询 + 文件 stat/ffprobe，不发 HTTP、不写库）。"""
+    checks: List[Dict[str, Any]] = []
+    warnings: List[str] = []
+
+    def add(
+        check_id: str,
+        label: str,
+        status: str,
+        detail: str = "",
+        warning: Optional[str] = None,
+    ) -> None:
+        checks.append({"id": check_id, "label": label, "status": status, "detail": detail})
+        if warning:
+            warnings.append(warning)
+
+    # 1) 成片就绪：render_url 缺失 -> fail；有 url 但文件解析不到 -> warn（video 检查会 fail）
+    render_url = str(episode.render_url or "").strip()
+    render_path = _resolve_output_file(render_url) if render_url else None
+    render_duration = 0.0
+    if render_path is not None:
+        render_duration = float(jobs.probe_video_duration(render_path) or 0.0)
+    if not render_url:
+        add("render", "成片就绪", "fail", "尚未渲染成片（render_url 为空）", "尚未渲染成片，请先在「生成」页渲染")
+    elif render_path is None:
+        add(
+            "render",
+            "成片就绪",
+            "warn",
+            f"render_url 指向的文件不存在：{render_url}",
+            "render_url 指向的成片文件不存在",
+        )
+    else:
+        duration_text = _format_mmss(render_duration) if render_duration > 0 else "时长未知"
+        add("render", "成片就绪", "pass", f"{duration_text} {render_url}")
+
+    # 2) 标题：1–100 字 pass，超长 warn，空 fail
+    title = str(episode.title or "").strip()
+    if not title:
+        add("title", "标题", "fail", "标题为空", "标题为空，请先填写节目标题")
+    elif len(title) > PUBLISH_TITLE_MAX_CHARS:
+        add(
+            "title",
+            "标题",
+            "warn",
+            f"{len(title)} 字（建议 ≤{PUBLISH_TITLE_MAX_CHARS} 字）：{title[:60]}",
+            f"标题 {len(title)} 字，超过建议的 {PUBLISH_TITLE_MAX_CHARS} 字",
+        )
+    else:
+        add("title", "标题", "pass", title)
+
+    # 3) 多语种版本：0 个 -> warn
+    loc_rows = (
+        db.query(models.Localization)
+        .filter(models.Localization.episode_id == episode.id)
+        .all()
+    )
+    langs = sorted(
+        {
+            str(row.lang or "").strip().lower()
+            for row in loc_rows
+            if str(row.lang or "").strip()
+        }
+    )
+    if not langs:
+        add("localization", "多语种版本", "warn", "暂无多语种版本（仅中文）", "暂无多语种版本，可先发布中文版")
+    else:
+        labels = [LOCALIZATION_LANG_LABELS.get(lang, lang) for lang in langs]
+        add("localization", "多语种版本", "pass", f"{'、'.join(labels)}（{len(langs)} 个版本）")
+
+    # 4) 发布配置（复用 /publish/config 读取逻辑）
+    publish_cfg = _publish_config_values(db)
+    if not publish_cfg["configured"]:
+        add(
+            "config",
+            "发布配置",
+            "fail",
+            "Upload-Post 未配置（需要 API Key + username）",
+            "发布前需要配置 Upload-Post Key 与账号",
+        )
+    elif not publish_cfg["enabled"]:
+        add(
+            "config",
+            "发布配置",
+            "fail",
+            f"已配置 {publish_cfg['username_masked'] or '账号'}，但发布开关已关闭",
+            "Upload-Post 发布开关已关闭",
+        )
+    else:
+        add(
+            "config",
+            "发布配置",
+            "pass",
+            f"已配置 {publish_cfg['username_masked']} · {'/'.join(publish_cfg['platforms'])}",
+        )
+
+    # 5) 视频可访问：与 POST /episodes/{eid}/publish 同一条取片逻辑（集目录 final.mp4 /
+    #    localized/<lang>/final.mp4），只 Path 判断存在性与大小，不真的发 HTTP。
+    candidates = _publish_video_candidates(episode, "zh", "final")
+    video_path = next((path for path in candidates if path.is_file()), None)
+    if video_path is None:
+        expected = candidates[0]
+        detail = f"成片文件不存在：{expected}"
+        if render_path is not None:
+            try:
+                same_file = render_path.resolve() == expected.resolve()
+            except OSError:
+                same_file = True
+            if not same_file:
+                detail += (
+                    f"；render_url 指向 {render_url} 可访问，"
+                    f"但发布接口读取集目录成片（需渲染到 outputs/episodes/{episode.id}/final.mp4）"
+                )
+        add("video", "视频可访问", "fail", detail, "成片文件不可访问（发布接口读取集目录成片）")
+    else:
+        try:
+            size = int(video_path.stat().st_size)
+        except OSError:
+            size = 0
+        media_url = config.media_url(video_path)
+        if size <= 0:
+            add("video", "视频可访问", "fail", f"成片文件为空：{media_url}", "成片文件为空")
+        else:
+            add("video", "视频可访问", "pass", f"{size / 1024 / 1024:.1f}MB {media_url}")
+
+    return checks, warnings, publish_cfg
+
+
+@router.get("/episodes/{eid}/publish/preflight", response_model=schemas.PublishPreflightOut)
+def publish_preflight(eid: str, db: Session = Depends(get_db)):
+    """发布前检查：成片/标题/多语种/发布配置/视频可访问，全部纯读。
+
+    - ok：没有 fail 项；
+    - publishable：ok 且发布配置已配置且开启；
+    - 视频检查与 POST /publish 取片逻辑一致（集目录成片），避免"检查通过但发布 400"。
+    """
+    episode = _get_or_404(db, models.Episode, eid, "集")
+    checks, warnings, publish_cfg = _publish_preflight_checks(episode, db)
+    ok = all(check["status"] != "fail" for check in checks)
+    publishable = bool(ok and publish_cfg["configured"] and publish_cfg["enabled"])
+    return {
+        "episode_id": episode.id,
+        "ok": ok,
+        "publishable": publishable,
+        "checks": checks,
+        "config": {
+            "configured": bool(publish_cfg["configured"]),
+            "enabled": bool(publish_cfg["enabled"]),
+            "platforms": list(publish_cfg["platforms"]),
+            "username_masked": publish_cfg["username_masked"] or None,
+        },
+        "warnings": warnings,
     }
 
 
