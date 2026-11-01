@@ -8,6 +8,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 import time
 import uuid
@@ -147,6 +148,44 @@ def wait_for_completion(
     }
 
 
+def _response_error_text(response: Any) -> str:
+    """从 Upload-Post 错误响应里提取可读原因（绝不包含请求头/Key）。
+
+    该接口 4xx 时会返回可操作 JSON，例如：
+    {"success": false, "message": "None of the requested platforms are valid for profile ...",
+     "invalid_platforms": {"youtube": "Profile default has no Youtube account configured"}}
+    优先取 message，再拼 invalid_platforms 的简要说明，让用户知道去 upload-post 后台连接账号。
+    """
+    if response is None:
+        return ""
+    try:
+        payload = response.json()
+    except ValueError:
+        text = str(getattr(response, "text", "") or "").strip()
+        return text[:400]
+    if not isinstance(payload, dict):
+        return ""
+    parts: List[str] = []
+    message = str(payload.get("message") or payload.get("error") or "").strip()
+    if message:
+        parts.append(message)
+    invalid = payload.get("invalid_platforms")
+    if isinstance(invalid, dict) and invalid:
+        bits: List[str] = []
+        for platform, reason in list(invalid.items())[:5]:
+            reason_text = str(reason).strip()
+            bits.append(f"{platform}: {reason_text}" if reason_text else str(platform))
+        parts.append("invalid_platforms: " + "; ".join(bits))
+    elif isinstance(invalid, list) and invalid:
+        parts.append("invalid_platforms: " + ", ".join(str(item) for item in invalid[:5]))
+    if parts:
+        return "；".join(parts)[:600]
+    try:
+        return json.dumps(payload, ensure_ascii=False)[:400]
+    except (TypeError, ValueError):
+        return ""
+
+
 def upload_video(
     video_path: str | Path,
     title: str,
@@ -213,9 +252,18 @@ def upload_video(
         except ValueError:
             return unconfirmed("Upload-Post returned invalid JSON")
     except httpx.HTTPStatusError as exc:
-        status_code = exc.response.status_code if exc.response is not None else 0
+        response = exc.response
+        status_code = response.status_code if response is not None else 0
+        detail = _response_error_text(response)
         if status_code >= 500:
-            return unconfirmed(f"Upload-Post upload failed: HTTP {status_code}")
+            suffix = f"：{detail}" if detail else ""
+            return unconfirmed(f"Upload-Post upload failed: HTTP {status_code}{suffix}")
+        if detail:
+            # 4xx：把服务端可操作原因带出来（如某平台账号未连接），仍是「已明确拒绝」，不发 request_id
+            return {
+                "success": False,
+                "error": f"Upload-Post 拒绝（HTTP {status_code}）：{detail}",
+            }
         return {"success": False, "error": f"Upload-Post upload rejected: HTTP {status_code}"}
     except (httpx.TimeoutException, httpx.ConnectError) as exc:
         return unconfirmed(f"Upload-Post network error: {exc}")

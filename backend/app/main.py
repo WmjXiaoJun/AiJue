@@ -18,6 +18,7 @@ import shutil
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+import httpx
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, StreamingResponse
@@ -62,6 +63,10 @@ DEFAULT_PUBLISH_HASHTAGS = ["#造片局", "#AI微综艺", "#Zaopianju", "#AIVari
 # 发布前检查：标题建议长度 / 本地化语言中文名
 PUBLISH_TITLE_MAX_CHARS = 100
 LOCALIZATION_LANG_LABELS = {"en": "英语", "es": "西语", "ja": "日语", "ko": "韩语", "pt": "葡语"}
+# 发布前「社交账号授权」检查（Upload-Post 只读 GET；3s 超时，失败不阻断发布）
+UPLOAD_POST_USERS_URL = "https://api.upload-post.com/api/uploadposts/users"
+UPLOAD_POST_ACCOUNTS_TIMEOUT_SECONDS = 3.0
+UPLOAD_POST_PLATFORM_LABELS = {"youtube": "YouTube", "tiktok": "TikTok", "instagram": "Instagram"}
 # LLM 台本生成 JSON Schema（附带 example 供 mock provider 直接使用）
 SCRIPT_JSON_SCHEMA: Dict[str, Any] = {
     "type": "object",
@@ -1947,10 +1952,75 @@ def _format_mmss(seconds: float) -> str:
     return f"{minutes}:{secs:02d}"
 
 
+def _account_value_present(value: Any) -> bool:
+    """Upload-Post social_accounts 里某平台的值是否表示「已连接」。
+
+    实测未连接平台会返回空字符串占位（如 `{"tiktok": ""}`），且上传时报
+    "Profile default has no ... account configured"；因此空字符串/空容器视为未连接，
+    真正连接后通常返回账号名/对象/非空值。
+    """
+    if value is None or value is False:
+        return False
+    if isinstance(value, str):
+        return bool(value.strip())
+    if isinstance(value, (list, dict, tuple, set)):
+        return bool(value)
+    return True
+
+
+def _upload_post_connected_platforms(
+    api_key: str, platforms: List[str], username: str = ""
+) -> List[str]:
+    """GET Upload-Post `/api/uploadposts/users`，返回所选平台中已连接（有账号）的平台列表。
+
+    只读请求、3s 超时；网络/HTTP/JSON 异常原样抛给调用方（preflight 会转 warn，绝不 500）。
+    """
+    selected = [str(item).strip().lower() for item in (platforms or []) if str(item).strip()]
+    if not selected:
+        return []
+    response = httpx.get(
+        UPLOAD_POST_USERS_URL,
+        headers={"Authorization": f"Apikey {api_key}"},
+        timeout=UPLOAD_POST_ACCOUNTS_TIMEOUT_SECONDS,
+    )
+    response.raise_for_status()
+    try:
+        payload = response.json()
+    except ValueError as exc:
+        raise ValueError("Upload-Post users 返回非 JSON") from exc
+    if not isinstance(payload, dict):
+        raise ValueError("Upload-Post users 返回格式异常")
+    profiles = payload.get("profiles")
+    if not isinstance(profiles, list):
+        profiles = []
+    wanted_username = str(username or "").strip().lower()
+    matched = [
+        profile
+        for profile in profiles
+        if isinstance(profile, dict)
+        and wanted_username
+        and str(profile.get("username") or "").strip().lower() == wanted_username
+    ]
+    account_maps: List[Dict[str, Any]] = []
+    for profile in matched or profiles:
+        accounts = profile.get("social_accounts") if isinstance(profile, dict) else None
+        if isinstance(accounts, dict):
+            account_maps.append(accounts)
+    connected: List[str] = []
+    for accounts in account_maps:
+        for platform, account in accounts.items():
+            name = str(platform or "").strip().lower()
+            if name not in selected or name in connected:
+                continue
+            if _account_value_present(account):
+                connected.append(name)
+    return connected
+
+
 def _publish_preflight_checks(
     episode: models.Episode, db: Session
 ) -> Tuple[List[Dict[str, Any]], List[str], Dict[str, Any]]:
-    """发布前检查（纯读：DB 查询 + 文件 stat/ffprobe，不发 HTTP、不写库）。"""
+    """发布前检查（纯读：DB 查询 + 文件 stat/ffprobe + Upload-Post 账号只读 GET，不写库/不发布）。"""
     checks: List[Dict[str, Any]] = []
     warnings: List[str] = []
 
@@ -2069,6 +2139,39 @@ def _publish_preflight_checks(
                 "pass",
                 f"{size / 1024 / 1024:.1f}MB {relative_path}",
             )
+
+    # 6) 社交账号授权：key 已配置时才查（GET /api/uploadposts/users，3s 超时，只读）；
+    #    全都没连接 -> fail（提示去 upload-post 后台 OAuth 连接账号）；查询失败 -> warn 不阻断。
+    publish_api_key = config.publish_key()
+    if publish_api_key:
+        selected_platforms = list(publish_cfg["platforms"] or PUBLISH_PLATFORMS)
+        try:
+            connected = _upload_post_connected_platforms(
+                publish_api_key,
+                selected_platforms,
+                username=seed.get_settings(db).upload_post_username or "",
+            )
+        except Exception as exc:  # noqa: BLE001 - 账号状态查询失败绝不能阻断 preflight
+            add(
+                "accounts",
+                "社交账号授权",
+                "warn",
+                f"账号状态查询失败，不阻断发布（{type(exc).__name__}）",
+                "账号状态查询失败，不阻断发布",
+            )
+            connected = None
+        if connected is not None:
+            if connected:
+                labels = [UPLOAD_POST_PLATFORM_LABELS.get(item, item) for item in connected]
+                add("accounts", "社交账号授权", "pass", f"已连接：{'、'.join(labels)}")
+            else:
+                add(
+                    "accounts",
+                    "社交账号授权",
+                    "fail",
+                    "Upload-Post 未连接任何社交账号（需在 upload-post.com 后台 OAuth 连接 YouTube/TikTok/Instagram）",
+                    "Upload-Post 未连接任何社交账号（需在 upload-post.com 后台 OAuth 连接账号）",
+                )
 
     return checks, warnings, publish_cfg
 

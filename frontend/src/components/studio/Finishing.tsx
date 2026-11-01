@@ -994,6 +994,17 @@ export function StudioFinishing({ episode, onEpisode, onNavigate }: StudioTabPro
                           <i className="st-pf-dot" />
                           <span className="st-pf-label">{item.label}</span>
                           <span className="st-pf-detail">{item.detail || "—"}</span>
+                          {item.id === "accounts" && item.status === "fail" && (
+                            <a
+                              className="st-pf-link"
+                              href="https://app.upload-post.com"
+                              target="_blank"
+                              rel="noreferrer"
+                              onClick={(event) => event.stopPropagation()}
+                            >
+                              去连接 ↗
+                            </a>
+                          )}
                         </li>
                       ))}
                     </ul>
@@ -1009,6 +1020,10 @@ export function StudioFinishing({ episode, onEpisode, onNavigate }: StudioTabPro
                   </p>
                 )}
                 {config?.username_masked && <p className="st-hint">账号 @{config.username_masked}</p>}
+
+                {preflight && !preflight.ok && (
+                  <p className="st-hint st-pf-blocked">存在发布前检查阻断项，修复后才能发布（见上方检查列表）。</p>
+                )}
 
                 <div className="st-finish-platforms">
                   {PLATFORMS.map((platform) => {
@@ -1063,7 +1078,8 @@ export function StudioFinishing({ episode, onEpisode, onNavigate }: StudioTabPro
                     type="button"
                     className="cm-btn cm-btn-primary cm-btn-sm"
                     onClick={() => void handlePublish()}
-                    disabled={publishBusy || publishActive || platforms.length === 0}
+                    disabled={publishBusy || publishActive || platforms.length === 0 || Boolean(preflight && !preflight.ok)}
+                    title={preflight && !preflight.ok ? "请先修复发布前检查中的阻断项" : undefined}
                   >
                     {publishBusy || publishActive ? <Spinner size={13} /> : <IconSend size={13} />}
                     {publishActive ? "发布中…" : "发布"}

@@ -587,3 +587,15 @@
 .st-pf-label { flex: 0 0 72px; color: var(--c-text); font-size: 11.5px; }
 .st-pf-detail { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.03em; color: var(--c-mut); }
 .st-pf-warn { margin-top: 8px; color: var(--c-gold-soft); }
+
+.st-pf-link {
+  flex: 0 0 auto;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--c-gold-soft);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(201, 162, 39, 0.4);
+  white-space: nowrap;
+}
+.st-pf-link:hover { color: #f0d98a; }
+.st-pf-blocked { color: #e39a86; margin-bottom: 8px; }
