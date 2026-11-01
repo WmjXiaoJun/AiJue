@@ -301,12 +301,12 @@ function Shell() {
 
   if (booting) {
     return (
-      <div className="boot-screen">
-        <div className="boot-glow" />
+      <div className="cm-boot">
+        <div className="cm-boot-glow" />
         <BrandMark size={64} />
         <h1>造片局</h1>
-        <p className="boot-tagline">AI 微综艺 · 制片工作台</p>
-        <div className="boot-loading">
+        <p className="cm-boot-tagline">AI VIDEO STUDIO · 制片工作台</p>
+        <div className="cm-boot-loading">
           <Spinner size={16} />
           <span>正在连接后端…</span>
         </div>
@@ -316,24 +316,24 @@ function Shell() {
 
   if (offline && !projects) {
     return (
-      <div className="boot-screen">
-        <div className="boot-glow" />
+      <div className="cm-boot">
+        <div className="cm-boot-glow" />
         <BrandMark size={64} />
         <h1>等待后端</h1>
-        <p className="boot-tagline">造片局 · AI 微综艺 制片工作台</p>
-        <div className="wait-card">
-          <div className="wait-title">
-            <i className="live-dot offline" />
+        <p className="cm-boot-tagline">造片局 · AI VIDEO STUDIO</p>
+        <div className="cm-boot-card">
+          <div className="cm-boot-card-title">
+            <i />
             后端未连接
           </div>
           <p>请先启动后端（默认 http://127.0.0.1:8090），界面会自动重连，无需刷新。</p>
           <code>powershell -ExecutionPolicy Bypass -File backend\run.ps1 -Port 8090</code>
-          <button type="button" className="btn btn-primary" onClick={() => void handleRetry()} disabled={retrying}>
+          <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" onClick={() => void handleRetry()} disabled={retrying}>
             {retrying ? <Spinner size={14} /> : <IconRefresh size={15} />}
             立即重试
           </button>
         </div>
-        <div className="boot-foot">接口 {"/api"} · 静态资源 /media</div>
+        <div className="cm-boot-foot">接口 {"/api"} · 静态资源 /media</div>
       </div>
     );
   }

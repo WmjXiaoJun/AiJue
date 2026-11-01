@@ -1,0 +1,275 @@
+/* =========================================================================
+   V14 · 全站一致性补丁（在 main.tsx 最后引入，保证覆盖旧样式）
+   1) Toast（新设计，自包含：toast 挂在 #root 之外，不能依赖 .cm-app 变量）
+   2) BootScreen / 后端等待屏（新设计）
+   3) 全站滚动与层级修正（双击滚动条 / z-index）
+   ========================================================================= */
+
+/* ------------------------------ Toast ------------------------------ */
+.cm-toast-stack {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 220;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  max-width: 420px;
+  pointer-events: none;
+}
+
+.cm-toast {
+  --t-accent: #c9a227;
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 11px 14px;
+  border: 1px solid rgba(201, 162, 39, 0.3);
+  border-left: 2px solid var(--t-accent);
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(19, 22, 29, 0.97), rgba(11, 13, 18, 0.97));
+  box-shadow: 0 24px 60px -28px rgba(0, 0, 0, 0.85);
+  color: #ece6d8;
+  font-family: "DengXian", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+  font-size: 12.5px;
+  line-height: 1.55;
+  letter-spacing: 0.02em;
+  pointer-events: auto;
+  animation: cm-toast-in 0.22s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+.cm-toast svg { flex: 0 0 auto; margin-top: 1px; color: var(--t-accent); }
+.cm-toast > span { min-width: 0; overflow-wrap: anywhere; }
+
+.cm-toast.is-success { --t-accent: #7fbfa7; border-color: rgba(79, 143, 124, 0.4); }
+.cm-toast.is-error { --t-accent: #e29a87; border-color: rgba(194, 84, 63, 0.45); }
+.cm-toast.is-info { --t-accent: #e5c66d; }
+
+@keyframes cm-toast-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 860px) {
+  .cm-toast-stack { right: 12px; bottom: 12px; left: 12px; max-width: none; }
+}
+
+/* ------------------------------ BootScreen ------------------------------ */
+.cm-boot {
+  --c-bg: #07080b;
+  --c-text: #ece6d8;
+  --c-sub: #9a958a;
+  --c-mut: #6b675f;
+  --c-gold: #c9a227;
+  --c-gold-soft: #e5c66d;
+  --c-line: rgba(201, 162, 39, 0.13);
+  --c-line-strong: rgba(201, 162, 39, 0.3);
+  --font-display: "KaiTi", "STKaiti", "Kaiti SC", "Songti SC", "SimSun", serif;
+  --font-body: "DengXian", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+  --font-mono: "Consolas", "SF Mono", "JetBrains Mono", monospace;
+
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  overflow: hidden;
+  padding: 32px;
+  background:
+    radial-gradient(1100px 620px at 12% -8%, rgba(201, 162, 39, 0.1), transparent 62%),
+    radial-gradient(900px 560px at 96% 108%, rgba(79, 143, 124, 0.08), transparent 60%),
+    linear-gradient(180deg, #080a0e 0%, #07080b 60%, #060709 100%);
+  color: var(--c-text);
+  font-family: var(--font-body);
+  text-align: center;
+}
+.cm-boot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='160' height='160' filter='url(%23n)' opacity='0.055'/></svg>");
+  mix-blend-mode: overlay;
+}
+.cm-boot > * { position: relative; z-index: 1; }
+.cm-boot-glow {
+  position: absolute;
+  z-index: 0;
+  width: 620px;
+  height: 620px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(201, 162, 39, 0.14), transparent 62%);
+  filter: blur(10px);
+  pointer-events: none;
+}
+.cm-boot h1 {
+  margin: 12px 0 0;
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--c-text);
+  text-shadow: 0 14px 40px rgba(0, 0, 0, 0.7);
+}
+.cm-boot-tagline {
+  margin: 4px 0 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--c-mut);
+}
+.cm-boot-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 26px;
+  padding: 9px 14px;
+  border: 1px solid var(--c-line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--c-sub);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+}
+.cm-boot-loading .spinner svg { color: var(--c-gold-soft); }
+
+.cm-boot-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(520px, 92vw);
+  margin-top: 22px;
+  padding: 18px 20px;
+  border: 1px solid var(--c-line);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(19, 22, 29, 0.92), rgba(11, 13, 18, 0.94));
+  box-shadow: 0 40px 100px -50px #000;
+  text-align: left;
+}
+.cm-boot-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-gold-soft);
+}
+.cm-boot-card-title i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #c2543f;
+  box-shadow: 0 0 8px rgba(194, 84, 63, 0.8);
+}
+.cm-boot-card p { margin: 0; font-size: 12px; line-height: 1.75; color: var(--c-sub); }
+.cm-boot-card code {
+  display: block;
+  padding: 9px 11px;
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  background: rgba(4, 6, 9, 0.85);
+  color: var(--c-gold-soft);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+.cm-boot-card .cm-btn { align-self: flex-start; }
+.cm-boot-foot {
+  margin-top: 20px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: var(--c-mut);
+}
+
+/* ------------------------------ 全站层级/滚动修正 ------------------------------ */
+/* 所有在用外壳（PlatformHome / ProjectStudio / CinemaStudio / V5World）都是 100vh 固定外壳，
+   页面滚动交给各自内容区，避免 body 层出现第二条滚动条。 */
+html,
+body,
+#root { height: 100%; }
+body { overflow: hidden; }
+
+/* 旧 toast 容器：已由 cm-toast-stack 取代，隐藏避免样式残留 */
+.toast-stack:not(.cm-toast-stack) { display: none; }
+
+/* ------------------------------ 崩溃兜底页（ErrorBoundary） ------------------------------ */
+.cm-crash {
+  --c-text: #ece6d8;
+  --c-sub: #9a958a;
+  --c-mut: #6b675f;
+  --c-gold: #c9a227;
+  --c-gold-soft: #e5c66d;
+  --c-line: rgba(201, 162, 39, 0.13);
+  --font-display: "KaiTi", "STKaiti", "Kaiti SC", "Songti SC", "SimSun", serif;
+  --font-body: "DengXian", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+  --font-mono: "Consolas", "SF Mono", "JetBrains Mono", monospace;
+
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+  background:
+    radial-gradient(1100px 620px at 12% -8%, rgba(201, 162, 39, 0.1), transparent 62%),
+    linear-gradient(180deg, #080a0e, #060709);
+  color: var(--c-text);
+  font-family: var(--font-body);
+}
+.cm-crash-card {
+  width: min(560px, 94vw);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px 24px;
+  border: 1px solid rgba(201, 162, 39, 0.26);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #0e1015, #080a0e);
+  box-shadow: 0 60px 160px -60px #000;
+}
+.cm-crash-kicker {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--c-gold);
+}
+.cm-crash-mark {
+  font-family: var(--font-display);
+  font-size: 15px;
+  letter-spacing: 0.2em;
+  color: var(--c-gold-soft);
+}
+.cm-crash-card h2 {
+  margin: 2px 0 0;
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+.cm-crash-card p { margin: 0; font-size: 12px; line-height: 1.75; color: var(--c-sub); }
+.cm-crash-card pre {
+  margin: 4px 0 6px;
+  padding: 10px 12px;
+  max-height: 200px;
+  overflow: auto;
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  background: rgba(4, 6, 9, 0.85);
+  color: #e29a87;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.cm-crash-card .cm-btn { align-self: flex-start; }
+

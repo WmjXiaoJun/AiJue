@@ -31,9 +31,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={notify}>
       {children}
-      <div className="toast-stack" role="status" aria-live="polite">
+      <div className="cm-toast-stack" role="status" aria-live="polite">
         {items.map((item) => (
-          <div key={item.id} className={"toast toast-" + item.tone}>
+          <div key={item.id} className={"cm-toast is-" + item.tone}>
             {item.tone === "success" ? <IconCheck size={16} /> : item.tone === "error" ? <IconAlert size={16} /> : <IconInfo size={16} />}
             <span>{item.message}</span>
           </div>

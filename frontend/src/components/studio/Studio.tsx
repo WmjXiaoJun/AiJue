@@ -231,6 +231,7 @@ export function ProjectStudio({
           </div>
         </nav>
 
+
         <main className="st-content">
           {activeTab === "script" ? (
             <StudioScripts {...tabProps} />
@@ -246,6 +247,53 @@ export function ProjectStudio({
             <StudioFinishing {...tabProps} />
           )}
         </main>
+
+        <footer className="st-flow">
+          <span className="st-flow-label">制片流水线</span>
+          <div className="st-flow-steps">
+            {STUDIO_TABS.map((item, index) => {
+              const currentIndex = STUDIO_TABS.findIndex((t) => t.key === activeTab);
+              const state = index < currentIndex ? "is-done" : index === currentIndex ? "is-current" : "";
+              return (
+                <button
+                  key={item.key}
+                  type="button"
+                  className={"st-flow-step " + state}
+                  onClick={() => handleTabChange(item.key)}
+                  title={item.desc}
+                >
+                  <span className="st-flow-no">{item.no}</span>
+                  <span className="st-flow-name">{item.label}</span>
+                </button>
+              );
+            })}
+          </div>
+          <div className="st-flow-actions">
+            {(() => {
+              const currentIndex = STUDIO_TABS.findIndex((t) => t.key === activeTab);
+              const prev = currentIndex > 0 ? STUDIO_TABS[currentIndex - 1] : null;
+              const next = currentIndex < STUDIO_TABS.length - 1 ? STUDIO_TABS[currentIndex + 1] : null;
+              return (
+                <>
+                  {prev && (
+                    <button type="button" className="cm-btn cm-btn-ghost cm-btn-sm" onClick={() => handleTabChange(prev.key)}>
+                      ← {prev.label}
+                    </button>
+                  )}
+                  {next ? (
+                    <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" onClick={() => handleTabChange(next.key)}>
+                      下一步：{next.label} →
+                    </button>
+                  ) : (
+                    <a className="cm-btn cm-btn-ghost cm-btn-sm" href="#/v5/gallery">
+                      去成片画廊 →
+                    </a>
+                  )}
+                </>
+              );
+            })()}
+          </div>
+        </footer>
       </div>
     </div>
   );

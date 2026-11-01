@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { ApiError, API_BASE, api, errorText } from "../lib/api";
 import type { Health, LLMConfig, LLMProviderInfo, LLMTestResult, Settings } from "../types";
 import { useToast } from "./Toast";
-import { Field, Modal, Notice, Spinner } from "./ui";
-import { IconAlert, IconCheck, IconRefresh } from "./icons";
+import { Spinner } from "./ui";
+import { IconAlert, IconCheck, IconClose, IconGlobe, IconRefresh, IconSettings, IconSpark } from "./icons";
+import "../styles/settings.css";
 
 interface Props {
   open: boolean;
@@ -352,372 +353,492 @@ export function SettingsModal({ open, onClose, health }: Props) {
     }
   };
 
+  // ESC 关闭（与其它新设计弹层一致；旧 Modal 组件已不再使用）
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  if (!open) return null;
+
   return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      title="设置"
-      subtitle="生成、配音与计价参数；demo 默认 mock 模式离线可跑"
-      size="md"
-      footer={
-        <>
-          <button type="button" className="btn btn-ghost" onClick={onClose}>
-            关闭
-          </button>
-          <button type="button" className="btn btn-primary" onClick={() => void save()} disabled={saving || loading || !!error}>
-            {saving ? <Spinner size={14} /> : null}
-            {saving ? "保存中…" : "保存设置"}
-          </button>
-        </>
-      }
-    >
-      <div className="settings-env">
-        <span>后端 {health?.status === "ok" ? "已连接" : "未知"}</span>
-        <span>版本 {health?.version || "—"}</span>
-        <span>模式 {health?.mode || form.generation_mode}</span>
-        <span>API {API_BASE}</span>
-      </div>
-
-      {error && (
-        <Notice tone="warn">
-          设置接口不可用：{error}（后端 PATCH/GET /settings 未就绪时功能自动降级，不影响制作流程）
-          <button type="button" className="link-btn" onClick={() => void load()}>
-            重试
-          </button>
-        </Notice>
-      )}
-
-      <div className="form-stack">
-        <div className="form-grid">
-          <Field label="生成模式" hint="mock = 离线 ffmpeg 示意片段">
-            <select className="select" value={form.generation_mode} onChange={(event) => update("generation_mode", event.target.value)}>
-              <option value="mock">mock · 离线演示</option>
-              <option value="comfyui">comfyui · MiniMax H3</option>
-            </select>
-          </Field>
-          <Field label="TTS 提供方">
-            <select className="select" value={form.tts_provider} onChange={(event) => update("tts_provider", event.target.value)}>
-              <option value="edge-tts">edge-tts</option>
-              <option value="edge">edge</option>
-            </select>
-          </Field>
-          <Field label="分辨率">
-            <input className="input" value={form.resolution} onChange={(event) => update("resolution", event.target.value)} />
-          </Field>
-          <Field label="帧率">
-            <input className="input" value={form.fps} onChange={(event) => update("fps", event.target.value)} inputMode="numeric" />
-          </Field>
-          <Field label="H3 单价（元/秒）" hint="768P 参考价 0.09">
-            <input
-              className="input"
-              value={form.h3_price_per_second}
-              onChange={(event) => update("h3_price_per_second", event.target.value)}
-              inputMode="decimal"
-            />
-          </Field>
-          <Field label="ComfyUI 地址" hint="comfyui 模式才需要">
-            <input
-              className="input"
-              value={form.comfyui_url}
-              onChange={(event) => update("comfyui_url", event.target.value)}
-              placeholder="http://127.0.0.1:8188"
-            />
-          </Field>
-        </div>
-        <div className="field">
-          <span className="field-label">H3 生成方式</span>
-          <div className="h3-provider-options">
-            <button
-              type="button"
-              className={"h3-provider-option" + (form.h3_provider === "local" ? " active" : "")}
-              onClick={() => update("h3_provider", "local")}
-            >
-              <span className="h3-provider-emoji">🖥</span>
-              <span className="h3-provider-main">
-                <b>本地 ComfyUI</b>
-                <em>生产用 · 慢 / 免费</em>
-              </span>
-              <span className="h3-provider-tag h3-provider-tag-local">生产</span>
-            </button>
-            <button
-              type="button"
-              className={"h3-provider-option" + (form.h3_provider === "metaso" ? " active" : "")}
-              onClick={() => update("h3_provider", "metaso")}
-            >
-              <span className="h3-provider-emoji">☁️</span>
-              <span className="h3-provider-main">
-                <b>MetaSo 云端</b>
-                <em>测试用 · 快 / 计费</em>
-              </span>
-              <span className="h3-provider-tag h3-provider-tag-cloud">云端测试</span>
+    <div className="cm-set-overlay" onMouseDown={onClose} role="presentation">
+      <section
+        className="cm-set"
+        role="dialog"
+        aria-modal="true"
+        aria-label="设置"
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <header className="cm-set-head">
+          <div className="cm-set-head-main">
+            <span className="cm-set-kicker">SETTINGS · 系统设置</span>
+            <h2 className="cm-set-title">设置</h2>
+            <p className="cm-set-sub">生成 / 配音 / 计价 · 海外发布 · AI 模型</p>
+          </div>
+          <div className="cm-set-head-side">
+            <span className={"cm-set-env-chip " + (health?.status === "ok" ? "is-on" : "is-warn")}>
+              <i className="cm-set-dot" />
+              {health?.status === "ok" ? "后端已连接" : "后端状态未知"}
+            </span>
+            <button type="button" className="cm-set-close" onClick={onClose} aria-label="关闭">
+              <IconClose size={16} />
             </button>
           </div>
-          <div className="h3-provider-meta">
+        </header>
+
+        <div className="cm-set-body">
+          {error && (
+            <div className="cm-set-notice is-warn">
+              <IconAlert size={15} />
+              <span>
+                设置接口不可用：{error}（后端 PATCH/GET /settings 未就绪时功能自动降级，不影响制作流程）
+              </span>
+              <button type="button" className="cm-set-link" onClick={() => void load()}>
+                重试
+              </button>
+            </div>
+          )}
+
+          <div className="cm-set-env">
             <span>
-              MetaSo Key：
-              <b className={metasoKeyConfigured === null ? "pending" : metasoKeyConfigured ? "ok" : "warn"}>
-                {metasoKeyConfigured === null ? "未知" : metasoKeyConfigured ? "已配置" : "未配置"}
-              </b>
+              <em>后端</em>
+              {health?.status === "ok" ? "已连接" : "未知"}
             </span>
-            <i />
             <span>
-              计价 ¥{(Number(form.h3_price_per_second) || 0.09).toFixed(2)}/秒 · 5s ≈ ¥
-              {((Number(form.h3_price_per_second) || 0.09) * 5).toFixed(2)}
+              <em>版本</em>
+              {health?.version || "—"}
+            </span>
+            <span>
+              <em>模式</em>
+              {health?.mode || form.generation_mode}
+            </span>
+            <span className="cm-set-env-api">
+              <em>API</em>
+              {API_BASE}
             </span>
           </div>
-          {form.h3_provider === "metaso" && (
-            <span className="h3-provider-note">
-              云端测试产物写入 /media/h3/{"{角色ID}"}_h3_metaso.mp4，并附带「云端测试」徽标，不替代本地生产成片。
-            </span>
-          )}
-          {!h3ProviderSupported && (
-            <span className="field-hint">当前后端尚未支持 h3_provider 字段（等后端更新）；保存时会自动忽略该字段并提示。</span>
-          )}
-        </div>
 
-        <div className="field publish-settings">
-          <span className="field-label">
-            海外发布（Upload-Post）
-            <span className={"publish-settings-status " + (publish.configured ? "ok" : "warn")}>
-              {publish.configured ? "已配置" : "未配置"}
-            </span>
-          </span>
-          <p className="field-hint publish-settings-hint">
-            在{" "}
-            <a href="https://upload-post.com" target="_blank" rel="noreferrer">
-              upload-post.com
-            </a>{" "}
-            注册并连接 YouTube / TikTok / Instagram 后，填入 API Key 与 username。Key 只写不读，GET /settings 不返回明文。
-          </p>
-          <div className="publish-settings-grid">
-            <Field
-              label="Upload-Post API Key"
-              hint={publish.configured ? "已配置（不回显）；留空保持不变" : "从 upload-post 控制台复制"}
-            >
-              <div className="publish-key-row">
+          {/* 01 生成与计价 */}
+          <section className="cm-set-section">
+            <header className="cm-set-section-head">
+              <span className="cm-set-no">01</span>
+              <div className="cm-set-section-main">
+                <h3 className="cm-set-section-title">
+                  <IconSpark size={14} /> 生成与计价
+                </h3>
+                <p className="cm-set-section-sub">GENERATION · 生成模式 / 配音 / 分辨率 / H3 计费</p>
+              </div>
+            </header>
+
+            <div className="cm-set-grid">
+              <label className="cm-set-field">
+                <span className="cm-set-label">生成模式</span>
+                <select
+                  className="cm-set-select"
+                  value={form.generation_mode}
+                  onChange={(event) => update("generation_mode", event.target.value)}
+                >
+                  <option value="mock">mock · 离线演示</option>
+                  <option value="comfyui">comfyui · MiniMax H3</option>
+                </select>
+                <span className="cm-set-hint">mock = 离线 ffmpeg 示意片段</span>
+              </label>
+              <label className="cm-set-field">
+                <span className="cm-set-label">TTS 提供方</span>
+                <select
+                  className="cm-set-select"
+                  value={form.tts_provider}
+                  onChange={(event) => update("tts_provider", event.target.value)}
+                >
+                  <option value="edge-tts">edge-tts</option>
+                  <option value="edge">edge</option>
+                </select>
+                <span className="cm-set-hint">固定音色（edge-tts 为主）</span>
+              </label>
+              <label className="cm-set-field">
+                <span className="cm-set-label">分辨率</span>
+                <input className="cm-set-input" value={form.resolution} onChange={(event) => update("resolution", event.target.value)} />
+              </label>
+              <label className="cm-set-field">
+                <span className="cm-set-label">帧率</span>
                 <input
-                  className="input"
-                  type="password"
-                  value={publish.apiKey}
-                  placeholder={publish.configured ? "••••••••（已配置）" : "粘贴 API Key"}
-                  autoComplete="new-password"
-                  onChange={(event) =>
-                    setPublish((prev) => ({ ...prev, apiKey: event.target.value, keyDirty: true }))
-                  }
+                  className="cm-set-input"
+                  value={form.fps}
+                  onChange={(event) => update("fps", event.target.value)}
+                  inputMode="numeric"
                 />
-                {publish.configured && (
+              </label>
+              <label className="cm-set-field">
+                <span className="cm-set-label">H3 单价（元/秒）</span>
+                <input
+                  className="cm-set-input"
+                  value={form.h3_price_per_second}
+                  onChange={(event) => update("h3_price_per_second", event.target.value)}
+                  inputMode="decimal"
+                />
+                <span className="cm-set-hint">768P 参考价 0.09</span>
+              </label>
+              <label className="cm-set-field">
+                <span className="cm-set-label">ComfyUI 地址</span>
+                <input
+                  className="cm-set-input"
+                  value={form.comfyui_url}
+                  onChange={(event) => update("comfyui_url", event.target.value)}
+                  placeholder="http://127.0.0.1:8188"
+                />
+                <span className="cm-set-hint">comfyui 模式才需要</span>
+              </label>
+            </div>
+
+            <div className="cm-set-field cm-set-field-wide">
+              <span className="cm-set-label">H3 生成方式</span>
+              <div className="cm-set-choices">
+                <button
+                  type="button"
+                  className={"cm-set-choice" + (form.h3_provider === "local" ? " is-active" : "")}
+                  onClick={() => update("h3_provider", "local")}
+                >
+                  <span className="cm-set-choice-main">
+                    <b>本地 ComfyUI</b>
+                    <em>生产用 · 慢 / 免费</em>
+                  </span>
+                  <span className="cm-set-badge">生产</span>
+                </button>
+                <button
+                  type="button"
+                  className={"cm-set-choice" + (form.h3_provider === "metaso" ? " is-active" : "")}
+                  onClick={() => update("h3_provider", "metaso")}
+                >
+                  <span className="cm-set-choice-main">
+                    <b>MetaSo 云端</b>
+                    <em>测试用 · 快 / 计费</em>
+                  </span>
+                  <span className="cm-set-badge is-soft">云端测试</span>
+                </button>
+              </div>
+              <div className="cm-set-meta-row">
+                <span>
+                  MetaSo Key：
+                  <b className={"cm-set-state " + (metasoKeyConfigured === null ? "" : metasoKeyConfigured ? "is-jade" : "is-red")}>
+                    {metasoKeyConfigured === null ? "未知" : metasoKeyConfigured ? "已配置" : "未配置"}
+                  </b>
+                </span>
+                <span className="cm-set-meta-divider" />
+                <span>
+                  计价 ¥{(Number(form.h3_price_per_second) || 0.09).toFixed(2)}/秒 · 5s ≈ ¥
+                  {((Number(form.h3_price_per_second) || 0.09) * 5).toFixed(2)}
+                </span>
+              </div>
+              {form.h3_provider === "metaso" && (
+                <span className="cm-set-hint">
+                  云端测试产物写入 /media/h3/{"{角色ID}"}_h3_metaso.mp4，并附带「云端测试」徽标，不替代本地生产成片。
+                </span>
+              )}
+              {!h3ProviderSupported && (
+                <span className="cm-set-hint is-warn">当前后端尚未支持 h3_provider 字段；保存时会自动忽略该字段并提示。</span>
+              )}
+            </div>
+          </section>
+
+          {/* 02 海外发布 */}
+          <section className="cm-set-section">
+            <header className="cm-set-section-head">
+              <span className="cm-set-no">02</span>
+              <div className="cm-set-section-main">
+                <h3 className="cm-set-section-title">
+                  <IconGlobe size={14} /> 海外发布（Upload-Post）
+                </h3>
+                <p className="cm-set-section-sub">PUBLISHING · YouTube / TikTok / Instagram 一键分发</p>
+              </div>
+              <span className={"cm-set-badge " + (publish.configured ? "is-jade" : "is-soft")}>
+                {publish.configured ? "已配置" : "未配置"}
+              </span>
+            </header>
+
+            <p className="cm-set-hint cm-set-hint-block">
+              在{" "}
+              <a href="https://upload-post.com" target="_blank" rel="noreferrer">
+                upload-post.com
+              </a>{" "}
+              注册并连接 YouTube / TikTok / Instagram 后，填入 API Key 与 username。Key 只写不读，GET /settings 不返回明文。
+            </p>
+
+            <div className="cm-set-grid">
+              <label className="cm-set-field">
+                <span className="cm-set-label">Upload-Post API Key</span>
+                <div className="cm-set-inline">
+                  <input
+                    className="cm-set-input"
+                    type="password"
+                    value={publish.apiKey}
+                    placeholder={publish.configured ? "••••••••（已配置）" : "粘贴 API Key"}
+                    autoComplete="new-password"
+                    onChange={(event) =>
+                      setPublish((prev) => ({ ...prev, apiKey: event.target.value, keyDirty: true }))
+                    }
+                  />
+                  {publish.configured && (
+                    <button
+                      type="button"
+                      className="cm-btn cm-btn-ghost cm-btn-sm"
+                      onClick={() => {
+                        if (!window.confirm("清除已保存的 Upload-Post API Key？")) return;
+                        setPublish((prev) => ({ ...prev, apiKey: "", keyDirty: true, configured: false }));
+                      }}
+                    >
+                      清除
+                    </button>
+                  )}
+                </div>
+                <span className="cm-set-hint">
+                  {publish.configured ? "已配置（不回显）；留空保持不变" : "从 upload-post 控制台复制"}
+                </span>
+              </label>
+              <label className="cm-set-field">
+                <span className="cm-set-label">Username</span>
+                <input
+                  className="cm-set-input"
+                  value={publish.username}
+                  placeholder="例如：zaopianju"
+                  onChange={(event) => setPublish((prev) => ({ ...prev, username: event.target.value }))}
+                />
+                <span className="cm-set-hint">upload-post 的 profile 用户名</span>
+              </label>
+            </div>
+
+            <div className="cm-set-checks">
+              <label className="cm-set-check">
+                <input
+                  type="checkbox"
+                  checked={publish.enabled}
+                  onChange={(event) => setPublish((prev) => ({ ...prev, enabled: event.target.checked }))}
+                />
+                <span className="cm-set-check-box">{publish.enabled && <IconCheck size={11} />}</span>
+                <span>启用海外发布</span>
+              </label>
+              <label className="cm-set-check">
+                <input
+                  type="checkbox"
+                  checked={publish.madeForKids}
+                  onChange={(event) => setPublish((prev) => ({ ...prev, madeForKids: event.target.checked }))}
+                />
+                <span className="cm-set-check-box">{publish.madeForKids && <IconCheck size={11} />}</span>
+                <span>YouTube：made for kids</span>
+              </label>
+            </div>
+
+            <div className="cm-set-field cm-set-field-wide">
+              <span className="cm-set-label">默认发布平台</span>
+              <div className="cm-set-chips">
+                {UPLOAD_PLATFORM_OPTIONS.map((platform) => {
+                  const active = publish.platforms.includes(platform.id);
+                  return (
+                    <button
+                      key={platform.id}
+                      type="button"
+                      className={"cm-set-chip" + (active ? " is-active" : "")}
+                      onClick={() =>
+                        setPublish((prev) => ({
+                          ...prev,
+                          platforms: active
+                            ? prev.platforms.filter((item) => item !== platform.id)
+                            : [...prev.platforms, platform.id],
+                        }))
+                      }
+                    >
+                      {active && <IconCheck size={11} />} {platform.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="cm-set-grid">
+              <label className="cm-set-field">
+                <span className="cm-set-label">YouTube 可见性</span>
+                <select
+                  className="cm-set-select"
+                  value={publish.privacy}
+                  onChange={(event) => setPublish((prev) => ({ ...prev, privacy: event.target.value }))}
+                >
+                  <option value="unlisted">unlisted · 不公开（推荐）</option>
+                  <option value="public">public · 公开</option>
+                  <option value="private">private · 仅自己可见</option>
+                </select>
+                <span className="cm-set-hint">默认 unlisted 先审后公开</span>
+              </label>
+            </div>
+
+            {!publishSupported && (
+              <span className="cm-set-hint is-warn">
+                当前后端尚未支持 upload_post_* 字段；保存会自动忽略这些字段并提示。
+              </span>
+            )}
+          </section>
+
+          {/* 03 AI 模型 */}
+          <section className="cm-set-section">
+            <header className="cm-set-section-head">
+              <span className="cm-set-no">03</span>
+              <div className="cm-set-section-main">
+                <h3 className="cm-set-section-title">
+                  <IconSettings size={14} /> AI 模型（LLM）
+                </h3>
+                <p className="cm-set-section-sub">LLM · 台本 / 内容生成（本地 Ollama 或 OpenAI 兼容）</p>
+              </div>
+              <span className={"cm-set-badge " + (llmSupported ? "is-jade" : "is-soft")}>
+                {llmSupported ? "接口可用" : "接口未就绪"}
+              </span>
+            </header>
+
+            <p className="cm-set-hint cm-set-hint-block">
+              本地 Ollama（免费离线）或 OpenAI 兼容 API（DeepSeek / OpenAI，需 Key）；用于「AI 生成台本」等 AI 内容。
+              API Key 只写不读，GET 永不返回明文。
+            </p>
+
+            <div className="cm-set-grid">
+              <label className="cm-set-field">
+                <span className="cm-set-label">Provider</span>
+                <select
+                  className="cm-set-select"
+                  value={llm.provider}
+                  onChange={(event) => {
+                    const id = event.target.value;
+                    const info = llmProviders.find((item) => item.id === id);
+                    setLlm((prev) => ({
+                      ...prev,
+                      provider: id,
+                      baseUrl: id === "mock" ? "" : info?.default_base_url || prev.baseUrl,
+                      model: info?.default_model || prev.model,
+                    }));
+                    setLlmTestResult(null);
+                    setLlmTestError(null);
+                  }}
+                >
+                  {llmProviders.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.label || item.name || item.id}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="cm-set-field">
+                <span className="cm-set-label">模型</span>
+                <input
+                  className="cm-set-input"
+                  value={llm.model}
+                  onChange={(event) => setLlm((prev) => ({ ...prev, model: event.target.value }))}
+                  placeholder="qwen2.5:7b / deepseek-chat"
+                />
+                <span className="cm-set-hint">本地默认 qwen2.5:7b；API 如 deepseek-chat</span>
+              </label>
+            </div>
+
+            <label className="cm-set-field cm-set-field-wide">
+              <span className="cm-set-label">Base URL</span>
+              <input
+                className="cm-set-input"
+                value={llm.baseUrl}
+                onChange={(event) => setLlm((prev) => ({ ...prev, baseUrl: event.target.value }))}
+                placeholder={llm.provider === "ollama" ? "http://127.0.0.1:11434" : "https://api.deepseek.com/v1"}
+                disabled={llm.provider === "mock"}
+              />
+              <span className="cm-set-hint">
+                {llm.provider === "ollama" ? "默认 http://127.0.0.1:11434" : "如 https://api.deepseek.com/v1"}
+              </span>
+            </label>
+
+            <label className="cm-set-field cm-set-field-wide">
+              <span className="cm-set-label">API Key</span>
+              <div className="cm-set-inline">
+                <input
+                  className="cm-set-input"
+                  type="password"
+                  value={llm.apiKey}
+                  placeholder={llm.keyConfigured ? "••••••••（已保存）" : "粘贴 API Key"}
+                  autoComplete="new-password"
+                  onChange={(event) => setLlm((prev) => ({ ...prev, apiKey: event.target.value, keyDirty: true }))}
+                />
+                {llm.keyConfigured && (
                   <button
                     type="button"
-                    className="btn btn-ghost btn-sm"
+                    className="cm-btn cm-btn-ghost cm-btn-sm"
                     onClick={() => {
-                      if (!window.confirm("清除已保存的 Upload-Post API Key？")) return;
-                      setPublish((prev) => ({ ...prev, apiKey: "", keyDirty: true, configured: false }));
+                      if (!window.confirm("清除已保存的 LLM API Key？")) return;
+                      setLlm((prev) => ({ ...prev, apiKey: "", keyDirty: true, keyConfigured: false }));
                     }}
                   >
                     清除
                   </button>
                 )}
+                <button type="button" className="cm-btn cm-btn-sm" onClick={() => void testLLM()} disabled={llmTesting}>
+                  {llmTesting ? <Spinner size={12} /> : null}
+                  {llmTesting ? "测试中…" : "测试连接"}
+                </button>
               </div>
-            </Field>
-            <Field label="Username" hint="upload-post 的 profile 用户名">
-              <input
-                className="input"
-                value={publish.username}
-                placeholder="例如：zaopianju"
-                onChange={(event) => setPublish((prev) => ({ ...prev, username: event.target.value }))}
-              />
-            </Field>
-          </div>
-
-          <div className="publish-settings-row">
-            <label className="check">
-              <input
-                type="checkbox"
-                checked={publish.enabled}
-                onChange={(event) => setPublish((prev) => ({ ...prev, enabled: event.target.checked }))}
-              />
-              <span className="check-box">{publish.enabled && <IconCheck size={12} />}</span>
-              <span>启用海外发布</span>
+              <span className="cm-set-hint">
+                {llm.keyConfigured
+                  ? "已保存（不回显）；留空保持不变"
+                  : llm.provider === "ollama"
+                    ? "本地 Ollama 无需 Key"
+                    : "OpenAI 兼容 provider 需要 API Key"}
+              </span>
             </label>
-            <label className="check">
-              <input
-                type="checkbox"
-                checked={publish.madeForKids}
-                onChange={(event) => setPublish((prev) => ({ ...prev, madeForKids: event.target.checked }))}
-              />
-              <span className="check-box">{publish.madeForKids && <IconCheck size={12} />}</span>
-              <span>YouTube：made for kids</span>
-            </label>
-          </div>
 
-          <div className="publish-settings-platforms">
-            <span className="publish-label">默认发布平台</span>
-            {UPLOAD_PLATFORM_OPTIONS.map((platform) => {
-              const active = publish.platforms.includes(platform.id);
-              return (
-                <button
-                  key={platform.id}
-                  type="button"
-                  className={"publish-platform-chip" + (active ? " active" : "")}
-                  onClick={() =>
-                    setPublish((prev) => ({
-                      ...prev,
-                      platforms: active
-                        ? prev.platforms.filter((item) => item !== platform.id)
-                        : [...prev.platforms, platform.id],
-                    }))
-                  }
-                >
-                  {active && <IconCheck size={11} />} {platform.label}
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="form-grid">
-            <Field label="YouTube 可见性" hint="默认 unlisted 先审后公开">
-              <select
-                className="select"
-                value={publish.privacy}
-                onChange={(event) => setPublish((prev) => ({ ...prev, privacy: event.target.value }))}
-              >
-                <option value="unlisted">unlisted · 不公开（推荐）</option>
-                <option value="public">public · 公开</option>
-                <option value="private">private · 仅自己可见</option>
-              </select>
-            </Field>
-          </div>
-
-          {!publishSupported && (
-            <span className="field-hint">
-              当前后端尚未支持 upload_post_* 字段（等 task-33）；保存会自动忽略这些字段并提示。
-            </span>
-          )}
+            {llmTestResult?.ok && (
+              <div className="cm-set-result is-ok">
+                <IconCheck size={13} /> 连接成功
+                {llmTestResult.model ? " · " + llmTestResult.model : ""}
+                {typeof llmTestResult.latency_ms === "number"
+                  ? " · " + Math.round(llmTestResult.latency_ms) + "ms"
+                  : typeof llmTestResult.elapsed_sec === "number"
+                    ? " · " + llmTestResult.elapsed_sec.toFixed(1) + "s"
+                    : ""}
+              </div>
+            )}
+            {llmTestResult && !llmTestResult.ok && (
+              <div className="cm-set-result is-error">
+                <IconAlert size={13} /> 连接失败：{llmTestResult.error || "未知原因"}
+              </div>
+            )}
+            {llmTestError && (
+              <div className="cm-set-result is-error">
+                <IconAlert size={13} /> {llmTestError}
+              </div>
+            )}
+            {!llmSupported && (
+              <span className="cm-set-hint is-warn">
+                当前后端尚未提供 /api/llm/config；字段仍会随保存 PATCH 尝试写入 llm_*。
+              </span>
+            )}
+          </section>
         </div>
 
-        <div className="field settings-llm">
-          <span className="field-label">
-            AI 模型（LLM）
-            <span className={"publish-settings-status " + (llmSupported ? "ok" : "warn")}>
-              {llmSupported ? "接口可用" : "接口未就绪"}
-            </span>
+        <footer className="cm-set-foot">
+          <span className="cm-set-foot-hint">
+            <IconRefresh size={13} /> 修改生成模式后，新任务按新设置执行；已排队任务不回溯。
           </span>
-          <p className="field-hint publish-settings-hint">
-            本地 Ollama（免费离线）或 OpenAI 兼容 API（DeepSeek / OpenAI，需 Key）；用于「AI 生成台本」等 AI 内容。
-            API Key 只写不读，GET 永不返回明文。
-          </p>
-          <div className="form-grid">
-            <Field label="Provider">
-              <select
-                className="select"
-                value={llm.provider}
-                onChange={(event) => {
-                  const id = event.target.value;
-                  const info = llmProviders.find((item) => item.id === id);
-                  setLlm((prev) => ({
-                    ...prev,
-                    provider: id,
-                    baseUrl: id === "mock" ? "" : info?.default_base_url || prev.baseUrl,
-                    model: info?.default_model || prev.model,
-                  }));
-                  setLlmTestResult(null);
-                  setLlmTestError(null);
-                }}
-              >
-                {llmProviders.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.label || item.name || item.id}
-                  </option>
-                ))}
-              </select>
-            </Field>
-            <Field label="模型" hint="本地默认 qwen2.5:7b；API 如 deepseek-chat">
-              <input
-                className="input"
-                value={llm.model}
-                onChange={(event) => setLlm((prev) => ({ ...prev, model: event.target.value }))}
-                placeholder="qwen2.5:7b / deepseek-chat"
-              />
-            </Field>
+          <div className="cm-set-foot-actions">
+            <button type="button" className="cm-btn cm-btn-sm" onClick={onClose}>
+              关闭
+            </button>
+            <button
+              type="button"
+              className="cm-btn cm-btn-primary cm-btn-sm"
+              onClick={() => void save()}
+              disabled={saving || loading || !!error}
+            >
+              {saving ? <Spinner size={13} /> : null}
+              {saving ? "保存中…" : "保存设置"}
+            </button>
           </div>
-          <Field label="Base URL" hint={llm.provider === "ollama" ? "默认 http://127.0.0.1:11434" : "如 https://api.deepseek.com/v1"}>
-            <input
-              className="input"
-              value={llm.baseUrl}
-              onChange={(event) => setLlm((prev) => ({ ...prev, baseUrl: event.target.value }))}
-              placeholder={llm.provider === "ollama" ? "http://127.0.0.1:11434" : "https://api.deepseek.com/v1"}
-              disabled={llm.provider === "mock"}
-            />
-          </Field>
-          <Field
-            label="API Key"
-            hint={
-              llm.keyConfigured
-                ? "已保存（不回显）；留空保持不变"
-                : llm.provider === "ollama"
-                  ? "本地 Ollama 无需 Key"
-                  : "OpenAI 兼容 provider 需要 API Key"
-            }
-          >
-            <div className="publish-key-row">
-              <input
-                className="input"
-                type="password"
-                value={llm.apiKey}
-                placeholder={llm.keyConfigured ? "••••••••（已保存）" : "粘贴 API Key"}
-                autoComplete="new-password"
-                onChange={(event) => setLlm((prev) => ({ ...prev, apiKey: event.target.value, keyDirty: true }))}
-              />
-              {llm.keyConfigured && (
-                <button
-                  type="button"
-                  className="btn btn-ghost btn-sm"
-                  onClick={() => {
-                    if (!window.confirm("清除已保存的 LLM API Key？")) return;
-                    setLlm((prev) => ({ ...prev, apiKey: "", keyDirty: true, keyConfigured: false }));
-                  }}
-                >
-                  清除
-                </button>
-              )}
-              <button type="button" className="btn btn-outline btn-sm" onClick={() => void testLLM()} disabled={llmTesting}>
-                {llmTesting ? <Spinner size={13} /> : null}
-                {llmTesting ? "测试中…" : "测试连接"}
-              </button>
-            </div>
-          </Field>
-          {llmTestResult?.ok && (
-            <div className="llm-test-result is-ok">
-              <IconCheck size={13} /> 连接成功
-              {llmTestResult.model ? " · " + llmTestResult.model : ""}
-              {typeof llmTestResult.latency_ms === "number"
-                ? " · " + Math.round(llmTestResult.latency_ms) + "ms"
-                : typeof llmTestResult.elapsed_sec === "number"
-                  ? " · " + llmTestResult.elapsed_sec.toFixed(1) + "s"
-                  : ""}
-            </div>
-          )}
-          {llmTestResult && !llmTestResult.ok && (
-            <div className="llm-test-result is-error">
-              <IconAlert size={13} /> 连接失败：{llmTestResult.error || "未知原因"}
-            </div>
-          )}
-          {llmTestError && (
-            <div className="llm-test-result is-error">
-              <IconAlert size={13} /> {llmTestError}
-            </div>
-          )}
-          {!llmSupported && (
-            <span className="field-hint">
-              当前后端尚未提供 /api/llm/config（等待 task-45）；字段仍会随保存 PATCH 尝试写入 llm_*。
-            </span>
-          )}
-        </div>
-
-        <div className="form-note">
-          <IconRefresh size={13} /> 修改生成模式后，新任务按新设置执行；已排队任务不回溯。
-        </div>
-      </div>
-    </Modal>
+        </footer>
+      </section>
+    </div>
   );
 }

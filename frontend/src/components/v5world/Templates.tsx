@@ -1,7 +1,7 @@
 // V5 World · 模板库：16 个 AI 微综艺模板（风格 / 时长 / 画幅 / 幕结构 / 卡司），
 // 可播放 3D 电影版、查看逐幕详情、一键进入渲染台。
 import { useEffect, useMemo, useState } from "react";
-import type { V5TemplateSummary, V5Output } from "../../lib/v5";
+import type { V5TemplateSummary } from "../../lib/v5";
 import { mediaSrc, previewUrl, v5api } from "../../lib/v5";
 import type { CinemaTemplate } from "../../lib/cinema";
 import { fmtDuration } from "../../lib/cinema";
@@ -18,7 +18,7 @@ interface TemplateDetail {
   packaging?: Record<string, unknown>;
 }
 
-export function V5Templates({ catalog, outputs, templates3d, loading, error, onRefresh, onRenderTemplate }: V5PageProps) {
+export function V5Templates({ catalog, templates3d, loading, error, onRefresh, onRenderTemplate }: V5PageProps) {
   const [search, setSearch] = useState("");
   const [styleFilter, setStyleFilter] = useState("all");
   const [detailId, setDetailId] = useState<string | null>(null);
@@ -28,8 +28,6 @@ export function V5Templates({ catalog, outputs, templates3d, loading, error, onR
     (catalog?.styles || []).forEach((style) => map.set(style.id, style.label));
     return map;
   }, [catalog]);
-
-  const outputMap = useMemo(() => new Map(outputs.map((item) => [item.id, item])), [outputs]);
 
   const templates = useMemo<V5TemplateSummary[]>(() => {
     const all = catalog?.templates || [];
@@ -168,12 +166,11 @@ export function V5Templates({ catalog, outputs, templates3d, loading, error, onR
         <div className="v5w-tpl-grid">
           {filtered.map((template) => {
             const tpl3d = templates3d[template.id] || null;
-            const output = outputMap.get(template.id) || null;
             const ready3d = Boolean(tpl3d && tpl3d.final.exists);
+            // 3D 成片为唯一成片数据源（旧 2D 成片已归档，不再作为海报/播放回退）
             const poster3d = tpl3d?.poster_url ? mediaSrc(tpl3d.poster_url) : mediaSrc(`/media/templates_3d/${template.id}/poster.jpg`);
-            const poster2d = output?.poster_url ? mediaSrc(output.poster_url) : "";
             const preview = previewUrl("templates", template.id, undefined, "640x360");
-            const sources = ready3d ? [poster3d, poster2d, preview] : [poster2d, poster3d, preview];
+            const sources = ready3d ? [poster3d, preview] : [preview];
             return (
               <article key={template.id} className={"v5w-tpl-card" + (ready3d ? " is-3d" : "")}>
                 <div className="v5w-tpl-poster">

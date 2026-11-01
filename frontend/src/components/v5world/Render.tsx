@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { V5RenderJob } from "../../lib/v5";
 import { v5api } from "../../lib/v5";
-import { fmtDuration } from "../../lib/cinema";
+import { fmtDuration, fmtSize } from "../../lib/cinema";
 import type { CinemaTemplate } from "../../lib/cinema";
 import type { V5PageProps } from "./V5World";
 import { IconAlert, IconCheck, IconFilm, IconPlay, IconRefresh, IconSpark } from "../icons";
@@ -30,7 +30,6 @@ const STATUS_TONE: Record<string, string> = {
 
 export function V5Render({
   catalog,
-  outputs,
   templates3d,
   presetTemplate,
   loading,
@@ -67,8 +66,9 @@ export function V5Render({
   }, []);
 
   const selected = useMemo(() => templates.find((item) => item.id === template) || null, [template, templates]);
-  const rendered = useMemo(() => outputs.find((item) => item.id === template) || null, [outputs, template]);
   const tpl3d: CinemaTemplate | null = templates3d[template] || null;
+  const total3d = Object.keys(templates3d).length;
+  const readyCount = Object.values(templates3d).filter((item) => item.final.exists).length;
 
   // 默认模板 + 目标时长（首次加载时对齐模板 target_duration）
   useEffect(() => {
@@ -194,7 +194,6 @@ export function V5Render({
     }
   };
 
-  const readyCount = templates.filter((item) => outputs.some((output) => output.id === item.id)).length;
   const jobProgress = job ? (job.status === "done" ? 100 : Math.max(0, Math.min(100, Number(job.progress) || 0))) : 0;
 
   return (
@@ -204,7 +203,8 @@ export function V5Render({
           <span className="cm-kicker">RENDER · 渲染台</span>
           <h1 className="cm-h1">渲染台</h1>
           <p className="cm-sub">
-            选模板 + 目标时长 → 提交 render_v5 后台任务（单并发）· {templates.length} 个模板可选 · 已有成片 {readyCount}
+            选模板 + 目标时长 → 提交 render_v5 后台任务（单并发）· {templates.length} 个模板可选 · 3D 电影版已就绪{" "}
+            {readyCount}/{total3d || 16}
           </p>
         </div>
         <div className="cm-head-actions">
@@ -224,12 +224,12 @@ export function V5Render({
           <div className="st-kpi-hint">catalog.templates</div>
         </div>
         <div className="st-kpi">
-          <span className="st-kpi-label">Rendered</span>
+          <span className="st-kpi-label">3D Ready</span>
           <div className="st-kpi-value is-jade">
             {readyCount}
-            <small>部成片</small>
+            <small>/ {total3d || 16}</small>
           </div>
-          <div className="st-kpi-hint">已有 final.mp4</div>
+          <div className="st-kpi-hint">3D 电影版已就绪</div>
         </div>
         <div className="st-kpi">
           <span className="st-kpi-label">Job</span>
@@ -308,15 +308,11 @@ export function V5Render({
                   <b className="cm-mono">{(selected.scene_route || []).length} 个节点</b>
                 </div>
                 <div className="v5w-render-summary-row">
-                  <span>当前 2D 成片</span>
-                  <b className="cm-mono">
-                    {rendered ? `${fmtDuration(rendered.duration || 0)} · QC ${rendered.qc_ok ? "通过" : "未通过"}` : "尚未渲染"}
-                  </b>
-                </div>
-                <div className="v5w-render-summary-row">
                   <span>3D 电影版</span>
                   <b className="cm-mono">
-                    {tpl3d?.final.exists ? `${fmtDuration(tpl3d.final.duration)} · 已就绪` : "暂无 3D 版"}
+                    {tpl3d?.final.exists
+                      ? `${fmtDuration(tpl3d.final.duration)} · ${fmtSize(tpl3d.final.size)} · 已就绪`
+                      : "暂无 3D 版"}
                   </b>
                 </div>
               </div>

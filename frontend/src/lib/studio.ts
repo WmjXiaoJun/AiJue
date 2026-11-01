@@ -229,13 +229,23 @@ export const studioApi = {
   characters: (pid: string): Promise<Character[]> => api.characters(pid),
   character: (cid: string): Promise<Character> => api.character(cid),
   createCharacter: api.createCharacter,
-  patchCharacter: api.patchCharacter,
+  /** 更新角色资料（name/title/persona/voice/accent_color）；后端会同步资产 */
+  patchCharacter: (
+    cid: string,
+    body: Partial<Pick<Character, "name" | "title" | "persona" | "voice" | "accent_color">>,
+  ): Promise<Character> => api.patchCharacter(cid, body),
   generateCharacter: (cid: string, styles?: string[]): Promise<Job> => api.generateCharacter(cid, styles),
   characterFiles: (cid: string) => api.characterFiles(cid),
   characterConcepts: (cid: string): Promise<ConceptFiles> => api.characterConcepts(cid),
   generateConcept: (cid: string, body: { modes?: string[]; style?: string; prompt_extra?: string; seed?: number }): Promise<Job> =>
     api.generateConcept(cid, body),
   setPortraitFromConcept: (cid: string, path: string, fallbackPath?: string) => api.setPortraitFromConcept(cid, path, fallbackPath),
+  /** 角色立绘 → H3 动画（本地 ComfyUI 或云端 MetaSo；昂贵，UI 需二次确认） */
+  h3Animate: (
+    cid: string,
+    body: { image?: string; prompt?: string; provider?: string } = {},
+    fallbackImage?: string,
+  ): Promise<Job> => api.h3Animate(cid, body, fallbackImage),
 
   jobs: (params: { episode_id?: string; type?: string; status?: string } = {}): Promise<Job[]> => api.jobs(params),
   job: (jid: string): Promise<Job> => api.job(jid),

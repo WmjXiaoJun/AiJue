@@ -2,7 +2,7 @@
 // 6 个子页：成片画廊 / 模板库 / 风格墙 / 场景库 / 角色库 / 渲染台。
 // 数据：GET /api/v5/catalog、GET /api/v5/outputs、GET /api/cinema/templates（16 模板 3D 成片）。
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { V5CatalogResponse, V5Output } from "../../lib/v5";
+import type { V5CatalogResponse } from "../../lib/v5";
 import { v5api } from "../../lib/v5";
 import type { CinemaTemplate } from "../../lib/cinema";
 import { cinemaApi } from "../../lib/cinema";
@@ -57,8 +57,7 @@ function tabFromHash(): V5WorldTab {
 
 export interface V5PageProps {
   catalog: V5CatalogResponse | null;
-  outputs: V5Output[];
-  /** 16 模板 3D 成片（key = 模板 id；GET /api/cinema/templates） */
+  /** 16 模板 3D 成片（key = 模板 id；GET /api/cinema/templates，唯一成片数据源） */
   templates3d: Record<string, CinemaTemplate>;
   loading: boolean;
   error: string;
@@ -73,12 +72,10 @@ export function V5World({ onExit, onCinema }: { onExit: () => void; onCinema: ()
 
   const [tab, setTab] = useState<V5WorldTab>(() => tabFromHash());
   const [catalog, setCatalog] = useState<V5CatalogResponse | null>(null);
-  const [outputs, setOutputs] = useState<V5Output[]>([]);
   const [templates3d, setTemplates3d] = useState<Record<string, CinemaTemplate>>({});
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
-  const [outputsError, setOutputsError] = useState("");
   const [templates3dError, setTemplates3dError] = useState("");
   const [presetTemplate, setPresetTemplate] = useState<string | null>(null);
 
@@ -96,11 +93,7 @@ export function V5World({ onExit, onCinema }: { onExit: () => void; onCinema: ()
     if (inFlightRef.current) return;
     inFlightRef.current = true;
     if (!silent) setLoading(true);
-    const [catRes, outRes, tplRes] = await Promise.allSettled([
-      v5api.catalog(),
-      v5api.outputs(false),
-      cinemaApi.templates(),
-    ]);
+    const [catRes, tplRes] = await Promise.allSettled([v5api.catalog(), cinemaApi.templates()]);
     if (!aliveRef.current) {
       inFlightRef.current = false;
       return;
@@ -110,13 +103,6 @@ export function V5World({ onExit, onCinema }: { onExit: () => void; onCinema: ()
       setError("");
     } else {
       setError(errMessage(catRes.reason));
-    }
-    if (outRes.status === "fulfilled") {
-      setOutputs(outRes.value.outputs || []);
-      setOutputsError("");
-    } else {
-      setOutputsError(errMessage(outRes.reason));
-      setOutputs([]);
     }
     if (tplRes.status === "fulfilled") {
       const map: Record<string, CinemaTemplate> = {};
@@ -174,7 +160,6 @@ export function V5World({ onExit, onCinema }: { onExit: () => void; onCinema: ()
     const templates = catalog?.templates || [];
     const threeD = Object.values(templates3d);
     return {
-      outputs: outputs.length,
       styles: catalog?.styles.length || 0,
       scenes: catalog?.scenes.length || 0,
       characters: catalog?.characters.length || 0,
@@ -182,13 +167,13 @@ export function V5World({ onExit, onCinema }: { onExit: () => void; onCinema: ()
       templates: templates.length,
       threeDDone: threeD.filter((item) => item.final?.exists).length,
       threeDExpected: threeD.length || 16,
-      qcPass: outputs.filter((item) => item.qc_ok).length,
+      threeDClipsDone: threeD.reduce((sum, item) => sum + (item.clips.done || 0), 0),
+      threeDClipsTotal: threeD.reduce((sum, item) => sum + (item.clips.total || 0), 0),
     };
-  }, [catalog, outputs, templates3d]);
+  }, [catalog, templates3d]);
 
   const pageProps: V5PageProps = {
     catalog,
-    outputs,
     templates3d,
     loading,
     error,
@@ -245,7 +230,7 @@ export function V5World({ onExit, onCinema }: { onExit: () => void; onCinema: ()
             <span className="cm-env-key">
               <i className="cm-env-dot is-on" />
               <span className="cm-env-text">
-                3D {stats.threeDDone}/{stats.threeDExpected} · 成片 {stats.outputs}
+                3D 成片 {stats.threeDDone}/{stats.threeDExpected}
               </span>
             </span>
           </div>
@@ -272,18 +257,18 @@ export function V5World({ onExit, onCinema }: { onExit: () => void; onCinema: ()
 
           <div className="cm-top-stats">
             <div className="cm-top-stat">
-              <b>
-                {stats.outputs}
-                <span style={{ color: "var(--c-mut)" }}> 部</span>
-              </b>
-              <span>成片</span>
-            </div>
-            <div className="cm-top-stat">
               <b style={{ color: "var(--c-gold)" }}>
                 {stats.threeDDone}
                 <span style={{ color: "var(--c-mut)" }}>/{stats.threeDExpected}</span>
               </b>
-              <span>3D 电影版</span>
+              <span>3D 成片</span>
+            </div>
+            <div className="cm-top-stat">
+              <b className="is-jade">
+                {stats.threeDClipsDone}
+                <span style={{ color: "var(--c-mut)" }}>/{stats.threeDClipsTotal || "—"}</span>
+              </b>
+              <span>3D 镜头</span>
             </div>
             <div className="cm-top-stat">
               <b>
@@ -293,8 +278,8 @@ export function V5World({ onExit, onCinema }: { onExit: () => void; onCinema: ()
               <span>风格 / 场景</span>
             </div>
             <div className="cm-top-stat">
-              <b style={{ color: "var(--c-jade)" }}>{stats.qcPass}</b>
-              <span>QC 通过</span>
+              <b>{stats.threeDExpected}</b>
+              <span>3D 模板</span>
             </div>
           </div>
 
@@ -314,7 +299,7 @@ export function V5World({ onExit, onCinema }: { onExit: () => void; onCinema: ()
         </header>
 
         <main className="cm-content">
-          {(error || outputsError || templates3dError) && (
+          {(error || templates3dError) && (
             <div className="v5w-banners">
               {error && (
                 <div className="cm-error">
@@ -325,16 +310,10 @@ export function V5World({ onExit, onCinema }: { onExit: () => void; onCinema: ()
                   </button>
                 </div>
               )}
-              {outputsError && (
-                <div className="cm-error is-soft">
-                  <IconAlert size={15} />
-                  <span>成片列表不可用：{outputsError}</span>
-                </div>
-              )}
               {templates3dError && (
                 <div className="cm-error is-soft">
                   <IconAlert size={15} />
-                  <span>3D 模板状态不可用（画廊回退 2D 版）：{templates3dError}</span>
+                  <span>3D 成片状态不可用：{templates3dError}</span>
                 </div>
               )}
             </div>

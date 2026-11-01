@@ -599,3 +599,39 @@
 }
 .st-pf-link:hover { color: #f0d98a; }
 .st-pf-blocked { color: #e39a86; margin-bottom: 8px; }
+
+/* ---------------- 制片流水线（Studio 底部） ---------------- */
+.st-flow {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 9px 24px;
+  border-top: 1px solid var(--c-line);
+  background: rgba(9, 11, 15, 0.92);
+  backdrop-filter: blur(8px);
+}
+.st-flow-label { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--c-mut); white-space: nowrap; }
+.st-flow-steps { display: flex; align-items: center; gap: 2px; flex: 1 1 auto; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.st-flow-steps::-webkit-scrollbar { display: none; }
+.st-flow-step {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 26px; padding: 0 9px;
+  border: 1px solid transparent; border-radius: 7px;
+  background: transparent; color: var(--c-mut);
+  font-size: 11px; letter-spacing: 0.03em; cursor: pointer; white-space: nowrap;
+  transition: all 0.16s ease;
+}
+.st-flow-step:hover { color: var(--c-text); background: rgba(255, 255, 255, 0.03); }
+.st-flow-step.is-done { color: #7fbfa7; }
+.st-flow-step.is-current { color: var(--c-gold-soft); border-color: var(--c-line-strong); background: var(--c-gold-dim); }
+.st-flow-no { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.08em; opacity: 0.75; }
+.st-flow-actions { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+@media (max-width: 1180px) {
+  .st-flow-label { display: none; }
+  .st-flow-step .st-flow-no { display: none; }
+}
+@media (max-width: 860px) {
+  .st-flow { padding: 8px 12px; gap: 8px; }
+  .st-flow-step { padding: 0 7px; }
+}
