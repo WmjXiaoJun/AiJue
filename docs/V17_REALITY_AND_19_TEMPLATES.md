@@ -77,3 +77,26 @@
 - 根因：12GB 显存下 20GB H3 模型 + 5GB VideoVAE 动态加载，默认 smart-memory 让权重长期驻留显存，VAE decode 阶段显存不足触发 WDDM 分页抖动。
 - 修复：ComfyUI 启动参数改为 `--disable-smart-memory --reserve-vram 0.5`（每 prompt 结束把权重卸载回内存、保留 0.5GB 显存余量）。实测 1024×576/124 帧 T2VA 从 5–21 分钟降到 **114 秒**，随后单镜稳定 ~4–6 分钟。
 - 附带：清理两个重复启动的批处理进程；`masked_singer` 因重启中断进入补跑队列（post-batch 编排器负责补跑失败模板 + 生成 3 个写实模板）。
+
+
+## 6. 16 模板 HQ 全量完成（2026-11-02 15:03）
+
+全部 16 个原有模板已按 1024×576 源 + 运镜 ref2va 原生口型重做并重新剪辑，校验 16/16 通过（1280×720/25fps、有音轨、有海报、源 1024×576）。
+
+| 模板 | 时长 | 大小 | 模板 | 时长 | 大小 |
+|---|---|---|---|---|---|
+| tonight_show | 41.61s | 16.4MB | classics | 42.25s | 17.2MB |
+| history_talk | 36.13s | 12.5MB | masked_singer | 41.70s | 19.0MB |
+| roundtable | 41.78s | 14.4MB | national_treasure | 41.06s | 15.2MB |
+| hot_ones | 38.58s | 13.4MB | mystery | 34.82s | 9.3MB |
+| qipashuo | 35.72s | 12.8MB | shark_tank | 31.51s | 14.1MB |
+| slow_life | 35.74s | 12.1MB | snl_sketch | 38.53s | 11.2MB |
+| standup | 41.31s | 11.0MB | taskmaster | 32.66s | 11.4MB |
+| traitors | 37.92s | 13.9MB | history_mystery | 40.83s | 13.8MB |
+
+- 校验脚本：`tmp/v17/verify19.py`（16/16 OK）；16 帧总览 `tmp/v17/verify/montage19.png`
+- 逐镜巡检：`tmp/v17/qa/qa_<模板>.png`；已检查 classics/national_treasure/hot_ones/standup 等
+- 旧 MuseTalk 版对比：`tmp/v17/compare/cmp_*.png`，旧成片归档 `outputs/_archive_v14_musetalk/`
+- 模板库页面截图：`tmp/v17/integration/templates_16done.png`（16/19 done + 3 写实 pending）
+
+**随后自动开始 3 个写实模板生成**（real_street → real_cafe → real_kitchen），预计 16:30–17:30 完成，完成后补 19 支最终校验。
