@@ -144,6 +144,7 @@ def main(argv=None) -> int:
     archive = REPO / f"outputs/_archive_v15_ref2va_768/{tid}/shots"
     archive.mkdir(parents=True, exist_ok=True)
     out_shots = t3.OUT3D / tid / "shots"
+    out_shots.mkdir(parents=True, exist_ok=True)  # 新模板首次生成时目录不存在
     for shot in shots:
         src = out_shots / f"{shot['id']}.mp4"
         dst = archive / f"{shot['id']}.mp4"
