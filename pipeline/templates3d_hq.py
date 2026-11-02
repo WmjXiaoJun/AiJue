@@ -137,6 +137,8 @@ def main(argv=None) -> int:
     ap.add_argument("--template", required=True)
     ap.add_argument("--skip-t2va", action="store_true")
     ap.add_argument("--skip-ref2va", action="store_true")
+    ap.add_argument("--reuse-shots", action="store_true",
+                    help="已有 shots/<sid>.mp4 时跳过生成，直接复用（用于快速重剪辑/UI「复用已有镜头」）")
     args = ap.parse_args(argv)
     tid = args.template
     briefs = briefs_for(tid)
@@ -152,6 +154,10 @@ def main(argv=None) -> int:
             shutil.copy2(src, dst)
     log(f"=== {tid}: {len(shots)} 镜，1024×576 T2VA + ref2va ===")
     for i, shot in enumerate(shots, 1):
+        existing = out_shots / f"{shot['id']}.mp4"
+        if args.reuse_shots and existing.is_file() and existing.stat().st_size > 100_000:
+            log(f"[{i}/{len(shots)}] {shot['id']} ok (reuse)")
+            continue
         seed = 20261102 + abs(hash(tid + shot["id"])) % 100000
         t2va = gen_t2va(tid, shot, seed)
         final_src = t2va
