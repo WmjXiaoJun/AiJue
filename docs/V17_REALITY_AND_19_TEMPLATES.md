@@ -62,7 +62,8 @@
 | snl_sketch | ✅ done | 32.7 min | 38.53s / 11.7MB |
 | standup | ✅ done | 33.9 min | 41.31s / 14.2MB |
 | taskmaster | ✅ done | 30.1 min | 32.66s / 11.9MB |
-| traitors | 🟡 跑中 | - | - |
+| traitors | ✅ done | 33.3 min | 37.92s / 14.7MB |
+| history_mystery | 🟡 跑中（最后一个） | - | - |
 | mystery 起其余 9 个 | ⏳ 排队 | - | - |
 
 - 单模板实测 ~35–40 分钟（1024×576 T2VA + 7~9 个对话镜 ref2va + 剪辑海报）
