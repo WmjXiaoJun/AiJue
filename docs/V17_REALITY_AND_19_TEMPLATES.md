@@ -58,7 +58,8 @@
 | mystery | ✅ done | 31.5 min | 34.82s / 12.2MB |
 | qipashuo | ✅ done | 29.8 min | 35.72s / 12.4MB |
 | shark_tank | ✅ done | 28.3 min | 31.51s / 13.5MB |
-| slow_life | 🟡 跑中 | - | - |
+| slow_life | ✅ done | 30.8 min | 35.74s / 13.0MB |
+| snl_sketch | 🟡 跑中 | - | - |
 | mystery 起其余 9 个 | ⏳ 排队 | - | - |
 
 - 单模板实测 ~35–40 分钟（1024×576 T2VA + 7~9 个对话镜 ref2va + 剪辑海报）
