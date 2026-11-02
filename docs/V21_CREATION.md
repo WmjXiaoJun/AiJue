@@ -54,3 +54,34 @@
 - **tpl-backend**：A/B 后端 API + 列表纳入 + 校验/删除 + 自测（角色 1 个、模板 1 个真实创建，检查 episode/audio/brief；pipeline run 只验证 202/409 不真跑 GPU）
 - **tpl-frontend**：「新建角色」表单 +「新建模板」向导 + 创建后刷新/高亮 + UI 状态优化 + 截图
 - **Lead**：契约/复核/E2E/截图/commit/交付
+
+
+## 5. 交付结果（2026-11-02 19:15）
+
+### 后端（tpl-backend，63/63 HTTP 自测 PASS）
+- 新增 `backend/app/routers/v5_create.py`：
+  - `POST /api/v5/characters`（custom 角色：校验→写 `contract/v5/custom/characters/<id>.json`，返回 preview_url）/ `DELETE`（custom-only；被模板引用 400）
+  - `POST /api/v5/templates`（校验→写 custom template→**24k mono TTS**（breeze 优先/edge 兜底+重试）→ `outputs/templates_v5/<id>/work/episode.json` + 每镜 wav→**semantic brief**（LLM）；返回镜数/总时长/warnings）/ `DELETE`（custom 且无 final）
+- 新增 `backend/app/routers/custom_hq_runner.py`：custom 模板 hq 子进程包装（patch load_template，不改 pipeline）
+- `cinema_templates.py` / `pipeline_ui.py`：custom 模板纳入 list/status/detail 与 pipeline run（`dry_run` 可选）；`main.py` 注册路由
+- 真实创建验证：角色 `custom_v21_host` + 6 镜模板 `custom_tpl_v21_night`（3 对白+3 B-roll，28.44s，6 条 wav，brief 6/6，casting/list/pipeline dry_run 均 200/202），删除规则全部符合
+
+### 前端（tpl-frontend）
+- `components/characters/CreateCharacterDrawer.tsx`：「新建角色」右侧抽屉（名字/时代/人格/性别/年龄/发型/主色/服装/配饰/角色池/24 音色试听）；创建→刷新+自动详情+高亮+toast
+- `components/library/CreateTemplateWizard.tsx`：「新建模板」4 步向导（基本信息→cast 3–5→4–8 分幕（场景 70 可搜索/说话角色/B-roll/台词）→预览创建）；创建→列表高亮+「去一键成片」banner
+- `lib/creation.ts`（API client + 400 逐条错误/404/405 友好提示 + 自动 id）、`styles/creation.css`
+- UI 状态优化：主 CTA 入口、提交 loading、错误逐条、空态/一致性小修
+- 实测：真实创建角色/模板成功（截图 `tmp/v21/ui/` 17 张），`tsc` 0 / build 通过 / console 无 JS error
+
+### 验证与清理
+- API E2E：`tmp/v21/create_verify.json`、`tmp/v21/backend_selftest.md`、`tmp/v21/http_selftest.py`
+- 测试创建的角色/模板已通过 DELETE API 清理（当前 24 角色 / 19 个 3D 模板 / 0 pending），创建入口保留并可用
+- 截图：角色抽屉 `02_create_character_drawer_1680`、音色选择 `03_create_character_voice_1680`、模板向导 4 步 `05–08`、创建成功 `13_templates_created_1680`、`10_characters_created_1680`；Lead 复拍 `tmp/v21/lead/`
+
+### 关于「每个模板是不同的工作流么？」
+**不是。** 3D 生成是**同一套流水线**（`templates3d_hq`：T2VA→ref2va 口型→剪辑→海报），19 个模板只是**模板合同不同**（style/cast/scenes/acts 台词/semantic brief/时长）。`contract/v6/workflows/*.json` 是遗留的 Agent 编排配置（16 个老模板、stages 结构完全相同、当前 3D 生成不走它，新模板/写实模板也没有）。如需，后续可统一为一份默认 workflow + 模板变量，或直接移除旧编排文件。
+
+### 遗留
+1. 本机 breeze 未启动 → 创建时 TTS 走 edge（启动后自动优先）；前端请求超时需 ≥120s（TTS+LLM）
+2. custom id 需 `custom_`/`custom_tpl_` 前缀（后端自动补）；删模板不清 `templates_3d/shots`、删角色不清 voice_casting 映射
+3. 真实 3D 生成（新模板 → 一键成片「开始生成」）未在本次自测跑完 GPU 全流程（结构验证通过）；首次生成约 20–45 分钟

@@ -94,9 +94,11 @@ function mergeCards(data: CinemaTemplatesResponse | null): CardItem[] {
 export function CinemaTemplates({
   embedded = false,
   onOpenShots,
+  highlightId,
 }: {
   embedded?: boolean;
   onOpenShots?: (templateId: string) => void;
+  highlightId?: string;
 } = {}) {
   const notify = useToast();
 
@@ -201,6 +203,16 @@ export function CinemaTemplates({
     summary?.failed ?? cards.filter((item) => item.template?.status === "assemble_failed").length;
   const assembleReadyCount = useMemo(() => cards.filter((item) => canAssemble(item.template)).length, [cards]);
   const placeholderOnly = !data || data.templates.length === 0;
+  // V21：新建模板后高亮 + 滚动定位
+  useEffect(() => {
+    if (!highlightId) return;
+    const timer = window.setTimeout(() => {
+      const node = document.querySelector(`[data-template-id="${highlightId}"]`);
+      if (node) node.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 260);
+    return () => window.clearTimeout(timer);
+  }, [highlightId]);
+
   const kindFilters: { id: TemplateKindFilter; label: string; count: number }[] = [
     { id: "all", label: "全部", count: cards.length },
     { id: "classic", label: "原 16 模板", count: classicCount },
@@ -471,6 +483,7 @@ export function CinemaTemplates({
             busyAction={busyAction}
             embedded={embedded}
             onOpenShots={onOpenShots}
+            highlight={highlightId === item.seed.id}
             onPlay={(template) => setPlaying(template)}
             onGenerate={(template) => void submitGenerate([template.id])}
             onAssemble={(template) => void submitAssemble([template.id])}
@@ -514,6 +527,7 @@ function TemplateCard({
   onOpen,
   embedded,
   onOpenShots,
+  highlight,
 }: {
   item: CardItem;
   genBlocked: boolean;
@@ -525,6 +539,7 @@ function TemplateCard({
   onOpen: (item: CardItem) => void;
   embedded?: boolean;
   onOpenShots?: (templateId: string) => void;
+  highlight?: boolean;
 }) {
   const { seed, template } = item;
   const [failedPoster, setFailedPoster] = useState("");
@@ -547,7 +562,7 @@ function TemplateCard({
   const canGenerate = Boolean(template) && busyAction !== generateKey;
 
   return (
-    <article className={cardClass}>
+    <article className={cardClass + (highlight ? " is-new" : "")} data-template-id={seed.id}>
       <button
         type="button"
         className={"cm-tpl-poster" + (status === "generating" ? " is-generating" : "")}

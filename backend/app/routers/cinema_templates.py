@@ -136,6 +136,8 @@ PROGRESS_PATH = T3D_ROOT / "progress.json"
 V5_ROOT = config.OUTPUTS_DIR / "templates_v5"
 BRIEFS_DIR = config.CONTRACT_DIR / "v5" / "cinema3d" / "templates3d"
 V5_TEMPLATE_CONTRACTS = config.CONTRACT_DIR / "v5" / "templates"
+#: V21 可视化创建的 custom 模板（contract/v5/custom/templates/<id>.json）
+CUSTOM_TEMPLATE_DIR = config.CONTRACT_DIR / "v5" / "custom" / "templates"
 
 
 def _pipeline_template_ids() -> List[str]:
@@ -157,28 +159,42 @@ def _pipeline_template_ids() -> List[str]:
 
 
 def _contract_template_ids() -> List[str]:
-    """从 `contract/v5/templates/*.json` 发现 3D 看板模板。
+    """从 contract 发现 3D 看板模板。
 
-    - 已有 3D 产物/3D brief（outputs/templates_3d/<id>、<id>.json 或 <id>_semantic.json）的模板；
-    - `real_*` 前缀（V17 写实人物场景模板约定）即使 3D 产物尚未生成也纳入。
+    - `contract/v5/templates/*.json`：已有 3D 产物/3D brief（outputs/templates_3d/<id>、
+      <id>.json 或 <id>_semantic.json）的模板；`real_*` 前缀即使 3D 产物尚未生成也纳入。
+    - `contract/v5/custom/templates/*.json`（V21 可视化创建）：有 semantic brief 或
+      `meta.three_d` 标记的 custom 模板纳入（pending，可走 3D 生成）。
     """
-    if not V5_TEMPLATE_CONTRACTS.is_dir():
-        return []
     found: List[str] = []
-    for path in sorted(V5_TEMPLATE_CONTRACTS.glob("*.json")):
-        tid = path.stem
-        if not _TEMPLATE_ID_RE.fullmatch(tid):
-            continue
-        if tid.startswith(_REAL_TEMPLATE_PREFIX):
-            found.append(tid)
-            continue
-        has_3d = (
-            (T3D_ROOT / tid).is_dir()
-            or (BRIEFS_DIR / f"{tid}.json").is_file()
-            or (BRIEFS_DIR / f"{tid}_semantic.json").is_file()
-        )
-        if has_3d:
-            found.append(tid)
+    if V5_TEMPLATE_CONTRACTS.is_dir():
+        for path in sorted(V5_TEMPLATE_CONTRACTS.glob("*.json")):
+            tid = path.stem
+            if not _TEMPLATE_ID_RE.fullmatch(tid):
+                continue
+            if tid.startswith(_REAL_TEMPLATE_PREFIX):
+                found.append(tid)
+                continue
+            has_3d = (
+                (T3D_ROOT / tid).is_dir()
+                or (BRIEFS_DIR / f"{tid}.json").is_file()
+                or (BRIEFS_DIR / f"{tid}_semantic.json").is_file()
+            )
+            if has_3d:
+                found.append(tid)
+    if CUSTOM_TEMPLATE_DIR.is_dir():
+        for path in sorted(CUSTOM_TEMPLATE_DIR.glob("*.json")):
+            tid = path.stem
+            if not _TEMPLATE_ID_RE.fullmatch(tid) or tid in found:
+                continue
+            try:
+                data = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                continue
+            meta = data.get("meta") if isinstance(data, dict) and isinstance(data.get("meta"), dict) else {}
+            if (BRIEFS_DIR / f"{tid}_semantic.json").is_file() or meta.get("three_d") \
+                    or meta.get("create_source") == "v21":
+                found.append(tid)
     return found
 
 
@@ -210,6 +226,35 @@ def _discover_template_ids() -> List[str]:
 
 TEMPLATES: List[str] = _discover_template_ids()
 TEMPLATE_SET = frozenset(TEMPLATES)
+
+#: V21：custom 模板创建/删除后，列表需即时反映（按 contract 目录 mtime 失效并重算）
+_TEMPLATE_IDS_LOCK = threading.RLock()
+_TEMPLATE_IDS_SIG: Optional[tuple] = None
+
+
+def _template_dirs_signature() -> tuple:
+    parts = []
+    for directory in (V5_TEMPLATE_CONTRACTS, CUSTOM_TEMPLATE_DIR, BRIEFS_DIR):
+        try:
+            parts.append((str(directory), directory.stat().st_mtime_ns if directory.is_dir() else 0))
+        except OSError:
+            parts.append((str(directory), -1))
+    return tuple(parts)
+
+
+def _refresh_template_ids() -> None:
+    """contract/custom 模板目录变化时刷新 TEMPLATES/TEMPLATE_SET（创建新模板后列表即时可见）。"""
+    global TEMPLATES, TEMPLATE_SET, _TEMPLATE_IDS_SIG
+    signature = _template_dirs_signature()
+    with _TEMPLATE_IDS_LOCK:
+        if signature == _TEMPLATE_IDS_SIG:
+            return
+        _TEMPLATE_IDS_SIG = signature
+        ids = _discover_template_ids()
+        if ids != TEMPLATES:
+            TEMPLATES = ids
+            TEMPLATE_SET = frozenset(ids)
+            logger.info("模板 3D 看板已刷新：%d 个模板（%s）", len(ids), ",".join(ids))
 
 POSTER_FILENAME = "poster.jpg"
 MIN_SHOT_BYTES = 100 * 1024  # 有效镜头文件最小体积（与 pipeline/templates3d.py 一致）
@@ -310,8 +355,13 @@ def _load_progress() -> Dict[str, Any]:
 
 
 def _template_contract(tid: str) -> Dict[str, Any]:
-    data = _JSON_CACHE.get(V5_TEMPLATE_CONTRACTS / f"{tid}.json")
-    return data if isinstance(data, dict) else {}
+    """内建 contract/v5/templates + V21 custom 覆盖合并后的模板合同。"""
+    merged: Dict[str, Any] = {}
+    for path in (V5_TEMPLATE_CONTRACTS / f"{tid}.json", CUSTOM_TEMPLATE_DIR / f"{tid}.json"):
+        data = _JSON_CACHE.get(path)
+        if isinstance(data, dict):
+            merged.update(data)
+    return merged
 
 
 def _template_label(tid: str) -> str:
@@ -1482,6 +1532,7 @@ def _spawn_template_job(job_id: str) -> None:
 @router.get("/")
 def list_templates(response: Response) -> Dict[str, Any]:
     response.headers["Cache-Control"] = "no-store, max-age=0"
+    _refresh_template_ids()  # V21：新建 custom 模板后列表即时可见
     progress = _load_progress()
     finals = _final_info_many(TEMPLATES)
     views = [
@@ -1501,6 +1552,7 @@ def list_templates(response: Response) -> Dict[str, Any]:
 @router.get("/status")
 def get_templates_status(response: Response) -> Dict[str, Any]:
     response.headers["Cache-Control"] = "no-store, max-age=0"
+    _refresh_template_ids()  # V21
     progress = _load_progress()
     rows = _status_rows(progress)
     return {
@@ -1541,6 +1593,7 @@ def _reserve_or_409(
 
 @router.post("/generate")
 def start_generate(payload: TemplateGenerateRequest) -> Dict[str, Any]:
+    _refresh_template_ids()  # V21：允许 custom 模板
     tids = _parse_templates(payload.templates)
     resolution = _parse_resolution(payload.resolution)
     force = bool(payload.force)
@@ -1596,6 +1649,7 @@ def start_generate(payload: TemplateGenerateRequest) -> Dict[str, Any]:
 # --------------------------------------------------------------------------- #
 @router.post("/assemble")
 def start_assemble(payload: TemplateAssembleRequest) -> Dict[str, Any]:
+    _refresh_template_ids()  # V21：允许 custom 模板
     tids = _parse_templates(payload.templates)
     force = bool(payload.force)
     dry_run = bool(payload.dry_run)
@@ -1672,6 +1726,7 @@ def start_assemble(payload: TemplateAssembleRequest) -> Dict[str, Any]:
 @router.get("/{tid}")
 def get_template(tid: str, response: Response) -> Dict[str, Any]:
     response.headers["Cache-Control"] = "no-store, max-age=0"
+    _refresh_template_ids()  # V21：新建 custom 模板后详情即时可见
     key = str(tid or "").strip()
     if key not in TEMPLATE_SET:
         raise HTTPException(

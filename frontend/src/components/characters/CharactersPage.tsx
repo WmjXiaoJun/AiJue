@@ -19,6 +19,7 @@ import {
   IconGrid,
   IconImage,
   IconPlay,
+  IconPlus,
   IconRefresh,
   IconSearch,
   IconSettings,
@@ -28,6 +29,7 @@ import {
   IconVolume,
 } from "../icons";
 import { VoicePicker } from "../voice/VoicePicker";
+import { CreateCharacterDrawer } from "./CreateCharacterDrawer";
 import { AppShell } from "../shell/AppShell";
 import "../../styles/cinema.css";
 import "../../styles/v18.css";
@@ -106,6 +108,8 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
   const [templateCast, setTemplateCast] = useState<string[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [highlightId, setHighlightId] = useState<string | null>(null);
   const [savedVoice, setSavedVoice] = useState<Record<string, string>>({});
 
   const [previewChar, setPreviewChar] = useState<string | null>(null);
@@ -357,6 +361,16 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
     return () => window.removeEventListener("keydown", onKey);
   }, [pickerOpen, selected]);
 
+  // V21：新建后高亮 + 滚动定位
+  useEffect(() => {
+    if (!highlightId) return;
+    const timer = window.setTimeout(() => {
+      const node = document.querySelector(`[data-char-id="${highlightId}"]`);
+      if (node) node.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 220);
+    return () => window.clearTimeout(timer);
+  }, [highlightId]);
+
   return (
     <AppShell
       active="characters"
@@ -369,7 +383,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
         { label: "写实", value: String(realCount), tone: "slate" },
         { label: "已调整", value: String(Object.keys(savedVoice).length), tone: "jade" },
       ]}
-      primaryAction={{ label: "一键成片", href: "#/pipeline", icon: <IconSpark size={14} />, title: "进入一键成片控制台" }}
+      primaryAction={{ label: "新建角色", onClick: () => setCreateOpen(true), icon: <IconPlus size={14} />, title: "创建自定义角色（写角色合同，不触发 GPU）" }}
       onRefresh={() => void refresh()}
       refreshing={refreshing}
       onOpenSettings={onOpenSettings}
@@ -463,7 +477,8 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                   return (
                     <div
                       key={char.id}
-                      className="v18-char-card"
+                      data-char-id={char.id}
+                      className={"v18-char-card" + (highlightId === char.id ? " is-new" : "")}
                       role="button"
                       tabIndex={0}
                       onClick={() => setSelected(char.id)}
@@ -653,6 +668,22 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
             </div>
           </aside>
         </div>
+      )}
+
+      {createOpen && (
+        <CreateCharacterDrawer
+          open={createOpen}
+          presets={presets}
+          auditionCharacter={(catalog?.characters || [])[0]?.id}
+          onClose={() => setCreateOpen(false)}
+          onCreated={(id) => {
+            setCreateOpen(false);
+            setHighlightId(id);
+            setSelected(id);
+            notify("角色已创建，正在刷新角色目录…", "info");
+            void load(true);
+          }}
+        />
       )}
 
       {selectedContract && pickerOpen && (

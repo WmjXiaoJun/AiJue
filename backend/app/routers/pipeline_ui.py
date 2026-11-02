@@ -63,6 +63,8 @@ _RUNS_LIMIT = 20
 
 _SEMANTIC_DIR = config.CONTRACT_DIR / "v5" / "cinema3d" / "templates3d"
 _TEMPLATE_CONTRACT_DIR = config.CONTRACT_DIR / "v5" / "templates"
+_CUSTOM_TEMPLATE_DIR = config.CONTRACT_DIR / "v5" / "custom" / "templates"
+_CUSTOM_HQ_RUNNER = Path(__file__).resolve().parent / "custom_hq_runner.py"
 _JOB_DIR = config.OUTPUTS_DIR / "pipeline_jobs"
 
 _LOCK = threading.RLock()
@@ -73,8 +75,35 @@ _ACTIVE: Optional[str] = None
 # --------------------------------------------------------------------------- #
 # 模板 / 路径
 # --------------------------------------------------------------------------- #
+def _custom_template_ids() -> List[str]:
+    """V21 可视化创建的 custom 模板（有 semantic brief 或 meta.three_d 标记）。"""
+    if not _CUSTOM_TEMPLATE_DIR.is_dir():
+        return []
+    ids: List[str] = []
+    for path in sorted(_CUSTOM_TEMPLATE_DIR.glob("*.json")):
+        tid = path.stem
+        if not _TEMPLATE_ID_RE.fullmatch(tid):
+            continue
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        meta = data.get("meta") if isinstance(data, dict) and isinstance(data.get("meta"), dict) else {}
+        if (_SEMANTIC_DIR / f"{tid}_semantic.json").is_file() or meta.get("three_d") \
+                or meta.get("create_source") == "v21":
+            ids.append(tid)
+    return ids
+
+
+def _is_custom_template(tid: str) -> bool:
+    """custom 模板（不在内建 contract/v5/templates 中）需要 hq 启动包装来兼容 load_template。"""
+    custom = _CUSTOM_TEMPLATE_DIR / f"{tid}.json"
+    builtin = _TEMPLATE_CONTRACT_DIR / f"{tid}.json"
+    return custom.is_file() and not builtin.is_file()
+
+
 def _template_ids() -> List[str]:
-    """19 个 3D 模板 id：优先 pipeline.templates3d.TEMPLATES，回落 contract semantic 文件。"""
+    """3D 模板 id：pipeline.templates3d 优先 + contract semantic + V21 custom 模板。"""
     ids: List[str] = []
     try:
         from pipeline import templates3d  # noqa: PLC0415
@@ -85,6 +114,9 @@ def _template_ids() -> List[str]:
         ids = []
     if not ids and _SEMANTIC_DIR.is_dir():
         ids = sorted(path.name[: -len("_semantic.json")] for path in _SEMANTIC_DIR.glob("*_semantic.json"))
+    for tid in _custom_template_ids():
+        if tid not in ids:
+            ids.append(tid)
     return [tid for tid in ids if _TEMPLATE_ID_RE.fullmatch(tid)]
 
 
@@ -121,12 +153,15 @@ def _final_url(tid: str) -> Optional[str]:
 
 
 def _template_label(tid: str) -> Optional[str]:
-    try:
-        data = json.loads((_TEMPLATE_CONTRACT_DIR / f"{tid}.json").read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return None
-    label = data.get("label") if isinstance(data, dict) else None
-    return str(label) if label else None
+    for path in (_TEMPLATE_CONTRACT_DIR / f"{tid}.json", _CUSTOM_TEMPLATE_DIR / f"{tid}.json"):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        label = data.get("label") if isinstance(data, dict) else None
+        if label:
+            return str(label)
+    return None
 
 
 # --------------------------------------------------------------------------- #
@@ -240,7 +275,11 @@ def _run_job(job_id: str) -> None:
                 _ACTIVE = None
         return
     tid = str(job.get("template_id") or "")
-    cmd = [sys.executable, "-m", "pipeline.templates3d_hq", "--template", tid]
+    if _is_custom_template(tid):
+        # V21 custom 模板：用包装器 patch load_template（pipeline 代码不改）
+        cmd = [sys.executable, str(_CUSTOM_HQ_RUNNER), "--template", tid]
+    else:
+        cmd = [sys.executable, "-m", "pipeline.templates3d_hq", "--template", tid]
     if job.get("reuse_shots"):
         cmd.append("--reuse-shots")
     env = dict(os.environ)
@@ -368,6 +407,7 @@ _load_persisted_jobs()
 class PipelineRunBody(BaseModel):
     template_id: str
     reuse_shots: bool = False
+    dry_run: bool = False  # V21：只做校验（不启动子进程/不占 GPU），供自测/预检使用
 
 
 class ApplyTemplateBody(BaseModel):
@@ -388,6 +428,26 @@ def start_pipeline_run(payload: PipelineRunBody):
     if reuse and _existing_shots(tid) <= 0:
         raise HTTPException(status_code=400,
                             detail=f"模板 {tid} 没有可复用的镜头（shots/ 为空），不能 reuse_shots")
+    if payload.dry_run:
+        # 只做校验：返回 202 语义的 dry-run 结果，不创建/不启动任何子进程（不占 GPU）
+        if _is_custom_template(tid):
+            command = [sys.executable, str(_CUSTOM_HQ_RUNNER), "--template", tid]
+        else:
+            command = [sys.executable, "-m", "pipeline.templates3d_hq", "--template", tid]
+        if reuse:
+            command.append("--reuse-shots")
+        return {
+            "ok": True,
+            "job_id": None,
+            "template_id": tid,
+            "template_label": _template_label(tid),
+            "reuse_shots": reuse,
+            "status": "dry_run",
+            "dry_run": True,
+            "stages": [item["id"] for item in STAGES],
+            "stage_labels": dict(_STAGE_LABEL),
+            "command": command,
+        }
     with _LOCK:
         if _ACTIVE:
             active = _JOBS.get(_ACTIVE) or {}

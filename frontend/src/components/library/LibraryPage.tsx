@@ -12,12 +12,14 @@ import { useToast } from "../Toast";
 import { Spinner } from "../ui";
 import {
   IconAlert,
+  IconCheck,
   IconClose,
   IconDownload,
   IconExternal,
   IconFilm,
   IconImage,
   IconPlay,
+  IconPlus,
   IconRefresh,
   IconSearch,
   IconSpark,
@@ -26,6 +28,7 @@ import {
 } from "../icons";
 import { AppShell } from "../shell/AppShell";
 import { CinemaTemplates } from "../cinema/Templates";
+import { CreateTemplateWizard } from "./CreateTemplateWizard";
 import { V5Styles } from "../v5world/Styles";
 import { V5Scenes } from "../v5world/Scenes";
 import "../../styles/cinema.css";
@@ -52,6 +55,10 @@ export function LibraryPage({ tab, onOpenSettings }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [refreshing, setRefreshing] = useState(false);
+  const [wizardOpen, setWizardOpen] = useState(false);
+  const [templateVersion, setTemplateVersion] = useState(0);
+  const [highlightTemplate, setHighlightTemplate] = useState<string | null>(null);
+  const [createdTemplate, setCreatedTemplate] = useState<string | null>(null);
   const inFlightRef = useRef(false);
 
   const load = useCallback(async (silent: boolean) => {
@@ -116,7 +123,11 @@ export function LibraryPage({ tab, onOpenSettings }: Props) {
               { label: "场景", value: String(catalog?.scenes.length ?? "—"), tone: "slate" },
             ]
       }
-      primaryAction={{ label: "一键成片", href: "#/pipeline", icon: <IconSpark size={14} />, title: "进入一键成片控制台" }}
+      primaryAction={
+        tab === "templates"
+          ? { label: "新建模板", onClick: () => setWizardOpen(true), icon: <IconPlus size={14} />, title: "创建自定义模板（4 步向导，含 TTS 分镜）" }
+          : { label: "一键成片", href: "#/pipeline", icon: <IconSpark size={14} />, title: "进入一键成片控制台" }
+      }
       onRefresh={() => void refresh()}
       refreshing={refreshing}
       onOpenSettings={onOpenSettings}
@@ -136,8 +147,27 @@ export function LibraryPage({ tab, onOpenSettings }: Props) {
         </div>
       )}
 
+      {tab === "templates" && createdTemplate && (
+        <div className="v21-created-banner">
+          <IconCheck size={14} />
+          <span>
+            模板 <b className="cm-mono">{createdTemplate}</b> 已创建（pending）· 可去「一键成片」生成 3D
+          </span>
+          <a className="cm-btn cm-btn-primary cm-btn-sm" href="#/pipeline">
+            <IconSpark size={12} /> 去一键成片
+          </a>
+          <button type="button" className="cm-btn cm-btn-sm" onClick={() => setCreatedTemplate(null)}>
+            知道了
+          </button>
+        </div>
+      )}
       {tab === "templates" && (
-        <CinemaTemplates embedded onOpenShots={() => (window.location.hash = "#/cinema/shots")} />
+        <CinemaTemplates
+          key={templateVersion}
+          embedded
+          highlightId={highlightTemplate || undefined}
+          onOpenShots={() => (window.location.hash = "#/cinema/shots")}
+        />
       )}
       {tab === "styles" && (
         <V5Styles
@@ -162,6 +192,23 @@ export function LibraryPage({ tab, onOpenSettings }: Props) {
         />
       )}
       {tab === "final" && <FinalLibrary templates={templates} loading={loading} onRefresh={() => void refresh()} />}
+
+      {wizardOpen && (
+        <CreateTemplateWizard
+          open={wizardOpen}
+          catalog={catalog}
+          existingTemplates={catalog?.templates || []}
+          onClose={() => setWizardOpen(false)}
+          onCreated={(id) => {
+            setWizardOpen(false);
+            setTemplateVersion((prev) => prev + 1);
+            setHighlightTemplate(id);
+            setCreatedTemplate(id);
+            notify("模板已创建；可去一键成片生成 3D", "success");
+            void load(true);
+          }}
+        />
+      )}
     </AppShell>
   );
 }
