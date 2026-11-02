@@ -235,7 +235,7 @@ export function CinemaAssemble({ onAssembled }: CinemaAssembleProps) {
   const goFinal = useCallback(() => {
     onAssembledRef.current?.();
     if (!window.location.hash.includes("/cinema/final")) {
-      window.location.hash = "#/cinema/final";
+      window.location.hash = "#/library/final";
     }
   }, []);
 

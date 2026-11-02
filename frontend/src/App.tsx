@@ -4,33 +4,71 @@ import type { Episode, Health, Project } from "./types";
 import { ToastProvider, useToast } from "./components/Toast";
 import { ProjectStudio } from "./components/studio/Studio";
 import { PlatformHome } from "./components/platform/PlatformHome";
-import { V5World } from "./components/v5world/V5World";
 import { CinemaStudio } from "./components/cinema/CinemaStudio";
 import { PipelineConsole } from "./components/pipeline/PipelineConsole";
 import { CharactersPage } from "./components/characters/CharactersPage";
+import { LibraryPage, type LibraryTab } from "./components/library/LibraryPage";
 import { BrandMark, IconRefresh } from "./components/icons";
 import { Spinner } from "./components/ui";
 
-export type TabKey = "script" | "assets" | "storyboard" | "generate" | "finish" | "templates3d";
+export type TabKey = "script" | "assets" | "storyboard" | "generate" | "finish";
 
-const TAB_KEYS: TabKey[] = ["script", "assets", "storyboard", "generate", "finish", "templates3d"];
+const TAB_KEYS: TabKey[] = ["script", "assets", "storyboard", "generate", "finish"];
 
 type ViewState =
   | { mode: "projects" }
   | { mode: "workspace"; project: Project; episode: Episode }
-  | { mode: "v5" }
   | { mode: "cinema" }
   | { mode: "pipeline" }
-  | { mode: "characters" };
+  | { mode: "characters" }
+  | { mode: "library"; tab: LibraryTab };
 
-function parseHash(): { eid?: string; tab: TabKey; v5?: boolean; cinema?: boolean; pipeline?: boolean; characters?: boolean } {
+const LIBRARY_TABS: LibraryTab[] = ["templates", "styles", "scenes", "final"];
+
+/** V20：旧 URL → 新 IA 的重定向表（含 V5 下线、Cinema 瘦身、工作台去 06 tab） */
+function legacyRedirectHash(): string | null {
+  const raw = window.location.hash.replace(/^#\/?/, "");
+  const parts = raw.split("/").filter(Boolean);
+  const path = "/" + parts.join("/");
+  const map: Record<string, string> = {
+    "/v5/gallery": "#/library/final",
+    "/v5/templates": "#/library/templates",
+    "/v5/styles": "#/library/styles",
+    "/v5/scenes": "#/library/scenes",
+    "/v5/characters": "#/characters",
+    "/v5/render": "#/pipeline",
+    "/cinema/overview": "#/projects",
+    "/cinema/templates": "#/library/templates",
+    "/cinema/final": "#/library/final",
+    "/cinema": "#/cinema/shots",
+  };
+  if (map[path]) return map[path];
+  if (parts[0] === "v5") return "#/library/final";
+  if (parts[0] === "cinema" && parts[1] && !["shots", "jobs", "assemble"].includes(parts[1])) {
+    return parts[1] === "templates" ? "#/library/templates" : parts[1] === "final" ? "#/library/final" : "#/projects";
+  }
+  if (parts[0] === "episodes" && parts[1] && parts[2] === "templates3d") {
+    return "#/episodes/" + encodeURIComponent(decodeURIComponent(parts[1])) + "/script";
+  }
+  return null;
+}
+
+function applyLegacyRedirect(): boolean {
+  const target = legacyRedirectHash();
+  if (!target) return false;
+  window.location.replace(window.location.pathname + target);
+  return true;
+}
+
+function parseHash(): { eid?: string; tab: TabKey; cinema?: boolean; pipeline?: boolean; characters?: boolean; library?: LibraryTab } {
   const raw = window.location.hash.replace(/^#\/?/, "");
   const parts = raw.split("/").filter(Boolean);
   if (parts[0] === "cinema") {
     return { tab: "script", cinema: true };
   }
-  if (parts[0] === "v5") {
-    return { tab: "script", v5: true };
+  if (parts[0] === "library") {
+    const tab = (LIBRARY_TABS as string[]).includes(parts[1] || "") ? (parts[1] as LibraryTab) : "templates";
+    return { tab: "script", library: tab };
   }
   if (parts[0] === "pipeline") {
     return { tab: "script", pipeline: true };
@@ -82,6 +120,7 @@ function Shell() {
 
   const boot = useCallback(
     async (silent: boolean) => {
+      if (applyLegacyRedirect()) return;
       if (!silent) setBooting(true);
       try {
         const h = await api.health();
@@ -92,8 +131,8 @@ function Shell() {
         const route = parseHash();
         if (route.cinema) {
           setView({ mode: "cinema" });
-        } else if (route.v5) {
-          setView({ mode: "v5" });
+        } else if (route.library) {
+          setView({ mode: "library", tab: route.library });
         } else if (route.pipeline) {
           setView({ mode: "pipeline" });
         } else if (route.characters) {
@@ -161,14 +200,15 @@ function Shell() {
   // 支持浏览器前进/后退 + 直接带 hash 打开
   useEffect(() => {
     const onHash = () => {
+      if (applyLegacyRedirect()) return;
       const route = parseHash();
       if (route.cinema) {
         setView({ mode: "cinema" });
         setTab("script");
         return;
       }
-      if (route.v5) {
-        setView({ mode: "v5" });
+      if (route.library) {
+        setView({ mode: "library", tab: route.library });
         setTab("script");
         return;
       }
@@ -278,20 +318,21 @@ function Shell() {
     void loadProjects().catch(() => undefined);
   }, [loadProjects]);
 
-  const openV5 = useCallback(() => {
-    setView({ mode: "v5" });
-    setEpisodes(null);
-    setTab("script");
-    setTaskStats({ activeJobs: 0, cost: 0 });
-    if (window.location.hash !== "#/v5") window.location.hash = "#/v5";
-  }, []);
-
   const openCinema = useCallback(() => {
     setView({ mode: "cinema" });
     setEpisodes(null);
     setTab("script");
     setTaskStats({ activeJobs: 0, cost: 0 });
-    if (window.location.hash !== "#/cinema/overview") window.location.hash = "#/cinema/overview";
+    if (window.location.hash !== "#/cinema/shots") window.location.hash = "#/cinema/shots";
+  }, []);
+
+  const openLibrary = useCallback((tab: LibraryTab = "templates") => {
+    setView({ mode: "library", tab });
+    setEpisodes(null);
+    setTab("script");
+    setTaskStats({ activeJobs: 0, cost: 0 });
+    const hash = "#/library/" + tab;
+    if (window.location.hash !== hash) window.location.hash = hash;
   }, []);
 
   const openPipeline = useCallback(() => {
@@ -399,9 +440,14 @@ function Shell() {
         onExit={goHome}
         onOpenCharacters={openCharacters}
         onOpenCinema={openCinema}
+        onOpenLibrary={() => openLibrary("templates")}
         onOpenSettings={openSettings}
       />
     );
+  }
+
+  if (view.mode === "library") {
+    return <LibraryPage tab={view.tab} onOpenSettings={openSettings} />;
   }
 
   if (view.mode === "characters") {
@@ -439,16 +485,13 @@ function Shell() {
         offline={offline}
         onOpenProject={(project) => void openProject(project)}
         onOpenCinema={openCinema}
-        onOpenV5={openV5}
+        onOpenLibrary={() => openLibrary("templates")}
+        onOpenFinal={() => openLibrary("final")}
         onProjectCreated={(project) => void handleProjectCreated(project)}
         onRefreshProjects={() => void loadProjects()}
         openSettingsSignal={settingsSignal}
       />
     );
-  }
-
-  if (view.mode === "v5") {
-    return <V5World onExit={goHome} onCinema={openCinema} onOpenSettings={openSettings} />;
   }
 
   return null;

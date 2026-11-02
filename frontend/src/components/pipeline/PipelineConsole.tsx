@@ -46,12 +46,13 @@ interface Props {
   onExit: () => void;
   onOpenCharacters: () => void;
   onOpenCinema: () => void;
+  onOpenLibrary: () => void;
   onOpenSettings: () => void;
 }
 
 const STEP_LABELS = ["选模板", "角色与声音", "剧本预览", "生成 3D", "成片", "发布前检查"];
 
-export function PipelineConsole({ onExit, onOpenCharacters, onOpenCinema, onOpenSettings }: Props) {
+export function PipelineConsole({ onExit, onOpenCharacters, onOpenCinema, onOpenLibrary, onOpenSettings }: Props) {
   const notify = useToast();
 
   const [catalog, setCatalog] = useState<V5CatalogResponse | null>(null);
@@ -504,7 +505,7 @@ export function PipelineConsole({ onExit, onOpenCharacters, onOpenCinema, onOpen
                 error={loadError}
                 onRefresh={() => void refresh()}
                 onNext={() => gotoStep(2)}
-                onOpenCinema={onOpenCinema}
+                onOpenCinema={onOpenLibrary}
                 totalHint={`${templates.length} 个 3D 模板 · 成片 ${doneCount}/${templates.length || "—"}`}
               />
             )}
@@ -560,6 +561,8 @@ export function PipelineConsole({ onExit, onOpenCharacters, onOpenCinema, onOpen
                 onNext={() => gotoStep(5)}
                 onPrev={() => gotoStep(3)}
                 finalReady={finalReady || run?.status === "done"}
+                onOpenShots={onOpenCinema}
+                onOpenJobs={() => (window.location.hash = "#/cinema/jobs")}
               />
             )}
             {step === 5 && (
@@ -571,7 +574,7 @@ export function PipelineConsole({ onExit, onOpenCharacters, onOpenCinema, onOpen
                   setStep(4);
                   void startRun(true);
                 }}
-                onOpenCinema={onOpenCinema}
+                onOpenCinema={onOpenLibrary}
                 busy={starting || activeRun}
               />
             )}

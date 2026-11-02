@@ -563,9 +563,6 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                         </a>
                       );
                     })}
-                    <a className="cm-btn cm-btn-sm" href={`#/v5/characters`} title="在 V5 世界角色库查看同款程序化预览">
-                      <IconExternal size={12} /> V5 角色库
-                    </a>
                   </div>
                 </div>
               </div>

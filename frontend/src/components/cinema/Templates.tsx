@@ -91,7 +91,13 @@ function mergeCards(data: CinemaTemplatesResponse | null): CardItem[] {
   return items;
 }
 
-export function CinemaTemplates() {
+export function CinemaTemplates({
+  embedded = false,
+  onOpenShots,
+}: {
+  embedded?: boolean;
+  onOpenShots?: (templateId: string) => void;
+} = {}) {
   const notify = useToast();
 
   const [data, setData] = useState<CinemaTemplatesResponse | null>(null);
@@ -103,6 +109,7 @@ export function CinemaTemplates() {
   const [playing, setPlaying] = useState<CinemaTemplate | null>(null);
   const [detailId, setDetailId] = useState<string | null>(null);
   const [kindFilter, setKindFilter] = useState<TemplateKindFilter>("all");
+  const [query, setQuery] = useState("");
 
   const aliveRef = useRef(true);
   const inFlightRef = useRef(false);
@@ -166,10 +173,22 @@ export function CinemaTemplates() {
   const realCount = useMemo(() => cards.filter((item) => isRealTemplate(item.seed.id)).length, [cards]);
   const classicCount = Math.max(0, cards.length - realCount);
   const filteredCards = useMemo(() => {
-    if (kindFilter === "real") return cards.filter((item) => isRealTemplate(item.seed.id));
-    if (kindFilter === "classic") return cards.filter((item) => !isRealTemplate(item.seed.id));
-    return cards;
-  }, [cards, kindFilter]);
+    const base =
+      kindFilter === "real"
+        ? cards.filter((item) => isRealTemplate(item.seed.id))
+        : kindFilter === "classic"
+          ? cards.filter((item) => !isRealTemplate(item.seed.id))
+          : cards;
+    const keyword = query.trim().toLowerCase();
+    if (!keyword) return base;
+    return base.filter((item) =>
+      [item.seed.id, item.seed.label, item.seed.style, item.template?.label, item.template?.style]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(keyword),
+    );
+  }, [cards, kindFilter, query]);
   const clipsDone = summary?.clips_done ?? 0;
   const clipsTotal = summary?.clips_total ?? 0;
   const overallPct = clipsTotal > 0 ? Math.round((clipsDone / clipsTotal) * 100) : 0;
@@ -272,8 +291,8 @@ export function CinemaTemplates() {
   const genBlocked = activeJobs > 0 || busyAction !== null;
 
   return (
-    <div className="cm-page cm-tpl">
-      <header className="cm-page-head">
+    <div className={"cm-page cm-tpl" + (embedded ? " cm-tpl-embedded" : "")}>
+      {!embedded && <header className="cm-page-head">
         <div className="cm-head-main">
           <div className="cm-kicker">TEMPLATE STUDIO · 3D</div>
           <h1 className="cm-h1">模板库 · 3D</h1>
@@ -322,7 +341,7 @@ export function CinemaTemplates() {
             {refreshing ? <Spinner size={14} /> : <IconRefresh />}
           </button>
         </div>
-      </header>
+      </header>}
 
       {error && (
         <div className="cm-error cm-tpl-errorbar" role="alert">
@@ -395,6 +414,13 @@ export function CinemaTemplates() {
             </button>
           ))}
         </div>
+        <input
+          className="cm-tpl-filter-search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="搜索模板 / 风格"
+          aria-label="搜索模板"
+        />
         <span className="cm-tpl-filter-note cm-mono">
           显示 {filteredCards.length} / {cards.length}
           {realCount > 0 ? ` · 写实 ${realCount} 支` : ""}
@@ -443,6 +469,8 @@ export function CinemaTemplates() {
             item={item}
             genBlocked={genBlocked}
             busyAction={busyAction}
+            embedded={embedded}
+            onOpenShots={onOpenShots}
             onPlay={(template) => setPlaying(template)}
             onGenerate={(template) => void submitGenerate([template.id])}
             onAssemble={(template) => void submitAssemble([template.id])}
@@ -484,6 +512,8 @@ function TemplateCard({
   onAssemble,
   onDetail,
   onOpen,
+  embedded,
+  onOpenShots,
 }: {
   item: CardItem;
   genBlocked: boolean;
@@ -493,6 +523,8 @@ function TemplateCard({
   onAssemble: (template: CinemaTemplate) => void;
   onDetail: (id: string) => void;
   onOpen: (item: CardItem) => void;
+  embedded?: boolean;
+  onOpenShots?: (templateId: string) => void;
 }) {
   const { seed, template } = item;
   const [failedPoster, setFailedPoster] = useState("");
@@ -624,15 +656,27 @@ function TemplateCard({
             {busyAction === generateKey ? <Spinner size={11} /> : null}
             {generateLabel}
           </button>
-          <button
-            type="button"
-            className="cm-btn cm-btn-sm cm-btn-ghost"
-            onClick={() => template && onAssemble(template)}
-            disabled={!canAssemble(template) || busyAction === assembleKey}
-            title={canAssemble(template) ? "合成 3D 成片" : "全部镜头就绪后才可合成"}
-          >
-            合成
-          </button>
+          {!embedded && (
+            <button
+              type="button"
+              className="cm-btn cm-btn-sm cm-btn-ghost"
+              onClick={() => template && onAssemble(template)}
+              disabled={!canAssemble(template) || busyAction === assembleKey}
+              title={canAssemble(template) ? "合成 3D 成片" : "全部镜头就绪后才可合成"}
+            >
+              合成
+            </button>
+          )}
+          {embedded && onOpenShots && (
+            <button
+              type="button"
+              className="cm-btn cm-btn-sm cm-btn-ghost"
+              onClick={() => onOpenShots(seed.id)}
+              title="进入 3D 制作台 · 镜头台"
+            >
+              镜头台
+            </button>
+          )}
           <button
             type="button"
             className="cm-btn cm-btn-sm cm-btn-ghost cm-tpl-more"

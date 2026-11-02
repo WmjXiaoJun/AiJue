@@ -167,7 +167,7 @@ export function StepTemplates({
             {loading ? <Spinner size={12} /> : <IconRefresh size={13} />} 刷新
           </button>
           <button type="button" className="cm-btn cm-btn-sm" onClick={onOpenCinema}>
-            <IconFilm size={13} /> 模板库
+            <IconFilm size={13} /> 模板与素材
           </button>
         </div>
       </div>
@@ -567,6 +567,8 @@ export function StepRun({
   onNext,
   onPrev,
   finalReady,
+  onOpenShots,
+  onOpenJobs,
 }: {
   template: CinemaTemplate | null;
   run: PipelineRun | null;
@@ -582,6 +584,8 @@ export function StepRun({
   onNext: () => void;
   onPrev: () => void;
   finalReady: boolean;
+  onOpenShots?: () => void;
+  onOpenJobs?: () => void;
 }) {
   const active = run && (run.status === "queued" || run.status === "running");
   const pct = pipelineRunPercent(run);
@@ -640,6 +644,16 @@ export function StepRun({
                 </div>
               </div>
               <div className="v18-run-actions">
+                {onOpenShots && (
+                  <a className="cm-btn cm-btn-sm" href="#/cinema/shots" onClick={(event) => { event.preventDefault(); onOpenShots(); }} title="进入 3D 制作台 · 镜头台">
+                    <IconFilm size={13} /> 镜头台
+                  </a>
+                )}
+                {onOpenJobs && (
+                  <a className="cm-btn cm-btn-sm" href="#/cinema/jobs" onClick={(event) => { event.preventDefault(); onOpenJobs(); }} title="进入 3D 制作台 · 生成队列">
+                    生成队列
+                  </a>
+                )}
                 <button
                   type="button"
                   className="cm-btn cm-btn-sm"
@@ -810,7 +824,7 @@ export function StepFinal({
                 <IconExternal size={12} /> 打开原片
               </a>
               <button type="button" className="cm-btn cm-btn-sm" onClick={onOpenCinema}>
-                <IconFilm size={12} /> 模板库
+                <IconFilm size={12} /> 模板与素材
               </button>
               <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" onClick={onNext} style={{ marginLeft: "auto" }}>
                 下一步：发布前检查 →

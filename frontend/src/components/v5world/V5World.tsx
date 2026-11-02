@@ -186,7 +186,7 @@ export function V5World({ onExit, onCinema, onOpenSettings }: { onExit: () => vo
 
   return (
     <AppShell
-      active="v5"
+      active={null}
       kicker="V5 · VARIABLE STYLE WORLD"
       title="V5 世界"
       breadcrumb={[{ label: "造片局" }, { label: `${TAB_META[tab].no} · ${TAB_META[tab].en}` }]}

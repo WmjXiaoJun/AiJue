@@ -11,7 +11,7 @@ export function CinemaOverviewPage({
   onNavigate,
 }: {
   overview: CinemaOverview | null;
-  onNavigate: (tab: CinemaTab) => void;
+  onNavigate: (tab: string) => void;
 }) {
   const [report, setReport] = useState<CinemaReport | null>(null);
 

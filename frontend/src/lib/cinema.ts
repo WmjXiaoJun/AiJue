@@ -2,7 +2,7 @@
 // 后端：backend/app/routers/cinema3d.py（前缀 /api/cinema）；契约见 docs/V7_FRONTEND_PLATFORM.md §3。
 import { API_BASE, ApiError, mediaUrl } from "./api";
 
-export type CinemaTab = "overview" | "templates" | "shots" | "jobs" | "assemble" | "final";
+export type CinemaTab = "shots" | "jobs" | "assemble";
 
 export type ShotSource = "cloud" | "local" | "reuse" | "missing";
 export type JobKind = "generate_local" | "generate_cloud" | "assemble";

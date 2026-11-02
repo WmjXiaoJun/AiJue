@@ -5,32 +5,26 @@ import { useToast } from "../Toast";
 import { AppShell } from "../shell/AppShell";
 import { Spinner } from "../ui";
 import { IconSpark, IconTemplate } from "../icons";
-import { CinemaOverviewPage } from "./Overview";
-import { CinemaTemplates } from "./Templates";
 import { CinemaShots } from "./Shots";
 import { CinemaJobs } from "./Jobs";
 import { CinemaAssemble } from "./Assemble";
-import { CinemaFinal } from "./Final";
 import "../../styles/cinema.css";
 
-const TAB_KEYS: CinemaTab[] = ["overview", "templates", "shots", "jobs", "assemble", "final"];
+const TAB_KEYS: CinemaTab[] = ["shots", "jobs", "assemble"];
 
 const TAB_META: Record<CinemaTab, { label: string; en: string; no: string; icon: JSX.Element }> = {
-  overview: { label: "总览", en: "OVERVIEW", no: "01", icon: <IconGrid /> },
-  templates: { label: "模板库 · 3D", en: "TEMPLATE STUDIO", no: "02", icon: <IconTemplate size={17} /> },
-  shots: { label: "镜头台", en: "SHOT WORKBENCH", no: "03", icon: <IconFrames /> },
-  jobs: { label: "生成队列", en: "RENDER QUEUE", no: "04", icon: <IconPulse /> },
-  assemble: { label: "剪辑台", en: "EDIT & MASTER", no: "05", icon: <IconSliders /> },
-  final: { label: "成片 & QC", en: "DELIVERY", no: "06", icon: <IconPlay /> },
+  shots: { label: "镜头台", en: "SHOT WORKBENCH", no: "01", icon: <IconFrames /> },
+  jobs: { label: "生成队列", en: "RENDER QUEUE", no: "02", icon: <IconPulse /> },
+  assemble: { label: "剪辑台", en: "EDIT & MASTER", no: "03", icon: <IconSliders /> },
 };
 
 function tabFromHash(): CinemaTab {
   const match = window.location.hash.match(/^#\/cinema\/?([a-z]*)/i);
   const key = (match?.[1] || "").toLowerCase() as CinemaTab;
-  return TAB_KEYS.includes(key) ? key : "overview";
+  return TAB_KEYS.includes(key) ? key : "shots";
 }
 
-export function CinemaStudio({ onExit, onOpenSettings }: { onExit: () => void; onOpenSettings?: () => void }) {
+export function CinemaStudio({ onExit, onOpenSettings }: { onExit: () => void; onOpenSettings?: () => void; onOpenFinal?: () => void; onOpenLibrary?: () => void }) {
   const notify = useToast();
   const [tab, setTab] = useState<CinemaTab>(() => tabFromHash());
   const [overview, setOverview] = useState<CinemaOverview | null>(null);
@@ -113,7 +107,7 @@ export function CinemaStudio({ onExit, onOpenSettings }: { onExit: () => void; o
 
   return (
     <AppShell
-      active="cinema"
+      active={null}
       kicker="CINEMA STUDIO · 3D 制片"
       title={overview?.project?.name || "国宝会说话 · 3D"}
       breadcrumb={[{ label: "造片局" }, { label: overview?.project?.episode_id || "ep_5610123283" }]}
@@ -147,12 +141,6 @@ export function CinemaStudio({ onExit, onOpenSettings }: { onExit: () => void; o
                 </button>
               </div>
             </div>
-          ) : tab === "overview" ? (
-            <CinemaOverviewPage overview={overview} onNavigate={navigate} />
-          ) : tab === "templates" ? (
-            <CinemaTemplates />
-          ) : tab === "shots" ? (
-            <CinemaShots />
           ) : tab === "jobs" ? (
             <CinemaJobs />
           ) : tab === "assemble" ? (
@@ -162,7 +150,7 @@ export function CinemaStudio({ onExit, onOpenSettings }: { onExit: () => void; o
               }}
             />
           ) : (
-            <CinemaFinal />
+            <CinemaShots />
           )}
     </AppShell>
   );

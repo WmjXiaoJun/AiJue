@@ -10,7 +10,6 @@ import { StudioAssets } from "./Assets";
 import { StudioStoryboard } from "./Storyboard";
 import { StudioRender } from "./Render";
 import { StudioFinishing } from "./Finishing";
-import { StudioTemplates3D } from "./Templates3D";
 import "../../styles/studio.css";
 
 interface Props {
@@ -187,8 +186,6 @@ export function ProjectStudio({
             <StudioStoryboard {...tabProps} />
           ) : activeTab === "generate" ? (
             <StudioRender {...tabProps} />
-          ) : activeTab === "templates3d" ? (
-            <StudioTemplates3D {...tabProps} onProjectFormatChange={setProjectFormatOverride} />
           ) : (
             <StudioFinishing {...tabProps} />
           )}
@@ -230,7 +227,7 @@ export function ProjectStudio({
                       下一步：{next.label} →
                     </button>
                   ) : (
-                    <a className="cm-btn cm-btn-ghost cm-btn-sm" href="#/v5/gallery">
+                    <a className="cm-btn cm-btn-ghost cm-btn-sm" href="#/library/final">
                       去成片画廊 →
                     </a>
                   )}

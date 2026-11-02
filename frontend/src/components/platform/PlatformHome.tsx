@@ -18,7 +18,8 @@ interface Props {
   offline: boolean;
   onOpenProject: (project: Project) => void;
   onOpenCinema: () => void;
-  onOpenV5: () => void;
+  onOpenLibrary: () => void;
+  onOpenFinal: () => void;
   onProjectCreated: (project: Project) => void;
   onRefreshProjects: () => void | Promise<void>;
   /** V18：其他页面「去设置」时递增，用于打开设置弹层 */
@@ -73,7 +74,7 @@ export function PlatformHome({
   offline,
   onOpenProject,
   onOpenCinema,
-  onOpenV5,
+  onOpenLibrary,
   onProjectCreated,
   onRefreshProjects,
   openSettingsSignal,
@@ -289,13 +290,13 @@ export function PlatformHome({
                   <div className="pl-sec-head">
                     <h2 className="pl-h2">{tplTotal} 模板 · 3D 影库</h2>
                     <span className="pl-sec-sub">已完成 {tplDone}/{tplTotal}</span>
-                    <a className="cm-btn cm-btn-ghost cm-btn-sm pl-sec-action" href="#/cinema/templates">
+                    <a className="cm-btn cm-btn-ghost cm-btn-sm pl-sec-action" href="#/library/templates">
                       全部 {tplTotal} 支 →
                     </a>
                   </div>
                   <div className="pl-tpl-grid">
                     {(tpl?.templates || []).slice(0, 6).map((item: CinemaTemplate) => (
-                      <a key={item.id} className="pl-tpl" href={`#/cinema/templates`} title={item.label}>
+                      <a key={item.id} className="pl-tpl" href={`#/library/templates`} title={item.label}>
                         <div className="pl-tpl-thumb">
                           {item.poster_url ? (
                             <img src={mediaUrl(item.poster_url)} alt={item.label} />

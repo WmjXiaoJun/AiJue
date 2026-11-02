@@ -942,3 +942,19 @@
 .cm-tpl-card.is-real .cm-tpl-poster-fallback i { color: var(--c-gold-soft); }
 .cm-tpl-card.is-real .cm-tpl-tags .tpl-real-badge { flex: none; }
 
+
+/* V20：模板与素材 · 搜索框（embedded 模式） */
+.cm-tpl-filter-search {
+  width: 220px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  background: rgba(8, 10, 15, 0.85);
+  color: var(--c-text);
+  font-family: var(--font-body);
+  font-size: 11.5px;
+  outline: none;
+}
+.cm-tpl-filter-search:focus { border-color: rgba(201, 162, 39, 0.55); box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.1); }
+.cm-tpl-filter-search::placeholder { color: var(--c-mut); }

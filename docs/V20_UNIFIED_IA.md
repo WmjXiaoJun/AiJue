@@ -64,3 +64,31 @@
 
 - **tpl-frontend**：导航/路由重构、`library` 新页面（templates/styles/scenes/final）、Cinema 制作台瘦身、V5 下线与重定向、工作台去 06 tab、入口链接；截图与自测
 - **Lead**：审计/规范/复核/E2E/截图/commit/交付
+
+
+## 5. 交付结果（2026-11-02 18:35）
+
+### 已上线（唯一一套 IA）
+- 主轨 6 项：项目大厅 01 / 一键成片 02 / 角色与声音 03 / **模板与素材 04** / **成片库 05** / 设置 06
+- 新页面 `#/library/<tab>`（`components/library/LibraryPage.tsx` + `library.css`）：
+  - `templates`：19 个 3D 模板（全部/原16/写实筛选 + 搜索；播放/重生成/镜头台）
+  - `styles`：17 个风格墙（复用 V5 Styles）
+  - `scenes`：70 个场景（复用 V5 Scenes）
+  - `final`：19 支成片库（搜索/筛选；播放/报告/QC/重新合成/镜头台/下载）
+- **V5 世界下线**：主轨入口与 V5World 路由移除；旧 URL 10/10 重定向 PASS（v5/gallery→library/final、v5/templates→library/templates、v5/styles→library/styles、v5/scenes→library/scenes、v5/characters→characters、v5/render→pipeline）
+- **Cinema 制作台瘦身**：只保留 镜头台/生成队列/剪辑台（`#/cinema/shots|jobs|assemble`，不作一级导航）；旧 cinema/overview→projects、cinema/templates→library/templates、cinema/final→library/final
+- **工作台**：移除 06 3D 模板 tab（5 tab：剧本/资产/分镜/生成/成片）
+- 交叉链接全部更新：项目大厅模板卡→模板与素材；一键成片第 4 步新增「镜头台/生成队列」；成片库卡→镜头台/报告；角色页去 V5 链接
+
+### 验证
+- 旧 URL 重定向：**10/10 PASS**（`tmp/v20/verify.py`）
+- 主路由 11 条（含制作台 3 tab）渲染正常、**无双 V5/无渲染台/无第二模板库/第二成片画廊**；console 无 JS error（资源 404 为立绘回退，见遗留）
+- 模板与素材：19 模板 / 17 风格 / 70 场景；成片库 19/19；制作台 3 tab；工作台 5 tab
+- `tsc` 0 error、`vite build` 通过（495KB / gzip 147KB）
+- 截图：`tmp/v20/after2/`（11 张 1680 + 3 张 1280）；before（旧 V5 六 tab）：`tmp/v20/before/`
+
+### 遗留
+1. 已无路由引用的旧组件（`v5world/V5World.tsx`、`v5world/Gallery.tsx`、`v5world/Templates.tsx`、`v5world/Characters.tsx`、`v5world/Render.tsx`、`studio/Templates3D.tsx`、`cinema/Overview.tsx`、`cinema/Final.tsx`）暂留（Styles/Scenes 仍被 Library 复用其 props 类型），后续可清理
+2. 角色立绘多级回退导致控制台资源 404（不影响功能），可后续批量生成统一立绘
+3. 2D 渲染台入口已下线，但后端 `/api/v5/render` 仍保留（历史项目兼容）
+4. 成片库「报告/QC」依赖产物 `qc_report.json` 存在，个别模板无 QC 文件时按钮提示

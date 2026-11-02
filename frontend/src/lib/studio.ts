@@ -24,14 +24,13 @@ export const STUDIO_TABS: { key: StudioTabKey; no: string; label: string; en: st
   { key: "storyboard", no: "03", label: "分镜台", en: "STORYBOARD", desc: "镜头 / 台词 / 视觉 / 版本" },
   { key: "generate", no: "04", label: "生成台", en: "RENDER", desc: "任务队列 / 进度 / 费用" },
   { key: "finish", no: "05", label: "成片房", en: "FINISHING", desc: "成片 / 渲染 / 出海 / 发布" },
-  { key: "templates3d", no: "06", label: "3D 模板", en: "3D TEMPLATE", desc: "项目模板 / 模板 3D / 切换" },
 ];
 
 /** 项目 format_id 与 3D 模板 id 的换算后缀（national_treasure_5min ↔ national_treasure） */
 export const TPL3D_FORMAT_SUFFIX = "_5min";
 
 /** Cinema Studio「模板 3D 制作进度」入口 */
-export const TPL3D_LIBRARY_HREF = "#/cinema/templates";
+export const TPL3D_LIBRARY_HREF = "#/library/templates";
 
 export interface StudioTabProps {
   project: Project;

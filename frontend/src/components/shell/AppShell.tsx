@@ -18,11 +18,12 @@ import {
   IconSpark,
   IconTemplate,
   IconUsers,
+  IconVideo,
 } from "../icons";
 import "../../styles/cinema.css";
 import "../../styles/shell.css";
 
-export type ShellNavKey = "projects" | "pipeline" | "characters" | "cinema" | "v5" | "settings";
+export type ShellNavKey = "projects" | "pipeline" | "characters" | "library" | "final" | "settings";
 
 export interface ShellTab {
   key: string;
@@ -50,7 +51,7 @@ export interface ShellPrimaryAction {
 }
 
 export interface AppShellProps {
-  active: Exclude<ShellNavKey, "settings">;
+  active: ShellNavKey | null;
   title: string;
   kicker?: string;
   breadcrumb?: { label: string; href?: string }[];
@@ -66,12 +67,12 @@ export interface AppShellProps {
   children: ReactNode;
 }
 
-const NAV_ITEMS: { key: Exclude<ShellNavKey, "settings"> | "settings"; no: string; label: string; href?: string; icon: ReactNode }[] = [
+const NAV_ITEMS: { key: ShellNavKey; no: string; label: string; href?: string; icon: ReactNode }[] = [
   { key: "projects", no: "01", label: "项目大厅", href: "#/projects", icon: <IconProjects /> },
   { key: "pipeline", no: "02", label: "一键成片", href: "#/pipeline", icon: <IconSpark /> },
   { key: "characters", no: "03", label: "角色与声音", href: "#/characters", icon: <IconUsers /> },
-  { key: "cinema", no: "04", label: "模板库", href: "#/cinema/templates", icon: <IconFilm /> },
-  { key: "v5", no: "05", label: "V5 世界", href: "#/v5/gallery", icon: <IconPalette /> },
+  { key: "library", no: "04", label: "模板与素材", href: "#/library/templates", icon: <IconTemplate /> },
+  { key: "final", no: "05", label: "成片库", href: "#/library/final", icon: <IconVideo /> },
   { key: "settings", no: "06", label: "设置", icon: <IconSettings /> },
 ];
 
