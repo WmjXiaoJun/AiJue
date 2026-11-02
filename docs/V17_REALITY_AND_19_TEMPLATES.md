@@ -52,8 +52,10 @@
 | classics | ✅ done | 36.4 min | 42.25s / 18.1MB / 1024 源 |
 | history_talk | ✅ done | 35.4 min | 36.13s / 13.1MB / 1024 源 |
 | roundtable | ✅ done | 44.4 min | 41.78s / 15.1MB |
-| masked_singer | ⏳ 待补跑（ComfyUI 重启中断） | - | - |
-| national_treasure 起其余 11 个 | 🟡 排队/跑中 | - | - |
+| masked_singer | ✅ done | 27.2 min | 41.70s / 19.9MB |
+| national_treasure | ✅ done | 26.9 min | 41.06s / 15.4MB |
+| hot_ones | 🟡 跑中（5/8） | - | - |
+| mystery 起其余 9 个 | ⏳ 排队 | - | - |
 
 - 单模板实测 ~35–40 分钟（1024×576 T2VA + 7~9 个对话镜 ref2va + 剪辑海报）
 - 按实测推算 15 个全量 ≈ 9–10 小时 → 预计 **16:00–17:30** 完成；随后补跑 masked_singer + 3 个写实模板 ≈ 2–2.5 小时
