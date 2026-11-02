@@ -1,0 +1,10 @@
+{
+  "id": "real_cafe_regular",
+  "voice": {
+    "voice_id": "navigator_kai",
+    "provider": "breeze",
+    "instruction": "44岁男性，宽亮，语速从容，带笑意与海风般的开阔感，尾音舒展。",
+    "seed": 20263011,
+    "cfg_scale": 4.0
+  }
+}

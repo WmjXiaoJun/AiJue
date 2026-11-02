@@ -222,6 +222,9 @@ export function ProjectStudio({
             </button>
           ))}
           <div className="st-tabbar-right">
+            <a className="st-tab-link" href="#/pipeline" title="一键成片 · 制片控制台">
+              一键成片 ↗
+            </a>
             <a className="st-tab-link" href="#/cinema/templates" title="模板的 3D 样片与制作进度">
               Cinema 3D ↗
             </a>

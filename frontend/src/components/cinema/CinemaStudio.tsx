@@ -3,7 +3,7 @@ import type { CinemaOverview, CinemaTab, CinemaTemplatesSummary, CinemaWorkers }
 import { TEMPLATE_3D_TOTAL, cinemaApi } from "../../lib/cinema";
 import { useToast } from "../Toast";
 import { Spinner } from "../ui";
-import { IconTemplate } from "../icons";
+import { IconSpark, IconTemplate } from "../icons";
 import { CinemaOverviewPage } from "./Overview";
 import { CinemaTemplates } from "./Templates";
 import { CinemaShots } from "./Shots";
@@ -151,6 +151,9 @@ export function CinemaStudio({ onExit }: { onExit: () => void }) {
               <span className="cm-env-text">ComfyUI · {workers?.comfyui_queue ?? 0} 队</span>
             </span>
           </div>
+          <a className="cm-back-link" href="#/pipeline" title="一键成片 · 制片控制台">
+            <IconSpark size={14} /> <span className="cm-env-text">一键成片</span>
+          </a>
           <button type="button" className="cm-back-link" onClick={onExit}>
             <IconBack /> <span className="cm-env-text">返回平台</span>
           </button>

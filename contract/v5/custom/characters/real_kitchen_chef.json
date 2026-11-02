@@ -1,0 +1,10 @@
+{
+  "id": "real_kitchen_chef",
+  "voice": {
+    "voice_id": "warm_male",
+    "provider": "breeze",
+    "instruction": "35岁男性，厚实温暖，语速偏慢，笑着说话，自带喜感但不油。",
+    "seed": 20263015,
+    "cfg_scale": 4.0
+  }
+}

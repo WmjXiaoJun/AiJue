@@ -237,6 +237,9 @@ export function V5World({ onExit, onCinema }: { onExit: () => void; onCinema: ()
           <button type="button" className="cm-back-link" onClick={onCinema} title="Cinema Studio · 3D 电影制片">
             <IconFilm size={14} /> <span className="cm-env-text">Cinema 3D</span>
           </button>
+          <a className="cm-back-link" href="#/pipeline" title="一键成片 · 制片控制台">
+            <IconSpark size={14} /> <span className="cm-env-text">一键成片</span>
+          </a>
           <button type="button" className="cm-back-link" onClick={onExit} title="返回项目大厅">
             <IconArrowLeft /> <span className="cm-env-text">返回平台</span>
           </button>

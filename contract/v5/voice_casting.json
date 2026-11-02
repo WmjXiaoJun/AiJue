@@ -1,0 +1,391 @@
+{
+  "updated": "2026-11-02",
+  "map": {
+    "ali": {
+      "voice_id": "legacy_v4_ali",
+      "label": "年轻女嘉宾（明亮清脆·俏皮）",
+      "reason": "V4 原声，明亮俏皮，贴 AI 创业者的语速",
+      "preview_text": "我又想到一个新点子，要不要听听？"
+    },
+    "dawei": {
+      "voice_id": "legacy_v4_dawei",
+      "label": "资深男嘉宾（沉稳沙哑·严肃）",
+      "reason": "沉沙哑而谨慎，老综艺导演的资历感",
+      "preview_text": "我从业三十年，这话我可不敢乱说。"
+    },
+    "juanwang": {
+      "voice_id": "fast_male",
+      "label": "卷王·机敏",
+      "reason": "极快节奏、句句抢话，卷王本色",
+      "preview_text": "第八版方案马上就好，再等我十分钟。"
+    },
+    "laozhou": {
+      "voice_id": "legacy_v4_laozhou",
+      "label": "深夜秀主持（低沉磁性·冷幽默）",
+      "reason": "V4 原声，低沉松弛带冷幽默，控场主持",
+      "preview_text": "来，咱们把场面话放一边，聊点真的。"
+    },
+    "lengmian": {
+      "voice_id": "cool_male",
+      "label": "冷面·冷峻",
+      "reason": "低冷少起伏、停顿多，冷面笑匠的反差",
+      "preview_text": "我没笑，是这事确实好笑。"
+    },
+    "mengxin": {
+      "voice_id": "soft_male",
+      "label": "萌新·清软",
+      "reason": "专为萌新设计：偏软、紧张又真诚",
+      "preview_text": "那个……这样可以吗？我再改改。"
+    },
+    "pangzi": {
+      "voice_id": "warm_male",
+      "label": "胖子·温厚",
+      "reason": "厚实温暖自带喜感，胖子式的亲和",
+      "preview_text": "先吃口热乎的，事儿慢慢说。"
+    },
+    "producer": {
+      "voice_id": "steady_male",
+      "label": "制片·干练",
+      "reason": "中音稳、语速中快，制片人的干练",
+      "preview_text": "时间不等人，各部门现在就位。"
+    },
+    "tianmei": {
+      "voice_id": "bright_female",
+      "label": "甜妹·明亮",
+      "reason": "清亮带甜、尾音上扬，元气甜妹",
+      "preview_text": "今天也超开心，你们呢？"
+    },
+    "xueba": {
+      "voice_id": "young_male",
+      "label": "学霸·清亮",
+      "reason": "清亮利落带锐气，学霸的答辩腔",
+      "preview_text": "第一，论点不清；第二，论据不足。"
+    },
+    "mystery_guest": {
+      "voice_id": "mystery_low",
+      "label": "神秘人·低沉",
+      "reason": "低沉含混、气息多，身份成谜",
+      "preview_text": "你确定，你想知道答案吗？"
+    },
+    "robot": {
+      "voice_id": "robot_flat",
+      "label": "机器人·平直",
+      "reason": "机械平直、无情绪起伏，AI 助理感",
+      "preview_text": "数据处理完毕，结论如下。"
+    },
+    "caocao": {
+      "voice_id": "emperor_yazhong",
+      "label": "帝王·威压",
+      "reason": "厚重威压、尾音下沉，枭雄的试探",
+      "preview_text": "天下英雄，唯使君与操耳。"
+    },
+    "guanyu": {
+      "voice_id": "warrior_houzhong",
+      "label": "武圣·浑厚",
+      "reason": "浑厚刚正、句句落地，武圣的傲骨",
+      "preview_text": "义字当头，关某从不含糊。"
+    },
+    "libai": {
+      "voice_id": "poet_haofang",
+      "label": "诗人·豪放",
+      "reason": "明亮外放、咏叹感，诗仙的狂放",
+      "preview_text": "拿酒来，今朝有酒今朝醉！"
+    },
+    "mulan": {
+      "voice_id": "heroine_sashuang",
+      "label": "女将·飒爽",
+      "reason": "清亮果断、尾音干脆，女将的利落",
+      "preview_text": "多说无益，看我怎么把它做成。"
+    },
+    "qinshihuang": {
+      "voice_id": "ruler_dark",
+      "label": "始皇帝·冷峻",
+      "reason": "极低极稳、压迫式留白，帝王冷峻",
+      "preview_text": "朕意已决，不必再议。"
+    },
+    "simaqian": {
+      "voice_id": "historian_kezhi",
+      "label": "史官·克制",
+      "reason": "平缓克制、咬字工整，史官的笔触",
+      "preview_text": "此事须有据，我不敢妄书一笔。"
+    },
+    "sunwu": {
+      "voice_id": "commander_dichen",
+      "label": "统帅·严峻",
+      "reason": "偏硬带风沙、顿挫强，兵家的严峻",
+      "preview_text": "先算败，再算胜，胜负已定。"
+    },
+    "sushi": {
+      "voice_id": "scholar_wenrun",
+      "label": "文士·温润",
+      "reason": "温润宽厚带笑，东坡的旷达",
+      "preview_text": "人间有味是清欢，且吃且看。"
+    },
+    "wuzetian": {
+      "voice_id": "empress_weiyi",
+      "label": "女皇·威仪",
+      "reason": "低中音稳而锋利，女皇的端肃",
+      "preview_text": "这天下的事，本宫自有分寸。"
+    },
+    "zhangqian": {
+      "voice_id": "envoy_jianyi",
+      "label": "使者·坚毅",
+      "reason": "沙哑坚定、气息稳，使者的路感",
+      "preview_text": "这条路我走过，风沙大，但值得。"
+    },
+    "zhenghe": {
+      "voice_id": "navigator_kai",
+      "label": "航海家·开阔",
+      "reason": "宽亮舒展带笑意，航海家的开阔",
+      "preview_text": "海那边还有天地，我们去看。"
+    },
+    "zhuge": {
+      "voice_id": "strategist_qinglang",
+      "label": "谋士·清朗",
+      "reason": "清朗偏薄、从容，谋士的书卷气",
+      "preview_text": "亮有一计，可解眼前之困。"
+    },
+    "real_host": {
+      "voice_id": "legacy_v4_laozhou",
+      "label": "深夜秀主持（低沉磁性·冷幽默）",
+      "reason": "低沉磁性、语速偏慢，贴记者型主持",
+      "preview_text": "夜里慢慢走，听听别人的故事。"
+    },
+    "real_street_runner": {
+      "voice_id": "cool_male",
+      "label": "冷面·冷峻",
+      "reason": "低冷少起伏、停顿多，贴疲惫夜归人",
+      "preview_text": "刚下班，只想一个人走一走。"
+    },
+    "real_street_owner": {
+      "voice_id": "heroine_sashuang",
+      "label": "女将·飒爽",
+      "reason": "清亮干脆、带笑，便利店店长的爽利",
+      "preview_text": "这么晚还来？给你留了杯热的。"
+    },
+    "real_cafe_owner": {
+      "voice_id": "empress_weiyi",
+      "label": "女皇·威仪",
+      "reason": "低中音稳而优雅，咖啡馆主理人的分寸",
+      "preview_text": "先坐会儿，咖啡马上就好。"
+    },
+    "real_cafe_regular": {
+      "voice_id": "navigator_kai",
+      "label": "航海家·开阔",
+      "reason": "宽亮从容带笑意，中年转行的松弛",
+      "preview_text": "我啊，就爱这一口手冲的味道。"
+    },
+    "real_kitchen_chef": {
+      "voice_id": "warm_male",
+      "label": "胖子·温厚",
+      "reason": "厚实温暖、语速慢，灶台边的家常气",
+      "preview_text": "锅里有热的，坐下吃点再走。"
+    },
+    "real_kitchen_regular": {
+      "voice_id": "young_male",
+      "label": "学霸·清亮",
+      "reason": "清亮偏快、尾音利落，年轻人的懒散劲",
+      "preview_text": "加完班，就馋这一口热汤。"
+    },
+    "custom_lin": {
+      "voice_id": "bright_female",
+      "label": "甜妹·明亮",
+      "reason": "清亮偏少女，贴年轻女学者的清爽",
+      "preview_text": "把旧材料讲成新故事，很有意思。"
+    }
+  },
+  "characters": {
+    "ali": {
+      "voice_id": "legacy_v4_ali",
+      "label": "年轻女嘉宾（明亮清脆·俏皮）",
+      "reason": "V4 原声，明亮俏皮，贴 AI 创业者的语速",
+      "preview_text": "我又想到一个新点子，要不要听听？"
+    },
+    "dawei": {
+      "voice_id": "legacy_v4_dawei",
+      "label": "资深男嘉宾（沉稳沙哑·严肃）",
+      "reason": "沉沙哑而谨慎，老综艺导演的资历感",
+      "preview_text": "我从业三十年，这话我可不敢乱说。"
+    },
+    "juanwang": {
+      "voice_id": "fast_male",
+      "label": "卷王·机敏",
+      "reason": "极快节奏、句句抢话，卷王本色",
+      "preview_text": "第八版方案马上就好，再等我十分钟。"
+    },
+    "laozhou": {
+      "voice_id": "legacy_v4_laozhou",
+      "label": "深夜秀主持（低沉磁性·冷幽默）",
+      "reason": "V4 原声，低沉松弛带冷幽默，控场主持",
+      "preview_text": "来，咱们把场面话放一边，聊点真的。"
+    },
+    "lengmian": {
+      "voice_id": "cool_male",
+      "label": "冷面·冷峻",
+      "reason": "低冷少起伏、停顿多，冷面笑匠的反差",
+      "preview_text": "我没笑，是这事确实好笑。"
+    },
+    "mengxin": {
+      "voice_id": "soft_male",
+      "label": "萌新·清软",
+      "reason": "专为萌新设计：偏软、紧张又真诚",
+      "preview_text": "那个……这样可以吗？我再改改。"
+    },
+    "pangzi": {
+      "voice_id": "warm_male",
+      "label": "胖子·温厚",
+      "reason": "厚实温暖自带喜感，胖子式的亲和",
+      "preview_text": "先吃口热乎的，事儿慢慢说。"
+    },
+    "producer": {
+      "voice_id": "steady_male",
+      "label": "制片·干练",
+      "reason": "中音稳、语速中快，制片人的干练",
+      "preview_text": "时间不等人，各部门现在就位。"
+    },
+    "tianmei": {
+      "voice_id": "bright_female",
+      "label": "甜妹·明亮",
+      "reason": "清亮带甜、尾音上扬，元气甜妹",
+      "preview_text": "今天也超开心，你们呢？"
+    },
+    "xueba": {
+      "voice_id": "young_male",
+      "label": "学霸·清亮",
+      "reason": "清亮利落带锐气，学霸的答辩腔",
+      "preview_text": "第一，论点不清；第二，论据不足。"
+    },
+    "mystery_guest": {
+      "voice_id": "mystery_low",
+      "label": "神秘人·低沉",
+      "reason": "低沉含混、气息多，身份成谜",
+      "preview_text": "你确定，你想知道答案吗？"
+    },
+    "robot": {
+      "voice_id": "robot_flat",
+      "label": "机器人·平直",
+      "reason": "机械平直、无情绪起伏，AI 助理感",
+      "preview_text": "数据处理完毕，结论如下。"
+    },
+    "caocao": {
+      "voice_id": "emperor_yazhong",
+      "label": "帝王·威压",
+      "reason": "厚重威压、尾音下沉，枭雄的试探",
+      "preview_text": "天下英雄，唯使君与操耳。"
+    },
+    "guanyu": {
+      "voice_id": "warrior_houzhong",
+      "label": "武圣·浑厚",
+      "reason": "浑厚刚正、句句落地，武圣的傲骨",
+      "preview_text": "义字当头，关某从不含糊。"
+    },
+    "libai": {
+      "voice_id": "poet_haofang",
+      "label": "诗人·豪放",
+      "reason": "明亮外放、咏叹感，诗仙的狂放",
+      "preview_text": "拿酒来，今朝有酒今朝醉！"
+    },
+    "mulan": {
+      "voice_id": "heroine_sashuang",
+      "label": "女将·飒爽",
+      "reason": "清亮果断、尾音干脆，女将的利落",
+      "preview_text": "多说无益，看我怎么把它做成。"
+    },
+    "qinshihuang": {
+      "voice_id": "ruler_dark",
+      "label": "始皇帝·冷峻",
+      "reason": "极低极稳、压迫式留白，帝王冷峻",
+      "preview_text": "朕意已决，不必再议。"
+    },
+    "simaqian": {
+      "voice_id": "historian_kezhi",
+      "label": "史官·克制",
+      "reason": "平缓克制、咬字工整，史官的笔触",
+      "preview_text": "此事须有据，我不敢妄书一笔。"
+    },
+    "sunwu": {
+      "voice_id": "commander_dichen",
+      "label": "统帅·严峻",
+      "reason": "偏硬带风沙、顿挫强，兵家的严峻",
+      "preview_text": "先算败，再算胜，胜负已定。"
+    },
+    "sushi": {
+      "voice_id": "scholar_wenrun",
+      "label": "文士·温润",
+      "reason": "温润宽厚带笑，东坡的旷达",
+      "preview_text": "人间有味是清欢，且吃且看。"
+    },
+    "wuzetian": {
+      "voice_id": "empress_weiyi",
+      "label": "女皇·威仪",
+      "reason": "低中音稳而锋利，女皇的端肃",
+      "preview_text": "这天下的事，本宫自有分寸。"
+    },
+    "zhangqian": {
+      "voice_id": "envoy_jianyi",
+      "label": "使者·坚毅",
+      "reason": "沙哑坚定、气息稳，使者的路感",
+      "preview_text": "这条路我走过，风沙大，但值得。"
+    },
+    "zhenghe": {
+      "voice_id": "navigator_kai",
+      "label": "航海家·开阔",
+      "reason": "宽亮舒展带笑意，航海家的开阔",
+      "preview_text": "海那边还有天地，我们去看。"
+    },
+    "zhuge": {
+      "voice_id": "strategist_qinglang",
+      "label": "谋士·清朗",
+      "reason": "清朗偏薄、从容，谋士的书卷气",
+      "preview_text": "亮有一计，可解眼前之困。"
+    },
+    "real_host": {
+      "voice_id": "legacy_v4_laozhou",
+      "label": "深夜秀主持（低沉磁性·冷幽默）",
+      "reason": "低沉磁性、语速偏慢，贴记者型主持",
+      "preview_text": "夜里慢慢走，听听别人的故事。"
+    },
+    "real_street_runner": {
+      "voice_id": "cool_male",
+      "label": "冷面·冷峻",
+      "reason": "低冷少起伏、停顿多，贴疲惫夜归人",
+      "preview_text": "刚下班，只想一个人走一走。"
+    },
+    "real_street_owner": {
+      "voice_id": "heroine_sashuang",
+      "label": "女将·飒爽",
+      "reason": "清亮干脆、带笑，便利店店长的爽利",
+      "preview_text": "这么晚还来？给你留了杯热的。"
+    },
+    "real_cafe_owner": {
+      "voice_id": "empress_weiyi",
+      "label": "女皇·威仪",
+      "reason": "低中音稳而优雅，咖啡馆主理人的分寸",
+      "preview_text": "先坐会儿，咖啡马上就好。"
+    },
+    "real_cafe_regular": {
+      "voice_id": "navigator_kai",
+      "label": "航海家·开阔",
+      "reason": "宽亮从容带笑意，中年转行的松弛",
+      "preview_text": "我啊，就爱这一口手冲的味道。"
+    },
+    "real_kitchen_chef": {
+      "voice_id": "warm_male",
+      "label": "胖子·温厚",
+      "reason": "厚实温暖、语速慢，灶台边的家常气",
+      "preview_text": "锅里有热的，坐下吃点再走。"
+    },
+    "real_kitchen_regular": {
+      "voice_id": "young_male",
+      "label": "学霸·清亮",
+      "reason": "清亮偏快、尾音利落，年轻人的懒散劲",
+      "preview_text": "加完班，就馋这一口热汤。"
+    },
+    "custom_lin": {
+      "voice_id": "bright_female",
+      "label": "甜妹·明亮",
+      "reason": "清亮偏少女，贴年轻女学者的清爽",
+      "preview_text": "把旧材料讲成新故事，很有意思。"
+    }
+  }
+}

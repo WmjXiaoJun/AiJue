@@ -63,3 +63,31 @@ Stepper 六步，全部在页内完成：
 - **tpl-frontend**：A/B 两个新页面 + 导航/路由 + D 操作状态，接后端 API，tsc/build，截图
 - **studio-a**：角色声音选角方案（32 角色 → 24 preset 映射、每角色试听句、角色页文案），写 `contract/v5/voice_casting.json`（不改代码）
 - **Lead**：契约/集成/E2E（真实跑一条 job）/截图复核/docs/commit
+
+
+## 5. 交付结果（2026-11-02 17:20）
+
+### 已完成
+- **后端**（tpl-backend，46/46 HTTP 自测 PASS）：
+  - `backend/app/routers/pipeline_ui.py`：`POST /api/pipeline/run`（202 单并发 409）、`GET /run/{id}`（status/stage/stage_index/progress/log_tail/elapsed/final_url/error）、`POST /run/{id}/cancel`、`GET /runs`、`POST /api/projects/{pid}/apply-template`；子进程跑 `pipeline.templates3d_hq`，job 落 `outputs/pipeline_jobs/`
+  - `v5_catalog.py`：`GET /api/v5/casting?template=`（19/19 模板）、重写 `POST /api/v5/voice/{character}/preview`（breeze 优先→edge 兜底、缓存、支持 `voice_id` 参数试听音色库）、`/voices` 扩展 provider/preview_url
+  - `v5_studio.py`：兼容 `provider=edge` 写实角色，GET/PUT voice 不再 500
+- **前端**（tpl-frontend，tsc 0 / build 通过 / 页面 console 无 JS 错误）：
+  - `#/pipeline` 制片控制台：6 步（选模板 / 角色与声音 / 剧本预览 / 生成 3D / 成片 / 发布前检查）+ 顶部「一键全流程」+ 阶段 i/N 进度 + 日志尾 + 取消（二次确认）+ 失败重试 + 409 提示
+  - `#/characters` 角色与声音：32 角色网格 / 详情抽屉 / 24 preset 音色库弹层（试听·应用·恢复默认）/ 批量全部试听 / 搜索与模板 cast 筛选
+  - 路由与导航：平台首页 / Cinema / V5 / 工作台均加「一键成片」入口
+- **角色声音选角**（studio-a）：`contract/v5/voice_casting.json`（32 角色 → 24 preset，含 reason 与试听句）+ `contract/v5/custom/characters/*.json` 32 个 voice 覆盖 + `docs/V18_VOICE_CASTING.md`；`validate_catalog` errors 0；22 模板 cast 内 0 撞音
+- **流水线复用**：`templates3d_hq --reuse-shots`（已有镜头直接重剪辑；实测 real_street 10s 完成、输出大小一致）
+
+### 验证证据
+- API E2E（`tmp/v18/e2e.py`）：**12/12 PASS** —— pipeline run(202)→轮询→done(7/7)→final_url 200；voice preview 200 + wav 200；casting 200；voices 200；PUT/GET voice 生效；apply-template 200
+- UI E2E（tpl-frontend 脚本 + Lead Playwright `tmp/v18/ui_e2e_final.py`）：选模板 → 角色试听（触发 `/api/v5/voice/real_host/preview`）→ 剧本 → 复用合成运行中 → 完成 → 成片播放（tonight_show 41s/17.2MB）；取消→已取消；音色应用→GET 验证→恢复默认
+- 截图：`tmp/v18/ui/01_pipeline_templates_1680.png` … `12_platform_home_1680.png`（16 张）；Lead 复拍：`tmp/v18/ui/pipeline_step1.png`、`characters_page.png`
+- 后端自测报告：`tmp/v18/backend_selftest.md`；前端说明：`tmp/v18/NOTES.md`
+
+### 已知事项 / 建议
+1. 真实完整生成（非 reuse）单模板 20–45 分钟：UI 已支持从「生成 3D」发起并展示逐镜进度；本次 E2E 用 reuse_shots 快速验证状态机，真实 GPU 全流程可随时点「开始生成」跑
+2. 音色试听：当前环境 breeze 服务未启动 → 回退 edge-tts（音色接近但非 Breeze preset 原始音色）；启动 breeze（local_models/breeze-venv）后自动使用
+3. `/voices.preview_url` 现为 null（preset 无独立 wav），音色库试听走 preview 接口 `voice_id` 参数；后续可批量预生成
+4. 写实角色 custom 覆盖中 `provider=edge` 与 breeze voice_id 混用：后端已兜底（edge 按 instruction 映射）；如需严格 Breeze 音色，可启动 breeze 服务或统一 provider
+5. 项目切换模板：real_* 暂无同名 format，apply-template 回退 `classics_5min`（返回 `mapped=fallback_first`）；如需 exact 映射，可补 `contract/formats/real_*_5min.json`

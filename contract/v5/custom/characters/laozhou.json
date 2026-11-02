@@ -1,0 +1,8 @@
+{
+  "id": "laozhou",
+  "voice": {
+    "voice_id": "legacy_v4_laozhou",
+    "seed": 20261026,
+    "cfg_scale": 4.0
+  }
+}

@@ -456,7 +456,33 @@ def _resolved_voice(catalog: dict, character: str) -> dict:
     if not isinstance(char, dict):
         raise HTTPException(status_code=404, detail=f"角色不存在: {character}")
     library = v5_voices.load_voice_library()
-    spec = v5_voices.resolve_voice(char, library)
+    try:
+        spec = v5_voices.resolve_voice(char, library)
+    except Exception as exc:  # noqa: BLE001 - 写实角色用 edge 音色，没有 Breeze preset/seed
+        import hashlib
+
+        raw = char.get("voice") if isinstance(char.get("voice"), dict) else {}
+        provider = str(raw.get("provider") or "").strip().lower()
+        voice_id = str(raw.get("voice_id") or "").strip()
+        if provider != "edge" and not voice_id.lower().startswith("zh-cn-"):
+            raise HTTPException(status_code=400, detail=f"角色声音解析失败: {exc}") from exc
+        instruction = str(raw.get("instruction") or "")
+        spec = {
+            "character": character,
+            "voice_id": voice_id,
+            "provider": "edge",
+            "instruction": instruction,
+            "label": str(raw.get("label") or char.get("label") or ""),
+            "seed": raw.get("seed"),
+            "cfg_scale": raw.get("cfg_scale"),
+            "rate": str(raw.get("rate") or "+0%"),
+            "ref_audio": None,
+            "ref_text": None,
+            "preset": None,
+            "source": "edge",
+            "key": "edge:" + hashlib.sha1(
+                f"{voice_id}|{instruction}|{raw.get('rate') or ''}".encode("utf-8")).hexdigest()[:12],
+        }
     return {"spec": spec, "char": char, "library": library}
 
 
@@ -475,6 +501,8 @@ def get_voice(character: str):
             "voice_id": spec["voice_id"], "seed": spec["seed"],
             "cfg_scale": spec["cfg_scale"], "instruction": spec.get("instruction"),
             "key": spec["key"], "ref_text": spec.get("ref_text") or "",
+            "provider": spec.get("provider"), "label": spec.get("label"),
+            "rate": spec.get("rate"),
             "lock": lock, "needs_relock": bool(stale) or not lock.get("exists"),
             "stale_locks": stale}
 

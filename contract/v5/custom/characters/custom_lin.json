@@ -5,10 +5,8 @@
   "tags": ["custom", "example", "host", "scholar"],
   "role_pool": ["host", "narrator", "figure_a"],
   "voice": {
-    "provider": "breeze",
-    "instruction": "28岁女性，清亮温和，语速偏慢，带一点书卷气的讲述感",
-    "seed": 20262026,
-    "cfg_scale": 4.0
+    "voice_id": "bright_female",
+    "provider": "breeze"
   },
   "appearance": {
     "gender": "female",

@@ -6,6 +6,8 @@ import { ProjectStudio } from "./components/studio/Studio";
 import { PlatformHome } from "./components/platform/PlatformHome";
 import { V5World } from "./components/v5world/V5World";
 import { CinemaStudio } from "./components/cinema/CinemaStudio";
+import { PipelineConsole } from "./components/pipeline/PipelineConsole";
+import { CharactersPage } from "./components/characters/CharactersPage";
 import { BrandMark, IconRefresh } from "./components/icons";
 import { Spinner } from "./components/ui";
 
@@ -17,9 +19,11 @@ type ViewState =
   | { mode: "projects" }
   | { mode: "workspace"; project: Project; episode: Episode }
   | { mode: "v5" }
-  | { mode: "cinema" };
+  | { mode: "cinema" }
+  | { mode: "pipeline" }
+  | { mode: "characters" };
 
-function parseHash(): { eid?: string; tab: TabKey; v5?: boolean; cinema?: boolean } {
+function parseHash(): { eid?: string; tab: TabKey; v5?: boolean; cinema?: boolean; pipeline?: boolean; characters?: boolean } {
   const raw = window.location.hash.replace(/^#\/?/, "");
   const parts = raw.split("/").filter(Boolean);
   if (parts[0] === "cinema") {
@@ -27,6 +31,12 @@ function parseHash(): { eid?: string; tab: TabKey; v5?: boolean; cinema?: boolea
   }
   if (parts[0] === "v5") {
     return { tab: "script", v5: true };
+  }
+  if (parts[0] === "pipeline") {
+    return { tab: "script", pipeline: true };
+  }
+  if (parts[0] === "characters") {
+    return { tab: "script", characters: true };
   }
   if (parts[0] === "episodes" && parts[1]) {
     const tab = TAB_KEYS.includes(parts[2] as TabKey) ? (parts[2] as TabKey) : "script";
@@ -58,6 +68,7 @@ function Shell() {
   const [tab, setTab] = useState<TabKey>("script");
   const [taskStats, setTaskStats] = useState<{ activeJobs: number; cost: number }>({ activeJobs: 0, cost: 0 });
   const [retrying, setRetrying] = useState(false);
+  const [settingsSignal, setSettingsSignal] = useState(0);
 
   const viewRef = useRef(view);
   viewRef.current = view;
@@ -83,6 +94,10 @@ function Shell() {
           setView({ mode: "cinema" });
         } else if (route.v5) {
           setView({ mode: "v5" });
+        } else if (route.pipeline) {
+          setView({ mode: "pipeline" });
+        } else if (route.characters) {
+          setView({ mode: "characters" });
         } else if (route.eid) {
           const episode = await api.episode(route.eid);
           const project = list.find((item) => item.id === episode.project_id) || (await api.project(episode.project_id));
@@ -154,6 +169,16 @@ function Shell() {
       }
       if (route.v5) {
         setView({ mode: "v5" });
+        setTab("script");
+        return;
+      }
+      if (route.pipeline) {
+        setView({ mode: "pipeline" });
+        setTab("script");
+        return;
+      }
+      if (route.characters) {
+        setView({ mode: "characters" });
         setTab("script");
         return;
       }
@@ -269,6 +294,32 @@ function Shell() {
     if (window.location.hash !== "#/cinema/overview") window.location.hash = "#/cinema/overview";
   }, []);
 
+  const openPipeline = useCallback(() => {
+    setView({ mode: "pipeline" });
+    setEpisodes(null);
+    setTab("script");
+    setTaskStats({ activeJobs: 0, cost: 0 });
+    if (window.location.hash !== "#/pipeline") window.location.hash = "#/pipeline";
+  }, []);
+
+  const openCharacters = useCallback(() => {
+    setView({ mode: "characters" });
+    setEpisodes(null);
+    setTab("script");
+    setTaskStats({ activeJobs: 0, cost: 0 });
+    if (window.location.hash !== "#/characters") window.location.hash = "#/characters";
+  }, []);
+
+  /** 从任意页面打开「设置」：回到项目大厅并让 PlatformHome 打开设置弹层 */
+  const openSettings = useCallback(() => {
+    setSettingsSignal((prev) => prev + 1);
+    setView({ mode: "projects" });
+    setEpisodes(null);
+    setTab("script");
+    if (window.location.hash !== "#/projects") window.location.hash = "#/projects";
+    void loadProjects().catch(() => undefined);
+  }, [loadProjects]);
+
   const applyEpisodeUpdate = useCallback((next: Episode) => {
     setView((prev) => (prev.mode === "workspace" ? { ...prev, episode: next } : prev));
     setEpisodes((prev) => (prev ? prev.map((item) => (item.id === next.id ? next : item)) : prev));
@@ -342,6 +393,28 @@ function Shell() {
     return <CinemaStudio onExit={goHome} />;
   }
 
+  if (view.mode === "pipeline") {
+    return (
+      <PipelineConsole
+        onExit={goHome}
+        onOpenCharacters={openCharacters}
+        onOpenCinema={openCinema}
+        onOpenSettings={openSettings}
+      />
+    );
+  }
+
+  if (view.mode === "characters") {
+    return (
+      <CharactersPage
+        onExit={goHome}
+        onOpenPipeline={openPipeline}
+        onOpenCinema={openCinema}
+        onOpenSettings={openSettings}
+      />
+    );
+  }
+
   if (view.mode === "workspace") {
     return (
       <ProjectStudio
@@ -368,6 +441,7 @@ function Shell() {
         onOpenV5={openV5}
         onProjectCreated={(project) => void handleProjectCreated(project)}
         onRefreshProjects={() => void loadProjects()}
+        openSettingsSignal={settingsSignal}
       />
     );
   }

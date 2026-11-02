@@ -20,6 +20,8 @@ interface Props {
   onOpenV5: () => void;
   onProjectCreated: (project: Project) => void;
   onRefreshProjects: () => void | Promise<void>;
+  /** V18：其他页面「去设置」时递增，用于打开设置弹层 */
+  openSettingsSignal?: number;
 }
 
 type EpisodeMap = Record<string, Episode[]>;
@@ -73,6 +75,7 @@ export function PlatformHome({
   onOpenV5,
   onProjectCreated,
   onRefreshProjects,
+  openSettingsSignal,
 }: Props) {
   const notify = useToast();
   const [episodeMap, setEpisodeMap] = useState<EpisodeMap>({});
@@ -109,6 +112,11 @@ export function PlatformHome({
   useEffect(() => {
     void load(false);
   }, [load]);
+
+  // V18：其他页面点「去设置」→ 打开设置弹层
+  useEffect(() => {
+    if (openSettingsSignal && openSettingsSignal > 0) setSettingsOpen(true);
+  }, [openSettingsSignal]);
 
   const refresh = useCallback(async () => {
     setRefreshing(true);
@@ -163,20 +171,30 @@ export function PlatformHome({
             <span className="pl-nav-label">项目大厅</span>
             <span className="cm-nav-no">01</span>
           </button>
+          <a className="cm-nav-item" href="#/pipeline" title="一键成片：选模板 → 角色声音 → 剧本 → 生成 → 成片">
+            <IconSpark />
+            <span className="pl-nav-label">一键成片</span>
+            <span className="cm-nav-no">02</span>
+          </a>
+          <a className="cm-nav-item" href="#/characters" title="角色与声音：32 角色 / 24 音色 preset / 试听">
+            <IconUsers />
+            <span className="pl-nav-label">角色与声音</span>
+            <span className="cm-nav-no">03</span>
+          </a>
           <button type="button" className="cm-nav-item" onClick={onOpenCinema}>
             <IconFilm />
             <span className="pl-nav-label">Cinema 3D</span>
-            <span className="cm-nav-no">02</span>
+            <span className="cm-nav-no">04</span>
           </button>
           <button type="button" className="cm-nav-item" onClick={onOpenV5}>
             <IconWorld />
             <span className="pl-nav-label">V5 世界</span>
-            <span className="cm-nav-no">03</span>
+            <span className="cm-nav-no">05</span>
           </button>
           <button type="button" className="cm-nav-item" onClick={() => setSettingsOpen(true)}>
             <IconGear />
             <span className="pl-nav-label">设置</span>
-            <span className="cm-nav-no">04</span>
+            <span className="cm-nav-no">06</span>
           </button>
         </nav>
         <div className="cm-rail-foot">
@@ -222,6 +240,10 @@ export function PlatformHome({
             <button type="button" className="cm-icon-btn" title="刷新" onClick={() => void refresh()} disabled={refreshing}>
               {refreshing ? <Spinner size={13} /> : <IconRefresh />}
             </button>
+            <a className="cm-btn cm-btn-sm" href="#/pipeline" title="一键成片：复用已有镜头快速合成 3D 成片">
+              <IconSpark />
+              一键成片
+            </a>
             <button type="button" className="cm-btn cm-btn-primary" onClick={() => setNewOpen(true)}>
               <IconPlus />
               新建项目
@@ -603,6 +625,24 @@ function IconClose() {
   return (
     <svg {...S} width={14} height={14}>
       <path d="M6 6l12 12M18 6 6 18" />
+    </svg>
+  );
+}
+function IconSpark() {
+  return (
+    <svg {...S} width={15} height={15}>
+      <path d="M12 3.5 13.8 9l5.2 1.8-5.2 1.8L12 18l-1.8-5.4L5 10.8 10.2 9 12 3.5Z" />
+      <path d="M18.5 16.5l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7.7-2Z" />
+    </svg>
+  );
+}
+function IconUsers() {
+  return (
+    <svg {...S}>
+      <circle cx="9" cy="8" r="3.2" />
+      <path d="M3.5 19c.5-3.1 2.7-4.7 5.5-4.7S14 15.9 14.5 19" />
+      <circle cx="16.8" cy="9.2" r="2.4" />
+      <path d="M15.6 14.6c2.5-.2 4.4 1.2 4.9 4.1" />
     </svg>
   );
 }
