@@ -54,7 +54,8 @@
 | roundtable | ✅ done | 44.4 min | 41.78s / 15.1MB |
 | masked_singer | ✅ done | 27.2 min | 41.70s / 19.9MB |
 | national_treasure | ✅ done | 26.9 min | 41.06s / 15.4MB |
-| hot_ones | 🟡 跑中（5/8） | - | - |
+| hot_ones | ✅ done | 32.3 min | 38.58s / 14.0MB |
+| mystery | 🟡 跑中（4/8） | - | - |
 | mystery 起其余 9 个 | ⏳ 排队 | - | - |
 
 - 单模板实测 ~35–40 分钟（1024×576 T2VA + 7~9 个对话镜 ref2va + 剪辑海报）
