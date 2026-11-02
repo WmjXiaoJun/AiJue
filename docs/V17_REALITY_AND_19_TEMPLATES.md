@@ -100,3 +100,55 @@
 - 模板库页面截图：`tmp/v17/integration/templates_16done.png`（16/19 done + 3 写实 pending）
 
 **随后自动开始 3 个写实模板生成**（real_street → real_cafe → real_kitchen），预计 16:30–17:30 完成，完成后补 19 支最终校验。
+
+
+## 7. 交付完成（2026-11-02 16:21）
+
+**19/19 模板成片全部完成并校验通过**（API summary：`total=19, done=19, assembled=19, clips 141/141, pending=0`）。
+
+### 3 个写实新模板（真实人物 + 真实场景）
+
+| 模板 | 时长 | 大小 | 源分辨率 | 生成耗时 |
+|---|---|---|---|---|
+| real_street 城市夜访 | 35.21s | 14.4MB | 1024×576 | 22.4 min |
+| real_cafe 咖啡对谈 | 33.84s | 11.5MB | 1024×576 | 21.8 min |
+| real_kitchen 深夜食堂 | 33.56s | 10.5MB | 1024×576 | 21.8 min |
+
+- 全部 1280×720 / 25fps / H.264 + AAC / 有海报；角色：沈舟(主持)、陈野/李静/周岚/高远/老赵/阿凯
+- 场景：夜间街头/地铁口/便利店、咖啡馆窗边/吧台/沙发、家庭厨房灶台/餐桌/暖灯
+- 抽帧巡检：`tmp/v17/qa/qa_real_street.png`、`qa_real_cafe.png`、`qa_real_kitchen.png`（写实人物、场景与台词对应，无重复人物坏帧）
+
+### 19 支统一校验（`tmp/v17/verify19.py` → OK 19/19）
+
+| 模板 | 时长 | 大小 | 模板 | 时长 | 大小 |
+|---|---|---|---|---|---|
+| tonight_show | 41.61s | 16.4MB | classics | 42.25s | 17.2MB |
+| history_talk | 36.13s | 12.5MB | masked_singer | 41.70s | 19.0MB |
+| roundtable | 41.78s | 14.4MB | national_treasure | 41.06s | 15.2MB |
+| hot_ones | 38.58s | 13.4MB | mystery | 34.82s | 9.3MB |
+| qipashuo | 35.72s | 12.8MB | shark_tank | 31.51s | 14.1MB |
+| slow_life | 35.74s | 12.1MB | snl_sketch | 38.53s | 11.2MB |
+| standup | 41.31s | 11.0MB | taskmaster | 32.66s | 11.4MB |
+| traitors | 37.92s | 13.9MB | history_mystery | 40.83s | 13.8MB |
+| real_street | 35.21s | 14.4MB | real_cafe | 33.84s | 11.5MB |
+| real_kitchen | 33.56s | 10.5MB | | | |
+
+### 证据/入口
+
+- 模板库页面（19/19 done、写实徽章、筛选三档）：`tmp/v17/integration/templates_19done.png`
+- 平台首页（19 模板 · 3D 影库）：`tmp/v17/integration/home_19done.png`
+- V5 世界画廊：`tmp/v17/integration/v5_gallery_19done.png`
+- 19 帧总览：`tmp/v17/verify/montage19.png`
+- 播放：`http://127.0.0.1:8090/#/cinema/templates` → 任一模板「播放」
+- 直链示例：`/media/templates_3d/real_street/final.mp4`、`/media/templates_3d/classics/final.mp4`
+
+### 已知取舍 / 后续
+
+1. 对话镜为「T2VA 首帧 + ref2va 原生口型」，无贴片马赛克；但对话镜相对偏近景，运镜幅度小（b-roll 仍保留宽景/运镜）。
+2. 个别镜头可能出现人群/镜面细节瑕疵（如 hot_ones v5_002 疑似双人），已记录；需要时可按单镜换 seed 重生成（约 6 分钟/镜）。
+3. 若后续要更强运镜的对话镜，可改「远景首帧 + 更强运镜提示词」再跑一轮；或评估云端 H3（2K，约 ¥0.15/秒）做 b-roll。
+4. Upload-Post 发布仍等社交账号授权。
+
+### 提交记录（V17）
+
+`c6f7796` 支持 19 模板 pipeline；`c06515c` 写实模板数据+UI/后端动态化；`fc4df4e`/`fd6f6db`/`b885d5d`/`b24279b` 进度与修复；本文档最终更新。
