@@ -60,7 +60,8 @@
 | shark_tank | ✅ done | 28.3 min | 31.51s / 13.5MB |
 | slow_life | ✅ done | 30.8 min | 35.74s / 13.0MB |
 | snl_sketch | ✅ done | 32.7 min | 38.53s / 11.7MB |
-| standup | 🟡 跑中 | - | - |
+| standup | ✅ done | 33.9 min | 41.31s / 14.2MB |
+| taskmaster | 🟡 跑中 | - | - |
 | mystery 起其余 9 个 | ⏳ 排队 | - | - |
 
 - 单模板实测 ~35–40 分钟（1024×576 T2VA + 7~9 个对话镜 ref2va + 剪辑海报）
