@@ -17,18 +17,18 @@
   "cast": [
     {
       "role": "host",
-      "character": "real_host",
-      "name": "沈舟"
+      "character": "laozhou",
+      "name": "老周"
     },
     {
       "role": "figure_a",
-      "character": "real_cafe_owner",
-      "name": "周岚"
+      "character": "tianmei",
+      "name": "甜妹"
     },
     {
       "role": "figure_b",
-      "character": "real_cafe_regular",
-      "name": "高远"
+      "character": "dawei",
+      "name": "大魏"
     }
   ],
   "acts": [
@@ -162,6 +162,7 @@
   "meta": {
     "source": "v17_real_templates",
     "script_lines": 4,
-    "note": "白天咖啡馆对谈：窗边木桌 / 吧台 / 暖光"
+    "note": "白天咖啡馆对谈：窗边木桌 / 吧台 / 暖光",
+    "cast_remap": "V19: 纸片人角色删除后重映射到现有高质量角色"
   }
 }

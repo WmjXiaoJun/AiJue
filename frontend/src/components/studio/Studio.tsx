@@ -3,6 +3,7 @@ import type { Episode, Job, Project, Shot } from "../../types";
 import type { StudioTabKey } from "../../lib/studio";
 import { STUDIO_TABS, EPISODE_STATUS_TEXT, fmtClock, fmtMoney, isActiveJob, studioApi, toneOfStatus } from "../../lib/studio";
 import { useToast } from "../Toast";
+import { AppShell } from "../shell/AppShell";
 import { Spinner } from "../ui";
 import { StudioScripts } from "./Scripts";
 import { StudioAssets } from "./Assets";
@@ -22,6 +23,8 @@ interface Props {
   onBack: () => void;
   onEpisodeUpdate: (episode: Episode) => void;
   onSwitchEpisode: (eid: string) => void;
+  /** V19：AppShell 设置入口 */
+  onOpenSettings?: () => void;
 }
 
 export function ProjectStudio({
@@ -33,6 +36,7 @@ export function ProjectStudio({
   onBack,
   onEpisodeUpdate,
   onSwitchEpisode,
+  onOpenSettings,
 }: Props) {
   const notify = useToast();
   const [episode, setEpisode] = useState<Episode>(initialEpisode);
@@ -130,112 +134,51 @@ export function ProjectStudio({
   };
 
   return (
-    <div className="cm-app st-app">
-      <div className="st-main">
-        <header className="st-topbar">
-          <button type="button" className="st-back" onClick={onBack} title="返回项目列表">
-            <IconChevronLeft /> 平台
-          </button>
-
-          <div className="st-head-main">
-            <div className="st-breadcrumb">
-              <span>{project.name}</span>
-              <span>/</span>
-              <b>第 {episode.no} 期</b>
-              <span>/</span>
-              <span>{tabMeta.en}</span>
-            </div>
-            <div className="st-ep-row">
-              <h1 className="st-ep-title">{episode.title || project.name + " · 第 " + episode.no + " 期"}</h1>
-              {episodes.length > 1 && (
-                <select
-                  className="st-ep-select"
-                  value={episode.id}
-                  disabled={switching}
-                  onChange={(e) => {
-                    setSwitching(true);
-                    onSwitchEpisode(e.target.value);
-                  }}
-                  title="切换期数"
-                >
-                  {episodes.map((ep) => (
-                    <option key={ep.id} value={ep.id}>
-                      第 {ep.no} 期 · {ep.title || ep.id}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
-            <div className="st-top-meta">
-              <span className={"st-tag " + (toneOfStatus(episode.status) === "jade" ? "is-jade" : toneOfStatus(episode.status) === "gold" ? "is-gold" : toneOfStatus(episode.status) === "red" ? "is-red" : "is-slate")}>
-                <Dot />
-                {EPISODE_STATUS_TEXT[episode.status] || episode.status}
-              </span>
-              <span className="st-tag is-slate cm-mono">目标 {fmtClock(episode.target_duration)}</span>
-              {episode.resolution && <span className="st-tag is-slate cm-mono">{episode.resolution}</span>}
-              {episode.aspect && <span className="st-tag is-slate cm-mono">{episode.aspect}</span>}
-              <span className="st-tag is-slate cm-mono">{displayFormatId}</span>
-            </div>
-          </div>
-
-          <div className="st-top-stats">
-            <div className="st-stat">
-              <b className={shotsTotal > 0 && shotsReady >= shotsTotal ? "is-jade" : ""}>{shotsTotal}</b>
-              <span>镜头</span>
-            </div>
-            <div className="st-stat-divider" />
-            <div className="st-stat">
-              <b>{fmtClock(episode.target_duration)}</b>
-              <span>目标时长</span>
-            </div>
-            <div className="st-stat-divider" />
-            <div className="st-stat">
-              <b className="is-gold">{fmtMoney(costTotal)}</b>
-              <span>已花费</span>
-            </div>
-            <div className="st-stat-divider" />
-            <div className="st-stat">
-              <b className={activeJobs ? "is-gold" : "is-jade"}>{activeJobs}</b>
-              <span>进行中任务</span>
-            </div>
-          </div>
-
-          <div className="st-top-actions">
-            <button type="button" className="cm-icon-btn" onClick={() => void refresh()} title="刷新型数/任务">
-              {refreshing ? <Spinner size={13} /> : <IconRefresh />}
-            </button>
-          </div>
-        </header>
-
-        <nav className="st-tabbar">
-          {STUDIO_TABS.map((item) => (
-            <button
-              key={item.key}
-              type="button"
-              className={"st-tab" + (activeTab === item.key ? " is-active" : "")}
-              onClick={() => handleTabChange(item.key)}
-              title={item.desc}
-            >
-              <span className="st-tab-no">{item.no}</span>
-              <span className="st-tab-label">{item.label}</span>
-              <span className="st-tab-en">{item.en}</span>
-            </button>
-          ))}
-          <div className="st-tabbar-right">
-            <a className="st-tab-link" href="#/pipeline" title="一键成片 · 制片控制台">
-              一键成片 ↗
-            </a>
-            <a className="st-tab-link" href="#/cinema/templates" title="模板的 3D 样片与制作进度">
-              Cinema 3D ↗
-            </a>
-            <button type="button" className="st-tab-link" onClick={onBack}>
-              返回平台
-            </button>
-          </div>
-        </nav>
-
-
-        <main className="st-content">
+    <AppShell
+      active="projects"
+      kicker="WORKSPACE · 工作台"
+      title={episode.title || project.name + " · 第 " + episode.no + " 期"}
+      breadcrumb={[
+        { label: project.name },
+        { label: `第 ${episode.no} 期` },
+        { label: tabMeta.en },
+      ]}
+      titleExtra={
+        episodes.length > 1 ? (
+          <select
+            className="st-ep-select"
+            value={episode.id}
+            disabled={switching}
+            onChange={(e) => {
+              setSwitching(true);
+              onSwitchEpisode(e.target.value);
+            }}
+            title="切换期数"
+          >
+            {episodes.map((ep) => (
+              <option key={ep.id} value={ep.id}>
+                第 {ep.no} 期 · {ep.title || ep.id}
+              </option>
+            ))}
+          </select>
+        ) : undefined
+      }
+      tabs={STUDIO_TABS.map((item) => ({ key: item.key, no: item.no, label: item.label, en: item.en }))}
+      activeTab={activeTab}
+      onTabChange={(key) => handleTabChange(key as StudioTabKey)}
+      chips={[
+        { label: "镜头", value: `${shotsReady}/${shotsTotal}`, tone: shotsTotal > 0 && shotsReady >= shotsTotal ? "jade" : "slate" },
+        { label: "目标", value: fmtClock(episode.target_duration), tone: "slate" },
+        { label: "已花费", value: fmtMoney(costTotal), tone: "gold" },
+        { label: "进行中", value: String(activeJobs), tone: activeJobs ? "gold" : "slate" },
+        { label: "状态", value: EPISODE_STATUS_TEXT[episode.status] || episode.status, tone: "jade" },
+      ]}
+      primaryAction={{ label: "一键成片", href: "#/pipeline", title: "进入一键成片控制台" }}
+      onRefresh={() => void refresh()}
+      refreshing={refreshing}
+      onOpenSettings={onOpenSettings || (() => { window.location.hash = "#/projects"; })}
+    >
+      
           {activeTab === "script" ? (
             <StudioScripts {...tabProps} />
           ) : activeTab === "assets" ? (
@@ -249,9 +192,8 @@ export function ProjectStudio({
           ) : (
             <StudioFinishing {...tabProps} />
           )}
-        </main>
+        <>
 
-        <footer className="st-flow">
           <span className="st-flow-label">制片流水线</span>
           <div className="st-flow-steps">
             {STUDIO_TABS.map((item, index) => {
@@ -296,9 +238,8 @@ export function ProjectStudio({
               );
             })()}
           </div>
-        </footer>
-      </div>
-    </div>
+        </>
+    </AppShell>
   );
 }
 

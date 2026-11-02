@@ -7,6 +7,7 @@ import { v5api } from "../../lib/v5";
 import type { CinemaTemplate } from "../../lib/cinema";
 import { TEMPLATE_3D_TOTAL, cinemaApi } from "../../lib/cinema";
 import { useToast } from "../Toast";
+import { AppShell } from "../shell/AppShell";
 import { Spinner } from "../ui";
 import {
   IconAlert,
@@ -67,7 +68,7 @@ export interface V5PageProps {
   onRenderTemplate?: (id: string) => void;
 }
 
-export function V5World({ onExit, onCinema }: { onExit: () => void; onCinema: () => void }) {
+export function V5World({ onExit, onCinema, onOpenSettings }: { onExit: () => void; onCinema: () => void; onOpenSettings?: () => void }) {
   const notify = useToast();
 
   const [tab, setTab] = useState<V5WorldTab>(() => tabFromHash());
@@ -184,124 +185,26 @@ export function V5World({ onExit, onCinema }: { onExit: () => void; onCinema: ()
   };
 
   return (
-    <div className="cm-app v5w-app">
-      <aside className="cm-rail">
-        <button type="button" className="cm-brand" onClick={() => navigate("gallery")} title="V5 World">
-          <span className="cm-brand-seal">造</span>
-          <span className="cm-brand-txt">
-            <span className="cm-brand-name">V5 世界</span>
-            <span className="cm-brand-sub">Variable Style</span>
-          </span>
-        </button>
-
-        <div className="cm-rail-label">V5 内容库</div>
-        <nav className="cm-nav">
-          {TAB_KEYS.map((key) => (
-            <button
-              key={key}
-              type="button"
-              className={"cm-nav-item" + (tab === key ? " is-active" : "")}
-              onClick={() => navigate(key)}
-              title={TAB_META[key].desc}
-            >
-              {TAB_META[key].icon}
-              <span className="cm-nav-label">{TAB_META[key].label}</span>
-              <span className="cm-nav-no">{TAB_META[key].no}</span>
-            </button>
-          ))}
-        </nav>
-
-        <div className="cm-rail-foot">
-          <div className="cm-env-row" title="GET /api/v5/catalog">
-            <span className="cm-env-key">
-              <i className={"cm-env-dot " + (catalog ? "is-on" : error ? "is-off" : "is-warn")} />
-              <span className="cm-env-text">{catalog ? "V5 目录已连接" : error ? "V5 目录离线" : "读取中…"}</span>
-            </span>
-          </div>
-          <div className="cm-env-row">
-            <span className="cm-env-key">
-              <i className="cm-env-dot is-on" />
-              <span className="cm-env-text">
-                {stats.styles} 风格 · {stats.scenes} 场景
-              </span>
-            </span>
-          </div>
-          <div className="cm-env-row">
-            <span className="cm-env-key">
-              <i className="cm-env-dot is-on" />
-              <span className="cm-env-text">
-                3D 成片 {stats.threeDDone}/{stats.threeDExpected}
-              </span>
-            </span>
-          </div>
-          <button type="button" className="cm-back-link" onClick={onCinema} title="Cinema Studio · 3D 电影制片">
-            <IconFilm size={14} /> <span className="cm-env-text">Cinema 3D</span>
-          </button>
-          <a className="cm-back-link" href="#/pipeline" title="一键成片 · 制片控制台">
-            <IconSpark size={14} /> <span className="cm-env-text">一键成片</span>
-          </a>
-          <button type="button" className="cm-back-link" onClick={onExit} title="返回项目大厅">
-            <IconArrowLeft /> <span className="cm-env-text">返回平台</span>
-          </button>
-        </div>
-      </aside>
-
-      <div className="cm-main">
-        <header className="cm-topbar">
-          <div className="cm-top-project">
-            <span className="cm-kicker">V5 · VARIABLE STYLE WORLD · 可变风格世界</span>
-            <div className="cm-top-title-row">
-              <h1 className="cm-top-title">V5 世界</h1>
-              <span className="cm-top-ep">
-                {TAB_META[tab].no} / {TAB_META[tab].en} · {TAB_META[tab].label}
-              </span>
-            </div>
-          </div>
-
-          <div className="cm-top-stats">
-            <div className="cm-top-stat">
-              <b style={{ color: "var(--c-gold)" }}>
-                {stats.threeDDone}
-                <span style={{ color: "var(--c-mut)" }}>/{stats.threeDExpected}</span>
-              </b>
-              <span>3D 成片</span>
-            </div>
-            <div className="cm-top-stat">
-              <b className="is-jade">
-                {stats.threeDClipsDone}
-                <span style={{ color: "var(--c-mut)" }}>/{stats.threeDClipsTotal || "—"}</span>
-              </b>
-              <span>3D 镜头</span>
-            </div>
-            <div className="cm-top-stat">
-              <b>
-                {stats.styles}
-                <span style={{ color: "var(--c-mut)" }}>/{stats.scenes}</span>
-              </b>
-              <span>风格 / 场景</span>
-            </div>
-            <div className="cm-top-stat">
-              <b>{stats.threeDExpected}</b>
-              <span>3D 模板</span>
-            </div>
-          </div>
-
-          <div className="cm-top-actions">
-            <button
-              type="button"
-              className={"cm-icon-btn" + (refreshing ? " is-busy" : "")}
-              onClick={() => void refresh()}
-              title="刷新 V5 目录 / 成片 / 3D 状态"
-            >
-              {refreshing ? <Spinner size={14} /> : <IconRefresh />}
-            </button>
-            <button type="button" className="cm-btn cm-btn-sm" onClick={onCinema}>
-              <IconFilm size={14} /> Cinema 3D
-            </button>
-          </div>
-        </header>
-
-        <main className="cm-content">
+    <AppShell
+      active="v5"
+      kicker="V5 · VARIABLE STYLE WORLD"
+      title="V5 世界"
+      breadcrumb={[{ label: "造片局" }, { label: `${TAB_META[tab].no} · ${TAB_META[tab].en}` }]}
+      tabs={TAB_KEYS.map((key) => ({ key, no: TAB_META[key].no, label: TAB_META[key].label, en: TAB_META[key].en }))}
+      activeTab={tab}
+      onTabChange={(key) => navigate(key as V5WorldTab)}
+      chips={[
+        { label: "3D 成片", value: `${stats.threeDDone}/${stats.threeDExpected}`, tone: "gold" },
+        { label: "3D 镜头", value: `${stats.threeDClipsDone}/${stats.threeDClipsTotal || "—"}`, tone: "slate" },
+        { label: "风格/场景", value: `${stats.styles}/${stats.scenes}`, tone: "slate" },
+        { label: "模板", value: String(stats.threeDExpected), tone: "jade" },
+      ]}
+      primaryAction={{ label: "打开渲染台", onClick: () => navigate("render"), title: "选择模板 + 时长提交渲染" }}
+      onRefresh={() => void refresh()}
+      refreshing={refreshing}
+      onOpenSettings={onOpenSettings || (() => { window.location.hash = "#/projects"; })}
+    >
+      
           {(error || templates3dError) && (
             <div className="v5w-banners">
               {error && (
@@ -335,9 +238,7 @@ export function V5World({ onExit, onCinema }: { onExit: () => void; onCinema: ()
           ) : (
             <V5Render {...pageProps} onRendered={() => void load(true)} />
           )}
-        </main>
-      </div>
-    </div>
+    </AppShell>
   );
 }
 

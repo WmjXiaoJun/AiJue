@@ -9,6 +9,7 @@ import { useToast } from "../Toast";
 import { Spinner } from "../ui";
 import { BrandMark } from "../icons";
 import { SettingsModal } from "../SettingsModal";
+import { AppShell } from "../shell/AppShell";
 import "../../styles/cinema.css";
 import "../../styles/platform.css";
 
@@ -153,105 +154,23 @@ export function PlatformHome({
   const activeJobs = jobs.filter(isActiveJob).length;
 
   return (
-    <div className="cm-app pl-app">
-      <aside className="cm-rail">
-        <div className="cm-brand">
-          <div className="cm-brand-seal">
-            <BrandMark size={30} />
-          </div>
-          <div className="cm-brand-txt">
-            <span className="cm-brand-name">造片局</span>
-            <span className="cm-brand-sub">CINEMA STUDIO</span>
-          </div>
-        </div>
-        <div className="cm-rail-label">制片流程</div>
-        <nav className="cm-nav">
-          <button type="button" className="cm-nav-item is-active">
-            <IconGrid />
-            <span className="pl-nav-label">项目大厅</span>
-            <span className="cm-nav-no">01</span>
-          </button>
-          <a className="cm-nav-item" href="#/pipeline" title="一键成片：选模板 → 角色声音 → 剧本 → 生成 → 成片">
-            <IconSpark />
-            <span className="pl-nav-label">一键成片</span>
-            <span className="cm-nav-no">02</span>
-          </a>
-          <a className="cm-nav-item" href="#/characters" title="角色与声音：32 角色 / 24 音色 preset / 试听">
-            <IconUsers />
-            <span className="pl-nav-label">角色与声音</span>
-            <span className="cm-nav-no">03</span>
-          </a>
-          <button type="button" className="cm-nav-item" onClick={onOpenCinema}>
-            <IconFilm />
-            <span className="pl-nav-label">Cinema 3D</span>
-            <span className="cm-nav-no">04</span>
-          </button>
-          <button type="button" className="cm-nav-item" onClick={onOpenV5}>
-            <IconWorld />
-            <span className="pl-nav-label">V5 世界</span>
-            <span className="cm-nav-no">05</span>
-          </button>
-          <button type="button" className="cm-nav-item" onClick={() => setSettingsOpen(true)}>
-            <IconGear />
-            <span className="pl-nav-label">设置</span>
-            <span className="cm-nav-no">06</span>
-          </button>
-        </nav>
-        <div className="cm-rail-foot">
-          <div className={`pl-env ${offline ? "is-off" : ""}`}>
-            <i className="cm-status-dot" />
-            {offline ? "后端未连接" : "后端已连接"}
-          </div>
-          <div className="pl-env-sub">v1.0.0 · 模式 comfyui</div>
-        </div>
-      </aside>
-
-      <div className="cm-main">
-        <header className="cm-topbar">
-          <div className="pl-top-left">
-            <span className="cm-kicker">PRODUCTION BOARD · 造片局</span>
-            <h1 className="pl-h1">项目大厅</h1>
-          </div>
-          <div className="pl-top-stats">
-            <div className="pl-top-stat">
-              <b>{projects.length}</b>
-              <span>项目</span>
-            </div>
-            <div className="pl-top-stat">
-              <b>{allEpisodes.length}</b>
-              <span>期数</span>
-            </div>
-            <div className="pl-top-stat">
-              <b className="is-jade">{finishedCount}</b>
-              <span>成片</span>
-            </div>
-            <div className="pl-top-stat">
-              <b className="is-gold">{tplDone}/{tplTotal}</b>
-              <span>3D 模板</span>
-            </div>
-            {activeJobs > 0 && (
-              <div className="pl-top-stat">
-                <b className="is-gold">{activeJobs}</b>
-                <span>进行中任务</span>
-              </div>
-            )}
-          </div>
-          <div className="pl-top-actions">
-            <button type="button" className="cm-icon-btn" title="刷新" onClick={() => void refresh()} disabled={refreshing}>
-              {refreshing ? <Spinner size={13} /> : <IconRefresh />}
-            </button>
-            <a className="cm-btn cm-btn-sm" href="#/pipeline" title="一键成片：复用已有镜头快速合成 3D 成片">
-              <IconSpark />
-              一键成片
-            </a>
-            <button type="button" className="cm-btn cm-btn-primary" onClick={() => setNewOpen(true)}>
-              <IconPlus />
-              新建项目
-            </button>
-          </div>
-        </header>
-
-        <main className="pl-content">
+    <AppShell
+      active="projects"
+      kicker="PRODUCTION BOARD · 造片局"
+      title="项目大厅"
+      chips={[
+        { label: "项目", value: String(projects.length) },
+        { label: "期数", value: String(allEpisodes.length), tone: "slate" },
+        { label: "成片", value: String(finishedCount), tone: "jade" },
+        { label: "3D 模板", value: `${tplDone}/${tplTotal}`, tone: "gold" },
+        ...(activeJobs > 0 ? [{ label: "进行中", value: String(activeJobs), tone: "gold" as const }] : []),
+      ]}
+      primaryAction={{ label: "新建项目", onClick: () => setNewOpen(true), icon: <IconPlus />, title: "新建项目（从节目模板开始）" }}
+      onRefresh={() => void refresh()}
+      refreshing={refreshing}
+      onOpenSettings={() => setSettingsOpen(true)}
+    >
+      <main className="pl-content">
           {loading ? (
             <div className="cm-loading">
               <Spinner size={15} /> 正在读取项目数据…
@@ -433,8 +352,7 @@ export function PlatformHome({
               </div>
             </>
           )}
-        </main>
-      </div>
+      </main>
 
       <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} health={{ status: offline ? "offline" : "ok" }} />
       <NewProjectPanel
@@ -446,7 +364,7 @@ export function PlatformHome({
           notify(`项目「${project.name}」已创建`, "success");
         }}
       />
-    </div>
+    </AppShell>
   );
 
   async function createEpisodeFor(pid: string) {

@@ -84,3 +84,38 @@
 - **tpl-frontend**：AppShell + 全站迁移（本轮唯一前端写者）
 - **studio-a**：角色删除 + 模板 cast 重映射 + voice_casting 清理 + 校验
 - **Lead**：审计/规范/复核/E2E/截图/commit/交付
+
+
+## 7. 交付结果（2026-11-02 18:05）
+
+### 全局 AppShell（已上线）
+- 新增 `frontend/src/components/shell/AppShell.tsx` + `styles/shell.css`：
+  - **240px 主轨**（≤1280 收 72px 图标轨；<1024 汉堡抽屉）+ **64px 顶栏** + **上下文水平 tabs** + 内容容器（max 1600 / padding 28）
+  - 主轨 6 项：项目大厅 01 / 一键成片 02 / 角色与声音 03 / 模板库 04 / V5 世界 05 / 设置 06；底部后端 / GPU / pipeline 状态（12s 只读轮询）
+  - 顶栏：kicker + 面包屑 + 标题（支持工作台期数切换 titleExtra）+ 统一状态 chips + 刷新 + **单一主 CTA**
+- 8 条路由全部迁入同一 shell（项目大厅 / 一键成片 / 角色与声音 / Cinema 6 tab / V5 6 tab / 工作台 01-06 / 设置弹层）
+- 删除：4 套独立品牌块/侧栏/顶栏、`返回平台`、`Cinema 3D ↗`、`一键成片 ↗`、底部重复流程条
+- 视觉锁死：暗金 tokens、KaiTi 品牌字、卡片 12px / 控件 8px / chip 全圆、低饱和黑金阴影
+- 验证：`tsc` 0 error、`vite build` 通过；1680/1280/1024 三档 8 路由截图，console 无 JS error（`tmp/v19/ui/` + `tmp/v19/after_lead/`）
+
+### 角色清理（已完成）
+- 删除 8 个纸片人占位角色（15 个文件）：`custom_lin` + 7 个 `real_*`（无概念图，渲染为灰纸片人）
+- 3 个写实模板 cast 重映射：
+  - real_street: 老周 / 学霸 / 甜妹
+  - real_cafe: 老周 / 甜妹 / 大魏
+  - real_kitchen: 老周 / 胖子 / 学霸
+- `custom_holo_talk` cast 同步；`voice_casting.json` 清理为 24 角色；`docs/V19_CHARACTER_CLEANUP.md` 记录
+- 校验：`load_catalog` errors 0、角色 24、22 模板 cast 悬空 0、`/api/v5/casting?template=real_*` 返回新 cast、已删角色 voice 接口 404（预期）
+- 角色页 32 → **24 卡**，无纸片人
+
+### 证据
+- before（旧 4 套外壳）：`tmp/v19/before/`（8 路由 1680）
+- after（新 shell）：`tmp/v19/after_lead/`（8 路由 1680 + 1280 + 1024）
+- 前端自测截图：`tmp/v19/ui/`（before/after 各 8 + 1280/1024 各 8），说明 `tmp/v19/NOTES.md`
+- 角色清理校验：`tmp/v19/character_cleanup_check_output.txt`
+- 构建：`frontend/dist`（577KB JS / gzip 167KB）
+
+### 遗留（影响说明）
+1. `outputs/templates_v5/real_*/work/episode.json` 仍记录旧写实角色 cast（outputs 未改）；若重新生成 3 支写实模板，会按新 cast 出片（外观变化），属预期
+2. 旧外壳 CSS 类（`.cm-rail/.cm-topbar/.st-topbar/.st-flow` 等）已无引用但仍保留，后续清理
+3. 角色页仍有个别图片 404 回退（多级立绘回退逻辑），不影响功能；可后续批量生成统一立绘

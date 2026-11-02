@@ -390,7 +390,7 @@ function Shell() {
   }
 
   if (view.mode === "cinema") {
-    return <CinemaStudio onExit={goHome} />;
+    return <CinemaStudio onExit={goHome} onOpenSettings={openSettings} />;
   }
 
   if (view.mode === "pipeline") {
@@ -427,6 +427,7 @@ function Shell() {
         onBack={goHome}
         onEpisodeUpdate={applyEpisodeUpdate}
         onSwitchEpisode={switchEpisode}
+        onOpenSettings={openSettings}
       />
     );
   }
@@ -447,7 +448,7 @@ function Shell() {
   }
 
   if (view.mode === "v5") {
-    return <V5World onExit={goHome} onCinema={openCinema} />;
+    return <V5World onExit={goHome} onCinema={openCinema} onOpenSettings={openSettings} />;
   }
 
   return null;

@@ -17,18 +17,18 @@
   "cast": [
     {
       "role": "host",
-      "character": "real_host",
-      "name": "沈舟"
+      "character": "laozhou",
+      "name": "老周"
     },
     {
       "role": "figure_a",
-      "character": "real_street_runner",
-      "name": "陈野"
+      "character": "xueba",
+      "name": "学霸"
     },
     {
       "role": "figure_b",
-      "character": "real_street_owner",
-      "name": "李静"
+      "character": "tianmei",
+      "name": "甜妹"
     }
   ],
   "acts": [
@@ -162,6 +162,7 @@
   "meta": {
     "source": "v17_real_templates",
     "script_lines": 4,
-    "note": "夜间城市街头采访：便利店门口 / 地铁口 / 霓虹街"
+    "note": "夜间城市街头采访：便利店门口 / 地铁口 / 霓虹街",
+    "cast_remap": "V19: 纸片人角色删除后重映射到现有高质量角色"
   }
 }

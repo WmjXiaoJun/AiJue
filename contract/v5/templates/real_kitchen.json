@@ -17,18 +17,18 @@
   "cast": [
     {
       "role": "host",
-      "character": "real_host",
-      "name": "沈舟"
+      "character": "laozhou",
+      "name": "老周"
     },
     {
       "role": "figure_a",
-      "character": "real_kitchen_regular",
-      "name": "阿凯"
+      "character": "pangzi",
+      "name": "胖子"
     },
     {
       "role": "figure_b",
-      "character": "real_kitchen_chef",
-      "name": "老赵"
+      "character": "xueba",
+      "name": "学霸"
     }
   ],
   "acts": [
@@ -162,6 +162,7 @@
   "meta": {
     "source": "v17_real_templates",
     "script_lines": 4,
-    "note": "夜晚家庭厨房：灶台 / 餐桌 / 暖灯"
+    "note": "夜晚家庭厨房：灶台 / 餐桌 / 暖灯",
+    "cast_remap": "V19: 纸片人角色删除后重映射到现有高质量角色"
   }
 }

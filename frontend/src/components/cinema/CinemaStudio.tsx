@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { CinemaOverview, CinemaTab, CinemaTemplatesSummary, CinemaWorkers } from "../../lib/cinema";
 import { TEMPLATE_3D_TOTAL, cinemaApi } from "../../lib/cinema";
 import { useToast } from "../Toast";
+import { AppShell } from "../shell/AppShell";
 import { Spinner } from "../ui";
 import { IconSpark, IconTemplate } from "../icons";
 import { CinemaOverviewPage } from "./Overview";
@@ -29,7 +30,7 @@ function tabFromHash(): CinemaTab {
   return TAB_KEYS.includes(key) ? key : "overview";
 }
 
-export function CinemaStudio({ onExit }: { onExit: () => void }) {
+export function CinemaStudio({ onExit, onOpenSettings }: { onExit: () => void; onOpenSettings?: () => void }) {
   const notify = useToast();
   const [tab, setTab] = useState<CinemaTab>(() => tabFromHash());
   const [overview, setOverview] = useState<CinemaOverview | null>(null);
@@ -111,114 +112,26 @@ export function CinemaStudio({ onExit }: { onExit: () => void }) {
   }, [workers]);
 
   return (
-    <div className="cm-app">
-      <aside className="cm-rail">
-        <button type="button" className="cm-brand" onClick={() => navigate("overview")} title="Cinema Studio">
-          <span className="cm-brand-seal">造</span>
-          <span className="cm-brand-txt">
-            <span className="cm-brand-name">造片局</span>
-            <span className="cm-brand-sub">Cinema Studio</span>
-          </span>
-        </button>
-
-        <div className="cm-rail-label">制片流程</div>
-        <nav className="cm-nav">
-          {TAB_KEYS.map((key) => (
-            <button
-              key={key}
-              type="button"
-              className={"cm-nav-item" + (tab === key ? " is-active" : "")}
-              onClick={() => navigate(key)}
-              title={TAB_META[key].label}
-            >
-              {TAB_META[key].icon}
-              <span className="cm-nav-label">{TAB_META[key].label}</span>
-              <span className="cm-nav-no">{TAB_META[key].no}</span>
-            </button>
-          ))}
-        </nav>
-
-        <div className="cm-rail-foot">
-          <div className="cm-env-row" title="ComfyUI:8188 / MetaSo Key">
-            <span className="cm-env-key">
-              <i className={"cm-env-dot " + envState.cls} />
-              <span className="cm-env-text">{envState.label}</span>
-            </span>
-          </div>
-          <div className="cm-env-row">
-            <span className="cm-env-key">
-              <i className={"cm-env-dot " + (workers?.comfyui ? "is-on" : "is-off")} />
-              <span className="cm-env-text">ComfyUI · {workers?.comfyui_queue ?? 0} 队</span>
-            </span>
-          </div>
-          <a className="cm-back-link" href="#/pipeline" title="一键成片 · 制片控制台">
-            <IconSpark size={14} /> <span className="cm-env-text">一键成片</span>
-          </a>
-          <button type="button" className="cm-back-link" onClick={onExit}>
-            <IconBack /> <span className="cm-env-text">返回平台</span>
-          </button>
-        </div>
-      </aside>
-
-      <div className="cm-main">
-        <header className="cm-topbar">
-          <div className="cm-top-project">
-            <span className="cm-kicker">Cinema Studio · 3D 制片</span>
-            <div className="cm-top-title-row">
-              <h1 className="cm-top-title">{overview?.project?.name || "国宝会说话 · 3D"}</h1>
-              <span className="cm-top-ep">
-                {overview?.project?.episode_id || "ep_5610123283"} · {overview?.template?.label || "国宝会说话 · 3D"}
-              </span>
-            </div>
-          </div>
-
-          <div className="cm-top-stats">
-            <div className="cm-top-stat">
-              <b>
-                {total - (shots?.missing ?? 0)}<span style={{ color: "var(--c-mut)" }}>/{total}</span>
-              </b>
-              <span>镜头就绪</span>
-            </div>
-            <div className="cm-top-stat">
-              <b>{finalDur ? formatDuration(finalDur) : "—"}</b>
-              <span>成片</span>
-            </div>
-            <div className="cm-top-stat">
-              <b style={{ color: activeJobs ? "var(--c-gold)" : "var(--c-jade)" }}>{activeJobs}</b>
-              <span>进行中任务</span>
-            </div>
-            <div className="cm-top-stat">
-              <b
-                style={{
-                  color:
-                    tplSummary && tplSummary.done > 0 && tplSummary.done >= tplTotal
-                      ? "var(--c-jade)"
-                      : "var(--c-gold-soft)",
-                }}
-                title={`${tplTotal} 个模板的 3D 化完成数`}
-              >
-                {tplSummary ? `${tplSummary.done}/${tplTotal}` : `—/${TEMPLATE_3D_TOTAL}`}
-              </b>
-              <span>模板 3D</span>
-            </div>
-          </div>
-
-          <div className="cm-top-actions">
-            <button
-              type="button"
-              className={"cm-icon-btn" + (refreshing ? " is-busy" : "")}
-              onClick={() => void refresh()}
-              title="刷新项目数据"
-            >
-              {refreshing ? <Spinner size={14} /> : <IconRefresh />}
-            </button>
-            <button type="button" className="cm-btn cm-btn-sm" onClick={() => navigate("assemble")}>
-              <IconSliders /> 剪辑成片
-            </button>
-          </div>
-        </header>
-
-        <main className="cm-content">
+    <AppShell
+      active="cinema"
+      kicker="CINEMA STUDIO · 3D 制片"
+      title={overview?.project?.name || "国宝会说话 · 3D"}
+      breadcrumb={[{ label: "造片局" }, { label: overview?.project?.episode_id || "ep_5610123283" }]}
+      tabs={TAB_KEYS.map((key) => ({ key, no: TAB_META[key].no, label: TAB_META[key].label, en: TAB_META[key].en }))}
+      activeTab={tab}
+      onTabChange={(key) => navigate(key as CinemaTab)}
+      chips={[
+        { label: "镜头就绪", value: `${total - (shots?.missing ?? 0)}/${total}`, tone: "slate" },
+        { label: "成片", value: finalDur ? formatDuration(finalDur) : "—", tone: finalDur ? "jade" : "slate" },
+        { label: "进行中", value: String(activeJobs), tone: activeJobs ? "gold" : "slate" },
+        { label: "模板 3D", value: `${tplSummary?.done ?? 0}/${tplTotal}`, tone: "gold" },
+      ]}
+      primaryAction={{ label: "剪辑成片", onClick: () => navigate("assemble"), title: "进入剪辑台合成成片" }}
+      onRefresh={() => void refresh()}
+      refreshing={refreshing}
+      onOpenSettings={onOpenSettings || (() => { window.location.hash = "#/projects"; })}
+    >
+      
           {loading && !overview ? (
             <div className="cm-page">
               <div className="cm-loading">
@@ -251,9 +164,7 @@ export function CinemaStudio({ onExit }: { onExit: () => void }) {
           ) : (
             <CinemaFinal />
           )}
-        </main>
-      </div>
-    </div>
+    </AppShell>
   );
 }
 

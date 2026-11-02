@@ -1,13 +1,13 @@
 {
   "id": "custom_holo_talk",
   "label": "全息史料夜话（示例）",
-  "description": "示例自定义模板：引用 custom_holo_paper 风格 + custom_lin 角色 + custom_holo_gallery 场景，展示模板/acts 写法。",
+  "description": "示例自定义模板：引用 custom_holo_paper 风格 + laozhou 角色 + custom_holo_gallery 场景，展示模板/acts 写法。",
   "tags": ["custom", "example"],
   "style": "custom_holo_paper",
   "target_duration": 30,
   "aspect": [16, 9],
   "cast": [
-    { "role": "host", "character": "custom_lin", "wardrobe": "hanfu_jacket" }
+    { "role": "host", "character": "laozhou", "wardrobe": "hanfu_jacket" }
   ],
   "acts": [
     {

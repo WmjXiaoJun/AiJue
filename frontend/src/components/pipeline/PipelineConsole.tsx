@@ -16,6 +16,7 @@ import { fallbackCasting, voiceApi } from "../../lib/voice";
 import { useToast } from "../Toast";
 import { Spinner } from "../ui";
 import { IconAlert, IconFilm, IconGlobe, IconGrid, IconLock, IconRefresh, IconSettings, IconSpark, IconTemplate, IconUsers, IconVideo } from "../icons";
+import { AppShell } from "../shell/AppShell";
 import { PipelineStepper, type PipelineStepMeta } from "./PipelineStepper";
 import {
   ErrorBar,
@@ -462,106 +463,28 @@ export function PipelineConsole({ onExit, onOpenCharacters, onOpenCinema, onOpen
   const doneCount = templates.filter((item) => item.final.exists).length;
 
   return (
-    <div className="cm-app v18-app">
-      <aside className="cm-rail">
-        <button type="button" className="cm-brand" onClick={onExit} title="返回项目大厅">
-          <span className="cm-brand-seal">造</span>
-          <span className="cm-brand-txt">
-            <span className="cm-brand-name">造片局</span>
-            <span className="cm-brand-sub">ONE-CLICK STUDIO</span>
-          </span>
-        </button>
-        <div className="cm-rail-label">制片流程</div>
-        <nav className="cm-nav">
-          <button type="button" className="cm-nav-item" onClick={onExit}>
-            <IconGrid /> <span className="cm-nav-label">项目大厅</span> <span className="cm-nav-no">01</span>
-          </button>
-          <button type="button" className="cm-nav-item is-active">
-            <IconSpark /> <span className="cm-nav-label">一键成片</span> <span className="cm-nav-no">02</span>
-          </button>
-          <button type="button" className="cm-nav-item" onClick={onOpenCharacters}>
-            <IconUsers /> <span className="cm-nav-label">角色与声音</span> <span className="cm-nav-no">03</span>
-          </button>
-          <button type="button" className="cm-nav-item" onClick={onOpenCinema}>
-            <IconFilm /> <span className="cm-nav-label">Cinema 3D</span> <span className="cm-nav-no">04</span>
-          </button>
-          <button type="button" className="cm-nav-item" onClick={onOpenSettings}>
-            <IconSettings /> <span className="cm-nav-label">设置</span> <span className="cm-nav-no">05</span>
-          </button>
-        </nav>
-        <div className="cm-rail-foot">
-          <div className="cm-env-row">
-            <span className="cm-env-key">
-              <i className={"cm-env-dot " + (templates.length ? "is-on" : loadError ? "is-off" : "is-warn")} />
-              <span className="cm-env-text">{templates.length ? "3D 模板已连接" : loadError ? "3D 模板离线" : "读取中…"}</span>
-            </span>
-          </div>
-          <div className="cm-env-row">
-            <span className="cm-env-key">
-              <i className="cm-env-dot is-on" />
-              <span className="cm-env-text">
-                成片 {doneCount}/{templates.length || "—"} · 音色 {presets.length}
-              </span>
-            </span>
-          </div>
-          <div className="cm-env-row">
-            <span className="cm-env-key">
-              <i className={"cm-env-dot " + (activeRun ? "is-warn" : "is-on")} />
-              <span className="cm-env-text">{activeRun ? "pipeline 运行中" : "pipeline 空闲"}</span>
-            </span>
-          </div>
-          <button type="button" className="cm-back-link" onClick={onExit}>
-            <IconGrid size={14} /> <span className="cm-env-text">返回平台</span>
-          </button>
-        </div>
-      </aside>
-
-      <div className="cm-main">
-        <header className="cm-topbar">
-          <div className="cm-top-project">
-            <span className="cm-kicker">ONE-CLICK PRODUCTION · 一键成片</span>
-            <div className="cm-top-title-row">
-              <h1 className="cm-top-title">制片控制台</h1>
-              <span className="cm-top-ep">
-                {selectedTemplate ? `${selectedTemplate.id} · ${selectedTemplate.label}` : "选择模板 → 角色声音 → 剧本 → 生成 → 成片"}
-              </span>
-            </div>
-          </div>
-          <div className="cm-top-stats">
-            <div className="cm-top-stat">
-              <b className="is-gold">
-                {doneCount}
-                <span style={{ color: "var(--c-mut)" }}>/{templates.length || "—"}</span>
-              </b>
-              <span>3D 成片</span>
-            </div>
-            <div className="cm-top-stat">
-              <b className={run?.status === "running" ? "is-gold" : "is-jade"}>{runStatusText}</b>
-              <span>pipeline</span>
-            </div>
-            <div className="cm-top-stat">
-              <b>{presets.length || "—"}</b>
-              <span>音色</span>
-            </div>
-          </div>
-          <div className="cm-top-actions v18-top-actions">
-            <button type="button" className="cm-icon-btn" onClick={() => void refresh()} disabled={refreshing} title="刷新全部数据">
-              {refreshing ? <Spinner size={14} /> : <IconRefresh />}
-            </button>
-            <button
-              type="button"
-              className="cm-btn cm-btn-primary cm-btn-sm"
-              onClick={oneClick}
-              disabled={starting || activeRun || !selectedId}
-              title={!selectedId ? "先在第 ① 步选模板" : "复用已有镜头 → 快速合成 3D 成片 → 发布前检查"}
-            >
-              {starting ? <Spinner size={13} /> : <IconSpark size={14} />} 一键全流程
-            </button>
-          </div>
-        </header>
-
-        <main className="cm-content">
-          <div className="v18-page">
+    <AppShell
+      active="pipeline"
+      kicker="ONE-CLICK PRODUCTION · 一键成片"
+      title="制片控制台"
+      breadcrumb={selectedTemplate ? [{ label: "造片局" }, { label: `${selectedTemplate.id} · ${selectedTemplate.label}` }] : [{ label: "造片局" }]}
+      chips={[
+        { label: "3D 成片", value: `${doneCount}/${templates.length || "—"}`, tone: "gold" },
+        { label: "pipeline", value: runStatusText, tone: run?.status === "failed" ? "red" : activeRun ? "gold" : "jade" },
+        { label: "音色", value: String(presets.length || "—"), tone: "slate" },
+      ]}
+      primaryAction={{
+        label: "一键全流程",
+        onClick: oneClick,
+        disabled: starting || activeRun || !selectedId,
+        title: !selectedId ? "先在第 ① 步选模板" : "复用已有镜头 → 快速合成 3D 成片 → 发布前检查",
+        icon: <IconSpark size={14} />,
+      }}
+      onRefresh={() => void refresh()}
+      refreshing={refreshing}
+      onOpenSettings={onOpenSettings}
+    >
+      <div className="v18-page">
             {loadError && (
               <ErrorBar
                 title="部分数据读取失败"
@@ -664,8 +587,6 @@ export function PipelineConsole({ onExit, onOpenCharacters, onOpenCinema, onOpen
               />
             )}
           </div>
-        </main>
-      </div>
-    </div>
+    </AppShell>
   );
 }

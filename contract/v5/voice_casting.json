@@ -144,54 +144,6 @@
       "label": "谋士·清朗",
       "reason": "清朗偏薄、从容，谋士的书卷气",
       "preview_text": "亮有一计，可解眼前之困。"
-    },
-    "real_host": {
-      "voice_id": "legacy_v4_laozhou",
-      "label": "深夜秀主持（低沉磁性·冷幽默）",
-      "reason": "低沉磁性、语速偏慢，贴记者型主持",
-      "preview_text": "夜里慢慢走，听听别人的故事。"
-    },
-    "real_street_runner": {
-      "voice_id": "cool_male",
-      "label": "冷面·冷峻",
-      "reason": "低冷少起伏、停顿多，贴疲惫夜归人",
-      "preview_text": "刚下班，只想一个人走一走。"
-    },
-    "real_street_owner": {
-      "voice_id": "heroine_sashuang",
-      "label": "女将·飒爽",
-      "reason": "清亮干脆、带笑，便利店店长的爽利",
-      "preview_text": "这么晚还来？给你留了杯热的。"
-    },
-    "real_cafe_owner": {
-      "voice_id": "empress_weiyi",
-      "label": "女皇·威仪",
-      "reason": "低中音稳而优雅，咖啡馆主理人的分寸",
-      "preview_text": "先坐会儿，咖啡马上就好。"
-    },
-    "real_cafe_regular": {
-      "voice_id": "navigator_kai",
-      "label": "航海家·开阔",
-      "reason": "宽亮从容带笑意，中年转行的松弛",
-      "preview_text": "我啊，就爱这一口手冲的味道。"
-    },
-    "real_kitchen_chef": {
-      "voice_id": "warm_male",
-      "label": "胖子·温厚",
-      "reason": "厚实温暖、语速慢，灶台边的家常气",
-      "preview_text": "锅里有热的，坐下吃点再走。"
-    },
-    "real_kitchen_regular": {
-      "voice_id": "young_male",
-      "label": "学霸·清亮",
-      "reason": "清亮偏快、尾音利落，年轻人的懒散劲",
-      "preview_text": "加完班，就馋这一口热汤。"
-    },
-    "custom_lin": {
-      "voice_id": "bright_female",
-      "label": "甜妹·明亮",
-      "reason": "清亮偏少女，贴年轻女学者的清爽",
-      "preview_text": "把旧材料讲成新故事，很有意思。"
     }
   },
   "characters": {
@@ -338,54 +290,7 @@
       "label": "谋士·清朗",
       "reason": "清朗偏薄、从容，谋士的书卷气",
       "preview_text": "亮有一计，可解眼前之困。"
-    },
-    "real_host": {
-      "voice_id": "legacy_v4_laozhou",
-      "label": "深夜秀主持（低沉磁性·冷幽默）",
-      "reason": "低沉磁性、语速偏慢，贴记者型主持",
-      "preview_text": "夜里慢慢走，听听别人的故事。"
-    },
-    "real_street_runner": {
-      "voice_id": "cool_male",
-      "label": "冷面·冷峻",
-      "reason": "低冷少起伏、停顿多，贴疲惫夜归人",
-      "preview_text": "刚下班，只想一个人走一走。"
-    },
-    "real_street_owner": {
-      "voice_id": "heroine_sashuang",
-      "label": "女将·飒爽",
-      "reason": "清亮干脆、带笑，便利店店长的爽利",
-      "preview_text": "这么晚还来？给你留了杯热的。"
-    },
-    "real_cafe_owner": {
-      "voice_id": "empress_weiyi",
-      "label": "女皇·威仪",
-      "reason": "低中音稳而优雅，咖啡馆主理人的分寸",
-      "preview_text": "先坐会儿，咖啡马上就好。"
-    },
-    "real_cafe_regular": {
-      "voice_id": "navigator_kai",
-      "label": "航海家·开阔",
-      "reason": "宽亮从容带笑意，中年转行的松弛",
-      "preview_text": "我啊，就爱这一口手冲的味道。"
-    },
-    "real_kitchen_chef": {
-      "voice_id": "warm_male",
-      "label": "胖子·温厚",
-      "reason": "厚实温暖、语速慢，灶台边的家常气",
-      "preview_text": "锅里有热的，坐下吃点再走。"
-    },
-    "real_kitchen_regular": {
-      "voice_id": "young_male",
-      "label": "学霸·清亮",
-      "reason": "清亮偏快、尾音利落，年轻人的懒散劲",
-      "preview_text": "加完班，就馋这一口热汤。"
-    },
-    "custom_lin": {
-      "voice_id": "bright_female",
-      "label": "甜妹·明亮",
-      "reason": "清亮偏少女，贴年轻女学者的清爽",
-      "preview_text": "把旧材料讲成新故事，很有意思。"
     }
-  }
+  },
+  "note": "V19：8 个纸片人角色已删除，现存 24 角色绑定（详见 docs/V19_CHARACTER_CLEANUP.md）"
 }

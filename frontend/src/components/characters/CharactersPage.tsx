@@ -28,6 +28,7 @@ import {
   IconVolume,
 } from "../icons";
 import { VoicePicker } from "../voice/VoicePicker";
+import { AppShell } from "../shell/AppShell";
 import "../../styles/cinema.css";
 import "../../styles/v18.css";
 
@@ -357,91 +358,23 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
   }, [pickerOpen, selected]);
 
   return (
-    <div className="cm-app v18-app">
-      <aside className="cm-rail">
-        <button type="button" className="cm-brand" onClick={onExit} title="返回项目大厅">
-          <span className="cm-brand-seal">造</span>
-          <span className="cm-brand-txt">
-            <span className="cm-brand-name">造片局</span>
-            <span className="cm-brand-sub">CAST &amp; VOICE</span>
-          </span>
-        </button>
-        <div className="cm-rail-label">制片流程</div>
-        <nav className="cm-nav">
-          <button type="button" className="cm-nav-item" onClick={onExit}>
-            <IconGrid /> <span className="cm-nav-label">项目大厅</span> <span className="cm-nav-no">01</span>
-          </button>
-          <button type="button" className="cm-nav-item" onClick={onOpenPipeline}>
-            <IconSpark /> <span className="cm-nav-label">一键成片</span> <span className="cm-nav-no">02</span>
-          </button>
-          <button type="button" className="cm-nav-item is-active">
-            <IconUsers /> <span className="cm-nav-label">角色与声音</span> <span className="cm-nav-no">03</span>
-          </button>
-          <button type="button" className="cm-nav-item" onClick={onOpenCinema}>
-            <IconFilm /> <span className="cm-nav-label">Cinema 3D</span> <span className="cm-nav-no">04</span>
-          </button>
-          <button type="button" className="cm-nav-item" onClick={onOpenSettings}>
-            <IconSettings /> <span className="cm-nav-label">设置</span> <span className="cm-nav-no">05</span>
-          </button>
-        </nav>
-        <div className="cm-rail-foot">
-          <div className="cm-env-row">
-            <span className="cm-env-key">
-              <i className={"cm-env-dot " + (catalog ? "is-on" : loadError ? "is-off" : "is-warn")} />
-              <span className="cm-env-text">{catalog ? "角色目录已连接" : loadError ? "目录离线" : "读取中…"}</span>
-            </span>
-          </div>
-          <div className="cm-env-row">
-            <span className="cm-env-key">
-              <i className="cm-env-dot is-on" />
-              <span className="cm-env-text">
-                角色 {catalog?.characters.length ?? "—"} · 音色 {presets.length || "—"}
-              </span>
-            </span>
-          </div>
-          <button type="button" className="cm-back-link" onClick={onExit}>
-            <IconGrid size={14} /> <span className="cm-env-text">返回平台</span>
-          </button>
-        </div>
-      </aside>
-
-      <div className="cm-main">
-        <header className="cm-topbar">
-          <div className="cm-top-project">
-            <span className="cm-kicker">CAST &amp; VOICE · 角色与声音</span>
-            <div className="cm-top-title-row">
-              <h1 className="cm-top-title">角色与声音</h1>
-              <span className="cm-top-ep">
-                {catalog ? `${catalog.characters.length} 角色 · ${presets.length} 音色 · 写实 ${realCount}` : "读取角色目录…"}
-              </span>
-            </div>
-          </div>
-          <div className="cm-top-stats">
-            <div className="cm-top-stat">
-              <b>{catalog?.characters.length ?? "—"}</b>
-              <span>角色</span>
-            </div>
-            <div className="cm-top-stat">
-              <b className="is-gold">{presets.length || "—"}</b>
-              <span>音色 preset</span>
-            </div>
-            <div className="cm-top-stat">
-              <b className="is-jade">{Object.keys(savedVoice).length}</b>
-              <span>本次已调整</span>
-            </div>
-          </div>
-          <div className="cm-top-actions v18-top-actions">
-            <button type="button" className="cm-icon-btn" onClick={() => void refresh()} disabled={refreshing} title="刷新角色与声音">
-              {refreshing ? <Spinner size={14} /> : <IconRefresh />}
-            </button>
-            <button type="button" className="cm-btn cm-btn-sm" onClick={onOpenPipeline}>
-              <IconSpark size={13} /> 一键成片
-            </button>
-          </div>
-        </header>
-
-        <main className="cm-content">
-          <div className="v18-page v18-char-page">
+    <AppShell
+      active="characters"
+      kicker="CAST & VOICE · 角色与声音"
+      title="角色与声音"
+      breadcrumb={[{ label: "造片局" }, { label: `${catalog?.characters.length ?? "—"} 角色 · ${presets.length} 音色` }]}
+      chips={[
+        { label: "角色", value: String(catalog?.characters.length ?? "—") },
+        { label: "音色", value: String(presets.length || "—"), tone: "gold" },
+        { label: "写实", value: String(realCount), tone: "slate" },
+        { label: "已调整", value: String(Object.keys(savedVoice).length), tone: "jade" },
+      ]}
+      primaryAction={{ label: "一键成片", href: "#/pipeline", icon: <IconSpark size={14} />, title: "进入一键成片控制台" }}
+      onRefresh={() => void refresh()}
+      refreshing={refreshing}
+      onOpenSettings={onOpenSettings}
+    >
+      <div className="v18-page v18-char-page">
             {loadError && (
               <div className="v18-error">
                 <IconAlert size={15} />
@@ -576,8 +509,6 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
               </div>
             )}
           </div>
-        </main>
-      </div>
 
       {/* 角色详情抽屉 */}
       {selected && selectedContract && (
@@ -745,6 +676,6 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
           }}
         />
       )}
-    </div>
+    </AppShell>
   );
 }

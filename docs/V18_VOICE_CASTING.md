@@ -1,5 +1,7 @@
 # V18 角色声音选角（32 角色 → 24 breeze preset）
 
+> ⚠️ **V19 更新（2026-11-02）**：`custom_lin` 与 7 个写实角色已删除，本文 32 角色选角表仅作历史存档；现存 24 角色绑定见 `docs/V19_CHARACTER_CLEANUP.md`。
+
 > 数据由 `tmp/v18/build_voice_casting.py` 生成；校验脚本 `tmp/v18/voice_casting_check.py`。所有角色都通过 `contract/v5/custom/characters/<id>.json` 的 `voice` 块绑定 preset，不改动 `contract/v5/characters/` 原文件，不改 outputs、不改代码。
 
 ## 1. 机制与交付
