@@ -58,3 +58,11 @@
 - 单模板实测 ~35–40 分钟（1024×576 T2VA + 7~9 个对话镜 ref2va + 剪辑海报）
 - 按实测推算 15 个全量 ≈ 9–10 小时 → 预计 **16:00–17:30** 完成；随后补跑 masked_singer + 3 个写实模板 ≈ 2–2.5 小时
 - 对比样张：	mp/v17/compare/cmp_classics.png（上=旧 MuseTalk 768，下=HQ 1024）
+
+
+## 5. 性能问题与修复（2026-11-02 上午）
+
+- 现象：1024×576 生成时单镜从 ~4 分钟恶化到 10–21 分钟，ComfyUI GPU CUDA 无占用、卡在 VideoVAE decode（日志停在 "VideoVAE prepared for dynamic VRAM loading … Staged"）。
+- 根因：12GB 显存下 20GB H3 模型 + 5GB VideoVAE 动态加载，默认 smart-memory 让权重长期驻留显存，VAE decode 阶段显存不足触发 WDDM 分页抖动。
+- 修复：ComfyUI 启动参数改为 `--disable-smart-memory --reserve-vram 0.5`（每 prompt 结束把权重卸载回内存、保留 0.5GB 显存余量）。实测 1024×576/124 帧 T2VA 从 5–21 分钟降到 **114 秒**，随后单镜稳定 ~4–6 分钟。
+- 附带：清理两个重复启动的批处理进程；`masked_singer` 因重启中断进入补跑队列（post-batch 编排器负责补跑失败模板 + 生成 3 个写实模板）。
