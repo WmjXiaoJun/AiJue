@@ -4,9 +4,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { errorText } from "../../lib/api";
 import { mediaSrc } from "../../lib/v5";
+import { ApiError } from "../../lib/api";
 import type { CinemaTemplate } from "../../lib/cinema";
 import { cinemaApi, fmtDuration, fmtSize, isRealTemplate } from "../../lib/cinema";
-import { isRunActive, pipelineApi } from "../../lib/pipeline";
+import { isBatchActive, isRunActive, pipelineApi, pipelineBatchApi } from "../../lib/pipeline";
+import type { PipelineBatch, PipelineBatchItem } from "../../lib/pipeline";
 import type { V5CatalogResponse } from "../../lib/v5";
 import { v5api } from "../../lib/v5";
 import { useToast } from "../Toast";
@@ -61,6 +63,14 @@ export function LibraryPage({ tab, onOpenSettings }: Props) {
   const [highlightTemplate, setHighlightTemplate] = useState<string | null>(null);
   const [createdTemplate, setCreatedTemplate] = useState<{ id: string; started: boolean; reason?: string } | null>(null);
   const [runningTemplateIds, setRunningTemplateIds] = useState<Set<string>>(new Set());
+  // V25：批量选择 / 批量队列
+  const [batchMode, setBatchMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [batch, setBatch] = useState<PipelineBatch | null>(null);
+  const [batchLoading, setBatchLoading] = useState(false);
+  const [batchSubmitting, setBatchSubmitting] = useState(false);
+  const [batchError, setBatchError] = useState("");
+  const [confirmCancel, setConfirmCancel] = useState(false);
   const inFlightRef = useRef(false);
 
   const load = useCallback(async (silent: boolean) => {
@@ -85,6 +95,46 @@ export function LibraryPage({ tab, onOpenSettings }: Props) {
   useEffect(() => {
     void load(false);
   }, [load]);
+
+  // V25：进入页面时恢复正在运行的 batch（刷新/切页后继续看进度）
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const list = await pipelineBatchApi.list(5);
+        if (!alive) return;
+        const active = list.find((item) => isBatchActive(item));
+        if (active) setBatch(active);
+      } catch {
+        /* 接口未就绪时静默 */
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  // V25：batch 队列 3s 轮询（终态自动停止）
+  useEffect(() => {
+    if (!batch?.id || !isBatchActive(batch)) return;
+    let alive = true;
+    const poll = async () => {
+      try {
+        const next = await pipelineBatchApi.get(batch.id);
+        if (!alive) return;
+        setBatch(next);
+        setBatchError("");
+      } catch (err) {
+        if (!alive) return;
+        setBatchError(err instanceof ApiError ? err.message : "批量进度读取失败");
+      }
+    };
+    const timer = window.setInterval(() => void poll(), 3000);
+    return () => {
+      alive = false;
+      window.clearInterval(timer);
+    };
+  }, [batch?.id, batch?.status]);
 
   // V23：生成中 badge —— /api/pipeline/runs 每 10s 轮询，匹配模板 running/queued job
   useEffect(() => {
@@ -111,6 +161,89 @@ export function LibraryPage({ tab, onOpenSettings }: Props) {
     await load(true);
     if (refreshing === false) notify("模板与素材数据已刷新", "success");
   }, [load, notify, refreshing]);
+
+  /* ------------------------------ V25：批量选择 / 队列 ------------------------------ */
+  const toggleBatchMode = useCallback(() => {
+    setBatchMode((prev) => {
+      if (prev) setSelectedIds(new Set());
+      return !prev;
+    });
+  }, []);
+
+  const toggleSelect = useCallback((templateId: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(templateId)) next.delete(templateId);
+      else next.add(templateId);
+      return next;
+    });
+  }, []);
+
+  const clearSelection = useCallback(() => setSelectedIds(new Set()), []);
+
+  const submitBatch = useCallback(
+    async (reuseShots: boolean) => {
+      const ids = Array.from(selectedIds);
+      if (!ids.length) {
+        notify("请先选择至少 1 个模板", "info");
+        return;
+      }
+      setBatchSubmitting(true);
+      setBatchError("");
+      try {
+        const started = await pipelineBatchApi.start(ids, reuseShots);
+        setBatch(started);
+        setConfirmCancel(false);
+        notify(`已提交批量${reuseShots ? "合成" : "生成"} · ${ids.length} 个模板排队中`, "success");
+        setBatchMode(false);
+        setSelectedIds(new Set());
+      } catch (err) {
+        const status = err instanceof ApiError ? err.status : 0;
+        const message = err instanceof Error ? err.message : String(err);
+        if (status === 404 || status === 405) {
+          setBatchError("批量接口尚未就绪（后端 V25 实现中），请稍后重试");
+          notify("批量接口尚未就绪（后端 V25 实现中）", "info");
+        } else if (status === 409) {
+          setBatchError("已有任务运行中（单发或批量队列），请等待完成或取消后再试");
+          notify("已有任务运行中，请等待完成或取消后再批量提交", "error");
+        } else {
+          setBatchError("批量提交失败：" + message);
+          notify("批量提交失败：" + message, "error");
+        }
+      } finally {
+        setBatchSubmitting(false);
+      }
+    },
+    [notify, selectedIds],
+  );
+
+  const cancelBatch = useCallback(async () => {
+    if (!batch?.id) return;
+    setBatchLoading(true);
+    try {
+      const next = await pipelineBatchApi.cancel(batch.id);
+      setBatch(next);
+      setConfirmCancel(false);
+      notify("已请求取消整批（进行中的任务会终止，未开始的标记为已取消）", "info");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      setBatchError("取消批量失败：" + message);
+      notify("取消批量失败：" + message, "error");
+    } finally {
+      setBatchLoading(false);
+    }
+  }, [batch?.id, notify]);
+
+  /** V25：batch 队列状态 → 模板卡片 badge */
+  const batchStatusMap = useMemo(() => {
+    const map = new Map<string, { status: string; done?: number; total?: number }>();
+    batch?.items.forEach((item) => {
+      if (item.status === "queued" || item.status === "running") {
+        map.set(item.template_id, { status: item.status, done: item.progress?.done, total: item.progress?.total });
+      }
+    });
+    return map;
+  }, [batch]);
 
   const templates = useMemo(() => Object.values(templates3d), [templates3d]);
   const doneCount = templates.filter((item) => item.final.exists).length;
@@ -169,6 +302,25 @@ export function LibraryPage({ tab, onOpenSettings }: Props) {
         </div>
       )}
 
+      {tab === "templates" && (
+        <div className="v25-batch-toolbar">
+          <button
+            type="button"
+            className={"cm-btn cm-btn-sm" + (batchMode ? " cm-btn-primary" : "")}
+            onClick={toggleBatchMode}
+            title="多选模板后批量排队生成/合成"
+          >
+            <IconCheck size={12} /> {batchMode ? "退出批量选择" : "批量选择"}
+          </button>
+          {batchMode && <span className="v25-batch-hint">点选模板卡片勾选；底部批量条可提交队列</span>}
+          {batch?.id && isBatchActive(batch) && (
+            <button type="button" className="cm-btn cm-btn-sm" onClick={() => setBatch(batch)} title="查看当前批量队列">
+              <IconFilm size={12} /> 批量队列进行中（{batch.summary?.done ?? 0}/{batch.total}）
+            </button>
+          )}
+          {batchError && <span className="v25-batch-error">{batchError}</span>}
+        </div>
+      )}
       {tab === "templates" && createdTemplate && (
         <div className={"v21-created-banner" + (createdTemplate.started ? " is-running" : "")}>
           <IconCheck size={14} />
@@ -201,6 +353,10 @@ export function LibraryPage({ tab, onOpenSettings }: Props) {
           embedded
           highlightId={highlightTemplate || undefined}
           runningTemplateIds={runningTemplateIds}
+          batchMode={batchMode}
+          selectedIds={selectedIds}
+          onToggleSelect={toggleSelect}
+          batchStatus={batchStatusMap}
           onOpenShots={() => (window.location.hash = "#/cinema/shots")}
         />
       )}
@@ -226,7 +382,112 @@ export function LibraryPage({ tab, onOpenSettings }: Props) {
           onRenderTemplate={() => (window.location.hash = "#/pipeline")}
         />
       )}
-      {tab === "final" && <FinalLibrary templates={templates} loading={loading} onRefresh={() => void refresh()} />}
+      {tab === "final" && <FinalLibrary templates={templates} loading={loading} onRefresh={() => void refresh()} batchStatus={batchStatusMap} />}
+
+      {tab === "templates" && batchMode && (
+        <div className="v25-batchbar" role="region" aria-label="批量操作">
+          <div className="v25-batchbar-info">
+            <b>已选 {selectedIds.size} 个</b>
+            <span>预计约 {Math.max(1, selectedIds.size * 2)}–{Math.max(1, selectedIds.size * 30)} 分钟（合成≈{Math.max(1, selectedIds.size * 2)} 分钟 / 生成≈{Math.max(1, selectedIds.size * 30)} 分钟）</span>
+          </div>
+          <div className="v25-batchbar-actions">
+            <button
+              type="button"
+              className="cm-btn cm-btn-primary cm-btn-sm"
+              disabled={batchSubmitting || !selectedIds.size}
+              onClick={() => void submitBatch(false)}
+              title="逐个模板走完整 3D 生成（串行排队；耗时较长）"
+            >
+              {batchSubmitting ? <Spinner size={12} /> : <IconSpark size={12} />} 批量生成
+            </button>
+            <button
+              type="button"
+              className="cm-btn cm-btn-sm"
+              disabled={batchSubmitting || !selectedIds.size}
+              onClick={() => void submitBatch(true)}
+              title="复用已有镜头只跑剪辑合成（快，不重新生成镜头）"
+            >
+              <IconFilm size={12} /> 批量合成（复用已有镜头）
+            </button>
+            <button type="button" className="cm-btn cm-btn-sm cm-btn-ghost" onClick={clearSelection} disabled={!selectedIds.size}>
+              取消选择
+            </button>
+          </div>
+        </div>
+      )}
+
+      {batch?.id && (
+        <div className="v25-batch-mask" onMouseDown={() => !isBatchActive(batch) && setBatch(null)} role="presentation">
+          <aside className="v25-batch-drawer" onMouseDown={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-label="批量队列">
+            <header className="v25-batch-head">
+              <div>
+                <span className="v21-drawer-kicker">BATCH PIPELINE · 批量队列</span>
+                <h3 className="v21-drawer-title">
+                  {batch.status === "running" ? "批量进行中" : batch.status === "queued" ? "批量排队中" : batch.status === "done" ? "批量完成" : batch.status === "canceled" ? "批量已取消" : "批量失败"}
+                </h3>
+                <p className="v21-drawer-sub">
+                  {batch.id} · {batch.total} 个模板 · {batch.reuse_shots ? "复用已有镜头合成" : "完整 3D 生成"} · 每 3s 刷新
+                </p>
+              </div>
+              <button type="button" className="v21-close" onClick={() => setBatch(null)} aria-label="收起队列">
+                <IconClose size={16} />
+              </button>
+            </header>
+            <div className="v25-batch-summary">
+              <span className="v18-tag is-jade">完成 {batch.summary?.done ?? 0}</span>
+              <span className="v18-tag is-gold">进行 {batch.summary?.running ?? 0}</span>
+              <span className="v18-tag">排队 {batch.summary?.queued ?? 0}</span>
+              <span className="v18-tag is-red">失败 {batch.summary?.failed ?? 0}</span>
+              {batch.elapsed_sec ? <span className="v18-tag">耗时 {Math.round(batch.elapsed_sec)}s</span> : null}
+            </div>
+            <div className="v25-batch-body">
+              {batch.items.map((item, index) => (
+                <BatchItemRow key={item.template_id + index} item={item} index={index} active={index === batch.current_index} />
+              ))}
+              {batchError && (
+                <div className="v21-error" style={{ marginTop: 10 }}>
+                  <b>队列状态读取失败</b>
+                  <span>{batchError}</span>
+                </div>
+              )}
+            </div>
+            <footer className="v25-batch-foot">
+              {isBatchActive(batch) ? (
+                confirmCancel ? (
+                  <>
+                    <span className="v21-foot-note">确认取消整批？进行中的任务会终止，未开始的标记为已取消。</span>
+                    <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" onClick={() => void cancelBatch()} disabled={batchLoading}>
+                      {batchLoading ? <Spinner size={12} /> : null} 确认取消整批
+                    </button>
+                    <button type="button" className="cm-btn cm-btn-sm" onClick={() => setConfirmCancel(false)} disabled={batchLoading}>
+                      继续等待
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <span className="v21-foot-note">批量队列串行执行；可离开页面，再次进入会恢复队列进度。</span>
+                    <button type="button" className="cm-btn cm-btn-sm cm-btn-ghost" onClick={() => setConfirmCancel(true)}>
+                      取消整批
+                    </button>
+                  </>
+                )
+              ) : (
+                <>
+                  <span className="v21-foot-note">
+                    {batch.summary?.failed ? `批量结束：完成 ${batch.summary?.done ?? 0} / 失败 ${batch.summary.failed}，可到成片库查看已完成成片。` : "批量结束，可去成片库查看/播放成片。"}
+                  </span>
+                  <a className="cm-btn cm-btn-primary cm-btn-sm" href="#/library/final">
+                    <IconVideo size={12} /> 去成片库
+                  </a>
+                  <button type="button" className="cm-btn cm-btn-sm" onClick={() => setBatch(null)}>
+                    关闭
+                  </button>
+                </>
+              )}
+            </footer>
+          </aside>
+        </div>
+      )}
 
       {wizardOpen && (
         <CreateTemplateWizard
@@ -256,10 +517,12 @@ function FinalLibrary({
   templates,
   loading,
   onRefresh,
+  batchStatus,
 }: {
   templates: CinemaTemplate[];
   loading: boolean;
   onRefresh: () => void;
+  batchStatus?: Map<string, { status: string; done?: number; total?: number }>;
 }) {
   const notify = useToast();
   const [filter, setFilter] = useState<"all" | "classic" | "real">("all");
@@ -371,6 +634,13 @@ function FinalLibrary({
                     <span className="v20-final-badge is-pending">待生成</span>
                   )}
                   {isRealTemplate(template.id) && <span className="tpl-real-badge v20-final-real">写实</span>}
+                  {batchStatus?.get(template.id) && (
+                    <span className={"v20-final-batch is-" + batchStatus.get(template.id)?.status}>
+                      {batchStatus.get(template.id)?.status === "queued"
+                        ? "排队中"
+                        : `生成中 ${batchStatus.get(template.id)?.done ?? 0}/${batchStatus.get(template.id)?.total ?? "—"}`}
+                    </span>
+                  )}
                   {ready && <span className="v20-final-play"><IconPlay size={18} /></span>}
                 </button>
                 <div className="v20-final-body">
@@ -440,6 +710,51 @@ function FinalLibrary({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+
+/* ------------------------------ V25：批量队列 item 行 ------------------------------ */
+function BatchItemRow({ item, index, active }: { item: PipelineBatchItem; index: number; active: boolean }) {
+  const pct = item.progress && item.progress.total > 0 ? Math.min(100, Math.round((item.progress.done / item.progress.total) * 100)) : item.status === "done" ? 100 : 0;
+  const statusText =
+    item.status === "queued"
+      ? "排队中"
+      : item.status === "running"
+        ? "生成中"
+        : item.status === "done"
+          ? "已完成"
+          : item.status === "failed"
+            ? "失败"
+            : item.status === "canceled"
+              ? "已取消"
+              : "已跳过";
+  return (
+    <div className={"v25-batch-item is-" + item.status + (active ? " is-active" : "")}>
+      <span className="v25-batch-no">{String(index + 1).padStart(2, "0")}</span>
+      <div className="v25-batch-item-main">
+        <div className="v25-batch-item-title">
+          <b>{item.label || item.template_id}</b>
+          <span className="cm-mono">{item.template_id}</span>
+        </div>
+        <div className="v25-batch-item-meta">
+          <span className={"v18-tag" + (item.status === "done" ? " is-jade" : item.status === "failed" ? " is-red" : item.status === "running" ? " is-gold" : "")}>{statusText}</span>
+          {item.job_id && <span className="cm-mono">job {item.job_id.slice(0, 10)}</span>}
+          {item.status === "running" && (item.stage_label || item.stage) && <span>{item.stage_label || item.stage}</span>}
+          {item.status === "running" && item.progress && item.progress.total > 0 && (
+            <span className="cm-mono">{item.progress.done}/{item.progress.total} 镜</span>
+          )}
+          {item.status === "running" && <span className="v25-batch-pct">{pct}%</span>}
+          {item.status === "done" && item.final_url && (
+            <a className="cm-btn cm-btn-sm cm-btn-ghost" href="#/library/final">
+              <IconVideo size={11} /> 成片
+            </a>
+          )}
+          {item.error && <span className="v25-batch-item-err">{item.error}</span>}
+        </div>
+        {item.status === "running" && <div className="cm-progress v25-batch-bar"><i style={{ width: Math.max(pct, 3) + "%" }} /></div>}
+      </div>
     </div>
   );
 }

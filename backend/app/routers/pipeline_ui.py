@@ -71,6 +71,13 @@ _LOCK = threading.RLock()
 _JOBS: Dict[str, Dict[str, Any]] = {}
 _ACTIVE: Optional[str] = None
 
+#: V25 批量队列：batch 内 items 串行复用 start_pipeline_job；与单发 run 互斥
+_BATCH_DIR = config.OUTPUTS_DIR / "pipeline_batches"
+_BATCHES: Dict[str, Dict[str, Any]] = {}
+_BATCH_LOCK = threading.RLock()
+_ACTIVE_BATCH: Optional[str] = None
+_BATCH_LIMIT = 10
+
 
 # --------------------------------------------------------------------------- #
 # 模板 / 路径
@@ -426,12 +433,13 @@ class ApplyTemplateBody(BaseModel):
 
 
 def start_pipeline_job(template_id: str, *, reuse_shots: bool = False,
-                       dry_run: bool = False) -> Dict[str, Any]:
-    """启动一条 pipeline 任务（供 POST /api/pipeline/run 与创建模板 auto_generate 复用）。
+                       dry_run: bool = False,
+                       batch_id: Optional[str] = None) -> Dict[str, Any]:
+    """启动一条 pipeline 任务（供 POST /api/pipeline/run、创建模板 auto_generate、批量队列复用）。
 
     行为与 POST /api/pipeline/run 一致：参数错误 400；已有 running 任务 409；
-    dry_run=True 只校验、不创建/不启动子进程。成功返回 {"ok", "job_id", "template_id",
-    "template_label", "status", ...}。
+    dry_run=True 只校验、不创建/不启动子进程。batch_id 非空表示由批量队列调用
+    （batch 运行中单发 run 会被 409 拦截，反之亦然）。
     """
     global _ACTIVE
     tid = str(template_id or "").strip()
@@ -465,6 +473,22 @@ def start_pipeline_job(template_id: str, *, reuse_shots: bool = False,
             "stage_labels": dict(_STAGE_LABEL),
             "command": command,
         }
+    # V25：批量队列与单发 run 互斥
+    with _BATCH_LOCK:
+        active_batch = _ACTIVE_BATCH
+        if batch_id is not None:
+            if active_batch != batch_id:
+                raise HTTPException(status_code=409, detail={
+                    "message": "批量任务已不在运行（可能被取消/结束）",
+                    "reason": "batch_mismatch", "batch_id": active_batch,
+                })
+        elif active_batch:
+            batch_meta = _BATCHES.get(active_batch) or {}
+            if batch_meta.get("status") in ("queued", "running"):
+                raise HTTPException(status_code=409, detail={
+                    "message": "批量任务运行中，暂不能单发 pipeline 任务",
+                    "reason": "batch_running", "batch_id": active_batch,
+                })
     with _LOCK:
         if _ACTIVE:
             active = _JOBS.get(_ACTIVE) or {}
@@ -495,6 +519,24 @@ def start_pipeline_job(template_id: str, *, reuse_shots: bool = False,
         _JOBS[job_id] = job
         _ACTIVE = job_id
         _persist(job)
+    # 竞态兜底：注册 job 后若批量已抢到活动权，则回滚本 job（避免 batch/单发同时运行）
+    if batch_id is None:
+        with _BATCH_LOCK:
+            race_batch = _ACTIVE_BATCH
+            race_meta = (_BATCHES.get(race_batch) or {}) if race_batch else {}
+        if race_batch and race_meta.get("status") in ("queued", "running"):
+            with _LOCK:
+                job["status"] = "failed"
+                job["error"] = "批量任务已启动，本次单发任务取消"
+                job["finished_at"] = _now_text()
+                job["finished_ts"] = time.time()
+                _persist(job)
+                if _ACTIVE == job_id:
+                    _ACTIVE = None
+            raise HTTPException(status_code=409, detail={
+                "message": "批量任务运行中，暂不能单发 pipeline 任务",
+                "reason": "batch_running", "batch_id": race_batch,
+            })
     try:
         threading.Thread(target=_run_job, args=(job_id,), daemon=True,
                          name=f"pipeline-{job_id}").start()
@@ -575,6 +617,514 @@ def list_pipeline_runs(limit: int = 20):
     return {"ok": True, "count": len(rows), "runs": rows}
 
 
+# --------------------------------------------------------------------------- #
+# V25 批量队列（多模板串行排队 / 进度 / 取消 / 持久化）
+# --------------------------------------------------------------------------- #
+class BatchCreateBody(BaseModel):
+    template_ids: List[str]
+    reuse_shots: bool = False
+    stop_on_error: bool = False
+
+
+def _batch_persist(batch: Dict[str, Any]) -> None:
+    try:
+        _BATCH_DIR.mkdir(parents=True, exist_ok=True)
+        target = _BATCH_DIR / f"{batch['id']}.json"
+        tmp = target.with_name(f"{target.name}.tmp-{os.getpid()}-{threading.get_ident()}")
+        tmp.write_text(json.dumps(batch, ensure_ascii=False), encoding="utf-8")
+        os.replace(tmp, target)
+    except OSError:
+        pass
+
+
+def _batch_elapsed(batch: Dict[str, Any]) -> float:
+    created = batch.get("created_ts")
+    if not isinstance(created, (int, float)):
+        return 0.0
+    finished = batch.get("finished_ts")
+    end = float(finished) if isinstance(finished, (int, float)) else time.time()
+    return round(max(0.0, end - float(created)), 1)
+
+
+def _batch_summary(batch: Dict[str, Any]) -> Dict[str, int]:
+    counts: Dict[str, int] = {key: 0 for key in
+                              ("queued", "running", "done", "failed", "canceled", "skipped")}
+    for item in batch.get("items") or []:
+        status = str(item.get("status") or "queued")
+        counts[status] = counts.get(status, 0) + 1
+    counts["total"] = len(batch.get("items") or [])
+    return counts
+
+
+def _batch_item_view(item: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "index": item.get("index"),
+        "template_id": item.get("template_id"),
+        "label": item.get("label"),
+        "status": item.get("status"),
+        "job_id": item.get("job_id"),
+        "stage": item.get("stage"),
+        "stage_index": item.get("stage_index"),
+        "progress": item.get("progress") or {"done": 0, "total": 0},
+        "final_url": item.get("final_url"),
+        "error": item.get("error"),
+        "started_at": item.get("started_at"),
+        "finished_at": item.get("finished_at"),
+    }
+
+
+def _batch_view(batch: Dict[str, Any], *, full: bool = True) -> Dict[str, Any]:
+    items = [_batch_item_view(item) for item in batch.get("items") or []]
+    if not full:
+        items = [{key: item.get(key) for key in
+                  ("index", "template_id", "label", "status", "job_id")} for item in items]
+    return {
+        "id": batch.get("id"),
+        "status": batch.get("status"),
+        "current_index": batch.get("current_index", -1),
+        "total": len(items),
+        "created_at": batch.get("created_at"),
+        "finished_at": batch.get("finished_at"),
+        "elapsed_sec": _batch_elapsed(batch),
+        "reuse_shots": bool(batch.get("reuse_shots")),
+        "stop_on_error": bool(batch.get("stop_on_error")),
+        "error": batch.get("error"),
+        "summary": _batch_summary(batch),
+        "template_ids": [item.get("template_id") for item in batch.get("items") or []],
+        "items": items,
+    }
+
+
+def _cancel_pipeline_job_safe(job_id: Optional[str]) -> Optional[Dict[str, Any]]:
+    if not job_id:
+        return None
+    try:
+        return cancel_pipeline_run(str(job_id))
+    except HTTPException:
+        return None
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def _fail_batch_remaining(batch: Dict[str, Any], reason: str) -> None:
+    with _BATCH_LOCK:
+        for other in batch.get("items") or []:
+            if other.get("status") == "queued":
+                other["status"] = "skipped"
+                other["error"] = reason
+            elif other.get("status") == "running":
+                other["status"] = "failed"
+                other["error"] = reason
+        batch["status"] = "failed"
+        batch["error"] = reason
+        batch["finished_at"] = _now_text()
+        batch["finished_ts"] = time.time()
+        batch["current_index"] = -1
+        _batch_persist(batch)
+
+
+def _run_batch(batch_id: str) -> None:
+    """批量执行线程：串行等待 pipeline 空闲 → start_pipeline_job → 轮询到 done/failed/canceled。"""
+    global _ACTIVE_BATCH
+    batch = _BATCHES.get(batch_id)
+    if not batch:
+        return
+    with _BATCH_LOCK:
+        if batch.get("status") != "queued":
+            return
+        batch["status"] = "running"
+        batch["started_at"] = _now_text()
+        batch["started_ts"] = time.time()
+        _batch_persist(batch)
+    try:
+        while True:
+            with _BATCH_LOCK:
+                if batch.get("status") != "running":
+                    break
+                item = next((it for it in batch.get("items") or []
+                             if it.get("status") == "queued"), None)
+                if item is None:
+                    break
+                item_index = item.get("index")
+            # 等待 pipeline 空闲（同时响应 cancel）
+            while True:
+                with _BATCH_LOCK:
+                    if batch.get("status") != "running":
+                        break
+                with _LOCK:
+                    active = (_JOBS.get(_ACTIVE) or {}) if _ACTIVE else {}
+                    busy = active.get("status") in ("queued", "running")
+                if not busy:
+                    break
+                time.sleep(0.5)
+            with _BATCH_LOCK:
+                if batch.get("status") != "running":
+                    break
+                item["status"] = "running"
+                item["started_at"] = _now_text()
+                item["started_ts"] = time.time()
+                item["error"] = None
+                batch["current_index"] = item_index
+                _batch_persist(batch)
+            # 启动 job（若单发刚抢占则等待重试；取消则立即停）
+            result: Optional[Dict[str, Any]] = None
+            start_error: Optional[str] = None
+            attempts = 0
+            canceled_before_start = False
+            while result is None:
+                with _BATCH_LOCK:
+                    if batch.get("status") != "running":
+                        canceled_before_start = True
+                        break
+                attempts += 1
+                try:
+                    result = start_pipeline_job(
+                        str(item.get("template_id") or ""),
+                        reuse_shots=bool(batch.get("reuse_shots")),
+                        dry_run=False, batch_id=batch_id)
+                except HTTPException as exc:
+                    detail = exc.detail if isinstance(exc.detail, dict) else {"message": str(exc.detail)}
+                    reason = str(detail.get("reason") or "")
+                    if exc.status_code == 409 and reason in ("pipeline_running", "batch_mismatch"):
+                        if reason == "batch_mismatch":
+                            start_error = "批量任务已结束"
+                            canceled_before_start = True
+                            break
+                        if attempts > 240:
+                            start_error = "等待 pipeline 空闲超时"
+                            break
+                        time.sleep(0.5)
+                        continue
+                    start_error = str(detail.get("message") or detail)
+                    break
+                except Exception as exc:  # noqa: BLE001
+                    start_error = f"{type(exc).__name__}: {exc}"
+                    break
+            if canceled_before_start:
+                with _BATCH_LOCK:
+                    item["status"] = "canceled"
+                    item["error"] = "用户取消"
+                    item["finished_at"] = _now_text()
+                    item["finished_ts"] = time.time()
+                    batch["current_index"] = -1
+                    _batch_persist(batch)
+                break
+            if result is None:
+                with _BATCH_LOCK:
+                    item["status"] = "failed"
+                    item["error"] = start_error or "启动失败"
+                    item["finished_at"] = _now_text()
+                    item["finished_ts"] = time.time()
+                    batch["current_index"] = -1
+                    _batch_persist(batch)
+                if bool(batch.get("stop_on_error")):
+                    _fail_batch_remaining(batch, f"{item.get('template_id')} 启动失败: {start_error}")
+                    return
+                continue
+            job_id = result.get("job_id")
+            with _BATCH_LOCK:
+                canceled_now = batch.get("status") == "canceled"
+                item["job_id"] = job_id
+                if canceled_now:
+                    item["status"] = "canceled"
+                    item["error"] = "用户取消"
+                    item["finished_at"] = _now_text()
+                    item["finished_ts"] = time.time()
+                    batch["current_index"] = -1
+                else:
+                    item["status"] = "running"
+                _batch_persist(batch)
+            if canceled_now:
+                _cancel_pipeline_job_safe(job_id)
+                break
+            poll_count = 0
+            while True:
+                with _BATCH_LOCK:
+                    canceled = batch.get("status") == "canceled"
+                if canceled:
+                    _cancel_pipeline_job_safe(job_id)
+                    with _BATCH_LOCK:
+                        if item.get("status") == "running":
+                            item["status"] = "canceled"
+                            item["error"] = "用户取消"
+                            item["finished_at"] = _now_text()
+                            item["finished_ts"] = time.time()
+                        batch["current_index"] = -1
+                        _batch_persist(batch)
+                    break
+                view: Optional[Dict[str, Any]] = None
+                with _LOCK:
+                    job = _JOBS.get(str(job_id)) if job_id else None
+                    if isinstance(job, dict):
+                        view = _job_view(job, tail=0)
+                if view is not None:
+                    status = str(view.get("status") or "")
+                    with _BATCH_LOCK:
+                        item["stage"] = view.get("stage")
+                        item["stage_index"] = view.get("stage_index")
+                        item["progress"] = view.get("progress") or item.get("progress")
+                        if status in ("done", "failed", "canceled"):
+                            item["status"] = status
+                            item["final_url"] = view.get("final_url")
+                            item["error"] = view.get("error")
+                            item["finished_at"] = _now_text()
+                            item["finished_ts"] = time.time()
+                            batch["current_index"] = -1
+                            _batch_persist(batch)
+                    if status in ("done", "failed", "canceled"):
+                        break
+                poll_count += 1
+                if poll_count % 10 == 0:
+                    _batch_persist(batch)
+                time.sleep(0.5)
+            with _BATCH_LOCK:
+                item_status = item.get("status")
+                batch_status = batch.get("status")
+            if batch_status == "canceled":
+                break
+            if item_status == "failed" and bool(batch.get("stop_on_error")):
+                _fail_batch_remaining(batch, f"{item.get('template_id')} 失败")
+                return
+        # 收尾
+        with _BATCH_LOCK:
+            if batch.get("status") not in ("canceled", "failed"):
+                items = batch.get("items") or []
+                if any(it.get("status") in ("failed", "skipped") for it in items):
+                    batch["status"] = "failed"
+                    batch["error"] = batch.get("error") or "部分模板失败"
+                else:
+                    batch["status"] = "done"
+                batch["finished_at"] = _now_text()
+                batch["finished_ts"] = time.time()
+                batch["current_index"] = -1
+                _batch_persist(batch)
+    except Exception as exc:  # noqa: BLE001 - 批量线程异常也要收尾
+        with _BATCH_LOCK:
+            batch["status"] = "failed"
+            batch["error"] = f"批量执行异常: {type(exc).__name__}: {exc}"
+            for item in batch.get("items") or []:
+                if item.get("status") in ("queued", "running"):
+                    item["status"] = "failed"
+                    item["error"] = batch["error"]
+                    item["finished_at"] = _now_text()
+            batch["finished_at"] = _now_text()
+            batch["finished_ts"] = time.time()
+            batch["current_index"] = -1
+            _batch_persist(batch)
+    finally:
+        with _BATCH_LOCK:
+            if _ACTIVE_BATCH == batch_id:
+                _ACTIVE_BATCH = None
+
+
+@router.post("/pipeline/batch", status_code=202, summary="启动批量 pipeline 队列（多模板串行）")
+def start_pipeline_batch(payload: BatchCreateBody):
+    global _ACTIVE_BATCH
+    raw_ids = payload.template_ids if isinstance(payload.template_ids, list) else []
+    ids: List[str] = []
+    for raw in raw_ids:
+        tid = str(raw or "").strip()
+        if not tid:
+            continue
+        if not _TEMPLATE_ID_RE.fullmatch(tid):
+            raise HTTPException(status_code=400, detail=f"非法模板 id: {tid}")
+        if tid not in _template_ids():
+            raise HTTPException(status_code=400, detail=f"未知模板: {tid}")
+        if tid not in ids:
+            ids.append(tid)
+    if not ids:
+        raise HTTPException(status_code=400, detail="template_ids 不能为空")
+    if len(ids) > 20:
+        raise HTTPException(status_code=400, detail="一次批量最多 20 个模板")
+    # 单发 run 运行中 → 409
+    with _LOCK:
+        active_job_id: Optional[str] = None
+        if _ACTIVE:
+            active = _JOBS.get(_ACTIVE) or {}
+            if active.get("status") in ("queued", "running"):
+                active_job_id = _ACTIVE
+    if active_job_id:
+        raise HTTPException(status_code=409, detail={
+            "message": "已有 pipeline 任务运行中，不能启动批量任务",
+            "reason": "pipeline_running", "job_id": active_job_id,
+        })
+    with _BATCH_LOCK:
+        if _ACTIVE_BATCH:
+            current = _BATCHES.get(_ACTIVE_BATCH) or {}
+            if current.get("status") in ("queued", "running"):
+                raise HTTPException(status_code=409, detail={
+                    "message": "已有批量任务在运行",
+                    "reason": "batch_running", "batch_id": _ACTIVE_BATCH,
+                })
+            _ACTIVE_BATCH = None
+    batch_id = "pb_" + uuid.uuid4().hex[:12]
+    items = [{
+        "index": index,
+        "template_id": tid,
+        "label": _template_label(tid) or tid,
+        "status": "queued",
+        "job_id": None,
+        "stage": None,
+        "stage_index": 0,
+        "progress": {"done": 0, "total": 0},
+        "final_url": None,
+        "error": None,
+        "started_at": None,
+        "finished_at": None,
+    } for index, tid in enumerate(ids)]
+    batch: Dict[str, Any] = {
+        "id": batch_id,
+        "status": "queued",
+        "current_index": -1,
+        "items": items,
+        "total": len(items),
+        "reuse_shots": bool(payload.reuse_shots),
+        "stop_on_error": bool(payload.stop_on_error),
+        "error": None,
+        "created_at": _now_text(),
+        "created_ts": time.time(),
+        "started_at": None,
+        "finished_at": None,
+        "finished_ts": None,
+    }
+    with _BATCH_LOCK:
+        _BATCHES[batch_id] = batch
+        _ACTIVE_BATCH = batch_id
+    _batch_persist(batch)
+    # 竞态兜底：设置 active batch 后若单发已注册 job，则回滚 batch 并 409
+    with _LOCK:
+        race_job = (_JOBS.get(_ACTIVE) or {}) if _ACTIVE else {}
+        race_job_id = _ACTIVE if race_job.get("status") in ("queued", "running") else None
+    if race_job_id:
+        with _BATCH_LOCK:
+            batch["status"] = "canceled"
+            batch["error"] = "检测到单发任务，批量任务取消"
+            batch["finished_at"] = _now_text()
+            batch["finished_ts"] = time.time()
+            _BATCHES.pop(batch_id, None)
+            if _ACTIVE_BATCH == batch_id:
+                _ACTIVE_BATCH = None
+        _batch_persist(batch)
+        raise HTTPException(status_code=409, detail={
+            "message": "已有 pipeline 任务运行中，不能启动批量任务",
+            "reason": "pipeline_running", "job_id": race_job_id,
+        })
+    try:
+        threading.Thread(target=_run_batch, args=(batch_id,), daemon=True,
+                         name=f"batch-{batch_id}").start()
+    except Exception as exc:  # noqa: BLE001
+        with _BATCH_LOCK:
+            batch["status"] = "failed"
+            batch["error"] = f"启动批量线程失败: {exc}"
+            batch["finished_at"] = _now_text()
+            batch["finished_ts"] = time.time()
+            if _ACTIVE_BATCH == batch_id:
+                _ACTIVE_BATCH = None
+        _batch_persist(batch)
+        raise HTTPException(status_code=500, detail=f"启动批量任务失败: {exc}") from exc
+    return {
+        "ok": True,
+        "batch_id": batch_id,
+        "status": "queued",
+        "total": len(items),
+        "reuse_shots": bool(payload.reuse_shots),
+        "stop_on_error": bool(payload.stop_on_error),
+        "created_at": batch["created_at"],
+        "items": [{"template_id": item["template_id"], "label": item["label"],
+                   "status": "queued"} for item in items],
+    }
+
+
+@router.get("/pipeline/batch/{batch_id}", summary="批量任务状态（items + summary + 当前进度）")
+def get_pipeline_batch(batch_id: str):
+    with _BATCH_LOCK:
+        batch = _BATCHES.get(str(batch_id or "").strip())
+        if not batch:
+            raise HTTPException(status_code=404, detail=f"批量任务不存在: {batch_id}")
+        return {"ok": True, **_batch_view(batch, full=True)}
+
+
+@router.get("/pipeline/batches", summary="最近批量任务（默认 10 条）")
+def list_pipeline_batches(limit: int = 10):
+    limit = max(1, min(int(limit or 10), 50))
+    with _BATCH_LOCK:
+        rows = sorted(_BATCHES.values(), key=lambda item: item.get("created_ts") or 0,
+                      reverse=True)[:limit]
+        views = [_batch_view(batch, full=False) for batch in rows]
+    return {"ok": True, "count": len(views), "batches": views}
+
+
+@router.post("/pipeline/batch/{batch_id}/cancel", summary="取消批量任务（当前 job + 未开始项）")
+def cancel_pipeline_batch(batch_id: str):
+    global _ACTIVE_BATCH
+    key = str(batch_id or "").strip()
+    with _BATCH_LOCK:
+        batch = _BATCHES.get(key)
+        if not batch:
+            raise HTTPException(status_code=404, detail=f"批量任务不存在: {batch_id}")
+        if batch.get("status") not in ("queued", "running"):
+            return {"ok": True, "batch_id": key, "status": batch.get("status"),
+                    "message": "批量任务已结束，无需取消"}
+        batch["status"] = "canceled"
+        batch["error"] = "用户取消"
+        batch["finished_at"] = _now_text()
+        batch["finished_ts"] = time.time()
+        batch["current_index"] = -1
+        running_job_id: Optional[str] = None
+        for item in batch.get("items") or []:
+            if item.get("status") == "queued":
+                item["status"] = "canceled"
+                item["error"] = "用户取消"
+                item["finished_at"] = _now_text()
+                item["finished_ts"] = time.time()
+            elif item.get("status") == "running":
+                running_job_id = item.get("job_id")
+                item["error"] = "用户取消"
+        _batch_persist(batch)
+    if running_job_id:
+        _cancel_pipeline_job_safe(running_job_id)
+    with _BATCH_LOCK:
+        for item in batch.get("items") or []:
+            if item.get("status") == "running":
+                item["status"] = "canceled"
+                item["error"] = "用户取消"
+                item["finished_at"] = _now_text()
+                item["finished_ts"] = time.time()
+        _batch_persist(batch)
+        if _ACTIVE_BATCH == key:
+            _ACTIVE_BATCH = None
+    return {"ok": True, "batch_id": key, "status": "canceled",
+            "canceled_job_id": running_job_id, **_batch_view(batch, full=False)}
+
+
+def _load_persisted_batches() -> None:
+    """启动时加载 batch；把中断（queued/running）的 batch/items 标 failed。"""
+    if not _BATCH_DIR.is_dir():
+        return
+    paths = sorted(_BATCH_DIR.glob("*.json"), key=lambda path: path.stat().st_mtime)
+    for path in paths[-50:]:
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if not isinstance(data, dict) or not data.get("id"):
+            continue
+        if data.get("status") in ("queued", "running"):
+            data["status"] = "failed"
+            data["error"] = "后端服务重启，批量任务中断（可重新发起）"
+            data["finished_at"] = _now_text()
+            data["finished_ts"] = time.time()
+            data["current_index"] = -1
+            for item in data.get("items") or []:
+                if item.get("status") in ("queued", "running"):
+                    item["status"] = "failed"
+                    item["error"] = data["error"]
+                    item["finished_at"] = _now_text()
+                    item["finished_ts"] = time.time()
+            _batch_persist(data)
+        _BATCHES[str(data["id"])] = data
+
+
 @router.post("/projects/{pid}/apply-template", summary="把项目切到 3D 模板对应的节目格式")
 def apply_template(pid: str, payload: ApplyTemplateBody, db: Session = Depends(get_db)):
     project = db.get(models.Project, pid)
@@ -611,3 +1161,7 @@ def apply_template(pid: str, payload: ApplyTemplateBody, db: Session = Depends(g
         "mapped": mapped,
         "note": note,
     }
+
+
+# 启动时恢复 batch 队列（中断的 batch 标 failed；须在模块加载末尾执行）
+_load_persisted_batches()

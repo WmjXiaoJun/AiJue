@@ -96,11 +96,21 @@ export function CinemaTemplates({
   onOpenShots,
   highlightId,
   runningTemplateIds,
+  batchMode = false,
+  selectedIds,
+  onToggleSelect,
+  batchStatus,
 }: {
   embedded?: boolean;
   onOpenShots?: (templateId: string) => void;
   highlightId?: string;
   runningTemplateIds?: Set<string>;
+  /** V25：批量选择模式（卡片 checkbox + 点击切换选中） */
+  batchMode?: boolean;
+  selectedIds?: Set<string>;
+  onToggleSelect?: (templateId: string) => void;
+  /** V25：batch 队列状态（模板 id → 状态/进度），卡片显示「排队中 / 生成中 i/N」 */
+  batchStatus?: Map<string, { status: string; done?: number; total?: number }>;
 } = {}) {
   const notify = useToast();
 
@@ -487,6 +497,10 @@ export function CinemaTemplates({
             onOpenShots={onOpenShots}
             highlight={highlightId === item.seed.id}
             running={runningTemplateIds?.has(item.seed.id)}
+            batchMode={batchMode}
+            selected={selectedIds?.has(item.seed.id)}
+            onToggleSelect={onToggleSelect}
+            batchHint={batchStatus?.get(item.seed.id)}
             onPlay={(template) => setPlaying(template)}
             onGenerate={(template) => void submitGenerate([template.id])}
             onAssemble={(template) => void submitAssemble([template.id])}
@@ -532,6 +546,10 @@ function TemplateCard({
   onOpenShots,
   highlight,
   running,
+  batchMode,
+  selected,
+  onToggleSelect,
+  batchHint,
 }: {
   item: CardItem;
   genBlocked: boolean;
@@ -545,6 +563,10 @@ function TemplateCard({
   onOpenShots?: (templateId: string) => void;
   highlight?: boolean;
   running?: boolean;
+  batchMode?: boolean;
+  selected?: boolean;
+  onToggleSelect?: (templateId: string) => void;
+  batchHint?: { status: string; done?: number; total?: number };
 }) {
   const { seed, template } = item;
   const [failedPoster, setFailedPoster] = useState("");
@@ -567,11 +589,25 @@ function TemplateCard({
   const canGenerate = Boolean(template) && busyAction !== generateKey;
 
   return (
-    <article className={cardClass + (highlight ? " is-new" : "")} data-template-id={seed.id}>
+    <article className={cardClass + (highlight ? " is-new" : "") + (batchMode ? " is-batch-mode" : "") + (selected ? " is-selected" : "")} data-template-id={seed.id}>
+      {batchMode && (
+        <label
+          className="v25-card-check"
+          onClick={(event) => event.stopPropagation()}
+          title={selected ? "取消选择" : "选择该模板"}
+        >
+          <input
+            type="checkbox"
+            checked={Boolean(selected)}
+            onChange={() => onToggleSelect?.(seed.id)}
+            aria-label={"选择模板 " + seed.id}
+          />
+        </label>
+      )}
       <button
         type="button"
         className={"cm-tpl-poster" + (status === "generating" ? " is-generating" : "")}
-        onClick={() => onOpen(item)}
+        onClick={() => (batchMode ? onToggleSelect?.(seed.id) : onOpen(item))}
         title={hasFinal ? "播放 3D 成片" : "查看模板镜头详情"}
       >
         {template?.poster_url && template.poster_url !== failedPoster ? (
@@ -593,10 +629,24 @@ function TemplateCard({
           {statusLabel}
         </span>
         {hasFinal && <span className="cm-tpl-badge3d">3D</span>}
-        {running && (
-          <span className="cm-tpl-running-badge" title="该模板的 3D 生成任务正在后台运行">
-            <Spinner size={10} /> 生成中
+        {batchHint ? (
+          <span className={"cm-tpl-batch-badge is-" + batchHint.status} title="批量队列中的模板状态">
+            {batchHint.status === "queued" ? (
+              <>排队中</>
+            ) : batchHint.status === "running" ? (
+              <>
+                <Spinner size={10} /> 生成中 {batchHint.done ?? 0}/{batchHint.total ?? "—"}
+              </>
+            ) : (
+              batchHint.status
+            )}
           </span>
+        ) : (
+          running && (
+            <span className="cm-tpl-running-badge" title="该模板的 3D 生成任务正在后台运行">
+              <Spinner size={10} /> 生成中
+            </span>
+          )
         )}
         {status === "generating" && <span className="cm-tpl-sweep" />}
         {hasFinal && (

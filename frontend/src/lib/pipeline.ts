@@ -141,3 +141,88 @@ export function pipelineRunPercent(run: PipelineRun | null | undefined): number 
   if (run.stage === "prepare") return 3;
   return 0;
 }
+
+/* ------------------------------ V25：批量队列 ------------------------------ */
+export type BatchItemStatus = "queued" | "running" | "done" | "failed" | "canceled" | "skipped";
+
+export interface PipelineBatchItem {
+  template_id: string;
+  label?: string;
+  status: BatchItemStatus;
+  job_id?: string;
+  stage?: string;
+  stage_index?: number;
+  stage_label?: string;
+  progress?: { done: number; total: number };
+  final_url?: string | null;
+  error?: string | null;
+  started_at?: string | null;
+  finished_at?: string | null;
+}
+
+export interface PipelineBatch {
+  id: string;
+  status: "queued" | "running" | "done" | "failed" | "canceled";
+  current_index?: number;
+  items: PipelineBatchItem[];
+  total: number;
+  created_at?: string;
+  elapsed_sec?: number;
+  summary?: Record<string, number>;
+  reuse_shots?: boolean;
+}
+
+function normalizeBatch(raw: unknown): PipelineBatch {
+  const rec = (raw || {}) as Record<string, unknown>;
+  const itemsRaw = Array.isArray(rec.items) ? rec.items : [];
+  return {
+    id: String(rec.id ?? rec.batch_id ?? ""),
+    status: (String(rec.status ?? "queued") as PipelineBatch["status"]) || "queued",
+    current_index: typeof rec.current_index === "number" ? rec.current_index : undefined,
+    total: Number(rec.total ?? itemsRaw.length) || itemsRaw.length,
+    created_at: typeof rec.created_at === "string" ? rec.created_at : undefined,
+    elapsed_sec: typeof rec.elapsed_sec === "number" ? rec.elapsed_sec : undefined,
+    summary: (rec.summary as Record<string, number>) || undefined,
+    reuse_shots: Boolean(rec.reuse_shots),
+    items: itemsRaw.map((item) => {
+      const it = (item || {}) as Record<string, unknown>;
+      return {
+        template_id: String(it.template_id ?? it.id ?? ""),
+        label: typeof it.label === "string" ? it.label : undefined,
+        status: (String(it.status ?? "queued") as BatchItemStatus) || "queued",
+        job_id: typeof it.job_id === "string" ? it.job_id : undefined,
+        stage: typeof it.stage === "string" ? it.stage : undefined,
+        stage_index: typeof it.stage_index === "number" ? it.stage_index : undefined,
+        stage_label: typeof it.stage_label === "string" ? it.stage_label : undefined,
+        progress: it.progress && typeof it.progress === "object"
+          ? { done: Number((it.progress as Record<string, unknown>).done) || 0, total: Number((it.progress as Record<string, unknown>).total) || 0 }
+          : undefined,
+        final_url: typeof it.final_url === "string" ? it.final_url : null,
+        error: typeof it.error === "string" ? it.error : null,
+        started_at: typeof it.started_at === "string" ? it.started_at : null,
+        finished_at: typeof it.finished_at === "string" ? it.finished_at : null,
+      };
+    }),
+  };
+}
+
+export function isBatchActive(batch: PipelineBatch | null | undefined): boolean {
+  return Boolean(batch && (batch.status === "queued" || batch.status === "running"));
+}
+
+export const pipelineBatchApi = {
+  start: async (templateIds: string[], reuseShots: boolean): Promise<PipelineBatch> =>
+    normalizeBatch(await request("/pipeline/batch", {
+      method: "POST",
+      body: JSON.stringify({ template_ids: templateIds, reuse_shots: reuseShots }),
+    })),
+  get: async (batchId: string): Promise<PipelineBatch> =>
+    normalizeBatch(await request("/pipeline/batch/" + encodeURIComponent(batchId))),
+  cancel: async (batchId: string): Promise<PipelineBatch> =>
+    normalizeBatch(await request("/pipeline/batch/" + encodeURIComponent(batchId) + "/cancel", { method: "POST" })),
+  list: async (limit = 5): Promise<PipelineBatch[]> => {
+    const res = (await request<unknown>("/pipeline/batches?limit=" + limit)) as Record<string, unknown> | unknown[];
+    const list = Array.isArray(res) ? res : Array.isArray((res as Record<string, unknown>)?.batches) ? ((res as Record<string, unknown>).batches as unknown[]) : [];
+    return list.map(normalizeBatch);
+  },
+};
