@@ -302,3 +302,71 @@ export function makeCustomId(prefix: "custom" | "custom_tpl"): string {
   const hex = Array.from({ length: 8 }, () => Math.floor(Math.random() * 16).toString(16)).join("");
   return `${prefix}_${hex}`;
 }
+
+/* ------------------------------ V32：角色试镜视频 ------------------------------ */
+export type AuditionStatus = "queued" | "running" | "done" | "failed" | "canceled";
+export type AuditionStyle = "anime" | "stylized_25d" | "realistic";
+
+export interface AuditionJob {
+  id: string;
+  character: string;
+  style: AuditionStyle | string;
+  status: AuditionStatus;
+  stage?: string;
+  progress?: number;
+  text?: string;
+  output_url?: string | null;
+  duration_sec?: number;
+  size_bytes?: number;
+  error?: string | null;
+  estimated_sec?: number;
+  elapsed_sec?: number;
+  created_at?: string | null;
+  started_at?: string | null;
+  finished_at?: string | null;
+}
+
+function normalizeAudition(raw: unknown): AuditionJob {
+  const rec = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
+  return {
+    id: String(rec.id ?? rec.job_id ?? ""),
+    character: String(rec.character ?? ""),
+    style: String(rec.style ?? "anime"),
+    status: (String(rec.status ?? "queued") as AuditionStatus) || "queued",
+    stage: typeof rec.stage === "string" ? rec.stage : undefined,
+    progress: Number(rec.progress) || 0,
+    text: typeof rec.text === "string" ? rec.text : undefined,
+    output_url: typeof rec.output_url === "string" ? rec.output_url : null,
+    duration_sec: Number(rec.duration_sec) || 0,
+    size_bytes: Number(rec.size_bytes) || 0,
+    error: typeof rec.error === "string" ? rec.error : null,
+    estimated_sec: Number(rec.estimated_sec) || 0,
+    elapsed_sec: Number(rec.elapsed_sec) || 0,
+    created_at: typeof rec.created_at === "string" ? rec.created_at : null,
+    started_at: typeof rec.started_at === "string" ? rec.started_at : null,
+    finished_at: typeof rec.finished_at === "string" ? rec.finished_at : null,
+  };
+}
+
+export function isAuditionActive(job: AuditionJob | null | undefined): boolean {
+  return Boolean(job && (job.status === "queued" || job.status === "running"));
+}
+
+export const auditionApi = {
+  start: async (
+    character: string,
+    body: { text?: string; style?: AuditionStyle; seed?: number; prompt_extra?: string },
+  ): Promise<AuditionJob> =>
+    normalizeAudition(await post(`/v5/characters/${encodeURIComponent(character)}/audition`, body, 60000)),
+  get: async (jobId: string): Promise<AuditionJob> =>
+    normalizeAudition(await get(`/auditions/${encodeURIComponent(jobId)}`)),
+  cancel: async (jobId: string): Promise<AuditionJob> =>
+    normalizeAudition(await post(`/auditions/${encodeURIComponent(jobId)}/cancel`, {}, 30000)),
+  list: async (character: string, limit = 10): Promise<AuditionJob[]> => {
+    const res = (await get(`/v5/characters/${encodeURIComponent(character)}/auditions?limit=${limit}`)) as
+      | { jobs?: unknown[]; auditions?: unknown[]; items?: unknown[] }
+      | unknown[];
+    const list = Array.isArray(res) ? res : res.jobs || res.auditions || res.items || [];
+    return list.map(normalizeAudition);
+  },
+};

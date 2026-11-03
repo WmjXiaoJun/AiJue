@@ -5,7 +5,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { errorText } from "../../lib/api";
 import type { V5CatalogResponse, V5CharacterSummary } from "../../lib/v5";
 import { mediaSrc, characterArtUrl, characterPreviewUrl, v5api } from "../../lib/v5";
-import { creationApi, creationErrorMessage } from "../../lib/creation";
+import { auditionApi, CreationError, creationApi, creationErrorMessage, isAuditionActive } from "../../lib/creation";
+import type { AuditionJob, AuditionStyle } from "../../lib/creation";
+import { downloadUrlAsBlob } from "../../lib/download";
 import type { CharacterAssets } from "../../lib/creation";
 import type { CharacterContract, VoicePreset } from "../../lib/voice";
 import { fetchCharacterContract, voiceApi } from "../../lib/voice";
@@ -15,6 +17,7 @@ import {
   IconAlert,
   IconCheck,
   IconClose,
+  IconDownload,
   IconExternal,
   IconFilm,
   IconGlobe,
@@ -59,6 +62,19 @@ const APPEARANCE_LABELS: Record<string, string> = {
   eye_style: "眼型",
   head_ratio: "头身比",
 };
+
+function fmtAuditionSize(bytes: number): string {
+  if (!bytes) return "—";
+  if (bytes >= 1024 * 1024) return (bytes / 1024 / 1024).toFixed(1) + " MB";
+  return Math.round(bytes / 1024) + " KB";
+}
+
+function fmtElapsed(sec: number): string {
+  const total = Math.max(0, Math.round(sec || 0));
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return m ? `${m}m${String(s).padStart(2, "0")}s` : `${s}s`;
+}
 
 function fmtAppearanceValue(value: unknown): string {
   if (value === null || value === undefined) return "—";
@@ -121,6 +137,20 @@ function CharacterPortrait({
 /** V30：立绘版本 */
 type PortraitVersion = "anime" | "stylized_25d" | "realistic";
 
+const AUDITION_STYLES: { id: AuditionStyle; label: string }[] = [
+  { id: "anime", label: "动漫" },
+  { id: "stylized_25d", label: "2.5D" },
+  { id: "realistic", label: "写实" },
+];
+
+const AUDITION_STAGES: Record<string, { label: string; progress: number }> = {
+  queued: { label: "排队中", progress: 5 },
+  tts: { label: "配音中", progress: 15 },
+  crop: { label: "裁切参考图", progress: 25 },
+  generate: { label: "生成视频中", progress: 60 },
+  done: { label: "已完成", progress: 100 },
+};
+
 const PORTRAIT_VERSIONS: { id: PortraitVersion; label: string; style: string; file: string }[] = [
   { id: "anime", label: "动漫", style: "anime", file: "portrait.png" },
   { id: "stylized_25d", label: "2.5D", style: "stylized_25d", file: "portrait_25d.png" },
@@ -157,6 +187,15 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
   const [portraitOverride, setPortraitOverride] = useState<Record<string, string>>({});
   const [portraitBusy, setPortraitBusy] = useState<string | null>(null);
   const [portraitError, setPortraitError] = useState("");
+  // V32：试镜视频
+  const [auditionOpen, setAuditionOpen] = useState(false);
+  const [auditionStyle, setAuditionStyle] = useState<AuditionStyle>("anime");
+  const [auditionText, setAuditionText] = useState("");
+  const [auditionSubmitting, setAuditionSubmitting] = useState(false);
+  const [auditionJob, setAuditionJob] = useState<AuditionJob | null>(null);
+  const [auditionJobs, setAuditionJobs] = useState<AuditionJob[]>([]);
+  const [auditionLoading, setAuditionLoading] = useState(false);
+  const [auditionError, setAuditionError] = useState("");
 
   const [previewChar, setPreviewChar] = useState<string | null>(null);
   const [previewError, setPreviewError] = useState("");
@@ -341,6 +380,140 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
       setAssetsByChar((prev) => (prev[characterId] ? prev : { ...prev, [characterId]: {} }));
     }
   }, []);
+
+  // V32：试镜视频 —— 最近任务/恢复/轮询/提交/取消/下载
+  const auditionDefaultText = useCallback((label: string) => `各位好，我是${label}。这是用我的角色立绘生成的一段试镜。`, []);
+
+  const loadAuditions = useCallback(async (characterId: string) => {
+    setAuditionLoading(true);
+    try {
+      const jobs = await auditionApi.list(characterId, 10);
+      setAuditionJobs(jobs);
+      const active = jobs.find((job) => isAuditionActive(job));
+      const latest = active || jobs.find((job) => job.status === "done") || jobs.find((job) => job.status === "failed") || null;
+      if (latest) setAuditionJob(latest);
+      setAuditionError("");
+    } catch (err) {
+      const status = err instanceof CreationError ? err.status : 0;
+      if (status !== 404 && status !== 405) setAuditionError(creationErrorMessage(err).join("；"));
+    } finally {
+      setAuditionLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    setAuditionJob(null);
+    setAuditionJobs([]);
+    setAuditionError("");
+    setAuditionOpen(false);
+    if (selected) void loadAuditions(selected);
+  }, [loadAuditions, selected]);
+
+  // 进行中任务 3s 轮询；完成/失败后刷新最近列表
+  useEffect(() => {
+    if (!selected || !auditionJob?.id || !isAuditionActive(auditionJob)) return;
+    let alive = true;
+    const timer = window.setInterval(async () => {
+      try {
+        const next = await auditionApi.get(auditionJob.id);
+        if (!alive) return;
+        setAuditionJob(next);
+        setAuditionError("");
+        if (!isAuditionActive(next)) {
+          setAuditionJobs((prev) => [next, ...prev.filter((job) => job.id !== next.id)].slice(0, 10));
+          void loadAuditions(selected);
+        }
+      } catch (err) {
+        if (!alive) return;
+        const status = err instanceof CreationError ? err.status : 0;
+        if (status === 404 || status === 405) setAuditionError("试镜任务接口尚未就绪（后端 V32 实现中）");
+        else setAuditionError("试镜任务状态读取失败：" + creationErrorMessage(err).join("；"));
+      }
+    }, 3000);
+    return () => {
+      alive = false;
+      window.clearInterval(timer);
+    };
+  }, [auditionJob?.id, auditionJob?.status, loadAuditions, selected]);
+
+  const openAuditionModal = useCallback(() => {
+    if (!selectedContract) return;
+    setAuditionStyle(portraitVersion);
+    setAuditionText(auditionDefaultText(selectedContract.label));
+    setAuditionError("");
+    setAuditionOpen(true);
+  }, [auditionDefaultText, portraitVersion, selectedContract]);
+
+  const submitAudition = useCallback(async () => {
+    if (!selectedContract) return;
+    setAuditionSubmitting(true);
+    setAuditionError("");
+    try {
+      const job = await auditionApi.start(selectedContract.id, {
+        text: auditionText.trim() || auditionDefaultText(selectedContract.label),
+        style: auditionStyle,
+      });
+      setAuditionJob(job);
+      setAuditionJobs((prev) => [job, ...prev.filter((item) => item.id !== job.id)]);
+      setAuditionOpen(false);
+      notify(`试镜视频任务已提交 · 约 3–4 分钟，可离开页面`, "success");
+    } catch (err) {
+      const status = err instanceof CreationError ? err.status : 0;
+      const message = creationErrorMessage(err).join("；");
+      if (status === 404 || status === 405) {
+        setAuditionError("试镜视频接口尚未就绪（后端 V32 实现中）");
+        notify("试镜视频接口尚未就绪（后端 V32 实现中）", "info");
+      } else if (status === 409) {
+        setAuditionError("GPU 正忙：" + message);
+        notify("GPU 正忙：" + message, "info");
+      } else {
+        setAuditionError("提交试镜失败：" + message);
+        notify("提交试镜失败：" + message, "error");
+      }
+    } finally {
+      setAuditionSubmitting(false);
+    }
+  }, [auditionDefaultText, auditionStyle, auditionText, notify, selectedContract]);
+
+  const cancelAudition = useCallback(async () => {
+    if (!auditionJob?.id) return;
+    try {
+      const next = await auditionApi.cancel(auditionJob.id);
+      setAuditionJob(next);
+      setAuditionJobs((prev) => [next, ...prev.filter((job) => job.id !== next.id)].slice(0, 10));
+      notify("已请求取消试镜任务", "info");
+    } catch (err) {
+      setAuditionError("取消失败：" + creationErrorMessage(err).join("；"));
+      notify("取消失败：" + creationErrorMessage(err).join("；"), "error");
+    }
+  }, [auditionJob?.id, notify]);
+
+  const retryAudition = useCallback(() => {
+    if (auditionJob) {
+      setAuditionStyle((auditionJob.style as AuditionStyle) || "anime");
+      setAuditionText(auditionJob.text || (selectedContract ? auditionDefaultText(selectedContract.label) : ""));
+    } else if (selectedContract) {
+      setAuditionStyle(portraitVersion);
+      setAuditionText(auditionDefaultText(selectedContract.label));
+    }
+    setAuditionError("");
+    setAuditionOpen(true);
+  }, [auditionDefaultText, auditionJob, portraitVersion, selectedContract]);
+
+  const downloadAudition = useCallback(async () => {
+    if (!auditionJob?.output_url) return;
+    try {
+      const res = await downloadUrlAsBlob(mediaSrc(auditionJob.output_url), `audition_${auditionJob.character}_${auditionJob.id}.mp4`);
+      notify(`已开始下载试镜视频（${fmtAuditionSize(res.size)}）`, "success");
+    } catch (err) {
+      notify("下载失败：" + (err instanceof Error ? err.message : String(err)), "error");
+    }
+  }, [auditionJob, notify]);
+
+  const auditionStage = auditionJob ? AUDITION_STAGES[auditionJob.stage || "queued"] || AUDITION_STAGES.queued : null;
+  const auditionProgress = auditionJob
+    ? Math.max(4, Math.min(100, auditionJob.progress && auditionJob.progress > 0 ? auditionJob.progress : auditionStage?.progress || 5))
+    : 0;
 
   /** V28：生成三视图/表情包/全部素材（imagegen，串行 40–90s） */
   const generateAssets = useCallback(
@@ -881,6 +1054,115 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                 </div>
               </div>
 
+              <section className="v18-drawer-sec v32-audition">
+                <div className="v18-drawer-sec-title">
+                  <IconFilm size={15} /> 试镜视频
+                  {auditionJob && (
+                    <span className={"v18-tag" + (auditionJob.status === "done" ? " is-jade" : auditionJob.status === "failed" ? " is-red" : " is-gold")}>
+                      {isAuditionActive(auditionJob) ? auditionStage?.label : auditionJob.status === "done" ? "已完成" : auditionJob.status === "canceled" ? "已取消" : auditionJob.status === "failed" ? "失败" : "排队中"}
+                    </span>
+                  )}
+                  <div className="v28-assets-actions">
+                    <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" disabled={auditionSubmitting} onClick={openAuditionModal}>
+                      <IconFilm size={12} /> 生成试镜视频
+                    </button>
+                  </div>
+                </div>
+                {auditionError && (
+                  <div className="v24-art-error" role="alert">
+                    <b>试镜视频</b>
+                    <span>{auditionError}</span>
+                  </div>
+                )}
+                {auditionLoading && !auditionJob && (
+                  <div className="v32-audition-loading">
+                    <Spinner size={14} /> 正在读取最近试镜任务…
+                  </div>
+                )}
+                {auditionJob && isAuditionActive(auditionJob) && (
+                  <div className="v32-progress-card">
+                    <div className="v32-progress-head">
+                      <span className="v32-progress-stage">
+                        <Spinner size={13} /> {auditionStage?.label || "排队中"}
+                      </span>
+                      <span className="v32-progress-elapsed">
+                        已用 {fmtElapsed(auditionJob.elapsed_sec || 0)} · 预计约 3–4 分钟
+                      </span>
+                    </div>
+                    <div className="v32-progress-bar">
+                      <i style={{ width: `${auditionProgress}%` }} />
+                      <span>{Math.round(auditionProgress)}%</span>
+                    </div>
+                    <div className="v32-progress-meta">
+                      <span>{AUDITION_STYLES.find((item) => item.id === auditionJob.style)?.label || auditionJob.style}版立绘</span>
+                      <span>可离开页面，回到角色详情自动恢复</span>
+                      <button type="button" className="cm-btn cm-btn-sm cm-btn-ghost" onClick={() => void cancelAudition()}>
+                        取消任务
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {auditionJob && auditionJob.status === "done" && auditionJob.output_url && (
+                  <div className="v32-video-card">
+                    <video
+                      className="v32-video"
+                      src={mediaSrc(auditionJob.output_url)}
+                      controls
+                      preload="metadata"
+                      playsInline
+                    />
+                    <div className="v32-video-meta">
+                      <span className="v18-tag is-jade">已完成</span>
+                      <span className="v18-tag">{AUDITION_STYLES.find((item) => item.id === auditionJob.style)?.label || auditionJob.style}</span>
+                      <span className="cm-mono">{auditionJob.duration_sec ? auditionJob.duration_sec.toFixed(1) + "s" : "—"}</span>
+                      <span className="cm-mono">{fmtAuditionSize(auditionJob.size_bytes || 0)}</span>
+                      <button type="button" className="cm-btn cm-btn-sm" onClick={() => void downloadAudition()}>
+                        <IconDownload size={11} /> 下载
+                      </button>
+                      <button type="button" className="cm-btn cm-btn-sm cm-btn-ghost" onClick={retryAudition}>
+                        重新生成
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {auditionJob && (auditionJob.status === "failed" || auditionJob.status === "canceled") && (
+                  <div className="v32-fail-card">
+                    <b>{auditionJob.status === "canceled" ? "试镜任务已取消" : "试镜视频生成失败"}</b>
+                    <span>{auditionJob.error || "未知错误；可重试"}</span>
+                    <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" onClick={retryAudition}>
+                      重试
+                    </button>
+                  </div>
+                )}
+                {auditionJobs.length > 0 && (
+                  <div className="v32-recent">
+                    <span className="v32-recent-title">最近试镜</span>
+                    {auditionJobs.slice(0, 3).map((job) => (
+                      <div key={job.id} className={"v32-recent-row" + (auditionJob?.id === job.id ? " is-active" : "")}>
+                        <span className={"v18-tag" + (job.status === "done" ? " is-jade" : job.status === "failed" ? " is-red" : job.status === "canceled" ? "" : " is-gold")}>
+                          {job.status === "done" ? "已完成" : job.status === "failed" ? "失败" : job.status === "canceled" ? "已取消" : job.status === "running" ? "生成中" : "排队中"}
+                        </span>
+                        <span className="cm-mono">{AUDITION_STYLES.find((item) => item.id === job.style)?.label || job.style}</span>
+                        <span className="v32-recent-id cm-mono">{job.id}</span>
+                        <button
+                          type="button"
+                          className="cm-btn cm-btn-sm"
+                          onClick={() => {
+                            setAuditionJob(job);
+                            setAuditionError("");
+                          }}
+                        >
+                          {job.status === "done" ? "查看" : "跟踪"}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <p className="v21-hint">
+                  试镜视频 = 立绘 + 角色音色 TTS + H3 图生视频口型同步；约 3–4 分钟（GPU 串行），生成期间可离开本页。
+                </p>
+              </section>
+
               <section className="v18-drawer-sec v28-assets">
                 <div className="v18-drawer-sec-title">
                   <IconImage size={15} /> 角色素材
@@ -1139,6 +1421,67 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
           }}
         />
       )}
+      {auditionOpen && selectedContract && (
+        <div className="v32-mask" onMouseDown={() => !auditionSubmitting && setAuditionOpen(false)} role="presentation">
+          <div className="v32-modal" onMouseDown={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-label="生成试镜视频">
+            <header className="v32-modal-head">
+              <div>
+                <span className="v21-drawer-kicker">AUDITION · 角色试镜</span>
+                <h3 className="v32-modal-title">生成试镜视频 · {selectedContract.label}</h3>
+              </div>
+              <button type="button" className="v21-close" onClick={() => setAuditionOpen(false)} aria-label="关闭" disabled={auditionSubmitting}>
+                <IconClose size={16} />
+              </button>
+            </header>
+            <div className="v32-modal-body">
+              <label className="v21-field">
+                <span className="v21-field-label">立绘版本</span>
+                <select
+                  className="v21-select"
+                  value={auditionStyle}
+                  onChange={(event) => setAuditionStyle(event.target.value as AuditionStyle)}
+                  disabled={auditionSubmitting}
+                >
+                  {AUDITION_STYLES.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.label}版立绘
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="v21-field">
+                <span className="v21-field-label">试镜台词（可修改，建议 ≤120 字）</span>
+                <textarea
+                  className="v21-textarea v32-textarea"
+                  value={auditionText}
+                  maxLength={200}
+                  rows={4}
+                  onChange={(event) => setAuditionText(event.target.value)}
+                  disabled={auditionSubmitting}
+                />
+                <span className="v21-hint">{auditionText.length}/200 字 · 台词越短生成越快</span>
+              </label>
+              <p className="v32-modal-hint">约 3–4 分钟（GPU 串行）· 可离开页面，回到角色详情自动恢复进度。</p>
+              {auditionError && (
+                <div className="v24-art-error" role="alert">
+                  <b>提交失败</b>
+                  <span>{auditionError}</span>
+                </div>
+              )}
+            </div>
+            <footer className="v32-modal-foot">
+              <span className="v21-foot-note">完成后可在角色详情在线播放 / 下载。</span>
+              <button type="button" className="cm-btn cm-btn-sm" onClick={() => setAuditionOpen(false)} disabled={auditionSubmitting}>
+                取消
+              </button>
+              <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" onClick={() => void submitAudition()} disabled={auditionSubmitting}>
+                {auditionSubmitting ? <Spinner size={12} /> : <IconFilm size={12} />} 生成试镜视频
+              </button>
+            </footer>
+          </div>
+        </div>
+      )}
+
       {lightbox && (
         <div className="v28-lightbox" onMouseDown={() => setLightbox(null)} role="presentation">
           <div className="v28-lightbox-body" onMouseDown={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-label={lightbox.label}>
