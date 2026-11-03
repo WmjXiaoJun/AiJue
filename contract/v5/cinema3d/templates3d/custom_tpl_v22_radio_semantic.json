@@ -1,0 +1,68 @@
+{
+ "template": "custom_tpl_v22_radio",
+ "style": "vhs_late_show",
+ "look": "1980s VHS late-night comedy club, brick wall with neon sign, magenta and cyan stage light, scanlines and chromatic aberration, analog tape grain, warm retro",
+ "mode": "semantic",
+ "shots": [
+  {
+   "id": "v5_001",
+   "kind": "broll",
+   "scene": "neon_skyline",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": "",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] 1980s VHS late-night comedy club, brick wall with neon sign, magenta and cyan stage light, scanlines and chromatic aberration, analog tape grain, warm retro. Set in a cinematic set inspired by neon skyline. The camera surveys the space, atmospheric and cinematic. Camera: slow crane rise. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft club 80s ambience, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_002",
+   "kind": "dialogue",
+   "scene": "late_night_studio",
+   "duration": 4.85,
+   "line": "各位深夜好，这里是城市来信，我是老周。",
+   "semantic_visual": "A middle-aged host in a dim radio studio leans toward a vintage microphone, warm desk lamp glow, VHS grain, shelves of tapes behind him, calm late-night mood.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] 1980s VHS late-night comedy club, brick wall with neon sign, magenta and cyan stage light, scanlines and chromatic aberration, analog tape grain, warm retro. Set in a cinematic set inspired by late night studio. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A middle-aged host in a dim radio studio leans toward a vintage microphone, warm desk lamp glow, VHS grain, shelves of tapes behind him, calm late-night mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft club 80s ambience, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_003",
+   "kind": "dialogue",
+   "scene": "late_night_studio",
+   "duration": 4.58,
+   "line": "今晚想聊一个很多年没敢说出口的名字。",
+   "semantic_visual": "A young woman sits across the studio table, fingers tracing the rim of a coffee mug, eyes lowered, soft neon light through blinds, nostalgic quiet atmosphere.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] 1980s VHS late-night comedy club, brick wall with neon sign, magenta and cyan stage light, scanlines and chromatic aberration, analog tape grain, warm retro. Set in a cinematic set inspired by late night studio. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: A young woman sits across the studio table, fingers tracing the rim of a coffee mug, eyes lowered, soft neon light through blinds, nostalgic quiet atmosphere.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft club 80s ambience, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_004",
+   "kind": "broll",
+   "scene": "rainy_street",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": "",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] 1980s VHS late-night comedy club, brick wall with neon sign, magenta and cyan stage light, scanlines and chromatic aberration, analog tape grain, warm retro. Set in a cinematic set inspired by rainy street. The camera surveys the space, atmospheric and cinematic. Camera: slow dolly move through the space. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft club 80s ambience, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_005",
+   "kind": "dialogue",
+   "scene": "late_night_studio",
+   "duration": 5.02,
+   "line": "写信的人说，他其实一直没离开过这座城。",
+   "semantic_visual": "A man holds an opened handwritten letter under a desk lamp, the city skyline glowing through the studio window behind him, reflective and wistful mood.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] 1980s VHS late-night comedy club, brick wall with neon sign, magenta and cyan stage light, scanlines and chromatic aberration, analog tape grain, warm retro. Set in a cinematic set inspired by late night studio. Featuring a stylized 3D animated man in his 50s, bald black hair, wearing a black jacket with red-brown accents, with glasses. The shot shows the idea through visible action: A man holds an opened handwritten letter under a desk lamp, the city skyline glowing through the studio window behind him, reflective and wistful mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft club 80s ambience, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_006",
+   "kind": "broll",
+   "scene": "subway_exit",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": "",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] 1980s VHS late-night comedy club, brick wall with neon sign, magenta and cyan stage light, scanlines and chromatic aberration, analog tape grain, warm retro. Set in a cinematic set inspired by subway exit. The camera surveys the space, atmospheric and cinematic. Camera: slow pull-back revealing the space. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft club 80s ambience, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  }
+ ]
+}

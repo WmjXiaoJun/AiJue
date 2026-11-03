@@ -1,0 +1,127 @@
+{
+  "id": "custom_tpl_v22_radio",
+  "label": "深夜电台 · 城市来信",
+  "description": "V21 可视化创建后真实生成的全新模板：深夜电台，听众来信。",
+  "tags": [
+    "custom",
+    "v21"
+  ],
+  "style": "vhs_late_show",
+  "target_duration": 23.45,
+  "aspect": [
+    16,
+    9
+  ],
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "name": "老周"
+    },
+    {
+      "role": "figure_a",
+      "character": "ali",
+      "name": "阿栗"
+    },
+    {
+      "role": "figure_b",
+      "character": "dawei",
+      "name": "大魏"
+    }
+  ],
+  "acts": [
+    {
+      "id": "act01",
+      "name": "第 1 幕",
+      "scene": "neon_skyline",
+      "camera": "crane_up",
+      "camera_strength": 0.06,
+      "duration": 3.0,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    },
+    {
+      "id": "act02",
+      "name": "第 2 幕",
+      "scene": "late_night_studio",
+      "camera": "push_in",
+      "camera_strength": 0.06,
+      "duration": 4.85,
+      "line": "host",
+      "text": "各位深夜好，这里是城市来信，我是老周。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act03",
+      "name": "第 3 幕",
+      "scene": "late_night_studio",
+      "camera": "dolly",
+      "camera_strength": 0.06,
+      "duration": 4.58,
+      "line": "figure_a",
+      "text": "今晚想聊一个很多年没敢说出口的名字。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act04",
+      "name": "第 4 幕",
+      "scene": "rainy_street",
+      "camera": "dolly",
+      "camera_strength": 0.06,
+      "duration": 3.0,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    },
+    {
+      "id": "act05",
+      "name": "第 5 幕",
+      "scene": "late_night_studio",
+      "camera": "push_in",
+      "camera_strength": 0.06,
+      "duration": 5.02,
+      "line": "figure_b",
+      "text": "写信的人说，他其实一直没离开过这座城。",
+      "characters": [
+        "figure_b"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act06",
+      "name": "第 6 幕",
+      "scene": "subway_exit",
+      "camera": "pull_out",
+      "camera_strength": 0.06,
+      "duration": 3.0,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    }
+  ],
+  "packaging": {
+    "subtitle": "default",
+    "transition": "fade",
+    "title": "深夜电台 · 城市来信"
+  },
+  "lipsync": {
+    "mode": "musetalk"
+  },
+  "audio": {},
+  "meta": {
+    "create_source": "v21",
+    "three_d": true,
+    "created_at": "2026-11-03 13:53:22",
+    "created_by": "api"
+  }
+}
