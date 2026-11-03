@@ -37,3 +37,26 @@
 - **tpl-backend**：多行 TTS/拼接/SRT/烧录/参数校验 + 自测
 - **tpl-frontend**：多行输入/字幕开关/多句进度/完成播放与 srt 下载 + 截图
 - **Lead**：真实生成 3 句带字幕验证、截图、docs、commit
+
+
+## 5. 交付结果（2026-11-03 23:46）
+
+### 后端（22/22 自测 PASS）
+- `POST /api/v5/characters/{id}/audition` 新增 `lines?: string[]`（≤6 行、每行 ≤80 字、优先 text、忽略空行）与 `subtitles?: bool=true`；创建时估算总时长 >12s → 400
+- 流程：逐句 TTS（同角色音色）→ 句间 0.35s 静音拼接 → `segments[start,end]` → SRT → H3 audio_ref（duration=总音频+0.1）→ subtitles=true 时 ffmpeg 烧录（白字黑边/底部居中/字号 20/MarginV 24）→ `<char>_<job>_sub.mp4`；烧录失败仅 warning 回退 plain
+- 任务字段新增 `lines/segments/srt_url/subtitles_burned/output_url/plain_output_url`
+- 实测：laozhou 3 句 → TTS 8.572s、H3 249.3s、烧录版 928,982B（1024×576 + 音轨 8.71s）、SRT 3 条、抽帧字幕可见（差异 5.06%）；subtitles=false 回归正常；参数 400 三种均验证
+- 8090 PID 43648
+
+### 前端
+- 试镜弹层台词改多行（每行一句，最多 6 行）：实时行数/预计时长/单行 ≤80 字，超限内联错误 + 禁用提交；「烧录字幕」默认勾选
+- 多句进度卡（第 i/n 句 · 配音中/生成视频中）；完成后内嵌播放烧录版 + 字幕徽标 + 烧录版/无字幕版/SRT 三个下载；最近列表「字幕」「n 句」标记
+- 截图 `tmp/v33/ui/`（6 张）
+
+### Lead 验收
+- 真实任务（后端自测）：3 句 + 字幕烧录 done，播放器可见字幕；UI 生产构建显示字幕徽标、SRT 下载、多行输入提示（`tmp/v33/lead/`）
+- 另本轮的 3 条角色试镜 demo 使用 lines+subtitles（见 docs/V33_CHARACTER_SHOWCASE.md）
+
+### 遗留
+- H3 冷启动约 4 分钟/条；12s 预检为估算，估算偏低时任务会 failed 并给可读错误
+- 烧录为 h264 重编码（veryfast/crf20）；H3 原生 24fps

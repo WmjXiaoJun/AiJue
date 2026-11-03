@@ -316,6 +316,14 @@ export interface AuditionJob {
   progress?: number;
   text?: string;
   output_url?: string | null;
+  /** V33：无字幕版 / SRT / 多句 */
+  plain_output_url?: string | null;
+  srt_url?: string | null;
+  subtitles_burned?: boolean;
+  lines?: string[];
+  segments?: { text: string; start: number; end: number }[];
+  total_lines?: number;
+  current_line?: number;
   duration_sec?: number;
   size_bytes?: number;
   error?: string | null;
@@ -337,6 +345,19 @@ function normalizeAudition(raw: unknown): AuditionJob {
     progress: Number(rec.progress) || 0,
     text: typeof rec.text === "string" ? rec.text : undefined,
     output_url: typeof rec.output_url === "string" ? rec.output_url : null,
+    plain_output_url: typeof rec.plain_output_url === "string" ? rec.plain_output_url : null,
+    srt_url: typeof rec.srt_url === "string" ? rec.srt_url : null,
+    subtitles_burned: Boolean(rec.subtitles_burned),
+    lines: Array.isArray(rec.lines) ? rec.lines.map((line) => String(line)) : undefined,
+    segments: Array.isArray(rec.segments)
+      ? rec.segments.map((seg) => ({
+          text: String((seg as Record<string, unknown>)?.text ?? ""),
+          start: Number((seg as Record<string, unknown>)?.start) || 0,
+          end: Number((seg as Record<string, unknown>)?.end) || 0,
+        }))
+      : undefined,
+    total_lines: Number(rec.total_lines) || 0,
+    current_line: Number(rec.current_line) || 0,
     duration_sec: Number(rec.duration_sec) || 0,
     size_bytes: Number(rec.size_bytes) || 0,
     error: typeof rec.error === "string" ? rec.error : null,
@@ -355,7 +376,14 @@ export function isAuditionActive(job: AuditionJob | null | undefined): boolean {
 export const auditionApi = {
   start: async (
     character: string,
-    body: { text?: string; style?: AuditionStyle; seed?: number; prompt_extra?: string },
+    body: {
+      text?: string;
+      lines?: string[];
+      subtitles?: boolean;
+      style?: AuditionStyle;
+      seed?: number;
+      prompt_extra?: string;
+    },
   ): Promise<AuditionJob> =>
     normalizeAudition(await post(`/v5/characters/${encodeURIComponent(character)}/audition`, body, 60000)),
   get: async (jobId: string): Promise<AuditionJob> =>

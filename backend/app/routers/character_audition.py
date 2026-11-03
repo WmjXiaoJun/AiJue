@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """V32：角色试镜视频（立绘 + 角色声音 → H3 图生视频 / 口型同步）后端。
 
 POST /api/v5/characters/{character}/audition   创建任务（202）
@@ -47,6 +47,11 @@ _STYLES = tuple(_PORTRAIT_BY_STYLE)
 _DEFAULT_TEXT = "各位好，我是{label}。这是用我的角色立绘生成的一段试镜。"
 _ESTIMATED_SEC = 200
 _JOB_ID_RE = re.compile(r"^au_[a-f0-9]{12}$")
+# V33：多句台词 + 字幕
+_MAX_LINES = 6
+_MAX_LINE_CHARS = 80
+_MAX_AUDIO_SECONDS = 12.0
+_LINE_GAP_SECONDS = 0.35
 
 _LOCK = threading.RLock()
 _JOBS: Dict[str, Dict[str, Any]] = {}
@@ -101,7 +106,13 @@ def _view(job: Dict[str, Any]) -> Dict[str, Any]:
         "stage_history": list(job.get("stage_history") or []),
         "progress": job.get("progress", 0),
         "text": job.get("text"),
+        "lines": job.get("lines") or [],
+        "segments": job.get("segments") or [],
+        "subtitles": bool(job.get("subtitles", True)),
+        "srt_url": job.get("srt_url"),
+        "subtitles_burned": bool(job.get("subtitles_burned")),
         "output_url": job.get("output_url"),
+        "plain_output_url": job.get("plain_output_url"),
         "duration_sec": job.get("duration_sec"),
         "size_bytes": job.get("size_bytes"),
         "width": job.get("width"),
@@ -235,6 +246,131 @@ def _build_prompt(character: dict, style: str, prompt_extra: str) -> str:
 
 
 # --------------------------------------------------------------------------- #
+# V33：多句 TTS / SRT / 烧录
+# --------------------------------------------------------------------------- #
+class _AuditionTooLong(RuntimeError):
+    pass
+
+
+def _probe_duration(path: Path) -> float:
+    try:
+        from pipeline import utils  # noqa: PLC0415
+
+        return round(float(utils.probe_duration(path) or 0.0), 3)
+    except Exception:  # noqa: BLE001
+        return 0.0
+
+
+def _estimate_audio_seconds(lines: List[str]) -> float:
+    """粗略估算 TTS 时长（中文约 4 字/秒）+ 句间 0.35s（用于创建时 400 预检）。"""
+    chars = sum(len(str(line)) for line in lines)
+    return round(chars / 4.0 + _LINE_GAP_SECONDS * max(0, len(lines) - 1), 2)
+
+
+def _srt_time(seconds: float) -> str:
+    total_ms = max(0, int(round(float(seconds) * 1000)))
+    hours, rest = divmod(total_ms, 3_600_000)
+    minutes, rest = divmod(rest, 60_000)
+    secs, millis = divmod(rest, 1000)
+    return f"{hours:02d}:{minutes:02d}:{secs:02d},{millis:03d}"
+
+
+def _write_srt(segments: List[Dict[str, Any]], path: Path) -> None:
+    blocks = []
+    for index, segment in enumerate(segments, 1):
+        blocks.append(
+            f"{index}\n{_srt_time(segment['start'])} --> {_srt_time(segment['end'])}\n"
+            f"{segment['text']}\n"
+        )
+    path.write_text("\n".join(blocks), encoding="utf-8")
+
+
+def _synthesize_lines(character: dict, lines: List[str], workdir: Path,
+                      warnings: List[str]) -> tuple:
+    """逐句 TTS（同角色音色）→ 句间 0.35s 静音 → 拼接 24k mono wav；返回 (wav, segments, total)。"""
+    parts: List[Path] = []
+    segments: List[Dict[str, Any]] = []
+    engines: List[str] = []
+    cursor = 0.0
+    for index, line in enumerate(lines):
+        line_wav = workdir / f"line_{index:02d}.wav"
+        tts = v5_create._synthesize_line(character, line, line_wav, warnings)
+        engines.append(str(tts.get("engine") or "unknown"))
+        duration = _probe_duration(line_wav)
+        if duration <= 0:
+            raise RuntimeError(f"第 {index + 1} 句 TTS 音频时长为 0")
+        start = cursor
+        end = round(start + duration, 3)
+        segments.append({"index": index, "text": line,
+                         "start": round(start, 3), "end": end})
+        parts.append(line_wav)
+        cursor = end
+        if index < len(lines) - 1:
+            cursor += _LINE_GAP_SECONDS
+    total = round(cursor, 3)
+    if total > _MAX_AUDIO_SECONDS:
+        raise _AuditionTooLong(
+            f"台词总时长 {total:.2f}s 超过 {_MAX_AUDIO_SECONDS:.0f}s，请精简台词")
+    gap_wav = workdir / "gap.wav"
+    subprocess.run(
+        [str(jobs.ffmpeg_bin()), "-y", "-hide_banner", "-loglevel", "error",
+         "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono",
+         "-t", f"{_LINE_GAP_SECONDS:.3f}", "-c:a", "pcm_s16le", str(gap_wav)],
+        capture_output=True, timeout=60, check=True,
+    )
+    entries: List[Path] = []
+    for index, part in enumerate(parts):
+        if index:
+            entries.append(gap_wav)
+        entries.append(part)
+    concat_file = workdir / "concat.txt"
+    lines_text = []
+    for entry in entries:
+        escaped = str(entry.resolve()).replace("\\", "/").replace("'", "'\\''")
+        lines_text.append(f"file '{escaped}'")
+    concat_file.write_text("\n".join(lines_text) + "\n", encoding="utf-8")
+    audio = workdir / "audio.wav"
+    proc = subprocess.run(
+        [str(jobs.ffmpeg_bin()), "-y", "-hide_banner", "-loglevel", "error",
+         "-f", "concat", "-safe", "0", "-i", str(concat_file),
+         "-ar", "24000", "-ac", "1", "-c:a", "pcm_s16le", str(audio)],
+        capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=120,
+    )
+    if proc.returncode != 0 or not audio.is_file() or audio.stat().st_size <= 0:
+        tail = "\n".join((proc.stderr or "").strip().splitlines()[-6:])
+        raise RuntimeError(f"多句 TTS 拼接失败（returncode={proc.returncode}）：{tail[-400:]}")
+    probed = _probe_duration(audio)
+    if probed > 0:
+        total = probed
+    return audio, segments, total, engines
+
+
+def _burn_subtitles(plain: Path, subtitled: Path, workdir: Path,
+                    warnings: List[str]) -> bool:
+    """用 ffmpeg subtitles 滤镜烧录 SRT（白字黑边、底部居中、MarginV 24）。"""
+    style = ("FontName=Microsoft YaHei,FontSize=20,PrimaryColour=&H00FFFFFF,"
+             "OutlineColour=&H00000000,BorderStyle=1,Outline=2,Shadow=0,"
+             "Alignment=2,MarginV=24")
+    vf = f"subtitles=subtitles.srt:force_style='{style}'"
+    try:
+        proc = subprocess.run(
+            [str(jobs.ffmpeg_bin()), "-y", "-hide_banner", "-loglevel", "error",
+             "-i", str(plain.resolve()), "-vf", vf, "-c:v", "libx264", "-preset", "veryfast",
+             "-crf", "20", "-c:a", "copy", "-movflags", "+faststart", str(subtitled.resolve())],
+            cwd=str(workdir), capture_output=True, text=True, encoding="utf-8",
+            errors="replace", timeout=600,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        warnings.append(f"字幕烧录失败: {type(exc).__name__}: {exc}")
+        return False
+    if proc.returncode != 0 or not subtitled.is_file() or subtitled.stat().st_size <= 0:
+        tail = "\n".join((proc.stderr or "").strip().splitlines()[-8:])
+        warnings.append(f"字幕烧录失败（returncode={proc.returncode}）：{tail[-500:]}")
+        return False
+    return True
+
+
+# --------------------------------------------------------------------------- #
 # 任务执行
 # --------------------------------------------------------------------------- #
 def _kill_process(proc: Optional[subprocess.Popen]) -> None:
@@ -272,29 +408,33 @@ def _run_audition(job_id: str) -> None:
     try:
         character = (job.get("character_data") or {})
         style = str(job.get("style") or "anime")
-        text = str(job.get("text") or "")
+        raw_lines = job.get("lines")
+        if isinstance(raw_lines, list) and raw_lines:
+            lines = [str(line).strip() for line in raw_lines if str(line).strip()]
+        else:
+            lines = [str(job.get("text") or "")]
+        lines = lines or [str(job.get("text") or "")]
         width = int(job.get("width") or 1024)
         height = int(job.get("height") or 576)
         workdir = _JOBS_DIR / f"{job_id}_work"
         workdir.mkdir(parents=True, exist_ok=True)
-        wav = workdir / "line.wav"
 
-        # 1) TTS（breeze 优先 / edge 兜底；24k mono）
-        tts = v5_create._synthesize_line(character, text, wav, warnings)
-        duration = 0.0
-        try:
-            from pipeline import utils  # noqa: PLC0415
-
-            duration = float(utils.probe_duration(wav) or 0.0)
-        except Exception:  # noqa: BLE001
-            duration = 0.0
-        if duration <= 0:
-            raise RuntimeError("TTS 音频时长为 0，无法生成试镜")
+        # 1) 逐句 TTS（breeze 优先 / edge 兜底；24k mono；句间 0.35s）→ segments + SRT
+        audio, segments, duration, engines = _synthesize_lines(
+            character, lines, workdir, warnings)
+        srt_path = workdir / "subtitles.srt"
+        _write_srt(segments, srt_path)
         with _LOCK:
             if job.get("status") == "canceled":
                 raise _AuditionCanceled()
-            job.update(tts_engine=tts.get("engine"),
-                       duration_sec=round(duration, 3))
+            job.update(
+                lines=lines,
+                segments=segments,
+                tts_engine=",".join(sorted(set(engines))),
+                duration_sec=round(duration, 3),
+                srt_url=f"/media/audition_jobs/{workdir.name}/{srt_path.name}"
+                        f"?t={int(srt_path.stat().st_mtime)}",
+            )
             _set_stage(job, "crop", 20)
             _persist(job)
 
@@ -315,7 +455,7 @@ def _run_audition(job_id: str) -> None:
         prompt = _build_prompt(character, style, str(job.get("prompt_extra") or ""))
         cmd = [
             sys.executable, str(_H3_CLI), "--mode", "audio_ref",
-            "--image", str(ref), "--audio", str(wav), "--out", str(out),
+            "--image", str(ref), "--audio", str(audio), "--out", str(out),
             "--duration", f"{duration + 0.1:.3f}",
             "--width", str(width), "--height", str(height),
             "--fps", "25", "--seed", str(job.get("seed") or 42),
@@ -371,21 +511,35 @@ def _run_audition(job_id: str) -> None:
         if not out.is_file() or out.stat().st_size <= 0:
             raise RuntimeError("H3 未产出视频文件")
 
-        # 4) 完成
-        info = _media_info(out)
+        # 4) 完成：可选烧录字幕（白字黑边/底部居中/MarginV 24），失败仅 warning
+        plain_info = _media_info(out)
+        plain_stat = out.stat()
+        plain_url = f"/media/character_demos/{out.name}?t={int(plain_stat.st_mtime)}"
+        final_path = out
+        final_info = plain_info
+        subtitles_burned = False
+        if bool(job.get("subtitles", True)):
+            subtitled = _DEMO_DIR / f"{job.get('character')}_{job_id}_sub.mp4"
+            if _burn_subtitles(out, subtitled, workdir, warnings):
+                final_path = subtitled
+                final_info = _media_info(subtitled)
+                subtitles_burned = True
         with _LOCK:
             if job.get("status") == "canceled":
                 raise _AuditionCanceled()
-            stat = out.stat()
+            stat = final_path.stat()
             job.update(
                 status="done",
-                output_url=f"/media/character_demos/{out.name}?t={int(stat.st_mtime)}",
-                output_path=str(out),
-                duration_sec=round(float(info.get("duration_sec") or duration), 3),
+                subtitles_burned=subtitles_burned,
+                plain_output_url=plain_url,
+                plain_output_path=str(out),
+                output_url=f"/media/character_demos/{final_path.name}?t={int(stat.st_mtime)}",
+                output_path=str(final_path),
+                duration_sec=round(float(final_info.get("duration_sec") or duration), 3),
                 size_bytes=int(stat.st_size),
-                width=info.get("width") or width,
-                height=info.get("height") or height,
-                has_audio=bool(info.get("has_audio")),
+                width=final_info.get("width") or width,
+                height=final_info.get("height") or height,
+                has_audio=bool(final_info.get("has_audio")),
                 warnings=warnings,
                 finished_at=_now(), finished_ts=time.time(),
             )
@@ -419,6 +573,8 @@ class _AuditionCanceled(Exception):
 # --------------------------------------------------------------------------- #
 class AuditionBody(BaseModel):
     text: Optional[str] = None
+    lines: Optional[List[str]] = None
+    subtitles: bool = True
     style: str = "anime"
     seed: Optional[int] = None
     prompt_extra: Optional[str] = None
@@ -455,8 +611,34 @@ def create_audition(character: str, payload: AuditionBody = Body(default=Auditio
     text = str(payload.text or "").strip()
     if not text:
         text = _DEFAULT_TEXT.format(label=str(char.get("label") or cid))
-    if len(text) > 120:
-        raise HTTPException(status_code=400, detail="台词不能超过 120 个字符")
+    lines: List[str] = []
+    if payload.lines is not None:
+        if not isinstance(payload.lines, (list, tuple)):
+            raise HTTPException(status_code=400, detail="lines 必须是字符串数组")
+        if len(payload.lines) > _MAX_LINES:
+            raise HTTPException(status_code=400, detail=f"lines 最多 {_MAX_LINES} 行")
+        for index, raw_line in enumerate(payload.lines):
+            line = str(raw_line or "").strip()
+            if not line:
+                continue
+            if len(line) > _MAX_LINE_CHARS:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"第 {index + 1} 行超过 {_MAX_LINE_CHARS} 字，请精简",
+                )
+            lines.append(line)
+    if not lines:
+        if len(text) > _MAX_LINE_CHARS:
+            raise HTTPException(status_code=400, detail="台词不能超过 80 个字符")
+        lines = [text]
+    elif len(lines) > _MAX_LINES:
+        raise HTTPException(status_code=400, detail=f"lines 最多 {_MAX_LINES} 行")
+    estimated = _estimate_audio_seconds(lines)
+    if estimated > _MAX_AUDIO_SECONDS:
+        raise HTTPException(status_code=400,
+                            detail="台词过长，请精简到 12 秒内（当前估算 "
+                                   f"{estimated:.1f}s）")
+    subtitles = bool(payload.subtitles)
     try:
         width = int(payload.width or 1024)
         height = int(payload.height or 576)
@@ -502,6 +684,12 @@ def create_audition(character: str, payload: AuditionBody = Body(default=Auditio
         "style": style,
         "portrait_file": portrait_file,
         "text": text,
+        "lines": lines,
+        "segments": [],
+        "subtitles": subtitles,
+        "subtitles_burned": False,
+        "srt_url": None,
+        "plain_output_url": None,
         "prompt_extra": prompt_extra,
         "seed": seed,
         "width": width,
@@ -547,6 +735,8 @@ def create_audition(character: str, payload: AuditionBody = Body(default=Auditio
         "style": style,
         "status": "queued",
         "text": text,
+        "lines": lines,
+        "subtitles": subtitles,
         "estimated_sec": _ESTIMATED_SEC,
         "portrait_file": portrait_file,
     }

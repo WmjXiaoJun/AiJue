@@ -191,6 +191,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
   const [auditionOpen, setAuditionOpen] = useState(false);
   const [auditionStyle, setAuditionStyle] = useState<AuditionStyle>("anime");
   const [auditionText, setAuditionText] = useState("");
+  const [auditionSubtitles, setAuditionSubtitles] = useState(true);
   const [auditionSubmitting, setAuditionSubmitting] = useState(false);
   const [auditionJob, setAuditionJob] = useState<AuditionJob | null>(null);
   const [auditionJobs, setAuditionJobs] = useState<AuditionJob[]>([]);
@@ -384,6 +385,26 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
   // V32：试镜视频 —— 最近任务/恢复/轮询/提交/取消/下载
   const auditionDefaultText = useCallback((label: string) => `各位好，我是${label}。这是用我的角色立绘生成的一段试镜。`, []);
 
+  /** V33：多行台词解析（空行忽略、每行≤80字、最多6行、合计预计≤12s） */
+  const auditionLines = auditionText
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const auditionEstimateSec = Math.round(
+    (auditionLines.reduce((sum, line) => sum + Math.max(1.1, line.length * 0.22), 0) + Math.max(0, auditionLines.length - 1) * 0.35) * 10,
+  ) / 10;
+  const auditionTooManyLines = auditionLines.length > 6;
+  const auditionLineTooLong = auditionLines.some((line) => line.length > 80);
+  const auditionEstimateTooLong = auditionEstimateSec > 12;
+  const auditionTextInvalid = auditionTooManyLines || auditionLineTooLong || auditionEstimateTooLong;
+  const auditionTextError = auditionTooManyLines
+    ? "最多 6 行台词，请删减"
+    : auditionLineTooLong
+      ? "单行台词最多 80 字，请精简"
+      : auditionEstimateTooLong
+        ? `预计约 ${auditionEstimateSec}s，超过 12s 上限，请精简台词`
+        : "";
+
   const loadAuditions = useCallback(async (characterId: string) => {
     setAuditionLoading(true);
     try {
@@ -440,6 +461,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
     if (!selectedContract) return;
     setAuditionStyle(portraitVersion);
     setAuditionText(auditionDefaultText(selectedContract.label));
+    setAuditionSubtitles(true);
     setAuditionError("");
     setAuditionOpen(true);
   }, [auditionDefaultText, portraitVersion, selectedContract]);
@@ -449,8 +471,15 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
     setAuditionSubmitting(true);
     setAuditionError("");
     try {
+      if (auditionTextInvalid) {
+        setAuditionError(auditionTextError);
+        setAuditionSubmitting(false);
+        return;
+      }
+      const lines = auditionLines.length ? auditionLines : [auditionDefaultText(selectedContract.label)];
       const job = await auditionApi.start(selectedContract.id, {
-        text: auditionText.trim() || auditionDefaultText(selectedContract.label),
+        lines,
+        subtitles: auditionSubtitles,
         style: auditionStyle,
       });
       setAuditionJob(job);
@@ -473,7 +502,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
     } finally {
       setAuditionSubmitting(false);
     }
-  }, [auditionDefaultText, auditionStyle, auditionText, notify, selectedContract]);
+  }, [auditionDefaultText, auditionEstimateSec, auditionLineTooLong, auditionLines, auditionStyle, auditionSubtitles, auditionTextError, auditionTextInvalid, auditionTooManyLines, notify, selectedContract]);
 
   const cancelAudition = useCallback(async () => {
     if (!auditionJob?.id) return;
@@ -510,7 +539,26 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
     }
   }, [auditionJob, notify]);
 
+  const downloadAuditionFile = useCallback(
+    async (url: string, filename: string, label: string) => {
+      try {
+        const res = await downloadUrlAsBlob(mediaSrc(url), filename);
+        notify(`已开始下载${label}（${fmtAuditionSize(res.size)}）`, "success");
+      } catch (err) {
+        notify(`下载${label}失败：` + (err instanceof Error ? err.message : String(err)), "error");
+      }
+    },
+    [notify],
+  );
+
   const auditionStage = auditionJob ? AUDITION_STAGES[auditionJob.stage || "queued"] || AUDITION_STAGES.queued : null;
+  const auditionTotalLines = auditionJob?.total_lines || auditionJob?.lines?.length || 0;
+  const auditionCurrentLine = auditionJob?.current_line || 0;
+  const auditionStageLabel = auditionJob
+    ? auditionTotalLines > 1 && auditionJob.stage && ["tts", "generate"].includes(auditionJob.stage)
+      ? `第 ${Math.max(1, auditionCurrentLine)}/${auditionTotalLines} 句 · ${auditionStage?.label || "生成中"}`
+      : auditionStage?.label || "排队中"
+    : "";
   const auditionProgress = auditionJob
     ? Math.max(4, Math.min(100, auditionJob.progress && auditionJob.progress > 0 ? auditionJob.progress : auditionStage?.progress || 5))
     : 0;
@@ -1083,7 +1131,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                   <div className="v32-progress-card">
                     <div className="v32-progress-head">
                       <span className="v32-progress-stage">
-                        <Spinner size={13} /> {auditionStage?.label || "排队中"}
+                        <Spinner size={13} /> {auditionStageLabel}
                       </span>
                       <span className="v32-progress-elapsed">
                         已用 {fmtElapsed(auditionJob.elapsed_sec || 0)} · 预计约 3–4 分钟
@@ -1095,6 +1143,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                     </div>
                     <div className="v32-progress-meta">
                       <span>{AUDITION_STYLES.find((item) => item.id === auditionJob.style)?.label || auditionJob.style}版立绘</span>
+                      <span>{auditionTotalLines ? `${auditionTotalLines} 句台词` : "单句台词"}{auditionJob.subtitles_burned === false ? "" : " · 烧录字幕"}</span>
                       <span>可离开页面，回到角色详情自动恢复</span>
                       <button type="button" className="cm-btn cm-btn-sm cm-btn-ghost" onClick={() => void cancelAudition()}>
                         取消任务
@@ -1114,11 +1163,30 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                     <div className="v32-video-meta">
                       <span className="v18-tag is-jade">已完成</span>
                       <span className="v18-tag">{AUDITION_STYLES.find((item) => item.id === auditionJob.style)?.label || auditionJob.style}</span>
+                      {auditionJob.subtitles_burned && <span className="v18-tag is-gold">字幕</span>}
                       <span className="cm-mono">{auditionJob.duration_sec ? auditionJob.duration_sec.toFixed(1) + "s" : "—"}</span>
                       <span className="cm-mono">{fmtAuditionSize(auditionJob.size_bytes || 0)}</span>
                       <button type="button" className="cm-btn cm-btn-sm" onClick={() => void downloadAudition()}>
-                        <IconDownload size={11} /> 下载
+                        <IconDownload size={11} /> {auditionJob.subtitles_burned ? "烧录版下载" : "下载"}
                       </button>
+                      {auditionJob.plain_output_url && (
+                        <button
+                          type="button"
+                          className="cm-btn cm-btn-sm cm-btn-ghost"
+                          onClick={() => void downloadAuditionFile(auditionJob.plain_output_url as string, `audition_${auditionJob.character}_${auditionJob.id}_plain.mp4`, "无字幕版")}
+                        >
+                          <IconDownload size={11} /> 无字幕版下载
+                        </button>
+                      )}
+                      {auditionJob.srt_url && (
+                        <button
+                          type="button"
+                          className="cm-btn cm-btn-sm cm-btn-ghost"
+                          onClick={() => void downloadAuditionFile(auditionJob.srt_url as string, `audition_${auditionJob.character}_${auditionJob.id}.srt`, "SRT 字幕")}
+                        >
+                          <IconDownload size={11} /> SRT 下载
+                        </button>
+                      )}
                       <button type="button" className="cm-btn cm-btn-sm cm-btn-ghost" onClick={retryAudition}>
                         重新生成
                       </button>
@@ -1143,6 +1211,8 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                           {job.status === "done" ? "已完成" : job.status === "failed" ? "失败" : job.status === "canceled" ? "已取消" : job.status === "running" ? "生成中" : "排队中"}
                         </span>
                         <span className="cm-mono">{AUDITION_STYLES.find((item) => item.id === job.style)?.label || job.style}</span>
+                        {(job.subtitles_burned || job.srt_url) && <span className="v18-tag is-gold">字幕</span>}
+                        {job.lines && job.lines.length > 1 && <span className="cm-mono">{job.lines.length} 句</span>}
                         <span className="v32-recent-id cm-mono">{job.id}</span>
                         <button
                           type="button"
@@ -1450,16 +1520,37 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                 </select>
               </label>
               <label className="v21-field">
-                <span className="v21-field-label">试镜台词（可修改，建议 ≤120 字）</span>
+                <span className="v21-field-label">试镜台词（每行一句，最多 6 行，空行忽略）</span>
                 <textarea
                   className="v21-textarea v32-textarea"
                   value={auditionText}
-                  maxLength={200}
-                  rows={4}
+                  rows={5}
                   onChange={(event) => setAuditionText(event.target.value)}
                   disabled={auditionSubmitting}
+                  placeholder={"第一句台词\n第二句台词\n第三句台词"}
                 />
-                <span className="v21-hint">{auditionText.length}/200 字 · 台词越短生成越快</span>
+                <div className="v32-line-meta">
+                  <span className={auditionTooManyLines ? "is-error" : ""}>{auditionLines.length}/6 行</span>
+                  <span className={auditionEstimateTooLong ? "is-error" : ""}>预计约 {auditionEstimateSec}s（上限 12s）</span>
+                  <span className="v21-hint">空行自动忽略；单行 ≤80 字</span>
+                </div>
+                {auditionTextError && (
+                  <span className="v32-line-error" role="alert">
+                    {auditionTextError}
+                  </span>
+                )}
+              </label>
+              <label className="v33-subtitle-toggle">
+                <input
+                  type="checkbox"
+                  checked={auditionSubtitles}
+                  onChange={(event) => setAuditionSubtitles(event.target.checked)}
+                  disabled={auditionSubmitting}
+                />
+                <span>
+                  <b>烧录字幕</b>
+                  <em>白字黑边、底部居中；完成后同时提供无字幕版与 SRT 字幕</em>
+                </span>
               </label>
               <p className="v32-modal-hint">约 3–4 分钟（GPU 串行）· 可离开页面，回到角色详情自动恢复进度。</p>
               {auditionError && (
@@ -1474,7 +1565,13 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
               <button type="button" className="cm-btn cm-btn-sm" onClick={() => setAuditionOpen(false)} disabled={auditionSubmitting}>
                 取消
               </button>
-              <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" onClick={() => void submitAudition()} disabled={auditionSubmitting}>
+              <button
+                type="button"
+                className="cm-btn cm-btn-primary cm-btn-sm"
+                onClick={() => void submitAudition()}
+                disabled={auditionSubmitting || auditionTextInvalid}
+                title={auditionTextInvalid ? auditionTextError : "提交试镜任务"}
+              >
                 {auditionSubmitting ? <Spinner size={12} /> : <IconFilm size={12} />} 生成试镜视频
               </button>
             </footer>
