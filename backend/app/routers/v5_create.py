@@ -60,6 +60,21 @@ _ART_MODES = ("portrait", "three_view", "expressions", "sheet")
 _ART_ALL_MODES = ("portrait", "three_view", "expressions", "sheet")
 _ART_VIEWS = ("front", "side", "three_quarter")
 _ART_EXPRESSIONS = ("neutral", "happy", "surprised", "thinking")
+#: V30 立绘版本：style → 落盘文件名（anime 系列统一 portrait.png）
+_ART_PORTRAIT_BY_STYLE = {
+    "anime": "portrait.png",
+    "illustrious": "portrait.png",
+    "guoman": "portrait.png",
+    "stylized_25d": "portrait_25d.png",
+    "realistic": "portrait_real.png",
+}
+_ART_PORTRAIT_VARIANT_BY_STYLE = {
+    "anime": "anime",
+    "illustrious": "anime",
+    "guoman": "anime",
+    "stylized_25d": "stylized_25d",
+    "realistic": "realistic",
+}
 
 CUSTOM_PREFIX = getattr(v5_catalog, "CUSTOM_PREFIX", "custom_")
 EDGE_DEFAULT_VOICE = "zh-CN-YunxiNeural"
@@ -315,15 +330,25 @@ def _imagegen_spec_path(character: dict) -> Path:
     return spec_path
 
 
-def _art_portrait_path(character_id: str) -> Path:
-    return _ART_DIR / character_id / "portrait.png"
+def _art_portrait_path(character_id: str, filename: str = "portrait.png") -> Path:
+    return _ART_DIR / character_id / filename
+
+
+def _art_portrait_file_for_style(style: str) -> str:
+    return _ART_PORTRAIT_BY_STYLE.get(str(style or "").strip().lower(), "portrait.png")
+
+
+def _art_portrait_variant_for_style(style: str) -> str:
+    return _ART_PORTRAIT_VARIANT_BY_STYLE.get(str(style or "").strip().lower(), "anime")
 
 
 def _art_asset_paths(character_id: str) -> Dict[str, Any]:
-    """角色素材路径表：portrait / three_view(3) / expressions(4) / sheet。"""
+    """角色素材路径表：portrait 三版本 / three_view(3) / expressions(4) / sheet。"""
     base = _ART_DIR / character_id
     return {
         "portrait": base / "portrait.png",
+        "portrait_25d": base / "portrait_25d.png",
+        "portrait_real": base / "portrait_real.png",
         "three_view": {view: base / "three_view" / f"{view}.png" for view in _ART_VIEWS},
         "expressions": {expr: base / "expressions" / f"{expr}.png" for expr in _ART_EXPRESSIONS},
         "sheet": base / "sheet.png",
@@ -348,13 +373,23 @@ def _art_file_url(character_id: str, rel: str) -> Optional[str]:
         return None
 
 
-def _art_portrait_url(character_id: str) -> Optional[str]:
-    return _art_file_url(character_id, "portrait.png")
+def _art_portrait_url(character_id: str, filename: str = "portrait.png") -> Optional[str]:
+    return _art_file_url(character_id, filename)
+
+
+def _art_portraits_payload(character_id: str) -> Dict[str, Optional[str]]:
+    return {
+        "anime": _art_file_url(character_id, "portrait.png"),
+        "stylized_25d": _art_file_url(character_id, "portrait_25d.png"),
+        "realistic": _art_file_url(character_id, "portrait_real.png"),
+    }
 
 
 def _art_assets_payload(character_id: str) -> Dict[str, Any]:
+    portraits = _art_portraits_payload(character_id)
     return {
-        "portrait": _art_file_url(character_id, "portrait.png"),
+        "portrait": portraits.get("anime"),
+        "portraits": portraits,
         "three_view": {view: _art_file_url(character_id, f"three_view/{view}.png")
                        for view in _ART_VIEWS},
         "expressions": {expr: _art_file_url(character_id, f"expressions/{expr}.png")
@@ -365,7 +400,8 @@ def _art_assets_payload(character_id: str) -> Dict[str, Any]:
 
 def _art_asset_files(character_id: str) -> List[Dict[str, Any]]:
     base = _ART_DIR / character_id
-    rels = ["portrait.png"] + [f"three_view/{view}.png" for view in _ART_VIEWS] \
+    rels = ["portrait.png", "portrait_25d.png", "portrait_real.png"] \
+        + [f"three_view/{view}.png" for view in _ART_VIEWS] \
         + [f"expressions/{expr}.png" for expr in _ART_EXPRESSIONS] \
         + ["sheet.png", "meta.json"]
     rows: List[Dict[str, Any]] = []
@@ -413,15 +449,16 @@ def _normalize_art_modes(raw: Any) -> Tuple[List[str], List[str]]:
 
 
 def _run_imagegen_cli(spec_path: Path, outdir: Path, *, mode: str, style: str, seed: int,
-                      prompt_extra: str, timeout: float = _ART_TIMEOUT_SECONDS) -> dict:
+                      prompt_extra: str, timeout: float = _ART_TIMEOUT_SECONDS,
+                      ckpt: Optional[str] = None) -> dict:
     """调用 imagegen CLI（子进程），解析末尾 JSON 摘要；失败抛 RuntimeError（含可读 tail）。"""
     cmd = [sys.executable, "-m", "imagegen.cli", "generate",
            "--spec", str(spec_path), "--outdir", str(outdir),
            "--mode", mode, "--style", style, "--seed", str(seed),
            "--timeout", str(int(max(60, timeout - 60)))]
-    ckpt = os.environ.get("V5_ART_CKPT", "").strip()
-    if ckpt:
-        cmd += ["--ckpt", ckpt]
+    chosen_ckpt = (ckpt or os.environ.get("V5_ART_CKPT", "")).strip()
+    if chosen_ckpt:
+        cmd += ["--ckpt", chosen_ckpt]
     if prompt_extra:
         cmd += ["--prompt-extra", prompt_extra]
     env = dict(os.environ)
@@ -448,10 +485,12 @@ def _run_imagegen_cli(spec_path: Path, outdir: Path, *, mode: str, style: str, s
     return summary
 
 
-def _art_modes_complete(character_id: str, modes: List[str]) -> bool:
+def _art_modes_complete(character_id: str, modes: List[str], *,
+                        portrait_file: str = "portrait.png") -> bool:
     paths = _art_asset_paths(character_id)
     for mode in modes:
-        if mode == "portrait" and not _art_file_ok(paths["portrait"]):
+        if mode == "portrait" and not _art_file_ok(
+                _art_portrait_path(character_id, portrait_file)):
             return False
         if mode == "three_view" and not all(_art_file_ok(path) for path in
                                             paths["three_view"].values()):
@@ -468,17 +507,22 @@ def _generate_art(character: dict, *, style: str, prompt_extra: str, seed: int,
                   force: bool, modes: Optional[List[str]] = None) -> dict:
     """生成角色素材（同步）：cached → 3D job 互斥 → 同角色互斥 → GPU 串行锁 → imagegen。
 
-    modes: portrait / three_view / expressions / sheet（可多选；None=portrait）。
-    portrait 已有且只请求 portrait 时保持 V24 的 cached 行为。
+    V30：style 决定立绘落盘版本（anime 系列 portrait.png / stylized_25d portrait_25d.png /
+    realistic portrait_real.png），cached 判断按对应版本文件；其他 mode（三视图/表情/sheet）共用。
     """
     normalized, errors = _normalize_art_modes(modes if modes is not None else ["portrait"])
     if errors:
         raise ValueError("; ".join(errors))
     character_id = str(character.get("id") or "")
-    if not force and _art_modes_complete(character_id, normalized):
+    portrait_file = _art_portrait_file_for_style(style)
+    portrait_variant = _art_portrait_variant_for_style(style)
+    if not force and _art_modes_complete(character_id, normalized,
+                                         portrait_file=portrait_file):
         return {
             "character": character_id,
-            "portrait_url": _art_portrait_url(character_id),
+            "portrait_url": _art_portrait_url(character_id, portrait_file),
+            "portrait_file": portrait_file,
+            "portrait_variant": portrait_variant,
             "assets": _art_assets_payload(character_id),
             "files": _art_asset_files(character_id),
             "generated": [],
@@ -510,13 +554,26 @@ def _generate_art(character: dict, *, style: str, prompt_extra: str, seed: int,
         _ART_INFLIGHT.add(character_id)
     started = time.time()
     warnings: List[str] = []
+    staging: Optional[Path] = None
     try:
         from .. import jobs  # noqa: PLC0415 - 与 concept job / h3 共用 ComfyUI 串行锁
-
+        # 2.5D/写实版本换用对应 checkpoint（V5.2 既有立绘分别用 AAM / RealVisXL）
+        env_ckpt = os.environ.get("V5_ART_CKPT", "").strip()
+        ckpt = env_ckpt
+        if not ckpt and style == "realistic":
+            ckpt = "RealVisXL_V5.0_fp16.safetensors"
+        elif not ckpt and style == "stylized_25d":
+            ckpt = "AAM_XL_Anime_Mix.safetensors"
         with jobs.GPU_LOCK:
             spec_path = _imagegen_spec_path(character)
             outdir = _ART_DIR / character_id
             outdir.mkdir(parents=True, exist_ok=True)
+            direct = portrait_file == "portrait.png"
+            run_outdir = outdir
+            if not direct:
+                staging = outdir / f".art-{uuid.uuid4().hex[:10]}"
+                staging.mkdir(parents=True, exist_ok=True)
+                run_outdir = staging
             if list(normalized) == list(_ART_ALL_MODES):
                 runs = ["all"]
             else:
@@ -524,13 +581,32 @@ def _generate_art(character: dict, *, style: str, prompt_extra: str, seed: int,
             summaries: List[dict] = []
             for run_mode in runs:
                 summaries.append(_run_imagegen_cli(
-                    spec_path, outdir, mode=run_mode, style=style, seed=seed,
-                    prompt_extra=prompt_extra))
+                    spec_path, run_outdir, mode=run_mode, style=style, seed=seed,
+                    prompt_extra=prompt_extra, ckpt=ckpt))
+            if not direct and staging is not None:
+                if "portrait" in normalized:
+                    src = staging / "portrait.png"
+                    if not _art_file_ok(src):
+                        raise RuntimeError(f"imagegen 未产出 portrait.png（staging={staging}）")
+                    os.replace(src, _art_portrait_path(character_id, portrait_file))
+                if "three_view" in normalized:
+                    src_dir = staging / "three_view"
+                    if src_dir.is_dir():
+                        shutil.copytree(src_dir, outdir / "three_view", dirs_exist_ok=True)
+                if "expressions" in normalized:
+                    src_dir = staging / "expressions"
+                    if src_dir.is_dir():
+                        shutil.copytree(src_dir, outdir / "expressions", dirs_exist_ok=True)
+                if "sheet" in normalized:
+                    src_sheet = staging / "sheet.png"
+                    if src_sheet.is_file():
+                        os.replace(src_sheet, outdir / "sheet.png")
         elapsed = round(time.time() - started, 1)
         missing = []
         paths = _art_asset_paths(character_id)
-        if "portrait" in normalized and not _art_file_ok(paths["portrait"]):
-            missing.append("portrait.png")
+        if "portrait" in normalized and not _art_file_ok(
+                _art_portrait_path(character_id, portrait_file)):
+            missing.append(portrait_file)
         if "three_view" in normalized:
             missing += [f"three_view/{view}.png" for view in _ART_VIEWS
                         if not _art_file_ok(paths["three_view"][view])]
@@ -543,7 +619,9 @@ def _generate_art(character: dict, *, style: str, prompt_extra: str, seed: int,
             raise RuntimeError(f"imagegen 未产出: {', '.join(missing)}（outdir={outdir}）")
         return {
             "character": character_id,
-            "portrait_url": _art_portrait_url(character_id),
+            "portrait_url": _art_portrait_url(character_id, portrait_file),
+            "portrait_file": portrait_file,
+            "portrait_variant": portrait_variant,
             "assets": _art_assets_payload(character_id),
             "files": _art_asset_files(character_id),
             "generated": list(normalized),
@@ -558,6 +636,8 @@ def _generate_art(character: dict, *, style: str, prompt_extra: str, seed: int,
             "warnings": warnings,
         }
     finally:
+        if staging is not None:
+            shutil.rmtree(staging, ignore_errors=True)
         with _ART_STATE_LOCK:
             _ART_INFLIGHT.discard(character_id)
 
@@ -929,6 +1009,8 @@ def get_character_assets(character: str) -> dict:
     assets = _art_assets_payload(cid)
     exists = {
         "portrait": _art_file_ok(paths["portrait"]),
+        "portrait_25d": _art_file_ok(paths["portrait_25d"]),
+        "portrait_real": _art_file_ok(paths["portrait_real"]),
         "three_view": all(_art_file_ok(path) for path in paths["three_view"].values()),
         "expressions": all(_art_file_ok(path) for path in paths["expressions"].values()),
         "sheet": _art_file_ok(paths["sheet"]),
@@ -940,7 +1022,8 @@ def get_character_assets(character: str) -> dict:
         "assets": assets,
         "exists": exists,
         "files": _art_asset_files(cid),
-        "any": any(exists[key] for key in ("portrait", "three_view", "expressions", "sheet")),
+        "any": any(exists[key] for key in ("portrait", "portrait_25d", "portrait_real",
+                                           "three_view", "expressions", "sheet")),
     }
 
 

@@ -118,6 +118,15 @@ function CharacterPortrait({
   return <img src={sources[index]} alt={label} loading="lazy" onError={() => setIndex((prev) => prev + 1)} />;
 }
 
+/** V30：立绘版本 */
+type PortraitVersion = "anime" | "stylized_25d" | "realistic";
+
+const PORTRAIT_VERSIONS: { id: PortraitVersion; label: string; style: string; file: string }[] = [
+  { id: "anime", label: "动漫", style: "anime", file: "portrait.png" },
+  { id: "stylized_25d", label: "2.5D", style: "stylized_25d", file: "portrait_25d.png" },
+  { id: "realistic", label: "写实", style: "realistic", file: "portrait_real.png" },
+];
+
 export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSettings }: Props) {
   const notify = useToast();
   const [catalog, setCatalog] = useState<V5CatalogResponse | null>(null);
@@ -142,6 +151,12 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
   const [assetBusy, setAssetBusy] = useState<string | null>(null);
   const [assetError, setAssetError] = useState("");
   const [lightbox, setLightbox] = useState<{ src: string; label: string } | null>(null);
+  // V30：立绘版本
+  const [portraitVersion, setPortraitVersion] = useState<PortraitVersion>("anime");
+  const [portraitAvail, setPortraitAvail] = useState<Record<string, boolean>>({});
+  const [portraitOverride, setPortraitOverride] = useState<Record<string, string>>({});
+  const [portraitBusy, setPortraitBusy] = useState<string | null>(null);
+  const [portraitError, setPortraitError] = useState("");
 
   const [previewChar, setPreviewChar] = useState<string | null>(null);
   const [previewError, setPreviewError] = useState("");
@@ -354,6 +369,104 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
     if (!selected) return;
     void loadAssets(selected);
   }, [loadAssets, selected]);
+
+  // V30：切换角色时重置立绘版本
+  useEffect(() => {
+    setPortraitVersion("anime");
+    setPortraitError("");
+    setPortraitBusy(null);
+  }, [selected]);
+
+  const portraitKey = (characterId: string, version: PortraitVersion) => characterId + ":" + version;
+
+  /** V30：某版立绘 URL（优先 assets.portraits / 生成返回 override，否则按约定文件名 + cache-bust） */
+  const portraitUrlFor = useCallback(
+    (characterId: string, version: PortraitVersion): string => {
+      const key = portraitKey(characterId, version);
+      if (portraitOverride[key]) return portraitOverride[key];
+      const bust = artBust[characterId];
+      const assets = assetsByChar[characterId];
+      const fromAssets =
+        version === "anime"
+          ? assets?.portraits?.anime || assets?.portrait
+          : version === "stylized_25d"
+            ? assets?.portraits?.stylized_25d
+            : assets?.portraits?.realistic;
+      if (fromAssets) {
+        const url = artMediaUrl(fromAssets);
+        return bust ? url + (url.includes("?") ? "&" : "?") + "t=" + bust : url;
+      }
+      const contractPortrait = version === "anime" ? contracts[characterId]?.art.portrait : undefined;
+      if (contractPortrait) {
+        const url = artMediaUrl(contractPortrait);
+        return bust ? url + (url.includes("?") ? "&" : "?") + "t=" + bust : url;
+      }
+      return characterArtUrl(characterId, PORTRAIT_VERSIONS.find((item) => item.id === version)?.file || "portrait.png", bust);
+    },
+    [artBust, assetsByChar, contracts, portraitOverride],
+  );
+
+  // V30：预加载检测可用性（404 → 缺失）
+  useEffect(() => {
+    if (!selected) return;
+    const characterId = selected;
+    const key = portraitKey(characterId, portraitVersion);
+    if (portraitOverride[key]) {
+      setPortraitAvail((prev) => ({ ...prev, [key]: true }));
+      return;
+    }
+    let alive = true;
+    const img = new Image();
+    img.onload = () => {
+      if (alive) setPortraitAvail((prev) => ({ ...prev, [key]: true }));
+    };
+    img.onerror = () => {
+      if (alive) setPortraitAvail((prev) => ({ ...prev, [key]: false }));
+    };
+    img.src = portraitUrlFor(characterId, portraitVersion);
+    return () => {
+      alive = false;
+    };
+  }, [portraitOverride, portraitUrlFor, portraitVersion, selected]);
+
+  /** V30：生成/重新生成某版本立绘（style 落盘 25d/real） */
+  const generatePortraitVersion = useCallback(
+    async (characterId: string, version: PortraitVersion) => {
+      const meta = PORTRAIT_VERSIONS.find((item) => item.id === version);
+      if (!meta) return;
+      const key = portraitKey(characterId, version);
+      setPortraitBusy(key);
+      setPortraitError("");
+      try {
+        const res = await creationApi.generateCharacterArt(characterId, { force: true, style: meta.style });
+        const stamp = Date.now();
+        setArtBust((prev) => ({ ...prev, [characterId]: stamp }));
+        if (res.portrait_url) {
+          const url = artMediaUrl(res.portrait_url);
+          const withBust = url + (url.includes("?") ? "&" : "?") + "t=" + stamp;
+          setPortraitOverride((prev) => ({ ...prev, [key]: withBust }));
+        }
+        setPortraitAvail((prev) => ({ ...prev, [key]: true }));
+        if (version === "anime" && res.portrait_url) {
+          setContracts((prev) => {
+            const current = prev[characterId];
+            if (!current) return prev;
+            return { ...prev, [characterId]: { ...current, art: { ...current.art, portrait: res.portrait_url } } };
+          });
+        }
+        notify(`「${contracts[characterId]?.label || characterId}」${meta.label}版立绘已生成${res.elapsed_sec ? ` · ${Math.round(Number(res.elapsed_sec))}s` : ""}`, "success");
+        void loadAssets(characterId);
+      } catch (err) {
+        const items = creationErrorMessage(err);
+        setPortraitError(items.join("；"));
+        setPortraitAvail((prev) => ({ ...prev, [key]: prev[key] ?? false }));
+        notify(`${meta.label}版立绘生成失败：${items.join("；")}`, "error");
+      } finally {
+        setPortraitBusy((prev) => (prev === key ? null : prev));
+      }
+    },
+    [contracts, loadAssets, notify],
+  );
 
   /** V24：生成/重新生成角色概念图（SDXL，20–60s） */
   const generateArt = useCallback(
@@ -646,13 +759,79 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
             </header>
             <div className="v18-drawer-body">
               <div className="v18-drawer-hero">
-                <div className="v18-drawer-art">
-                  <CharacterPortrait
-                    characterId={selectedContract.id}
-                    label={selectedContract.label}
-                    portrait={selectedContract.art.portrait}
-                    bust={artBust[selectedContract.id]}
-                  />
+                <div className="v18-drawer-art v30-drawer-art">
+                  <div className="v30-portrait">
+                    <div className="v30-portrait-tabs" role="group" aria-label="立绘版本">
+                      {PORTRAIT_VERSIONS.map((item) => {
+                        const key = portraitKey(selectedContract.id, item.id);
+                        const avail = portraitAvail[key];
+                        return (
+                          <button
+                            key={item.id}
+                            type="button"
+                            className={"v30-portrait-tab" + (portraitVersion === item.id ? " is-active" : "")}
+                            onClick={() => {
+                              setPortraitVersion(item.id);
+                              setPortraitError("");
+                            }}
+                            title={avail === false ? `${item.label}版尚未生成` : `${item.label}版立绘`}
+                          >
+                            <i className={"v30-portrait-dot" + (avail === true ? " is-on" : avail === false ? " is-off" : "")} />
+                            {item.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <div className="v30-portrait-frame">
+                      {portraitBusy === portraitKey(selectedContract.id, portraitVersion) ? (
+                        <div className="v30-portrait-loading">
+                          <Spinner size={16} />
+                          <b>正在生成{portraitVersion === "anime" ? "动漫" : portraitVersion === "stylized_25d" ? "2.5D" : "写实"}版立绘…</b>
+                          <span>约 10–60 秒（imagegen 串行）</span>
+                        </div>
+                      ) : portraitAvail[portraitKey(selectedContract.id, portraitVersion)] === false ? (
+                        <div className="v30-portrait-missing">
+                          <IconImage size={26} />
+                          <b>{PORTRAIT_VERSIONS.find((item) => item.id === portraitVersion)?.label}版立绘尚未生成</b>
+                          <span>点击下方按钮生成该版本（约 10–60 秒）</span>
+                          <button
+                            type="button"
+                            className="cm-btn cm-btn-primary cm-btn-sm"
+                            onClick={() => void generatePortraitVersion(selectedContract.id, portraitVersion)}
+                          >
+                            <IconSpark size={12} /> 生成此版本
+                          </button>
+                        </div>
+                      ) : (
+                        <img
+                          src={portraitUrlFor(selectedContract.id, portraitVersion)}
+                          alt={`${selectedContract.label} · ${portraitVersion}`}
+                          onClick={() => setLightbox({ src: portraitUrlFor(selectedContract.id, portraitVersion), label: `${selectedContract.label} · 立绘（${portraitVersion}）` })}
+                          title="点击放大"
+                        />
+                      )}
+                    </div>
+                    <div className="v30-portrait-actions">
+                      {portraitAvail[portraitKey(selectedContract.id, portraitVersion)] !== false && (
+                        <button
+                          type="button"
+                          className="cm-btn cm-btn-sm cm-btn-ghost"
+                          disabled={portraitBusy === portraitKey(selectedContract.id, portraitVersion)}
+                          onClick={() => void generatePortraitVersion(selectedContract.id, portraitVersion)}
+                          title="重新生成当前版本立绘（imagegen，10–60s）"
+                        >
+                          {portraitBusy === portraitKey(selectedContract.id, portraitVersion) ? <Spinner size={12} /> : <IconSpark size={12} />}
+                          重新生成{PORTRAIT_VERSIONS.find((item) => item.id === portraitVersion)?.label}
+                        </button>
+                      )}
+                    </div>
+                    {portraitError && (
+                      <div className="v24-art-error" role="alert">
+                        <b>立绘生成失败</b>
+                        <span>{portraitError}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div className="v18-drawer-facts">
                   <p className="v18-drawer-persona">{selectedContract.persona || "暂无 persona 描述。"}</p>

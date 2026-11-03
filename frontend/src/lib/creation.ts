@@ -49,6 +49,8 @@ export interface CharacterAssetGroup {
 
 export interface CharacterAssets {
   portrait?: string;
+  /** V30：三种立绘版本（存在才带 URL） */
+  portraits?: { anime?: string | null; stylized_25d?: string | null; realistic?: string | null };
   three_view?: CharacterAssetGroup;
   expressions?: CharacterAssetGroup;
   sheet?: string;
@@ -178,6 +180,14 @@ function normalizeAssets(raw: Record<string, unknown>): CharacterAssets {
   };
   const assets: CharacterAssets = {};
   if (typeof raw.portrait === "string") assets.portrait = raw.portrait;
+  if (raw.portraits && typeof raw.portraits === "object") {
+    const portraits = raw.portraits as Record<string, unknown>;
+    assets.portraits = {
+      anime: typeof portraits.anime === "string" ? portraits.anime : null,
+      stylized_25d: typeof portraits.stylized_25d === "string" ? portraits.stylized_25d : null,
+      realistic: typeof portraits.realistic === "string" ? portraits.realistic : null,
+    };
+  }
   const three = group(raw.three_view);
   if (three) assets.three_view = three;
   const expr = group(raw.expressions);

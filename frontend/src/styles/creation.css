@@ -340,3 +340,35 @@
 .v28-lightbox-head span { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .v28-lightbox-body img { display: block; max-width: 100%; max-height: calc(92vh - 46px); object-fit: contain; background: #05070a; }
 @media (max-width: 900px) { .v28-asset-grid { grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); } }
+
+/* V30：立绘版本切换 */
+.v30-drawer-art { align-items: stretch; }
+.v30-portrait { display: flex; flex-direction: column; gap: 7px; width: 100%; height: 100%; min-height: 260px; }
+.v30-portrait-tabs { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.v30-portrait-tab {
+  display: inline-flex; align-items: center; gap: 5px;
+  height: 24px; padding: 0 9px;
+  border: 1px solid var(--c-line); border-radius: 999px;
+  background: transparent; color: var(--c-sub);
+  font-size: 10px; cursor: pointer; white-space: nowrap;
+}
+.v30-portrait-tab.is-active { border-color: rgba(201,162,39,.5); background: rgba(201,162,39,.13); color: var(--c-gold-soft); }
+.v30-portrait-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--c-mut); opacity: .6; }
+.v30-portrait-dot.is-on { background: #7fbfa7; opacity: 1; box-shadow: 0 0 6px rgba(79,143,124,.8); }
+.v30-portrait-dot.is-off { background: #6b675f; opacity: .35; }
+.v30-portrait-frame {
+  position: relative; flex: 1 1 auto; min-height: 210px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--c-line); border-radius: 10px; overflow: hidden;
+  background: radial-gradient(120% 120% at 20% 0%, rgba(201,162,39,.1), transparent 60%), #0b0e13;
+}
+.v30-portrait-frame img { display: block; width: 100%; height: 100%; max-height: 300px; object-fit: contain; cursor: zoom-in; }
+.v30-portrait-loading, .v30-portrait-missing {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+  padding: 16px; text-align: center;
+}
+.v30-portrait-loading b, .v30-portrait-missing b { font-size: 12px; color: var(--c-gold-soft); }
+.v30-portrait-loading span, .v30-portrait-missing span { font-size: 10px; color: var(--c-mut); }
+.v30-portrait-missing svg { color: var(--c-mut); }
+.v30-portrait-missing .cm-btn { margin-top: 5px; }
+.v30-portrait-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
