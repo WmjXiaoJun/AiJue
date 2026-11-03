@@ -75,3 +75,88 @@
 /* V26：成片库卡片发布包按钮 / pipeline 发布前检查按钮 */
 .v20-final-actions .cm-btn.is-publish { border-color: rgba(79, 143, 124, 0.42); color: #a9dfcb; }
 .v20-final-actions .cm-btn.is-publish:hover { border-color: rgba(79, 143, 124, 0.65); color: #c8f0e0; }
+
+/* V27：竖版 9:16 */
+.v27-vertical {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border: 1px solid var(--c-line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.018);
+  cursor: pointer;
+  transition: border-color 0.16s ease, background 0.16s ease;
+}
+.v27-vertical.is-on { border-color: rgba(201, 162, 39, 0.5); background: linear-gradient(180deg, rgba(201, 162, 39, 0.12), rgba(201, 162, 39, 0.03)); }
+.v27-vertical input { width: 15px; height: 15px; accent-color: var(--c-gold); cursor: pointer; flex: 0 0 auto; }
+.v27-vertical-main { display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-width: 0; }
+.v27-vertical-main b { font-size: 12px; color: var(--c-text); font-weight: 600; }
+.v27-vertical-main em { font-style: normal; font-family: var(--font-mono); font-size: 8.5px; color: var(--c-mut); letter-spacing: 0.03em; }
+.v27-vertical-default {
+  flex: 0 0 auto;
+  height: 18px;
+  padding: 0 7px;
+  border: 1px solid rgba(201, 162, 39, 0.42);
+  border-radius: 999px;
+  color: var(--c-gold-soft);
+  font-family: var(--font-mono);
+  font-size: 7.5px;
+  line-height: 16px;
+  letter-spacing: 0.08em;
+}
+.v27-vertical-preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 11px;
+  border: 1px dashed rgba(201, 162, 39, 0.35);
+  border-radius: 9px;
+  background: rgba(201, 162, 39, 0.04);
+  color: var(--c-sub);
+  font-size: 10.5px;
+  line-height: 1.55;
+}
+.v27-vertical-phone {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 38px;
+  border: 1.5px solid var(--c-gold-soft);
+  border-radius: 5px;
+  position: relative;
+}
+.v27-vertical-phone::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  top: 11px;
+  height: 12px;
+  border-radius: 1px;
+  background: linear-gradient(180deg, rgba(201, 162, 39, 0.55), rgba(201, 162, 39, 0.2));
+}
+.v27-vertical-phone::after {
+  content: "";
+  position: absolute;
+  left: 7px;
+  right: 7px;
+  bottom: 4px;
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(201, 162, 39, 0.4);
+}
+.v26-file.is-vertical { background: rgba(79, 143, 124, 0.05); }
+.v27-vertical-badge {
+  flex: 0 0 auto;
+  height: 17px;
+  padding: 0 6px;
+  border: 1px solid rgba(79, 143, 124, 0.5);
+  border-radius: 999px;
+  background: rgba(79, 143, 124, 0.12);
+  color: #a9dfcb;
+  font-family: var(--font-mono);
+  font-size: 7.5px;
+  line-height: 15px;
+  letter-spacing: 0.08em;
+}
+.v27-vertical-dim { flex: 0 0 auto; font-family: var(--font-mono); font-size: 8px; color: var(--c-mut); }

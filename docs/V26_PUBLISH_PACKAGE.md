@@ -50,7 +50,7 @@ body `{platform?: "youtube"|"tiktok"|"instagram"|"generic" = "generic", force?: 
 ### 后端（cinema_templates.py）
 - `POST /api/cinema/templates/{tid}/publish-package`（platform: 通用/YouTube/TikTok/Instagram + force）：构建 zip 到 `outputs/templates_3d/<tid>/publish/<tid>_<platform>.zip`；cached 复用；非法 id 400
 - `GET /api/cinema/templates/{tid}/publish-package`：列出最近包（当前 4 个：generic/youtube/tiktok/instagram）
-- zip 内容（实测 custom_tpl_v23_shop）：`video/final.mp4` 3.60MB / `cover/cover.jpg` 47KB / `subtitles/zh.srt` 172B(6 行) / `metadata.json` 1.2KB / `README.txt` 1.5KB / `timeline.json` 5.6KB / `report.json` 1.3KB；zip 3.64MB，`/media` 200 `application/x-zip-compressed`
+- zip 内容（实测 custom_tpl_v23_shop）：`video/final.mp4` 3.60MB / `cover/cover.jpg` 47KB / `subtitles/zh.srt` 172B(6 行) / `metadata.json` 1.2KB / `README.txt` 1.5KB / `timeline.json` 5.6KB / `report.json` 1.3KB；zip 3.64MB，`/media` 200 `application/zip`（V27 起统一）
 - metadata 实测：title「深夜便利店 · 十分钟」、duration 15.15、1280x720、platform youtube、tags [custom,v21,film_interview,AI视频,YouTube]
 - 无成片模板：不在 cinema 列表的模板 404（可读）；非法 id 400
 

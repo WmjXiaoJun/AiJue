@@ -21,7 +21,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import httpx
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, StreamingResponse
+from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -2554,9 +2554,26 @@ app.include_router(pipeline_ui_router.router)
 app.include_router(v5_create_router.router)
 
 config.OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
+
+
+class MediaStaticFiles(StaticFiles):
+    """V26：/media 下的发布包 .zip 统一 Content-Type: application/zip。
+
+    Windows 的 mimetypes 会把 .zip 映射成 application/x-zip-compressed，前端按
+    application/zip 判断时不一致，这里显式覆盖。
+    """
+
+    async def get_response(self, path, scope):
+        response = await super().get_response(path, scope)
+        if isinstance(response, FileResponse) and str(path).lower().endswith(".zip"):
+            response.media_type = "application/zip"
+            response.headers["content-type"] = "application/zip"
+        return response
+
+
 app.mount(
     config.MEDIA_URL_PREFIX,
-    StaticFiles(directory=str(config.OUTPUTS_DIR)),
+    MediaStaticFiles(directory=str(config.OUTPUTS_DIR)),
     name="media",
 )
 

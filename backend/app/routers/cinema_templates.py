@@ -1728,6 +1728,10 @@ def start_assemble(payload: TemplateAssembleRequest) -> Dict[str, Any]:
 # --------------------------------------------------------------------------- #
 PUBLISH_DIRNAME = "publish"
 PUBLISH_PLATFORMS = ("youtube", "tiktok", "instagram", "generic")
+PUBLISH_VERTICAL_PLATFORMS = ("tiktok", "instagram")
+PUBLISH_VERTICAL_MODES = ("blur_pad",)
+PUBLISH_VERTICAL_SIZE = (1080, 1920)
+PUBLISH_VERTICAL_FG = (1080, 608)
 PUBLISH_KEEP = 5
 PUBLISH_PLATFORM_LABEL = {
     "youtube": "YouTube",
@@ -1761,6 +1765,145 @@ def _publish_prune(tid: str) -> None:
             pass
 
 
+def _publish_zip_metadata(zip_path: Path) -> Optional[Dict[str, Any]]:
+    """读取 zip 内的 metadata.json（用于缓存命中校验/返回竖版信息）。"""
+    try:
+        with zipfile.ZipFile(zip_path) as zf:
+            if "metadata.json" not in zf.namelist():
+                return None
+            data = json.loads(zf.read("metadata.json").decode("utf-8"))
+            return data if isinstance(data, dict) else None
+    except (OSError, ValueError, UnicodeDecodeError, zipfile.BadZipFile):
+        return None
+
+
+def _publish_vertical_payload(metadata: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+    metadata = metadata or {}
+    info = metadata.get("vertical") if isinstance(metadata.get("vertical"), dict) else {}
+    return {
+        "enabled": bool(metadata.get("vertical_requested")),
+        "generated": bool(info.get("file")),
+        "file": info.get("file"),
+        "cover_file": info.get("cover_file"),
+        "resolution": info.get("resolution") or f"{PUBLISH_VERTICAL_SIZE[0]}x{PUBLISH_VERTICAL_SIZE[1]}"
+        if metadata.get("vertical_requested") else None,
+        "mode": info.get("mode") or metadata.get("vertical_mode") or "blur_pad",
+        "duration_sec": info.get("duration_sec"),
+        "size_bytes": info.get("size_bytes"),
+        "error": info.get("error"),
+    }
+
+
+def _publish_cache_compatible(tid: str, platform: str, vertical: bool,
+                              vertical_mode: str) -> bool:
+    """缓存是否满足本次请求（含竖版开关/模式）；不满足则重建。"""
+    zip_path = _publish_zip_path(tid, platform)
+    try:
+        if not zip_path.is_file() or zip_path.stat().st_size <= 0:
+            return False
+    except OSError:
+        return False
+    metadata = _publish_zip_metadata(zip_path)
+    if not isinstance(metadata, dict):
+        return False
+    if str(metadata.get("platform") or "") != platform:
+        return False
+    if bool(metadata.get("vertical_requested")) != bool(vertical):
+        return False
+    if vertical and str(metadata.get("vertical_mode") or "") != vertical_mode:
+        return False
+    return True
+
+
+def _publish_build_vertical(tid: str, cover: Optional[Path], workdir: Path, mode: str,
+                            warnings: List[str]) -> Tuple[Optional[Path], Optional[Path],
+                                                          Dict[str, Any]]:
+    """生成 1080×1920 竖版视频 + 竖版封面（blur_pad：模糊背景 + 16:9 前景居中）。
+
+    返回 (video_path, cover_path, vertical_info)；失败只记 warning，不阻塞 16:9 包。
+    """
+    if mode not in PUBLISH_VERTICAL_MODES:
+        message = f"不支持的 vertical_mode: {mode}（仅 {', '.join(PUBLISH_VERTICAL_MODES)}）"
+        warnings.append(message)
+        return None, None, {"mode": mode, "error": message}
+    final = _final_path(tid)
+    width, height = PUBLISH_VERTICAL_SIZE
+    fg_width, fg_height = PUBLISH_VERTICAL_FG
+    video_out = workdir / "final_vertical.mp4"
+    video_filter = (
+        f"[0:v]split=2[src_bg][src_fg];"
+        f"[src_bg]scale={width}:{height}:force_original_aspect_ratio=increase,"
+        f"crop={width}:{height},gblur=sigma=30[bg];"
+        f"[src_fg]scale={fg_width}:{fg_height}[fg];"
+        f"[bg][fg]overlay=(W-w)/2:(H-h)/2,format=yuv420p,fps=25[v]"
+    )
+    started = time.time()
+    try:
+        proc = subprocess.run(
+            [str(jobs.ffmpeg_bin()), "-y", "-i", str(final),
+             "-filter_complex", video_filter,
+             "-map", "[v]", "-map", "0:a?",
+             "-c:v", "libx264", "-preset", "medium", "-crf", "20",
+             "-c:a", "aac", "-b:a", "128k", "-shortest",
+             "-movflags", "+faststart", str(video_out)],
+            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=300,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        message = f"竖版视频生成失败: {type(exc).__name__}: {exc}"
+        warnings.append(message)
+        return None, None, {"mode": mode, "error": message[:500]}
+    if proc.returncode != 0 or not video_out.is_file() or video_out.stat().st_size <= 0:
+        tail = "\n".join((proc.stderr or "").strip().splitlines()[-8:])
+        message = f"竖版视频 ffmpeg 失败（returncode={proc.returncode}）：{tail[-600:]}"
+        warnings.append(message)
+        return None, None, {"mode": mode, "error": message[:800]}
+    probe = _publish_probe(video_out)
+    video_info: Dict[str, Any] = {
+        "file": "video/final_vertical.mp4",
+        "resolution": probe.get("resolution") or f"{width}x{height}",
+        "width": probe.get("width") or width,
+        "height": probe.get("height") or height,
+        "fps": probe.get("fps"),
+        "mode": mode,
+        "duration_sec": probe.get("duration_sec"),
+        "size_bytes": int(video_out.stat().st_size),
+        "generated_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+        "elapsed_sec": round(time.time() - started, 2),
+    }
+    cover_out: Optional[Path] = None
+    if cover is not None:
+        cover_out = workdir / "cover_vertical.jpg"
+        cover_filter = (
+            f"[0:v]split=2[src_bg][src_fg];"
+            f"[src_bg]scale={width}:{height}:force_original_aspect_ratio=increase,"
+            f"crop={width}:{height},gblur=sigma=30[bg];"
+            f"[src_fg]scale={fg_width}:{fg_height}[fg];"
+            f"[bg][fg]overlay=(W-w)/2:(H-h)/2[out]"
+        )
+        try:
+            cover_proc = subprocess.run(
+                [str(jobs.ffmpeg_bin()), "-y", "-loop", "1", "-i", str(cover),
+                 "-filter_complex", cover_filter, "-map", "[out]",
+                 "-frames:v", "1", "-q:v", "3", str(cover_out)],
+                capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=120,
+            )
+            if (cover_proc.returncode == 0 and cover_out.is_file()
+                    and cover_out.stat().st_size > 0):
+                cover_probe = _publish_probe(cover_out)
+                video_info["cover_file"] = "cover/cover_vertical.jpg"
+                video_info["cover_resolution"] = (
+                    cover_probe.get("resolution") or f"{width}x{height}")
+            else:
+                warnings.append("竖版封面生成失败（ffmpeg 返回非 0），仅保留 16:9 封面")
+                cover_out = None
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            warnings.append(f"竖版封面生成失败: {type(exc).__name__}: {exc}")
+            cover_out = None
+    else:
+        warnings.append("竖版封面未生成（无可用 16:9 封面）")
+    return video_out, cover_out, video_info
+
+
 def _publish_view(tid: str, platform: str, *, cached: bool) -> Dict[str, Any]:
     zip_path = _publish_zip_path(tid, platform)
     stat = zip_path.stat()
@@ -1773,6 +1916,7 @@ def _publish_view(tid: str, platform: str, *, cached: bool) -> Dict[str, Any]:
                 files.append({"name": info.filename, "size": int(info.file_size)})
     except (OSError, zipfile.BadZipFile):
         files = []
+    metadata = _publish_zip_metadata(zip_path)
     return {
         "ok": True,
         "template_id": tid,
@@ -1784,6 +1928,7 @@ def _publish_view(tid: str, platform: str, *, cached: bool) -> Dict[str, Any]:
         "platform": platform,
         "platform_label": PUBLISH_PLATFORM_LABEL.get(platform, platform),
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(stat.st_mtime)),
+        "vertical": _publish_vertical_payload(metadata),
         "path": str(zip_path),
     }
 
@@ -2100,12 +2245,25 @@ def _publish_readme(tid: str, contract: Dict[str, Any], metadata: Dict[str, Any]
         "  timeline.json         时间线（若模板有）",
         "  report.json           合成报告/探测信息（若模板有）",
         "  README.txt            本说明",
+    ]
+    if metadata.get("vertical_requested"):
+        vertical = metadata.get("vertical") if isinstance(metadata.get("vertical"), dict) else {}
+        if vertical.get("file"):
+            lines.extend([
+                "  video/final_vertical.mp4  竖版 9:16 成片（1080×1920，blur_pad 模糊背景填充）",
+                "  cover/cover_vertical.jpg  竖版封面（1080×1920）",
+            ])
+        else:
+            lines.append(
+                "  （竖版 9:16 生成失败：{}；16:9 包仍可正常上传）".format(
+                    vertical.get("error") or "未知错误"))
+    lines.extend([
         "",
         "二、上传步骤",
         "  1. 登录目标平台创作中心，选择上传视频；",
-        "  2. 上传 video/final.mp4；",
+        "  2. 上传 video/final.mp4（TikTok/IG 建议改用 video/final_vertical.mp4）；",
         "  3. 复制 metadata.json 的 title / description / tags 填写；",
-        "  4. 上传 cover/cover.jpg 作为封面（YouTube 建议 1280×720）；",
+        "  4. 上传 cover/cover.jpg 作为封面（竖版平台可用 cover/cover_vertical.jpg）；",
         "  5. 字幕：上传 subtitles/zh.srt 或在平台自动生成；",
         "  6. 发布前检查画幅/时长是否符合平台要求。",
         "",
@@ -2120,15 +2278,27 @@ def _publish_readme(tid: str, contract: Dict[str, Any], metadata: Dict[str, Any]
         f"  画质 QC：{'ok' if (metadata.get('qc') or {}).get('ok') else 'unknown'}",
         "  账号尚未连接：本包为本地导出，需手动上传。",
         "",
-    ]
+    ])
+    if metadata.get("vertical_requested"):
+        vertical = metadata.get("vertical") if isinstance(metadata.get("vertical"), dict) else {}
+        if vertical.get("file"):
+            lines.extend([
+                "五、竖版 9:16（blur_pad）",
+                "  - 背景：原片放大填满 1080×1920 后 gblur(sigma=30)；前景：原片缩放到 1080×608 居中；",
+                "  - 编码：H.264 + AAC，yuv420p，25fps；时长与原片一致；",
+                "  - 上传 TikTok / Instagram Reels 时优先使用 video/final_vertical.mp4。",
+                "",
+            ])
     if warnings:
-        lines.append("五、构建警告")
+        lines.append("六、构建警告")
         lines.extend(f"  - {item}" for item in warnings)
         lines.append("")
     return "\n".join(lines)
 
 
-def _build_publish_package(tid: str, platform: str, force: bool) -> Dict[str, Any]:
+def _build_publish_package(tid: str, platform: str, force: bool,
+                           vertical: bool = False,
+                           vertical_mode: str = "blur_pad") -> Dict[str, Any]:
     final = _final_path(tid)
     try:
         final_ok = final.is_file() and final.stat().st_size > 0
@@ -2140,7 +2310,8 @@ def _build_publish_package(tid: str, platform: str, force: bool) -> Dict[str, An
     zip_path = _publish_zip_path(tid, platform)
     with _PUBLISH_LOCK:
         try:
-            if zip_path.is_file() and zip_path.stat().st_size > 0 and not force:
+            if (zip_path.is_file() and zip_path.stat().st_size > 0 and not force
+                    and _publish_cache_compatible(tid, platform, vertical, vertical_mode)):
                 return _publish_view(tid, platform, cached=True)
         except OSError:
             pass
@@ -2155,12 +2326,25 @@ def _build_publish_package(tid: str, platform: str, force: bool) -> Dict[str, An
             srt_bytes, srt_count, srt_source = _publish_subtitles(tid, warnings)
             cover = _publish_cover(tid, workdir, warnings)
             metadata = _publish_metadata(tid, contract, final_info, platform, srt_count)
-            readme = _publish_readme(tid, contract, metadata, platform, srt_count,
-                                     srt_source, bool(cover), warnings)
             entries: Dict[str, Any] = {"video/final.mp4": final}
             if cover is not None:
                 entries["cover/cover.jpg"] = cover
             entries["subtitles/zh.srt"] = srt_bytes
+            # V27：竖版 9:16（TikTok/IG 默认开启）；失败只 warning，不阻塞 16:9 包
+            metadata["vertical_requested"] = bool(vertical)
+            metadata["vertical_mode"] = vertical_mode
+            if vertical:
+                vertical_video, vertical_cover, vertical_info = _publish_build_vertical(
+                    tid, cover, workdir, vertical_mode, warnings)
+                metadata["vertical"] = vertical_info
+                if vertical_video is not None:
+                    entries["video/final_vertical.mp4"] = vertical_video
+                if vertical_cover is not None:
+                    entries["cover/cover_vertical.jpg"] = vertical_cover
+            else:
+                metadata["vertical"] = None
+            readme = _publish_readme(tid, contract, metadata, platform, srt_count,
+                                     srt_source, bool(cover), warnings)
             entries["metadata.json"] = json.dumps(metadata, ensure_ascii=False, indent=2).encode("utf-8")
             entries["README.txt"] = readme.encode("utf-8")
             timeline = T3D_ROOT / tid / "timeline.json"
@@ -2195,6 +2379,7 @@ def _build_publish_package(tid: str, platform: str, force: bool) -> Dict[str, An
         _publish_prune(tid)
         view = _publish_view(tid, platform, cached=False)
         view["warnings"] = warnings
+        view["vertical"] = _publish_vertical_payload(metadata)
         view["metadata_summary"] = {
             "title": metadata.get("title"),
             "duration_sec": metadata.get("duration_sec"),
@@ -2205,6 +2390,8 @@ def _build_publish_package(tid: str, platform: str, force: bool) -> Dict[str, An
             "cast": [row.get("name") for row in metadata.get("cast") or []],
             "subtitle_lines": (metadata.get("qc") or {}).get("subtitle_lines"),
             "subtitle_source": srt_source,
+            "vertical_generated": bool((metadata.get("vertical") or {}).get("file")),
+            "vertical_resolution": (metadata.get("vertical") or {}).get("resolution"),
         }
         return view
 
@@ -2212,6 +2399,9 @@ def _build_publish_package(tid: str, platform: str, force: bool) -> Dict[str, An
 class PublishPackageBody(BaseModel):
     platform: str = "generic"
     force: bool = False
+    # V27：竖版 9:16；None 时按平台默认（tiktok/instagram=true，其它 false）
+    vertical: Optional[bool] = None
+    vertical_mode: str = "blur_pad"
 
 
 @router.post("/{tid}/publish-package", summary="导出发布包 zip（成片/封面/中文字幕/元数据/README）")
@@ -2228,7 +2418,14 @@ def build_publish_package(tid: str,
     if platform not in PUBLISH_PLATFORMS:
         raise HTTPException(status_code=400,
                             detail=f"platform 只支持 {', '.join(PUBLISH_PLATFORMS)}（当前 {platform!r}）")
-    return _build_publish_package(key, platform, bool(payload.force))
+    vertical_mode = str(payload.vertical_mode or "blur_pad").strip().lower()
+    if vertical_mode not in PUBLISH_VERTICAL_MODES:
+        raise HTTPException(status_code=400,
+                            detail=f"vertical_mode 只支持 {', '.join(PUBLISH_VERTICAL_MODES)}（当前 {vertical_mode!r}）")
+    vertical = (bool(payload.vertical) if payload.vertical is not None
+                else platform in PUBLISH_VERTICAL_PLATFORMS)
+    return _build_publish_package(key, platform, bool(payload.force),
+                                  vertical=vertical, vertical_mode=vertical_mode)
 
 
 @router.get("/{tid}/publish-package", summary="列出该模板已生成的发布包（最近 5 个）")

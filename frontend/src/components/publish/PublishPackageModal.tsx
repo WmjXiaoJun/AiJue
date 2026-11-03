@@ -23,6 +23,11 @@ const PLATFORM_TIPS: Record<PublishPlatform, string[]> = {
   instagram: ["IG Reels 需 9:16 竖屏：同 TikTok，需裁切/重组", "封面用包内 cover.jpg（1280×720），可再裁 1080×1350"],
 };
 
+/** V27：TikTok/IG 默认附带竖版 9:16 */
+function defaultVertical(platform: PublishPlatform): boolean {
+  return platform === "tiktok" || platform === "instagram";
+}
+
 function fmtBytes(bytes: number): string {
   if (!bytes) return "—";
   if (bytes < 1024) return bytes + " B";
@@ -53,6 +58,7 @@ export function PublishPackageModal({
 }) {
   const notify = useToast();
   const [platform, setPlatform] = useState<PublishPlatform>("generic");
+  const [vertical, setVertical] = useState(false);
   const [loading, setLoading] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [rebuilding, setRebuilding] = useState(false);
@@ -69,18 +75,23 @@ export function PublishPackageModal({
   }, []);
 
   const build = useCallback(
-    async (nextPlatform: PublishPlatform, force = false) => {
+    async (nextPlatform: PublishPlatform, nextVertical: boolean, force = false) => {
       if (force) setRebuilding(true);
       else setLoading(true);
       setErrors([]);
       try {
-        const res = await cinemaApi.publishPackage(templateId, { platform: nextPlatform, force });
+        const res = await cinemaApi.publishPackage(templateId, {
+          platform: nextPlatform,
+          force,
+          vertical: nextVertical,
+          vertical_mode: "blur_pad",
+        });
         if (!aliveRef.current) return;
         setPkg(res);
         notify(
           res.cached
-            ? `已复用发布包缓存（${PLATFORMS.find((item) => item.id === nextPlatform)?.label || nextPlatform}）`
-            : "发布包已生成",
+            ? `已复用发布包缓存（${PLATFORMS.find((item) => item.id === nextPlatform)?.label || nextPlatform}${nextVertical ? " · 含竖版" : ""}）`
+            : `发布包已生成${nextVertical ? "（含竖版 9:16）" : ""}`,
           "success",
         );
       } catch (err) {
@@ -104,7 +115,8 @@ export function PublishPackageModal({
     setErrors([]);
     setCopied(false);
     setPlatform("generic");
-    void build("generic", false);
+    setVertical(false);
+    void build("generic", false, false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, templateId]);
 
@@ -130,8 +142,9 @@ export function PublishPackageModal({
       duration_sec: null,
       generated_at: null,
       package: pkg?.package_url || null,
+      ...(vertical ? { vertical: { file: "video/final_vertical.mp4", resolution: "1080x1920", mode: "blur_pad" } } : {}),
     };
-  }, [pkg, platform, templateId, templateLabel]);
+  }, [pkg, platform, templateId, templateLabel, vertical]);
 
   const download = async () => {
     if (!pkg?.package_url) return;
@@ -185,7 +198,16 @@ export function PublishPackageModal({
 
   if (!open) return null;
 
-  const tips = PLATFORM_TIPS[platform];
+  const tips = (() => {
+    const base = PLATFORM_TIPS[platform];
+    if (vertical) {
+      const verticalTip = defaultVertical(platform)
+        ? "已附带竖版 9:16：可直接上传 TikTok/IG；竖版为模糊背景填充，完整保留画面"
+        : "已附带竖版 9:16（1080×1920，模糊背景填充）：可上传 TikTok/IG";
+      return [verticalTip, ...base.filter((tip) => !tip.includes("9:16"))];
+    }
+    return base;
+  })();
   return (
     <div className="v26-mask" onMouseDown={() => !downloading && onClose()} role="presentation">
       <div className="v26-modal" onMouseDown={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-label="发布包导出">
@@ -211,14 +233,39 @@ export function PublishPackageModal({
                 className={"v26-platform" + (platform === item.id ? " is-active" : "")}
                 disabled={loading || rebuilding}
                 onClick={() => {
+                  const nextVertical = defaultVertical(item.id);
                   setPlatform(item.id);
-                  void build(item.id, false);
+                  setVertical(nextVertical);
+                  void build(item.id, nextVertical, false);
                 }}
               >
                 {item.label}
               </button>
             ))}
           </div>
+
+          <label className={"v27-vertical" + (vertical ? " is-on" : "")}>
+            <input
+              type="checkbox"
+              checked={vertical}
+              disabled={loading || rebuilding}
+              onChange={(event) => setVertical(event.target.checked)}
+            />
+            <span className="v27-vertical-main">
+              <b>附带竖版 9:16（TikTok/IG）</b>
+              <em>1080×1920 · 模糊背景填充，完整保留 16:9 画面；含竖版封面</em>
+            </span>
+            {defaultVertical(platform) && <span className="v27-vertical-default">平台默认</span>}
+          </label>
+          {vertical && (
+            <div className="v27-vertical-preview">
+              <span className="v27-vertical-phone" aria-hidden="true" />
+              <span>
+                将输出 <b className="cm-mono">video/final_vertical.mp4</b>（1080×1920）与 <b className="cm-mono">cover/cover_vertical.jpg</b>；
+                若需按当前勾选重新生成，点「重新打包」。
+              </span>
+            </div>
+          )}
 
           {errors.length > 0 && (
             <div className="v21-error">
@@ -229,7 +276,7 @@ export function PublishPackageModal({
                 ))}
               </ul>
               <div style={{ marginTop: 6 }}>
-                <button type="button" className="cm-btn cm-btn-sm" onClick={() => void build(platform, true)}>
+                <button type="button" className="cm-btn cm-btn-sm" onClick={() => void build(platform, vertical, true)}>
                   <IconRefresh size={12} /> 重试
                 </button>
               </div>
@@ -240,8 +287,8 @@ export function PublishPackageModal({
             <div className="v26-loading">
               <Spinner size={18} />
               <div>
-                <b>{rebuilding ? "正在重新打包…" : "正在打包发布包…"}</b>
-                <span>视频/封面/字幕/元数据写入 zip，通常 2–10 秒</span>
+                <b>{rebuilding ? "正在重新打包…" : "正在打包发布包…"}{vertical ? "（含竖版 9:16）" : ""}</b>
+                <span>视频/封面/字幕/元数据写入 zip；竖版需 ffmpeg 生成，通常 3–20 秒</span>
               </div>
             </div>
           ) : pkg ? (
@@ -250,6 +297,7 @@ export function PublishPackageModal({
                 <div className="v26-summary-item"><span>平台</span><b>{PLATFORMS.find((item) => item.id === platform)?.label || platform}</b></div>
                 <div className="v26-summary-item"><span>包大小</span><b>{fmtBytes(pkg.size_bytes)}</b></div>
                 <div className="v26-summary-item"><span>文件</span><b>{pkg.files.length} 个</b></div>
+                <div className="v26-summary-item"><span>竖版</span><b>{pkg.files.some((file) => file.name.includes("_vertical")) ? "已附带 9:16" : "未附带"}</b></div>
                 <div className="v26-summary-item"><span>状态</span><b>{pkg.cached ? "缓存复用" : "新生成"}</b></div>
               </div>
               <div className="v26-files">
@@ -257,13 +305,22 @@ export function PublishPackageModal({
                   <span>文件清单</span>
                   <span className="cm-mono">{pkg.package_url.split("/").pop()}</span>
                 </div>
-                {pkg.files.map((file) => (
-                  <div key={file.name} className="v26-file">
-                    {file.name.startsWith("video/") ? <IconVideo size={13} /> : file.name.startsWith("cover/") ? <IconImage size={13} /> : <IconCheck size={12} />}
-                    <span className="v26-file-name">{file.name}</span>
-                    <span className="v26-file-size cm-mono">{fmtBytes(file.size)}</span>
-                  </div>
-                ))}
+                {pkg.files.map((file) => {
+                  const isVertical = file.name.includes("_vertical");
+                  return (
+                    <div key={file.name} className={"v26-file" + (isVertical ? " is-vertical" : "")}>
+                      {file.name.startsWith("video/") ? <IconVideo size={13} /> : file.name.startsWith("cover/") ? <IconImage size={13} /> : <IconCheck size={12} />}
+                      <span className="v26-file-name">{file.name}</span>
+                      {isVertical && (
+                        <>
+                          <span className="v27-vertical-badge">竖版</span>
+                          <span className="v27-vertical-dim">1080×1920</span>
+                        </>
+                      )}
+                      <span className="v26-file-size cm-mono">{fmtBytes(file.size)}</span>
+                    </div>
+                  );
+                })}
                 {(pkg.warnings || []).map((warning, index) => (
                   <div key={index} className="v26-warning">
                     <IconAlert size={12} /> {warning}
@@ -277,8 +334,8 @@ export function PublishPackageModal({
                 <button type="button" className="cm-btn" onClick={() => void copyMetadata()}>
                   {copied ? <IconCheck size={13} /> : <IconImage size={13} />} {copied ? "已复制元数据" : "复制元数据"}
                 </button>
-                <button type="button" className="cm-btn cm-btn-sm cm-btn-ghost" onClick={() => void build(platform, true)} disabled={rebuilding}>
-                  <IconRefresh size={12} /> 重新打包
+                <button type="button" className="cm-btn cm-btn-sm cm-btn-ghost" onClick={() => void build(platform, vertical, true)} disabled={rebuilding} title="按当前平台与竖版勾选重新打包（force）">
+                  <IconRefresh size={12} /> 重新打包{vertical ? "（含竖版）" : ""}
                 </button>
               </div>
             </>
@@ -287,7 +344,7 @@ export function PublishPackageModal({
               <IconDownload size={26} />
               <b>还没有发布包</b>
               <span>点击下方按钮生成（需该模板已有成片 final.mp4）</span>
-              <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" onClick={() => void build(platform, false)}>
+              <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" onClick={() => void build(platform, vertical, false)}>
                 <IconDownload size={12} /> 生成发布包
               </button>
             </div>

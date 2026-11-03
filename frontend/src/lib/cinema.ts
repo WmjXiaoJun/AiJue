@@ -243,6 +243,8 @@ export interface PublishPackageResponse {
   platform?: string;
   /** 部分后端实现会在响应里带 metadata（用于「复制元数据」） */
   metadata?: Record<string, unknown>;
+  /** V27：竖版产物信息（vertical=true 时返回） */
+  vertical?: { file?: string; cover?: string; resolution?: string; mode?: string } | null;
   warnings?: string[];
 }
 
@@ -278,11 +280,11 @@ export const cinemaApi = {
   /** V26：构建/复用发布包 zip（视频/封面/字幕/元数据/README） */
   publishPackage: (
     templateId: string,
-    body: { platform?: PublishPlatform; force?: boolean } = {},
+    body: { platform?: PublishPlatform; force?: boolean; vertical?: boolean; vertical_mode?: "blur_pad" | "crop" } = {},
   ): Promise<PublishPackageResponse> =>
     request(`/cinema/templates/${encodeURIComponent(templateId)}/publish-package`, {
       method: "POST",
-      body: JSON.stringify({ platform: "generic", force: false, ...body }),
+      body: JSON.stringify({ platform: "generic", force: false, vertical: false, ...body }),
     }),
 };
 
