@@ -404,6 +404,17 @@ _load_persisted_jobs()
 # --------------------------------------------------------------------------- #
 # 请求模型 / 端点
 # --------------------------------------------------------------------------- #
+def active_pipeline_job() -> Optional[Dict[str, Any]]:
+    """当前 queued/running 的 pipeline job（供概念图端点判断 GPU/3D 互斥）。"""
+    with _LOCK:
+        if not _ACTIVE:
+            return None
+        job = _JOBS.get(_ACTIVE) or {}
+        if job.get("status") in ("queued", "running"):
+            return _job_view(job, tail=0)
+    return None
+
+
 class PipelineRunBody(BaseModel):
     template_id: str
     reuse_shots: bool = False

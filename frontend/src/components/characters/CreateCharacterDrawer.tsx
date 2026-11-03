@@ -5,7 +5,7 @@ import { errorText } from "../../lib/api";
 import { mediaSrc } from "../../lib/v5";
 import type { VoicePreset } from "../../lib/voice";
 import { voiceApi } from "../../lib/voice";
-import { creationApi, creationErrorMessage, isCreationNotReady, type CharacterCreateBody } from "../../lib/creation";
+import { creationApi, creationErrorMessage, isCreationNotReady, type CharacterCreateBody, type CharacterCreateResponse } from "../../lib/creation";
 import { useToast } from "../Toast";
 import { Spinner } from "../ui";
 import { IconClose, IconPlay, IconRefresh, IconSpark, IconVolume } from "../icons";
@@ -34,7 +34,7 @@ interface Props {
   /** 试听用的已存在角色（新建角色尚无 id，借已存在角色 + voice_id 扩展试听） */
   auditionCharacter?: string;
   onClose: () => void;
-  onCreated: (id: string) => void;
+  onCreated: (id: string, res: CharacterCreateResponse) => void;
 }
 
 export function CreateCharacterDrawer({ open, presets, auditionCharacter, onClose, onCreated }: Props) {
@@ -52,6 +52,7 @@ export function CreateCharacterDrawer({ open, presets, auditionCharacter, onClos
   const [accessories, setAccessories] = useState("");
   const [rolePool, setRolePool] = useState("host, guest_a");
   const [voiceId, setVoiceId] = useState(presets[0]?.voice_id || "");
+  const [autoArt, setAutoArt] = useState(true);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [auditioning, setAuditioning] = useState<string | null>(null);
@@ -67,6 +68,7 @@ export function CreateCharacterDrawer({ open, presets, auditionCharacter, onClos
     }
     setErrors([]);
     setSaving(false);
+    setAutoArt(true);
     if (!voiceId && presets[0]) setVoiceId(presets[0].voice_id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
@@ -136,6 +138,7 @@ export function CreateCharacterDrawer({ open, presets, auditionCharacter, onClos
         .map((item) => item.trim())
         .filter(Boolean),
       tags: era === "history" ? ["history"] : [],
+      auto_art: autoArt,
       appearance: {
         gender,
         age: Math.max(1, Math.min(120, Number(age) || 28)),
@@ -150,8 +153,15 @@ export function CreateCharacterDrawer({ open, presets, auditionCharacter, onClos
     };
     try {
       const res = await creationApi.createCharacter(body);
-      notify(`角色「${label.trim()}」已创建`, "success");
-      onCreated(res.id);
+      const art = res?.art || null;
+      if (autoArt && art?.generated) {
+        notify(`角色「${label.trim()}」已创建，概念图已生成`, "success");
+      } else if (autoArt && art && art.generated === false) {
+        notify(`角色「${label.trim()}」已创建；概念图生成失败${art.error ? "（" + art.error + "）" : ""}，可在详情重新生成`, "info");
+      } else {
+        notify(`角色「${label.trim()}」已创建`, "success");
+      }
+      onCreated(res.id, res);
     } catch (err) {
       const items = creationErrorMessage(err);
       setErrors(items);
@@ -319,15 +329,29 @@ export function CreateCharacterDrawer({ open, presets, auditionCharacter, onClos
           </div>
         </div>
 
-        <footer className="v21-foot">
-          <span className="v21-foot-note">创建只写角色数据，不触发任何 GPU 生成。</span>
+        <footer className="v21-foot" style={{ flexDirection: "column", alignItems: "stretch", gap: 10 }}>
+          <label className={"v21-autogen" + (autoArt ? " is-on" : "")} style={{ margin: 0 }}>
+            <input
+              type="checkbox"
+              checked={autoArt}
+              disabled={saving}
+              onChange={(event) => setAutoArt(event.target.checked)}
+            />
+            <span className="v21-autogen-text">
+              <b>创建后生成概念图</b>
+              <em>约 20–60 秒 · SDXL 立绘写入角色美术目录</em>
+            </span>
+          </label>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          <span className="v21-foot-note">创建只写角色数据；勾选时会调用本地 imagegen 生成 portrait.png（不触发 3D 渲染），失败不阻塞创建。</span>
           <button type="button" className="cm-btn cm-btn-sm" onClick={onClose} disabled={saving}>
             取消
           </button>
           <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" onClick={() => void submit()} disabled={saving}>
             {saving ? <Spinner size={13} /> : <IconSpark size={13} />}
-            {saving ? "创建中…" : "创建角色"}
+            {saving ? (autoArt ? "创建并生成中…" : "创建中…") : autoArt ? "创建并生成概念图" : "创建角色"}
           </button>
+          </div>
         </footer>
       </aside>
     </div>

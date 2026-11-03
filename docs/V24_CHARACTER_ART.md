@@ -45,3 +45,29 @@ body `{mode?: "portrait", style?: "anime"|"illustrious"|"guoman", prompt_extra?:
 - **tpl-backend**：art 端点 + spec 映射 + GPU 锁 + auto_art + 自测
 - **tpl-frontend**：创建抽屉 checkbox/loading、详情重新生成、立绘 cache-bust、截图
 - **Lead**：真实创建+生图验证、截图、docs、commit
+
+
+## 6. 交付结果（2026-11-03 16:10）
+
+### 后端（tpl-backend，27/27 自测 PASS，真实 SDXL 生成 3 张）
+- `POST /api/v5/characters/{character}/art`：contract appearance → imagegen spec（已有 24 角色复用 `tmp/v52_art/specs` 精选 spec）→ `imagegen.cli generate --mode portrait`（832×1216）→ `assets/v5/characters/<id>/portrait.png`；返回 `portrait_url`（带 `?t=`）、`cached`、`elapsed_sec`、`style`、`seed`
+- `force=false` 已有立绘 → `cached:true/0s`；`force=true` 重新生成（默认换 seed 避免 ComfyUI 缓存）；
+- 并发/资源保护：与 DB 概念图共用 `jobs.GPU_LOCK` 串行；有 3D pipeline job 时 art 返回 **409**（`reason:"3d_job_running"`）；同角色并发 409
+- `POST /api/v5/characters` 新增 `auto_art`：创建成功后同步生图，`art:{generated,portrait_url,elapsed_sec,cached,style,seed}`；失败只 warning 不阻塞创建
+- 实测：新角色 auto_art 创建总耗时 **12.4s**（生图 12.3s），portrait 832×1216/1.22MB，`/media` 200
+
+### 前端（tpl-frontend）
+- 新建角色抽屉：「创建后生成概念图（约 20–60 秒）」默认勾选；loading「创建并生成中…」；成功后刷新网格、自动打开详情、卡片显示 SDXL 立绘（cache-bust）
+- 角色详情：「生成概念图 / 重新生成概念图」+ 生成中 loading + 400/409/500 可读错误；成功后卡片与详情即时刷新
+- 角色卡立绘回退链：合同 art → `portrait.png` → 程序化预览 → 首字；无图不受影响
+- `tsc` 0 / build 通过 / console 无 JS error
+
+### Lead 独立 E2E
+- `POST /api/v5/characters {auto_art:true}` → 12.5s 返回 `art.generated=true`，portrait 1,123,474 bytes / `/media` 200；catalog 26 → 删除后 24
+- UI 验证：抽屉勾选态、详情「生成概念图」按钮存在、console 无错误（截图 `tmp/v24/lead/`）
+- 生成样张：SDXL 动漫立绘 832×1216（`tmp/v24/ui/03_created_with_art_card_detail_1680.png`）
+- 清理：测试角色与美术目录已删除（catalog 回到 24）；laozhou 立绘已恢复原始 canonical（后端自测重生成的备份在 `tmp/v24/backup/`）
+
+### 证据
+- `tmp/v24/ui/`（7 张前端流程截图）、`tmp/v24/lead/`（Lead 复拍）、`tmp/v24/backend_selftest.md`、`tmp/v24/art_verify.json`
+- 提示：生成期间离开页面不影响；有 3D 生成任务时 art 会 409，稍后重试即可

@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { errorText } from "../../lib/api";
 import type { V5CatalogResponse, V5CharacterSummary } from "../../lib/v5";
 import { mediaSrc, characterArtUrl, characterPreviewUrl, v5api } from "../../lib/v5";
+import { creationApi, creationErrorMessage } from "../../lib/creation";
 import type { CharacterContract, VoicePreset } from "../../lib/voice";
 import { fetchCharacterContract, voiceApi } from "../../lib/voice";
 import { useToast } from "../Toast";
@@ -78,18 +79,28 @@ function sourceLabel(source: string): string {
 }
 
 /** 立绘多级回退：角色合同 art.portrait → /media/v5/characters/<id>/portrait.png → 程序化预览 → 首字 */
-function CharacterPortrait({ characterId, label, portrait }: { characterId: string; label: string; portrait?: string }) {
-  const sources = useMemo(
-    () =>
-      [
-        portrait ? mediaSrc(portrait) : "",
-        characterArtUrl(characterId),
-        characterPreviewUrl(characterId),
-      ].filter(Boolean),
-    [characterId, portrait],
-  );
+function CharacterPortrait({
+  characterId,
+  label,
+  portrait,
+  bust,
+}: {
+  characterId: string;
+  label: string;
+  portrait?: string;
+  /** V24：重新生成概念图后的 cache-bust 时间戳 */
+  bust?: number;
+}) {
+  const sources = useMemo(() => {
+    const suffix = bust ? (portrait && portrait.includes("?") ? "&" : "?") + "t=" + bust : "";
+    return [
+      portrait ? mediaSrc(portrait) + suffix : "",
+      characterArtUrl(characterId, "portrait.png", bust),
+      characterPreviewUrl(characterId),
+    ].filter(Boolean);
+  }, [bust, characterId, portrait]);
   const [index, setIndex] = useState(0);
-  useEffect(() => setIndex(0), [characterId]);
+  useEffect(() => setIndex(0), [characterId, bust]);
   if (!sources.length || index >= sources.length) return <span className="v18-char-initial">{label.slice(0, 1)}</span>;
   return <img src={sources[index]} alt={label} loading="lazy" onError={() => setIndex((prev) => prev + 1)} />;
 }
@@ -111,6 +122,9 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
   const [createOpen, setCreateOpen] = useState(false);
   const [highlightId, setHighlightId] = useState<string | null>(null);
   const [savedVoice, setSavedVoice] = useState<Record<string, string>>({});
+  const [artBust, setArtBust] = useState<Record<string, number>>({});
+  const [artBusy, setArtBusy] = useState<string | null>(null);
+  const [artError, setArtError] = useState("");
 
   const [previewChar, setPreviewChar] = useState<string | null>(null);
   const [previewError, setPreviewError] = useState("");
@@ -284,6 +298,35 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
       });
     },
     [],
+  );
+
+  /** V24：生成/重新生成角色概念图（SDXL，20–60s） */
+  const generateArt = useCallback(
+    async (characterId: string, force: boolean) => {
+      setArtBusy(characterId);
+      setArtError("");
+      try {
+        const res = await creationApi.generateCharacterArt(characterId, { force });
+        const stamp = Date.now();
+        setArtBust((prev) => ({ ...prev, [characterId]: stamp }));
+        setContracts((prev) => {
+          const current = prev[characterId];
+          if (!current) return prev;
+          return { ...prev, [characterId]: { ...current, art: { ...current.art, portrait: res.portrait_url } } };
+        });
+        notify(
+          res.cached ? "已存在概念图（缓存），可强制重新生成" : `「${characterId}」概念图已生成${res.elapsed_sec ? ` · ${Math.round(Number(res.elapsed_sec))}s` : ""}`,
+          "success",
+        );
+      } catch (err) {
+        const items = creationErrorMessage(err);
+        setArtError(items.join("；"));
+        notify("概念图生成失败：" + items.join("；"), "error");
+      } finally {
+        setArtBusy((prev) => (prev === characterId ? null : prev));
+      }
+    },
+    [notify],
   );
 
   const previewOne = useCallback(
@@ -491,7 +534,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                       title={`查看 ${char.label} 的资料与声音`}
                     >
                       <div className="v18-char-portrait">
-                        <CharacterPortrait characterId={char.id} label={char.label} portrait={contract?.art.portrait} />
+                        <CharacterPortrait characterId={char.id} label={char.label} portrait={contract?.art.portrait} bust={artBust[char.id]} />
                         {contract?.era && <span className="v18-char-era"><span className="v18-tag">{contract.era}</span></span>}
                       </div>
                       <div className="v18-char-body">
@@ -553,6 +596,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                     characterId={selectedContract.id}
                     label={selectedContract.label}
                     portrait={selectedContract.art.portrait}
+                    bust={artBust[selectedContract.id]}
                   />
                 </div>
                 <div className="v18-drawer-facts">
@@ -569,16 +613,37 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                       ))}
                   </div>
                   <div className="v18-art-links">
+                    <button
+                      type="button"
+                      className="cm-btn cm-btn-primary cm-btn-sm"
+                      onClick={() => void generateArt(selectedContract.id, true)}
+                      disabled={artBusy === selectedContract.id}
+                      title="调用本地 imagegen/SDXL 生成 portrait.png（串行，不触发 3D）"
+                    >
+                      {artBusy === selectedContract.id ? <Spinner size={12} /> : <IconImage size={12} />}
+                      {artBusy === selectedContract.id
+                        ? "概念图生成中…（约 20–60s）"
+                        : selectedContract.art.portrait || artBust[selectedContract.id]
+                          ? "重新生成概念图"
+                          : "生成概念图"}
+                    </button>
                     {(["portrait", "front", "cutout"] as const).map((kind) => {
                       const path = selectedContract.art[kind];
                       if (!path) return null;
+                      const href = kind === "portrait" && artBust[selectedContract.id] ? mediaSrc(path) + (path.includes("?") ? "&" : "?") + "t=" + artBust[selectedContract.id] : mediaSrc(path);
                       return (
-                        <a key={kind} className="cm-btn cm-btn-sm" href={mediaSrc(path)} target="_blank" rel="noreferrer">
+                        <a key={kind} className="cm-btn cm-btn-sm" href={href} target="_blank" rel="noreferrer">
                           <IconImage size={12} /> {kind === "portrait" ? "立绘" : kind === "front" ? "正面" : "抠像"}
                         </a>
                       );
                     })}
                   </div>
+                  {artError && (
+                    <div className="v24-art-error" role="alert">
+                      <b>概念图生成失败</b>
+                      <span>{artError}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -676,11 +741,22 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
           presets={presets}
           auditionCharacter={(catalog?.characters || [])[0]?.id}
           onClose={() => setCreateOpen(false)}
-          onCreated={(id) => {
+          onCreated={(id, res) => {
             setCreateOpen(false);
             setHighlightId(id);
             setSelected(id);
-            notify("角色已创建，正在刷新角色目录…", "info");
+            if (res?.art?.generated) {
+              setArtBust((prev) => ({ ...prev, [id]: Date.now() }));
+              setContracts((prev) => {
+                const current = prev[id];
+                if (!current) return prev;
+                return { ...prev, [id]: { ...current, art: { ...current.art, portrait: res.art?.portrait_url } } };
+              });
+            }
+            notify(
+              res?.art?.generated ? "角色已创建，概念图已生成，正在刷新…" : "角色已创建，正在刷新角色目录…",
+              "info",
+            );
             void load(true);
           }}
         />

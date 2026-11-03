@@ -14,10 +14,13 @@ Semantic brief 复用 `pipeline.templates3d_semantic`（LLM）；失败时写通
 from __future__ import annotations
 
 import json
+import hashlib
+import os
 import re
 import shutil
 import subprocess
 import sys
+import threading
 import time
 import uuid
 from pathlib import Path
@@ -44,6 +47,15 @@ _FFMPEG = _REPO_ROOT / "tools" / "node_modules" / "ffmpeg-static" / "ffmpeg.exe"
 _ID_RE = re.compile(r"^[a-z][a-z0-9_]{1,60}$")
 _ROLE_RE = re.compile(r"^[a-z][a-z0-9_]{0,30}$")
 _HEX_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
+
+#: V24 概念图（imagegen/SDXL）：只生成单张 portrait，写 assets/v5/characters/<id>/portrait.png
+_ART_DIR = _REPO_ROOT / "assets" / "v5" / "characters"
+_ART_SPEC_DIR = _REPO_ROOT / "tmp" / "v24" / "specs"
+_ART_STYLES = ("anime", "illustrious", "guoman", "realistic", "stylized_25d")
+_ART_DEFAULT_STYLE = "anime"
+_ART_TIMEOUT_SECONDS = 300.0
+_ART_INFLIGHT: set = set()
+_ART_STATE_LOCK = threading.Lock()
 
 CUSTOM_PREFIX = getattr(v5_catalog, "CUSTOM_PREFIX", "custom_")
 EDGE_DEFAULT_VOICE = "zh-CN-YunxiNeural"
@@ -121,6 +133,287 @@ def _probe_duration(path: Path) -> float:
     from pipeline import utils  # noqa: PLC0415
 
     return round(float(utils.probe_duration(path) or 0.0), 3)
+
+
+# --------------------------------------------------------------------------- #
+# V24 角色概念图（imagegen / SDXL，单张 portrait）
+# --------------------------------------------------------------------------- #
+_IMG_OUTFIT_TAGS = {
+    "hanfu": "hanfu, chinese clothes", "suit": "suit, necktie", "jacket": "jacket",
+    "shirt": "shirt", "robe": "robe", "armor": "chinese armor",
+    "tangzhuang": "tangzhuang", "qipao": "qipao", "apron": "apron",
+    "labcoat": "lab coat", "sportswear": "sportswear", "hoodie": "hoodie",
+    "gown": "gown", "dress": "dress", "uniform": "uniform", "coat": "coat",
+}
+_IMG_HAIR_TAGS = {
+    "ancient_guan": "chinese hair bun, guan hat, long black hair",
+    "lun_jin": "lun jin headwear", "short_swept": "short swept hair",
+    "bob": "bob cut", "long_straight": "long straight hair",
+    "ponytail": "ponytail", "bun": "hair bun", "messy": "messy hair",
+    "curly": "curly hair", "buzz": "buzz cut", "long": "long hair",
+}
+_IMG_ACCESSORY_TAGS = {
+    "feather_fan": "holding feather fan", "glasses": "glasses",
+    "watch": "wristwatch", "earring": "earrings", "hat": "hat",
+    "sword": "sword", "scroll": "holding scroll",
+    "microphone": "microphone", "mic": "microphone", "headset": "headset",
+    "headphones": "headphones", "crown": "crown", "helmet": "helmet",
+    "necklace": "necklace", "mask": "mask",
+}
+_IMG_ERA_TAGS = {"history": "chinese ancient setting, historical",
+                 "modern": "modern setting"}
+_IMG_MARK_TAGS = {
+    "smile_lines": "smile", "warm_smile": "warm smile", "scar": "scar",
+    "freckles": "freckles", "beauty_mark": "beauty mark",
+    "wrinkles": "slight wrinkles", "tired_eyes": "tired eyes",
+}
+_IMG_BEARD_TAGS = {
+    "long_goatee": "long beard, goatee", "stubble": "stubble",
+    "short_beard": "short beard", "full": "full beard", "none": "",
+}
+
+
+class _ArtBusyError(RuntimeError):
+    """概念图并发/GPU 互斥（映射为 HTTP 409）。"""
+
+    def __init__(self, reason: str, message: str, *, job_id: Optional[str] = None):
+        super().__init__(message)
+        self.reason = reason
+        self.job_id = job_id
+
+
+def _default_art_seed(character_id: str) -> int:
+    return 42 + int(hashlib.sha1(character_id.encode("utf-8")).hexdigest()[:8], 16) % 10000
+
+
+def _adapt_imagegen_spec(character: dict) -> dict:
+    """contract 角色 appearance → imagegen spec（字段映射参考 tmp/gen_v52_char_specs.py）。"""
+    ap = character.get("appearance") if isinstance(character.get("appearance"), dict) else {}
+    outfit = ap.get("outfit") if isinstance(ap.get("outfit"), dict) else {}
+    accessories = [str(item) for item in (ap.get("accessories") or []) if str(item).strip()]
+    marks = [str(item) for item in (ap.get("marks") or []) if str(item).strip()]
+    tags: List[str] = []
+    for item in accessories:
+        tag = _IMG_ACCESSORY_TAGS.get(item)
+        if tag and tag not in tags:
+            tags.append(tag)
+    for item in marks:
+        tag = _IMG_MARK_TAGS.get(item)
+        if tag and tag not in tags:
+            tags.append(tag)
+    if ap.get("hat"):
+        hat = str(ap["hat"]).strip()
+        if hat and hat not in tags:
+            tags.append(hat)
+    outfit_type = str(outfit.get("type") or "")
+    if _IMG_OUTFIT_TAGS.get(outfit_type):
+        tags.append(_IMG_OUTFIT_TAGS[outfit_type])
+    hair_style = str(ap.get("hair_style") or "")
+    if _IMG_HAIR_TAGS.get(hair_style):
+        tags.append(_IMG_HAIR_TAGS[hair_style])
+    beard = str(ap.get("beard") or ap.get("facial_hair") or "")
+    if _IMG_BEARD_TAGS.get(beard):
+        tags.append(_IMG_BEARD_TAGS[beard])
+    era = str(character.get("era") or "")
+    if _IMG_ERA_TAGS.get(era):
+        tags.append(_IMG_ERA_TAGS[era])
+    character_id = str(character.get("id") or "")
+    return {
+        "id": character_id,
+        "name": str(character.get("label") or character.get("name") or character_id),
+        "title": str(character.get("persona") or ""),
+        "persona": str(character.get("persona") or ""),
+        "accent_color": str(outfit.get("accent") or ap.get("accent") or "#F5C518"),
+        "style": {"primary": "3d_toon", "variants": ["3d_toon", "2d_cel"]},
+        "appearance": {
+            "gender": str(ap.get("gender") or "male"),
+            "age": int(_to_float(ap.get("age"), 30)),
+            "height_ratio": 1,
+            "head_scale": float(_to_float(ap.get("head_ratio"), 1.0)),
+            "chibi": float(_to_float(ap.get("chibi"), 0.18)),
+            "skin": str(ap.get("skin") or "#F2D6C3"),
+            "hair_color": str(ap.get("hair") or "#2B2B33"),
+            "hair_style": hair_style or "short_swept",
+            "eye_color": str(ap.get("eye") or "#2B2B33"),
+            "eye_size": 1,
+            "brow": str(ap.get("brow") or "normal"),
+            "facial_hair": beard,
+            "outfit": {
+                "type": outfit_type or "suit",
+                "main": str(outfit.get("main") or "#2F3A4F"),
+                "accent": str(outfit.get("accent") or "#F5C518"),
+                "shirt": str(outfit.get("shirt") or "#F4F1E8"),
+            },
+            "accessories": accessories,
+            "marks": marks,
+        },
+        "extra_tags": tags,
+    }
+
+
+def _imagegen_spec_path(character: dict) -> Path:
+    """构造并落盘 tmp/v24/specs/<id>.json。
+
+    已有 `tmp/v52_art/specs/<id>.json`（24 个内建角色的精选 spec）优先复用其 appearance/style，
+    但用 contract 的最新 label/persona/appearance 覆盖关键字段；custom/新角色走 appearance 映射。
+    """
+    character_id = str(character.get("id") or "")
+    curated_path = _REPO_ROOT / "tmp" / "v52_art" / "specs" / f"{character_id}.json"
+    spec: Optional[dict] = None
+    if curated_path.is_file():
+        try:
+            loaded = json.loads(curated_path.read_text(encoding="utf-8"))
+            if isinstance(loaded, dict):
+                spec = loaded
+        except (OSError, ValueError):
+            spec = None
+    if not isinstance(spec, dict):
+        spec = _adapt_imagegen_spec(character)
+
+    ap = character.get("appearance") if isinstance(character.get("appearance"), dict) else {}
+    appearance = spec.get("appearance") if isinstance(spec.get("appearance"), dict) else {}
+    appearance.update({
+        "gender": str(ap.get("gender") or appearance.get("gender") or "male"),
+        "age": int(_to_float(ap.get("age"), appearance.get("age") or 30)),
+        "skin": str(ap.get("skin") or appearance.get("skin") or "#F2D6C3"),
+        "hair_color": str(ap.get("hair") or appearance.get("hair_color") or "#2B2B33"),
+        "hair_style": str(ap.get("hair_style") or appearance.get("hair_style") or "short_swept"),
+        "eye_color": str(ap.get("eye") or appearance.get("eye_color") or "#2B2B33"),
+        "brow": str(ap.get("brow") or appearance.get("brow") or "normal"),
+        "facial_hair": str(ap.get("beard") or appearance.get("facial_hair") or ""),
+    })
+    outfit = ap.get("outfit") if isinstance(ap.get("outfit"), dict) else {}
+    if outfit:
+        current = appearance.get("outfit") if isinstance(appearance.get("outfit"), dict) else {}
+        current.update({key: str(outfit.get(key) or current.get(key) or default) for key, default in
+                        (("type", "suit"), ("main", "#2F3A4F"), ("accent", "#F5C518"), ("shirt", "#F4F1E8"))})
+        appearance["outfit"] = current
+    appearance.setdefault("outfit", {"type": "suit", "main": "#2F3A4F",
+                                     "accent": "#F5C518", "shirt": "#F4F1E8"})
+    appearance.setdefault("accessories", [])
+    appearance.setdefault("marks", [])
+    spec["appearance"] = appearance
+
+    spec["id"] = character_id
+    spec["name"] = str(character.get("label") or character.get("name") or spec.get("name") or character_id)
+    spec["title"] = str(character.get("persona") or spec.get("title") or "")
+    spec["persona"] = str(character.get("persona") or spec.get("persona") or "")
+    style_meta = spec.get("style") if isinstance(spec.get("style"), dict) else {}
+    style_meta.setdefault("primary", "3d_toon")
+    style_meta.setdefault("variants", ["3d_toon", "2d_cel"])
+    spec["style"] = style_meta
+    extra_tags = spec.get("extra_tags") if isinstance(spec.get("extra_tags"), list) else []
+    spec["extra_tags"] = [str(tag) for tag in extra_tags if str(tag).strip()]
+
+    _ART_SPEC_DIR.mkdir(parents=True, exist_ok=True)
+    spec_path = _ART_SPEC_DIR / f"{character_id}.json"
+    _write_json(spec_path, spec)
+    return spec_path
+
+
+def _art_portrait_path(character_id: str) -> Path:
+    return _ART_DIR / character_id / "portrait.png"
+
+
+def _art_portrait_url(character_id: str) -> Optional[str]:
+    path = _art_portrait_path(character_id)
+    try:
+        if not path.is_file() or path.stat().st_size <= 2000:
+            return None
+        return f"/media/v5/characters/{character_id}/portrait.png?t={int(path.stat().st_mtime)}"
+    except OSError:
+        return None
+
+
+def _run_imagegen_cli(spec_path: Path, outdir: Path, *, style: str, seed: int,
+                      prompt_extra: str, timeout: float = _ART_TIMEOUT_SECONDS) -> dict:
+    """调用 imagegen CLI（子进程），解析末尾 JSON 摘要；失败抛 RuntimeError（含可读 tail）。"""
+    cmd = [sys.executable, "-m", "imagegen.cli", "generate",
+           "--spec", str(spec_path), "--outdir", str(outdir),
+           "--mode", "portrait", "--style", style, "--seed", str(seed),
+           "--timeout", str(int(max(60, timeout - 60)))]
+    ckpt = os.environ.get("V5_ART_CKPT", "").strip()
+    if ckpt:
+        cmd += ["--ckpt", ckpt]
+    if prompt_extra:
+        cmd += ["--prompt-extra", prompt_extra]
+    env = dict(os.environ)
+    env["PYTHONIOENCODING"] = "utf-8"
+    try:
+        proc = subprocess.run(cmd, cwd=str(_REPO_ROOT), capture_output=True, text=True,
+                              encoding="utf-8", errors="replace", env=env,
+                              timeout=timeout + 30)
+    except subprocess.TimeoutExpired as exc:
+        raise RuntimeError(f"imagegen 超时（{timeout + 30:.0f}s）") from exc
+    output = (proc.stdout or "") + "\n" + (proc.stderr or "")
+    summary: dict = {}
+    for line in reversed((proc.stdout or "").strip().splitlines()):
+        line = line.strip()
+        if line.startswith("{") and line.endswith("}"):
+            try:
+                summary = json.loads(line)
+                break
+            except ValueError:
+                continue
+    if proc.returncode != 0 or not summary.get("ok"):
+        tail = "\n".join(output.strip().splitlines()[-10:])
+        raise RuntimeError(f"imagegen 失败（returncode={proc.returncode}）：{tail[-1200:]}")
+    return summary
+
+
+def _generate_art(character: dict, *, style: str, prompt_extra: str, seed: int,
+                  force: bool) -> dict:
+    """生成角色概念图（同步）：cached 判断 → 3D job 互斥 → 同角色互斥 → GPU 串行锁 → imagegen。"""
+    character_id = str(character.get("id") or "")
+    portrait = _art_portrait_path(character_id)
+    if not force and portrait.is_file() and portrait.stat().st_size > 2000:
+        return {"character": character_id, "portrait_url": _art_portrait_url(character_id),
+                "elapsed_sec": 0.0, "style": style, "seed": seed, "cached": True}
+
+    # 与 3D 生成互斥：正在跑 pipeline job 时直接 409，避免抢 ComfyUI/GPU
+    try:
+        from .pipeline_ui import active_pipeline_job  # noqa: PLC0415
+
+        active = active_pipeline_job()
+    except Exception:  # noqa: BLE001 - 内部查询失败不阻塞（仍受 GPU_LOCK 串行）
+        active = None
+    if active:
+        raise _ArtBusyError(
+            "3d_job_running",
+            f"3D 生成任务运行中（{active.get('template_id') or active.get('id')}），请等它结束再生成概念图",
+            job_id=str(active.get("id") or "") or None)
+
+    with _ART_STATE_LOCK:
+        if character_id in _ART_INFLIGHT:
+            raise _ArtBusyError("same_character_running",
+                                f"角色 {character_id} 概念图正在生成中，请稍后")
+        _ART_INFLIGHT.add(character_id)
+    started = time.time()
+    try:
+        from .. import jobs  # noqa: PLC0415 - 与 concept job / h3 共用 ComfyUI 串行锁
+
+        with jobs.GPU_LOCK:
+            spec_path = _imagegen_spec_path(character)
+            outdir = _ART_DIR / character_id
+            outdir.mkdir(parents=True, exist_ok=True)
+            summary = _run_imagegen_cli(spec_path, outdir, style=style, seed=seed,
+                                        prompt_extra=prompt_extra)
+        elapsed = round(time.time() - started, 1)
+        if not portrait.is_file() or portrait.stat().st_size <= 2000:
+            raise RuntimeError(f"imagegen 未产出 portrait.png（outdir={outdir}）")
+        return {
+            "character": character_id,
+            "portrait_url": _art_portrait_url(character_id),
+            "elapsed_sec": elapsed,
+            "style": style,
+            "seed": seed,
+            "cached": False,
+            "images": len(summary.get("images") or []),
+            "imagegen_elapsed_sec": summary.get("elapsed_sec"),
+        }
+    finally:
+        with _ART_STATE_LOCK:
+            _ART_INFLIGHT.discard(character_id)
 
 
 # --------------------------------------------------------------------------- #
@@ -284,6 +577,7 @@ def create_character(body: Dict[str, Any] = Body(default={})) -> dict:
     label = str(data.get("label") or "").strip()
     if not label:
         raise _err("缺少 label（角色名）")
+    auto_art = _as_bool(data.get("auto_art"))  # V24：创建成功后同步生成概念图
     catalog = _catalog()
     cid = _normalize_custom_id(data.get("id"), default_prefix="custom_")
     if not _ID_RE.fullmatch(cid):
@@ -353,13 +647,36 @@ def create_character(body: Dict[str, Any] = Body(default={})) -> dict:
     _write_json(path, item)
 
     merged = (_catalog().get("characters") or {}).get(cid) or item
+    warnings: List[str] = list(result.get("warnings") or [])
+    art: Optional[Dict[str, Any]] = None
+    if auto_art:
+        # V24：同步生成概念图（20–60s）；失败不阻塞创建
+        art_started = time.time()
+        try:
+            art_result = _generate_art(merged, style=_ART_DEFAULT_STYLE, prompt_extra="",
+                                       seed=_default_art_seed(cid), force=False)
+            art = {
+                "generated": True,
+                "portrait_url": art_result.get("portrait_url"),
+                "elapsed_sec": art_result.get("elapsed_sec"),
+                "cached": bool(art_result.get("cached")),
+                "style": art_result.get("style"),
+                "seed": art_result.get("seed"),
+            }
+        except Exception as exc:  # noqa: BLE001 - auto_art 失败不影响创建
+            message = f"{type(exc).__name__}: {exc}"
+            warnings.append(f"auto_art 概念图生成失败：{message}")
+            art = {"generated": False, "portrait_url": None,
+                   "elapsed_sec": round(time.time() - art_started, 1),
+                   "cached": False, "error": message[:400]}
     return {
         "ok": True,
         "id": cid,
         "item": merged,
         "preview_url": f"/api/v5/preview/characters/{cid}",
+        "art": art,
         "path": str(path),
-        "warnings": result.get("warnings") or [],
+        "warnings": warnings,
     }
 
 
@@ -389,6 +706,50 @@ def delete_character(character: str) -> dict:
                                                        *refs])
     custom.unlink()
     return {"ok": True, "id": cid, "deleted": True, "path": str(custom)}
+
+
+# --------------------------------------------------------------------------- #
+# V24 角色概念图：生成 / 重新生成（单张 portrait，imagegen/SDXL）
+# --------------------------------------------------------------------------- #
+@router.post("/characters/{character}/art", summary="生成/重新生成角色概念图（imagegen/SDXL，单张 portrait）")
+def generate_character_art(character: str, body: Dict[str, Any] = Body(default={})) -> dict:
+    cid = str(character or "").strip().lower()
+    if not _ID_RE.fullmatch(cid):
+        raise HTTPException(status_code=404, detail=f"角色不存在: {character}")
+    catalog = _catalog()
+    char = (catalog.get("characters") or {}).get(cid)
+    if not isinstance(char, dict):
+        raise HTTPException(status_code=404, detail=f"角色不存在: {cid}")
+    data = body if isinstance(body, dict) else {}
+    mode = str(data.get("mode") or "portrait").strip().lower()
+    if mode != "portrait":
+        raise _err(f"mode 只支持 portrait（当前 {mode!r}）")
+    style = str(data.get("style") or _ART_DEFAULT_STYLE).strip().lower()
+    if style not in _ART_STYLES:
+        raise _err(f"未知 style: {style}（可选 {', '.join(_ART_STYLES)}）")
+    prompt_extra = str(data.get("prompt_extra") or "").strip()[:500]
+    try:
+        has_seed = data.get("seed") is not None
+        seed = int(data.get("seed")) if has_seed else _default_art_seed(cid)
+    except (TypeError, ValueError) as exc:
+        raise _err(f"seed 必须是整数: {data.get('seed')!r}") from exc
+    force = _as_bool(data.get("force"))
+    if force and not has_seed:
+        # 「重新生成」默认换一个 seed（前端也可显式传 seed 复现）；否则 ComfyUI 会命中相同 prompt 缓存
+        seed = (seed + int(time.time() * 1000)) % (2 ** 31 - 1)
+    try:
+        result = _generate_art(char, style=style, prompt_extra=prompt_extra,
+                               seed=seed, force=force)
+    except _ArtBusyError as exc:
+        raise HTTPException(status_code=409, detail={
+            "message": str(exc), "reason": exc.reason,
+            "job_id": exc.job_id, "character": cid,
+        }) from exc
+    except HTTPException:
+        raise
+    except Exception as exc:  # noqa: BLE001 - imagegen 失败可读返回
+        raise HTTPException(status_code=500, detail=f"概念图生成失败: {exc}") from exc
+    return {"ok": True, **result, "mode": mode}
 
 
 # --------------------------------------------------------------------------- #

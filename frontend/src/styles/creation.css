@@ -269,3 +269,19 @@
   backdrop-filter: blur(5px);
 }
 .cm-tpl-running-badge svg { animation: shell-spin 1s linear infinite; }
+
+/* V24：概念图生成错误 */
+.v24-art-error {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 8px;
+  padding: 8px 11px;
+  border: 1px solid rgba(194, 84, 63, 0.42);
+  border-radius: 8px;
+  background: rgba(194, 84, 63, 0.1);
+  color: #e6a08f;
+  font-size: 11px;
+  line-height: 1.55;
+}
+.v24-art-error b { color: #f0c1b3; font-size: 11.5px; }

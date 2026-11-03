@@ -454,9 +454,12 @@ export function characterPreviewUrl(characterId: string, styleId?: string): stri
   return apiUrl("/v5/preview/character/" + enc(characterId) + "?" + params.toString());
 }
 
-/** 角色 AI 立绘（assets/v5/characters/<id>/portrait.png；未生成时 404） */
-export function characterArtUrl(characterId: string, file = "portrait.png"): string {
-  return mediaSrc("/media/v5/characters/" + enc(characterId) + "/" + file);
+/** 角色 AI 立绘（assets/v5/characters/<id>/portrait.png；未生成时 404）
+ *  V24：bust 传时间戳可在重新生成后强制刷新（?t=）。 */
+export function characterArtUrl(characterId: string, file = "portrait.png", bust?: number | string): string {
+  const base = mediaSrc("/media/v5/characters/" + enc(characterId) + "/" + file);
+  if (bust === undefined || bust === null || bust === "") return base;
+  return base + (base.includes("?") ? "&" : "?") + "t=" + encodeURIComponent(String(bust));
 }
 
 /** 场景 AI plate（assets/v5/scenes/<id>.png；未生成时 404） */

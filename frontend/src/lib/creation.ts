@@ -13,6 +13,8 @@ export interface CharacterCreateBody {
   voice_id?: string;
   role_pool?: string[];
   tags?: string[];
+  /** V24：创建后同步生成 SDXL 概念图（20–60s，失败不阻塞创建） */
+  auto_art?: boolean;
   appearance: {
     gender?: string;
     age?: number;
@@ -23,11 +25,32 @@ export interface CharacterCreateBody {
   };
 }
 
+/** V24：概念图生成结果 */
+export interface CharacterArtResult {
+  generated: boolean;
+  portrait_url?: string;
+  elapsed_sec?: number;
+  cached?: boolean;
+  error?: string;
+}
+
+export interface CharacterArtResponse {
+  ok: boolean;
+  character: string;
+  portrait_url: string;
+  elapsed_sec?: number;
+  style?: string;
+  seed?: number;
+  cached?: boolean;
+}
+
 export interface CharacterCreateResponse {
   ok: boolean;
   id: string;
   item?: Record<string, unknown>;
   preview_url?: string;
+  /** V24：auto_art=true 时的概念图结果 */
+  art?: CharacterArtResult | null;
 }
 
 export interface TemplateCastInput {
@@ -94,7 +117,7 @@ export class CreationError extends Error {
 
 function errorItems(status: number, detail: unknown, statusText: string): string[] {
   if (status === 404 || status === 405) {
-    return ["创建接口尚未就绪（后端 V21 创建 API 实现中）；当前操作未写入任何数据，请稍后重试"];
+    return ["接口尚未就绪（后端创建/概念图 API 实现中），请稍后重试"];
   }
   if (detail && typeof detail === "object" && !Array.isArray(detail)) {
     const rec = detail as Record<string, unknown>;
@@ -151,9 +174,15 @@ async function post<T>(path: string, body: unknown, timeoutMs = 240000): Promise
 
 export const creationApi = {
   createCharacter: (body: CharacterCreateBody): Promise<CharacterCreateResponse> =>
-    post("/v5/characters", body),
+    post("/v5/characters", body, 300000),
   createTemplate: (body: TemplateCreateBody): Promise<TemplateCreateResponse> =>
-    post("/v5/templates", body),
+    post("/v5/templates", body, 300000),
+  /** V24：生成/重新生成角色概念图（SDXL，20–60s，串行 GPU） */
+  generateCharacterArt: (
+    character: string,
+    body: { mode?: "portrait"; style?: string; prompt_extra?: string; seed?: number; force?: boolean } = {},
+  ): Promise<CharacterArtResponse> =>
+    post(`/v5/characters/${encodeURIComponent(character)}/art`, { mode: "portrait", force: true, ...body }, 300000),
 };
 
 /** 400 错误是否为「后端未就绪」 */
