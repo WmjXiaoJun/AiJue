@@ -220,3 +220,52 @@
 }
 .v21-created-banner svg { color: #8fc3ae; flex: 0 0 auto; }
 .v21-created-banner .cm-btn { margin-left: auto; }
+
+/* V23：创建后立即生成 3D 开关 / 生成中 badge / 运行 banner */
+.v21-autogen {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 13px;
+  border: 1px solid var(--c-line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  cursor: pointer;
+  transition: border-color 0.16s ease, background 0.16s ease;
+}
+.v21-autogen.is-on {
+  border-color: rgba(201, 162, 39, 0.5);
+  background: linear-gradient(180deg, rgba(201, 162, 39, 0.13), rgba(201, 162, 39, 0.03));
+}
+.v21-autogen input {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--c-gold);
+  cursor: pointer;
+}
+.v21-autogen-text { display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-width: 0; }
+.v21-autogen-text b { font-size: 12.5px; font-weight: 600; color: var(--c-text); letter-spacing: 0.02em; }
+.v21-autogen-text em { font-style: normal; font-family: var(--font-mono); font-size: 9px; color: var(--c-mut); letter-spacing: 0.04em; }
+.v21-created-banner.is-running { border-color: rgba(201, 162, 39, 0.45); background: rgba(201, 162, 39, 0.1); color: var(--c-gold-soft); }
+.v21-created-banner.is-running svg { color: var(--c-gold-soft); }
+.cm-tpl-running-badge {
+  position: absolute;
+  right: 9px;
+  top: 9px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 21px;
+  padding: 0 8px;
+  border: 1px solid rgba(201, 162, 39, 0.52);
+  border-radius: 999px;
+  background: rgba(8, 9, 13, 0.78);
+  color: var(--c-gold-soft);
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.1em;
+  backdrop-filter: blur(5px);
+}
+.cm-tpl-running-badge svg { animation: shell-spin 1s linear infinite; }

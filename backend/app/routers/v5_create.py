@@ -103,6 +103,20 @@ def _to_float(value: Any, default: float) -> float:
         return default
 
 
+def _as_bool(value: Any, default: bool = False) -> bool:
+    """兼容 JSON bool / 0-1 / "true"/"false" 字符串。"""
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return value != 0
+    text = str(value or "").strip().lower()
+    if text in ("1", "true", "yes", "on"):
+        return True
+    if text in ("0", "false", "no", "off", ""):
+        return False
+    return default
+
+
 def _probe_duration(path: Path) -> float:
     from pipeline import utils  # noqa: PLC0415
 
@@ -488,12 +502,48 @@ def _normalize_aspect(raw: Any) -> List[int]:
     return [16, 9]
 
 
+def _maybe_autostart(tid: str, *, auto_generate: bool, dry_run: bool,
+                     warnings: List[str]) -> Optional[Dict[str, Any]]:
+    """V23：创建成功后按 auto_generate 提交 pipeline job。
+
+    - auto_generate=false 或 dry_run=true → 返回 None（pipeline: null，向后兼容）；
+    - 单并发 busy（409）→ started=false / reason="busy" / running_job_id，不报错；
+    - 其它启动异常 → started=false / reason="error" / error + warning，不影响创建成功。
+    """
+    if not auto_generate or dry_run:
+        return None
+    try:
+        from .pipeline_ui import start_pipeline_job  # noqa: PLC0415 - 延迟 import 避免循环依赖
+
+        started = start_pipeline_job(tid, reuse_shots=False, dry_run=False)
+        return {
+            "started": True,
+            "job_id": started.get("job_id"),
+            "status": started.get("status") or "queued",
+        }
+    except HTTPException as exc:
+        detail = exc.detail if isinstance(exc.detail, dict) else {"message": str(exc.detail)}
+        if int(exc.status_code or 0) == 409:
+            return {"started": False, "reason": "busy",
+                    "running_job_id": detail.get("job_id")}
+        message = str(detail.get("message") or detail)
+        warnings.append(f"auto_generate 启动失败：{message}")
+        return {"started": False, "reason": "error", "error": message}
+    except Exception as exc:  # noqa: BLE001
+        message = f"{type(exc).__name__}: {exc}"
+        warnings.append(f"auto_generate 启动异常：{message}")
+        return {"started": False, "reason": "error", "error": message}
+
+
 @router.post("/templates", summary="新建模板（TTS + episode + semantic brief）")
 def create_template(body: Dict[str, Any] = Body(default={})) -> dict:
     data = body if isinstance(body, dict) else {}
     catalog = _catalog()
     warnings: List[str] = []
     errors: List[str] = []
+    # V23：创建后立即生成 3D；dry_run=true 时不启动（pipeline=null，向后兼容）
+    auto_generate = _as_bool(data.get("auto_generate"))
+    dry_run = _as_bool(data.get("dry_run"))
 
     label = str(data.get("label") or "").strip()
     if not label:
@@ -707,6 +757,9 @@ def create_template(body: Dict[str, Any] = Body(default={})) -> dict:
             "episode_path": str(workdir / "episode.json"),
             "semantic_path": str(_SEMANTIC_DIR / f"{tid}_semantic.json") if brief_ok else None,
         }
+        # V23：所有产物就绪后再尝试启动 pipeline job；busy/异常不影响创建成功
+        response["pipeline"] = _maybe_autostart(tid, auto_generate=auto_generate,
+                                               dry_run=dry_run, warnings=warnings)
         return response
     except HTTPException:
         shutil.rmtree(_V5_OUT / tid, ignore_errors=True)

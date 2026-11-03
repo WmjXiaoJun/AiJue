@@ -53,6 +53,18 @@ export interface TemplateCreateBody {
   cast: TemplateCastInput[];
   acts: TemplateActInput[];
   auto_brief?: boolean;
+  /** V23：创建成功后立即提交 3D pipeline job */
+  auto_generate?: boolean;
+}
+
+/** V23：POST /api/v5/templates 的 pipeline 字段（auto_generate=true 时返回） */
+export interface TemplatePipelineResult {
+  started: boolean;
+  job_id?: string;
+  status?: string;
+  reason?: string;
+  running_job_id?: string;
+  error?: string;
 }
 
 export interface TemplateCreateResponse {
@@ -64,6 +76,7 @@ export interface TemplateCreateResponse {
   audio?: number;
   brief?: boolean;
   warnings?: string[];
+  pipeline?: TemplatePipelineResult | null;
 }
 
 /** 创建失败：携带可逐条展示的校验错误 */
@@ -82,6 +95,12 @@ export class CreationError extends Error {
 function errorItems(status: number, detail: unknown, statusText: string): string[] {
   if (status === 404 || status === 405) {
     return ["创建接口尚未就绪（后端 V21 创建 API 实现中）；当前操作未写入任何数据，请稍后重试"];
+  }
+  if (detail && typeof detail === "object" && !Array.isArray(detail)) {
+    const rec = detail as Record<string, unknown>;
+    if (Array.isArray(rec.errors)) return (rec.errors as unknown[]).map((item) => (typeof item === "string" ? item : JSON.stringify(item)));
+    if (typeof rec.message === "string" && rec.message.trim()) return [rec.message];
+    if (Array.isArray(rec.detail)) return errorItems(status, rec.detail, statusText);
   }
   if (Array.isArray(detail)) {
     return detail.map((item) => {

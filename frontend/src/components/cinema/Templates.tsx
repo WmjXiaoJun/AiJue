@@ -95,10 +95,12 @@ export function CinemaTemplates({
   embedded = false,
   onOpenShots,
   highlightId,
+  runningTemplateIds,
 }: {
   embedded?: boolean;
   onOpenShots?: (templateId: string) => void;
   highlightId?: string;
+  runningTemplateIds?: Set<string>;
 } = {}) {
   const notify = useToast();
 
@@ -484,6 +486,7 @@ export function CinemaTemplates({
             embedded={embedded}
             onOpenShots={onOpenShots}
             highlight={highlightId === item.seed.id}
+            running={runningTemplateIds?.has(item.seed.id)}
             onPlay={(template) => setPlaying(template)}
             onGenerate={(template) => void submitGenerate([template.id])}
             onAssemble={(template) => void submitAssemble([template.id])}
@@ -528,6 +531,7 @@ function TemplateCard({
   embedded,
   onOpenShots,
   highlight,
+  running,
 }: {
   item: CardItem;
   genBlocked: boolean;
@@ -540,6 +544,7 @@ function TemplateCard({
   embedded?: boolean;
   onOpenShots?: (templateId: string) => void;
   highlight?: boolean;
+  running?: boolean;
 }) {
   const { seed, template } = item;
   const [failedPoster, setFailedPoster] = useState("");
@@ -588,6 +593,11 @@ function TemplateCard({
           {statusLabel}
         </span>
         {hasFinal && <span className="cm-tpl-badge3d">3D</span>}
+        {running && (
+          <span className="cm-tpl-running-badge" title="该模板的 3D 生成任务正在后台运行">
+            <Spinner size={10} /> 生成中
+          </span>
+        )}
         {status === "generating" && <span className="cm-tpl-sweep" />}
         {hasFinal && (
           <span className="cm-tpl-poster-play">

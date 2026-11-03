@@ -6,6 +6,7 @@ import { errorText } from "../../lib/api";
 import { mediaSrc } from "../../lib/v5";
 import type { CinemaTemplate } from "../../lib/cinema";
 import { cinemaApi, fmtDuration, fmtSize, isRealTemplate } from "../../lib/cinema";
+import { isRunActive, pipelineApi } from "../../lib/pipeline";
 import type { V5CatalogResponse } from "../../lib/v5";
 import { v5api } from "../../lib/v5";
 import { useToast } from "../Toast";
@@ -58,7 +59,8 @@ export function LibraryPage({ tab, onOpenSettings }: Props) {
   const [wizardOpen, setWizardOpen] = useState(false);
   const [templateVersion, setTemplateVersion] = useState(0);
   const [highlightTemplate, setHighlightTemplate] = useState<string | null>(null);
-  const [createdTemplate, setCreatedTemplate] = useState<string | null>(null);
+  const [createdTemplate, setCreatedTemplate] = useState<{ id: string; started: boolean; reason?: string } | null>(null);
+  const [runningTemplateIds, setRunningTemplateIds] = useState<Set<string>>(new Set());
   const inFlightRef = useRef(false);
 
   const load = useCallback(async (silent: boolean) => {
@@ -83,6 +85,26 @@ export function LibraryPage({ tab, onOpenSettings }: Props) {
   useEffect(() => {
     void load(false);
   }, [load]);
+
+  // V23：生成中 badge —— /api/pipeline/runs 每 10s 轮询，匹配模板 running/queued job
+  useEffect(() => {
+    let alive = true;
+    const poll = async () => {
+      try {
+        const runs = await pipelineApi.runs();
+        if (!alive) return;
+        setRunningTemplateIds(new Set(runs.filter((run) => isRunActive(run)).map((run) => run.template_id)));
+      } catch {
+        /* 轮询失败静默；不影响页面 */
+      }
+    };
+    void poll();
+    const timer = window.setInterval(() => void poll(), 10000);
+    return () => {
+      alive = false;
+      window.clearInterval(timer);
+    };
+  }, []);
 
   const refresh = useCallback(async () => {
     setRefreshing(true);
@@ -148,13 +170,25 @@ export function LibraryPage({ tab, onOpenSettings }: Props) {
       )}
 
       {tab === "templates" && createdTemplate && (
-        <div className="v21-created-banner">
+        <div className={"v21-created-banner" + (createdTemplate.started ? " is-running" : "")}>
           <IconCheck size={14} />
           <span>
-            模板 <b className="cm-mono">{createdTemplate}</b> 已创建（pending）· 可去「一键成片」生成 3D
+            模板 <b className="cm-mono">{createdTemplate.id}</b> 已创建
+            {createdTemplate.started ? " · 3D 生成已开始（后台任务，进度在「一键成片」）" : "（pending）"}
+            {!createdTemplate.started && createdTemplate.reason === "busy" ? " · 已有任务运行，可稍后生成" : ""}
           </span>
-          <a className="cm-btn cm-btn-primary cm-btn-sm" href="#/pipeline">
-            <IconSpark size={12} /> 去一键成片
+          <a
+            className="cm-btn cm-btn-primary cm-btn-sm"
+            href={"#/pipeline?template=" + encodeURIComponent(createdTemplate.id)}
+            onClick={() => {
+              try {
+                sessionStorage.setItem("v23_pipeline_template", createdTemplate.id);
+              } catch {
+                /* ignore */
+              }
+            }}
+          >
+            <IconSpark size={12} /> {createdTemplate.started ? "查看生成进度 →" : "去一键成片"}
           </a>
           <button type="button" className="cm-btn cm-btn-sm" onClick={() => setCreatedTemplate(null)}>
             知道了
@@ -166,6 +200,7 @@ export function LibraryPage({ tab, onOpenSettings }: Props) {
           key={templateVersion}
           embedded
           highlightId={highlightTemplate || undefined}
+          runningTemplateIds={runningTemplateIds}
           onOpenShots={() => (window.location.hash = "#/cinema/shots")}
         />
       )}
@@ -199,12 +234,15 @@ export function LibraryPage({ tab, onOpenSettings }: Props) {
           catalog={catalog}
           existingTemplates={catalog?.templates || []}
           onClose={() => setWizardOpen(false)}
-          onCreated={(id) => {
+          onCreated={(id, res) => {
             setWizardOpen(false);
             setTemplateVersion((prev) => prev + 1);
             setHighlightTemplate(id);
-            setCreatedTemplate(id);
-            notify("模板已创建；可去一键成片生成 3D", "success");
+            const started = Boolean(res?.pipeline?.started);
+            setCreatedTemplate({ id, started, reason: res?.pipeline?.reason });
+            if (started) {
+              setRunningTemplateIds((prev) => new Set(prev).add(id));
+            }
             void load(true);
           }}
         />

@@ -2,7 +2,7 @@
 // 提交 POST /api/v5/templates（后端会合成 TTS/episode 并生成 semantic brief；不触发 GPU）。
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { V5CatalogResponse, V5TemplateSummary } from "../../lib/v5";
-import { creationApi, creationErrorMessage, isCreationNotReady, makeCustomId, type TemplateActInput, type TemplateCastInput } from "../../lib/creation";
+import { creationApi, creationErrorMessage, isCreationNotReady, makeCustomId, type TemplateActInput, type TemplateCastInput, type TemplateCreateResponse } from "../../lib/creation";
 import { useToast } from "../Toast";
 import { Spinner } from "../ui";
 import { IconAlert, IconCheck, IconClose, IconPlus, IconSpark, IconTrash } from "../icons";
@@ -37,7 +37,7 @@ interface Props {
   catalog: V5CatalogResponse | null;
   existingTemplates: V5TemplateSummary[];
   onClose: () => void;
-  onCreated: (id: string) => void;
+  onCreated: (id: string, res: TemplateCreateResponse) => void;
 }
 
 function rowKey(): string {
@@ -63,6 +63,7 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
   const [castPick, setCastPick] = useState("");
   const [sceneQueries, setSceneQueries] = useState<Record<string, string>>({});
   const [creating, setCreating] = useState(false);
+  const [autoGenerate, setAutoGenerate] = useState(true);
   const [errors, setErrors] = useState<string[]>([]);
 
   const styles = catalog?.styles || [];
@@ -83,6 +84,7 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
     setSceneQueries({});
     setErrors([]);
     setCreating(false);
+    setAutoGenerate(true);
   };
 
   useEffect(() => {
@@ -175,15 +177,28 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
         cast: castBody,
         acts: actBody,
         auto_brief: true,
+        auto_generate: autoGenerate,
       });
-      notify(
-        `模板「${label.trim()}」已创建${res?.shots ? ` · ${res.shots} 镜` : ""}${res?.total_duration ? ` · ${Math.round(Number(res.total_duration))}s` : ""}；可去一键成片生成 3D`,
-        "success",
-      );
+      const pipeline = res?.pipeline || null;
+      if (pipeline?.started) {
+        notify("模板已创建，3D 生成已开始", "success");
+      } else if (autoGenerate && pipeline && !pipeline.started) {
+        notify(
+          pipeline.reason === "busy"
+            ? "已有任务运行，模板已创建；可在生成队列或一键成片稍后生成"
+            : `模板已创建；3D 生成未能启动${pipeline.error ? "（" + pipeline.error + "）" : ""}，可稍后手动生成`,
+          "info",
+        );
+      } else {
+        notify(
+          `模板「${label.trim()}」已创建${res?.shots ? ` · ${res.shots} 镜` : ""}${res?.total_duration ? ` · ${Math.round(Number(res.total_duration))}s` : ""}；可去一键成片生成 3D`,
+          "success",
+        );
+      }
       if (Array.isArray(res?.warnings) && res.warnings.length) {
         notify("创建完成，但有提示：" + res.warnings.join("；"), "info");
       }
-      onCreated(res.id);
+      onCreated(res.id, res);
     } catch (err) {
       setErrors(creationErrorMessage(err));
       if (isCreationNotReady(err)) toastNotReady();
@@ -411,6 +426,25 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
                 <div className="v21-summary-item"><span>画面</span><b>{label || "—"} / {aspect}</b></div>
                 <div className="v21-summary-item"><span>Cast</span><b>{cast.length} 角色</b></div>
                 <div className="v21-summary-item"><span>分幕</span><b>{acts.length} 幕</b></div>
+                <div className="v21-summary-item"><span>将生成</span><b>{acts.length} 镜</b></div>
+                <div className="v21-summary-item"><span>预计生成</span><b>10–45 分钟</b></div>
+              </div>
+
+              <label className={"v21-autogen" + (autoGenerate ? " is-on" : "")}>
+                <input
+                  type="checkbox"
+                  checked={autoGenerate}
+                  disabled={creating}
+                  onChange={(event) => setAutoGenerate(event.target.checked)}
+                />
+                <span className="v21-autogen-text">
+                  <b>创建后立即生成 3D</b>
+                  <em>约 10–45 分钟 · 后台任务，不阻塞页面</em>
+                </span>
+                <span className="v21-autogen-switch" aria-hidden="true" />
+              </label>
+              <div className="v21-hint">
+                生成期间可离开页面，进度在「一键成片」可见；创建完成后会自动跳到「一键成片 · 第 ④ 步」。
               </div>
               <div className="v21-preview-list">
                 {acts.map((row, index) => (
@@ -423,8 +457,10 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
                 ))}
               </div>
               <div className="v21-hint">
-                创建会：写入模板合同、按 cast 合成 24k TTS 试听 wav、写 episode 分镜、生成 semantic brief；耗时约 20–60s，不触发 3D/GPU 渲染。
-                创建完成后模板出现在「模板与素材」并可在「一键成片」生成 3D。
+                创建会：写入模板合同、按 cast 合成 24k TTS 试听 wav、写 episode 分镜、生成 semantic brief；耗时约 20–60s。
+                {autoGenerate
+                  ? "随后自动提交 3D 生成任务（后台约 10–45 分钟，可离开页面）。"
+                  : "不自动生成；创建后可去「一键成片」手动开始 3D 生成。"}
               </div>
             </>
           )}
@@ -438,7 +474,9 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
                 ? "选择 3–5 个角色并指定 role"
                 : step === 3
                   ? "至少 4 幕，逐幕选场景与说话角色（或 B-roll）"
-                  : "确认后创建（只创建数据 + TTS 试听/分镜，不触发 GPU）"}
+                  : autoGenerate
+                    ? "确认后创建并自动提交 3D 生成任务（后台运行，可离开页面）"
+                    : "确认后仅创建模板（不生成 3D）"}
           </span>
           <div className="v18-actions-right" style={{ display: "flex", gap: 8, marginLeft: "auto" }}>
             <button type="button" className="cm-btn cm-btn-sm" onClick={onClose} disabled={creating}>
@@ -456,7 +494,13 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
             ) : (
               <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" onClick={() => void submit()} disabled={creating || !castValid || !actsValid}>
                 {creating ? <Spinner size={13} /> : <IconSpark size={13} />}
-                {creating ? "创建中（TTS 合成，约 20–60s）…" : "创建模板"}
+                {creating
+                  ? autoGenerate
+                    ? "创建并生成中…"
+                    : "创建中（TTS 合成，约 20–60s）…"
+                  : autoGenerate
+                    ? "创建并生成 3D"
+                    : "仅创建模板"}
               </button>
             )}
           </div>

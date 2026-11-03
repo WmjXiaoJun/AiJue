@@ -41,3 +41,40 @@
 - **tpl-backend**：POST /api/v5/templates auto_generate + 复用 helper + busy 处理 + 自测
 - **tpl-frontend**：向导 checkbox、提交带参、成功跳转进度、生成中 badge、UI 文案
 - **Lead**：真实跑一支 4 镜模板验证全链路 + 截图 + docs + commit
+
+
+## 5. 交付结果（2026-11-03 15:08）
+
+### 后端（tpl-backend，34/34 自测 PASS）
+- `pipeline_ui.start_pipeline_job(...)` 抽取复用；`POST /api/pipeline/run` 变薄封装
+- `POST /api/v5/templates` 新增 `auto_generate` / `dry_run`；`_maybe_autostart` 在 template/episode/TTS/semantic **全部完成后**启动 job；响应新增 `pipeline` 字段（started/job_id/status 或 busy/error；无参时 null，向后兼容）
+- busy 语义：已有 running job 时创建仍成功，返回 `started:false, reason:"busy", running_job_id`
+- 自测：4 幕模板 auto_generate → job 启动（queued→running→cancel 验证状态机）；busy/dry_run/无参/未知 style 全 PASS；测试数据已清理
+
+### 前端（tpl-frontend）
+- 向导 step4：checkbox「创建后立即生成 3D（约 10–45 分钟）」默认勾选 + 「将生成 N 镜 / 预计 10–45 分钟」摘要；loading「创建并生成中…」
+- 成功分支：`pipeline.started=true` → toast「模板已创建，3D 生成已开始」+ banner「查看生成进度 →」→ `#/pipeline?template=<id>` 自动选中模板并定位第④步（URL 清理）；busy → 「已有任务运行，模板已创建」
+- 模板库卡：`/api/pipeline/runs` 10s 轮询 → 运行中模板显示「生成中」badge
+- `tsc` 0 / build 通过；6 张状态截图 `tmp/v23/ui/`
+
+### Lead 真实 E2E（完整链路）
+| 项 | 值 |
+|---|---|
+| 模板 | `custom_tpl_v23_shop` · 深夜便利店「十分钟」/ film_interview / 4 幕（2 对话 + 2 b-roll）/ 15.15s |
+| 创建 | `POST /api/v5/templates` + `auto_generate:true` → **19.7s** 完成，返回 `pipeline:{started:true, job_id:"pl_240ad03b4f3b"}` |
+| 生成 | job 真实 GPU：4 镜 T2VA+ref2va → 剪辑 → 海报，**874.1s ≈ 14.6 分钟**，done 4/4 |
+| 成片 | **15.15s / 3.6MB / 1280×720 / 25fps / 有音轨**；poster/report/timeline 齐全 |
+| 当前状态 | 模板库 **21/21 完成、151/151 镜头**；成片库 21 支 |
+| 证据 | 抽帧 `tmp/v23/verify/contact_sheet.png`（16mm 便利店场景，字幕与台词一致）；UI：`tmp/v23/lead/01_library_running_badge_real.png`（运行中 badge 真实数据）、`02_pipeline_autoselect_running.png`（自动定位第④步）、`03_library_done_after.png`、`04_final_library_after.png` |
+| 直链 | `/media/templates_3d/custom_tpl_v23_shop/final.mp4` |
+
+- 说明：真实 E2E 轮询客户端在任务完成瞬间遇到一次本地连接中止（httpx ReadError），但后端 job 已正常完成（status=done、final.mp4 已产出）；不影响交付
+- 产物：模板合同 `contract/v5/custom/templates/custom_tpl_v23_shop.json` + semantic brief 入库（第 21 个模板）
+
+### 使用方式
+1. 模板与素材 →「新建模板」→ 第④步保持勾选「创建后立即生成 3D」→ 创建
+2. 成功后点「查看生成进度 →」自动跳到一键成片第④步看逐镜进度；也可稍后在模板库/成片库查看结果
+
+### 遗留
+- 生成期间离开页面不影响任务（后台 job + 落盘）；回来可在「一键成片 → 第④步」或模板卡 badge 看到状态
+- busy 时模板照常创建，稍后手动生成

@@ -414,21 +414,27 @@ class ApplyTemplateBody(BaseModel):
     template_id: str
 
 
-@router.post("/pipeline/run", status_code=202, summary="启动 3D 模板全流程任务（单并发）")
-def start_pipeline_run(payload: PipelineRunBody):
+def start_pipeline_job(template_id: str, *, reuse_shots: bool = False,
+                       dry_run: bool = False) -> Dict[str, Any]:
+    """启动一条 pipeline 任务（供 POST /api/pipeline/run 与创建模板 auto_generate 复用）。
+
+    行为与 POST /api/pipeline/run 一致：参数错误 400；已有 running 任务 409；
+    dry_run=True 只校验、不创建/不启动子进程。成功返回 {"ok", "job_id", "template_id",
+    "template_label", "status", ...}。
+    """
     global _ACTIVE
-    tid = str(payload.template_id or "").strip()
+    tid = str(template_id or "").strip()
     if not _TEMPLATE_ID_RE.fullmatch(tid):
         raise HTTPException(status_code=400, detail="template_id 必须是合法模板 id")
     if tid not in _template_ids():
         raise HTTPException(status_code=400, detail=f"未知模板: {tid}")
     if not _semantic_path(tid).is_file():
         raise HTTPException(status_code=400, detail=f"模板语义 brief 不存在: {tid}_semantic.json")
-    reuse = bool(payload.reuse_shots)
+    reuse = bool(reuse_shots)
     if reuse and _existing_shots(tid) <= 0:
         raise HTTPException(status_code=400,
                             detail=f"模板 {tid} 没有可复用的镜头（shots/ 为空），不能 reuse_shots")
-    if payload.dry_run:
+    if dry_run:
         # 只做校验：返回 202 语义的 dry-run 结果，不创建/不启动任何子进程（不占 GPU）
         if _is_custom_template(tid):
             command = [sys.executable, str(_CUSTOM_HQ_RUNNER), "--template", tid]
@@ -478,7 +484,19 @@ def start_pipeline_run(payload: PipelineRunBody):
         _JOBS[job_id] = job
         _ACTIVE = job_id
         _persist(job)
-    threading.Thread(target=_run_job, args=(job_id,), daemon=True, name=f"pipeline-{job_id}").start()
+    try:
+        threading.Thread(target=_run_job, args=(job_id,), daemon=True,
+                         name=f"pipeline-{job_id}").start()
+    except Exception as exc:  # noqa: BLE001 - 线程启动失败不能留下卡死的 queued job
+        with _LOCK:
+            job["status"] = "failed"
+            job["error"] = f"启动任务线程失败: {exc}"
+            job["finished_at"] = _now_text()
+            job["finished_ts"] = time.time()
+            _persist(job)
+            if _ACTIVE == job_id:
+                _ACTIVE = None
+        raise HTTPException(status_code=500, detail=f"启动任务失败: {exc}") from exc
     return {
         "ok": True,
         "job_id": job_id,
@@ -489,6 +507,12 @@ def start_pipeline_run(payload: PipelineRunBody):
         "stages": [item["id"] for item in STAGES],
         "stage_labels": dict(_STAGE_LABEL),
     }
+
+
+@router.post("/pipeline/run", status_code=202, summary="启动 3D 模板全流程任务（单并发）")
+def start_pipeline_run(payload: PipelineRunBody):
+    return start_pipeline_job(payload.template_id, reuse_shots=payload.reuse_shots,
+                              dry_run=payload.dry_run)
 
 
 @router.get("/pipeline/run/{job_id}", summary="pipeline 任务状态（阶段/进度/日志尾/成片）")

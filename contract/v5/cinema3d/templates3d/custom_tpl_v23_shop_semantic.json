@@ -1,0 +1,48 @@
+{
+ "template": "custom_tpl_v23_shop",
+ "style": "film_interview",
+ "look": "warm 16mm film interview set, cream and amber practical light, soft bokeh background, gentle film grain, shallow depth of field, analog color",
+ "mode": "semantic",
+ "shots": [
+  {
+   "id": "v5_001",
+   "kind": "broll",
+   "scene": "convenience_store",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": "",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 16mm film interview set, cream and amber practical light, soft bokeh background, gentle film grain, shallow depth of field, analog color. Set in a cinematic set inspired by convenience store. The camera surveys the space, atmospheric and cinematic. Camera: slow dolly move through the space. photorealistic cinematic live-action quality, realistic human skin and materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft room warm ambience, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_002",
+   "kind": "dialogue",
+   "scene": "convenience_store",
+   "duration": 4.73,
+   "line": "凌晨的便利店，是最诚实的深夜客厅。",
+   "semantic_visual": "A glowing convenience store stands alone on a dark, empty street at night, warm light spilling from its windows onto wet pavement. Inside, shelves and a counter are visible through the glass, quiet and inviting.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 16mm film interview set, cream and amber practical light, soft bokeh background, gentle film grain, shallow depth of field, analog color. Set in a cinematic set inspired by convenience store. Featuring a real 42-year-old Chinese man, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A glowing convenience store stands alone on a dark, empty street at night, warm light spilling from its windows onto wet pavement. Inside, shelves and a counter are visible through the glass, quiet and inviting.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. photorealistic cinematic live-action quality, realistic human skin and materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft room warm ambience, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_003",
+   "kind": "dialogue",
+   "scene": "street_night",
+   "duration": 4.42,
+   "line": "我每天这个点下班，只想来买一杯热的。",
+   "semantic_visual": "A young woman in a light jacket walks alone down a dim night street toward a bright storefront, breath faint in the cold air. She reaches the glass door and steps inside, drawn by the warmth.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 16mm film interview set, cream and amber practical light, soft bokeh background, gentle film grain, shallow depth of field, analog color. Set in a cinematic set inspired by street night. Featuring a real 20-year-old Chinese woman, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A young woman in a light jacket walks alone down a dim night street toward a bright storefront, breath faint in the cold air. She reaches the glass door and steps inside, drawn by the warmth.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. photorealistic cinematic live-action quality, realistic human skin and materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft room warm ambience, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_004",
+   "kind": "broll",
+   "scene": "street_night",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": "",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 16mm film interview set, cream and amber practical light, soft bokeh background, gentle film grain, shallow depth of field, analog color. Set in a cinematic set inspired by street night. The camera surveys the space, atmospheric and cinematic. Camera: slow pull-back revealing the space. photorealistic cinematic live-action quality, realistic human skin and materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft room warm ambience, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  }
+ ]
+}

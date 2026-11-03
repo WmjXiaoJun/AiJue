@@ -43,6 +43,8 @@ interface TemplateActLine {
 }
 
 interface Props {
+  /** V23：创建即生成跳转时预选模板并定位第④步 */
+  initialTemplateId?: string;
   onExit: () => void;
   onOpenCharacters: () => void;
   onOpenCinema: () => void;
@@ -52,7 +54,7 @@ interface Props {
 
 const STEP_LABELS = ["选模板", "角色与声音", "剧本预览", "生成 3D", "成片", "发布前检查"];
 
-export function PipelineConsole({ onExit, onOpenCharacters, onOpenCinema, onOpenLibrary, onOpenSettings }: Props) {
+export function PipelineConsole({ initialTemplateId, onExit, onOpenCharacters, onOpenCinema, onOpenLibrary, onOpenSettings }: Props) {
   const notify = useToast();
 
   const [catalog, setCatalog] = useState<V5CatalogResponse | null>(null);
@@ -87,6 +89,7 @@ export function PipelineConsole({ onExit, onOpenCharacters, onOpenCinema, onOpen
   const [settingsError, setSettingsError] = useState("");
 
   const lastReuseRef = useRef(true);
+  const injectedTemplateRef = useRef(false);
   const aliveRef = useRef(true);
   const inFlightRef = useRef(false);
 
@@ -140,6 +143,16 @@ export function PipelineConsole({ onExit, onOpenCharacters, onOpenCinema, onOpen
   useEffect(() => {
     void loadAll(false);
   }, [loadAll]);
+
+  // V23：从「创建即生成」跳转过来 → 选中新模板并定位第④步
+  useEffect(() => {
+    if (!initialTemplateId || injectedTemplateRef.current || !templates.length) return;
+    const target = templates.find((item) => item.id === initialTemplateId);
+    if (!target) return;
+    injectedTemplateRef.current = true;
+    setSelectedId(target.id);
+    setStep(4);
+  }, [initialTemplateId, templates]);
 
   const refreshTemplates = useCallback(async () => {
     try {

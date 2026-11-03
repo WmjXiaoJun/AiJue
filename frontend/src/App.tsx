@@ -60,8 +60,11 @@ function applyLegacyRedirect(): boolean {
   return true;
 }
 
-function parseHash(): { eid?: string; tab: TabKey; cinema?: boolean; pipeline?: boolean; characters?: boolean; library?: LibraryTab } {
-  const raw = window.location.hash.replace(/^#\/?/, "");
+function parseHash(): { eid?: string; tab: TabKey; cinema?: boolean; pipeline?: boolean; characters?: boolean; library?: LibraryTab; template?: string } {
+  const rawHash = window.location.hash.replace(/^#\/?/, "");
+  const queryAt = rawHash.indexOf("?");
+  const raw = queryAt >= 0 ? rawHash.slice(0, queryAt) : rawHash;
+  const query = new URLSearchParams(queryAt >= 0 ? rawHash.slice(queryAt + 1) : "");
   const parts = raw.split("/").filter(Boolean);
   if (parts[0] === "cinema") {
     return { tab: "script", cinema: true };
@@ -71,7 +74,14 @@ function parseHash(): { eid?: string; tab: TabKey; cinema?: boolean; pipeline?: 
     return { tab: "script", library: tab };
   }
   if (parts[0] === "pipeline") {
-    return { tab: "script", pipeline: true };
+    // V23：创建即生成后跳转 #/pipeline?template=<id>（或 sessionStorage 兜底），选中模板并定位第④步
+    let stored: string | null = null;
+    try {
+      stored = sessionStorage.getItem("v23_pipeline_template");
+    } catch {
+      stored = null;
+    }
+    return { tab: "script", pipeline: true, template: query.get("template") || stored || undefined };
   }
   if (parts[0] === "characters") {
     return { tab: "script", characters: true };
@@ -107,6 +117,7 @@ function Shell() {
   const [taskStats, setTaskStats] = useState<{ activeJobs: number; cost: number }>({ activeJobs: 0, cost: 0 });
   const [retrying, setRetrying] = useState(false);
   const [settingsSignal, setSettingsSignal] = useState(0);
+  const [pipelineInitialTemplate, setPipelineInitialTemplate] = useState<string | null>(null);
 
   const viewRef = useRef(view);
   viewRef.current = view;
@@ -131,6 +142,18 @@ function Shell() {
         const route = parseHash();
         if (route.cinema) {
           setView({ mode: "cinema" });
+        } else if (route.pipeline && route.template) {
+          setPipelineInitialTemplate(route.template);
+          try {
+            sessionStorage.removeItem("v23_pipeline_template");
+          } catch {
+            /* ignore */
+          }
+          if (window.location.hash.includes("?")) window.history.replaceState(null, "", "#/pipeline");
+          setView({ mode: "pipeline" });
+          setEpisodes(null);
+          setTab("script");
+          setTaskStats({ activeJobs: 0, cost: 0 });
         } else if (route.library) {
           setView({ mode: "library", tab: route.library });
         } else if (route.pipeline) {
@@ -213,6 +236,15 @@ function Shell() {
         return;
       }
       if (route.pipeline) {
+        if (route.template) {
+          setPipelineInitialTemplate(route.template);
+          try {
+            sessionStorage.removeItem("v23_pipeline_template");
+          } catch {
+            /* ignore */
+          }
+          if (window.location.hash.includes("?")) window.history.replaceState(null, "", "#/pipeline");
+        }
         setView({ mode: "pipeline" });
         setTab("script");
         return;
@@ -437,6 +469,7 @@ function Shell() {
   if (view.mode === "pipeline") {
     return (
       <PipelineConsole
+        initialTemplateId={pipelineInitialTemplate || undefined}
         onExit={goHome}
         onOpenCharacters={openCharacters}
         onOpenCinema={openCinema}
