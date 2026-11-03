@@ -16,6 +16,7 @@ import {
   IconCopy,
   IconExternal,
   IconFilm,
+  IconDownload,
   IconGlobe,
   IconInfo,
   IconLock,
@@ -847,6 +848,7 @@ export function StepPreflight({
   onOpenSettings,
   onPrev,
   onDone,
+  onExportPackage,
 }: {
   template: CinemaTemplate | null;
   settings: Settings | null;
@@ -855,6 +857,8 @@ export function StepPreflight({
   onOpenSettings: () => void;
   onPrev: () => void;
   onDone: () => void;
+  /** V26：导出当前模板发布包 */
+  onExportPackage?: () => void;
 }) {
   const ready = Boolean(template?.final.exists);
   const publishConfigured = Boolean((settings as Record<string, unknown> | null)?.upload_post_api_key_configured);
@@ -904,6 +908,17 @@ export function StepPreflight({
           <p className="v18-panel-sub">PREFLIGHT · 成片 / 发布账号 / 模型 / 母版 自检（如实展示未连接项）</p>
         </div>
         <div className="v18-panel-actions">
+          {onExportPackage && (
+            <button
+              type="button"
+              className="cm-btn cm-btn-primary cm-btn-sm"
+              onClick={onExportPackage}
+              disabled={!ready}
+              title={ready ? "导出当前模板发布包 zip（视频/封面/字幕/元数据/README）" : "该模板暂无成片，无法导出发布包"}
+            >
+              <IconDownload size={13} /> 导出发布包
+            </button>
+          )}
           <button type="button" className="cm-btn cm-btn-sm" onClick={onOpenSettings}>
             <IconLock size={13} /> 设置
           </button>

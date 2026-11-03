@@ -17,6 +17,7 @@ import { useToast } from "../Toast";
 import { Spinner } from "../ui";
 import { IconAlert, IconFilm, IconGlobe, IconGrid, IconLock, IconRefresh, IconSettings, IconSpark, IconTemplate, IconUsers, IconVideo } from "../icons";
 import { AppShell } from "../shell/AppShell";
+import { PublishPackageModal } from "../publish/PublishPackageModal";
 import { PipelineStepper, type PipelineStepMeta } from "./PipelineStepper";
 import {
   ErrorBar,
@@ -83,6 +84,7 @@ export function PipelineConsole({ initialTemplateId, onExit, onOpenCharacters, o
   const [cancelling, setCancelling] = useState(false);
   const [pollError, setPollError] = useState("");
   const [logOpen, setLogOpen] = useState(false);
+  const [publishOpen, setPublishOpen] = useState(false);
 
   const [settings, setSettings] = useState<Settings | null>(null);
   const [settingsLoading, setSettingsLoading] = useState(false);
@@ -600,9 +602,18 @@ export function PipelineConsole({ initialTemplateId, onExit, onOpenCharacters, o
                 onOpenSettings={onOpenSettings}
                 onPrev={() => gotoStep(5)}
                 onDone={onExit}
+                onExportPackage={() => setPublishOpen(true)}
               />
             )}
           </div>
+      {publishOpen && selectedTemplate && (
+        <PublishPackageModal
+          open
+          templateId={selectedTemplate.id}
+          templateLabel={selectedTemplate.label}
+          onClose={() => setPublishOpen(false)}
+        />
+      )}
     </AppShell>
   );
 }

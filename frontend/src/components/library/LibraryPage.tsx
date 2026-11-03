@@ -32,6 +32,7 @@ import {
 import { AppShell } from "../shell/AppShell";
 import { CinemaTemplates } from "../cinema/Templates";
 import { CreateTemplateWizard } from "./CreateTemplateWizard";
+import { PublishPackageModal } from "../publish/PublishPackageModal";
 import { V5Styles } from "../v5world/Styles";
 import { V5Scenes } from "../v5world/Scenes";
 import "../../styles/cinema.css";
@@ -529,6 +530,7 @@ function FinalLibrary({
   const [query, setQuery] = useState("");
   const [playing, setPlaying] = useState<CinemaTemplate | null>(null);
   const [assembling, setAssembling] = useState<string | null>(null);
+  const [publishTemplate, setPublishTemplate] = useState<CinemaTemplate | null>(null);
 
   useEffect(() => {
     if (!playing) return;
@@ -666,6 +668,14 @@ function FinalLibrary({
                     <a className="cm-btn cm-btn-sm" href={qcUrl} target="_blank" rel="noreferrer" title="QC 报告 JSON（黑帧/响度/字幕覆盖/时长偏差）">
                       <IconImage size={12} /> QC
                     </a>
+                    <button
+                      type="button"
+                      className="cm-btn cm-btn-sm is-publish"
+                      onClick={() => setPublishTemplate(template)}
+                      title="导出发布包（成片 + 封面 + 字幕 + 元数据 + README 的 zip）"
+                    >
+                      <IconDownload size={12} /> 发布包
+                    </button>
                     <button type="button" className="cm-btn cm-btn-sm cm-btn-ghost" onClick={() => void reassemble(template)} disabled={assembling === template.id}>
                       {assembling === template.id ? <Spinner size={12} /> : <IconSpark size={12} />} 重新合成
                     </button>
@@ -681,6 +691,15 @@ function FinalLibrary({
             );
           })}
         </div>
+      )}
+
+      {publishTemplate && (
+        <PublishPackageModal
+          open
+          templateId={publishTemplate.id}
+          templateLabel={publishTemplate.label}
+          onClose={() => setPublishTemplate(null)}
+        />
       )}
 
       {playing && (

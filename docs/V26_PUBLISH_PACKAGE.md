@@ -43,3 +43,33 @@ body `{platform?: "youtube"|"tiktok"|"instagram"|"generic" = "generic", force?: 
 - **tpl-backend**：publish-package 构建 API（zip/srt/元数据/缓存/清理）+ 自测
 - **tpl-frontend**：成片库卡「发布包」+ 导出弹层 + 下载/复制/提示；pipeline 第⑥步按钮
 - **Lead**：真实导出验证（打开 zip 检查 srt/metadata）、截图、docs、commit
+
+
+## 5. 交付结果（2026-11-03 19:55）
+
+### 后端（cinema_templates.py）
+- `POST /api/cinema/templates/{tid}/publish-package`（platform: 通用/YouTube/TikTok/Instagram + force）：构建 zip 到 `outputs/templates_3d/<tid>/publish/<tid>_<platform>.zip`；cached 复用；非法 id 400
+- `GET /api/cinema/templates/{tid}/publish-package`：列出最近包（当前 4 个：generic/youtube/tiktok/instagram）
+- zip 内容（实测 custom_tpl_v23_shop）：`video/final.mp4` 3.60MB / `cover/cover.jpg` 47KB / `subtitles/zh.srt` 172B(6 行) / `metadata.json` 1.2KB / `README.txt` 1.5KB / `timeline.json` 5.6KB / `report.json` 1.3KB；zip 3.64MB，`/media` 200 `application/x-zip-compressed`
+- metadata 实测：title「深夜便利店 · 十分钟」、duration 15.15、1280x720、platform youtube、tags [custom,v21,film_interview,AI视频,YouTube]
+- 无成片模板：不在 cinema 列表的模板 404（可读）；非法 id 400
+
+### 前端
+- `components/publish/PublishPackageModal.tsx` + `styles/publish.css`：导出中 loading、文件清单（名称/大小）、平台切换、重新打包（force）、下载 zip（blob）、复制元数据、平台提醒
+- 成片库每张卡片「发布包」按钮（21 个可用）；一键成片第⑥步「导出发布包」（当前模板，无成片 disabled）
+- 实测（Lead 复验）：成片库点「发布包」→ 弹层显示真实 7 个文件（16.44MB 视频等）+ 下载按钮；console 无 JS error；`tsc` 0 / build 通过
+
+### 使用
+1. 成片库 → 任意卡片「发布包」→ 选平台 → 下载 zip
+2. 解压后：MP4 上传平台；cover.jpg 作封面；zh.srt 作字幕；metadata.json 的 title/description/tags 直接复制到 YouTube/TikTok 描述；README 有步骤说明
+3. 平台提醒：TikTok/Instagram 需 9:16（当前母版 16:9，需裁切/重组）；YouTube 封面建议 1280×720
+
+### 证据
+- `tmp/v26/lead/01_publish_modal.png`（导出弹层真实文件清单）
+- `tmp/v26/ui/`（6 张前端流程截图：导出中/清单/下载 toast/错误/第⑥步入口/弹层）
+- `tmp/v26/package.zip`（实际下载的 zip 样本）、`tmp/v26/e2e_result.json` 无、`tmp/v26/publish_verify.json`
+- `outputs/templates_3d/custom_tpl_v23_shop/publish/`（generic/youtube/tiktok/instagram 4 个包）
+
+### 说明
+- 发布账号仍未连接（Upload-Post OAuth），本轮只做本地导出，手动上传
+- 母版 1280×720 16:9；9:16 平台需另行裁切（弹层已提示）

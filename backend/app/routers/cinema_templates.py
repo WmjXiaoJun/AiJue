@@ -44,16 +44,19 @@ import json
 import logging
 import os
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
 import threading
 import time
+import zipfile
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
-from fastapi import APIRouter, HTTPException, Response
+from fastapi import APIRouter, Body, HTTPException, Response
 from pydantic import BaseModel
 
 from .. import config, jobs
@@ -1718,6 +1721,548 @@ def start_assemble(payload: TemplateAssembleRequest) -> Dict[str, Any]:
     if warning:
         response["warning"] = warning
     return response
+
+
+# --------------------------------------------------------------------------- #
+# V26 发布包导出（zip：成片/封面/中文字幕/元数据/时间线/报告/README）
+# --------------------------------------------------------------------------- #
+PUBLISH_DIRNAME = "publish"
+PUBLISH_PLATFORMS = ("youtube", "tiktok", "instagram", "generic")
+PUBLISH_KEEP = 5
+PUBLISH_PLATFORM_LABEL = {
+    "youtube": "YouTube",
+    "tiktok": "TikTok",
+    "instagram": "Instagram Reels",
+    "generic": "通用",
+}
+_PUBLISH_LOCK = threading.Lock()
+_ASS_TIME_RE = re.compile(r"^(?:(\d+):)?(\d{1,2}):(\d{1,2}(?:\.\d+)?)$")
+
+
+def _publish_dir(tid: str) -> Path:
+    return T3D_ROOT / tid / PUBLISH_DIRNAME
+
+
+def _publish_zip_path(tid: str, platform: str) -> Path:
+    return _publish_dir(tid) / f"{tid}_{platform}.zip"
+
+
+def _publish_prune(tid: str) -> None:
+    """只保留最近 5 个发布包（按修改时间倒序）。"""
+    try:
+        zips = sorted(_publish_dir(tid).glob("*.zip"),
+                      key=lambda path: path.stat().st_mtime, reverse=True)
+    except OSError:
+        return
+    for old in zips[PUBLISH_KEEP:]:
+        try:
+            old.unlink()
+        except OSError:
+            pass
+
+
+def _publish_view(tid: str, platform: str, *, cached: bool) -> Dict[str, Any]:
+    zip_path = _publish_zip_path(tid, platform)
+    stat = zip_path.stat()
+    files: List[Dict[str, Any]] = []
+    try:
+        with zipfile.ZipFile(zip_path) as zf:
+            for info in zf.infolist():
+                if info.is_dir():
+                    continue
+                files.append({"name": info.filename, "size": int(info.file_size)})
+    except (OSError, zipfile.BadZipFile):
+        files = []
+    return {
+        "ok": True,
+        "template_id": tid,
+        "package_url": _t3d_media(tid, f"{PUBLISH_DIRNAME}/{zip_path.name}"),
+        "filename": zip_path.name,
+        "size_bytes": int(stat.st_size),
+        "files": files,
+        "cached": cached,
+        "platform": platform,
+        "platform_label": PUBLISH_PLATFORM_LABEL.get(platform, platform),
+        "generated_at": time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(stat.st_mtime)),
+        "path": str(zip_path),
+    }
+
+
+def _ass_time_seconds(value: str) -> Optional[float]:
+    match = _ASS_TIME_RE.match(str(value or "").strip())
+    if not match:
+        return None
+    hours = int(match.group(1) or 0)
+    minutes = int(match.group(2))
+    seconds = float(match.group(3))
+    return hours * 3600 + minutes * 60 + seconds
+
+
+def _format_srt_time(seconds: float) -> str:
+    total_ms = max(0, int(round(float(seconds) * 1000)))
+    hours, rest = divmod(total_ms, 3600_000)
+    minutes, rest = divmod(rest, 60_000)
+    secs, millis = divmod(rest, 1000)
+    return f"{hours:02d}:{minutes:02d}:{secs:02d},{millis:03d}"
+
+
+def _clean_subtitle_text(value: str) -> str:
+    text = re.sub(r"\{[^}]*\}", "", str(value or ""))
+    text = text.replace("\\N", "\n").replace("\\n", "\n").replace("\\h", " ")
+    return text.strip()
+
+
+def _srt_entries_from_ass(path: Path) -> List[Tuple[float, float, str]]:
+    entries: List[Tuple[float, float, str]] = []
+    try:
+        text = path.read_text(encoding="utf-8-sig", errors="replace")
+    except OSError:
+        return entries
+    for line in text.splitlines():
+        if not line.startswith("Dialogue:"):
+            continue
+        parts = line[len("Dialogue:"):].strip().split(",", 9)
+        if len(parts) < 10:
+            continue
+        start = _ass_time_seconds(parts[1])
+        end = _ass_time_seconds(parts[2])
+        content = _clean_subtitle_text(parts[9])
+        if start is None or end is None or end <= start or not content:
+            continue
+        entries.append((start, end, content))
+    entries.sort(key=lambda item: item[0])
+    return entries
+
+
+def _srt_entries_from_timeline(timeline: Any) -> List[Tuple[float, float, str]]:
+    entries: List[Tuple[float, float, str]] = []
+    if not isinstance(timeline, dict):
+        return entries
+    for track in timeline.get("tracks") or []:
+        if not isinstance(track, dict):
+            continue
+        kind = str(track.get("kind") or track.get("type") or "").lower()
+        if kind not in ("subtitle", "subtitles", "sub", "text", "caption"):
+            continue
+        for clip in track.get("clips") or []:
+            if not isinstance(clip, dict):
+                continue
+            text = _clean_subtitle_text(clip.get("text") or clip.get("line") or "")
+            if not text:
+                continue
+            try:
+                start = float(clip.get("at") if clip.get("at") is not None else clip.get("start"))
+                end = float(clip.get("out") if clip.get("out") is not None else clip.get("end"))
+            except (TypeError, ValueError):
+                continue
+            if end <= start:
+                end = start + 2.0
+            entries.append((start, end, text))
+    entries.sort(key=lambda item: item[0])
+    return entries
+
+
+def _srt_entries_from_episode(tid: str) -> List[Tuple[float, float, str]]:
+    episode = None
+    for path in (T3D_ROOT / tid / "work" / "episode.json",
+                 V5_ROOT / tid / "work" / "episode.json"):
+        data = _JSON_CACHE.get(path)
+        if isinstance(data, dict):
+            episode = data
+            break
+    if not isinstance(episode, dict):
+        return []
+    entries: List[Tuple[float, float, str]] = []
+    cursor = 0.0
+    for shot in episode.get("shots") or []:
+        if not isinstance(shot, dict):
+            continue
+        duration = float(shot.get("duration") or 0.0)
+        start = shot.get("_edit_start")
+        start = float(start) if isinstance(start, (int, float)) else cursor
+        cursor = max(cursor, start + max(0.0, duration))
+        text = _clean_subtitle_text(shot.get("line") or "")
+        if not text or duration <= 0:
+            continue
+        speech = float(shot.get("speech_duration") or 0.0)
+        end = start + max(1.2, min(duration - 0.05, (speech + 0.5) if speech > 0 else duration - 0.3))
+        if end <= start + 0.2:
+            end = start + 1.2
+        entries.append((start + 0.1, end, text))
+    entries.sort(key=lambda item: item[0])
+    return entries
+
+
+def _publish_subtitles(tid: str, warnings: List[str]) -> Tuple[bytes, int, str]:
+    """优先 work/final.ass → timeline → episode；返回 (srt_bytes, 条数, 来源)。"""
+    ass_path = T3D_ROOT / tid / "work" / "final.ass"
+    if ass_path.is_file() and ass_path.stat().st_size > 0:
+        entries = _srt_entries_from_ass(ass_path)
+        if entries:
+            return _srt_text(entries).encode("utf-8"), len(entries), "work/final.ass"
+        warnings.append("work/final.ass 存在但没有可解析的字幕 Dialogue，尝试 timeline/episode")
+    for path in (T3D_ROOT / tid / "timeline.json",
+                 T3D_ROOT / tid / "work" / "timeline.json"):
+        data = _JSON_CACHE.get(path)
+        entries = _srt_entries_from_timeline(data)
+        if entries:
+            warnings.append("字幕从 timeline.json 合成（final.ass 缺失/为空）")
+            return _srt_text(entries).encode("utf-8"), len(entries), str(path.relative_to(T3D_ROOT))
+    entries = _srt_entries_from_episode(tid)
+    if entries:
+        warnings.append("字幕从 work/episode.json 台词合成（final.ass/timeline 缺失）")
+        return _srt_text(entries).encode("utf-8"), len(entries), "work/episode.json"
+    warnings.append("未找到字幕台词（final.ass/timeline/episode 均为空），subtitles/zh.srt 为空文件")
+    return b"", 0, "empty"
+
+
+def _srt_text(entries: Sequence[Tuple[float, float, str]]) -> str:
+    blocks = []
+    for index, (start, end, text) in enumerate(entries, 1):
+        blocks.append(f"{index}\n{_format_srt_time(start)} --> {_format_srt_time(end)}\n{text}\n")
+    return "\n".join(blocks)
+
+
+def _publish_cover(tid: str, workdir: Path, warnings: List[str]) -> Optional[Path]:
+    poster = _poster_path(tid)
+    if poster.is_file() and poster.stat().st_size > 0:
+        return poster
+    final = _final_path(tid)
+    cover = workdir / "cover.jpg"
+    try:
+        proc = subprocess.run(
+            [str(jobs.ffmpeg_bin()), "-y", "-ss", "1.0", "-i", str(final),
+             "-frames:v", "1", "-q:v", "3", str(cover)],
+            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=60,
+        )
+        if proc.returncode == 0 and cover.is_file() and cover.stat().st_size > 0:
+            warnings.append("封面从 final.mp4 第 1s 抽帧生成（poster.jpg 不存在）")
+            return cover
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        warnings.append(f"封面抽帧失败: {exc}")
+    warnings.append("未生成 cover/cover.jpg（poster 与抽帧均失败）")
+    return None
+
+
+def _publish_probe(path: Path) -> Dict[str, Any]:
+    try:
+        proc = subprocess.run(
+            [str(jobs.ffprobe_bin()), "-v", "error", "-show_streams",
+             "-show_format", "-of", "json", str(path)],
+            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=60,
+        )
+        data = json.loads(proc.stdout or "{}")
+    except (OSError, ValueError, subprocess.TimeoutExpired):
+        return {}
+    video = next((stream for stream in data.get("streams") or []
+                  if stream.get("codec_type") == "video"), {})
+    fmt = data.get("format") if isinstance(data.get("format"), dict) else {}
+    fps = 0.0
+    raw_rate = str(video.get("r_frame_rate") or video.get("avg_frame_rate") or "0/1")
+    try:
+        num, _, den = raw_rate.partition("/")
+        fps = round(float(num) / float(den or 1), 3)
+    except (TypeError, ValueError, ZeroDivisionError):
+        fps = 0.0
+    width = int(video.get("width") or 0)
+    height = int(video.get("height") or 0)
+    return {
+        "codec": video.get("codec_name"),
+        "width": width,
+        "height": height,
+        "resolution": f"{width}x{height}" if width and height else None,
+        "fps": fps,
+        "duration_sec": round(float(fmt.get("duration") or 0.0), 2),
+        "size_bytes": int(fmt.get("size") or 0),
+    }
+
+
+def _publish_cast(contract: Dict[str, Any]) -> List[Dict[str, str]]:
+    rows: List[Dict[str, str]] = []
+    base_dirs = (config.CONTRACT_DIR / "v5" / "characters",
+                 config.CONTRACT_DIR / "v5" / "custom" / "characters")
+    for entry in contract.get("cast") or []:
+        if not isinstance(entry, dict):
+            continue
+        cid = str(entry.get("character") or "").strip()
+        role = str(entry.get("role") or "").strip()
+        name = str(entry.get("name") or "").strip()
+        if not name and cid:
+            for base in base_dirs:
+                data = _JSON_CACHE.get(base / f"{cid}.json")
+                if isinstance(data, dict):
+                    name = str(data.get("label") or data.get("name") or "").strip()
+                    if name:
+                        break
+        rows.append({"role": role, "character": cid, "name": name or cid})
+    return rows
+
+
+def _publish_metadata(tid: str, contract: Dict[str, Any], final_info: Dict[str, Any],
+                      platform: str, srt_count: int) -> Dict[str, Any]:
+    final = _final_path(tid)
+    probe = _publish_probe(final)
+    cast = _publish_cast(contract)
+    label = str(contract.get("label") or _template_label(tid) or tid)
+    description = str(contract.get("description") or "").strip()
+    if not description:
+        description = f"{label} · AI 生成的原创短视频"
+    cast_text = "、".join(f"{row['name']}（{row['role']}）" for row in cast if row.get("name"))
+    if cast_text:
+        description += f"｜阵容：{cast_text}"
+    style = str(contract.get("style") or "")
+    if style:
+        description += f"｜风格：{style}"
+    tags: List[str] = []
+    for tag in list(contract.get("tags") or []) + [style, "AI视频",
+                                                   PUBLISH_PLATFORM_LABEL.get(platform, platform)]:
+        value = str(tag or "").strip()
+        if value and value not in tags:
+            tags.append(value)
+    report = _JSON_CACHE.get(T3D_ROOT / tid / "report.json")
+    report = report if isinstance(report, dict) else {}
+    report_qc = report.get("qc") if isinstance(report.get("qc"), dict) else {}
+    checks = report_qc.get("checks") or report.get("checks") or []
+    try:
+        stat = final.stat()
+    except OSError:
+        stat = None
+    metadata = {
+        "title": label,
+        "description": description,
+        "tags": tags,
+        "template_id": tid,
+        "template_label": label,
+        "style": style,
+        "cast": cast,
+        "duration_sec": float(final_info.get("duration") or probe.get("duration_sec") or 0.0),
+        "resolution": probe.get("resolution"),
+        "fps": probe.get("fps"),
+        "size_bytes": int(stat.st_size) if stat else int(final_info.get("size") or 0),
+        "generated_at": (time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(stat.st_mtime))
+                         if stat else time.strftime("%Y-%m-%dT%H:%M:%S")),
+        "platform": platform,
+        "platform_label": PUBLISH_PLATFORM_LABEL.get(platform, platform),
+        "qc": {
+            "ok": bool(final_info.get("exists")),
+            "report_present": bool(report),
+            "probe": probe,
+            "checks": checks,
+            "subtitle_lines": srt_count,
+            "final_url": _t3d_media(tid, "final.mp4"),
+        },
+    }
+    return metadata
+
+
+def _publish_readme(tid: str, contract: Dict[str, Any], metadata: Dict[str, Any],
+                    platform: str, srt_count: int, srt_source: str,
+                    has_cover: bool, warnings: Sequence[str]) -> str:
+    label = metadata.get("title") or tid
+    cast_text = "、".join(f"{row['name']}（{row['role']}）"
+                          for row in metadata.get("cast") or [] if row.get("name")) or "—"
+    notes = {
+        "youtube": [
+            "YouTube：可直接上传 16:9 成片（当前 {res}，{fps}fps）；",
+            "标题/简介/标签见 metadata.json；字幕上传 subtitles/zh.srt；",
+            "封面建议 1280×720，可将 cover/cover.jpg 上传为自定义缩略图；",
+            "若走 Shorts，请使用竖版 9:16 另行导出。",
+        ],
+        "tiktok": [
+            "TikTok：优先 9:16 竖版，当前成片为 {res}，上传前建议裁切/加边框；",
+            "可直接上传 video/final.mp4，平台会自动转码；",
+            "字幕可用 subtitles/zh.srt（TikTok 也支持自动字幕）；",
+            "标题/文案参考 metadata.json 的 description。",
+        ],
+        "instagram": [
+            "Instagram Reels：建议 9:16 竖版（当前 {res}），可裁切/加边框；",
+            "时长与分辨率建议 ≤ 90s / 1080p；封面可用 cover/cover.jpg；",
+            "字幕可烧录或参考 subtitles/zh.srt 文案。",
+        ],
+        "generic": [
+            "通用包：video/final.mp4 为成片，cover/cover.jpg 为封面；",
+            "subtitles/zh.srt 为 SRT 中文字幕，metadata.json 为标题/简介/标签；",
+            "按目标平台要求调整画幅（TikTok/IG 建议 9:16）后上传。",
+        ],
+    }.get(platform, [])
+    lines = [
+        f"发布包：{label}（模板 {tid}）",
+        f"平台：{PUBLISH_PLATFORM_LABEL.get(platform, platform)}（platform={platform}）",
+        f"生成时间：{metadata.get('generated_at')}",
+        "",
+        "一、包内文件",
+        "  video/final.mp4       成片（{:.2f}s，{}，{}fps）".format(
+            float(metadata.get("duration_sec") or 0), metadata.get("resolution"),
+            metadata.get("fps")),
+        "  cover/cover.jpg       封面（{}）".format("poster.jpg" if has_cover else "未生成"),
+        "  subtitles/zh.srt      中文字幕（{} 条，来源 {}）".format(srt_count, srt_source),
+        "  metadata.json         标题/简介/标签/角色/画质信息",
+        "  timeline.json         时间线（若模板有）",
+        "  report.json           合成报告/探测信息（若模板有）",
+        "  README.txt            本说明",
+        "",
+        "二、上传步骤",
+        "  1. 登录目标平台创作中心，选择上传视频；",
+        "  2. 上传 video/final.mp4；",
+        "  3. 复制 metadata.json 的 title / description / tags 填写；",
+        "  4. 上传 cover/cover.jpg 作为封面（YouTube 建议 1280×720）；",
+        "  5. 字幕：上传 subtitles/zh.srt 或在平台自动生成；",
+        "  6. 发布前检查画幅/时长是否符合平台要求。",
+        "",
+        "三、平台注意",
+        *[f"  - {note.format(res=metadata.get('resolution'), fps=metadata.get('fps'))}"
+          for note in notes],
+        "",
+        "四、生成信息",
+        f"  模板：{tid}（{contract.get('label') or label}）",
+        f"  风格：{metadata.get('style') or '—'}",
+        f"  阵容：{cast_text}",
+        f"  画质 QC：{'ok' if (metadata.get('qc') or {}).get('ok') else 'unknown'}",
+        "  账号尚未连接：本包为本地导出，需手动上传。",
+        "",
+    ]
+    if warnings:
+        lines.append("五、构建警告")
+        lines.extend(f"  - {item}" for item in warnings)
+        lines.append("")
+    return "\n".join(lines)
+
+
+def _build_publish_package(tid: str, platform: str, force: bool) -> Dict[str, Any]:
+    final = _final_path(tid)
+    try:
+        final_ok = final.is_file() and final.stat().st_size > 0
+    except OSError:
+        final_ok = False
+    if not final_ok:
+        raise HTTPException(status_code=400,
+                            detail=f"模板 {tid} 没有成片 final.mp4，请先生成/合成后再导出发布包")
+    zip_path = _publish_zip_path(tid, platform)
+    with _PUBLISH_LOCK:
+        try:
+            if zip_path.is_file() and zip_path.stat().st_size > 0 and not force:
+                return _publish_view(tid, platform, cached=True)
+        except OSError:
+            pass
+        publish_dir = _publish_dir(tid)
+        publish_dir.mkdir(parents=True, exist_ok=True)
+        workdir = Path(tempfile.mkdtemp(prefix=f".{tid}-publish-", dir=str(T3D_ROOT / tid)))
+        warnings: List[str] = []
+        metadata: Dict[str, Any] = {}
+        try:
+            contract = _template_contract(tid) or {"id": tid, "label": _template_label(tid)}
+            final_info = _final_info(tid)
+            srt_bytes, srt_count, srt_source = _publish_subtitles(tid, warnings)
+            cover = _publish_cover(tid, workdir, warnings)
+            metadata = _publish_metadata(tid, contract, final_info, platform, srt_count)
+            readme = _publish_readme(tid, contract, metadata, platform, srt_count,
+                                     srt_source, bool(cover), warnings)
+            entries: Dict[str, Any] = {"video/final.mp4": final}
+            if cover is not None:
+                entries["cover/cover.jpg"] = cover
+            entries["subtitles/zh.srt"] = srt_bytes
+            entries["metadata.json"] = json.dumps(metadata, ensure_ascii=False, indent=2).encode("utf-8")
+            entries["README.txt"] = readme.encode("utf-8")
+            timeline = T3D_ROOT / tid / "timeline.json"
+            if not timeline.is_file():
+                timeline = T3D_ROOT / tid / "work" / "timeline.json"
+            if timeline.is_file():
+                entries["timeline.json"] = timeline
+            else:
+                warnings.append("timeline.json 不存在，包内未包含")
+            report = T3D_ROOT / tid / "report.json"
+            if report.is_file():
+                entries["report.json"] = report
+            else:
+                warnings.append("report.json 不存在，包内未包含")
+            tmp_zip = publish_dir / f".{zip_path.name}.tmp-{os.getpid()}-{threading.get_ident()}"
+            try:
+                with zipfile.ZipFile(tmp_zip, "w", compression=zipfile.ZIP_DEFLATED,
+                                     compresslevel=6) as zf:
+                    for arcname, source in entries.items():
+                        if isinstance(source, (bytes, bytearray)):
+                            zf.writestr(arcname, bytes(source))
+                        else:
+                            zf.write(source, arcname=arcname)
+                os.replace(tmp_zip, zip_path)
+            finally:
+                try:
+                    tmp_zip.unlink(missing_ok=True)
+                except OSError:
+                    pass
+        finally:
+            shutil.rmtree(workdir, ignore_errors=True)
+        _publish_prune(tid)
+        view = _publish_view(tid, platform, cached=False)
+        view["warnings"] = warnings
+        view["metadata_summary"] = {
+            "title": metadata.get("title"),
+            "duration_sec": metadata.get("duration_sec"),
+            "resolution": metadata.get("resolution"),
+            "fps": metadata.get("fps"),
+            "size_bytes": metadata.get("size_bytes"),
+            "tags": metadata.get("tags"),
+            "cast": [row.get("name") for row in metadata.get("cast") or []],
+            "subtitle_lines": (metadata.get("qc") or {}).get("subtitle_lines"),
+            "subtitle_source": srt_source,
+        }
+        return view
+
+
+class PublishPackageBody(BaseModel):
+    platform: str = "generic"
+    force: bool = False
+
+
+@router.post("/{tid}/publish-package", summary="导出发布包 zip（成片/封面/中文字幕/元数据/README）")
+def build_publish_package(tid: str,
+                          payload: PublishPackageBody = Body(default=PublishPackageBody())) -> Dict[str, Any]:
+    _refresh_template_ids()
+    key = str(tid or "").strip()
+    if not _TEMPLATE_ID_RE.fullmatch(key):
+        raise HTTPException(status_code=400,
+                            detail="template_id 不合法（仅允许 [a-z][a-z0-9_]{1,60}）")
+    if key not in TEMPLATE_SET:
+        raise HTTPException(status_code=404, detail=f"模板不存在：{tid}")
+    platform = str(payload.platform or "generic").strip().lower()
+    if platform not in PUBLISH_PLATFORMS:
+        raise HTTPException(status_code=400,
+                            detail=f"platform 只支持 {', '.join(PUBLISH_PLATFORMS)}（当前 {platform!r}）")
+    return _build_publish_package(key, platform, bool(payload.force))
+
+
+@router.get("/{tid}/publish-package", summary="列出该模板已生成的发布包（最近 5 个）")
+def list_publish_packages(tid: str) -> Dict[str, Any]:
+    _refresh_template_ids()
+    key = str(tid or "").strip()
+    if not _TEMPLATE_ID_RE.fullmatch(key):
+        raise HTTPException(status_code=400,
+                            detail="template_id 不合法（仅允许 [a-z][a-z0-9_]{1,60}）")
+    if key not in TEMPLATE_SET:
+        raise HTTPException(status_code=404, detail=f"模板不存在：{tid}")
+    _publish_prune(key)
+    rows: List[Dict[str, Any]] = []
+    try:
+        zips = sorted(_publish_dir(key).glob("*.zip"),
+                      key=lambda path: path.stat().st_mtime, reverse=True)
+    except OSError:
+        zips = []
+    for path in zips:
+        platform = path.stem.rsplit("_", 1)[-1]
+        try:
+            stat = path.stat()
+        except OSError:
+            continue
+        rows.append({
+            "filename": path.name,
+            "package_url": _t3d_media(key, f"{PUBLISH_DIRNAME}/{path.name}"),
+            "size_bytes": int(stat.st_size),
+            "platform": platform if platform in PUBLISH_PLATFORMS else "unknown",
+            "generated_at": time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(stat.st_mtime)),
+            "mtime_ts": stat.st_mtime,
+        })
+    return {"ok": True, "template_id": key, "count": len(rows),
+            "packages": rows, "keep_limit": PUBLISH_KEEP}
 
 
 # --------------------------------------------------------------------------- #

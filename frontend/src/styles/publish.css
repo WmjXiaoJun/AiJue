@@ -1,0 +1,77 @@
+/* V26 · 发布包导出弹层 */
+.v26-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 155;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 22px;
+  background: rgba(3, 4, 6, 0.76);
+  backdrop-filter: blur(7px);
+  animation: v21-fade 0.16s ease both;
+}
+.v26-modal {
+  width: min(760px, 95vw);
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(201, 162, 39, 0.28);
+  border-radius: 13px;
+  background: linear-gradient(180deg, #0e1015, #080a0e);
+  box-shadow: 0 60px 160px -60px #000;
+  overflow: hidden;
+  animation: v21-rise 0.2s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+.v26-head { display: flex; align-items: flex-start; gap: 12px; padding: 16px 18px 13px; border-bottom: 1px solid var(--c-line); }
+.v26-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 14px 18px 20px; display: flex; flex-direction: column; gap: 12px; }
+.v26-body::-webkit-scrollbar { width: 9px; }
+.v26-body::-webkit-scrollbar-thumb { background: rgba(201, 162, 39, 0.2); border-radius: 8px; }
+.v26-platforms { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.v26-platform {
+  height: 26px;
+  padding: 0 11px;
+  border: 1px solid var(--c-line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--c-sub);
+  font-size: 10.5px;
+  cursor: pointer;
+}
+.v26-platform.is-active { border-color: rgba(201, 162, 39, 0.5); background: rgba(201, 162, 39, 0.12); color: var(--c-gold-soft); }
+.v26-platform:disabled { opacity: 0.55; cursor: not-allowed; }
+.v26-loading {
+  display: flex; align-items: center; gap: 12px;
+  padding: 22px 16px;
+  border: 1px solid var(--c-line); border-radius: 10px;
+  background: rgba(255, 255, 255, 0.015);
+}
+.v26-loading b { display: block; font-size: 13px; color: var(--c-text); }
+.v26-loading span { font-size: 10.5px; color: var(--c-mut); }
+.v26-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.v26-summary-item { display: flex; flex-direction: column; gap: 3px; padding: 8px 10px; border: 1px solid var(--c-line); border-radius: 9px; background: rgba(255, 255, 255, 0.018); }
+.v26-summary-item span { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c-mut); }
+.v26-summary-item b { font-family: var(--font-mono); font-size: 12px; color: var(--c-text); }
+.v26-files { display: flex; flex-direction: column; border: 1px solid var(--c-line); border-radius: 10px; overflow: hidden; }
+.v26-files-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 8px 11px; border-bottom: 1px solid var(--c-line);
+  background: rgba(255, 255, 255, 0.02);
+  font-size: 10.5px; color: var(--c-sub);
+}
+.v26-files-head .cm-mono { font-size: 8px; color: var(--c-mut); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.v26-file { display: flex; align-items: center; gap: 8px; padding: 7px 11px; border-bottom: 1px solid rgba(201, 162, 39, 0.06); font-size: 11px; color: var(--c-sub); }
+.v26-file:last-child { border-bottom: 0; }
+.v26-file svg { color: var(--c-gold-soft); flex: 0 0 auto; }
+.v26-file-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.v26-file-size { font-size: 9px; color: var(--c-mut); }
+.v26-warning { display: flex; align-items: center; gap: 6px; padding: 6px 11px; color: #d9a97f; font-size: 10.5px; background: rgba(201, 162, 39, 0.06); }
+.v26-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.v26-tips { padding: 10px 12px; border: 1px solid rgba(201, 162, 39, 0.18); border-radius: 10px; background: rgba(201, 162, 39, 0.05); }
+.v26-tips b { display: block; font-size: 11.5px; color: var(--c-gold-soft); margin-bottom: 5px; }
+.v26-tips ul { margin: 0; padding-left: 17px; display: flex; flex-direction: column; gap: 3px; }
+.v26-tips li { font-size: 10.5px; color: var(--c-sub); line-height: 1.55; }
+
+/* V26：成片库卡片发布包按钮 / pipeline 发布前检查按钮 */
+.v20-final-actions .cm-btn.is-publish { border-color: rgba(79, 143, 124, 0.42); color: #a9dfcb; }
+.v20-final-actions .cm-btn.is-publish:hover { border-color: rgba(79, 143, 124, 0.65); color: #c8f0e0; }

@@ -226,6 +226,28 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return (await res.json()) as T;
 }
 
+/** V26：发布包文件 */
+export interface PublishPackageFile {
+  name: string;
+  size: number;
+}
+
+/** V26：发布包导出结果（POST/GET /api/cinema/templates/{tid}/publish-package） */
+export interface PublishPackageResponse {
+  ok: boolean;
+  template_id: string;
+  package_url: string;
+  size_bytes: number;
+  files: PublishPackageFile[];
+  cached?: boolean;
+  platform?: string;
+  /** 部分后端实现会在响应里带 metadata（用于「复制元数据」） */
+  metadata?: Record<string, unknown>;
+  warnings?: string[];
+}
+
+export type PublishPlatform = "generic" | "youtube" | "tiktok" | "instagram";
+
 export const cinemaApi = {
   overview: (): Promise<CinemaOverview> => request("/cinema/overview"),
   shots: (): Promise<CinemaShotsResponse> => request("/cinema/shots"),
@@ -253,6 +275,15 @@ export const cinemaApi = {
   /** 排入 3D 合成队列（ffmpeg 剪辑成片）；templates 传 "all" 或模板 id 数组 */
   assembleTemplates: (body: CinemaTemplatesAssembleRequest): Promise<{ job_id: string }> =>
     request("/cinema/templates/assemble", { method: "POST", body: JSON.stringify(body) }),
+  /** V26：构建/复用发布包 zip（视频/封面/字幕/元数据/README） */
+  publishPackage: (
+    templateId: string,
+    body: { platform?: PublishPlatform; force?: boolean } = {},
+  ): Promise<PublishPackageResponse> =>
+    request(`/cinema/templates/${encodeURIComponent(templateId)}/publish-package`, {
+      method: "POST",
+      body: JSON.stringify({ platform: "generic", force: false, ...body }),
+    }),
 };
 
 // ---------------- 展示辅助 ----------------
