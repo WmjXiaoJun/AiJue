@@ -53,3 +53,30 @@ body：
 - **tpl-backend**：promo router（多镜生成/拼接/海报/SRT/状态/取消/持久化）+ 自测
 - **tpl-frontend**：宣传片弹层/进度/完成播放/最近列表 + 截图
 - **Lead**：真实 2 镜生成验证、截图、docs、commit
+
+
+## 5. 交付结果（2026-11-04 06:52）
+
+### 后端（21/21 自测 PASS）
+- 新增 `backend/app/routers/character_promo.py` + `main.py` 注册 + `character_audition.py` 反向互斥：
+  - `POST /api/v5/characters/{id}/promo`（202）；校验角色/立绘、shots 1–3、每镜 lines ≤2/行 ≤60 字/单镜 ≤8s、背景机位枚举；非法 400
+  - 任务 `queued→running(stage shot_i_tts / shot_i_generate / assemble)→done`；每镜复用 audition 流程（TTS+segments+SRT+H3+字幕烧录）
+  - 拼接：片头卡 2.2s + 每镜场景卡 1.0s + 正片；concat 重编码 1024×576/24fps/AAC；poster + 合并 SRT（偏移）
+  - `GET /api/promos/{id}`、`POST .../cancel`、`GET /api/v5/characters/{id}/promos?limit=5`；持久化 `outputs/promo_jobs/*.json`；3D/audition/promo 互斥 409
+- 实测：laozhou 2 镜（棚拍近景 + 咖啡馆中景）**248.3s done**，输出 1024×576/24fps/14.59s / 1.13MB；抽帧片头卡/场景卡/两镜字幕均正确；poster/SRT 200；参数 400 七类、取消、409 全 PASS
+- 8090 PID 29792
+
+### 前端
+- 试镜视频区块新增「生成角色宣传片」：弹层（风格/标题 + 2 镜默认场景 + 可加第 3 镜/删除 + 单镜校验 + 6–12 分钟提示）
+- 进行中：第 i/n 镜 配音/生成 → 拼接中 + 进度/已用时间/取消；完成：内嵌播放 + 时长/大小/风格/镜数 + 下载视频/海报/SRT；最近宣传片列表（≤3）
+- 截图 `tmp/v35/ui/`（6 张）
+
+### Lead 独立 E2E
+- 2 镜宣传片：208.1s done，14.59s / 1,132,862B / 1024×576 + 音轨；片头卡「老周 · 老周·深夜电台主理人」、场景卡、字幕抽帧确认（`tmp/v35/frame_*.jpg`）
+- 看片：`/media/character_demos/laozhou_promo_pr_2d08b33a90e7.mp4`（另有 backend 样本 `laozhou_promo_pr_446fc0433e33.mp4`）
+- UI（生产构建）：角色详情试镜区显示宣传片入口、内嵌播放真实成片、弹层场景编辑可用（`tmp/v35/lead/`）
+
+### 说明 / 遗留
+- 真实耗时约 2 分钟/镜（2 镜 208–248s），前端 loading 建议 4–8 分钟
+- 片头/场景卡为 PIL 生成静音段；poster 取片头帧；取消保留中间镜文件但无最终产物
+- H3 原生 24fps；3D pipeline 启动时未反向检查 promo（沿用现有范围）

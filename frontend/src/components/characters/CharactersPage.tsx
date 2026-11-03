@@ -5,8 +5,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { errorText } from "../../lib/api";
 import type { V5CatalogResponse, V5CharacterSummary } from "../../lib/v5";
 import { mediaSrc, characterArtUrl, characterPreviewUrl, v5api } from "../../lib/v5";
-import { auditionApi, CreationError, creationApi, creationErrorMessage, isAuditionActive } from "../../lib/creation";
-import type { AuditionBackground, AuditionCamera, AuditionJob, AuditionStyle } from "../../lib/creation";
+import { auditionApi, CreationError, creationApi, creationErrorMessage, isAuditionActive, isPromoActive, promoApi } from "../../lib/creation";
+import type { AuditionBackground, AuditionCamera, AuditionJob, AuditionStyle, PromoJob, PromoSceneInput } from "../../lib/creation";
 import { downloadUrlAsBlob } from "../../lib/download";
 import type { CharacterAssets } from "../../lib/creation";
 import type { CharacterContract, VoicePreset } from "../../lib/voice";
@@ -220,6 +220,16 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
   const [auditionJobs, setAuditionJobs] = useState<AuditionJob[]>([]);
   const [auditionLoading, setAuditionLoading] = useState(false);
   const [auditionError, setAuditionError] = useState("");
+  // V35：角色宣传片
+  const [promoOpen, setPromoOpen] = useState(false);
+  const [promoStyle, setPromoStyle] = useState<AuditionStyle>("realistic");
+  const [promoTitle, setPromoTitle] = useState("");
+  const [promoScenes, setPromoScenes] = useState<{ background: AuditionBackground; camera: AuditionCamera; text: string }[]>([]);
+  const [promoSubmitting, setPromoSubmitting] = useState(false);
+  const [promoJob, setPromoJob] = useState<PromoJob | null>(null);
+  const [promoJobs, setPromoJobs] = useState<PromoJob[]>([]);
+  const [promoLoading, setPromoLoading] = useState(false);
+  const [promoError, setPromoError] = useState("");
 
   const [previewChar, setPreviewChar] = useState<string | null>(null);
   const [previewError, setPreviewError] = useState("");
@@ -591,6 +601,166 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
   const auditionProgress = auditionJob
     ? Math.max(4, Math.min(100, auditionJob.progress && auditionJob.progress > 0 ? auditionJob.progress : auditionStage?.progress || 5))
     : 0;
+
+  // V35：角色宣传片 —— 默认两镜、校验、提交、轮询、取消、下载
+  const defaultPromoScenes = useCallback(
+    (label: string) => [
+      { background: "studio" as AuditionBackground, camera: "closeup" as AuditionCamera, text: `大家好，我是${label}。` },
+      { background: "cafe" as AuditionBackground, camera: "medium" as AuditionCamera, text: "深夜的咖啡馆，最适合聊点真的。" },
+    ],
+    [],
+  );
+
+  const promoSceneInfo = promoScenes.map((scene) => {
+    const lines = scene.text.split("\n").map((line) => line.trim()).filter(Boolean);
+    const estimate =
+      Math.round((lines.reduce((sum, line) => sum + Math.max(1.1, line.length * 0.22), 0) + Math.max(0, lines.length - 1) * 0.35) * 10) / 10;
+    const tooMany = lines.length > 2;
+    const tooLong = lines.some((line) => line.length > 60);
+    const tooSlow = estimate > 8;
+    return { lines, estimate, tooMany, tooLong, tooSlow, invalid: tooMany || tooLong || tooSlow || lines.length === 0 };
+  });
+  const promoInvalid = promoScenes.length < 1 || promoScenes.length > 3 || promoSceneInfo.some((scene) => scene.invalid);
+  const promoErrorText = promoSceneInfo.some((scene) => scene.tooMany)
+    ? "每镜最多 2 行台词"
+    : promoSceneInfo.some((scene) => scene.tooLong)
+      ? "单行台词最多 60 字"
+      : promoSceneInfo.some((scene) => scene.tooSlow)
+        ? "单镜台词预计超过 8s，请精简"
+        : promoSceneInfo.some((scene) => scene.lines.length === 0)
+          ? "每镜至少 1 行台词"
+          : "";
+
+  const loadPromos = useCallback(async (characterId: string) => {
+    setPromoLoading(true);
+    try {
+      const jobs = await promoApi.list(characterId, 5);
+      setPromoJobs(jobs);
+      const active = jobs.find((job) => isPromoActive(job));
+      const latest = active || jobs.find((job) => job.status === "done") || jobs.find((job) => job.status === "failed") || null;
+      if (latest) setPromoJob(latest);
+      setPromoError("");
+    } catch (err) {
+      const status = err instanceof CreationError ? err.status : 0;
+      if (status !== 404 && status !== 405) setPromoError(creationErrorMessage(err).join("；"));
+    } finally {
+      setPromoLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    setPromoJob(null);
+    setPromoJobs([]);
+    setPromoError("");
+    setPromoOpen(false);
+    if (selected) void loadPromos(selected);
+  }, [loadPromos, selected]);
+
+  useEffect(() => {
+    if (!selected || !promoJob?.id || !isPromoActive(promoJob)) return;
+    let alive = true;
+    const timer = window.setInterval(async () => {
+      try {
+        const next = await promoApi.get(promoJob.id);
+        if (!alive) return;
+        setPromoJob(next);
+        setPromoError("");
+        if (!isPromoActive(next)) {
+          setPromoJobs((prev) => [next, ...prev.filter((job) => job.id !== next.id)].slice(0, 5));
+          void loadPromos(selected);
+        }
+      } catch (err) {
+        if (!alive) return;
+        const status = err instanceof CreationError ? err.status : 0;
+        if (status === 404 || status === 405) setPromoError("宣传片任务接口尚未就绪（后端 V35 实现中）");
+        else setPromoError("宣传片状态读取失败：" + creationErrorMessage(err).join("；"));
+      }
+    }, 3000);
+    return () => {
+      alive = false;
+      window.clearInterval(timer);
+    };
+  }, [loadPromos, promoJob?.id, promoJob?.status, selected]);
+
+  const openPromoModal = useCallback(() => {
+    if (!selectedContract) return;
+    setPromoStyle("realistic");
+    setPromoTitle("");
+    setPromoScenes(defaultPromoScenes(selectedContract.label));
+    setPromoError("");
+    setPromoOpen(true);
+  }, [defaultPromoScenes, selectedContract]);
+
+  const submitPromo = useCallback(async () => {
+    if (!selectedContract) return;
+    if (promoInvalid) {
+      setPromoError(promoErrorText || "请检查宣传片场景参数");
+      return;
+    }
+    setPromoSubmitting(true);
+    setPromoError("");
+    try {
+      const shots: PromoSceneInput[] = promoSceneInfo.map((scene, index) => ({
+        lines: scene.lines,
+        background: promoScenes[index].background,
+        camera: promoScenes[index].camera,
+        subtitles: true,
+      }));
+      const job = await promoApi.start(selectedContract.id, {
+        style: promoStyle,
+        title: promoTitle.trim() || undefined,
+        shots,
+      });
+      setPromoJob(job);
+      setPromoJobs((prev) => [job, ...prev.filter((item) => item.id !== job.id)].slice(0, 5));
+      setPromoOpen(false);
+      notify(`角色宣传片任务已提交 · ${shots.length} 镜，约 6–12 分钟，可离开页面`, "success");
+    } catch (err) {
+      const status = err instanceof CreationError ? err.status : 0;
+      const message = creationErrorMessage(err).join("；");
+      if (status === 404 || status === 405) {
+        setPromoError("角色宣传片接口尚未就绪（后端 V35 实现中）");
+        notify("角色宣传片接口尚未就绪（后端 V35 实现中）", "info");
+      } else if (status === 409) {
+        setPromoError("GPU 正忙：" + message);
+        notify("GPU 正忙：" + message, "info");
+      } else {
+        setPromoError("提交宣传片失败：" + message);
+        notify("提交宣传片失败：" + message, "error");
+      }
+    } finally {
+      setPromoSubmitting(false);
+    }
+  }, [notify, promoErrorText, promoInvalid, promoSceneInfo, promoScenes, promoStyle, promoTitle, selectedContract]);
+
+  const cancelPromo = useCallback(async () => {
+    if (!promoJob?.id) return;
+    try {
+      const next = await promoApi.cancel(promoJob.id);
+      setPromoJob(next);
+      setPromoJobs((prev) => [next, ...prev.filter((job) => job.id !== next.id)].slice(0, 5));
+      notify("已请求取消角色宣传片", "info");
+    } catch (err) {
+      setPromoError("取消失败：" + creationErrorMessage(err).join("；"));
+    }
+  }, [notify, promoJob?.id]);
+
+  const promoStageInfo = (() => {
+    if (!promoJob) return { label: "", progress: 0 };
+    const stage = promoJob.stage || "";
+    const match = /shot[_\s]*(\d+)(?:[_\s]*\/[_\s]*(\d+))?[_\s]*([a-z_]*)/i.exec(stage);
+    if (match) {
+      const currentShot = Number(match[1]) || promoJob.current_shot || 1;
+      const totalShots = Number(match[2]) || promoJob.total_shots || promoJob.shots?.length || 0;
+      const kind = match[3] || "";
+      const kindLabel = kind.includes("tts") || kind.includes("voice") ? "配音中" : kind.includes("generate") || kind.includes("h3") ? "生成中" : kind.includes("subtitle") ? "字幕处理中" : kind.includes("assemble") ? "场景处理中" : "处理中";
+      return { label: `第 ${currentShot}/${totalShots} 镜 · ${kindLabel}`, progress: promoJob.progress || 10 };
+    }
+    if (/assemble|concat|拼接/i.test(stage)) return { label: "拼接中（片头 / 场景卡 / 正片）", progress: promoJob.progress || 90 };
+    if (stage === "done") return { label: "已完成", progress: 100 };
+    if (promoJob.status === "queued") return { label: "排队中", progress: promoJob.progress || 5 };
+    return { label: promoJob.status === "running" ? "生成中" : stage || "处理中", progress: promoJob.progress || 5 };
+  })();
 
   /** V28：生成三视图/表情包/全部素材（imagegen，串行 40–90s） */
   const generateAssets = useCallback(
@@ -1143,6 +1313,9 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                     <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" disabled={auditionSubmitting} onClick={openAuditionModal}>
                       <IconFilm size={12} /> 生成试镜视频
                     </button>
+                    <button type="button" className="cm-btn cm-btn-sm" disabled={promoSubmitting} onClick={openPromoModal}>
+                      <IconSpark size={12} /> 生成角色宣传片
+                    </button>
                   </div>
                 </div>
                 {auditionError && (
@@ -1268,6 +1441,121 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                         </button>
                       </div>
                     ))}
+                  </div>
+                )}
+                {(promoJob || promoJobs.length > 0 || promoLoading || promoError) && (
+                  <div className="v35-promo">
+                    <div className="v35-promo-head">
+                      <span className="v35-promo-title">角色宣传片</span>
+                      {promoJob && (
+                        <span className={"v18-tag" + (promoJob.status === "done" ? " is-jade" : promoJob.status === "failed" ? " is-red" : " is-gold")}>
+                          {isPromoActive(promoJob) ? promoStageInfo.label : promoJob.status === "done" ? "已完成" : promoJob.status === "canceled" ? "已取消" : "失败"}
+                        </span>
+                      )}
+                      {promoLoading && !promoJob && (
+                        <span className="v35-promo-loading">
+                          <Spinner size={11} /> 读取最近宣传片…
+                        </span>
+                      )}
+                    </div>
+                    {promoJob && isPromoActive(promoJob) && (
+                      <div className="v32-progress-card">
+                        <div className="v32-progress-head">
+                          <span className="v32-progress-stage">
+                            <Spinner size={13} /> {promoStageInfo.label}
+                          </span>
+                          <span className="v32-progress-elapsed">已用 {fmtElapsed(promoJob.elapsed_sec || 0)} · 预计约 6–12 分钟</span>
+                        </div>
+                        <div className="v32-progress-bar">
+                          <i style={{ width: `${Math.max(4, Math.min(100, promoJob.progress || promoStageInfo.progress))}%` }} />
+                          <span>{Math.round(Math.max(4, Math.min(100, promoJob.progress || promoStageInfo.progress)))}%</span>
+                        </div>
+                        <div className="v32-progress-meta">
+                          <span className="v34-scene-tag">{promoJob.scene_count || promoJob.shots?.length || 0} 镜 · 片头 + 场景卡</span>
+                          <span>可离开页面，回来自动恢复</span>
+                          <button type="button" className="cm-btn cm-btn-sm cm-btn-ghost" onClick={() => void cancelPromo()}>
+                            取消任务
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    {promoJob && promoJob.status === "done" && promoJob.output_url && (
+                      <div className="v32-video-card">
+                        <video className="v32-video" src={mediaSrc(promoJob.output_url)} controls preload="metadata" playsInline />
+                        <div className="v32-video-meta">
+                          <span className="v18-tag is-jade">已完成</span>
+                          <span className="v18-tag">{AUDITION_STYLES.find((item) => item.id === promoJob.style)?.label || promoJob.style}</span>
+                          <span className="cm-mono">{promoJob.scene_count || promoJob.shots?.length || 0} 镜</span>
+                          <span className="cm-mono">{promoJob.duration_sec ? promoJob.duration_sec.toFixed(1) + "s" : "—"}</span>
+                          <span className="cm-mono">{fmtAuditionSize(promoJob.size_bytes || 0)}</span>
+                          <button
+                            type="button"
+                            className="cm-btn cm-btn-sm"
+                            onClick={() => void downloadAuditionFile(promoJob.output_url as string, `promo_${promoJob.character}_${promoJob.id}.mp4`, "宣传片")}
+                          >
+                            <IconDownload size={11} /> 下载视频
+                          </button>
+                          {promoJob.poster_url && (
+                            <button
+                              type="button"
+                              className="cm-btn cm-btn-sm cm-btn-ghost"
+                              onClick={() => void downloadAuditionFile(promoJob.poster_url as string, `promo_${promoJob.character}_${promoJob.id}_poster.jpg`, "海报")}
+                            >
+                              <IconDownload size={11} /> 下载海报
+                            </button>
+                          )}
+                          {promoJob.srt_url && (
+                            <button
+                              type="button"
+                              className="cm-btn cm-btn-sm cm-btn-ghost"
+                              onClick={() => void downloadAuditionFile(promoJob.srt_url as string, `promo_${promoJob.character}_${promoJob.id}.srt`, "SRT 字幕")}
+                            >
+                              <IconDownload size={11} /> SRT
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    {promoJob && (promoJob.status === "failed" || promoJob.status === "canceled") && (
+                      <div className="v32-fail-card">
+                        <b>{promoJob.status === "canceled" ? "宣传片任务已取消" : "宣传片生成失败"}</b>
+                        <span>{promoJob.error || "未知错误；可重试"}</span>
+                        <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" onClick={openPromoModal}>
+                          重试
+                        </button>
+                      </div>
+                    )}
+                    {promoError && (
+                      <div className="v24-art-error" role="alert">
+                        <b>角色宣传片</b>
+                        <span>{promoError}</span>
+                      </div>
+                    )}
+                    {promoJobs.length > 0 && (
+                      <div className="v32-recent">
+                        <span className="v32-recent-title">最近宣传片</span>
+                        {promoJobs.slice(0, 3).map((job) => (
+                          <div key={job.id} className={"v32-recent-row" + (promoJob?.id === job.id ? " is-active" : "")}>
+                            <span className={"v18-tag" + (job.status === "done" ? " is-jade" : job.status === "failed" ? " is-red" : job.status === "canceled" ? "" : " is-gold")}>
+                              {job.status === "done" ? "已完成" : job.status === "failed" ? "失败" : job.status === "canceled" ? "已取消" : job.status === "running" ? "生成中" : "排队中"}
+                            </span>
+                            <span className="cm-mono">{AUDITION_STYLES.find((item) => item.id === job.style)?.label || job.style}</span>
+                            <span className="cm-mono">{job.scene_count || job.shots?.length || 0} 镜</span>
+                            {job.title && <span className="v32-recent-id">{job.title}</span>}
+                            <button
+                              type="button"
+                              className="cm-btn cm-btn-sm"
+                              onClick={() => {
+                                setPromoJob(job);
+                                setPromoError("");
+                              }}
+                            >
+                              {job.status === "done" ? "查看" : "跟踪"}
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
                 <p className="v21-hint">
@@ -1533,6 +1821,141 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
           }}
         />
       )}
+      {promoOpen && selectedContract && (
+        <div className="v32-mask" onMouseDown={() => !promoSubmitting && setPromoOpen(false)} role="presentation">
+          <div className="v32-modal v35-modal" onMouseDown={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-label="生成角色宣传片">
+            <header className="v32-modal-head">
+              <div>
+                <span className="v21-drawer-kicker">PROMO · 角色宣传片</span>
+                <h3 className="v32-modal-title">生成角色宣传片 · {selectedContract.label}</h3>
+              </div>
+              <button type="button" className="v21-close" onClick={() => setPromoOpen(false)} aria-label="关闭" disabled={promoSubmitting}>
+                <IconClose size={16} />
+              </button>
+            </header>
+            <div className="v32-modal-body">
+              <div className="v34-select-row">
+                <label className="v21-field">
+                  <span className="v21-field-label">风格</span>
+                  <select className="v21-select" value={promoStyle} onChange={(event) => setPromoStyle(event.target.value as AuditionStyle)} disabled={promoSubmitting}>
+                    {AUDITION_STYLES.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.label}{item.id === "realistic" ? "（默认）" : ""}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="v21-field">
+                  <span className="v21-field-label">标题（可选，片头副标题）</span>
+                  <input
+                    className="v21-input"
+                    value={promoTitle}
+                    maxLength={40}
+                    placeholder="例如：老周 · 深夜电台主理人"
+                    onChange={(event) => setPromoTitle(event.target.value)}
+                    disabled={promoSubmitting}
+                  />
+                </label>
+              </div>
+              <div className="v35-scenes">
+                {promoScenes.map((scene, index) => {
+                  const info = promoSceneInfo[index];
+                  return (
+                    <div key={index} className={"v35-scene" + (info?.invalid ? " is-invalid" : "")}>
+                      <div className="v35-scene-head">
+                        <span>第 {index + 1} 镜</span>
+                        {info && <span className="cm-mono">{info.estimate}s{info.invalid ? " · 超限" : ""}</span>}
+                        {promoScenes.length > 1 && (
+                          <button
+                            type="button"
+                            className="v35-scene-del"
+                            disabled={promoSubmitting}
+                            onClick={() => setPromoScenes((prev) => prev.filter((_, i) => i !== index))}
+                            title="删除该镜"
+                          >
+                            <IconClose size={12} /> 删除
+                          </button>
+                        )}
+                      </div>
+                      <div className="v35-scene-row">
+                        <select
+                          className="v21-select"
+                          value={scene.background}
+                          onChange={(event) =>
+                            setPromoScenes((prev) => prev.map((item, i) => (i === index ? { ...item, background: event.target.value as AuditionBackground } : item)))
+                          }
+                          disabled={promoSubmitting}
+                          aria-label={`第 ${index + 1} 镜背景`}
+                        >
+                          {AUDITION_BACKGROUNDS.map((item) => (
+                            <option key={item.id} value={item.id}>
+                              {item.label}
+                            </option>
+                          ))}
+                        </select>
+                        <select
+                          className="v21-select"
+                          value={scene.camera}
+                          onChange={(event) =>
+                            setPromoScenes((prev) => prev.map((item, i) => (i === index ? { ...item, camera: event.target.value as AuditionCamera } : item)))
+                          }
+                          disabled={promoSubmitting}
+                          aria-label={`第 ${index + 1} 镜机位`}
+                        >
+                          {AUDITION_CAMERAS.map((item) => (
+                            <option key={item.id} value={item.id}>
+                              {item.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <textarea
+                        className="v21-textarea v35-scene-text"
+                        value={scene.text}
+                        rows={2}
+                        disabled={promoSubmitting}
+                        placeholder={"每行一句台词（1–2 行，单行 ≤60 字）"}
+                        onChange={(event) =>
+                          setPromoScenes((prev) => prev.map((item, i) => (i === index ? { ...item, text: event.target.value } : item)))
+                        }
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+              {promoScenes.length < 3 && (
+                <button
+                  type="button"
+                  className="cm-btn cm-btn-sm cm-btn-ghost"
+                  disabled={promoSubmitting}
+                  onClick={() =>
+                    setPromoScenes((prev) => [...prev, { background: "radio", camera: "medium", text: "" }])
+                  }
+                >
+                  <IconPlus size={12} /> 添加第 {promoScenes.length + 1} 镜
+                </button>
+              )}
+              <p className="v32-modal-hint">约 6–12 分钟（多镜 GPU 串行 + 拼接；片头 2.2s + 每镜场景卡 1.0s）· 可离开页面，回来自动恢复。</p>
+              {(promoErrorText || promoError) && (
+                <div className="v24-art-error" role="alert">
+                  <b>请检查宣传片参数</b>
+                  <span>{promoErrorText || promoError}</span>
+                </div>
+              )}
+            </div>
+            <footer className="v32-modal-foot">
+              <span className="v21-foot-note">{promoScenes.length} 镜 · {AUDITION_STYLES.find((item) => item.id === promoStyle)?.label} · 片头 + 场景卡拼接</span>
+              <button type="button" className="cm-btn cm-btn-sm" onClick={() => setPromoOpen(false)} disabled={promoSubmitting}>
+                取消
+              </button>
+              <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" onClick={() => void submitPromo()} disabled={promoSubmitting || promoInvalid}>
+                {promoSubmitting ? <Spinner size={12} /> : <IconSpark size={12} />} 生成角色宣传片
+              </button>
+            </footer>
+          </div>
+        </div>
+      )}
+
       {auditionOpen && selectedContract && (
         <div className="v32-mask" onMouseDown={() => !auditionSubmitting && setAuditionOpen(false)} role="presentation">
           <div className="v32-modal" onMouseDown={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-label="生成试镜视频">

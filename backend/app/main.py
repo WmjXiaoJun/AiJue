@@ -29,6 +29,7 @@ from sqlalchemy.orm import Session
 from . import character_files, concept_files, config, jobs, llm, models, schemas, script_parser, seed
 from .db import SessionLocal, get_db, init_db
 from .routers import character_audition as character_audition_router
+from .routers import character_promo as character_promo_router
 from .routers import cinema3d as cinema3d_router
 from .routers import cinema_templates as cinema_templates_router
 from .routers import pipeline_ui as pipeline_ui_router
@@ -2554,6 +2555,8 @@ app.include_router(cinema_templates_router.router)
 app.include_router(publish_batches_router.router)
 # V32 角色试镜视频（/api/v5/characters/{id}/audition + /api/auditions/*）
 app.include_router(character_audition_router.router)
+# V35 角色宣传片（/api/v5/characters/{id}/promo + /api/promos/*）
+app.include_router(character_promo_router.router)
 # V18 全流程编排 API（/api/pipeline/* + 项目切换 3D 模板）
 app.include_router(pipeline_ui_router.router)
 # V21 可视化创建 API（/api/v5/characters、/api/v5/templates 新建/删除）

@@ -410,3 +410,109 @@ export const auditionApi = {
     return list.map(normalizeAudition);
   },
 };
+
+/* ------------------------------ V35：角色宣传片 ------------------------------ */
+export type PromoStatus = "queued" | "running" | "done" | "failed" | "canceled";
+
+export interface PromoSceneInput {
+  lines: string[];
+  background?: AuditionBackground;
+  camera?: AuditionCamera;
+  subtitles?: boolean;
+}
+
+export interface PromoJobShot {
+  index?: number;
+  status?: string;
+  stage?: string;
+  background?: string;
+  background_label?: string;
+  camera?: string;
+  camera_label?: string;
+  lines?: string[];
+  duration_sec?: number;
+}
+
+export interface PromoJob {
+  id: string;
+  character: string;
+  style: AuditionStyle | string;
+  title?: string;
+  status: PromoStatus;
+  stage?: string;
+  progress?: number;
+  scene_count?: number;
+  current_shot?: number;
+  total_shots?: number;
+  shots?: PromoJobShot[];
+  output_url?: string | null;
+  poster_url?: string | null;
+  srt_url?: string | null;
+  duration_sec?: number;
+  size_bytes?: number;
+  error?: string | null;
+  estimated_sec?: number;
+  elapsed_sec?: number;
+  created_at?: string | null;
+}
+
+function normalizePromoJob(raw: unknown): PromoJob {
+  const rec = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
+  const shotsRaw = Array.isArray(rec.shots) ? rec.shots : [];
+  return {
+    id: String(rec.id ?? rec.job_id ?? ""),
+    character: String(rec.character ?? ""),
+    style: String(rec.style ?? "realistic"),
+    title: typeof rec.title === "string" ? rec.title : undefined,
+    status: (String(rec.status ?? "queued") as PromoStatus) || "queued",
+    stage: typeof rec.stage === "string" ? rec.stage : undefined,
+    progress: Number(rec.progress) || 0,
+    scene_count: Number(rec.scene_count) || shotsRaw.length,
+    current_shot: Number(rec.current_shot) || 0,
+    total_shots: Number(rec.total_shots) || 0,
+    shots: shotsRaw.map((item) => {
+      const shot = (item && typeof item === "object" ? item : {}) as Record<string, unknown>;
+      return {
+        index: Number(shot.index) || undefined,
+        status: typeof shot.status === "string" ? shot.status : undefined,
+        stage: typeof shot.stage === "string" ? shot.stage : undefined,
+        background: typeof shot.background === "string" ? shot.background : undefined,
+        background_label: typeof shot.background_label === "string" ? shot.background_label : undefined,
+        camera: typeof shot.camera === "string" ? shot.camera : undefined,
+        camera_label: typeof shot.camera_label === "string" ? shot.camera_label : undefined,
+        lines: Array.isArray(shot.lines) ? shot.lines.map((line) => String(line)) : undefined,
+        duration_sec: Number(shot.duration_sec) || 0,
+      };
+    }),
+    output_url: typeof rec.output_url === "string" ? rec.output_url : null,
+    poster_url: typeof rec.poster_url === "string" ? rec.poster_url : null,
+    srt_url: typeof rec.srt_url === "string" ? rec.srt_url : null,
+    duration_sec: Number(rec.duration_sec) || 0,
+    size_bytes: Number(rec.size_bytes) || 0,
+    error: typeof rec.error === "string" ? rec.error : null,
+    estimated_sec: Number(rec.estimated_sec) || 0,
+    elapsed_sec: Number(rec.elapsed_sec) || 0,
+    created_at: typeof rec.created_at === "string" ? rec.created_at : null,
+  };
+}
+
+export function isPromoActive(job: PromoJob | null | undefined): boolean {
+  return Boolean(job && (job.status === "queued" || job.status === "running"));
+}
+
+export const promoApi = {
+  start: async (
+    character: string,
+    body: { style?: AuditionStyle; title?: string; seed?: number; shots: PromoSceneInput[] },
+  ): Promise<PromoJob> => normalizePromoJob(await post(`/v5/characters/${encodeURIComponent(character)}/promo`, body, 60000)),
+  get: async (jobId: string): Promise<PromoJob> => normalizePromoJob(await get(`/promos/${encodeURIComponent(jobId)}`)),
+  cancel: async (jobId: string): Promise<PromoJob> =>
+    normalizePromoJob(await post(`/promos/${encodeURIComponent(jobId)}/cancel`, {}, 30000)),
+  list: async (character: string, limit = 5): Promise<PromoJob[]> => {
+    const res = (await get(`/v5/characters/${encodeURIComponent(character)}/promos?limit=${limit}`)) as
+      | { promos?: unknown[]; jobs?: unknown[]; items?: unknown[] }
+      | unknown[];
+    const list = Array.isArray(res) ? res : res.promos || res.jobs || res.items || [];
+    return list.map(normalizePromoJob);
+  },
+};

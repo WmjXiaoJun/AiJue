@@ -710,6 +710,19 @@ def create_audition(character: str, payload: AuditionBody = Body(default=Auditio
             "reason": "pipeline_running",
             "job_id": active.get("id"),
         })
+    # V35：与角色宣传片互斥（promo 运行时 audition 409）
+    try:
+        from . import character_promo  # noqa: PLC0415
+
+        active_promo = character_promo.active_promo_job()
+    except Exception:  # noqa: BLE001
+        active_promo = None
+    if active_promo:
+        raise HTTPException(status_code=409, detail={
+            "message": "宣传片任务运行中，暂不能生成试镜视频",
+            "reason": "promo_running",
+            "job_id": active_promo.get("id"),
+        })
     with _LOCK:
         if _ACTIVE_JOB:
             current = _JOBS.get(_ACTIVE_JOB) or {}

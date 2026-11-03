@@ -424,3 +424,19 @@
 .v34-select-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .v34-select-row .v21-field { margin: 0; }
 .v34-scene-tag { border-color: rgba(201,162,39,.35); color: var(--c-gold-soft); }
+
+/* V35：角色宣传片 */
+.v35-promo { display: flex; flex-direction: column; gap: 7px; padding-top: 8px; border-top: 1px dashed var(--c-line); margin-top: 4px; }
+.v35-promo-head { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.v35-promo-title { font-family: var(--font-display); font-size: 13px; color: var(--c-text); letter-spacing: .05em; }
+.v35-promo-loading { display: inline-flex; align-items: center; gap: 5px; font-size: 9.5px; color: var(--c-mut); }
+.v35-modal { width: min(680px, 94vw); }
+.v35-scenes { display: flex; flex-direction: column; gap: 9px; }
+.v35-scene { display: flex; flex-direction: column; gap: 6px; padding: 9px 10px; border: 1px solid var(--c-line); border-radius: 10px; background: rgba(255,255,255,.015); }
+.v35-scene.is-invalid { border-color: rgba(194,84,63,.5); }
+.v35-scene-head { display: flex; align-items: center; gap: 8px; font-size: 10.5px; color: var(--c-sub); }
+.v35-scene-head .cm-mono { margin-left: auto; color: var(--c-mut); }
+.v35-scene-del { display: inline-flex; align-items: center; gap: 3px; border: 0; background: transparent; color: #c98f80; font-size: 9.5px; cursor: pointer; padding: 0; }
+.v35-scene-del:disabled { opacity: .5; cursor: not-allowed; }
+.v35-scene-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.v35-scene-text { min-height: 54px; resize: vertical; font-size: 11px; line-height: 1.55; }
