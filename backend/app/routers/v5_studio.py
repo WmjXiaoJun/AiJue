@@ -54,7 +54,11 @@ TEMPLATE_MEDIA_RE = re.compile(
     r"timeline\.json|contact_sheet\.png|storyboard\.png|storyboard\.html|"
     r"frames/frame_\d{1,3}\.png|shots/[a-z0-9_]{1,80}\.png|"
     r"work/storyboard/[a-z0-9_]{1,80}\.(jpg|png))$")
-CHAR_MEDIA_RE = re.compile(r"^(portrait|portrait_real|portrait_25d|front|cutout|thumb)\.(png|jpg|jpeg|webp)$")
+CHAR_MEDIA_RE = re.compile(
+    r"^(?:(?:portrait|portrait_real|portrait_25d|front|cutout|thumb)\.(?:png|jpg|jpeg|webp)"
+    r"|three_view/(?:front|side|three_quarter)\.png"
+    r"|expressions/(?:neutral|happy|surprised|thinking)\.png"
+    r"|sheet\.png|meta\.json)$")
 SCENE_MEDIA_RE = re.compile(r"^[a-z][a-z0-9_]{1,60}(_\d{1,2})?\.(png|jpg|jpeg|webp)$")
 VOICE_RE = re.compile(r"^[a-z][a-z0-9_]{1,60}$")
 MEDIA_TYPES = {
@@ -408,7 +412,7 @@ def get_storyboard(template: str):
 # ---------------------------------------------------------------------------
 # 静态媒体（防路径穿越）
 # ---------------------------------------------------------------------------
-@router.get("/media/v5/characters/{character}/{filename}", summary="角色 AI 立绘")
+@router.get("/media/v5/characters/{character}/{filename:path}", summary="角色 AI 立绘/三视图/表情/设定图")
 def get_character_art(character: str, filename: str):
     if not ID_RE.match(character) or not CHAR_MEDIA_RE.match(filename):
         raise HTTPException(status_code=404, detail="文件不存在")

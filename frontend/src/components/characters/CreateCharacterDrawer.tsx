@@ -53,6 +53,7 @@ export function CreateCharacterDrawer({ open, presets, auditionCharacter, onClos
   const [rolePool, setRolePool] = useState("host, guest_a");
   const [voiceId, setVoiceId] = useState(presets[0]?.voice_id || "");
   const [autoArt, setAutoArt] = useState(true);
+  const [autoArtModes, setAutoArtModes] = useState(false);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [auditioning, setAuditioning] = useState<string | null>(null);
@@ -69,6 +70,7 @@ export function CreateCharacterDrawer({ open, presets, auditionCharacter, onClos
     setErrors([]);
     setSaving(false);
     setAutoArt(true);
+    setAutoArtModes(false);
     if (!voiceId && presets[0]) setVoiceId(presets[0].voice_id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
@@ -139,6 +141,7 @@ export function CreateCharacterDrawer({ open, presets, auditionCharacter, onClos
         .filter(Boolean),
       tags: era === "history" ? ["history"] : [],
       auto_art: autoArt,
+      auto_art_modes: autoArt && autoArtModes ? ["all"] : undefined,
       appearance: {
         gender,
         age: Math.max(1, Math.min(120, Number(age) || 28)),
@@ -335,11 +338,26 @@ export function CreateCharacterDrawer({ open, presets, auditionCharacter, onClos
               type="checkbox"
               checked={autoArt}
               disabled={saving}
-              onChange={(event) => setAutoArt(event.target.checked)}
+              onChange={(event) => {
+                setAutoArt(event.target.checked);
+                if (!event.target.checked) setAutoArtModes(false);
+              }}
             />
             <span className="v21-autogen-text">
               <b>创建后生成概念图</b>
               <em>约 20–60 秒 · SDXL 立绘写入角色美术目录</em>
+            </span>
+          </label>
+          <label className={"v21-autogen" + (autoArtModes ? " is-on" : "")} style={{ margin: 0, opacity: autoArt ? 1 : 0.55 }}>
+            <input
+              type="checkbox"
+              checked={autoArtModes}
+              disabled={saving || !autoArt}
+              onChange={(event) => setAutoArtModes(event.target.checked)}
+            />
+            <span className="v21-autogen-text">
+              <b>同时生成三视图与表情包</b>
+              <em>约 1–2 分钟 · 三视图 3 张 + 表情 4 张 + 设定图 1 张</em>
             </span>
           </label>
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
@@ -349,7 +367,17 @@ export function CreateCharacterDrawer({ open, presets, auditionCharacter, onClos
           </button>
           <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" onClick={() => void submit()} disabled={saving}>
             {saving ? <Spinner size={13} /> : <IconSpark size={13} />}
-            {saving ? (autoArt ? "创建并生成中…" : "创建中…") : autoArt ? "创建并生成概念图" : "创建角色"}
+            {saving
+              ? autoArtModes
+                ? "创建并生成素材中…（约 1–2 分钟）"
+                : autoArt
+                  ? "创建并生成中…"
+                  : "创建中…"
+              : autoArtModes
+                ? "创建并生成三视图/表情"
+                : autoArt
+                  ? "创建并生成概念图"
+                  : "创建角色"}
           </button>
           </div>
         </footer>

@@ -41,3 +41,42 @@
 - **tpl-backend**：A 后端（modes/assets/auto_art_modes）+ B 后端（crop）
 - **tpl-frontend**：A 前端（素材区块/勾选/lightbox）+ B 前端（模式选择）
 - **Lead**：真实生成 + crop 包验证、截图、docs、commit
+
+
+## 5. 交付结果（2026-11-03 20:50）
+
+### 后端（34/34 自测 PASS）
+**A. 角色素材**
+- `POST /api/v5/characters/{id}/art` 增加 `modes?: string[]`（缺省 `["portrait"]`；`["all"]` = portrait+three_view+expressions+sheet；非法 400）
+  - 产物：portrait 832×1216、three_view 3×1024×1024、expressions 4×1024×1024、sheet 1600×900、meta.json（共 10 文件）
+  - 返回 `assets{portrait,three_view,exprressions,sheet}`、`files`、`generated`、`modes`；cached 按 modes 判断
+- 新增 `GET /api/v5/characters/{id}/assets`：URL 映射 + exists + files（10 项）
+- 创建支持 `auto_art_modes?: string[]`（默认 portrait，可 all）
+- 实测：all 111.4s、9 个 /media URL 全 200；重复 all cached 0.0s；媒体路由已支持 `three_view/...`、`expressions/...` 嵌套
+- `v5_studio.py` 同步扩展媒体路由（嵌套素材路径）
+
+**B. 竖版 crop**
+- `vertical_mode` 支持 `blur_pad`（默认）与 `crop`：中心裁切 9:16（1280×720→405×720→lanczos 1080×1920，封面同法）；不再 400
+- metadata.vertical.mode=crop；缓存按 mode 校验，切换自动重建；README 说明两种模式
+- 实测：tiktok+vertical+crop 3.2s、zip 11,321,412B；竖版 ffprobe **1080×1920 / H.264 / 25fps / AAC / 15.12s**；封面 1080×1920；抽帧与期望中心裁切 **SSIM=0.96085**；blur_pad 回归正常
+- 8090 PID 43028
+
+### 前端
+**A. 角色素材**：详情「角色素材」区块（立绘/三视图 3/表情 4/设定图 网格）+「生成三视图/生成表情包/全部生成」+ loading/错误 + cache-bust + 缩略图 lightbox；新建角色 checkbox「同时生成三视图与表情包」→ `auto_art_modes:["all"]`
+**B. 竖版模式**：发布弹层勾选竖版后「模糊背景填充 / 中心裁切 9:16」选择（默认 blur_pad）；请求带 `vertical_mode`；清单 badge「竖版·模糊/竖版·裁切」+ 尺寸/模式；重新打包按当前模式
+
+### Lead 独立验收
+- E2E（`tmp/v28/e2e_v28.py`）：创建临时角色 `auto_art_modes:["all"]` → 三视图 3/表情 4/设定图/立绘全部 200，素材拼图 `tmp/v28/character_assets_sheet.png`
+- crop 包：zip 11.32MB，竖版 1080×1920 + 音轨 15.12s、封面 1080×1920、metadata.mode=crop；抽帧 `tmp/v28/crop_frame.jpg` 确认中心裁切无模糊边
+- UI（生产构建）：详情显示「角色素材」三视图/表情网格；发布弹层 crop 选中显示「裁切」badge；console 无 JS error（`tmp/v28/lead/`）
+- 截图：`tmp/v28/ui/`（7 张前端）、`tmp/v28/lead/`（2 张）
+
+### 清理
+- 测试角色（custom_522f7c5e / custom_cd306749 等）已 DELETE + 清理 assets；catalog 回到 24 角色
+- backend/前端 E2E 期间对 ali/laozhou 生成的内建素材已 revert，canonical 立绘恢复；仓库无新增内建素材改动
+
+### 说明 / 遗留
+- `modes:["all"]` 约 1–2 分钟（首轮可能 2–3 分钟，ComfyUI 串行）；请求超时建议 ≥180s
+- all 会额外生成 scene.png（不在 assets 返回，可忽略）
+- crop 仅适合 16:9 成片的中心 9:16 裁切：左右与底部字幕边缘可能被裁掉（抽帧可见），发布前可预览
+- 竖版 crop 与 blur_pad 共用同一 zip 名，切换模式需重新打包/下载

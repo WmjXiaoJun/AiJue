@@ -23,6 +23,13 @@ const PLATFORM_TIPS: Record<PublishPlatform, string[]> = {
   instagram: ["IG Reels 需 9:16 竖屏：同 TikTok，需裁切/重组", "封面用包内 cover.jpg（1280×720），可再裁 1080×1350"],
 };
 
+type VerticalMode = "blur_pad" | "crop";
+
+const VERTICAL_MODES: { id: VerticalMode; label: string; desc: string }[] = [
+  { id: "blur_pad", label: "模糊背景填充", desc: "完整保留 16:9 画面，上下用模糊背景填充（默认）" },
+  { id: "crop", label: "中心裁切 9:16", desc: "裁切画面中心并放大到 1080×1920，适合主体居中素材" },
+];
+
 /** V27：TikTok/IG 默认附带竖版 9:16 */
 function defaultVertical(platform: PublishPlatform): boolean {
   return platform === "tiktok" || platform === "instagram";
@@ -59,6 +66,7 @@ export function PublishPackageModal({
   const notify = useToast();
   const [platform, setPlatform] = useState<PublishPlatform>("generic");
   const [vertical, setVertical] = useState(false);
+  const [verticalMode, setVerticalMode] = useState<VerticalMode>("blur_pad");
   const [loading, setLoading] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [rebuilding, setRebuilding] = useState(false);
@@ -75,7 +83,7 @@ export function PublishPackageModal({
   }, []);
 
   const build = useCallback(
-    async (nextPlatform: PublishPlatform, nextVertical: boolean, force = false) => {
+    async (nextPlatform: PublishPlatform, nextVertical: boolean, nextMode: VerticalMode, force = false) => {
       if (force) setRebuilding(true);
       else setLoading(true);
       setErrors([]);
@@ -84,7 +92,7 @@ export function PublishPackageModal({
           platform: nextPlatform,
           force,
           vertical: nextVertical,
-          vertical_mode: "blur_pad",
+          vertical_mode: nextMode,
         });
         if (!aliveRef.current) return;
         setPkg(res);
@@ -116,7 +124,8 @@ export function PublishPackageModal({
     setCopied(false);
     setPlatform("generic");
     setVertical(false);
-    void build("generic", false, false);
+    setVerticalMode("blur_pad");
+    void build("generic", false, "blur_pad", false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, templateId]);
 
@@ -142,9 +151,9 @@ export function PublishPackageModal({
       duration_sec: null,
       generated_at: null,
       package: pkg?.package_url || null,
-      ...(vertical ? { vertical: { file: "video/final_vertical.mp4", resolution: "1080x1920", mode: "blur_pad" } } : {}),
+      ...(vertical ? { vertical: { file: "video/final_vertical.mp4", resolution: "1080x1920", mode: verticalMode } } : {}),
     };
-  }, [pkg, platform, templateId, templateLabel, vertical]);
+  }, [pkg, platform, templateId, templateLabel, vertical, verticalMode]);
 
   const download = async () => {
     if (!pkg?.package_url) return;
@@ -201,9 +210,10 @@ export function PublishPackageModal({
   const tips = (() => {
     const base = PLATFORM_TIPS[platform];
     if (vertical) {
+      const modeLabel = verticalMode === "crop" ? "中心裁切" : "模糊背景填充";
       const verticalTip = defaultVertical(platform)
-        ? "已附带竖版 9:16：可直接上传 TikTok/IG；竖版为模糊背景填充，完整保留画面"
-        : "已附带竖版 9:16（1080×1920，模糊背景填充）：可上传 TikTok/IG";
+        ? `已附带竖版 9:16（${modeLabel}）：可直接上传 TikTok/IG；${verticalMode === "crop" ? "画面按中心裁切放大，上下部分会被裁掉" : "竖版为模糊背景填充，完整保留画面"}`
+        : `已附带竖版 9:16（1080×1920，${modeLabel}）：可上传 TikTok/IG`;
       return [verticalTip, ...base.filter((tip) => !tip.includes("9:16"))];
     }
     return base;
@@ -236,7 +246,8 @@ export function PublishPackageModal({
                   const nextVertical = defaultVertical(item.id);
                   setPlatform(item.id);
                   setVertical(nextVertical);
-                  void build(item.id, nextVertical, false);
+                  setVerticalMode("blur_pad");
+                  void build(item.id, nextVertical, "blur_pad", false);
                 }}
               >
                 {item.label}
@@ -258,6 +269,24 @@ export function PublishPackageModal({
             {defaultVertical(platform) && <span className="v27-vertical-default">平台默认</span>}
           </label>
           {vertical && (
+            <div className="v28-vmode" role="group" aria-label="竖版模式">
+              <span className="v28-vmode-label">竖版模式</span>
+              {VERTICAL_MODES.map((mode) => (
+                <button
+                  key={mode.id}
+                  type="button"
+                  className={"v28-vmode-btn" + (verticalMode === mode.id ? " is-active" : "")}
+                  disabled={loading || rebuilding}
+                  onClick={() => setVerticalMode(mode.id)}
+                  title={mode.desc}
+                >
+                  {mode.label}
+                </button>
+              ))}
+              <span className="v28-vmode-desc">{VERTICAL_MODES.find((mode) => mode.id === verticalMode)?.desc}</span>
+            </div>
+          )}
+          {vertical && (
             <div className="v27-vertical-preview">
               <span className="v27-vertical-phone" aria-hidden="true" />
               <span>
@@ -276,7 +305,7 @@ export function PublishPackageModal({
                 ))}
               </ul>
               <div style={{ marginTop: 6 }}>
-                <button type="button" className="cm-btn cm-btn-sm" onClick={() => void build(platform, vertical, true)}>
+                <button type="button" className="cm-btn cm-btn-sm" onClick={() => void build(platform, vertical, verticalMode, true)}>
                   <IconRefresh size={12} /> 重试
                 </button>
               </div>
@@ -297,7 +326,7 @@ export function PublishPackageModal({
                 <div className="v26-summary-item"><span>平台</span><b>{PLATFORMS.find((item) => item.id === platform)?.label || platform}</b></div>
                 <div className="v26-summary-item"><span>包大小</span><b>{fmtBytes(pkg.size_bytes)}</b></div>
                 <div className="v26-summary-item"><span>文件</span><b>{pkg.files.length} 个</b></div>
-                <div className="v26-summary-item"><span>竖版</span><b>{pkg.files.some((file) => file.name.includes("_vertical")) ? "已附带 9:16" : "未附带"}</b></div>
+                <div className="v26-summary-item"><span>竖版</span><b>{pkg.files.some((file) => file.name.includes("_vertical")) ? (verticalMode === "crop" ? "已附带·裁切" : "已附带·模糊填充") : "未附带"}</b></div>
                 <div className="v26-summary-item"><span>状态</span><b>{pkg.cached ? "缓存复用" : "新生成"}</b></div>
               </div>
               <div className="v26-files">
@@ -313,8 +342,8 @@ export function PublishPackageModal({
                       <span className="v26-file-name">{file.name}</span>
                       {isVertical && (
                         <>
-                          <span className="v27-vertical-badge">竖版</span>
-                          <span className="v27-vertical-dim">1080×1920</span>
+                          <span className="v27-vertical-badge">{verticalMode === "crop" ? "竖版·裁切" : "竖版·模糊"}</span>
+                          <span className="v27-vertical-dim">1080×1920 · {verticalMode}</span>
                         </>
                       )}
                       <span className="v26-file-size cm-mono">{fmtBytes(file.size)}</span>
@@ -334,8 +363,8 @@ export function PublishPackageModal({
                 <button type="button" className="cm-btn" onClick={() => void copyMetadata()}>
                   {copied ? <IconCheck size={13} /> : <IconImage size={13} />} {copied ? "已复制元数据" : "复制元数据"}
                 </button>
-                <button type="button" className="cm-btn cm-btn-sm cm-btn-ghost" onClick={() => void build(platform, vertical, true)} disabled={rebuilding} title="按当前平台与竖版勾选重新打包（force）">
-                  <IconRefresh size={12} /> 重新打包{vertical ? "（含竖版）" : ""}
+                <button type="button" className="cm-btn cm-btn-sm cm-btn-ghost" onClick={() => void build(platform, vertical, verticalMode, true)} disabled={rebuilding} title="按当前平台、竖版勾选与模式重新打包（force）">
+                  <IconRefresh size={12} /> 重新打包{vertical ? `（含竖版·${verticalMode === "crop" ? "裁切" : "模糊"}）` : ""}
                 </button>
               </div>
             </>
@@ -344,7 +373,7 @@ export function PublishPackageModal({
               <IconDownload size={26} />
               <b>还没有发布包</b>
               <span>点击下方按钮生成（需该模板已有成片 final.mp4）</span>
-              <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" onClick={() => void build(platform, vertical, false)}>
+              <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" onClick={() => void build(platform, vertical, verticalMode, false)}>
                 <IconDownload size={12} /> 生成发布包
               </button>
             </div>

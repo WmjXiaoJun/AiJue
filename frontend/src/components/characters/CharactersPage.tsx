@@ -6,6 +6,7 @@ import { errorText } from "../../lib/api";
 import type { V5CatalogResponse, V5CharacterSummary } from "../../lib/v5";
 import { mediaSrc, characterArtUrl, characterPreviewUrl, v5api } from "../../lib/v5";
 import { creationApi, creationErrorMessage } from "../../lib/creation";
+import type { CharacterAssets } from "../../lib/creation";
 import type { CharacterContract, VoicePreset } from "../../lib/voice";
 import { fetchCharacterContract, voiceApi } from "../../lib/voice";
 import { useToast } from "../Toast";
@@ -70,6 +71,18 @@ function fmtAppearanceValue(value: unknown): string {
   return String(value) || "—";
 }
 
+/** V28：合同/接口里的素材路径（assets/v5/... 或 /media/v5/...）→ 可访问 /media URL */
+function artMediaUrl(path?: string): string {
+  if (!path) return "";
+  if (/^(https?:|blob:|data:)/i.test(path)) return path;
+  const marker = "v5/characters";
+  if (!path.startsWith("/media") && path.includes(marker)) {
+    return mediaSrc("/media/" + path.slice(path.indexOf(marker)));
+  }
+  if (path.startsWith("assets/")) return mediaSrc("/media/" + path.slice("assets/".length));
+  return mediaSrc(path);
+}
+
 /** 合同来源路径过长（绝对路径）→ 展示友好来源 */
 function sourceLabel(source: string): string {
   if (!source) return "—";
@@ -125,6 +138,10 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
   const [artBust, setArtBust] = useState<Record<string, number>>({});
   const [artBusy, setArtBusy] = useState<string | null>(null);
   const [artError, setArtError] = useState("");
+  const [assetsByChar, setAssetsByChar] = useState<Record<string, CharacterAssets>>({});
+  const [assetBusy, setAssetBusy] = useState<string | null>(null);
+  const [assetError, setAssetError] = useState("");
+  const [lightbox, setLightbox] = useState<{ src: string; label: string } | null>(null);
 
   const [previewChar, setPreviewChar] = useState<string | null>(null);
   const [previewError, setPreviewError] = useState("");
@@ -299,6 +316,44 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
     },
     [],
   );
+
+  /** V28：拉取角色已生成素材（三视图/表情/设定图） */
+  const loadAssets = useCallback(async (characterId: string) => {
+    try {
+      const assets = await creationApi.getCharacterAssets(characterId);
+      setAssetsByChar((prev) => ({ ...prev, [characterId]: assets }));
+    } catch {
+      setAssetsByChar((prev) => (prev[characterId] ? prev : { ...prev, [characterId]: {} }));
+    }
+  }, []);
+
+  /** V28：生成三视图/表情包/全部素材（imagegen，串行 40–90s） */
+  const generateAssets = useCallback(
+    async (characterId: string, modes: string[], label: string) => {
+      setAssetBusy(characterId);
+      setAssetError("");
+      try {
+        const res = await creationApi.generateCharacterArt(characterId, { modes, force: true });
+        const stamp = Date.now();
+        setArtBust((prev) => ({ ...prev, [characterId]: stamp }));
+        if (res.assets) setAssetsByChar((prev) => ({ ...prev, [characterId]: res.assets || {} }));
+        else await loadAssets(characterId);
+        notify(`${label}已生成${res.elapsed_sec ? ` · ${Math.round(Number(res.elapsed_sec))}s` : ""}`, "success");
+      } catch (err) {
+        const items = creationErrorMessage(err);
+        setAssetError(items.join("；"));
+        notify(`${label}生成失败：${items.join("；")}`, "error");
+      } finally {
+        setAssetBusy((prev) => (prev === characterId ? null : prev));
+      }
+    },
+    [loadAssets, notify],
+  );
+
+  useEffect(() => {
+    if (!selected) return;
+    void loadAssets(selected);
+  }, [loadAssets, selected]);
 
   /** V24：生成/重新生成角色概念图（SDXL，20–60s） */
   const generateArt = useCallback(
@@ -647,6 +702,130 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                 </div>
               </div>
 
+              <section className="v18-drawer-sec v28-assets">
+                <div className="v18-drawer-sec-title">
+                  <IconImage size={15} /> 角色素材
+                  <span className="v18-tag is-gold">
+                    {1 +
+                      Object.keys((assetsByChar[selectedContract.id]?.three_view || {})).length +
+                      Object.keys((assetsByChar[selectedContract.id]?.expressions || {})).length +
+                      (assetsByChar[selectedContract.id]?.sheet ? 1 : 0)}{" "}
+                    张
+                  </span>
+                  <div className="v28-assets-actions">
+                    <button
+                      type="button"
+                      className="cm-btn cm-btn-sm"
+                      disabled={assetBusy === selectedContract.id}
+                      onClick={() => void generateAssets(selectedContract.id, ["three_view"], "三视图")}
+                    >
+                      {assetBusy === selectedContract.id ? <Spinner size={12} /> : <IconImage size={12} />} 生成三视图
+                    </button>
+                    <button
+                      type="button"
+                      className="cm-btn cm-btn-sm"
+                      disabled={assetBusy === selectedContract.id}
+                      onClick={() => void generateAssets(selectedContract.id, ["expressions"], "表情包")}
+                    >
+                      {assetBusy === selectedContract.id ? <Spinner size={12} /> : <IconImage size={12} />} 生成表情包
+                    </button>
+                    <button
+                      type="button"
+                      className="cm-btn cm-btn-primary cm-btn-sm"
+                      disabled={assetBusy === selectedContract.id}
+                      onClick={() => void generateAssets(selectedContract.id, ["all"], "全部素材")}
+                    >
+                      {assetBusy === selectedContract.id ? <Spinner size={12} /> : <IconSpark size={12} />} 全部生成
+                    </button>
+                  </div>
+                </div>
+                {assetBusy === selectedContract.id && (
+                  <div className="v28-assets-loading">
+                    <Spinner size={16} />
+                    <div>
+                      <b>正在生成角色素材…</b>
+                      <span>三视图 ×3 + 表情 ×4 + 设定图 ×1；imagegen 串行，约 40–90 秒，可稍候</span>
+                    </div>
+                  </div>
+                )}
+                {assetError && (
+                  <div className="v24-art-error" role="alert">
+                    <b>角色素材生成失败</b>
+                    <span>{assetError}</span>
+                  </div>
+                )}
+                {(() => {
+                  const current = assetsByChar[selectedContract.id] || {};
+                  const bust = artBust[selectedContract.id];
+                  const portraitSrc = selectedContract.art.portrait
+                    ? artMediaUrl(selectedContract.art.portrait) + (bust ? (selectedContract.art.portrait.includes("?") ? "&" : "?") + "t=" + bust : "")
+                    : characterArtUrl(selectedContract.id, "portrait.png", bust);
+                  const bustCharUrl = (rel: string) => characterArtUrl(selectedContract.id, rel, bust);
+                  const groups: { key: string; label: string; items: { name: string; src: string }[] }[] = [
+                    { key: "portrait", label: "立绘", items: [{ name: "portrait", src: portraitSrc }] },
+                    {
+                      key: "three_view",
+                      label: "三视图",
+                      items: [
+                        { name: "front", src: current.three_view?.front ? artMediaUrl(current.three_view.front) + (bust ? "?t=" + bust : "") : bustCharUrl("three_view/front.png") },
+                        { name: "side", src: current.three_view?.side ? artMediaUrl(current.three_view.side) + (bust ? "?t=" + bust : "") : bustCharUrl("three_view/side.png") },
+                        { name: "three_quarter", src: current.three_view?.three_quarter ? artMediaUrl(current.three_view.three_quarter) + (bust ? "?t=" + bust : "") : bustCharUrl("three_view/three_quarter.png") },
+                      ],
+                    },
+                    {
+                      key: "expressions",
+                      label: "表情包",
+                      items: ["neutral", "happy", "surprised", "thinking"].map((name) => ({
+                        name,
+                        src: (current.expressions && current.expressions[name])
+                          ? artMediaUrl(current.expressions[name] as string) + (bust ? "?t=" + bust : "")
+                          : bustCharUrl("expressions/" + name + ".png"),
+                      })),
+                    },
+                    {
+                      key: "sheet",
+                      label: "设定图",
+                      items: [{ name: "sheet", src: current.sheet ? artMediaUrl(current.sheet) + (bust ? "?t=" + bust : "") : bustCharUrl("sheet.png") }],
+                    },
+                  ];
+                  return (
+                    <div className="v28-asset-groups">
+                      {groups.map((group) => (
+                        <div key={group.key} className="v28-asset-group">
+                          <span className="v28-asset-group-label">{group.label}</span>
+                          <div className="v28-asset-grid">
+                            {group.items.map((item) => (
+                              <button
+                                key={group.key + item.name}
+                                type="button"
+                                className="v28-asset-thumb"
+                                onClick={() => setLightbox({ src: item.src, label: `${selectedContract.label} · ${group.label} · ${item.name}` })}
+                                title={`点击放大 · ${item.name}`}
+                              >
+                                <img
+                                  src={item.src}
+                                  alt={item.name}
+                                  loading="lazy"
+                                  onError={(event) => {
+                                    event.currentTarget.style.display = "none";
+                                    (event.currentTarget.parentElement as HTMLElement)?.classList.add("is-missing");
+                                  }}
+                                  onLoad={(event) => {
+                                    (event.currentTarget.parentElement as HTMLElement)?.classList.remove("is-missing");
+                                  }}
+                                />
+                                <span>{item.name}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
+                <p className="v21-hint">素材写入 assets/v5/characters/&lt;id&gt;/（三视图/表情/设定图）；生成后即时刷新，可点击缩略图放大。</p>
+              </section>
+
               <section className="v18-drawer-sec">
                 <div className="v18-drawer-sec-title">
                   <IconVolume size={15} /> 声音卡
@@ -747,6 +926,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
             setSelected(id);
             if (res?.art?.generated) {
               setArtBust((prev) => ({ ...prev, [id]: Date.now() }));
+              void loadAssets(id);
               setContracts((prev) => {
                 const current = prev[id];
                 if (!current) return prev;
@@ -779,6 +959,19 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
             }));
           }}
         />
+      )}
+      {lightbox && (
+        <div className="v28-lightbox" onMouseDown={() => setLightbox(null)} role="presentation">
+          <div className="v28-lightbox-body" onMouseDown={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-label={lightbox.label}>
+            <header className="v28-lightbox-head">
+              <span>{lightbox.label}</span>
+              <button type="button" className="v21-close" onClick={() => setLightbox(null)} aria-label="关闭预览">
+                <IconClose size={16} />
+              </button>
+            </header>
+            <img src={lightbox.src} alt={lightbox.label} />
+          </div>
+        </div>
       )}
     </AppShell>
   );

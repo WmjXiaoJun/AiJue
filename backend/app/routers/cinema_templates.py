@@ -1729,7 +1729,7 @@ def start_assemble(payload: TemplateAssembleRequest) -> Dict[str, Any]:
 PUBLISH_DIRNAME = "publish"
 PUBLISH_PLATFORMS = ("youtube", "tiktok", "instagram", "generic")
 PUBLISH_VERTICAL_PLATFORMS = ("tiktok", "instagram")
-PUBLISH_VERTICAL_MODES = ("blur_pad",)
+PUBLISH_VERTICAL_MODES = ("blur_pad", "crop")
 PUBLISH_VERTICAL_SIZE = (1080, 1920)
 PUBLISH_VERTICAL_FG = (1080, 608)
 PUBLISH_KEEP = 5
@@ -1818,7 +1818,7 @@ def _publish_cache_compatible(tid: str, platform: str, vertical: bool,
 def _publish_build_vertical(tid: str, cover: Optional[Path], workdir: Path, mode: str,
                             warnings: List[str]) -> Tuple[Optional[Path], Optional[Path],
                                                           Dict[str, Any]]:
-    """生成 1080×1920 竖版视频 + 竖版封面（blur_pad：模糊背景 + 16:9 前景居中）。
+    """生成 1080×1920 竖版视频 + 竖版封面（blur_pad 模糊填充 / crop 中心裁切）。
 
     返回 (video_path, cover_path, vertical_info)；失败只记 warning，不阻塞 16:9 包。
     """
@@ -1830,13 +1830,22 @@ def _publish_build_vertical(tid: str, cover: Optional[Path], workdir: Path, mode
     width, height = PUBLISH_VERTICAL_SIZE
     fg_width, fg_height = PUBLISH_VERTICAL_FG
     video_out = workdir / "final_vertical.mp4"
-    video_filter = (
-        f"[0:v]split=2[src_bg][src_fg];"
-        f"[src_bg]scale={width}:{height}:force_original_aspect_ratio=increase,"
-        f"crop={width}:{height},gblur=sigma=30[bg];"
-        f"[src_fg]scale={fg_width}:{fg_height}[fg];"
-        f"[bg][fg]overlay=(W-w)/2:(H-h)/2,format=yuv420p,fps=25[v]"
-    )
+    if mode == "crop":
+        # 中心裁切 9:16：16:9 源片取中心 405×720，再 lanczos 放大到 1080×1920
+        # （表达式兼容 poster 等非 1280×720 输入）
+        crop_expr = "crop='min(iw,ih*9/16)':'ih':'(iw-ow)/2':'(ih-oh)/2'"
+        video_filter = (
+            f"[0:v]{crop_expr},"
+            f"scale={width}:{height}:flags=lanczos,format=yuv420p,fps=25[v]"
+        )
+    else:
+        video_filter = (
+            f"[0:v]split=2[src_bg][src_fg];"
+            f"[src_bg]scale={width}:{height}:force_original_aspect_ratio=increase,"
+            f"crop={width}:{height},gblur=sigma=30[bg];"
+            f"[src_fg]scale={fg_width}:{fg_height}[fg];"
+            f"[bg][fg]overlay=(W-w)/2:(H-h)/2,format=yuv420p,fps=25[v]"
+        )
     started = time.time()
     try:
         proc = subprocess.run(
@@ -1873,13 +1882,20 @@ def _publish_build_vertical(tid: str, cover: Optional[Path], workdir: Path, mode
     cover_out: Optional[Path] = None
     if cover is not None:
         cover_out = workdir / "cover_vertical.jpg"
-        cover_filter = (
-            f"[0:v]split=2[src_bg][src_fg];"
-            f"[src_bg]scale={width}:{height}:force_original_aspect_ratio=increase,"
-            f"crop={width}:{height},gblur=sigma=30[bg];"
-            f"[src_fg]scale={fg_width}:{fg_height}[fg];"
-            f"[bg][fg]overlay=(W-w)/2:(H-h)/2[out]"
-        )
+        if mode == "crop":
+            crop_expr = "crop='min(iw,ih*9/16)':'ih':'(iw-ow)/2':'(ih-oh)/2'"
+            cover_filter = (
+                f"[0:v]{crop_expr},"
+                f"scale={width}:{height}:flags=lanczos[out]"
+            )
+        else:
+            cover_filter = (
+                f"[0:v]split=2[src_bg][src_fg];"
+                f"[src_bg]scale={width}:{height}:force_original_aspect_ratio=increase,"
+                f"crop={width}:{height},gblur=sigma=30[bg];"
+                f"[src_fg]scale={fg_width}:{fg_height}[fg];"
+                f"[bg][fg]overlay=(W-w)/2:(H-h)/2[out]"
+            )
         try:
             cover_proc = subprocess.run(
                 [str(jobs.ffmpeg_bin()), "-y", "-loop", "1", "-i", str(cover),
@@ -2282,13 +2298,24 @@ def _publish_readme(tid: str, contract: Dict[str, Any], metadata: Dict[str, Any]
     if metadata.get("vertical_requested"):
         vertical = metadata.get("vertical") if isinstance(metadata.get("vertical"), dict) else {}
         if vertical.get("file"):
-            lines.extend([
-                "五、竖版 9:16（blur_pad）",
-                "  - 背景：原片放大填满 1080×1920 后 gblur(sigma=30)；前景：原片缩放到 1080×608 居中；",
-                "  - 编码：H.264 + AAC，yuv420p，25fps；时长与原片一致；",
-                "  - 上传 TikTok / Instagram Reels 时优先使用 video/final_vertical.mp4。",
-                "",
-            ])
+            mode = str(vertical.get("mode") or "blur_pad")
+            if mode == "crop":
+                mode_lines = [
+                    "五、竖版 9:16（中心裁切 crop）",
+                    "  - 画面：原片中心裁切 405×720（9:16）后 lanczos 放大到 1080×1920；",
+                    "  - 编码：H.264 + AAC，yuv420p，25fps；时长与原片一致；",
+                    "  - 上传 TikTok / Instagram Reels 时优先使用 video/final_vertical.mp4。",
+                    "",
+                ]
+            else:
+                mode_lines = [
+                    "五、竖版 9:16（模糊背景填充 blur_pad）",
+                    "  - 背景：原片放大填满 1080×1920 后 gblur(sigma=30)；前景：原片缩放到 1080×608 居中；",
+                    "  - 编码：H.264 + AAC，yuv420p，25fps；时长与原片一致；",
+                    "  - 上传 TikTok / Instagram Reels 时优先使用 video/final_vertical.mp4。",
+                    "",
+                ]
+            lines.extend(mode_lines)
     if warnings:
         lines.append("六、构建警告")
         lines.extend(f"  - {item}" for item in warnings)

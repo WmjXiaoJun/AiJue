@@ -15,6 +15,8 @@ export interface CharacterCreateBody {
   tags?: string[];
   /** V24：创建后同步生成 SDXL 概念图（20–60s，失败不阻塞创建） */
   auto_art?: boolean;
+  /** V28：auto_art 同时生成的素材模式（["all"] = 三视图+表情+设定图） */
+  auto_art_modes?: string[];
   appearance: {
     gender?: string;
     age?: number;
@@ -34,14 +36,38 @@ export interface CharacterArtResult {
   error?: string;
 }
 
+export interface CharacterAssetGroup {
+  front?: string;
+  side?: string;
+  three_quarter?: string;
+  neutral?: string;
+  happy?: string;
+  surprised?: string;
+  thinking?: string;
+  [key: string]: string | undefined;
+}
+
+export interface CharacterAssets {
+  portrait?: string;
+  three_view?: CharacterAssetGroup;
+  expressions?: CharacterAssetGroup;
+  sheet?: string;
+  exists?: Record<string, boolean>;
+}
+
 export interface CharacterArtResponse {
   ok: boolean;
   character: string;
-  portrait_url: string;
+  portrait_url?: string;
   elapsed_sec?: number;
   style?: string;
   seed?: number;
   cached?: boolean;
+  mode?: string;
+  /** V28：本次生成的 mode 列表 */
+  generated?: string[];
+  assets?: CharacterAssets;
+  warnings?: string[];
 }
 
 export interface CharacterCreateResponse {
@@ -115,6 +141,52 @@ export class CreationError extends Error {
   }
 }
 
+async function get<T>(path: string, timeoutMs = 30000): Promise<T> {
+  const controller = new AbortController();
+  const timer = window.setTimeout(() => controller.abort(), timeoutMs);
+  let res: Response;
+  try {
+    res = await fetch(API_BASE + path, { signal: controller.signal });
+  } catch (err) {
+    window.clearTimeout(timer);
+    const message = err instanceof DOMException && err.name === "AbortError" ? "请求超时" : "无法连接后端";
+    throw new CreationError(0, [message]);
+  }
+  window.clearTimeout(timer);
+  if (!res.ok) {
+    let detail: unknown = null;
+    try {
+      const data = (await res.json()) as { detail?: unknown };
+      detail = data?.detail;
+    } catch {
+      /* 非 JSON */
+    }
+    throw new CreationError(res.status, errorItems(res.status, detail, res.statusText || "请求失败"));
+  }
+  return (await res.json()) as T;
+}
+
+function normalizeAssets(raw: Record<string, unknown>): CharacterAssets {
+  const group = (value: unknown): CharacterAssetGroup | undefined => {
+    if (!value || typeof value !== "object") return undefined;
+    const rec = value as Record<string, unknown>;
+    const out: CharacterAssetGroup = {};
+    Object.keys(rec).forEach((key) => {
+      if (typeof rec[key] === "string") out[key] = rec[key] as string;
+    });
+    return Object.keys(out).length ? out : undefined;
+  };
+  const assets: CharacterAssets = {};
+  if (typeof raw.portrait === "string") assets.portrait = raw.portrait;
+  const three = group(raw.three_view);
+  if (three) assets.three_view = three;
+  const expr = group(raw.expressions);
+  if (expr) assets.expressions = expr;
+  if (typeof raw.sheet === "string") assets.sheet = raw.sheet;
+  if (raw.exists && typeof raw.exists === "object") assets.exists = raw.exists as Record<string, boolean>;
+  return assets;
+}
+
 function errorItems(status: number, detail: unknown, statusText: string): string[] {
   if (status === 404 || status === 405) {
     return ["接口尚未就绪（后端创建/概念图 API 实现中），请稍后重试"];
@@ -180,9 +252,27 @@ export const creationApi = {
   /** V24：生成/重新生成角色概念图（SDXL，20–60s，串行 GPU） */
   generateCharacterArt: (
     character: string,
-    body: { mode?: "portrait"; style?: string; prompt_extra?: string; seed?: number; force?: boolean } = {},
+    body: {
+      mode?: "portrait";
+      modes?: string[];
+      style?: string;
+      prompt_extra?: string;
+      seed?: number;
+      force?: boolean;
+    } = {},
   ): Promise<CharacterArtResponse> =>
-    post(`/v5/characters/${encodeURIComponent(character)}/art`, { mode: "portrait", force: true, ...body }, 300000),
+    post(`/v5/characters/${encodeURIComponent(character)}/art`, { mode: "portrait", force: true, ...body }, 600000),
+  /** V28：扫描角色已生成素材（三视图/表情/设定图/立绘） */
+  getCharacterAssets: async (character: string): Promise<CharacterAssets> => {
+    try {
+      const res = await get(`/v5/characters/${encodeURIComponent(character)}/assets`);
+      const rec = (res || {}) as Record<string, unknown>;
+      const assets = (rec.assets || rec) as Record<string, unknown>;
+      return normalizeAssets(assets);
+    } catch (err) {
+      throw err;
+    }
+  },
 };
 
 /** 400 错误是否为「后端未就绪」 */

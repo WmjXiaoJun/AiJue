@@ -48,14 +48,18 @@ _ID_RE = re.compile(r"^[a-z][a-z0-9_]{1,60}$")
 _ROLE_RE = re.compile(r"^[a-z][a-z0-9_]{0,30}$")
 _HEX_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
 
-#: V24 概念图（imagegen/SDXL）：只生成单张 portrait，写 assets/v5/characters/<id>/portrait.png
+#: V24 概念图（imagegen/SDXL）：单张 portrait；V28 扩展三视图/表情/设定图
 _ART_DIR = _REPO_ROOT / "assets" / "v5" / "characters"
-_ART_SPEC_DIR = _REPO_ROOT / "tmp" / "v24" / "specs"
+_ART_SPEC_DIR = _REPO_ROOT / "tmp" / "v28" / "specs"
 _ART_STYLES = ("anime", "illustrious", "guoman", "realistic", "stylized_25d")
 _ART_DEFAULT_STYLE = "anime"
-_ART_TIMEOUT_SECONDS = 300.0
+_ART_TIMEOUT_SECONDS = 900.0
 _ART_INFLIGHT: set = set()
 _ART_STATE_LOCK = threading.Lock()
+_ART_MODES = ("portrait", "three_view", "expressions", "sheet")
+_ART_ALL_MODES = ("portrait", "three_view", "expressions", "sheet")
+_ART_VIEWS = ("front", "side", "three_quarter")
+_ART_EXPRESSIONS = ("neutral", "happy", "surprised", "thinking")
 
 CUSTOM_PREFIX = getattr(v5_catalog, "CUSTOM_PREFIX", "custom_")
 EDGE_DEFAULT_VOICE = "zh-CN-YunxiNeural"
@@ -315,22 +319,105 @@ def _art_portrait_path(character_id: str) -> Path:
     return _ART_DIR / character_id / "portrait.png"
 
 
-def _art_portrait_url(character_id: str) -> Optional[str]:
-    path = _art_portrait_path(character_id)
+def _art_asset_paths(character_id: str) -> Dict[str, Any]:
+    """角色素材路径表：portrait / three_view(3) / expressions(4) / sheet。"""
+    base = _ART_DIR / character_id
+    return {
+        "portrait": base / "portrait.png",
+        "three_view": {view: base / "three_view" / f"{view}.png" for view in _ART_VIEWS},
+        "expressions": {expr: base / "expressions" / f"{expr}.png" for expr in _ART_EXPRESSIONS},
+        "sheet": base / "sheet.png",
+    }
+
+
+def _art_file_ok(path: Path) -> bool:
+    try:
+        return path.is_file() and path.stat().st_size > 2000
+    except OSError:
+        return False
+
+
+def _art_file_url(character_id: str, rel: str) -> Optional[str]:
+    path = _ART_DIR / character_id / rel
     try:
         if not path.is_file() or path.stat().st_size <= 2000:
             return None
-        return f"/media/v5/characters/{character_id}/portrait.png?t={int(path.stat().st_mtime)}"
+        return (f"/media/v5/characters/{character_id}/{rel}"
+                f"?t={int(path.stat().st_mtime)}")
     except OSError:
         return None
 
 
-def _run_imagegen_cli(spec_path: Path, outdir: Path, *, style: str, seed: int,
+def _art_portrait_url(character_id: str) -> Optional[str]:
+    return _art_file_url(character_id, "portrait.png")
+
+
+def _art_assets_payload(character_id: str) -> Dict[str, Any]:
+    return {
+        "portrait": _art_file_url(character_id, "portrait.png"),
+        "three_view": {view: _art_file_url(character_id, f"three_view/{view}.png")
+                       for view in _ART_VIEWS},
+        "expressions": {expr: _art_file_url(character_id, f"expressions/{expr}.png")
+                        for expr in _ART_EXPRESSIONS},
+        "sheet": _art_file_url(character_id, "sheet.png"),
+    }
+
+
+def _art_asset_files(character_id: str) -> List[Dict[str, Any]]:
+    base = _ART_DIR / character_id
+    rels = ["portrait.png"] + [f"three_view/{view}.png" for view in _ART_VIEWS] \
+        + [f"expressions/{expr}.png" for expr in _ART_EXPRESSIONS] \
+        + ["sheet.png", "meta.json"]
+    rows: List[Dict[str, Any]] = []
+    for rel in rels:
+        path = base / rel
+        try:
+            if not path.is_file() or path.stat().st_size <= 0:
+                continue
+            stat = path.stat()
+        except OSError:
+            continue
+        rows.append({"name": rel, "size": int(stat.st_size),
+                     "url": _art_file_url(character_id, rel),
+                     "mtime": time.strftime("%Y-%m-%dT%H:%M:%S",
+                                            time.localtime(stat.st_mtime))})
+    return rows
+
+
+def _normalize_art_modes(raw: Any) -> Tuple[List[str], List[str]]:
+    """modes 归一化：["all"] 展开全部；返回 (modes, errors)。"""
+    if raw is None:
+        return ["portrait"], []
+    if isinstance(raw, str):
+        raw = [raw]
+    if not isinstance(raw, (list, tuple)):
+        return [], ["modes 需为字符串数组"]
+    modes: List[str] = []
+    errors: List[str] = []
+    for item in raw:
+        token = str(item or "").strip().lower()
+        if not token:
+            continue
+        if token == "all":
+            for mode in _ART_ALL_MODES:
+                if mode not in modes:
+                    modes.append(mode)
+        elif token in _ART_MODES:
+            if token not in modes:
+                modes.append(token)
+        else:
+            errors.append(f"未知 mode: {token}（可选 {', '.join(_ART_MODES)} 或 all）")
+    if not modes and not errors:
+        modes = ["portrait"]
+    return modes, errors
+
+
+def _run_imagegen_cli(spec_path: Path, outdir: Path, *, mode: str, style: str, seed: int,
                       prompt_extra: str, timeout: float = _ART_TIMEOUT_SECONDS) -> dict:
     """调用 imagegen CLI（子进程），解析末尾 JSON 摘要；失败抛 RuntimeError（含可读 tail）。"""
     cmd = [sys.executable, "-m", "imagegen.cli", "generate",
            "--spec", str(spec_path), "--outdir", str(outdir),
-           "--mode", "portrait", "--style", style, "--seed", str(seed),
+           "--mode", mode, "--style", style, "--seed", str(seed),
            "--timeout", str(int(max(60, timeout - 60)))]
     ckpt = os.environ.get("V5_ART_CKPT", "").strip()
     if ckpt:
@@ -344,7 +431,7 @@ def _run_imagegen_cli(spec_path: Path, outdir: Path, *, style: str, seed: int,
                               encoding="utf-8", errors="replace", env=env,
                               timeout=timeout + 30)
     except subprocess.TimeoutExpired as exc:
-        raise RuntimeError(f"imagegen 超时（{timeout + 30:.0f}s）") from exc
+        raise RuntimeError(f"imagegen {mode} 超时（{timeout + 30:.0f}s）") from exc
     output = (proc.stdout or "") + "\n" + (proc.stderr or "")
     summary: dict = {}
     for line in reversed((proc.stdout or "").strip().splitlines()):
@@ -357,18 +444,51 @@ def _run_imagegen_cli(spec_path: Path, outdir: Path, *, style: str, seed: int,
                 continue
     if proc.returncode != 0 or not summary.get("ok"):
         tail = "\n".join(output.strip().splitlines()[-10:])
-        raise RuntimeError(f"imagegen 失败（returncode={proc.returncode}）：{tail[-1200:]}")
+        raise RuntimeError(f"imagegen {mode} 失败（returncode={proc.returncode}）：{tail[-1200:]}")
     return summary
 
 
+def _art_modes_complete(character_id: str, modes: List[str]) -> bool:
+    paths = _art_asset_paths(character_id)
+    for mode in modes:
+        if mode == "portrait" and not _art_file_ok(paths["portrait"]):
+            return False
+        if mode == "three_view" and not all(_art_file_ok(path) for path in
+                                            paths["three_view"].values()):
+            return False
+        if mode == "expressions" and not all(_art_file_ok(path) for path in
+                                             paths["expressions"].values()):
+            return False
+        if mode == "sheet" and not _art_file_ok(paths["sheet"]):
+            return False
+    return True
+
+
 def _generate_art(character: dict, *, style: str, prompt_extra: str, seed: int,
-                  force: bool) -> dict:
-    """生成角色概念图（同步）：cached 判断 → 3D job 互斥 → 同角色互斥 → GPU 串行锁 → imagegen。"""
+                  force: bool, modes: Optional[List[str]] = None) -> dict:
+    """生成角色素材（同步）：cached → 3D job 互斥 → 同角色互斥 → GPU 串行锁 → imagegen。
+
+    modes: portrait / three_view / expressions / sheet（可多选；None=portrait）。
+    portrait 已有且只请求 portrait 时保持 V24 的 cached 行为。
+    """
+    normalized, errors = _normalize_art_modes(modes if modes is not None else ["portrait"])
+    if errors:
+        raise ValueError("; ".join(errors))
     character_id = str(character.get("id") or "")
-    portrait = _art_portrait_path(character_id)
-    if not force and portrait.is_file() and portrait.stat().st_size > 2000:
-        return {"character": character_id, "portrait_url": _art_portrait_url(character_id),
-                "elapsed_sec": 0.0, "style": style, "seed": seed, "cached": True}
+    if not force and _art_modes_complete(character_id, normalized):
+        return {
+            "character": character_id,
+            "portrait_url": _art_portrait_url(character_id),
+            "assets": _art_assets_payload(character_id),
+            "files": _art_asset_files(character_id),
+            "generated": [],
+            "modes": normalized,
+            "elapsed_sec": 0.0,
+            "style": style,
+            "seed": seed,
+            "cached": True,
+            "warnings": [],
+        }
 
     # 与 3D 生成互斥：正在跑 pipeline job 时直接 409，避免抢 ComfyUI/GPU
     try:
@@ -380,15 +500,16 @@ def _generate_art(character: dict, *, style: str, prompt_extra: str, seed: int,
     if active:
         raise _ArtBusyError(
             "3d_job_running",
-            f"3D 生成任务运行中（{active.get('template_id') or active.get('id')}），请等它结束再生成概念图",
+            f"3D 生成任务运行中（{active.get('template_id') or active.get('id')}），请等它结束再生成角色素材",
             job_id=str(active.get("id") or "") or None)
 
     with _ART_STATE_LOCK:
         if character_id in _ART_INFLIGHT:
             raise _ArtBusyError("same_character_running",
-                                f"角色 {character_id} 概念图正在生成中，请稍后")
+                                f"角色 {character_id} 素材正在生成中，请稍后")
         _ART_INFLIGHT.add(character_id)
     started = time.time()
+    warnings: List[str] = []
     try:
         from .. import jobs  # noqa: PLC0415 - 与 concept job / h3 共用 ComfyUI 串行锁
 
@@ -396,20 +517,45 @@ def _generate_art(character: dict, *, style: str, prompt_extra: str, seed: int,
             spec_path = _imagegen_spec_path(character)
             outdir = _ART_DIR / character_id
             outdir.mkdir(parents=True, exist_ok=True)
-            summary = _run_imagegen_cli(spec_path, outdir, style=style, seed=seed,
-                                        prompt_extra=prompt_extra)
+            if list(normalized) == list(_ART_ALL_MODES):
+                runs = ["all"]
+            else:
+                runs = list(normalized)
+            summaries: List[dict] = []
+            for run_mode in runs:
+                summaries.append(_run_imagegen_cli(
+                    spec_path, outdir, mode=run_mode, style=style, seed=seed,
+                    prompt_extra=prompt_extra))
         elapsed = round(time.time() - started, 1)
-        if not portrait.is_file() or portrait.stat().st_size <= 2000:
-            raise RuntimeError(f"imagegen 未产出 portrait.png（outdir={outdir}）")
+        missing = []
+        paths = _art_asset_paths(character_id)
+        if "portrait" in normalized and not _art_file_ok(paths["portrait"]):
+            missing.append("portrait.png")
+        if "three_view" in normalized:
+            missing += [f"three_view/{view}.png" for view in _ART_VIEWS
+                        if not _art_file_ok(paths["three_view"][view])]
+        if "expressions" in normalized:
+            missing += [f"expressions/{expr}.png" for expr in _ART_EXPRESSIONS
+                        if not _art_file_ok(paths["expressions"][expr])]
+        if "sheet" in normalized and not _art_file_ok(paths["sheet"]):
+            missing.append("sheet.png")
+        if missing:
+            raise RuntimeError(f"imagegen 未产出: {', '.join(missing)}（outdir={outdir}）")
         return {
             "character": character_id,
             "portrait_url": _art_portrait_url(character_id),
+            "assets": _art_assets_payload(character_id),
+            "files": _art_asset_files(character_id),
+            "generated": list(normalized),
+            "modes": list(normalized),
             "elapsed_sec": elapsed,
             "style": style,
             "seed": seed,
             "cached": False,
-            "images": len(summary.get("images") or []),
-            "imagegen_elapsed_sec": summary.get("elapsed_sec"),
+            "images": sum(len(summary.get("images") or []) for summary in summaries),
+            "imagegen_elapsed_sec": sum(float(summary.get("elapsed_sec") or 0.0)
+                                        for summary in summaries),
+            "warnings": warnings,
         }
     finally:
         with _ART_STATE_LOCK:
@@ -578,6 +724,11 @@ def create_character(body: Dict[str, Any] = Body(default={})) -> dict:
     if not label:
         raise _err("缺少 label（角色名）")
     auto_art = _as_bool(data.get("auto_art"))  # V24：创建成功后同步生成概念图
+    auto_art_modes: List[str] = ["portrait"]
+    if auto_art:
+        auto_art_modes, auto_mode_errors = _normalize_art_modes(data.get("auto_art_modes"))
+        if auto_mode_errors:
+            raise _err("auto_art_modes 不合法", auto_mode_errors)
     catalog = _catalog()
     cid = _normalize_custom_id(data.get("id"), default_prefix="custom_")
     if not _ID_RE.fullmatch(cid):
@@ -650,14 +801,18 @@ def create_character(body: Dict[str, Any] = Body(default={})) -> dict:
     warnings: List[str] = list(result.get("warnings") or [])
     art: Optional[Dict[str, Any]] = None
     if auto_art:
-        # V24：同步生成概念图（20–60s）；失败不阻塞创建
+        # V24/V28：同步生成角色素材（portrait 20–60s；all 约 40–90s）；失败不阻塞创建
         art_started = time.time()
         try:
             art_result = _generate_art(merged, style=_ART_DEFAULT_STYLE, prompt_extra="",
-                                       seed=_default_art_seed(cid), force=False)
+                                       seed=_default_art_seed(cid), force=False,
+                                       modes=auto_art_modes)
             art = {
                 "generated": True,
                 "portrait_url": art_result.get("portrait_url"),
+                "assets": art_result.get("assets"),
+                "generated_modes": art_result.get("generated"),
+                "modes": art_result.get("modes"),
                 "elapsed_sec": art_result.get("elapsed_sec"),
                 "cached": bool(art_result.get("cached")),
                 "style": art_result.get("style"),
@@ -665,8 +820,9 @@ def create_character(body: Dict[str, Any] = Body(default={})) -> dict:
             }
         except Exception as exc:  # noqa: BLE001 - auto_art 失败不影响创建
             message = f"{type(exc).__name__}: {exc}"
-            warnings.append(f"auto_art 概念图生成失败：{message}")
-            art = {"generated": False, "portrait_url": None,
+            warnings.append(f"auto_art 素材生成失败：{message}")
+            art = {"generated": False, "portrait_url": None, "assets": None,
+                   "modes": auto_art_modes,
                    "elapsed_sec": round(time.time() - art_started, 1),
                    "cached": False, "error": message[:400]}
     return {
@@ -709,9 +865,9 @@ def delete_character(character: str) -> dict:
 
 
 # --------------------------------------------------------------------------- #
-# V24 角色概念图：生成 / 重新生成（单张 portrait，imagegen/SDXL）
+# V24/V28 角色素材：立绘 / 三视图 / 表情包 / 设定图（imagegen/SDXL）
 # --------------------------------------------------------------------------- #
-@router.post("/characters/{character}/art", summary="生成/重新生成角色概念图（imagegen/SDXL，单张 portrait）")
+@router.post("/characters/{character}/art", summary="生成/重新生成角色素材（portrait/three_view/expressions/sheet/all）")
 def generate_character_art(character: str, body: Dict[str, Any] = Body(default={})) -> dict:
     cid = str(character or "").strip().lower()
     if not _ID_RE.fullmatch(cid):
@@ -721,9 +877,12 @@ def generate_character_art(character: str, body: Dict[str, Any] = Body(default={
     if not isinstance(char, dict):
         raise HTTPException(status_code=404, detail=f"角色不存在: {cid}")
     data = body if isinstance(body, dict) else {}
-    mode = str(data.get("mode") or "portrait").strip().lower()
-    if mode != "portrait":
-        raise _err(f"mode 只支持 portrait（当前 {mode!r}）")
+    raw_modes = data.get("modes")
+    if raw_modes is None and data.get("mode") is not None:
+        raw_modes = [data.get("mode")]
+    modes, mode_errors = _normalize_art_modes(raw_modes)
+    if mode_errors:
+        raise _err("modes 不合法", mode_errors)
     style = str(data.get("style") or _ART_DEFAULT_STYLE).strip().lower()
     if style not in _ART_STYLES:
         raise _err(f"未知 style: {style}（可选 {', '.join(_ART_STYLES)}）")
@@ -739,7 +898,7 @@ def generate_character_art(character: str, body: Dict[str, Any] = Body(default={
         seed = (seed + int(time.time() * 1000)) % (2 ** 31 - 1)
     try:
         result = _generate_art(char, style=style, prompt_extra=prompt_extra,
-                               seed=seed, force=force)
+                               seed=seed, force=force, modes=modes)
     except _ArtBusyError as exc:
         raise HTTPException(status_code=409, detail={
             "message": str(exc), "reason": exc.reason,
@@ -748,8 +907,41 @@ def generate_character_art(character: str, body: Dict[str, Any] = Body(default={
     except HTTPException:
         raise
     except Exception as exc:  # noqa: BLE001 - imagegen 失败可读返回
-        raise HTTPException(status_code=500, detail=f"概念图生成失败: {exc}") from exc
-    return {"ok": True, **result, "mode": mode}
+        raise HTTPException(status_code=500, detail=f"角色素材生成失败: {exc}") from exc
+    return {
+        "ok": True,
+        **result,
+        "mode": modes[0] if len(modes) == 1 else "mixed",
+        "modes": modes,
+    }
+
+
+@router.get("/characters/{character}/assets", summary="扫描角色已生成素材（立绘/三视图/表情/设定图）")
+def get_character_assets(character: str) -> dict:
+    cid = str(character or "").strip().lower()
+    if not _ID_RE.fullmatch(cid):
+        raise HTTPException(status_code=404, detail=f"角色不存在: {character}")
+    catalog = _catalog()
+    char = (catalog.get("characters") or {}).get(cid)
+    if not isinstance(char, dict):
+        raise HTTPException(status_code=404, detail=f"角色不存在: {cid}")
+    paths = _art_asset_paths(cid)
+    assets = _art_assets_payload(cid)
+    exists = {
+        "portrait": _art_file_ok(paths["portrait"]),
+        "three_view": all(_art_file_ok(path) for path in paths["three_view"].values()),
+        "expressions": all(_art_file_ok(path) for path in paths["expressions"].values()),
+        "sheet": _art_file_ok(paths["sheet"]),
+        "meta": (paths["portrait"].parent / "meta.json").is_file(),
+    }
+    return {
+        "ok": True,
+        "character": cid,
+        "assets": assets,
+        "exists": exists,
+        "files": _art_asset_files(cid),
+        "any": any(exists[key] for key in ("portrait", "three_view", "expressions", "sheet")),
+    }
 
 
 # --------------------------------------------------------------------------- #
