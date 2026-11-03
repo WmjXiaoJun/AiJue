@@ -584,3 +584,90 @@ export function templateClipPercent(template: CinemaTemplate | null | undefined)
   return Math.max(0, Math.min(100, Math.round(template.progress)));
 }
 
+
+/* ------------------------------ V29：批量发布包导出 ------------------------------ */
+export type PublishBatchItemStatus = "queued" | "building" | "done" | "failed" | "canceled";
+
+export interface PublishPackageBatchItem {
+  template_id: string;
+  label?: string;
+  status: PublishBatchItemStatus;
+  package_url?: string | null;
+  size_bytes?: number;
+  files_count?: number;
+  error?: string | null;
+  started_at?: string | null;
+  finished_at?: string | null;
+}
+
+export interface PublishPackageBatch {
+  id: string;
+  status: "queued" | "running" | "done" | "partial_failed" | "failed" | "canceled";
+  current_index?: number;
+  total: number;
+  items: PublishPackageBatchItem[];
+  summary?: Record<string, number>;
+  elapsed_sec?: number;
+  platform?: string;
+  vertical?: boolean;
+  vertical_mode?: string;
+}
+
+function normalizePublishBatch(raw: unknown): PublishPackageBatch {
+  const rec = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
+  const itemsRaw = Array.isArray(rec.items) ? rec.items : [];
+  return {
+    id: String(rec.id ?? rec.batch_id ?? ""),
+    status: (String(rec.status ?? "queued") as PublishPackageBatch["status"]) || "queued",
+    current_index: typeof rec.current_index === "number" ? rec.current_index : undefined,
+    total: Number(rec.total ?? itemsRaw.length) || itemsRaw.length,
+    summary: (rec.summary as Record<string, number>) || undefined,
+    elapsed_sec: typeof rec.elapsed_sec === "number" ? rec.elapsed_sec : undefined,
+    platform: typeof rec.platform === "string" ? rec.platform : undefined,
+    vertical: Boolean(rec.vertical),
+    vertical_mode: typeof rec.vertical_mode === "string" ? rec.vertical_mode : undefined,
+    items: itemsRaw.map((item) => {
+      const it = (item && typeof item === "object" ? item : {}) as Record<string, unknown>;
+      return {
+        template_id: String(it.template_id ?? it.id ?? ""),
+        label: typeof it.label === "string" ? it.label : undefined,
+        status: (String(it.status ?? "queued") as PublishBatchItemStatus) || "queued",
+        package_url: typeof it.package_url === "string" ? it.package_url : null,
+        size_bytes: Number(it.size_bytes) || 0,
+        files_count: Number(it.files_count) || 0,
+        error: typeof it.error === "string" ? it.error : null,
+        started_at: typeof it.started_at === "string" ? it.started_at : null,
+        finished_at: typeof it.finished_at === "string" ? it.finished_at : null,
+      };
+    }),
+  };
+}
+
+export function isPublishBatchActive(batch: PublishPackageBatch | null | undefined): boolean {
+  return Boolean(batch && (batch.status === "queued" || batch.status === "running"));
+}
+
+export const publishPackageBatchApi = {
+  start: async (body: {
+    template_ids: string[];
+    platform?: PublishPlatform;
+    vertical?: boolean;
+    vertical_mode?: "blur_pad" | "crop";
+    force?: boolean;
+  }): Promise<PublishPackageBatch> =>
+    normalizePublishBatch(
+      await request("/cinema/publish-packages/batch", {
+        method: "POST",
+        body: JSON.stringify({ platform: "generic", vertical: false, vertical_mode: "blur_pad", force: false, ...body }),
+      }),
+    ),
+  get: async (batchId: string): Promise<PublishPackageBatch> =>
+    normalizePublishBatch(await request(`/cinema/publish-packages/batch/${encodeURIComponent(batchId)}`)),
+  cancel: async (batchId: string): Promise<PublishPackageBatch> =>
+    normalizePublishBatch(await request(`/cinema/publish-packages/batch/${encodeURIComponent(batchId)}/cancel`, { method: "POST" })),
+  list: async (limit = 5): Promise<PublishPackageBatch[]> => {
+    const res = (await request<unknown>("/cinema/publish-packages/batches?limit=" + limit)) as Record<string, unknown> | unknown[];
+    const list = Array.isArray(res) ? res : Array.isArray((res as Record<string, unknown>)?.batches) ? ((res as Record<string, unknown>).batches as unknown[]) : [];
+    return list.map(normalizePublishBatch);
+  },
+};

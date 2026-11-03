@@ -31,6 +31,7 @@ from .db import SessionLocal, get_db, init_db
 from .routers import cinema3d as cinema3d_router
 from .routers import cinema_templates as cinema_templates_router
 from .routers import pipeline_ui as pipeline_ui_router
+from .routers import publish_batches as publish_batches_router
 from .routers import v5_catalog as v5_catalog_router
 from .routers import v5_create as v5_create_router
 from .routers import v5_studio as v5_studio_router
@@ -2548,6 +2549,8 @@ app.include_router(v6_agent_router.router)
 app.include_router(cinema3d_router.router)
 # V8 16 模板 3D 化 API（/api/cinema/templates/*，复用 cinema3d 的任务队列）
 app.include_router(cinema_templates_router.router)
+# V29 批量导出发布包（/api/cinema/publish-packages/*）
+app.include_router(publish_batches_router.router)
 # V18 全流程编排 API（/api/pipeline/* + 项目切换 3D 模板）
 app.include_router(pipeline_ui_router.router)
 # V21 可视化创建 API（/api/v5/characters、/api/v5/templates 新建/删除）

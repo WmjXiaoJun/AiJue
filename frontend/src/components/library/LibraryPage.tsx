@@ -7,6 +7,9 @@ import { mediaSrc } from "../../lib/v5";
 import { ApiError } from "../../lib/api";
 import type { CinemaTemplate } from "../../lib/cinema";
 import { cinemaApi, fmtDuration, fmtSize, isRealTemplate } from "../../lib/cinema";
+import { isPublishBatchActive, publishPackageBatchApi } from "../../lib/cinema";
+import type { PublishPackageBatch, PublishPackageBatchItem, PublishPlatform } from "../../lib/cinema";
+import { downloadUrlAsBlob } from "../../lib/download";
 import { isBatchActive, isRunActive, pipelineApi, pipelineBatchApi } from "../../lib/pipeline";
 import type { PipelineBatch, PipelineBatchItem } from "../../lib/pipeline";
 import type { V5CatalogResponse } from "../../lib/v5";
@@ -531,6 +534,19 @@ function FinalLibrary({
   const [playing, setPlaying] = useState<CinemaTemplate | null>(null);
   const [assembling, setAssembling] = useState<string | null>(null);
   const [publishTemplate, setPublishTemplate] = useState<CinemaTemplate | null>(null);
+  // V29：批量导出发布包
+  const [exportMode, setExportMode] = useState(false);
+  const [exportIds, setExportIds] = useState<Set<string>>(new Set());
+  const [exportPlatform, setExportPlatform] = useState<PublishPlatform>("generic");
+  const [exportVertical, setExportVertical] = useState(false);
+  const [exportVerticalMode, setExportVerticalMode] = useState<"blur_pad" | "crop">("blur_pad");
+  const [pubBatch, setPubBatch] = useState<PublishPackageBatch | null>(null);
+  const [pubSubmitting, setPubSubmitting] = useState(false);
+  const [pubError, setPubError] = useState("");
+  const [pubConfirmCancel, setPubConfirmCancel] = useState(false);
+  const [pubCanceling, setPubCanceling] = useState(false);
+  const [downloadingAll, setDownloadingAll] = useState(false);
+  const [downloadAllIndex, setDownloadAllIndex] = useState(0);
 
   useEffect(() => {
     if (!playing) return;
@@ -570,6 +586,163 @@ function FinalLibrary({
     [notify, onRefresh],
   );
 
+  const toggleExportMode = useCallback(() => {
+    setExportMode((prev) => {
+      if (prev) setExportIds(new Set());
+      return !prev;
+    });
+  }, []);
+
+  const toggleExportSelect = useCallback((templateId: string) => {
+    setExportIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(templateId)) next.delete(templateId);
+      else next.add(templateId);
+      return next;
+    });
+  }, []);
+
+  const changeExportPlatform = useCallback((platform: PublishPlatform) => {
+    setExportPlatform(platform);
+    const verticalDefault = platform === "tiktok" || platform === "instagram";
+    setExportVertical(verticalDefault);
+    setExportVerticalMode("blur_pad");
+  }, []);
+
+  // 进入成片库时恢复运行中的批量导出
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const list = await publishPackageBatchApi.list(5);
+        if (!alive) return;
+        const active = list.find((item) => isPublishBatchActive(item));
+        if (active) setPubBatch(active);
+      } catch {
+        /* 接口未就绪时静默 */
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  // 3s 轮询
+  useEffect(() => {
+    if (!pubBatch?.id || !isPublishBatchActive(pubBatch)) return;
+    let alive = true;
+    const poll = async () => {
+      try {
+        const next = await publishPackageBatchApi.get(pubBatch.id);
+        if (!alive) return;
+        setPubBatch(next);
+        setPubError("");
+      } catch (err) {
+        if (!alive) return;
+        setPubError(err instanceof Error ? err.message : "批量导出进度读取失败");
+      }
+    };
+    const timer = window.setInterval(() => void poll(), 3000);
+    return () => {
+      alive = false;
+      window.clearInterval(timer);
+    };
+  }, [pubBatch?.id, pubBatch?.status]);
+
+  const submitExport = useCallback(async () => {
+    const ids = Array.from(exportIds);
+    if (!ids.length) {
+      notify("请先选择至少 1 支成片", "info");
+      return;
+    }
+    setPubSubmitting(true);
+    setPubError("");
+    try {
+      const batch = await publishPackageBatchApi.start({
+        template_ids: ids,
+        platform: exportPlatform,
+        vertical: exportVertical,
+        vertical_mode: exportVerticalMode,
+        force: false,
+      });
+      setPubBatch(batch);
+      setPubConfirmCancel(false);
+      setExportMode(false);
+      setExportIds(new Set());
+      notify(`已提交批量导出 · ${ids.length} 支成片排队中`, "success");
+    } catch (err) {
+      const status = err instanceof ApiError ? err.status : 0;
+      const message = err instanceof Error ? err.message : String(err);
+      if (status === 404 || status === 405) {
+        setPubError("批量导出接口尚未就绪（后端 V29 实现中），请稍后重试");
+        notify("批量导出接口尚未就绪（后端 V29 实现中）", "info");
+      } else {
+        setPubError("批量导出失败：" + message);
+        notify("批量导出失败：" + message, "error");
+      }
+    } finally {
+      setPubSubmitting(false);
+    }
+  }, [exportIds, exportPlatform, exportVertical, exportVerticalMode, notify]);
+
+  const cancelExport = useCallback(async () => {
+    if (!pubBatch?.id) return;
+    setPubCanceling(true);
+    try {
+      const next = await publishPackageBatchApi.cancel(pubBatch.id);
+      setPubBatch(next);
+      setPubConfirmCancel(false);
+      notify("已请求取消批量导出（当前项完成后停止）", "info");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      setPubError("取消失败：" + message);
+      notify("取消失败：" + message, "error");
+    } finally {
+      setPubCanceling(false);
+    }
+  }, [notify, pubBatch?.id]);
+
+  const downloadOne = useCallback(
+    async (item: PublishPackageBatchItem) => {
+      if (!item.package_url) return;
+      try {
+        const res = await downloadUrlAsBlob(mediaSrc(item.package_url), `${item.template_id}_publish.zip`);
+        notify(`已开始下载：${res.filename}（${fmtSize(res.size)}）`, "success");
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        setPubError("下载失败：" + message);
+        notify("下载失败：" + message, "error");
+      }
+    },
+    [notify],
+  );
+
+  const downloadAllDone = useCallback(async () => {
+    const items = (pubBatch?.items || []).filter((item) => item.status === "done" && item.package_url);
+    if (!items.length) {
+      notify("没有可下载的发布包", "info");
+      return;
+    }
+    setDownloadingAll(true);
+    setDownloadAllIndex(0);
+    let ok = 0;
+    for (let i = 0; i < items.length; i += 1) {
+      setDownloadAllIndex(i + 1);
+      try {
+        await downloadUrlAsBlob(mediaSrc(items[i].package_url as string), `${items[i].template_id}_publish.zip`);
+        ok += 1;
+      } catch (err) {
+        notify(`「${items[i].label || items[i].template_id}」下载失败：${err instanceof Error ? err.message : String(err)}`, "error");
+      }
+      await new Promise((resolve) => window.setTimeout(resolve, 700));
+    }
+    setDownloadingAll(false);
+    notify(`全部下载完成：${ok}/${items.length} 个发布包`, ok === items.length ? "success" : "info");
+  }, [notify, pubBatch?.items]);
+
+  const exportDoneItems = (pubBatch?.items || []).filter((item) => item.status === "done" && item.package_url);
+  const exportSummary = pubBatch?.summary || {};
+
   return (
     <div className="v20-final">
       <div className="v20-final-toolbar">
@@ -603,6 +776,16 @@ function FinalLibrary({
         <span className="v18-filter-count">
           {list.length} / {templates.length} 支
         </span>
+        <button
+          type="button"
+          className={"cm-btn cm-btn-sm" + (exportMode ? " cm-btn-primary" : "")}
+          onClick={toggleExportMode}
+          title="多选成片批量导出发布包"
+        >
+          <IconDownload size={12} /> {exportMode ? "退出批量导出" : "批量导出"}
+        </button>
+        {exportMode && <span className="v29-export-hint">勾选成片后使用底部批量条统一设置平台/竖版</span>}
+        {pubError && !pubBatch && <span className="v25-batch-error">{pubError}</span>}
       </div>
 
       {loading && !templates.length ? (
@@ -623,8 +806,33 @@ function FinalLibrary({
             const videoUrl = mediaSrc(template.final.url || `/media/templates_3d/${template.id}/final.mp4`);
             const qcUrl = mediaSrc(`/media/templates_3d/${template.id}/qc_report.json`);
             return (
-              <article key={template.id} className={"v20-final-card" + (ready ? " is-ready" : "") + (isRealTemplate(template.id) ? " is-real" : "")}>
-                <button type="button" className="v20-final-poster" onClick={() => ready && setPlaying(template)} disabled={!ready} title={ready ? "播放 3D 成片" : "尚无成片"}>
+              <article
+                key={template.id}
+                className={
+                  "v20-final-card" +
+                  (ready ? " is-ready" : "") +
+                  (isRealTemplate(template.id) ? " is-real" : "") +
+                  (exportMode ? " is-batch-mode" : "") +
+                  (exportIds.has(template.id) ? " is-selected" : "")
+                }
+              >
+                {exportMode && (
+                  <label className="v25-card-check" onClick={(event) => event.stopPropagation()} title={exportIds.has(template.id) ? "取消选择" : "选择该成片"}>
+                    <input
+                      type="checkbox"
+                      checked={exportIds.has(template.id)}
+                      onChange={() => toggleExportSelect(template.id)}
+                      aria-label={"选择成片 " + template.id}
+                    />
+                  </label>
+                )}
+                <button
+                  type="button"
+                  className="v20-final-poster"
+                  onClick={() => (exportMode ? toggleExportSelect(template.id) : ready && setPlaying(template))}
+                  disabled={!exportMode && !ready}
+                  title={exportMode ? "点击选择/取消该成片" : ready ? "播放 3D 成片" : "尚无成片"}
+                >
                   {template.poster_url ? (
                     <img src={mediaSrc(template.poster_url)} alt={template.label} loading="lazy" />
                   ) : (
@@ -690,6 +898,192 @@ function FinalLibrary({
               </article>
             );
           })}
+        </div>
+      )}
+
+      {exportMode && (
+        <div className="v29-batchbar" role="region" aria-label="批量导出发布包">
+          <div className="v29-batchbar-info">
+            <b>已选 {exportIds.size} 支成片</b>
+            <span>统一设置平台 / 竖版 / 模式后批量构建发布包</span>
+          </div>
+          <select
+            className="v21-select v29-batchbar-select"
+            value={exportPlatform}
+            onChange={(event) => changeExportPlatform(event.target.value as PublishPlatform)}
+            aria-label="目标平台"
+            disabled={pubSubmitting}
+          >
+            <option value="generic">本地/通用</option>
+            <option value="youtube">YouTube</option>
+            <option value="tiktok">TikTok</option>
+            <option value="instagram">Instagram</option>
+          </select>
+          <label className={"v29-batchbar-toggle" + (exportVertical ? " is-on" : "")}>
+            <input
+              type="checkbox"
+              checked={exportVertical}
+              onChange={(event) => setExportVertical(event.target.checked)}
+              disabled={pubSubmitting}
+            />
+            竖版 9:16
+          </label>
+          <div className="v29-batchbar-modes" role="group" aria-label="竖版模式">
+            <button
+              type="button"
+              className={"v28-vmode-btn" + (exportVerticalMode === "blur_pad" ? " is-active" : "")}
+              onClick={() => setExportVerticalMode("blur_pad")}
+              disabled={!exportVertical || pubSubmitting}
+              title="模糊背景填充（完整保留 16:9 画面）"
+            >
+              模糊填充
+            </button>
+            <button
+              type="button"
+              className={"v28-vmode-btn" + (exportVerticalMode === "crop" ? " is-active" : "")}
+              onClick={() => setExportVerticalMode("crop")}
+              disabled={!exportVertical || pubSubmitting}
+              title="中心裁切 9:16（主体居中素材）"
+            >
+              中心裁切
+            </button>
+          </div>
+          <div className="v29-batchbar-actions">
+            <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" disabled={pubSubmitting || !exportIds.size} onClick={() => void submitExport()}>
+              {pubSubmitting ? <Spinner size={12} /> : <IconDownload size={12} />} 批量导出发布包
+            </button>
+            <button
+              type="button"
+              className="cm-btn cm-btn-sm cm-btn-ghost"
+              disabled={!exportIds.size || pubSubmitting}
+              onClick={() => setExportIds(new Set())}
+            >
+              取消选择
+            </button>
+          </div>
+        </div>
+      )}
+
+      {pubBatch && (
+        <div className="v25-batch-mask" onMouseDown={() => !isPublishBatchActive(pubBatch) && setPubBatch(null)} role="presentation">
+          <aside className="v25-batch-drawer v29-pub-drawer" onMouseDown={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-label="批量导出发布包">
+            <header className="v25-batch-head">
+              <div>
+                <span className="v21-drawer-kicker">BATCH PUBLISH · 批量发布包</span>
+                <h3 className="v21-drawer-title">
+                  {pubBatch.status === "running" || pubBatch.status === "queued"
+                    ? "批量导出中"
+                    : pubBatch.status === "done"
+                      ? "批量导出完成"
+                      : pubBatch.status === "partial_failed"
+                        ? "批量导出部分失败"
+                        : pubBatch.status === "canceled"
+                          ? "批量导出已取消"
+                          : "批量导出失败"}
+                </h3>
+                <p className="v21-drawer-sub">
+                  {pubBatch.id} · {pubBatch.total} 支成片 · {pubBatch.platform || exportPlatform}
+                  {pubBatch.vertical ? ` · 竖版 ${pubBatch.vertical_mode || exportVerticalMode}` : " · 16:9"} · 每 3s 刷新
+                </p>
+              </div>
+              <button type="button" className="v21-close" onClick={() => setPubBatch(null)} aria-label="收起批量导出">
+                <IconClose size={16} />
+              </button>
+            </header>
+            <div className="v25-batch-summary">
+              <span className="v18-tag is-jade">完成 {exportSummary.done ?? exportDoneItems.length}</span>
+              <span className="v18-tag is-gold">构建中 {exportSummary.building ?? 0}</span>
+              <span className="v18-tag">排队 {exportSummary.queued ?? 0}</span>
+              <span className="v18-tag is-red">失败 {exportSummary.failed ?? 0}</span>
+              {pubBatch.elapsed_sec ? <span className="v18-tag">耗时 {Math.round(pubBatch.elapsed_sec)}s</span> : null}
+            </div>
+            <div className="v25-batch-body">
+              {pubBatch.items.map((item, index) => {
+                const statusText =
+                  item.status === "queued"
+                    ? "排队中"
+                    : item.status === "building"
+                      ? "构建中"
+                      : item.status === "done"
+                        ? "已完成"
+                        : item.status === "failed"
+                          ? "失败"
+                          : "已取消";
+                return (
+                  <div key={item.template_id + index} className={"v29-pub-item is-" + item.status + (index === pubBatch.current_index ? " is-active" : "")}>
+                    <span className="v25-batch-no">{String(index + 1).padStart(2, "0")}</span>
+                    <div className="v29-pub-item-main">
+                      <div className="v29-pub-item-title">
+                        <b>{item.label || item.template_id}</b>
+                        <span className="cm-mono">{item.template_id}</span>
+                      </div>
+                      <div className="v29-pub-item-meta">
+                        <span className={"v18-tag" + (item.status === "done" ? " is-jade" : item.status === "failed" ? " is-red" : item.status === "building" ? " is-gold" : "")}>
+                          {statusText}
+                        </span>
+                        {item.status === "done" && (
+                          <>
+                            <span className="cm-mono">{fmtSize(item.size_bytes || 0)}</span>
+                            <span>{item.files_count || 0} 文件</span>
+                            <button type="button" className="cm-btn cm-btn-sm" onClick={() => void downloadOne(item)}>
+                              <IconDownload size={11} /> 下载
+                            </button>
+                          </>
+                        )}
+                        {item.status === "building" && <span className="cm-mono">打包中…</span>}
+                        {item.error && <span className="v29-pub-item-err">{item.error}</span>}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+              {pubError && (
+                <div className="v21-error" style={{ marginTop: 10 }}>
+                  <b>批量导出状态读取失败</b>
+                  <span>{pubError}</span>
+                </div>
+              )}
+            </div>
+            <footer className="v25-batch-foot">
+              {isPublishBatchActive(pubBatch) ? (
+                pubConfirmCancel ? (
+                  <>
+                    <span className="v21-foot-note">确认取消整批？当前项完成后停止，未开始项标记为已取消。</span>
+                    <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" onClick={() => void cancelExport()} disabled={pubCanceling}>
+                      {pubCanceling ? <Spinner size={12} /> : null} 确认取消整批
+                    </button>
+                    <button type="button" className="cm-btn cm-btn-sm" onClick={() => setPubConfirmCancel(false)} disabled={pubCanceling}>
+                      继续等待
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button type="button" className="cm-btn cm-btn-sm" onClick={() => void downloadAllDone()} disabled={downloadingAll || !exportDoneItems.length}>
+                      {downloadingAll ? <Spinner size={12} /> : <IconDownload size={12} />} 全部下载{downloadingAll ? `（${downloadAllIndex}/${exportDoneItems.length}）` : ""}
+                    </button>
+                    <span className="v21-foot-note">批量导出串行构建；可离开页面，再次进入会恢复队列进度。</span>
+                    <button type="button" className="cm-btn cm-btn-sm cm-btn-ghost" onClick={() => setPubConfirmCancel(true)}>
+                      取消整批
+                    </button>
+                  </>
+                )
+              ) : (
+                <>
+                  <span className="v21-foot-note">
+                    {pubBatch.status === "partial_failed" || (exportSummary.failed ?? 0) > 0
+                      ? `批量结束：完成 ${exportDoneItems.length} / 失败 ${exportSummary.failed ?? pubBatch.items.filter((item) => item.status === "failed").length}，可下载已完成发布包。`
+                      : "批量结束，可下载全部发布包或关闭。"}
+                  </span>
+                  <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" onClick={() => void downloadAllDone()} disabled={downloadingAll || !exportDoneItems.length}>
+                    {downloadingAll ? <Spinner size={12} /> : <IconDownload size={12} />} 全部下载{downloadingAll ? `（${downloadAllIndex}/${exportDoneItems.length}）` : ""}
+                  </button>
+                  <button type="button" className="cm-btn cm-btn-sm" onClick={() => setPubBatch(null)}>
+                    关闭
+                  </button>
+                </>
+              )}
+            </footer>
+          </aside>
         </div>
       )}
 
