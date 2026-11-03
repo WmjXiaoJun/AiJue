@@ -637,6 +637,18 @@ def create_promo(character: str, payload: PromoBody = Body(default=PromoBody(sho
             "message": "3D 生成任务运行中，暂不能生成宣传片",
             "reason": "pipeline_running", "job_id": active_pipeline.get("id"),
         })
+    # V36：与双人对戏互斥
+    try:
+        from . import character_dialogue  # noqa: PLC0415
+
+        active_dialogue = character_dialogue.active_dialogue_job()
+    except Exception:  # noqa: BLE001
+        active_dialogue = None
+    if active_dialogue:
+        raise HTTPException(status_code=409, detail={
+            "message": "双人对戏任务运行中，暂不能生成宣传片",
+            "reason": "dialogue_running", "job_id": active_dialogue.get("id"),
+        })
     with _LOCK:
         audition_active = None
         if audition._ACTIVE_JOB:
