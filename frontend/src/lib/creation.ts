@@ -516,3 +516,165 @@ export const promoApi = {
     return list.map(normalizePromoJob);
   },
 };
+
+/* ------------------------------ V36：双人对戏 + 试镜合集发布包 ------------------------------ */
+export type DialogueSpeaker = "a" | "b";
+
+export interface DialogueLineInput {
+  speaker: DialogueSpeaker;
+  text: string;
+}
+
+export interface DialogueJobLine extends DialogueLineInput {
+  index?: number;
+  start?: number;
+  end?: number;
+  duration_sec?: number;
+}
+
+export interface DialogueJob {
+  id: string;
+  character_a: string;
+  character_b: string;
+  a_label?: string;
+  b_label?: string;
+  style: AuditionStyle | string;
+  background?: string;
+  background_label?: string;
+  camera?: string;
+  camera_label?: string;
+  title?: string;
+  status: "queued" | "running" | "done" | "failed" | "canceled";
+  stage?: string;
+  progress?: number;
+  current_line?: number;
+  total_lines?: number;
+  lines?: DialogueJobLine[];
+  output_url?: string | null;
+  poster_url?: string | null;
+  srt_url?: string | null;
+  duration_sec?: number;
+  size_bytes?: number;
+  error?: string | null;
+  elapsed_sec?: number;
+  created_at?: string | null;
+}
+
+function normalizeDialogueJob(raw: unknown): DialogueJob {
+  const rec = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
+  const linesRaw = Array.isArray(rec.lines) ? rec.lines : [];
+  return {
+    id: String(rec.id ?? rec.job_id ?? ""),
+    character_a: String(rec.character_a ?? ""),
+    character_b: String(rec.character_b ?? ""),
+    a_label: typeof rec.a_label === "string" ? rec.a_label : undefined,
+    b_label: typeof rec.b_label === "string" ? rec.b_label : undefined,
+    style: String(rec.style ?? "realistic"),
+    background: typeof rec.background === "string" ? rec.background : undefined,
+    background_label: typeof rec.background_label === "string" ? rec.background_label : undefined,
+    camera: typeof rec.camera === "string" ? rec.camera : undefined,
+    camera_label: typeof rec.camera_label === "string" ? rec.camera_label : undefined,
+    title: typeof rec.title === "string" ? rec.title : undefined,
+    status: (String(rec.status ?? "queued") as DialogueJob["status"]) || "queued",
+    stage: typeof rec.stage === "string" ? rec.stage : undefined,
+    progress: Number(rec.progress) || 0,
+    current_line: Number(rec.current_line) || 0,
+    total_lines: Number(rec.total_lines) || linesRaw.length,
+    lines: linesRaw.map((item) => {
+      const line = (item && typeof item === "object" ? item : {}) as Record<string, unknown>;
+      return {
+        speaker: (String(line.speaker ?? "a") === "b" ? "b" : "a") as DialogueSpeaker,
+        text: String(line.text ?? ""),
+        index: Number(line.index) || undefined,
+        start: Number(line.start) || 0,
+        end: Number(line.end) || 0,
+        duration_sec: Number(line.duration_sec) || 0,
+      };
+    }),
+    output_url: typeof rec.output_url === "string" ? rec.output_url : null,
+    poster_url: typeof rec.poster_url === "string" ? rec.poster_url : null,
+    srt_url: typeof rec.srt_url === "string" ? rec.srt_url : null,
+    duration_sec: Number(rec.duration_sec) || 0,
+    size_bytes: Number(rec.size_bytes) || 0,
+    error: typeof rec.error === "string" ? rec.error : null,
+    elapsed_sec: Number(rec.elapsed_sec) || 0,
+    created_at: typeof rec.created_at === "string" ? rec.created_at : null,
+  };
+}
+
+export function isDialogueActive(job: DialogueJob | null | undefined): boolean {
+  return Boolean(job && (job.status === "queued" || job.status === "running"));
+}
+
+export const dialogueApi = {
+  start: async (body: {
+    character_a: string;
+    character_b: string;
+    style?: AuditionStyle;
+    background?: AuditionBackground;
+    camera?: AuditionCamera;
+    title?: string;
+    lines: DialogueLineInput[];
+  }): Promise<DialogueJob> => normalizeDialogueJob(await post("/v5/characters/dialogue", body, 60000)),
+  get: async (jobId: string): Promise<DialogueJob> => normalizeDialogueJob(await get(`/v5/dialogues/${encodeURIComponent(jobId)}`)),
+  cancel: async (jobId: string): Promise<DialogueJob> =>
+    normalizeDialogueJob(await post(`/v5/dialogues/${encodeURIComponent(jobId)}/cancel`, {}, 30000)),
+  list: async (limit = 5): Promise<DialogueJob[]> => {
+    const res = (await get(`/v5/dialogues?limit=${limit}`)) as { dialogues?: unknown[]; jobs?: unknown[]; items?: unknown[] } | unknown[];
+    const list = Array.isArray(res) ? res : res.dialogues || res.jobs || res.items || [];
+    return list.map(normalizeDialogueJob);
+  },
+};
+
+export interface ShowcasePackageFile {
+  name: string;
+  size_bytes?: number;
+  size?: number;
+}
+
+export interface ShowcasePackage {
+  ok: boolean;
+  package_url?: string | null;
+  size_bytes?: number;
+  files: ShowcasePackageFile[];
+  cached?: boolean;
+  title?: string;
+  created_at?: string | null;
+  error?: string | null;
+}
+
+function normalizeShowcasePackage(raw: unknown): ShowcasePackage {
+  const rec = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
+  const files = Array.isArray(rec.files) ? rec.files : [];
+  return {
+    ok: rec.ok !== false,
+    package_url: typeof rec.package_url === "string" ? rec.package_url : null,
+    size_bytes: Number(rec.size_bytes) || 0,
+    files: files.map((item) => {
+      const file = (item && typeof item === "object" ? item : {}) as Record<string, unknown>;
+      return {
+        name: String(file.name ?? ""),
+        size_bytes: Number(file.size_bytes ?? file.size) || 0,
+      };
+    }),
+    cached: Boolean(rec.cached),
+    title: typeof rec.title === "string" ? rec.title : undefined,
+    created_at: typeof rec.created_at === "string" ? rec.created_at : null,
+    error: typeof rec.error === "string" ? rec.error : null,
+  };
+}
+
+export const showcaseApi = {
+  build: async (body: { title?: string; force?: boolean } = {}): Promise<ShowcasePackage> =>
+    normalizeShowcasePackage(await post("/v5/character-showcase/publish-package", body, 300000)),
+  list: async (): Promise<ShowcasePackage[]> => {
+    const res = (await get("/v5/character-showcase/publish-package")) as
+      | { packages?: unknown[]; items?: unknown[]; package_url?: string; files?: unknown[] }
+      | unknown[];
+    if (Array.isArray(res)) return res.map(normalizeShowcasePackage);
+    if (res && Array.isArray(res.packages)) return res.packages.map(normalizeShowcasePackage);
+    if (res && Array.isArray(res.items)) return res.items.map(normalizeShowcasePackage);
+    if (res && (res.package_url || Array.isArray(res.files))) return [normalizeShowcasePackage(res)];
+    return [];
+  },
+};

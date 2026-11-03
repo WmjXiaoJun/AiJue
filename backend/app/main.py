@@ -29,7 +29,9 @@ from sqlalchemy.orm import Session
 from . import character_files, concept_files, config, jobs, llm, models, schemas, script_parser, seed
 from .db import SessionLocal, get_db, init_db
 from .routers import character_audition as character_audition_router
+from .routers import character_dialogue as character_dialogue_router
 from .routers import character_promo as character_promo_router
+from .routers import character_showcase as character_showcase_router
 from .routers import cinema3d as cinema3d_router
 from .routers import cinema_templates as cinema_templates_router
 from .routers import pipeline_ui as pipeline_ui_router
@@ -2542,6 +2544,9 @@ async def events(episode_id: Optional[str] = None):
 # 静态资源 & 前端 SPA
 # --------------------------------------------------------------------------- #
 app.include_router(router)
+# V36 双人对戏 / 试镜合集发布包（必须在 V5 catalog 通用路由之前注册，避免 /api/v5/{kind}/{id} 抢占）
+app.include_router(character_dialogue_router.router)
+app.include_router(character_showcase_router.router)
 # V5 契约 API（/api/v5/*，独立前缀；不改变既有 V3/V4 接口）
 app.include_router(v5_studio_router.router)
 app.include_router(v5_catalog_router.router)

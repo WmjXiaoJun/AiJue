@@ -5,8 +5,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { errorText } from "../../lib/api";
 import type { V5CatalogResponse, V5CharacterSummary } from "../../lib/v5";
 import { mediaSrc, characterArtUrl, characterPreviewUrl, v5api } from "../../lib/v5";
-import { auditionApi, CreationError, creationApi, creationErrorMessage, isAuditionActive, isPromoActive, promoApi } from "../../lib/creation";
-import type { AuditionBackground, AuditionCamera, AuditionJob, AuditionStyle, PromoJob, PromoSceneInput } from "../../lib/creation";
+import { auditionApi, CreationError, creationApi, creationErrorMessage, dialogueApi, isAuditionActive, isDialogueActive, isPromoActive, promoApi, showcaseApi } from "../../lib/creation";
+import type { AuditionBackground, AuditionCamera, AuditionJob, AuditionStyle, DialogueJob, DialogueSpeaker, PromoJob, PromoSceneInput, ShowcasePackage } from "../../lib/creation";
 import { downloadUrlAsBlob } from "../../lib/download";
 import type { CharacterAssets } from "../../lib/creation";
 import type { CharacterContract, VoicePreset } from "../../lib/voice";
@@ -230,6 +230,31 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
   const [promoJobs, setPromoJobs] = useState<PromoJob[]>([]);
   const [promoLoading, setPromoLoading] = useState(false);
   const [promoError, setPromoError] = useState("");
+  // V36-A：双人对戏
+  const [duoOpen, setDuoOpen] = useState(false);
+  const [duoA, setDuoA] = useState("");
+  const [duoB, setDuoB] = useState("");
+  const [duoStyle, setDuoStyle] = useState<AuditionStyle>("realistic");
+  const [duoBackground, setDuoBackground] = useState<AuditionBackground>("cafe");
+  const [duoCamera, setDuoCamera] = useState<AuditionCamera>("medium");
+  const [duoTitle, setDuoTitle] = useState("");
+  const [duoLInes, setDuoLines] = useState<{ speaker: DialogueSpeaker; text: string }[]>([
+    { speaker: "a", text: "这么晚还来喝咖啡？" },
+    { speaker: "b", text: "睡不着，想找个人聊聊。" },
+    { speaker: "a", text: "那就聊聊吧。" },
+    { speaker: "b", text: "你不怕我说到天亮？" },
+  ]);
+  const [duoSubmitting, setDuoSubmitting] = useState(false);
+  const [duoJob, setDuoJob] = useState<DialogueJob | null>(null);
+  const [duoJobs, setDuoJobs] = useState<DialogueJob[]>([]);
+  const [duoLoading, setDuoLoading] = useState(false);
+  const [duoError, setDuoError] = useState("");
+  // V36-B：试镜合集发布包
+  const [showcaseOpen, setShowcaseOpen] = useState(false);
+  const [showcasePkg, setShowcasePkg] = useState<ShowcasePackage | null>(null);
+  const [showcaseLoading, setShowcaseLoading] = useState(false);
+  const [showcaseBuilding, setShowcaseBuilding] = useState(false);
+  const [showcaseError, setShowcaseError] = useState("");
 
   const [previewChar, setPreviewChar] = useState<string | null>(null);
   const [previewError, setPreviewError] = useState("");
@@ -762,6 +787,227 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
     return { label: promoJob.status === "running" ? "生成中" : stage || "处理中", progress: promoJob.progress || 5 };
   })();
 
+  // V36：双人对戏 —— 行编辑/校验/提交/轮询/取消/最近列表
+  const duoCharacters = useMemo(() => Object.values(contracts), [contracts]);
+
+  const duoLineInfo = duoLInes.map((line) => {
+    const text = line.text.trim();
+    const estimate = Math.round(Math.max(1.2, text.length * 0.22) * 10) / 10;
+    return { text, estimate, tooLong: text.length > 60, empty: !text };
+  });
+  const duoEstimatedSec = Math.round((duoLineInfo.reduce((sum, line) => sum + line.estimate, 0) + Math.max(0, duoLInes.length - 1) * 0.35) * 10) / 10;
+  const duoInvalid =
+    duoLInes.length < 2 ||
+    duoLInes.length > 6 ||
+    duoLineInfo.some((line) => line.empty || line.tooLong) ||
+    duoEstimatedSec > 16 ||
+    !duoA ||
+    !duoB ||
+    duoA === duoB;
+  const duoErrorText =
+    duoA === duoB
+      ? "角色 A 与角色 B 不能相同"
+      : duoLineInfo.some((line) => line.empty)
+        ? "每行台词不能为空"
+        : duoLineInfo.some((line) => line.tooLong)
+          ? "单行台词最多 60 字"
+          : duoEstimatedSec > 16
+            ? "台词总时长预计超过 16s，请精简"
+            : "";
+
+  const loadDialogues = useCallback(async () => {
+    setDuoLoading(true);
+    try {
+      const jobs = await dialogueApi.list(5);
+      setDuoJobs(jobs);
+      const active = jobs.find((job) => isDialogueActive(job));
+      const latest = active || jobs.find((job) => job.status === "done") || jobs.find((job) => job.status === "failed") || null;
+      if (latest) setDuoJob(latest);
+      setDuoError("");
+    } catch (err) {
+      const status = err instanceof CreationError ? err.status : 0;
+      if (status !== 404 && status !== 405) setDuoError(creationErrorMessage(err).join("；"));
+    } finally {
+      setDuoLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadDialogues();
+  }, [loadDialogues]);
+
+  useEffect(() => {
+    if (!duoJob?.id || !isDialogueActive(duoJob)) return;
+    let alive = true;
+    const timer = window.setInterval(async () => {
+      try {
+        const next = await dialogueApi.get(duoJob.id);
+        if (!alive) return;
+        setDuoJob(next);
+        setDuoError("");
+        if (!isDialogueActive(next)) {
+          setDuoJobs((prev) => [next, ...prev.filter((job) => job.id !== next.id)].slice(0, 5));
+          void loadDialogues();
+        }
+      } catch (err) {
+        if (!alive) return;
+        const status = err instanceof CreationError ? err.status : 0;
+        if (status === 404 || status === 405) {
+          // 兼容后端单任务路由未注册/冲突：回退到列表接口取最新状态
+          try {
+            const jobs = await dialogueApi.list(5);
+            const found = jobs.find((item) => item.id === duoJob.id);
+            if (found) {
+              setDuoJob(found);
+              setDuoJobs(jobs);
+              setDuoError("");
+              return;
+            }
+          } catch {
+            /* 列表也失败则走友好提示 */
+          }
+          setDuoError("双人对戏接口尚未就绪（后端 V36 实现中）");
+        } else {
+          setDuoError("双人对戏状态读取失败：" + creationErrorMessage(err).join("；"));
+        }
+      }
+    }, 3000);
+    return () => {
+      alive = false;
+      window.clearInterval(timer);
+    };
+  }, [duoJob?.id, duoJob?.status, loadDialogues]);
+
+  const openDuoModal = useCallback(() => {
+    setDuoA(Object.values(contracts)[0]?.id || "");
+    setDuoB(Object.values(contracts)[1]?.id || "");
+    setDuoStyle("realistic");
+    setDuoBackground("cafe");
+    setDuoCamera("medium");
+    setDuoTitle("");
+    setDuoLines([
+      { speaker: "a", text: "这么晚还来喝咖啡？" },
+      { speaker: "b", text: "睡不着，想找个人聊聊。" },
+      { speaker: "a", text: "那就聊聊吧。" },
+      { speaker: "b", text: "你不怕我说到天亮？" },
+    ]);
+    setDuoError("");
+    setDuoOpen(true);
+  }, [contracts]);
+
+  const submitDuo = useCallback(async () => {
+    if (duoInvalid) {
+      setDuoError(duoErrorText || "请检查双人对戏参数");
+      return;
+    }
+    setDuoSubmitting(true);
+    setDuoError("");
+    try {
+      const job = await dialogueApi.start({
+        character_a: duoA,
+        character_b: duoB,
+        style: duoStyle,
+        background: duoBackground,
+        camera: duoCamera,
+        title: duoTitle.trim() || undefined,
+        lines: duoLineInfo.map((line, index) => ({ speaker: duoLInes[index].speaker, text: line.text })),
+      });
+      setDuoJob(job);
+      setDuoJobs((prev) => [job, ...prev.filter((item) => item.id !== job.id)].slice(0, 5));
+      setDuoOpen(false);
+      notify(`双人对戏任务已提交 · ${duoLInes.length} 句，约 8–10 分钟，可离开页面`, "success");
+    } catch (err) {
+      const status = err instanceof CreationError ? err.status : 0;
+      const message = creationErrorMessage(err).join("；");
+      if (status === 404 || status === 405) {
+        setDuoError("双人对戏接口尚未就绪（后端 V36 实现中）");
+        notify("双人对戏接口尚未就绪（后端 V36 实现中）", "info");
+      } else if (status === 409) {
+        setDuoError("GPU 正忙：" + message);
+        notify("GPU 正忙：" + message, "info");
+      } else {
+        setDuoError("提交双人对戏失败：" + message);
+        notify("提交双人对戏失败：" + message, "error");
+      }
+    } finally {
+      setDuoSubmitting(false);
+    }
+  }, [duoA, duoB, duoBackground, duoCamera, duoErrorText, duoInvalid, duoLineInfo, duoLInes, duoStyle, duoTitle, notify]);
+
+  const cancelDuo = useCallback(async () => {
+    if (!duoJob?.id) return;
+    try {
+      const next = await dialogueApi.cancel(duoJob.id);
+      setDuoJob(next);
+      setDuoJobs((prev) => [next, ...prev.filter((job) => job.id !== next.id)].slice(0, 5));
+      notify("已请求取消双人对戏", "info");
+    } catch (err) {
+      setDuoError("取消失败：" + creationErrorMessage(err).join("；"));
+    }
+  }, [notify, duoJob?.id]);
+
+  const duoStageInfo = (() => {
+    if (!duoJob) return { label: "", progress: 0 };
+    const stage = duoJob.stage || "";
+    const match = /line[_\s]*(\d+)[_\s]*([a-z_]*)/i.exec(stage);
+    const total = duoJob.total_lines || duoJob.lines?.length || duoLInes.length;
+    if (match) {
+      const kind = match[2] || "";
+      const kindLabel = kind.includes("tts") || kind.includes("voice") ? "配音中" : kind.includes("generate") || kind.includes("h3") ? "生成中" : kind.includes("subtitle") ? "字幕处理中" : "处理中";
+      return { label: `第 ${match[1]}/${total} 句 · ${kindLabel}`, progress: duoJob.progress || 10 };
+    }
+    if (/assemble|concat|拼接/i.test(stage)) return { label: "拼接中（片头 / 正反打）", progress: duoJob.progress || 90 };
+    if (stage === "done") return { label: "已完成", progress: 100 };
+    return { label: duoJob.status === "queued" ? "排队中" : duoJob.status === "running" ? "生成中" : stage || "处理中", progress: duoJob.progress || 5 };
+  })();
+
+  // V36-B：试镜合集发布包
+  const openShowcase = useCallback(async () => {
+    setShowcaseOpen(true);
+    setShowcaseError("");
+    setShowcaseLoading(true);
+    try {
+      const packages = await showcaseApi.list();
+      setShowcasePkg(packages[0] || null);
+    } catch (err) {
+      const status = err instanceof CreationError ? err.status : 0;
+      if (status === 404 || status === 405) setShowcaseError("合集发布包接口尚未就绪（后端 V36 实现中）；可点「导出发布包」重试");
+      else setShowcaseError("读取合集发布包失败：" + creationErrorMessage(err).join("；"));
+    } finally {
+      setShowcaseLoading(false);
+    }
+  }, []);
+
+  const buildShowcase = useCallback(
+    async (force = false) => {
+      setShowcaseBuilding(true);
+      setShowcaseError("");
+      try {
+        const pkg = await showcaseApi.build({ force });
+        setShowcasePkg(pkg);
+        notify(force ? "合集发布包已重新构建" : pkg.cached ? "合集发布包已存在（cached）" : "合集发布包已生成", "success");
+      } catch (err) {
+        const status = err instanceof CreationError ? err.status : 0;
+        const message = creationErrorMessage(err).join("；");
+        if (status === 404 || status === 405) setShowcaseError("合集发布包接口尚未就绪（后端 V36 实现中）");
+        else setShowcaseError("导出合集发布包失败：" + message);
+      } finally {
+        setShowcaseBuilding(false);
+      }
+    },
+    [notify],
+  );
+
+  const downloadShowcase = useCallback(async () => {
+    if (!showcasePkg?.package_url) return;
+    try {
+      const res = await downloadUrlAsBlob(mediaSrc(showcasePkg.package_url), "character_audition_showcase.zip");
+      notify(`已开始下载试镜合集发布包（${fmtAuditionSize(res.size)}）`, "success");
+    } catch (err) {
+      notify("下载失败：" + (err instanceof Error ? err.message : String(err)), "error");
+    }
+  }, [notify, showcasePkg?.package_url]);
+
   /** V28：生成三视图/表情包/全部素材（imagegen，串行 40–90s） */
   const generateAssets = useCallback(
     async (characterId: string, modes: string[], label: string) => {
@@ -1015,6 +1261,16 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
         { label: "已调整", value: String(Object.keys(savedVoice).length), tone: "jade" },
       ]}
       primaryAction={{ label: "新建角色", onClick: () => setCreateOpen(true), icon: <IconPlus size={14} />, title: "创建自定义角色（写角色合同，不触发 GPU）" }}
+      extraActions={
+        <>
+          <button type="button" className="cm-btn cm-btn-sm" onClick={openDuoModal} title="两个角色正反打对戏（GPU 约 8–10 分钟）">
+            <IconUsers size={12} /> 双人对戏
+          </button>
+          <button type="button" className="cm-btn cm-btn-sm" onClick={() => void openShowcase()} title="角色试镜合集发布包（视频+封面+元数据+SRT）">
+            <IconFilm size={12} /> 试镜合集
+          </button>
+        </>
+      }
       onRefresh={() => void refresh()}
       refreshing={refreshing}
       onOpenSettings={onOpenSettings}
@@ -1046,6 +1302,117 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                     知道了
                   </button>
                 </div>
+              </div>
+            )}
+
+            {(duoJob || duoJobs.length > 0) && (
+              <div className="v36-duo-zone">
+                <div className="v36-duo-head">
+                  <span className="v36-duo-title">
+                    <IconUsers size={13} /> 双人对戏
+                  </span>
+                  {duoJob && (
+                    <span className={"v18-tag" + (duoJob.status === "done" ? " is-jade" : duoJob.status === "failed" ? " is-red" : " is-gold")}>
+                      {isDialogueActive(duoJob) ? duoStageInfo.label : duoJob.status === "done" ? "已完成" : duoJob.status === "canceled" ? "已取消" : "失败"}
+                    </span>
+                  )}
+                  {duoLoading && !duoJob && <span className="v36-duo-loading"><Spinner size={11} /> 读取最近对戏…</span>}
+                  <span className="v36-duo-cast">
+                    {(duoJob ? [duoJob.a_label || duoJob.character_a, duoJob.b_label || duoJob.character_b] : []).filter(Boolean).join(" × ") || "选择角色 A/B 后生成"}
+                  </span>
+                </div>
+                {duoJob && isDialogueActive(duoJob) && (
+                  <div className="v32-progress-card">
+                    <div className="v32-progress-head">
+                      <span className="v32-progress-stage"><Spinner size={13} /> {duoStageInfo.label}</span>
+                      <span className="v32-progress-elapsed">已用 {fmtElapsed(duoJob.elapsed_sec || 0)} · 预计约 8–10 分钟</span>
+                    </div>
+                    <div className="v32-progress-bar">
+                      <i style={{ width: `${Math.max(4, Math.min(100, duoJob.progress || duoStageInfo.progress))}%` }} />
+                      <span>{Math.round(Math.max(4, Math.min(100, duoJob.progress || duoStageInfo.progress)))}%</span>
+                    </div>
+                    <div className="v32-progress-meta">
+                      <span className="v34-scene-tag">
+                        {auditionBackgroundLabel(duoJob.background, duoJob.background_label)} · {auditionCameraLabel(duoJob.camera, duoJob.camera_label)}
+                      </span>
+                      <span>{duoJob.total_lines || duoJob.lines?.length || 0} 句 · 正反打</span>
+                      <button type="button" className="cm-btn cm-btn-sm cm-btn-ghost" onClick={() => void cancelDuo()}>取消任务</button>
+                    </div>
+                  </div>
+                )}
+                {duoJob && duoJob.status === "done" && duoJob.output_url && (
+                  <div className="v32-video-card">
+                    <video className="v32-video v36-duo-video" src={mediaSrc(duoJob.output_url)} controls preload="metadata" playsInline />
+                    <div className="v32-video-meta">
+                      <span className="v18-tag is-jade">已完成</span>
+                      <span className="v18-tag">{AUDITION_STYLES.find((item) => item.id === duoJob.style)?.label || duoJob.style}</span>
+                      <span className="cm-mono">{duoJob.total_lines || duoJob.lines?.length || 0} 句</span>
+                      <span className="cm-mono">{duoJob.duration_sec ? duoJob.duration_sec.toFixed(1) + "s" : "—"}</span>
+                      <span className="cm-mono">{fmtAuditionSize(duoJob.size_bytes || 0)}</span>
+                      <button
+                        type="button"
+                        className="cm-btn cm-btn-sm"
+                        onClick={() =>
+                          void downloadAuditionFile(
+                            duoJob.output_url as string,
+                            `dialogue_${duoJob.character_a}_${duoJob.character_b}_${duoJob.id}.mp4`,
+                            "双人对戏视频",
+                          )
+                        }
+                      >
+                        <IconDownload size={11} /> 下载视频
+                      </button>
+                      {duoJob.poster_url && (
+                        <button type="button" className="cm-btn cm-btn-sm cm-btn-ghost" onClick={() => void downloadAuditionFile(duoJob.poster_url as string, `dialogue_${duoJob.id}_poster.jpg`, "海报")}>
+                          <IconDownload size={11} /> 海报
+                        </button>
+                      )}
+                      {duoJob.srt_url && (
+                        <button type="button" className="cm-btn cm-btn-sm cm-btn-ghost" onClick={() => void downloadAuditionFile(duoJob.srt_url as string, `dialogue_${duoJob.id}.srt`, "SRT")}>
+                          <IconDownload size={11} /> SRT
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+                {duoJob && (duoJob.status === "failed" || duoJob.status === "canceled") && (
+                  <div className="v32-fail-card">
+                    <b>{duoJob.status === "canceled" ? "双人对戏已取消" : "双人对戏生成失败"}</b>
+                    <span>{duoJob.error || "未知错误；可重试"}</span>
+                    <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" onClick={openDuoModal}>重试</button>
+                  </div>
+                )}
+                {duoError && (
+                  <div className="v24-art-error" role="alert">
+                    <b>双人对戏</b>
+                    <span>{duoError}</span>
+                  </div>
+                )}
+                {duoJobs.length > 0 && (
+                  <div className="v32-recent">
+                    <span className="v32-recent-title">最近双人对戏</span>
+                    {duoJobs.slice(0, 3).map((job) => (
+                      <div key={job.id} className={"v32-recent-row" + (duoJob?.id === job.id ? " is-active" : "")}>
+                        <span className={"v18-tag" + (job.status === "done" ? " is-jade" : job.status === "failed" ? " is-red" : job.status === "canceled" ? "" : " is-gold")}>
+                          {job.status === "done" ? "已完成" : job.status === "failed" ? "失败" : job.status === "canceled" ? "已取消" : job.status === "running" ? "生成中" : "排队中"}
+                        </span>
+                        <span className="cm-mono">{(job.a_label || job.character_a) + " × " + (job.b_label || job.character_b)}</span>
+                        <span className="cm-mono">{job.total_lines || job.lines?.length || 0} 句</span>
+                        {job.title && <span className="v32-recent-id">{job.title}</span>}
+                        <button
+                          type="button"
+                          className="cm-btn cm-btn-sm"
+                          onClick={() => {
+                            setDuoJob(job);
+                            setDuoError("");
+                          }}
+                        >
+                          {job.status === "done" ? "查看" : "跟踪"}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
@@ -1821,6 +2188,203 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
           }}
         />
       )}
+      {duoOpen && (
+        <div className="v32-mask" onMouseDown={() => !duoSubmitting && setDuoOpen(false)} role="presentation">
+          <div className="v32-modal v36-duo-modal" onMouseDown={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-label="双人对戏">
+            <header className="v32-modal-head">
+              <div>
+                <span className="v21-drawer-kicker">DIALOGUE · 双人对戏</span>
+                <h3 className="v32-modal-title">生成双人对戏</h3>
+              </div>
+              <button type="button" className="v21-close" onClick={() => setDuoOpen(false)} aria-label="关闭" disabled={duoSubmitting}>
+                <IconClose size={16} />
+              </button>
+            </header>
+            <div className="v32-modal-body">
+              <div className="v36-duo-cast-row">
+                {(["a", "b"] as const).map((side) => {
+                  const value = side === "a" ? duoA : duoB;
+                  const char = contracts[value];
+                  const styleFile = duoStyle === "realistic" ? "portrait_real.png" : duoStyle === "stylized_25d" ? "portrait_25d.png" : "portrait.png";
+                  return (
+                    <label key={side} className="v21-field">
+                      <span className="v21-field-label">角色 {side.toUpperCase()}</span>
+                      <div className="v36-duo-char">
+                        <div className="v36-duo-mini">
+                          {value ? (
+                            <img
+                              src={characterArtUrl(value, styleFile, artBust[value])}
+                              alt={char?.label || value}
+                              onError={(event) => {
+                                (event.currentTarget as HTMLImageElement).style.visibility = "hidden";
+                              }}
+                            />
+                          ) : (
+                            <IconUser size={16} />
+                          )}
+                        </div>
+                        <select
+                          className="v21-select"
+                          value={value}
+                          onChange={(event) => (side === "a" ? setDuoA(event.target.value) : setDuoB(event.target.value))}
+                          disabled={duoSubmitting}
+                        >
+                          {duoCharacters.map((item) => (
+                            <option key={item.id} value={item.id}>{item.label}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+              <div className="v36-duo-options">
+                <label className="v21-field">
+                  <span className="v21-field-label">风格</span>
+                  <select className="v21-select" value={duoStyle} onChange={(event) => setDuoStyle(event.target.value as AuditionStyle)} disabled={duoSubmitting}>
+                    {AUDITION_STYLES.map((item) => (<option key={item.id} value={item.id}>{item.label}</option>))}
+                  </select>
+                </label>
+                <label className="v21-field">
+                  <span className="v21-field-label">背景</span>
+                  <select className="v21-select" value={duoBackground} onChange={(event) => setDuoBackground(event.target.value as AuditionBackground)} disabled={duoSubmitting}>
+                    {AUDITION_BACKGROUNDS.map((item) => (<option key={item.id} value={item.id}>{item.label}</option>))}
+                  </select>
+                </label>
+                <label className="v21-field">
+                  <span className="v21-field-label">机位</span>
+                  <select className="v21-select" value={duoCamera} onChange={(event) => setDuoCamera(event.target.value as AuditionCamera)} disabled={duoSubmitting}>
+                    {AUDITION_CAMERAS.map((item) => (<option key={item.id} value={item.id}>{item.label}</option>))}
+                  </select>
+                </label>
+              </div>
+              <label className="v21-field">
+                <span className="v21-field-label">标题（可选，片头卡）</span>
+                <input className="v21-input" value={duoTitle} maxLength={40} placeholder="例如：老周 & 甜妹 · 深夜咖啡馆" onChange={(event) => setDuoTitle(event.target.value)} disabled={duoSubmitting} />
+              </label>
+              <div className="v36-duo-lines">
+                <div className="v36-duo-lines-head">
+                  <span>台词（每行一句，2–6 句）</span>
+                  <span className={duoEstimatedSec > 16 ? "is-error" : ""}>预计约 {duoEstimatedSec}s（上限 16s）</span>
+                </div>
+                {duoLInes.map((line, index) => (
+                  <div key={index} className="v36-duo-line">
+                    <button
+                      type="button"
+                      className={"v36-speaker " + (line.speaker === "b" ? "is-b" : "is-a")}
+                      onClick={() => setDuoLines((prev) => prev.map((item, i) => (i === index ? { ...item, speaker: item.speaker === "a" ? "b" : "a" } : item)))}
+                      disabled={duoSubmitting}
+                      title="点击切换 A/B 说话"
+                    >
+                      {line.speaker.toUpperCase()}
+                    </button>
+                    <input
+                      className="v21-input"
+                      value={line.text}
+                      maxLength={80}
+                      placeholder={line.speaker === "a" ? "角色 A 的台词…" : "角色 B 的台词…"}
+                      onChange={(event) => setDuoLines((prev) => prev.map((item, i) => (i === index ? { ...item, text: event.target.value } : item)))}
+                      disabled={duoSubmitting}
+                    />
+                    <span className="v36-line-len cm-mono">{line.text.length}/60</span>
+                    {duoLInes.length > 2 && (
+                      <button type="button" className="v35-scene-del" disabled={duoSubmitting} onClick={() => setDuoLines((prev) => prev.filter((_, i) => i !== index))} title="删除该句">
+                        <IconClose size={12} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+                {duoLInes.length < 6 && (
+                  <button type="button" className="cm-btn cm-btn-sm cm-btn-ghost" onClick={() => setDuoLines((prev) => [...prev, { speaker: prev.length % 2 === 0 ? "a" : "b", text: "" }])} disabled={duoSubmitting}>
+                    <IconPlus size={12} /> 添加台词
+                  </button>
+                )}
+              </div>
+              <p className="v32-modal-hint">约 8–10 分钟（每句一镜正反打 + 各自音色 + 字幕 + 拼接）· 可离开页面，回来自动恢复。</p>
+              {(duoErrorText || duoError) && (
+                <div className="v24-art-error" role="alert">
+                  <b>请检查双人对戏参数</b>
+                  <span>{duoErrorText || duoError}</span>
+                </div>
+              )}
+            </div>
+            <footer className="v32-modal-foot">
+              <span className="v21-foot-note">{duoLInes.length} 句 · {AUDITION_STYLES.find((item) => item.id === duoStyle)?.label} · {auditionBackgroundLabel(duoBackground)} · {auditionCameraLabel(duoCamera)}</span>
+              <button type="button" className="cm-btn cm-btn-sm" onClick={() => setDuoOpen(false)} disabled={duoSubmitting}>取消</button>
+              <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" onClick={() => void submitDuo()} disabled={duoSubmitting || duoInvalid}>
+                {duoSubmitting ? <Spinner size={12} /> : <IconUsers size={12} />} 生成双人对戏
+              </button>
+            </footer>
+          </div>
+        </div>
+      )}
+
+      {showcaseOpen && (
+        <div className="v32-mask" onMouseDown={() => !showcaseBuilding && setShowcaseOpen(false)} role="presentation">
+          <div className="v32-modal v36-showcase-modal" onMouseDown={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-label="试镜合集发布包">
+            <header className="v32-modal-head">
+              <div>
+                <span className="v21-drawer-kicker">SHOWCASE · 试镜合集</span>
+                <h3 className="v32-modal-title">试镜合集发布包</h3>
+              </div>
+              <button type="button" className="v21-close" onClick={() => setShowcaseOpen(false)} aria-label="关闭" disabled={showcaseBuilding}>
+                <IconClose size={16} />
+              </button>
+            </header>
+            <div className="v32-modal-body">
+              <div className="v36-showcase-info">
+                <div className="v36-showcase-cover"><IconFilm size={28} /></div>
+                <div>
+                  <b>角色试镜合集 · 10 角色</b>
+                  <span>outputs/character_demos/character_audition_reel.mp4 · 1024×576 · 字幕已烧录</span>
+                  <span>打包内容：视频 + 封面 + metadata + README + 各角色 SRT</span>
+                </div>
+              </div>
+              {showcaseLoading && (
+                <div className="v32-audition-loading"><Spinner size={14} /> 正在读取已有发布包…</div>
+              )}
+              {showcasePkg && (
+                <div className="v36-showcase-pkg">
+                  <div className="v36-showcase-pkg-head">
+                    <span className="v18-tag is-jade">已生成</span>
+                    {showcasePkg.cached && <span className="v18-tag">cached</span>}
+                    <span className="cm-mono">{showcasePkg.files.length} 文件</span>
+                    <span className="cm-mono">{fmtAuditionSize(showcasePkg.size_bytes || 0)}</span>
+                    <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" onClick={() => void downloadShowcase()} disabled={!showcasePkg.package_url}>
+                      <IconDownload size={11} /> 下载 zip
+                    </button>
+                  </div>
+                  <div className="v36-showcase-files">
+                    {showcasePkg.files.slice(0, 12).map((file) => (
+                      <div key={file.name} className="v36-showcase-file">
+                        <span className="cm-mono">{file.name}</span>
+                        <span className="cm-mono">{fmtAuditionSize(file.size_bytes || 0)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {showcaseError && (
+                <div className="v24-art-error" role="alert">
+                  <b>试镜合集发布包</b>
+                  <span>{showcaseError}</span>
+                </div>
+              )}
+              <p className="v32-modal-hint">发布包为 zip：video / cover / metadata.json / README.txt / subtitles/*.srt，可手动上传视频平台。</p>
+            </div>
+            <footer className="v32-modal-foot">
+              <span className="v21-foot-note">{showcasePkg ? `已有包 · ${showcasePkg.cached ? "cached" : "新构建"}` : "首次导出会构建 zip（约数秒）"}</span>
+              <button type="button" className="cm-btn cm-btn-sm cm-btn-ghost" onClick={() => void buildShowcase(true)} disabled={showcaseBuilding}>
+                {showcaseBuilding ? <Spinner size={12} /> : <IconRefresh size={12} />} 重新构建（force）
+              </button>
+              <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" onClick={() => void buildShowcase(false)} disabled={showcaseBuilding}>
+                {showcaseBuilding ? <Spinner size={12} /> : <IconDownload size={12} />} 导出发布包
+              </button>
+            </footer>
+          </div>
+        </div>
+      )}
+
       {promoOpen && selectedContract && (
         <div className="v32-mask" onMouseDown={() => !promoSubmitting && setPromoOpen(false)} role="presentation">
           <div className="v32-modal v35-modal" onMouseDown={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-label="生成角色宣传片">

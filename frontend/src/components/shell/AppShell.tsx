@@ -61,6 +61,8 @@ export interface AppShellProps {
   onTabChange?: (key: string) => void;
   chips?: ShellChip[];
   primaryAction?: ShellPrimaryAction;
+  /** 页头附加操作（渲染在主操作左侧） */
+  extraActions?: ReactNode;
   onRefresh?: () => void;
   refreshing?: boolean;
   onOpenSettings: () => void;
@@ -96,6 +98,7 @@ export function AppShell({
   onTabChange,
   chips,
   primaryAction,
+  extraActions,
   onRefresh,
   refreshing,
   onOpenSettings,
@@ -309,6 +312,7 @@ export function AppShell({
                 <IconRefresh size={15} />
               </button>
             )}
+            {extraActions && <div className="shell-extra-actions">{extraActions}</div>}
             {primaryAction && (
               primaryAction.href ? (
                 <a className="cm-btn cm-btn-primary shell-cta" href={primaryAction.href} title={primaryAction.title}>
