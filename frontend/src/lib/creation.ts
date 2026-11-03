@@ -306,6 +306,8 @@ export function makeCustomId(prefix: "custom" | "custom_tpl"): string {
 /* ------------------------------ V32：角色试镜视频 ------------------------------ */
 export type AuditionStatus = "queued" | "running" | "done" | "failed" | "canceled";
 export type AuditionStyle = "anime" | "stylized_25d" | "realistic";
+export type AuditionBackground = "studio" | "radio" | "cafe" | "street" | "office" | "ancient_hall" | "futuristic";
+export type AuditionCamera = "medium" | "closeup" | "half_body";
 
 export interface AuditionJob {
   id: string;
@@ -324,6 +326,10 @@ export interface AuditionJob {
   segments?: { text: string; start: number; end: number }[];
   total_lines?: number;
   current_line?: number;
+  background?: AuditionBackground | string;
+  background_label?: string;
+  camera?: AuditionCamera | string;
+  camera_label?: string;
   duration_sec?: number;
   size_bytes?: number;
   error?: string | null;
@@ -358,6 +364,10 @@ function normalizeAudition(raw: unknown): AuditionJob {
       : undefined,
     total_lines: Number(rec.total_lines) || 0,
     current_line: Number(rec.current_line) || 0,
+    background: typeof rec.background === "string" ? rec.background : undefined,
+    background_label: typeof rec.background_label === "string" ? rec.background_label : undefined,
+    camera: typeof rec.camera === "string" ? rec.camera : undefined,
+    camera_label: typeof rec.camera_label === "string" ? rec.camera_label : undefined,
     duration_sec: Number(rec.duration_sec) || 0,
     size_bytes: Number(rec.size_bytes) || 0,
     error: typeof rec.error === "string" ? rec.error : null,
@@ -380,6 +390,8 @@ export const auditionApi = {
       text?: string;
       lines?: string[];
       subtitles?: boolean;
+      background?: AuditionBackground;
+      camera?: AuditionCamera;
       style?: AuditionStyle;
       seed?: number;
       prompt_extra?: string;

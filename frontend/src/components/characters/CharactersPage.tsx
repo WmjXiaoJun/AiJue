@@ -6,7 +6,7 @@ import { errorText } from "../../lib/api";
 import type { V5CatalogResponse, V5CharacterSummary } from "../../lib/v5";
 import { mediaSrc, characterArtUrl, characterPreviewUrl, v5api } from "../../lib/v5";
 import { auditionApi, CreationError, creationApi, creationErrorMessage, isAuditionActive } from "../../lib/creation";
-import type { AuditionJob, AuditionStyle } from "../../lib/creation";
+import type { AuditionBackground, AuditionCamera, AuditionJob, AuditionStyle } from "../../lib/creation";
 import { downloadUrlAsBlob } from "../../lib/download";
 import type { CharacterAssets } from "../../lib/creation";
 import type { CharacterContract, VoicePreset } from "../../lib/voice";
@@ -143,6 +143,27 @@ const AUDITION_STYLES: { id: AuditionStyle; label: string }[] = [
   { id: "realistic", label: "写实" },
 ];
 
+const AUDITION_BACKGROUNDS: { id: AuditionBackground; label: string }[] = [
+  { id: "studio", label: "棚拍" },
+  { id: "radio", label: "深夜电台" },
+  { id: "cafe", label: "咖啡馆" },
+  { id: "street", label: "夜景街头" },
+  { id: "office", label: "办公室" },
+  { id: "ancient_hall", label: "古风大殿" },
+  { id: "futuristic", label: "未来演播厅" },
+];
+
+const AUDITION_CAMERAS: { id: AuditionCamera; label: string }[] = [
+  { id: "medium", label: "中景" },
+  { id: "closeup", label: "近景" },
+  { id: "half_body", label: "半身" },
+];
+
+const auditionBackgroundLabel = (id?: string, label?: string) =>
+  label || AUDITION_BACKGROUNDS.find((item) => item.id === id)?.label || id || "";
+const auditionCameraLabel = (id?: string, label?: string) =>
+  label || AUDITION_CAMERAS.find((item) => item.id === id)?.label || id || "";
+
 const AUDITION_STAGES: Record<string, { label: string; progress: number }> = {
   queued: { label: "排队中", progress: 5 },
   tts: { label: "配音中", progress: 15 },
@@ -192,6 +213,8 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
   const [auditionStyle, setAuditionStyle] = useState<AuditionStyle>("anime");
   const [auditionText, setAuditionText] = useState("");
   const [auditionSubtitles, setAuditionSubtitles] = useState(true);
+  const [auditionBackground, setAuditionBackground] = useState<AuditionBackground>("studio");
+  const [auditionCamera, setAuditionCamera] = useState<AuditionCamera>("medium");
   const [auditionSubmitting, setAuditionSubmitting] = useState(false);
   const [auditionJob, setAuditionJob] = useState<AuditionJob | null>(null);
   const [auditionJobs, setAuditionJobs] = useState<AuditionJob[]>([]);
@@ -462,6 +485,8 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
     setAuditionStyle(portraitVersion);
     setAuditionText(auditionDefaultText(selectedContract.label));
     setAuditionSubtitles(true);
+    setAuditionBackground("studio");
+    setAuditionCamera("medium");
     setAuditionError("");
     setAuditionOpen(true);
   }, [auditionDefaultText, portraitVersion, selectedContract]);
@@ -481,6 +506,8 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
         lines,
         subtitles: auditionSubtitles,
         style: auditionStyle,
+        background: auditionBackground,
+        camera: auditionCamera,
       });
       setAuditionJob(job);
       setAuditionJobs((prev) => [job, ...prev.filter((item) => item.id !== job.id)]);
@@ -502,7 +529,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
     } finally {
       setAuditionSubmitting(false);
     }
-  }, [auditionDefaultText, auditionEstimateSec, auditionLineTooLong, auditionLines, auditionStyle, auditionSubtitles, auditionTextError, auditionTextInvalid, auditionTooManyLines, notify, selectedContract]);
+  }, [auditionBackground, auditionCamera, auditionDefaultText, auditionEstimateSec, auditionLineTooLong, auditionLines, auditionStyle, auditionSubtitles, auditionTextError, auditionTextInvalid, auditionTooManyLines, notify, selectedContract]);
 
   const cancelAudition = useCallback(async () => {
     if (!auditionJob?.id) return;
@@ -521,6 +548,8 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
     if (auditionJob) {
       setAuditionStyle((auditionJob.style as AuditionStyle) || "anime");
       setAuditionText(auditionJob.text || (selectedContract ? auditionDefaultText(selectedContract.label) : ""));
+      setAuditionBackground((auditionJob.background as AuditionBackground) || "studio");
+      setAuditionCamera((auditionJob.camera as AuditionCamera) || "medium");
     } else if (selectedContract) {
       setAuditionStyle(portraitVersion);
       setAuditionText(auditionDefaultText(selectedContract.label));
@@ -1144,6 +1173,9 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                     <div className="v32-progress-meta">
                       <span>{AUDITION_STYLES.find((item) => item.id === auditionJob.style)?.label || auditionJob.style}版立绘</span>
                       <span>{auditionTotalLines ? `${auditionTotalLines} 句台词` : "单句台词"}{auditionJob.subtitles_burned === false ? "" : " · 烧录字幕"}</span>
+                      <span className="v34-scene-tag">
+                        {auditionBackgroundLabel(auditionJob.background, auditionJob.background_label)} · {auditionCameraLabel(auditionJob.camera, auditionJob.camera_label)}
+                      </span>
                       <span>可离开页面，回到角色详情自动恢复</span>
                       <button type="button" className="cm-btn cm-btn-sm cm-btn-ghost" onClick={() => void cancelAudition()}>
                         取消任务
@@ -1164,6 +1196,11 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                       <span className="v18-tag is-jade">已完成</span>
                       <span className="v18-tag">{AUDITION_STYLES.find((item) => item.id === auditionJob.style)?.label || auditionJob.style}</span>
                       {auditionJob.subtitles_burned && <span className="v18-tag is-gold">字幕</span>}
+                      {auditionJob.background && (
+                        <span className="v18-tag v34-scene-tag">
+                          {auditionBackgroundLabel(auditionJob.background, auditionJob.background_label)} · {auditionCameraLabel(auditionJob.camera, auditionJob.camera_label)}
+                        </span>
+                      )}
                       <span className="cm-mono">{auditionJob.duration_sec ? auditionJob.duration_sec.toFixed(1) + "s" : "—"}</span>
                       <span className="cm-mono">{fmtAuditionSize(auditionJob.size_bytes || 0)}</span>
                       <button type="button" className="cm-btn cm-btn-sm" onClick={() => void downloadAudition()}>
@@ -1212,6 +1249,11 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                         </span>
                         <span className="cm-mono">{AUDITION_STYLES.find((item) => item.id === job.style)?.label || job.style}</span>
                         {(job.subtitles_burned || job.srt_url) && <span className="v18-tag is-gold">字幕</span>}
+                        {job.background && (
+                          <span className="v18-tag v34-scene-tag">
+                            {auditionBackgroundLabel(job.background, job.background_label)} · {auditionCameraLabel(job.camera, job.camera_label)}
+                          </span>
+                        )}
                         {job.lines && job.lines.length > 1 && <span className="cm-mono">{job.lines.length} 句</span>}
                         <span className="v32-recent-id cm-mono">{job.id}</span>
                         <button
@@ -1540,6 +1582,38 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                   </span>
                 )}
               </label>
+              <div className="v34-select-row">
+                <label className="v21-field">
+                  <span className="v21-field-label">背景</span>
+                  <select
+                    className="v21-select"
+                    value={auditionBackground}
+                    onChange={(event) => setAuditionBackground(event.target.value as AuditionBackground)}
+                    disabled={auditionSubmitting}
+                  >
+                    {AUDITION_BACKGROUNDS.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.label}{item.id === "studio" ? "（默认）" : ""}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="v21-field">
+                  <span className="v21-field-label">机位</span>
+                  <select
+                    className="v21-select"
+                    value={auditionCamera}
+                    onChange={(event) => setAuditionCamera(event.target.value as AuditionCamera)}
+                    disabled={auditionSubmitting}
+                  >
+                    {AUDITION_CAMERAS.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.label}{item.id === "medium" ? "（默认）" : ""}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
               <label className="v33-subtitle-toggle">
                 <input
                   type="checkbox"

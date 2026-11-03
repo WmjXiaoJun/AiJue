@@ -52,6 +52,24 @@ _MAX_LINES = 6
 _MAX_LINE_CHARS = 80
 _MAX_AUDIO_SECONDS = 12.0
 _LINE_GAP_SECONDS = 0.35
+# V34：背景 / 机位
+_BACKGROUNDS = {
+    "studio": ("棚拍", "in a dark professional recording studio with soft key light"),
+    "radio": ("深夜电台",
+              "in a warm late-night radio studio with a vintage microphone and practical lamps softly out of focus"),
+    "cafe": ("咖啡馆", "in a cozy cafe by a window with warm afternoon light and a softly blurred background"),
+    "street": ("夜景街头", "on a neon-lit city street at night with bokeh lights and shallow depth of field"),
+    "office": ("办公室", "in a modern office with the city skyline visible through the window"),
+    "ancient_hall": ("古风大殿",
+                     "in an ancient Chinese hall with wooden pillars, red curtains and warm lantern light"),
+    "futuristic": ("未来演播厅",
+                   "in a futuristic control room with blue holographic screens and cinematic studio lighting"),
+}
+_CAMERAS = {
+    "medium": ("中景", "medium close-up, chest-up framing"),
+    "closeup": ("近景", "tight close-up on the face, shallow depth of field"),
+    "half_body": ("半身", "half-body shot, waist-up framing, more of the outfit visible"),
+}
 
 _LOCK = threading.RLock()
 _JOBS: Dict[str, Dict[str, Any]] = {}
@@ -107,6 +125,10 @@ def _view(job: Dict[str, Any]) -> Dict[str, Any]:
         "progress": job.get("progress", 0),
         "text": job.get("text"),
         "lines": job.get("lines") or [],
+        "background": job.get("background"),
+        "background_label": job.get("background_label"),
+        "camera": job.get("camera"),
+        "camera_label": job.get("camera_label"),
         "segments": job.get("segments") or [],
         "subtitles": bool(job.get("subtitles", True)),
         "srt_url": job.get("srt_url"),
@@ -212,7 +234,12 @@ _STYLE_HINT = {
 }
 
 
-def _build_prompt(character: dict, style: str, prompt_extra: str) -> str:
+def _build_prompt(character: dict, style: str, prompt_extra: str,
+                  background: str = "studio", camera: str = "medium") -> str:
+    background_label, background_phrase = _BACKGROUNDS.get(
+        str(background or "studio").strip().lower(), _BACKGROUNDS["studio"])
+    camera_label, camera_phrase = _CAMERAS.get(
+        str(camera or "medium").strip().lower(), _CAMERAS["medium"])
     label = str(character.get("label") or character.get("id") or "")
     app = character.get("appearance") if isinstance(character.get("appearance"), dict) else {}
     outfit = app.get("outfit") if isinstance(app.get("outfit"), dict) else {}
@@ -229,18 +256,18 @@ def _build_prompt(character: dict, style: str, prompt_extra: str) -> str:
     identity += (", " + ", ".join(details)) if details else ""
     identity += "; preserve the exact face, hairstyle, hair color, outfit, age and art style."
     summary = (
-        "One continuous medium close-up of Subject 1 speaking naturally and directly to the camera, "
+        f"One continuous {camera_phrase} of Subject 1 speaking naturally and directly to the camera, "
         "lips moving in sync with the reference speech audio, subtle blinking, eyebrow movement and "
         "small head nods while talking; stable identity, hairstyle, outfit and composition; "
-        f"{_STYLE_HINT.get(style, _STYLE_HINT['anime'])}; 16:9 cinematic studio background; "
-        "no text, no watermark."
+        f"{_STYLE_HINT.get(style, _STYLE_HINT['anime'])}; "
+        f"{background_phrase}; 16:9 cinematic composition, no text, no watermark."
     )
     if prompt_extra:
         summary += " " + prompt_extra
     return (
         f"subject_definitions: {identity}\n\n"
         f"summary: {summary}\n\n"
-        "overall_soundscape: The reference speech audio, close-mic voice, quiet studio room tone.\n\n"
+        "overall_soundscape: The reference speech audio, close-mic voice, quiet room tone.\n\n"
         "non_diegetic_music: N/A"
     )
 
@@ -452,7 +479,11 @@ def _run_audition(job_id: str) -> None:
         # 3) H3 audio_ref（1024×576 / duration=音频+0.1）
         out = _DEMO_DIR / f"{job.get('character')}_{job_id}.mp4"
         _DEMO_DIR.mkdir(parents=True, exist_ok=True)
-        prompt = _build_prompt(character, style, str(job.get("prompt_extra") or ""))
+        prompt = _build_prompt(
+            character, style, str(job.get("prompt_extra") or ""),
+            background=str(job.get("background") or "studio"),
+            camera=str(job.get("camera") or "medium"),
+        )
         cmd = [
             sys.executable, str(_H3_CLI), "--mode", "audio_ref",
             "--image", str(ref), "--audio", str(audio), "--out", str(out),
@@ -576,6 +607,8 @@ class AuditionBody(BaseModel):
     lines: Optional[List[str]] = None
     subtitles: bool = True
     style: str = "anime"
+    background: str = "studio"
+    camera: str = "medium"
     seed: Optional[int] = None
     prompt_extra: Optional[str] = None
     width: int = 1024
@@ -639,6 +672,18 @@ def create_audition(character: str, payload: AuditionBody = Body(default=Auditio
                             detail="台词过长，请精简到 12 秒内（当前估算 "
                                    f"{estimated:.1f}s）")
     subtitles = bool(payload.subtitles)
+    background = str(payload.background or "studio").strip().lower()
+    if background not in _BACKGROUNDS:
+        raise HTTPException(status_code=400,
+                            detail=f"background 只支持 {', '.join(_BACKGROUNDS)}"
+                                   f"（当前 {background!r}）")
+    camera = str(payload.camera or "medium").strip().lower()
+    if camera not in _CAMERAS:
+        raise HTTPException(status_code=400,
+                            detail=f"camera 只支持 {', '.join(_CAMERAS)}"
+                                   f"（当前 {camera!r}）")
+    background_label = _BACKGROUNDS[background][0]
+    camera_label = _CAMERAS[camera][0]
     try:
         width = int(payload.width or 1024)
         height = int(payload.height or 576)
@@ -685,6 +730,10 @@ def create_audition(character: str, payload: AuditionBody = Body(default=Auditio
         "portrait_file": portrait_file,
         "text": text,
         "lines": lines,
+        "background": background,
+        "background_label": background_label,
+        "camera": camera,
+        "camera_label": camera_label,
         "segments": [],
         "subtitles": subtitles,
         "subtitles_burned": False,
@@ -736,6 +785,10 @@ def create_audition(character: str, payload: AuditionBody = Body(default=Auditio
         "status": "queued",
         "text": text,
         "lines": lines,
+        "background": background,
+        "background_label": background_label,
+        "camera": camera,
+        "camera_label": camera_label,
         "subtitles": subtitles,
         "estimated_sec": _ESTIMATED_SEC,
         "portrait_file": portrait_file,

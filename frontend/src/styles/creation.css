@@ -419,3 +419,8 @@
 .v33-subtitle-toggle input { width: 14px; height: 14px; margin-top: 1px; accent-color: var(--c-gold); cursor: pointer; }
 .v33-subtitle-toggle b { display: block; font-size: 11px; color: var(--c-text); }
 .v33-subtitle-toggle em { display: block; margin-top: 2px; font-size: 9.5px; font-style: normal; color: var(--c-mut); }
+
+/* V34：试镜背景/机位 */
+.v34-select-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.v34-select-row .v21-field { margin: 0; }
+.v34-scene-tag { border-color: rgba(201,162,39,.35); color: var(--c-gold-soft); }
