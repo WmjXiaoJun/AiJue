@@ -94,6 +94,19 @@
 
 创建时自动 TTS（4 段音频）+ LLM 语义 brief；`keyframe_candidates: 2`。
 
+### 双人对戏模板（V47）
+
+`custom_tpl_v46_duologue`「V46 2D·装配夜话」：老秦 × 小满 6 幕正反打（19.1s）
+
+1. 组装车间 b-roll
+2. 老秦：「它要是醒了，会不会不认我们？」
+3. 小满：「不会，它记得你的手。」
+4. 老秦：「机器记得的，只有力道。」
+5. 小满：「那你就，轻一点。」
+6. 底城霓虹巷 b-roll
+
+同一场景内交替给两个角色，落 4 段 TTS 音频；`keyframe_candidates: 2`。注意：自动 brief 的 `look` 默认继承模板 style 的「霓虹演播厅」，必须改写成车间 look，否则 b-roll 会渲染成 talk show。
+
 ## 5. 前端
 
 - `RenderStyle` 增加 `arcane_cinematic`；风格元信息「赛博电影感 / 赛博 / 绘画感半写实动画（Arcane 风）：厚涂笔触 + 青橙光比 + 电影景深」。

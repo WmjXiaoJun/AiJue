@@ -1,0 +1,130 @@
+{
+  "id": "custom_tpl_v46_duologue",
+  "label": "V46 2D·装配夜话",
+  "description": "赛博电影感 6 幕双人对戏：老秦和小满在组装车间，聊一台即将醒来的机器人。",
+  "tags": [
+    "custom",
+    "v21"
+  ],
+  "style": "neon_toon",
+  "target_duration": 19.14,
+  "aspect": [
+    16,
+    9
+  ],
+  "render_type": "2d",
+  "render_style": "arcane_cinematic",
+  "keyframe_candidates": 2,
+  "cast": [
+    {
+      "role": "host",
+      "character": "custom_old_inventor",
+      "name": "老秦"
+    },
+    {
+      "role": "figure_a",
+      "character": "custom_street_kid",
+      "name": "小满"
+    }
+  ],
+  "acts": [
+    {
+      "id": "act01",
+      "name": "第 1 幕",
+      "scene": "robot_assembly",
+      "camera": "dolly",
+      "camera_strength": 0.06,
+      "duration": 2.6,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    },
+    {
+      "id": "act02",
+      "name": "第 2 幕",
+      "scene": "robot_assembly",
+      "camera": "push_in",
+      "camera_strength": 0.06,
+      "duration": 3.91,
+      "line": "host",
+      "text": "它要是醒了，会不会不认我们？",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act03",
+      "name": "第 3 幕",
+      "scene": "robot_assembly",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 3.36,
+      "line": "figure_a",
+      "text": "不会，它记得你的手。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act04",
+      "name": "第 4 幕",
+      "scene": "robot_assembly",
+      "camera": "push_in",
+      "camera_strength": 0.06,
+      "duration": 3.6,
+      "line": "host",
+      "text": "机器记得的，只有力道。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act05",
+      "name": "第 5 幕",
+      "scene": "robot_assembly",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 3.07,
+      "line": "figure_a",
+      "text": "那你就，轻一点。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act06",
+      "name": "第 6 幕",
+      "scene": "undercity_street",
+      "camera": "dolly",
+      "camera_strength": 0.06,
+      "duration": 2.6,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    }
+  ],
+  "packaging": {
+    "subtitle": "default",
+    "transition": "fade",
+    "title": "V46 2D·装配夜话"
+  },
+  "lipsync": {
+    "mode": "musetalk"
+  },
+  "audio": {},
+  "meta": {
+    "create_source": "v21",
+    "three_d": false,
+    "render_type": "2d",
+    "render_style": "arcane_cinematic",
+    "keyframe_candidates": 2,
+    "created_at": "2026-11-05 02:54:29",
+    "created_by": "api"
+  }
+}

@@ -175,3 +175,15 @@ def test_cyber_templates_default_two_candidates():
     for tid in ("custom_tpl_v46_undercity", "custom_tpl_v46_council"):
         tpl = _json.loads((repo / f"contract/v5/custom/templates/{tid}.json").read_text(encoding="utf-8"))
         assert int(tpl.get("keyframe_candidates") or 1) == 2
+
+
+def test_duologue_template_alternates_cast():
+    """V47：双人对戏模板 6 幕、4 段台词，老秦/小满交替。"""
+    import json as _json
+    repo = pathlib.Path(__file__).resolve().parents[1]
+    tpl = _json.loads((repo / "contract/v5/custom/templates/custom_tpl_v46_duologue.json").read_text(encoding="utf-8"))
+    assert tpl["render_style"] == "arcane_cinematic"
+    assert len(tpl["acts"]) == 6
+    speakers = [act.get("line") for act in tpl["acts"] if act.get("text")]
+    assert speakers == ["host", "figure_a", "host", "figure_a"], speakers
+    assert tpl.get("keyframe_candidates") == 2
