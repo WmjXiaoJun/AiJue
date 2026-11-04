@@ -41,6 +41,8 @@ import { V5Scenes } from "../v5world/Scenes";
 import "../../styles/cinema.css";
 import "../../styles/v18.css";
 import "../../styles/library.css";
+// V5 World 复用页（风格 / 场景）的样式：v5w-* 全在这份 CSS 里，缺了就会「图片铺满 + 标签挤成一行」
+import "../../styles/v5world.css";
 
 export type LibraryTab = "templates" | "styles" | "scenes" | "final";
 
@@ -863,6 +865,9 @@ function FinalLibrary({
                     <span>{fmtSize(template.final.size)}</span>
                     <span>镜头 {template.clips.done}/{template.clips.total || "—"}</span>
                     <span className="v18-tag is-gold">{template.status === "done" ? "已完成" : template.status}</span>
+                    <a className="v20-final-source cm-mono" href={videoUrl} target="_blank" rel="noreferrer" title="打开原片">
+                      <IconDownload size={11} /> 原片
+                    </a>
                   </div>
                   <div className="v20-final-actions">
                     <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" disabled={!ready} onClick={() => setPlaying(template)}>
@@ -889,9 +894,6 @@ function FinalLibrary({
                     </button>
                     <a className="cm-btn cm-btn-sm cm-btn-ghost" href="#/cinema/shots" title="进入 3D 制作台 · 镜头台">
                       <IconFilm size={12} /> 镜头台
-                    </a>
-                    <a className="cm-btn cm-btn-sm cm-btn-ghost" href={videoUrl} target="_blank" rel="noreferrer" title="打开原片">
-                      <IconDownload size={12} />
                     </a>
                   </div>
                 </div>

@@ -60,8 +60,10 @@
 .pl-hero-title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 38px;
-  line-height: 1.15;
+  font-size: clamp(26px, 2.3vw, 38px);
+  line-height: 1.2;
+  text-wrap: balance;
+  max-width: 26ch;
   font-weight: 600;
   letter-spacing: 0.03em;
   color: var(--c-text);

@@ -1,0 +1,27 @@
+{
+  "scene": "kitchen_stove",
+  "label": "灶台特写",
+  "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\scenes\\kitchen_stove.png",
+  "png": "kitchen_stove.png",
+  "prompt": "masterpiece, best quality, very aesthetic, absurdres, anime style, detailed background art, cinematic lighting, scenery, no humans, home kitchen stove corner, gas stove with a steaming pot, range hood, tiled backsplash, warm task light, anime background art, wide shot, depth of field, 16:9, high detail, no text",
+  "raw_prompt": "home kitchen stove corner, gas stove with a steaming pot, range hood, tiled backsplash, warm task light, anime background art",
+  "prompt_source": "fallback",
+  "negative": "lowres, worst quality, low quality, bad anatomy, bad hands, text, watermark, signature, logo, jpeg artifacts, human, person, character, face, portrait, close-up, 3d render, photo, realistic, blurry",
+  "seed": 20261101,
+  "size": [
+    1280,
+    720
+  ],
+  "requested_size": [
+    1280,
+    720
+  ],
+  "model": "animagine-xl-4.0.safetensors",
+  "steps": 28,
+  "cfg": 5.5,
+  "sampler": "euler_ancestral",
+  "scheduler": "normal",
+  "prompt_id": "2125fcf9-06b3-47bd-9871-cf6aab380f61",
+  "gen_sec": 10.0,
+  "created_at": "2026-11-04 19:25:34"
+}

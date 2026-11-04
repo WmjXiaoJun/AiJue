@@ -321,6 +321,46 @@ FALLBACK_PROMPTS: dict[str, str] = {
         "gothic crypt under a castle, ribbed stone vaults, stone sarcophagi, "
         "candles and cobwebs, cold blue grey with warm candle light"
     ),
+    # ---- 现代日常包（V45 补齐：这 9 个场景此前没有 plate，场景库会 404 后回落到程序化预览）----
+    "cafe_corner": (
+        "cozy cafe corner by a tall window, wooden table and two chairs, warm "
+        "pendant lamp, rain streaks on the glass, blurred city lights outside, "
+        "potted plants, anime background art"
+    ),
+    "cafe_counter": (
+        "cafe service counter with espresso machine and pastry case, wooden "
+        "shelves of cups, chalkboard menu, warm hanging lights, no people, "
+        "anime background art"
+    ),
+    "cafe_sofa": (
+        "cafe lounge with soft fabric sofa and cushions, low coffee table, "
+        "warm floor lamp, large window with evening city view, anime background art"
+    ),
+    "convenience_store": (
+        "24-hour convenience store interior at night, bright shelves of snacks "
+        "and drinks, glass door with street glow, fluorescent ceiling light, "
+        "no people, anime background art"
+    ),
+    "kitchen_home": (
+        "warm home kitchen, wooden cabinets, window with daylight, kettle and "
+        "cutting board on the counter, cosy domestic atmosphere, anime background art"
+    ),
+    "kitchen_stove": (
+        "home kitchen stove corner, gas stove with a steaming pot, range hood, "
+        "tiled backsplash, warm task light, anime background art"
+    ),
+    "kitchen_table": (
+        "home kitchen dining table with wooden chairs, breakfast set on the "
+        "table, morning sunlight through the window, anime background art"
+    ),
+    "street_night": (
+        "city street at night, wet asphalt with neon reflections, street lamps "
+        "and storefront signs, glowing vending machine, no people, anime background art"
+    ),
+    "subway_exit": (
+        "subway station exit at night, stairs leading up to the street, tiled "
+        "walls, fluorescent light, city glow at the top of the stairs, anime background art"
+    ),
 }
 
 # 历史场景（pilot/验收重点：必须有历史内容）

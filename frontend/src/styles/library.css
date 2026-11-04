@@ -74,7 +74,10 @@
 .v20-final-title b { font-family: var(--font-display); font-size: 17px; font-weight: 600; letter-spacing: 0.04em; color: var(--c-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .v20-final-title .cm-mono { margin-left: auto; font-size: 8px; color: var(--c-mut); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .v20-final-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-family: var(--font-mono); font-size: 8.5px; color: var(--c-sub); }
-.v20-final-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+.v20-final-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: center; gap: 6px; margin-top: 2px; }
+.v20-final-actions .cm-btn { justify-content: center; min-width: 0; padding: 0 8px; }
+.v20-final-source { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; color: var(--c-mut); text-decoration: none; }
+.v20-final-source:hover { color: var(--c-gold-soft); }
 
 .v20-modal-mask {
   position: fixed;

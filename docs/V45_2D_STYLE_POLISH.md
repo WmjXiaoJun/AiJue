@@ -94,6 +94,13 @@
 - 前端：`/` 200，`frontend/dist/assets/*.js` 内含「吉卜力治愈系」
 
 ### 6.0.1 UI 排版验证（浏览器实测 1600/1280/1100/900/760，Chrome headless + puppeteer）
+**场景库 / 风格墙（2026-11-04 19:2x 修复）**
+- 根因：`LibraryPage` 复用了 `v5world/Scenes|Styles`，但只 import 了 `cinema/v18/library.css`，漏了 `v5world.css` → `v5w-scene-grid / v5w-scene-card` 全失效，场景封面按原图铺满整页、标签挤成一行。
+- 修复：`LibraryPage.tsx` 补 `import "../../styles/v5world.css"`（构建 CSS 从 297KB → 323KB）。修复后场景库 70 张卡正常网格（5/4/3/2 列断点）、标签 chip、KPIs 全部正常。
+- 补齐场景 plate：9 个现代场景（cafe_corner / cafe_counter / cafe_sofa / convenience_store / kitchen_home / kitchen_stove / kitchen_table / street_night / subway_exit）原本没有 plate，卡片 404 后回落程序化预览；已在 `pipeline/v5_scene_art.py` 补 9 条 FALLBACK_PROMPTS 并生成 1280×720 plate（`assets/v5/scenes/*.png`）。现在场景库 70/70 有美术、0 个 404。
+- 成片库卡片：7 个操作按钮换行成「2+2+1」，最后一个「原片」图标单独占一行；改 `.v20-final-actions` 为 3 列网格（6 个按钮 2 行），「原片」移到元信息行右侧。
+- 项目大厅 hero 标题：长项目名在 38px 下断成「（5 分钟 / Demo）」；改 `clamp(26px,2.3vw,38px)` + `text-wrap: balance` + `max-width:26ch`。
+- 全站 8 个主路由浏览器巡检：0 console error、0 请求 404、无横向溢出。
 - **模板卡**：「V45 2D·吉卜力治愈系」原先被截成「V45 2D·吉…」，风格徽标「2D·赛璐璐」被挤成两行——改为标题独占一行、ID 另起一行，徽标 `flex:0 0 auto; white-space:nowrap`，6 张 2D 卡标题全部完整（`clipped:false`）。
 - **新建模板向导**：≤900px 时节目类型的 1 列断点提前到 720px，三选一保持一行；2D 风格四选一在 900px 变 2×2 且完整可见（底边 798 < 底部栏 905），不再被折叠线切掉。
 - **分幕步骤**：每幕的「搜索场景」由独占一行改为与场景下拉同行（108px 小输入框，≤900px 再堆叠），4 幕少 4 条多余输入行；说话角色下拉补占位项「选择说话角色 / B-roll」，不再默认显示 B-roll 却校验失败。
@@ -112,7 +119,12 @@
 4. `python -m pytest tests/test_v45_style_polish.py` 7 passed；`tests/test_api.py -k "render or template or style"` 3 passed；`tests/test_v5_catalog.py` 24 passed / 2 failed——两个失败是既有数据问题：`git grep custom_lin fe55c3d` 为空（V45 之前就没有该示例角色合同）、`relic_talk.json` 的 packaging 自 v6.3 起未改动。
 5. 前端 `npm run build`（tsc + vite）通过。
 
-## 7. 遗留
+## 7. 老版本清理（2026-11-04 19:30）
+- 删除 V41/V44 两条老 2D 示例模板（合同 + semantic + `templates_3d/2d/v5` 产物 + 关键帧 + clips），模板目录回到 **28 个（4 个 2D + 24 个 3D）**。
+- 删除历史 demo 媒体与旧归档：`outputs/{_archive_v5_2d_finals,_archive_v14_*,_archive_v15_ref2va_768,template_demos_scene,templates_v3_previs,llm_demos,history_full,scene_demos,scene_demos_3d,style_demos_v2,character_demos,shots_plan_demo,screenshots}` 与 `tmp/{v41,v42,v43,v44,v45_probe*}`。
+- 共释放 **11.73 GB**；保留当前 3D 模板产物、4 条 V45 样片、README 引用的 `outputs/demo|h3|template_demos|h3_style_demos`。
+
+## 8. 遗留
 
 - 4 风格 3 底模（见 §1）；要完全一一对应可补一个 SDXL 动漫底模并改风格表 `ckpt`。
 - H3 ref2va 只吃关键帧首帧，年龄/气质靠首帧与口型句双重约束；若某风格脸仍偏年轻，优先降该风格 `ip_strength` 0.02 或加 `no youthful face` 负面。

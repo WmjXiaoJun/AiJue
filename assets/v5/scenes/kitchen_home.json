@@ -1,0 +1,27 @@
+{
+  "scene": "kitchen_home",
+  "label": "家庭厨房",
+  "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\scenes\\kitchen_home.png",
+  "png": "kitchen_home.png",
+  "prompt": "masterpiece, best quality, very aesthetic, absurdres, anime style, detailed background art, cinematic lighting, scenery, no humans, warm home kitchen, wooden cabinets, window with daylight, kettle and cutting board on the counter, cosy domestic atmosphere, anime background art, wide shot, depth of field, 16:9, high detail, no text",
+  "raw_prompt": "warm home kitchen, wooden cabinets, window with daylight, kettle and cutting board on the counter, cosy domestic atmosphere, anime background art",
+  "prompt_source": "fallback",
+  "negative": "lowres, worst quality, low quality, bad anatomy, bad hands, text, watermark, signature, logo, jpeg artifacts, human, person, character, face, portrait, close-up, 3d render, photo, realistic, blurry",
+  "seed": 20261101,
+  "size": [
+    1280,
+    720
+  ],
+  "requested_size": [
+    1280,
+    720
+  ],
+  "model": "animagine-xl-4.0.safetensors",
+  "steps": 28,
+  "cfg": 5.5,
+  "sampler": "euler_ancestral",
+  "scheduler": "normal",
+  "prompt_id": "a490ce9c-3d3a-42f9-aea8-ecbd9315fdc6",
+  "gen_sec": 10.1,
+  "created_at": "2026-11-04 19:25:24"
+}
