@@ -505,3 +505,24 @@
 .v36-showcase-pkg-head .cm-btn { margin-left: 0; }
 .v38-split .v36-showcase-pkg-head .v38-split-desc { flex: 1 1 180px; }
 .v38-split .v36-showcase-pkg-head .cm-btn { margin-left: 0; }
+
+/* V41：节目类型选择 */
+.v41-render-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+.v41-render-option {
+  display: flex; flex-direction: column; gap: 3px;
+  padding: 10px 11px; border: 1px solid var(--c-line); border-radius: 10px;
+  background: rgba(255,255,255,.015); cursor: pointer;
+}
+.v41-render-option input { position: absolute; opacity: 0; pointer-events: none; }
+.v41-render-option b { font-family: var(--font-display); font-size: 14px; color: var(--c-text); letter-spacing: .04em; }
+.v41-render-option .v41-render-wait { font-family: var(--font-mono); font-size: 9px; color: var(--c-gold-soft); }
+.v41-render-option em { font-style: normal; font-size: 9.5px; color: var(--c-mut); line-height: 1.5; }
+.v41-render-option.is-active { border-color: rgba(201,162,39,.55); background: rgba(201,162,39,.08); box-shadow: inset 0 0 0 1px rgba(201,162,39,.18); }
+.v41-render-option.is-2d.is-active { border-color: rgba(79,143,124,.55); background: rgba(79,143,124,.08); }
+.v41-render-option.is-2d.is-active .v41-render-wait { color: #8fd0b8; }
+@media (max-width: 900px) { .v41-render-grid { grid-template-columns: 1fr; } }
+
+/* V41：一键成片类型 chip */
+.v41-type-chip.is-2d { border-color: rgba(79,143,124,.5); color: #8fd0b8; }
+.v41-type-chip.is-3d { border-color: rgba(201,162,39,.45); color: var(--c-gold-soft); }
+.v41-type-chip.is-realistic { border-color: rgba(140,160,190,.45); color: #b7c7dd; }

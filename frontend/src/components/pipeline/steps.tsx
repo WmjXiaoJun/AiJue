@@ -1,6 +1,7 @@
 // V18 · 制片控制台各步骤面板（Step 1–6）
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CinemaTemplate } from "../../lib/cinema";
+import { renderTypeMeta } from "../../lib/cinema";
 import { fmtDuration, fmtSize, isRealTemplate } from "../../lib/cinema";
 import type { PipelineRun } from "../../lib/pipeline";
 import { PIPELINE_STAGE_LABEL, pipelineRunPercent } from "../../lib/pipeline";
@@ -546,7 +547,7 @@ export function StepScript({
             ))}
           </div>
         )}
-        <StepNav onPrev={onPrev} onNext={onNext} nextLabel="下一步：生成 3D" hint={templateLabel} />
+        <StepNav onPrev={onPrev} onNext={onNext} nextLabel="下一步：生成成片" hint={templateLabel} />
       </div>
     </div>
   );
@@ -589,6 +590,7 @@ export function StepRun({
   onOpenJobs?: () => void;
 }) {
   const active = run && (run.status === "queued" || run.status === "running");
+  const renderMeta = renderTypeMeta(template);
   const pct = pipelineRunPercent(run);
   const stageText = run ? PIPELINE_STAGE_LABEL[run.stage] || run.stage || "排队中" : "";
   const statusClass = run
@@ -605,11 +607,16 @@ export function StepRun({
       <div className="v18-panel-head">
         <div className="v18-panel-head-main">
           <h3 className="v18-panel-title">
-            <IconSpark size={17} /> ④ 生成 3D
+            <IconSpark size={17} /> ④ 生成{renderMeta.short}
           </h3>
-          <p className="v18-panel-sub">GENERATE · pipeline 任务（单并发）· 1.5s 轮询阶段与逐镜进度</p>
+          <p className="v18-panel-sub">
+            GENERATE · {renderMeta.label} · 预计 {renderMeta.wait} · pipeline 任务（单并发）
+          </p>
         </div>
         <div className="v18-panel-actions">
+          <span className={"v18-tag v41-type-chip is-" + renderMeta.id}>
+            {renderMeta.short} · {renderMeta.wait}
+          </span>
           <span className="v18-crumb">{template ? template.id : "未选模板"}</span>
         </div>
       </div>
@@ -746,7 +753,9 @@ export function StepRun({
             </div>
             {!run && (
               <p className="v18-note">
-                <IconInfo size={13} /> 采用「复用已有镜头快速合成」通常在数分钟内完成；完整生成（T2VA + 口型）单模板约 20–45 分钟，同一时间只允许一个任务（冲突时后端返回 409）。
+                <IconInfo size={13} /> {renderMeta.id === "2d"
+                  ? "2D 动画走轻量 2D 渲染器（render → qc），单模板约 1–3 分钟；可复用已有镜头快速出片。"
+                  : `${renderMeta.label}完整生成（T2VA + 口型）单模板预计 ${renderMeta.wait}；复用已有镜头快速合成通常在数分钟内完成。同一时间只允许一个任务（冲突时后端返回 409）。`}
               </p>
             )}
           </>
@@ -755,6 +764,10 @@ export function StepRun({
       </div>
     </div>
   );
+}
+
+function resolveRenderTypeFallback(id: string): string {
+  return id.startsWith("real_") ? "realistic" : "3d";
 }
 
 /* ------------------------------ Step 5 · 成片 ------------------------------ */
@@ -774,7 +787,13 @@ export function StepFinal({
   busy: boolean;
 }) {
   const ready = Boolean(template?.final.exists && template.final.url);
-  const src = template ? mediaSrc(template.final.url || `/media/templates_3d/${template.id}/final.mp4`) : "";
+  const renderMeta = renderTypeMeta(template);
+  const src = template
+    ? mediaSrc(
+        template.final.url ||
+          (resolveRenderTypeFallback(template.id) === "2d" ? `/media/templates_2d/${template.id}/final.mp4` : `/media/templates_3d/${template.id}/final.mp4`),
+      )
+    : "";
   return (
     <div className="v18-panel">
       <div className="v18-panel-head">
@@ -782,10 +801,10 @@ export function StepFinal({
           <h3 className="v18-panel-title">
             <IconVideo size={17} /> ⑤ 成片
           </h3>
-          <p className="v18-panel-sub">FINAL · 3D 成片播放 / 规格 / 重新合成</p>
+          <p className="v18-panel-sub">FINAL · {renderMeta.label}成片播放 / 规格 / 重新合成 · 预计 {renderMeta.wait}</p>
         </div>
         <div className="v18-panel-actions">
-          {ready ? <span className="v18-tag is-jade"><IconCheck size={10} /> 3D 成片就绪</span> : <span className="v18-tag">尚无成片</span>}
+          {ready ? <span className="v18-tag is-jade"><IconCheck size={10} /> {renderMeta.short} 成片就绪</span> : <span className="v18-tag">尚无成片</span>}
         </div>
       </div>
       <div className="v18-panel-body">
@@ -794,7 +813,7 @@ export function StepFinal({
         ) : !ready ? (
           <EmptyBlock
             icon={<IconVideo size={26} />}
-            title="还没有 3D 成片"
+            title={`还没有 ${renderMeta.short} 成片`}
             desc={`模板「${template.label}」尚无 final.mp4；回到第 ④ 步生成或复用已有镜头合成。`}
             actions={
               <>

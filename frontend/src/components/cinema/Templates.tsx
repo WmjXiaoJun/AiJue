@@ -15,6 +15,7 @@ import {
   fmtDuration,
   fmtSize,
   isRealTemplate,
+  renderTypeMeta,
   templateClipPercent,
   templateStatusDot,
   type CinemaTemplate,
@@ -38,7 +39,7 @@ import "../../styles/cinema-templates.css";
 const POLL_IDLE_MS = 3000;
 const POLL_BUSY_MS = 2000;
 
-type TemplateKindFilter = "all" | "classic" | "real";
+type TemplateKindFilter = "all" | "2d" | "3d" | "realistic";
 
 interface CardItem {
   seed: CinemaTemplateSeed;
@@ -69,6 +70,10 @@ function canAssemble(template: CinemaTemplate | null): boolean {
   if (!template) return false;
   if (template.final.exists && template.final.url) return true;
   return template.clips.total > 0 && template.clips.done >= template.clips.total;
+}
+
+function resolveRenderTypeForCard(item: CardItem) {
+  return renderTypeMeta(item.template ?? { id: item.seed.id });
 }
 
 function mergeCards(data: CinemaTemplatesResponse | null): CardItem[] {
@@ -184,15 +189,23 @@ export function CinemaTemplates({
   const summary = data?.summary ?? null;
   // V17：总数动态化（后端新增 real_* 模板后自动变 19；接口失败时回落到 16 个占位种子）
   const totalTemplates = summary?.total || cards.length || TEMPLATE_3D_TOTAL;
-  const realCount = useMemo(() => cards.filter((item) => isRealTemplate(item.seed.id)).length, [cards]);
+  const realCount = useMemo(() => cards.filter((item) => renderTypeMeta(item.template ?? { id: item.seed.id }).id === "realistic").length, [cards]);
   const classicCount = Math.max(0, cards.length - realCount);
+  const typeCounts = useMemo(
+    () =>
+      cards.reduce(
+        (acc, item) => {
+          const type = renderTypeMeta(item.template ?? { id: item.seed.id }).id;
+          acc[type] = (acc[type] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>,
+      ),
+    [cards],
+  );
   const filteredCards = useMemo(() => {
     const base =
-      kindFilter === "real"
-        ? cards.filter((item) => isRealTemplate(item.seed.id))
-        : kindFilter === "classic"
-          ? cards.filter((item) => !isRealTemplate(item.seed.id))
-          : cards;
+      kindFilter === "all" ? cards : cards.filter((item) => resolveRenderTypeForCard(item).id === kindFilter);
     const keyword = query.trim().toLowerCase();
     if (!keyword) return base;
     return base.filter((item) =>
@@ -227,8 +240,9 @@ export function CinemaTemplates({
 
   const kindFilters: { id: TemplateKindFilter; label: string; count: number }[] = [
     { id: "all", label: "全部", count: cards.length },
-    { id: "classic", label: "原 16 模板", count: classicCount },
-    { id: "real", label: "写实新模板", count: realCount },
+    { id: "2d", label: "2D 动画", count: typeCounts["2d"] || 0 },
+    { id: "3d", label: "3D 电影", count: typeCounts["3d"] || 0 },
+    { id: "realistic", label: "写实", count: typeCounts["realistic"] || 0 },
   ];
 
   const refresh = useCallback(async () => {
@@ -569,6 +583,7 @@ function TemplateCard({
   batchHint?: { status: string; done?: number; total?: number };
 }) {
   const { seed, template } = item;
+  const renderMeta = resolveRenderTypeForCard(item);
   const [failedPoster, setFailedPoster] = useState("");
   const label = template?.label || seed.label;
   const style = template?.style || seed.style;
@@ -608,7 +623,7 @@ function TemplateCard({
         type="button"
         className={"cm-tpl-poster" + (status === "generating" ? " is-generating" : "")}
         onClick={() => (batchMode ? onToggleSelect?.(seed.id) : onOpen(item))}
-        title={hasFinal ? "播放 3D 成片" : "查看模板镜头详情"}
+        title={hasFinal ? `播放 ${renderMeta.label}成片` : "查看模板镜头详情"}
       >
         {template?.poster_url && template.poster_url !== failedPoster ? (
           <img
@@ -628,7 +643,7 @@ function TemplateCard({
           <i className={"cm-status-dot " + (status ? templateStatusDot(status) : "")} />
           {statusLabel}
         </span>
-        {hasFinal && <span className="cm-tpl-badge3d">3D</span>}
+        {hasFinal && <span className={"cm-tpl-type-badge is-" + renderMeta.id}>{renderMeta.short}</span>}
         {batchHint ? (
           <span className={"cm-tpl-batch-badge is-" + batchHint.status} title="批量队列中的模板状态">
             {batchHint.status === "queued" ? (
@@ -666,7 +681,9 @@ function TemplateCard({
           <span className="cm-tpl-style" title={style}>
             {style}
           </span>
-          {isRealTemplate(seed.id) && <span className="tpl-real-badge">写实</span>}
+          <span className={"cm-tpl-type-tag is-" + renderMeta.id} title={renderMeta.label + " · " + renderMeta.wait}>
+            {renderMeta.short}
+          </span>
           <span className="cm-tpl-en">{seed.en}</span>
         </div>
 
@@ -693,7 +710,7 @@ function TemplateCard({
           ) : (
             <span className="cm-tpl-final-main">—</span>
           )}
-          <span className="cm-tpl-final-label">{hasFinal ? "3D 成片" : "未合成"}</span>
+          <span className="cm-tpl-final-label">{hasFinal ? `${renderMeta.short} 成片` : "未合成"}</span>
         </div>
 
         {template?.error && (
@@ -708,7 +725,7 @@ function TemplateCard({
             className="cm-btn cm-btn-sm cm-btn-play"
             onClick={() => template && onPlay(template)}
             disabled={!hasFinal || !template}
-            title={hasFinal ? "播放 3D 成片" : "还没有 3D 成片"}
+            title={hasFinal ? `播放 ${renderMeta.label}成片` : `还没有 ${renderMeta.short} 成片`}
           >
             <IconPlay size={11} /> 播放
           </button>
@@ -737,7 +754,7 @@ function TemplateCard({
               className="cm-btn cm-btn-sm cm-btn-ghost"
               onClick={() => template && onAssemble(template)}
               disabled={!canAssemble(template) || busyAction === assembleKey}
-              title={canAssemble(template) ? "合成 3D 成片" : "全部镜头就绪后才可合成"}
+              title={canAssemble(template) ? `合成 ${renderMeta.short} 成片` : "全部镜头就绪后才可合成"}
             >
               合成
             </button>
@@ -747,7 +764,7 @@ function TemplateCard({
               type="button"
               className="cm-btn cm-btn-sm cm-btn-ghost"
               onClick={() => onOpenShots(seed.id)}
-              title="进入 3D 制作台 · 镜头台"
+              title="进入制作台 · 镜头台"
             >
               镜头台
             </button>
@@ -778,12 +795,13 @@ function TemplatePlayer({ template, onClose }: { template: CinemaTemplate; onClo
   }, [onClose]);
 
   const final = template.final;
+  const renderMeta = renderTypeMeta(template);
   return createPortal(
-    <div className="cm-tpl-modal" onMouseDown={onClose} role="dialog" aria-modal="true" aria-label={`${template.label} 3D 成片`}>
+    <div className="cm-tpl-modal" onMouseDown={onClose} role="dialog" aria-modal="true" aria-label={`${template.label} ${renderMeta.label}成片`}>
       <div className="cm-tpl-modal-inner" onMouseDown={(event) => event.stopPropagation()}>
         <header className="cm-tpl-modal-head">
           <div style={{ minWidth: 0 }}>
-            <span className="cm-tpl-modal-kicker">3D 成片 · {template.style || "3D"}</span>
+            <span className="cm-tpl-modal-kicker">{renderMeta.label}成片 · {template.style || renderMeta.short} · {renderMeta.wait}</span>
             <h3 className="cm-tpl-modal-title">
               {template.label}
               <small>{template.id}</small>
@@ -806,7 +824,7 @@ function TemplatePlayer({ template, onClose }: { template: CinemaTemplate; onClo
             {fmtDuration(final.duration)} · {fmtSize(final.size)}
           </span>
           <span>
-            镜头 {template.clips.done}/{template.clips.total || "—"} · 3D 重制
+            镜头 {template.clips.done}/{template.clips.total || "—"} · {renderMeta.id === "2d" ? "2D 渲染" : renderMeta.id === "realistic" ? "写实生成" : "3D 重制"}
           </span>
           <span className="cm-tpl-modal-spacer" />
           {template.report_url && (

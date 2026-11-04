@@ -135,6 +135,7 @@ ALLOWED_STATUSES = {
 CLIP_OK_STATUSES = ("ok", "cached", "card-skip")
 
 T3D_ROOT = config.OUTPUTS_DIR / "templates_3d"
+T2D_ROOT = config.OUTPUTS_DIR / "templates_2d"
 PROGRESS_PATH = T3D_ROOT / "progress.json"
 V5_ROOT = config.OUTPUTS_DIR / "templates_v5"
 BRIEFS_DIR = config.CONTRACT_DIR / "v5" / "cinema3d" / "templates3d"
@@ -196,7 +197,8 @@ def _contract_template_ids() -> List[str]:
                 continue
             meta = data.get("meta") if isinstance(data, dict) and isinstance(data.get("meta"), dict) else {}
             if (BRIEFS_DIR / f"{tid}_semantic.json").is_file() or meta.get("three_d") \
-                    or meta.get("create_source") == "v21":
+                    or meta.get("create_source") == "v21" \
+                    or str(data.get("render_type") or "").lower() in ("2d", "3d", "realistic"):
                 found.append(tid)
     return found
 
@@ -266,12 +268,15 @@ DEFAULT_RESOLUTION = "768x432"
 
 #: 任务 kind（与 cinema3d.py 共用 _JOBS；这里补上中文标签）
 KIND_TEMPLATES_GENERATE = "templates_generate"
+KIND_TEMPLATES_GENERATE_2D = "templates_generate_2d"
 KIND_TEMPLATES_ASSEMBLE = "templates_assemble"
 JOB_KIND_LABEL.setdefault(KIND_TEMPLATES_GENERATE, "模板 3D 生成")
+JOB_KIND_LABEL.setdefault(KIND_TEMPLATES_GENERATE_2D, "模板 2D 生成")
 JOB_KIND_LABEL.setdefault(KIND_TEMPLATES_ASSEMBLE, "模板 3D 合成")
 
 #: 生成任务互斥范围：本模板生成 + 原 relic 3D 的本地/云端生成（同一块 GPU）
-GENERATE_CONFLICT_KINDS = ("generate_local", "generate_cloud", KIND_TEMPLATES_GENERATE)
+GENERATE_CONFLICT_KINDS = ("generate_local", "generate_cloud",
+                           KIND_TEMPLATES_GENERATE, KIND_TEMPLATES_GENERATE_2D)
 #: 合成任务互斥范围：本模板合成 + 原 relic 3D 合成
 ASSEMBLE_CONFLICT_KINDS = ("assemble", KIND_TEMPLATES_ASSEMBLE)
 
@@ -379,6 +384,27 @@ def _template_style(tid: str) -> Optional[str]:
     # 新模板 contract 尚未落地时，语义 brief 里的 style 也可用
     semantic_style = _load_semantic(tid).get("style")
     return str(semantic_style) if semantic_style else None
+
+
+_RENDER_TYPE_LABELS = {"2d": "2D 动画", "3d": "3D 电影", "realistic": "写实实拍"}
+
+
+def _template_render_type(tid: str) -> str:
+    """V41：模板节目类型；显式 render_type 优先，缺省 real_* → realistic，否则 3d。"""
+    raw = str(_template_contract(tid).get("render_type") or "").strip().lower()
+    if raw in _RENDER_TYPE_LABELS:
+        return raw
+    return "realistic" if str(tid).startswith(_REAL_TEMPLATE_PREFIX) else "3d"
+
+
+def _template_render_type_label(tid: str) -> str:
+    render_type = _template_render_type(tid)
+    return _RENDER_TYPE_LABELS.get(render_type, render_type)
+
+
+def _template_type_fields(tid: str) -> Dict[str, str]:
+    return {"render_type": _template_render_type(tid),
+            "render_type_label": _template_render_type_label(tid)}
 
 
 def _load_briefs(tid: str) -> Dict[str, Any]:
@@ -571,13 +597,37 @@ _FINAL_CACHE: Dict[str, Tuple[Tuple[int, int], float, Dict[str, Any]]] = {}
 _FINAL_LOCK = threading.Lock()
 
 
+def _preferred_final_path(tid: str) -> Path:
+    root = T2D_ROOT if _template_render_type(tid) == "2d" else T3D_ROOT
+    return root / tid / "final.mp4"
+
+
 def _final_path(tid: str) -> Path:
-    return T3D_ROOT / tid / "final.mp4"
+    """V41：优先按 render_type 选目录；另一目录已有成片时兼容回退。"""
+    preferred = _preferred_final_path(tid)
+    other_root = T3D_ROOT if preferred.parent.parent == T2D_ROOT else T2D_ROOT
+    other = other_root / tid / "final.mp4"
+    try:
+        if preferred.is_file() and preferred.stat().st_size > 0:
+            return preferred
+        if other.is_file() and other.stat().st_size > 0:
+            return other
+    except OSError:
+        pass
+    return preferred
+
+
+def _final_media_url(path: Path, tid: str) -> str:
+    try:
+        root_name = path.parent.parent.name
+    except Exception:  # noqa: BLE001
+        root_name = "templates_3d"
+    return _media_url(f"{root_name}/{tid}/final.mp4")
 
 
 def _final_info(tid: str) -> Dict[str, Any]:
     path = _final_path(tid)
-    url = _t3d_media(tid, "final.mp4")
+    url = _final_media_url(path, tid)
     try:
         stat = path.stat()
     except OSError:
@@ -620,7 +670,7 @@ _POSTER_WORKER: Optional[threading.Thread] = None
 
 
 def _poster_path(tid: str) -> Path:
-    return T3D_ROOT / tid / POSTER_FILENAME
+    return _final_path(tid).parent / POSTER_FILENAME
 
 
 def _poster_exists(tid: str) -> bool:
@@ -777,27 +827,34 @@ def _enqueue_poster(tid: str) -> None:
         _POSTER_WORKER.start()
 
 
+def _media_for_root(root_name: str, tid: str, rel: str) -> str:
+    return _media_url(f"{root_name}/{tid}/{rel}")
+
+
 def _poster_url(tid: str, final_exists: bool, allow_generate: bool) -> Optional[str]:
-    """海报 URL：优先 3D poster.jpg；成片已出但海报未生成时抽帧（列表异步/详情同步）；
-    成片还没出来时回落到 contract 声明的海报 / 旧 2D 产物；都没有返回 None（前端显示占位，不 500）。"""
+    """海报 URL：优先 final 同目录 poster.jpg；成片已出但海报未生成时抽帧
+    （列表异步/详情同步）；成片还没出来时回落到 contract 声明海报 / 旧 2D 产物。"""
+    root_name = _final_path(tid).parent.parent.name
     if _poster_exists(tid):
-        return _t3d_media(tid, POSTER_FILENAME)
+        return _media_for_root(root_name, tid, POSTER_FILENAME)
     if final_exists:
         if allow_generate:
             if _generate_poster(tid):
-                return _t3d_media(tid, POSTER_FILENAME)
+                return _media_for_root(root_name, tid, POSTER_FILENAME)
         else:
             _enqueue_poster(tid)
     return _contract_poster_url(tid) or _old_poster_url(tid)
 
 
 def _report_url(tid: str) -> Optional[str]:
-    path = T3D_ROOT / tid / "report.json"
-    try:
-        if path.is_file() and path.stat().st_size > 0:
-            return _t3d_media(tid, "report.json")
-    except OSError:
-        pass
+    # 3D report.json / 2D qc_report.json 都兼容
+    for root, filename in ((T3D_ROOT, "report.json"), (T2D_ROOT, "qc_report.json")):
+        path = root / tid / filename
+        try:
+            if path.is_file() and path.stat().st_size > 0:
+                return _media_for_root(root.name, tid, filename)
+        except OSError:
+            continue
     return None
 
 
@@ -819,7 +876,10 @@ def _template_view(
         "id": tid,
         "label": _template_label(tid),
         "style": _template_style(tid),
+        **_template_type_fields(tid),
         "status": state["status"],
+        "stage": ("render" if state["status"] in (STATUS_GENERATING, STATUS_PENDING)
+                  else "done" if state["status"] == STATUS_DONE else state["status"]),
         "assembled": state["assembled"],
         "progress": state["progress"],
         "clips": state["clips"],
@@ -866,6 +926,7 @@ def _status_rows(progress: Dict[str, Any]) -> List[Dict[str, Any]]:
             {
                 "id": tid,
                 "label": _template_label(tid),
+                **_template_type_fields(tid),
                 "status": state["status"],
                 "assembled": state["assembled"],
                 "progress": state["progress"],
@@ -1229,6 +1290,23 @@ def _generate_cmd(tids: Sequence[str], force: bool, resolution: str) -> List[str
     return cmd
 
 
+def _generate_2d_cmd(tid: str, force: bool) -> List[str]:
+    """V41：custom/内建模板统一的 V5 2D 渲染命令（custom_2d_runner 兼容加载 custom 模板）。"""
+    runner = Path(__file__).resolve().parent / "custom_2d_runner.py"
+    out = T2D_ROOT / tid / "final.mp4"
+    workdir = V5_ROOT / tid / "work"
+    cmd = [
+        sys.executable,
+        str(runner),
+        "--template", tid,
+        "--out", str(out),
+        "--workdir", str(workdir),
+    ]
+    if force:
+        cmd.append("--force")
+    return cmd
+
+
 def _assemble_cmd(tids: Sequence[str], force: bool) -> List[str]:
     cmd = [
         sys.executable,
@@ -1378,6 +1456,49 @@ class _TemplateJobTracker:
         }
 
 
+class _Template2DTracker:
+    """V41：解析 render_v5 的 `PROGRESS <pct> <msg>`，映射阶段 render → qc → done。"""
+
+    _PROGRESS_RE = re.compile(r"^PROGRESS\s+(\d+)\s*(.*)$")
+
+    def __init__(self, tids: Sequence[str]) -> None:
+        self.tids = list(tids)
+        self.last_progress = 1.0
+        self.last_message = "2D 渲染中"
+
+    def on_line(self, line: str) -> Optional[Dict[str, Any]]:
+        match = self._PROGRESS_RE.match(line.strip())
+        if not match:
+            return None
+        pct = max(1.0, min(99.0, float(match.group(1))))
+        message = (match.group(2) or "").strip()[:200] or "2D 渲染中"
+        self.last_progress = pct
+        self.last_message = message
+        stage = "qc" if pct >= 90 else "render"
+        return {"progress": pct, "message": message, "stage": stage}
+
+    def result(self) -> Dict[str, Any]:
+        templates: List[Dict[str, Any]] = []
+        for tid in self.tids:
+            final = T2D_ROOT / tid / "final.mp4"
+            info = _final_info(tid)
+            templates.append({
+                "id": tid,
+                "final": str(final),
+                "exists": bool(final.is_file() and final.stat().st_size > 0),
+                "duration": info.get("duration"),
+                "size": info.get("size"),
+                "url": info.get("url"),
+            })
+        return {
+            "mode": "generate_2d",
+            "templates": list(self.tids),
+            "render_type": "2d",
+            "templates_result": templates,
+            "ok": bool(templates) and all(row["exists"] for row in templates),
+        }
+
+
 def _generate_done_message(result: Dict[str, Any]) -> str:
     tids = result.get("templates") or []
     clips_done = int(result.get("clips_done") or 0)
@@ -1412,6 +1533,7 @@ def _finish_template_job(job_id: str, message: str, result: Dict[str, Any]) -> N
         job.update(
             status="done",
             progress=100.0,
+            stage="done",
             finished_at=_now_text(),
             message=message[:300],
             result=result,
@@ -1433,8 +1555,13 @@ def _run_template_job(job_id: str) -> None:
     if not cmd:
         _finish_failed(job_id, "内部错误：任务缺少可执行命令")
         return
-    tracker = _TemplateJobTracker(mode, tids)
-    label = JOB_KIND_LABEL.get(KIND_TEMPLATES_GENERATE if mode == "generate" else KIND_TEMPLATES_ASSEMBLE, "任务")
+    is_2d = mode == "generate_2d"
+    tracker = _Template2DTracker(tids) if is_2d else _TemplateJobTracker(mode, tids)
+    if is_2d:
+        label = JOB_KIND_LABEL.get(KIND_TEMPLATES_GENERATE_2D, "模板 2D 生成")
+    else:
+        label = JOB_KIND_LABEL.get(
+            KIND_TEMPLATES_GENERATE if mode == "generate" else KIND_TEMPLATES_ASSEMBLE, "任务")
 
     proc: Optional[subprocess.Popen] = None
     try:
@@ -1449,6 +1576,7 @@ def _run_template_job(job_id: str) -> None:
                 started_at=_now_text(),
                 _started_ts=time.time(),
                 progress=1.0,
+                stage="render" if is_2d else current.get("stage"),
                 message=f"{label}运行中",
             )
             start_snapshot = dict(current)
@@ -1506,17 +1634,28 @@ def _run_template_job(job_id: str) -> None:
         _finish_failed(job_id, f"任务超时（>{int(float(timeout or 0))}s），已终止")
         return
 
-    if mode == "assemble":
+    if is_2d:
+        result = tracker.result()
+        if returncode == 0 and result.get("ok"):
+            _finish_template_job(job_id, "2D 渲染完成（QC PASS）", result)
+        elif returncode == 0:
+            _finish_failed(job_id, "2D 渲染结束但未找到有效成片 final.mp4")
+        else:
+            _finish_failed(job_id, _failure_message(int(returncode or -1), logs, "generate"))
+    elif mode == "assemble":
         result = tracker.assemble_result()
         message = _assemble_done_message(result)
+        if returncode == 0:
+            _finish_template_job(job_id, message, result)
+        else:
+            _finish_failed(job_id, _failure_message(int(returncode or -1), logs, "assemble"))
     else:
         result = tracker.generate_result()
         message = _generate_done_message(result)
-    if returncode == 0:
-        _finish_template_job(job_id, message, result)
-    else:
-        fail_mode = "assemble" if mode == "assemble" else "generate"
-        _finish_failed(job_id, _failure_message(int(returncode or -1), logs, fail_mode))
+        if returncode == 0:
+            _finish_template_job(job_id, message, result)
+        else:
+            _finish_failed(job_id, _failure_message(int(returncode or -1), logs, "generate"))
 
 
 def _spawn_template_job(job_id: str) -> None:
@@ -1601,6 +1740,49 @@ def start_generate(payload: TemplateGenerateRequest) -> Dict[str, Any]:
     resolution = _parse_resolution(payload.resolution)
     force = bool(payload.force)
     dry_run = bool(payload.dry_run)
+    render_types = {tid: _template_render_type(tid) for tid in tids}
+    two_d = [tid for tid in tids if render_types.get(tid) == "2d"]
+    three_d = [tid for tid in tids if render_types.get(tid) != "2d"]
+    if two_d and three_d:
+        raise _bad_request("一次批量只能提交同一节目类型：2D 与 3D/写实请分开生成")
+    if len(two_d) > 1:
+        raise _bad_request("2D 一次只支持生成 1 个模板（批量请逐个提交）")
+
+    if two_d:
+        tid = two_d[0]
+        cmd = _generate_2d_cmd(tid, force)
+        job = _reserve_or_409(
+            GENERATE_CONFLICT_KINDS,
+            KIND_TEMPLATES_GENERATE_2D,
+            [tid],
+            _cmd=cmd,
+            _mode="generate_2d",
+            _timeout=1800,
+            _templates=[tid],
+            stage="render",
+            render_type="2d",
+            message=f"模板 2D 生成排队中（{tid}）",
+            templates=[tid],
+            force=force,
+            resolution="1280x720",
+            dry_run=dry_run,
+            result={"mode": "generate_2d", "templates": [tid], "force": force,
+                    "dry_run": dry_run, "render_type": "2d"},
+        )
+        if dry_run:
+            _update_job(
+                job["id"], status="done", progress=100.0, stage="done",
+                finished_at=_now_text(),
+                message="dry-run：未执行（命令见 logs/result）",
+                result={"mode": "generate_2d", "dry_run": True, "templates": [tid],
+                        "force": force, "command": cmd, "render_type": "2d"},
+            )
+            _append_log(job["id"], "[dry-run] " + " ".join(cmd))
+        else:
+            _spawn_template_job(job["id"])
+        logger.info("模板 2D 渲染任务入队：%s %s", job["id"], tid)
+        return {"job_id": job["id"], "templates": [tid], "render_type": "2d",
+                "dry_run": dry_run}
 
     if not dry_run:  # dry-run 不启动子进程，只预览命令，不受后台 GPU 任务影响
         external_pid = _external_generation_pid()
@@ -1623,13 +1805,15 @@ def start_generate(payload: TemplateGenerateRequest) -> Dict[str, Any]:
         force=force,
         resolution=resolution,
         dry_run=dry_run,
-        result={"mode": "generate", "templates": list(tids), "force": force, "dry_run": dry_run},
+        result={"mode": "generate", "templates": list(tids), "force": force,
+                "dry_run": dry_run, "render_type": render_types},
     )
     if dry_run:
         _update_job(
             job["id"],
             status="done",
             progress=100.0,
+            stage="done",
             finished_at=_now_text(),
             message="dry-run：未执行（命令见 logs/result）",
             result={
@@ -1644,7 +1828,8 @@ def start_generate(payload: TemplateGenerateRequest) -> Dict[str, Any]:
     else:
         _spawn_template_job(job["id"])
     logger.info("templates3d 生成任务入队：%s %s", job["id"], ",".join(tids))
-    return {"job_id": job["id"], "templates": list(tids), "dry_run": bool(payload.dry_run)}
+    return {"job_id": job["id"], "templates": list(tids),
+            "render_types": render_types, "dry_run": bool(payload.dry_run)}
 
 
 # --------------------------------------------------------------------------- #

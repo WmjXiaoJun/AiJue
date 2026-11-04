@@ -99,6 +99,8 @@ export interface TemplateCreateBody {
   id?: string;
   label: string;
   style: string;
+  /** V41：节目类型（2d | 3d | realistic） */
+  render_type?: "2d" | "3d" | "realistic";
   aspect?: string;
   description?: string;
   cast: TemplateCastInput[];

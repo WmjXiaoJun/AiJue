@@ -36,3 +36,37 @@
 - **tpl-backend**：render_type 合同/接口/分派 + 2D runner（含 custom 兼容）+ 列表兼容 + 自测（真实跑一个 2D 模板）
 - **tpl-frontend**：向导类型选择 + 卡片徽标/筛选 + 第④步提示 + 截图
 - **Lead**：真实 2D 模板端到端（UI/API 创建→生成→播放）、3D/写实回归、截图、docs、commit
+
+
+## 6. 交付结果（2026-11-04 14:12）
+
+### 后端（20/20 自测 PASS + dispatch 修复验证）
+- 模板合同 `render_type`（2d|3d|realistic；缺省 real_*→realistic，否则 3d）；POST /api/v5/templates 接受并写 custom 合同；列表/status/详情/catalog 返回 `render_type` + 中文 label（2D 动画/3D 电影/写实实拍）
+- 2D 渲染路径：新增 `backend/app/routers/custom_2d_runner.py`（patch catalog 支持 custom 模板 → `pipeline.render_v5.main`），输出 `outputs/templates_2d/<tid>/final.mp4` + poster/QC/分镜/timeline
+- 分派修复：`pipeline_ui.start_pipeline_job` 读取 render_type；2D → custom_2d_runner（stage render/qc/done、解析 PROGRESS）；3D/写实 → 原 hq；auto_generate / 手动 run / V25 批量全部按类型分派
+- 实测（修复后）：创建+auto_generate 2D → done 64.3s；手动 run → 48.0s；批量 → 48.2s；3D/写实 dry-run 未被误分派；2D 成片 1280×720/25fps/AAC，`templates_2d` 目录、/media 200
+
+### 前端
+- 新建模板向导 step1 新增「节目类型」三选一（2D 动画≈1–3 分钟 / 3D 电影≈15–40 分钟 / 写实实拍≈15–40 分钟）+ 画面差异提示，提交带 render_type
+- 模板库卡片类型徽标（2D/3D/写实）+ 筛选「全部/2D 动画/3D 电影/写实」带计数
+- 一键成片：页头类型/耗时 chip、面包屑；第④步「生成 2D / 生成 3D」+ 类型说明；第⑤步成片类型标签；2D final 路径兼容
+- `tsc` 0 / build 通过 / console 无 error
+
+### 演示模板与成片（保留）
+- 模板：`custom_tpl_v41_2d_demo`「2D 动画 · 城市来信」（neon_toon，cast 老周/阿栗/甜妹，4 幕）
+- 成片：**13.488s / 4,189,562B / 1280×720 / 25fps / AAC**，QC PASS，poster/contact_sheet/timeline 齐全
+- 看片：`/media/templates_2d/custom_tpl_v41_2d_demo/final.mp4`
+- 页面级验证（Playwright）：一键成片选 2D 模板 → 第④步「重新生成」→ 页面提示「2D 成片就绪 · 镜头 4/4」；模板库筛选 2D → 卡片 2D 徽标 → 播放弹层正常播放（`tmp/v41/lead/`）
+
+### 当前类型分布（22 个模板）
+| 类型 | 数量 | 说明 |
+|---|---|---|
+| 2D 动画 | 1 | 自定义 demo（新能力） |
+| 3D 电影 | 18 | 内置 + 2 个自定义 3D |
+| 写实实拍 | 3 | real_street / real_cafe / real_kitchen（走 3D 流水线，画风写实） |
+
+### 说明 / 遗留
+- 一个模板 = 一个节目，cast 在新建模板向导 step2 配置（3–5 人，含声音），三种类型均可自定义模板
+- 2D 每次 `--force` 重渲约 48–65 秒，不支持 reuse_shots；2D/3D 混合批量需分开提交（批量已按类型分派，但 API 不允许混合一次提交）
+- 写实类型复用 3D hq（写实画风模板），生成耗时与 3D 一致（约 15–40 分钟/条）
+- 2D 列表 `final_url` 字段可能为空，但前端已按 `templates_2d` 回退并可播放；poster_url 正常

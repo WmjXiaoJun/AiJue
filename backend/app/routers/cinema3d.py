@@ -94,6 +94,7 @@ PUBLIC_JOB_KEYS = (
     "kind",
     "status",
     "progress",
+    "stage",
     "message",
     "started_at",
     "finished_at",

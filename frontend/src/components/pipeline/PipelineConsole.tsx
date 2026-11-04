@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { api, errorText } from "../../lib/api";
 import type { Settings } from "../../types";
 import type { CinemaTemplate } from "../../lib/cinema";
+import { renderTypeMeta } from "../../lib/cinema";
 import { cinemaApi } from "../../lib/cinema";
 import type { V5CatalogResponse, V5TemplateSummary } from "../../lib/v5";
 import { v5api, isV5NotFound } from "../../lib/v5";
@@ -53,7 +54,7 @@ interface Props {
   onOpenSettings: () => void;
 }
 
-const STEP_LABELS = ["选模板", "角色与声音", "剧本预览", "生成 3D", "成片", "发布前检查"];
+const STEP_LABELS = ["选模板", "角色与声音", "剧本预览", "生成成片", "成片", "发布前检查"];
 
 export function PipelineConsole({ initialTemplateId, onExit, onOpenCharacters, onOpenCinema, onOpenLibrary, onOpenSettings }: Props) {
   const notify = useToast();
@@ -477,15 +478,21 @@ export function PipelineConsole({ initialTemplateId, onExit, onOpenCharacters, o
 
   const activeRun = Boolean(run && (run.status === "queued" || run.status === "running"));
   const doneCount = templates.filter((item) => item.final.exists).length;
+  const selectedRenderMeta = renderTypeMeta(selectedTemplate);
 
   return (
     <AppShell
       active="pipeline"
       kicker="ONE-CLICK PRODUCTION · 一键成片"
       title="制片控制台"
-      breadcrumb={selectedTemplate ? [{ label: "造片局" }, { label: `${selectedTemplate.id} · ${selectedTemplate.label}` }] : [{ label: "造片局" }]}
+      breadcrumb={
+        selectedTemplate
+          ? [{ label: "造片局" }, { label: `${selectedTemplate.id} · ${selectedTemplate.label}` }, { label: selectedRenderMeta.label }]
+          : [{ label: "造片局" }]
+      }
       chips={[
-        { label: "3D 成片", value: `${doneCount}/${templates.length || "—"}`, tone: "gold" },
+        { label: "节目类型", value: selectedTemplate ? `${selectedRenderMeta.short} · ${selectedRenderMeta.wait}` : "未选模板", tone: selectedTemplate ? "gold" : "slate" },
+        { label: "成片", value: `${doneCount}/${templates.length || "—"}`, tone: "gold" },
         { label: "pipeline", value: runStatusText, tone: run?.status === "failed" ? "red" : activeRun ? "gold" : "jade" },
         { label: "音色", value: String(presets.length || "—"), tone: "slate" },
       ]}
@@ -493,7 +500,7 @@ export function PipelineConsole({ initialTemplateId, onExit, onOpenCharacters, o
         label: "一键全流程",
         onClick: oneClick,
         disabled: starting || activeRun || !selectedId,
-        title: !selectedId ? "先在第 ① 步选模板" : "复用已有镜头 → 快速合成 3D 成片 → 发布前检查",
+        title: !selectedId ? "先在第 ① 步选模板" : selectedTemplate ? `复用已有镜头 → 快速合成${selectedRenderMeta.short}成片 → 发布前检查` : "复用已有镜头 → 快速合成成片 → 发布前检查",
         icon: <IconSpark size={14} />,
       }}
       onRefresh={() => void refresh()}

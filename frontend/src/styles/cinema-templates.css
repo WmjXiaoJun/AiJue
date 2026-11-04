@@ -958,3 +958,13 @@
 }
 .cm-tpl-filter-search:focus { border-color: rgba(201, 162, 39, 0.55); box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.1); }
 .cm-tpl-filter-search::placeholder { color: var(--c-mut); }
+
+/* V41：模板节目类型徽标 */
+.cm-tpl-type-tag { display: inline-flex; align-items: center; height: 18px; padding: 0 6px; border-radius: 4px; border: 1px solid var(--c-line); font-family: var(--font-mono); font-size: 8.5px; letter-spacing: .06em; }
+.cm-tpl-type-tag.is-2d { border-color: rgba(79,143,124,.5); color: #8fd0b8; background: rgba(79,143,124,.1); }
+.cm-tpl-type-tag.is-3d { border-color: rgba(201,162,39,.45); color: var(--c-gold-soft); background: rgba(201,162,39,.1); }
+.cm-tpl-type-tag.is-realistic { border-color: rgba(140,160,190,.45); color: #b7c7dd; background: rgba(140,160,190,.08); }
+.cm-tpl-type-badge { position: absolute; top: 8px; right: 8px; padding: 1px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 9px; letter-spacing: .08em; background: rgba(8,9,13,.72); border: 1px solid var(--c-line); }
+.cm-tpl-type-badge.is-2d { color: #8fd0b8; border-color: rgba(79,143,124,.55); }
+.cm-tpl-type-badge.is-3d { color: var(--c-gold-soft); border-color: rgba(201,162,39,.5); }
+.cm-tpl-type-badge.is-realistic { color: #b7c7dd; border-color: rgba(140,160,190,.5); }

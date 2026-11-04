@@ -127,10 +127,43 @@ export interface CinemaTemplateFinal {
   mtime?: string | null;
 }
 
+export type RenderType = "2d" | "3d" | "realistic";
+
+export interface RenderTypeMeta {
+  id: RenderType;
+  label: string;
+  short: string;
+  wait: string;
+  desc: string;
+  tone: string;
+}
+
+/** V41：节目类型元信息（2D 快 / 3D 与写实慢） */
+export const RENDER_TYPE_META: Record<RenderType, RenderTypeMeta> = {
+  "2d": { id: "2d", label: "2D 动画", short: "2D", wait: "约 1–3 分钟", desc: "动画/插画风 · 出片快，适合日常短视频", tone: "jade" },
+  "3d": { id: "3d", label: "3D 电影", short: "3D", wait: "约 15–40 分钟", desc: "电影感镜头 + 3D 角色 · 耗时较长", tone: "gold" },
+  realistic: { id: "realistic", label: "写实实拍", short: "写实", wait: "约 15–40 分钟", desc: "真人质感画面 · 走 3D 生成路径，耗时较长", tone: "slate" },
+};
+
+/** V41：解析模板节目类型（显式 render_type 优先；real_* 缺省写实；否则 3D） */
+export function resolveRenderType(input?: { render_type?: string; id?: string } | string | null): RenderType {
+  const explicit = typeof input === "string" ? input : input?.render_type;
+  if (explicit === "2d" || explicit === "3d" || explicit === "realistic") return explicit;
+  const id = typeof input === "string" ? input : input?.id || "";
+  return id.startsWith("real_") ? "realistic" : "3d";
+}
+
+export function renderTypeMeta(input?: { render_type?: string; id?: string } | string | null): RenderTypeMeta {
+  return RENDER_TYPE_META[resolveRenderType(input)];
+}
+
 export interface CinemaTemplate {
   id: string;
   label: string;
   style: string;
+  /** V41：节目类型（2d | 3d | realistic；缺省按 id 推导） */
+  render_type?: RenderType | string;
+  render_type_label?: string;
   status: CinemaTemplateStatus;
   /** 0–100（后端按镜头数/时长估算；缺失时前端按 clips 兜底） */
   progress: number;
@@ -438,6 +471,8 @@ export function normalizeCinemaTemplate(
     id: looseString(rec.id) || fallback?.id || "",
     label: looseString(rec.label) || fallback?.label || "",
     style: looseString(rec.style) || fallback?.style || "",
+    render_type: looseString(rec.render_type) || undefined,
+    render_type_label: looseString(rec.render_type_label) || looseString(rec.type_label) || undefined,
     status,
     progress,
     clips: { done: clipsDone, total: clipsTotal },

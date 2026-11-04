@@ -2,6 +2,7 @@
 // 提交 POST /api/v5/templates（后端会合成 TTS/episode 并生成 semantic brief；不触发 GPU）。
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { V5CatalogResponse, V5TemplateSummary } from "../../lib/v5";
+import { RENDER_TYPE_META, type RenderType } from "../../lib/cinema";
 import { creationApi, creationErrorMessage, isCreationNotReady, makeCustomId, type TemplateActInput, type TemplateCastInput, type TemplateCreateResponse } from "../../lib/creation";
 import { useToast } from "../Toast";
 import { Spinner } from "../ui";
@@ -55,6 +56,7 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
   const [id, setId] = useState(() => makeCustomId("custom_tpl"));
   const [label, setLabel] = useState("");
   const [style, setStyle] = useState("");
+  const [renderType, setRenderType] = useState<RenderType>("3d");
   const [aspect, setAspect] = useState("16:9");
   const [targetDuration, setTargetDuration] = useState("40");
   const [description, setDescription] = useState("");
@@ -75,6 +77,7 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
     setId(makeCustomId("custom_tpl"));
     setLabel("");
     setStyle(styles[0]?.id || "");
+    setRenderType("3d");
     setAspect("16:9");
     setTargetDuration("40");
     setDescription("");
@@ -172,6 +175,7 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
         id,
         label: label.trim(),
         style,
+        render_type: renderType,
         aspect,
         description: description.trim() || undefined,
         cast: castBody,
@@ -180,18 +184,19 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
         auto_generate: autoGenerate,
       });
       const pipeline = res?.pipeline || null;
+      const renderMeta = RENDER_TYPE_META[renderType];
       if (pipeline?.started) {
-        notify("模板已创建，3D 生成已开始", "success");
+        notify(`模板已创建，${renderMeta.label}生成已开始（${renderMeta.wait}）`, "success");
       } else if (autoGenerate && pipeline && !pipeline.started) {
         notify(
           pipeline.reason === "busy"
             ? "已有任务运行，模板已创建；可在生成队列或一键成片稍后生成"
-            : `模板已创建；3D 生成未能启动${pipeline.error ? "（" + pipeline.error + "）" : ""}，可稍后手动生成`,
+            : `模板已创建；${renderMeta.label}生成未能启动${pipeline.error ? "（" + pipeline.error + "）" : ""}，可稍后手动生成`,
           "info",
         );
       } else {
         notify(
-          `模板「${label.trim()}」已创建${res?.shots ? ` · ${res.shots} 镜` : ""}${res?.total_duration ? ` · ${Math.round(Number(res.total_duration))}s` : ""}；可去一键成片生成 3D`,
+          `模板「${label.trim()}」已创建${res?.shots ? ` · ${res.shots} 镜` : ""}${res?.total_duration ? ` · ${Math.round(Number(res.total_duration))}s` : ""}；可去一键成片生成${RENDER_TYPE_META[renderType].label}`,
           "success",
         );
       }
@@ -219,7 +224,7 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
             <span className="v21-drawer-kicker">NEW TEMPLATE · 新建模板</span>
             <h3 className="v21-drawer-title">新建模板</h3>
             <p className="v21-drawer-sub">
-              创建模板合同 + TTS 分镜 + semantic brief；不触发 3D 渲染，创建后可在「一键成片」生成 3D。
+              创建模板合同 + TTS 分镜 + semantic brief；选择节目类型（2D 快 / 3D 与写实慢），创建后可在「一键成片」生成。
             </p>
           </div>
           <button type="button" className="v21-close" onClick={onClose} aria-label="关闭" disabled={creating}>
@@ -286,6 +291,32 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
                   ))}
                 </select>
               </label>
+              <div className="v21-field is-wide v41-render-field">
+                <span className="v21-label">节目类型（渲染路径与耗时）</span>
+                <div className="v41-render-grid" role="radiogroup" aria-label="节目类型">
+                  {(Object.values(RENDER_TYPE_META) as typeof RENDER_TYPE_META[RenderType][]).map((meta) => (
+                    <label key={meta.id} className={"v41-render-option is-" + meta.tone + (renderType === meta.id ? " is-active" : "")}>
+                      <input
+                        type="radio"
+                        name="v41_render_type"
+                        value={meta.id}
+                        checked={renderType === meta.id}
+                        onChange={() => setRenderType(meta.id)}
+                      />
+                      <b>{meta.label}</b>
+                      <span className="v41-render-wait">{meta.wait}</span>
+                      <em>{meta.desc}</em>
+                    </label>
+                  ))}
+                </div>
+                <span className="v21-hint">
+                  {renderType === "2d"
+                    ? "2D 动画走轻量 2D 渲染器，约 1–3 分钟出片（1280×720）"
+                    : renderType === "3d"
+                      ? "3D 电影走 3D pipeline（T2VA + 口型），单模板约 15–40 分钟"
+                      : "写实实拍复用写实立绘/镜头并走 3D 生成路径，约 15–40 分钟"}
+                </span>
+              </div>
               <label className="v21-field">
                 <span className="v21-label">目标时长（参考，秒）</span>
                 <input className="v21-input" type="number" min={10} max={180} value={targetDuration} onChange={(event) => setTargetDuration(event.target.value)} />
@@ -427,7 +458,8 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
                 <div className="v21-summary-item"><span>Cast</span><b>{cast.length} 角色</b></div>
                 <div className="v21-summary-item"><span>分幕</span><b>{acts.length} 幕</b></div>
                 <div className="v21-summary-item"><span>将生成</span><b>{acts.length} 镜</b></div>
-                <div className="v21-summary-item"><span>预计生成</span><b>10–45 分钟</b></div>
+                <div className="v21-summary-item"><span>节目类型</span><b>{RENDER_TYPE_META[renderType].label}</b></div>
+                <div className="v21-summary-item"><span>预计生成</span><b>{RENDER_TYPE_META[renderType].wait}</b></div>
               </div>
 
               <label className={"v21-autogen" + (autoGenerate ? " is-on" : "")}>

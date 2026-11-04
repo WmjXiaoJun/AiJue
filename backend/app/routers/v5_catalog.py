@@ -94,11 +94,40 @@ def get_catalog(kind: Optional[str] = Query(default=None, description="只看某
                 for item in (catalog.get(current) or {}).values()
                 if isinstance(item, dict)
             ]
+    _enrich_template_summaries(catalog, summary)
     return summary
 
 
 def _source_of(catalog: dict, kind: str, item_id: str) -> dict:
     return v5_catalog.item_source(catalog, kind, item_id)
+
+
+_RENDER_TYPE_LABELS = {"2d": "2D 动画", "3d": "3D 电影", "realistic": "写实实拍"}
+
+
+def _template_render_type(item_id: str, item: dict) -> str:
+    raw = str((item or {}).get("render_type") or "").strip().lower()
+    if raw in _RENDER_TYPE_LABELS:
+        return raw
+    return "realistic" if str(item_id).startswith("real_") else "3d"
+
+
+def _template_type_fields(item_id: str, item: dict) -> dict:
+    render_type = _template_render_type(item_id, item)
+    return {"render_type": render_type,
+            "render_type_label": _RENDER_TYPE_LABELS[render_type]}
+
+
+def _enrich_template_summaries(catalog: dict, summary: dict) -> None:
+    templates = catalog.get("templates") or {}
+    for row in summary.get("templates") or []:
+        if not isinstance(row, dict):
+            continue
+        tid = str(row.get("id") or "")
+        item = templates.get(tid) if isinstance(templates.get(tid), dict) else {}
+        if not item and "render_type" in row:
+            item = row
+        row.update(_template_type_fields(tid, item))
 
 
 @router.post("/validate", summary="校验整个 V5 目录（Schema/引用/custom id/资源）")
@@ -146,11 +175,14 @@ def get_item(kind: str, item_id: str):
     current = _kind_or_404(kind)
     item = _item_or_404(catalog, current, item_id)
     source = _source_of(catalog, current, item_id)
+    response_item = dict(item)
+    if current == "templates":
+        response_item.update(_template_type_fields(item_id, item))
     return {
         "ok": True,
         "kind": current,
         "id": item_id,
-        "item": item,
+        "item": response_item,
         "custom": bool(source.get("custom")),
         "source": source.get("path", ""),
         "base": source.get("base", ""),

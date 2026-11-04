@@ -47,6 +47,9 @@ _FFMPEG = _REPO_ROOT / "tools" / "node_modules" / "ffmpeg-static" / "ffmpeg.exe"
 _ID_RE = re.compile(r"^[a-z][a-z0-9_]{1,60}$")
 _ROLE_RE = re.compile(r"^[a-z][a-z0-9_]{0,30}$")
 _HEX_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
+# V41：节目类型
+_RENDER_TYPES = ("2d", "3d", "realistic")
+_RENDER_TYPE_LABELS = {"2d": "2D 动画", "3d": "3D 电影", "realistic": "写实实拍"}
 
 #: V24 概念图（imagegen/SDXL）：单张 portrait；V28 扩展三视图/表情/设定图
 _ART_DIR = _REPO_ROOT / "assets" / "v5" / "characters"
@@ -1195,6 +1198,12 @@ def create_template(body: Dict[str, Any] = Body(default={})) -> dict:
         errors.append(f"id 不合法：{tid}（需 ^[a-z][a-z0-9_]{{1,60}}$）")
     if tid in (catalog.get("templates") or {}):
         errors.append(f"模板 id 已存在：{tid}")
+    # V41：节目类型（2d/3d/realistic）；缺省 real_* → realistic，否则 3d
+    render_type = str(data.get("render_type") or "").strip().lower()
+    if not render_type:
+        render_type = "realistic" if tid.startswith("real_") else "3d"
+    if render_type not in _RENDER_TYPES:
+        errors.append(f"render_type 只支持 {', '.join(_RENDER_TYPES)}（当前 {render_type!r}）")
     aspect = _normalize_aspect(data.get("aspect"))
 
     cast_in = data.get("cast")
@@ -1337,11 +1346,13 @@ def create_template(body: Dict[str, Any] = Body(default={})) -> dict:
             "description": str(data.get("description") or f"{label}（V21 可视化创建）").strip(),
             "tags": ["custom", "v21"],
             "style": style_id, "target_duration": total_duration, "aspect": aspect,
+            "render_type": render_type,
             "cast": cast, "acts": template_acts,
             "packaging": {"subtitle": "default", "transition": "fade", "title": label},
             "lipsync": {"mode": "musetalk"},
             "audio": {},
-            "meta": {"create_source": "v21", "three_d": True,
+            "meta": {"create_source": "v21", "three_d": render_type != "2d",
+                     "render_type": render_type,
                      "created_at": _now_text(), "created_by": "api"},
         }
         result = v5_catalog.validate_item("templates", template_item, catalog, as_custom=True)
@@ -1381,6 +1392,8 @@ def create_template(body: Dict[str, Any] = Body(default={})) -> dict:
                                             style_entry, warnings)
         response = {
             "ok": True, "id": tid, "label": label, "style": style_id,
+            "render_type": render_type,
+            "render_type_label": _RENDER_TYPE_LABELS.get(render_type, render_type),
             "shots": len(shots),
             "dialogue_shots": sum(1 for shot in shots if shot["line"]),
             "broll_shots": sum(1 for shot in shots if not shot["line"]),

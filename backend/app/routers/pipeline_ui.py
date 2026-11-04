@@ -97,9 +97,39 @@ def _custom_template_ids() -> List[str]:
             continue
         meta = data.get("meta") if isinstance(data, dict) and isinstance(data.get("meta"), dict) else {}
         if (_SEMANTIC_DIR / f"{tid}_semantic.json").is_file() or meta.get("three_d") \
-                or meta.get("create_source") == "v21":
+                or meta.get("create_source") == "v21" \
+                or str(data.get("render_type") or "").lower() in ("2d", "3d", "realistic"):
             ids.append(tid)
     return ids
+
+
+def _template_contract(tid: str) -> Dict[str, Any]:
+    merged: Dict[str, Any] = {}
+    for path in (_TEMPLATE_CONTRACT_DIR / f"{tid}.json",
+                 _CUSTOM_TEMPLATE_DIR / f"{tid}.json"):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if isinstance(data, dict):
+            merged.update(data)
+    return merged
+
+
+_RENDER_TYPE_LABELS = {"2d": "2D 动画", "3d": "3D 电影", "realistic": "写实实拍"}
+
+
+def _template_render_type(tid: str) -> str:
+    """V41：模板节目类型；显式优先，缺省 real_* → realistic，否则 3d。"""
+    raw = str(_template_contract(tid).get("render_type") or "").strip().lower()
+    if raw in _RENDER_TYPE_LABELS:
+        return raw
+    return "realistic" if str(tid).startswith("real_") else "3d"
+
+
+def _template_render_type_label(tid: str) -> str:
+    render_type = _template_render_type(tid)
+    return _RENDER_TYPE_LABELS.get(render_type, render_type)
 
 
 def _is_custom_template(tid: str) -> bool:
@@ -150,13 +180,49 @@ def _existing_shots(tid: str) -> int:
 
 
 def _final_url(tid: str) -> Optional[str]:
-    path = config.OUTPUTS_DIR / "templates_3d" / tid / "final.mp4"
-    try:
-        if not path.is_file() or path.stat().st_size <= 0:
-            return None
-        return config.media_url(path)
-    except OSError:
-        return None
+    render_type = _template_render_type(tid)
+    candidates = [
+        config.OUTPUTS_DIR / "templates_2d" / tid / "final.mp4",
+        config.OUTPUTS_DIR / "templates_3d" / tid / "final.mp4",
+    ]
+    if render_type != "2d":
+        candidates.reverse()
+    for path in candidates:
+        try:
+            if path.is_file() and path.stat().st_size > 0:
+                return config.media_url(path)
+        except OSError:
+            continue
+    return None
+
+
+def _template_2d_out(tid: str) -> Path:
+    return config.OUTPUTS_DIR / "templates_2d" / tid / "final.mp4"
+
+
+def _template_2d_workdir(tid: str) -> Path:
+    return config.OUTPUTS_DIR / "templates_v5" / tid / "work"
+
+
+def _generate_2d_command(tid: str) -> List[str]:
+    runner = Path(__file__).resolve().parent / "custom_2d_runner.py"
+    return [
+        sys.executable, str(runner),
+        "--template", tid,
+        "--out", str(_template_2d_out(tid)),
+        "--workdir", str(_template_2d_workdir(tid)),
+        "--force",
+    ]
+
+
+_2D_STAGES = [
+    {"id": "render", "label": "2D 渲染"},
+    {"id": "qc", "label": "QC 质检"},
+    {"id": "done", "label": "完成"},
+]
+_2D_STAGE_LABEL = {item["id"]: item["label"] for item in _2D_STAGES}
+_2D_STAGE_INDEX = {item["id"]: index for index, item in enumerate(_2D_STAGES)}
+_2D_PROGRESS_RE = re.compile(r"^PROGRESS\s+(\d+)\s*(.*)$")
 
 
 def _template_label(tid: str) -> Optional[str]:
@@ -199,17 +265,28 @@ def _elapsed_sec(job: Dict[str, Any]) -> float:
 
 
 def _job_view(job: Dict[str, Any], *, tail: int = _TAIL_LINES) -> Dict[str, Any]:
-    stage = str(job.get("stage") or "prepare")
+    is_2d = str(job.get("render_type") or "") == "2d"
+    stages = _2D_STAGES if is_2d else STAGES
+    stage_label = _2D_STAGE_LABEL if is_2d else _STAGE_LABEL
+    stage_index = _2D_STAGE_INDEX if is_2d else _STAGE_INDEX
+    stage = str(job.get("stage") or ("render" if is_2d else "prepare"))
     total = int(job.get("total") or 0)
     done = int(job.get("done") or 0)
+    percent = job.get("percent")
+    if not isinstance(percent, (int, float)):
+        percent = (done * 100.0 / total) if total > 0 else (100.0 if job.get("status") == "done" else 0.0)
     return {
         "id": job.get("id"),
         "template_id": job.get("template_id"),
+        "template_label": job.get("template_label"),
+        "render_type": job.get("render_type") or _template_render_type(str(job.get("template_id") or "")),
+        "render_type_label": _template_render_type_label(str(job.get("template_id") or "")),
         "status": job.get("status"),
         "stage": stage,
-        "stage_index": int(_STAGE_INDEX.get(stage, 0)),
-        "stage_label": _STAGE_LABEL.get(stage, stage),
+        "stage_index": int(stage_index.get(stage, 0)),
+        "stage_label": stage_label.get(stage, stage),
         "progress": {"done": max(0, done), "total": max(0, total)},
+        "percent": round(max(0.0, min(100.0, float(percent))), 1),
         "log_tail": (job.get("log") or [])[-tail:],
         "elapsed_sec": _elapsed_sec(job),
         "final_url": _final_url(str(job.get("template_id") or "")) if job.get("status") == "done" else None,
@@ -217,7 +294,8 @@ def _job_view(job: Dict[str, Any], *, tail: int = _TAIL_LINES) -> Dict[str, Any]
         "reuse_shots": bool(job.get("reuse_shots")),
         "created_at": job.get("created_at"),
         "finished_at": job.get("finished_at"),
-        "stages": [item["id"] for item in STAGES],
+        "stages": [item["id"] for item in stages],
+        "stage_labels": dict(stage_label),
     }
 
 
@@ -235,6 +313,17 @@ def _append_log(job: Dict[str, Any], raw: str) -> None:
     stamp = re.match(r"^\[\d{2}:\d{2}:\d{2}\]\s*", body)
     if stamp:
         body = body[stamp.end():]
+    if str(job.get("render_type") or "") == "2d":
+        match = _2D_PROGRESS_RE.match(body.strip())
+        if match:
+            pct = max(1.0, min(99.0, float(match.group(1))))
+            job["percent"] = pct
+            new_stage = "qc" if pct >= 90 else "render"
+            if job.get("stage") != new_stage:
+                job["stage"] = new_stage
+            if job.get("status") == "running":
+                _persist(job)
+        return
     changed = False
     shot = _SHOT_PROGRESS_RE.search(body)
     if shot:
@@ -282,7 +371,11 @@ def _run_job(job_id: str) -> None:
                 _ACTIVE = None
         return
     tid = str(job.get("template_id") or "")
-    if _is_custom_template(tid):
+    is_2d = str(job.get("render_type") or "") == "2d"
+    if is_2d:
+        # V41：2D 走 render_v5 包装（custom 模板兼容加载）
+        cmd = _generate_2d_command(tid)
+    elif _is_custom_template(tid):
         # V21 custom 模板：用包装器 patch load_template（pipeline 代码不改）
         cmd = [sys.executable, str(_CUSTOM_HQ_RUNNER), "--template", tid]
     else:
@@ -332,7 +425,7 @@ def _run_job(job_id: str) -> None:
             job["status"] = "running"
             job["started_ts"] = time.time()
             job["started_at"] = _now_text()
-            job["stage"] = job.get("stage") or "prepare"
+            job["stage"] = job.get("stage") or ("render" if is_2d else "prepare")
             kill_now = False
             _persist(job)
     if kill_now:
@@ -369,12 +462,21 @@ def _run_job(job_id: str) -> None:
             job["status"] = "canceled"
             job["error"] = job.get("error") or "任务已取消"
         elif code == 0:
-            job["status"] = "done"
-            job["stage"] = "done"
-            total = int(job.get("total") or 0)
-            job["done"] = total
+            if is_2d and (not _template_2d_out(tid).is_file()
+                          or _template_2d_out(tid).stat().st_size <= 0):
+                job["status"] = "failed"
+                job["stage"] = "failed"
+                job["error"] = "2D 渲染结束但未找到有效成片 outputs/templates_2d/<tid>/final.mp4"
+            else:
+                job["status"] = "done"
+                job["stage"] = "done"
+                job["percent"] = 100.0
+                total = int(job.get("total") or 0)
+                job["done"] = total
         else:
             job["status"] = "failed"
+            if is_2d:
+                job["stage"] = "failed"
             tail = " / ".join((job.get("log") or [])[-5:])
             job["error"] = job.get("error") or f"进程退出码 {code}" + (f"：{tail[:600]}" if tail else "")
         _persist(job)
@@ -447,30 +549,40 @@ def start_pipeline_job(template_id: str, *, reuse_shots: bool = False,
         raise HTTPException(status_code=400, detail="template_id 必须是合法模板 id")
     if tid not in _template_ids():
         raise HTTPException(status_code=400, detail=f"未知模板: {tid}")
-    if not _semantic_path(tid).is_file():
+    render_type = _template_render_type(tid)
+    is_2d = render_type == "2d"
+    if not is_2d and not _semantic_path(tid).is_file():
         raise HTTPException(status_code=400, detail=f"模板语义 brief 不存在: {tid}_semantic.json")
     reuse = bool(reuse_shots)
-    if reuse and _existing_shots(tid) <= 0:
+    if is_2d and reuse:
+        raise HTTPException(status_code=400, detail="2D 模板不支持 reuse_shots（每次走 render_v5）")
+    if not is_2d and reuse and _existing_shots(tid) <= 0:
         raise HTTPException(status_code=400,
                             detail=f"模板 {tid} 没有可复用的镜头（shots/ 为空），不能 reuse_shots")
     if dry_run:
         # 只做校验：返回 202 语义的 dry-run 结果，不创建/不启动任何子进程（不占 GPU）
-        if _is_custom_template(tid):
+        if is_2d:
+            command = _generate_2d_command(tid)
+        elif _is_custom_template(tid):
             command = [sys.executable, str(_CUSTOM_HQ_RUNNER), "--template", tid]
         else:
             command = [sys.executable, "-m", "pipeline.templates3d_hq", "--template", tid]
         if reuse:
             command.append("--reuse-shots")
+        stages = _2D_STAGES if is_2d else STAGES
+        labels = _2D_STAGE_LABEL if is_2d else dict(_STAGE_LABEL)
         return {
             "ok": True,
             "job_id": None,
             "template_id": tid,
             "template_label": _template_label(tid),
+            "render_type": render_type,
+            "render_type_label": _template_render_type_label(tid),
             "reuse_shots": reuse,
             "status": "dry_run",
             "dry_run": True,
-            "stages": [item["id"] for item in STAGES],
-            "stage_labels": dict(_STAGE_LABEL),
+            "stages": [item["id"] for item in stages],
+            "stage_labels": labels,
             "command": command,
         }
     # V25：批量队列与单发 run 互斥
@@ -504,10 +616,12 @@ def start_pipeline_job(template_id: str, *, reuse_shots: bool = False,
             "id": job_id,
             "template_id": tid,
             "template_label": _template_label(tid),
+            "render_type": render_type,
             "reuse_shots": reuse,
             "status": "queued",
-            "stage": "prepare",
-            "total": _semantic_shot_total(tid) or _existing_shots(tid),
+            "stage": "render" if is_2d else "prepare",
+            "percent": 0.0,
+            "total": 0 if is_2d else (_semantic_shot_total(tid) or _existing_shots(tid)),
             "done": 0,
             "log": [],
             "error": None,
@@ -550,15 +664,19 @@ def start_pipeline_job(template_id: str, *, reuse_shots: bool = False,
             if _ACTIVE == job_id:
                 _ACTIVE = None
         raise HTTPException(status_code=500, detail=f"启动任务失败: {exc}") from exc
+    stages = _2D_STAGES if is_2d else STAGES
+    labels = _2D_STAGE_LABEL if is_2d else dict(_STAGE_LABEL)
     return {
         "ok": True,
         "job_id": job_id,
         "template_id": tid,
         "template_label": _template_label(tid),
+        "render_type": render_type,
+        "render_type_label": _template_render_type_label(tid),
         "reuse_shots": reuse,
         "status": "queued",
-        "stages": [item["id"] for item in STAGES],
-        "stage_labels": dict(_STAGE_LABEL),
+        "stages": [item["id"] for item in stages],
+        "stage_labels": labels,
     }
 
 
