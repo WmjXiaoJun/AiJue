@@ -100,3 +100,12 @@ def test_outfit_is_pinned_from_contract():
     assert "same suit" in look["identity"]
     assert "suspenders" in look["negatives"]
     assert "business suit" in look["motion"]
+
+
+def test_retro_has_age_bias_in_prompt():
+    """V45：Illustrious 容易画年轻，retro_cel 的关键帧 prompt 额外带年龄偏置。"""
+    style = hq.STYLE_2D_STYLES["retro_cel"]
+    assert style.get("age_extra")
+    prompt = hq._keyframe_prompt(style, "a studio", hq._character_look("laozhou"))
+    assert "45 years old" in prompt
+    assert "weathered skin" in prompt

@@ -101,6 +101,7 @@
 - 成片库卡片：7 个操作按钮换行成「2+2+1」，最后一个「原片」图标单独占一行；改 `.v20-final-actions` 为 3 列网格（6 个按钮 2 行），「原片」移到元信息行右侧。
 - 项目大厅 hero 标题：长项目名在 38px 下断成「（5 分钟 / Demo）」；改 `clamp(26px,2.3vw,38px)` + `text-wrap: balance` + `max-width:26ch`。
 - 全站 8 个主路由浏览器巡检：0 console error、0 请求 404、无横向溢出。
+- **角色与声音页**：顶部「双人对戏」demo 区只在有历史任务时出现；清掉 `outputs/dialogue_jobs` 后该区自动消失，页面直接进入 24 个角色网格（功能按钮仍保留，需要时还能发起）。
 - **风格墙封面**：自定义风格「全息宣纸（示例）」原来只有程序化渐变当封面（灰卡）。现在排序改为「同风格 3D 海报 → 场景 × 风格代表画面 → 程序化预览」，并给风格摘要加 `rep_scene` 字段（`pipeline/v5_catalog.py` + `contract/v5/custom/styles/*.json`）；自定义风格卡现在显示 `/api/v5/preview/scenes/<rep>?style=<id>` 的真实绘景封面。
 - **模板卡**：「V45 2D·吉卜力治愈系」原先被截成「V45 2D·吉…」，风格徽标「2D·赛璐璐」被挤成两行——改为标题独占一行、ID 另起一行，徽标 `flex:0 0 auto; white-space:nowrap`，6 张 2D 卡标题全部完整（`clipped:false`）。
 - **新建模板向导**：≤900px 时节目类型的 1 列断点提前到 720px，三选一保持一行；2D 风格四选一在 900px 变 2×2 且完整可见（底边 798 < 底部栏 905），不再被折叠线切掉。
@@ -123,7 +124,8 @@
 ## 7. 老版本清理（2026-11-04 19:30）
 - 删除 V41/V44 两条老 2D 示例模板（合同 + semantic + `templates_3d/2d/v5` 产物 + 关键帧 + clips），模板目录回到 **28 个（4 个 2D + 24 个 3D）**。
 - 删除历史 demo 媒体与旧归档：`outputs/{_archive_v5_2d_finals,_archive_v14_*,_archive_v15_ref2va_768,template_demos_scene,templates_v3_previs,llm_demos,history_full,scene_demos,scene_demos_3d,style_demos_v2,character_demos,shots_plan_demo,screenshots}` 与 `tmp/{v41,v42,v43,v44,v45_probe*}`。
-- 共释放 **11.73 GB**；保留当前 3D 模板产物、4 条 V45 样片、README 引用的 `outputs/demo|h3|template_demos|h3_style_demos`。
+- 追加删除角色 demo 媒体：`outputs/{dialogue_jobs,audition_jobs,promo_jobs}`（169.1 MB 旧对戏/试镜/宣传片），角色页不再出现历史 demo 区块。
+- 共释放 **11.9 GB**；保留当前 3D 模板产物、4 条 V45 样片、README 引用的 `outputs/demo|h3|template_demos|h3_style_demos`。
 
 ## 8. 遗留
 

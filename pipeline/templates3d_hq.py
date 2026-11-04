@@ -94,6 +94,9 @@ STYLE_2D_STYLES = {
                    "vintage film grain, hand-painted cel"),
         "background": ("90s hand-painted anime background art, painted city night, "
                        "soft gradients, sharp background detail"),
+        # Illustrious 对“成熟”不敏感，会把人画年轻；这风格额外压年龄
+        "age_extra": ("older mature adult, 45 years old, weathered skin, faint wrinkles, "
+                      "sharp cheekbones, mature male face"),
     },
     "soft_watercolor": {
         "label": "吉卜力治愈系",
@@ -305,8 +308,10 @@ KEYFRAME_NEGATIVE = (
 def _keyframe_prompt(style: dict, visual: str, look: dict) -> str:
     """V45：风格句 + 场景句 + 环境句 + 角色年龄气质句（环境在前，避免只画脸）。"""
     scene = visual or "a cinematic interior scene with a fully visible background"
-    return (f"{style['prompt']}; {scene}; {style['background']}; {look['identity']}; "
-            "detailed face, cel-shaded, clean lineart, official anime art")
+    age_extra = str(style.get("age_extra") or "").strip()
+    parts = [style["prompt"], scene, style["background"], look["identity"],
+             age_extra, "detailed face, cel-shaded, clean lineart, official anime art"]
+    return "; ".join(part for part in parts if part)
 
 
 def _ckpt_tag(ckpt: str) -> str:
