@@ -311,7 +311,7 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
                 </div>
                 <span className="v21-hint">
                   {renderType === "2d"
-                    ? "2D 动画走轻量 2D 渲染器，约 1–3 分钟出片（1280×720）"
+                    ? "AI 生成 2D 动漫画面（cel-shading / 平涂），与 3D 同档约 15–40 分钟（镜头生成 → 口型 → 剪辑）"
                     : renderType === "3d"
                       ? "3D 电影走 3D pipeline（T2VA + 口型），单模板约 15–40 分钟"
                       : "写实实拍复用写实立绘/镜头并走 3D 生成路径，约 15–40 分钟"}

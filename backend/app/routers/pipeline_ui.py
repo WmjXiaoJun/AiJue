@@ -21,6 +21,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import threading
@@ -200,29 +201,33 @@ def _template_2d_out(tid: str) -> Path:
     return config.OUTPUTS_DIR / "templates_2d" / tid / "final.mp4"
 
 
-def _template_2d_workdir(tid: str) -> Path:
-    return config.OUTPUTS_DIR / "templates_v5" / tid / "work"
+def _template_3d_out(tid: str) -> Path:
+    return config.OUTPUTS_DIR / "templates_3d" / tid / "final.mp4"
 
 
-def _generate_2d_command(tid: str) -> List[str]:
-    runner = Path(__file__).resolve().parent / "custom_2d_runner.py"
-    return [
-        sys.executable, str(runner),
-        "--template", tid,
-        "--out", str(_template_2d_out(tid)),
-        "--workdir", str(_template_2d_workdir(tid)),
-        "--force",
-    ]
+def _sync_2d_outputs(tid: str) -> None:
+    """V42：hq 输出在 templates_3d，成功后复制 final/poster 到 templates_2d 兼容目录。"""
+    src_final = _template_3d_out(tid)
+    if not src_final.is_file() or src_final.stat().st_size <= 0:
+        return
+    dst_dir = config.OUTPUTS_DIR / "templates_2d" / tid
+    dst_dir.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(src_final, dst_dir / "final.mp4")
+    src_poster = config.OUTPUTS_DIR / "templates_3d" / tid / "poster.jpg"
+    if src_poster.is_file() and src_poster.stat().st_size > 0:
+        shutil.copy2(src_poster, dst_dir / "poster.jpg")
 
 
-_2D_STAGES = [
-    {"id": "render", "label": "2D 渲染"},
-    {"id": "qc", "label": "QC 质检"},
-    {"id": "done", "label": "完成"},
-]
-_2D_STAGE_LABEL = {item["id"]: item["label"] for item in _2D_STAGES}
-_2D_STAGE_INDEX = {item["id"]: index for index, item in enumerate(_2D_STAGES)}
-_2D_PROGRESS_RE = re.compile(r"^PROGRESS\s+(\d+)\s*(.*)$")
+def _generate_hq_command(tid: str, style_mode: str = "3d",
+                         reuse: bool = False) -> List[str]:
+    if _is_custom_template(tid):
+        cmd = [sys.executable, str(_CUSTOM_HQ_RUNNER), "--template", tid]
+    else:
+        cmd = [sys.executable, "-m", "pipeline.templates3d_hq", "--template", tid]
+    cmd.extend(["--style-mode", style_mode])
+    if reuse:
+        cmd.append("--reuse-shots")
+    return cmd
 
 
 def _template_label(tid: str) -> Optional[str]:
@@ -265,11 +270,10 @@ def _elapsed_sec(job: Dict[str, Any]) -> float:
 
 
 def _job_view(job: Dict[str, Any], *, tail: int = _TAIL_LINES) -> Dict[str, Any]:
-    is_2d = str(job.get("render_type") or "") == "2d"
-    stages = _2D_STAGES if is_2d else STAGES
-    stage_label = _2D_STAGE_LABEL if is_2d else _STAGE_LABEL
-    stage_index = _2D_STAGE_INDEX if is_2d else _STAGE_INDEX
-    stage = str(job.get("stage") or ("render" if is_2d else "prepare"))
+    stages = STAGES
+    stage_label = _STAGE_LABEL
+    stage_index = _STAGE_INDEX
+    stage = str(job.get("stage") or "prepare")
     total = int(job.get("total") or 0)
     done = int(job.get("done") or 0)
     percent = job.get("percent")
@@ -313,17 +317,6 @@ def _append_log(job: Dict[str, Any], raw: str) -> None:
     stamp = re.match(r"^\[\d{2}:\d{2}:\d{2}\]\s*", body)
     if stamp:
         body = body[stamp.end():]
-    if str(job.get("render_type") or "") == "2d":
-        match = _2D_PROGRESS_RE.match(body.strip())
-        if match:
-            pct = max(1.0, min(99.0, float(match.group(1))))
-            job["percent"] = pct
-            new_stage = "qc" if pct >= 90 else "render"
-            if job.get("stage") != new_stage:
-                job["stage"] = new_stage
-            if job.get("status") == "running":
-                _persist(job)
-        return
     changed = False
     shot = _SHOT_PROGRESS_RE.search(body)
     if shot:
@@ -372,16 +365,9 @@ def _run_job(job_id: str) -> None:
         return
     tid = str(job.get("template_id") or "")
     is_2d = str(job.get("render_type") or "") == "2d"
-    if is_2d:
-        # V41：2D 走 render_v5 包装（custom 模板兼容加载）
-        cmd = _generate_2d_command(tid)
-    elif _is_custom_template(tid):
-        # V21 custom 模板：用包装器 patch load_template（pipeline 代码不改）
-        cmd = [sys.executable, str(_CUSTOM_HQ_RUNNER), "--template", tid]
-    else:
-        cmd = [sys.executable, "-m", "pipeline.templates3d_hq", "--template", tid]
-    if job.get("reuse_shots"):
-        cmd.append("--reuse-shots")
+    # V42：2D 也用 H3 hq，仅追加 --style-mode 2d；custom 走 wrapper 透传
+    cmd = _generate_hq_command(tid, "2d" if is_2d else "3d",
+                               bool(job.get("reuse_shots")))
     env = dict(os.environ)
     env["PYTHONIOENCODING"] = "utf-8"
     env["PYTHONUNBUFFERED"] = "1"
@@ -462,6 +448,8 @@ def _run_job(job_id: str) -> None:
             job["status"] = "canceled"
             job["error"] = job.get("error") or "任务已取消"
         elif code == 0:
+            if is_2d:
+                _sync_2d_outputs(tid)
             if is_2d and (not _template_2d_out(tid).is_file()
                           or _template_2d_out(tid).stat().st_size <= 0):
                 job["status"] = "failed"
@@ -551,26 +539,15 @@ def start_pipeline_job(template_id: str, *, reuse_shots: bool = False,
         raise HTTPException(status_code=400, detail=f"未知模板: {tid}")
     render_type = _template_render_type(tid)
     is_2d = render_type == "2d"
-    if not is_2d and not _semantic_path(tid).is_file():
+    if not _semantic_path(tid).is_file():
         raise HTTPException(status_code=400, detail=f"模板语义 brief 不存在: {tid}_semantic.json")
     reuse = bool(reuse_shots)
-    if is_2d and reuse:
-        raise HTTPException(status_code=400, detail="2D 模板不支持 reuse_shots（每次走 render_v5）")
-    if not is_2d and reuse and _existing_shots(tid) <= 0:
+    if reuse and _existing_shots(tid) <= 0:
         raise HTTPException(status_code=400,
                             detail=f"模板 {tid} 没有可复用的镜头（shots/ 为空），不能 reuse_shots")
     if dry_run:
         # 只做校验：返回 202 语义的 dry-run 结果，不创建/不启动任何子进程（不占 GPU）
-        if is_2d:
-            command = _generate_2d_command(tid)
-        elif _is_custom_template(tid):
-            command = [sys.executable, str(_CUSTOM_HQ_RUNNER), "--template", tid]
-        else:
-            command = [sys.executable, "-m", "pipeline.templates3d_hq", "--template", tid]
-        if reuse:
-            command.append("--reuse-shots")
-        stages = _2D_STAGES if is_2d else STAGES
-        labels = _2D_STAGE_LABEL if is_2d else dict(_STAGE_LABEL)
+        command = _generate_hq_command(tid, "2d" if is_2d else "3d", reuse)
         return {
             "ok": True,
             "job_id": None,
@@ -581,8 +558,8 @@ def start_pipeline_job(template_id: str, *, reuse_shots: bool = False,
             "reuse_shots": reuse,
             "status": "dry_run",
             "dry_run": True,
-            "stages": [item["id"] for item in stages],
-            "stage_labels": labels,
+            "stages": [item["id"] for item in STAGES],
+            "stage_labels": dict(_STAGE_LABEL),
             "command": command,
         }
     # V25：批量队列与单发 run 互斥
@@ -619,9 +596,9 @@ def start_pipeline_job(template_id: str, *, reuse_shots: bool = False,
             "render_type": render_type,
             "reuse_shots": reuse,
             "status": "queued",
-            "stage": "render" if is_2d else "prepare",
+            "stage": "prepare",
             "percent": 0.0,
-            "total": 0 if is_2d else (_semantic_shot_total(tid) or _existing_shots(tid)),
+            "total": _semantic_shot_total(tid) or _existing_shots(tid),
             "done": 0,
             "log": [],
             "error": None,
@@ -664,8 +641,6 @@ def start_pipeline_job(template_id: str, *, reuse_shots: bool = False,
             if _ACTIVE == job_id:
                 _ACTIVE = None
         raise HTTPException(status_code=500, detail=f"启动任务失败: {exc}") from exc
-    stages = _2D_STAGES if is_2d else STAGES
-    labels = _2D_STAGE_LABEL if is_2d else dict(_STAGE_LABEL)
     return {
         "ok": True,
         "job_id": job_id,
@@ -675,8 +650,8 @@ def start_pipeline_job(template_id: str, *, reuse_shots: bool = False,
         "render_type_label": _template_render_type_label(tid),
         "reuse_shots": reuse,
         "status": "queued",
-        "stages": [item["id"] for item in stages],
-        "stage_labels": labels,
+        "stages": [item["id"] for item in STAGES],
+        "stage_labels": dict(_STAGE_LABEL),
     }
 
 

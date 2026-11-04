@@ -1291,20 +1291,33 @@ def _generate_cmd(tids: Sequence[str], force: bool, resolution: str) -> List[str
 
 
 def _generate_2d_cmd(tid: str, force: bool) -> List[str]:
-    """V41：custom/内建模板统一的 V5 2D 渲染命令（custom_2d_runner 兼容加载 custom 模板）。"""
-    runner = Path(__file__).resolve().parent / "custom_2d_runner.py"
-    out = T2D_ROOT / tid / "final.mp4"
-    workdir = V5_ROOT / tid / "work"
-    cmd = [
-        sys.executable,
-        str(runner),
-        "--template", tid,
-        "--out", str(out),
-        "--workdir", str(workdir),
-    ]
+    """V42：2D = H3 AI + 2D anime 提示词（不再用 render_v5 快剪）。"""
+    runner = Path(__file__).resolve().parent / "custom_hq_runner.py"
+    custom = (CUSTOM_TEMPLATE_DIR / f"{tid}.json").is_file() and \
+             not (V5_TEMPLATE_CONTRACTS / f"{tid}.json").is_file()
+    if custom:
+        cmd = [sys.executable, str(runner), "--template", tid, "--style-mode", "2d"]
+    else:
+        cmd = [sys.executable, "-m", "pipeline.templates3d_hq",
+               "--template", tid, "--style-mode", "2d"]
     if force:
-        cmd.append("--force")
+        # hq 没有 --force，清空旧 shots 由 runner/pipeline 缓存逻辑处理；保留参数不传入
+        pass
     return cmd
+
+
+def _sync_2d_outputs(tid: str) -> bool:
+    """V42：hq 输出 templates_3d → 复制 final/poster 到 templates_2d 兼容目录。"""
+    src_final = T3D_ROOT / tid / "final.mp4"
+    if not src_final.is_file() or src_final.stat().st_size <= 0:
+        return False
+    dst = T2D_ROOT / tid
+    dst.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(src_final, dst / "final.mp4")
+    src_poster = T3D_ROOT / tid / "poster.jpg"
+    if src_poster.is_file() and src_poster.stat().st_size > 0:
+        shutil.copy2(src_poster, dst / "poster.jpg")
+    return True
 
 
 def _assemble_cmd(tids: Sequence[str], force: bool) -> List[str]:
@@ -1556,7 +1569,7 @@ def _run_template_job(job_id: str) -> None:
         _finish_failed(job_id, "内部错误：任务缺少可执行命令")
         return
     is_2d = mode == "generate_2d"
-    tracker = _Template2DTracker(tids) if is_2d else _TemplateJobTracker(mode, tids)
+    tracker = _TemplateJobTracker("generate" if is_2d else mode, tids)
     if is_2d:
         label = JOB_KIND_LABEL.get(KIND_TEMPLATES_GENERATE_2D, "模板 2D 生成")
     else:
@@ -1576,7 +1589,7 @@ def _run_template_job(job_id: str) -> None:
                 started_at=_now_text(),
                 _started_ts=time.time(),
                 progress=1.0,
-                stage="render" if is_2d else current.get("stage"),
+                stage=current.get("stage") or "prepare",
                 message=f"{label}运行中",
             )
             start_snapshot = dict(current)
@@ -1635,11 +1648,20 @@ def _run_template_job(job_id: str) -> None:
         return
 
     if is_2d:
-        result = tracker.result()
-        if returncode == 0 and result.get("ok"):
-            _finish_template_job(job_id, "2D 渲染完成（QC PASS）", result)
-        elif returncode == 0:
-            _finish_failed(job_id, "2D 渲染结束但未找到有效成片 final.mp4")
+        if returncode == 0:
+            synced = _sync_2d_outputs(tids[0]) if tids else False
+            final = T2D_ROOT / tids[0] / "final.mp4" if tids else None
+            if synced and final and final.is_file() and final.stat().st_size > 0:
+                result = {
+                    "mode": "generate_2d", "render_type": "2d",
+                    "templates": list(tids),
+                    "outputs": [{"id": tid, "final": str(T2D_ROOT / tid / "final.mp4"),
+                                 "url": _media_url(f"templates_2d/{tid}/final.mp4")}
+                                for tid in tids],
+                }
+                _finish_template_job(job_id, "2D AI 生成完成（H3 + 2D anime）", result)
+            else:
+                _finish_failed(job_id, "2D hq 结束但未找到有效成片 final.mp4")
         else:
             _finish_failed(job_id, _failure_message(int(returncode or -1), logs, "generate"))
     elif mode == "assemble":
@@ -1757,14 +1779,14 @@ def start_generate(payload: TemplateGenerateRequest) -> Dict[str, Any]:
             [tid],
             _cmd=cmd,
             _mode="generate_2d",
-            _timeout=1800,
+            _timeout=GENERATE_TIMEOUT_SECONDS,
             _templates=[tid],
-            stage="render",
+            stage="prepare",
             render_type="2d",
-            message=f"模板 2D 生成排队中（{tid}）",
+            message=f"模板 2D AI 生成排队中（{tid}，H3 + 2D anime）",
             templates=[tid],
             force=force,
-            resolution="1280x720",
+            resolution="1024x576",
             dry_run=dry_run,
             result={"mode": "generate_2d", "templates": [tid], "force": force,
                     "dry_run": dry_run, "render_type": "2d"},

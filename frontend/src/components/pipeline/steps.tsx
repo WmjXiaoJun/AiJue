@@ -754,7 +754,7 @@ export function StepRun({
             {!run && (
               <p className="v18-note">
                 <IconInfo size={13} /> {renderMeta.id === "2d"
-                  ? "2D 动画走轻量 2D 渲染器（render → qc），单模板约 1–3 分钟；可复用已有镜头快速出片。"
+                  ? "2D 动漫由 H3 AI 生成（cel-shading / 平涂），生成流程同 3D：镜头生成 → 口型 → 剪辑，单模板约 15–40 分钟。"
                   : `${renderMeta.label}完整生成（T2VA + 口型）单模板预计 ${renderMeta.wait}；复用已有镜头快速合成通常在数分钟内完成。同一时间只允许一个任务（冲突时后端返回 409）。`}
               </p>
             )}

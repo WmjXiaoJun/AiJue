@@ -138,9 +138,9 @@ export interface RenderTypeMeta {
   tone: string;
 }
 
-/** V41：节目类型元信息（2D 快 / 3D 与写实慢） */
+/** V42：节目类型元信息（2D 改为 AI 生成兜底，与 3D/写实同档 15–40 分钟） */
 export const RENDER_TYPE_META: Record<RenderType, RenderTypeMeta> = {
-  "2d": { id: "2d", label: "2D 动画", short: "2D", wait: "约 1–3 分钟", desc: "动画/插画风 · 出片快，适合日常短视频", tone: "jade" },
+  "2d": { id: "2d", label: "2D 动画", short: "2D", wait: "约 15–40 分钟", desc: "AI 生成 2D 动漫画面（cel-shading / 平涂）· 与 3D 同档耗时", tone: "jade" },
   "3d": { id: "3d", label: "3D 电影", short: "3D", wait: "约 15–40 分钟", desc: "电影感镜头 + 3D 角色 · 耗时较长", tone: "gold" },
   realistic: { id: "realistic", label: "写实实拍", short: "写实", wait: "约 15–40 分钟", desc: "真人质感画面 · 走 3D 生成路径，耗时较长", tone: "slate" },
 };
