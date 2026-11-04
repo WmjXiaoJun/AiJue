@@ -1,0 +1,48 @@
+{
+ "template": "custom_tpl_v46_robot",
+ "style": "neon_toon",
+ "look": "cyberpunk robot assembly workshop, industrial ceiling lights, teal and amber palette, painted animation, volumetric light, half-built humanoid robot on a workbench",
+ "mode": "semantic",
+ "shots": [
+  {
+   "id": "v5_001",
+   "kind": "broll",
+   "scene": "robot_assembly",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": "",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] cyberpunk painted animation, cinematic semi-realistic, volumetric light. Set in robot assembly. A half-built humanoid robot lies on a heavy workbench, articulated arms and cables hanging above, welding sparks and drifting dust in the industrial light. The camera surveys the space, atmospheric and cinematic. Camera: slow dolly move through the space. 3D animated feature film quality, rich materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people.\n\noverall_soundscape: soft industrial ambience, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_002",
+   "kind": "dialogue",
+   "scene": "robot_assembly",
+   "duration": 4.03,
+   "line": "这台老伙计，还差一颗心。",
+   "semantic_visual": "Neon-lit toon workshop: an old mechanic in goggles leans over a half-built robot on a cluttered bench, its chest cavity open and empty, glowing tools scattered around, mood wistful and dim.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] neon-lit 3d toon late-night talk show studio, cyan and magenta rim light, glossy reflective floor, glass curtain wall with city bokeh, cinematic bloom, thick clean outlines. Set in a cinematic set inspired by robot assembly. Featuring a stylized 3D animated man in his 60s, grey hair, wearing a red-brown coat with gold accents, with goggles and wrench. The shot shows the idea through visible action: Neon-lit toon workshop: an old mechanic in goggles leans over a half-built robot on a cluttered bench, its chest cavity open and empty, glowing tools scattered around, mood wistful and dim.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft city night ambience, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_003",
+   "kind": "dialogue",
+   "scene": "robot_assembly",
+   "duration": 3.65,
+   "line": "那我们把心脏装进去，试试？",
+   "semantic_visual": "A young apprentice holds up a pulsing neon heart core, grinning, as she reaches toward the open chest panel of the toon robot, bright pink and blue light spilling across the bench.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] neon-lit 3d toon late-night talk show studio, cyan and magenta rim light, glossy reflective floor, glass curtain wall with city bokeh, cinematic bloom, thick clean outlines. Set in a cinematic set inspired by robot assembly. Featuring a stylized 3D animated man in his 20s, messy black hair, wearing a purple hoodie with gold accents, with backpack. The shot shows the idea through visible action: A young apprentice holds up a pulsing neon heart core, grinning, as she reaches toward the open chest panel of the toon robot, bright pink and blue light spilling across the bench.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft city night ambience, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_004",
+   "kind": "broll",
+   "scene": "undercity_street",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": "",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] cyberpunk painted animation, cinematic semi-realistic, volumetric light. Set in undercity street. A rain-soaked undercity street at night, dense neon signs and steam, wet asphalt reflecting teal and amber light. The camera surveys the space, atmospheric and cinematic. Camera: slow dolly move through the space. 3D animated feature film quality, rich materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people.\n\noverall_soundscape: soft industrial ambience, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  }
+ ]
+}

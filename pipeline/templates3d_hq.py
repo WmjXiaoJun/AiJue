@@ -857,10 +857,12 @@ def main(argv=None) -> int:
     clip = out_shots / f"{poster_shot['id']}.mp4"
     poster_key = None
     if style_mode == "2d":
-        key_candidate = _keyframe_dir(tid, style_2d, STYLE_2D_STYLES[style_2d],
-                                      ip_strength) / f"{poster_shot['id']}.png"
-        if key_candidate.is_file():
-            poster_key = key_candidate
+        key_dir_base = _keyframe_dir(tid, style_2d, STYLE_2D_STYLES[style_2d], ip_strength)
+        # V46：抽卡时关键帧在 <base>_cN/ 下，两个位置都要找
+        key_candidates = [key_dir_base / f"{poster_shot['id']}.png",
+                          *sorted(key_dir_base.parent.glob(
+                              f"{key_dir_base.name}_c*/{poster_shot['id']}.png"))]
+        poster_key = next((path for path in key_candidates if path.is_file()), None)
     if poster_key is not None:
         subprocess.run([str(FFMPEG), "-y", "-hide_banner", "-loglevel", "error",
                         "-i", str(poster_key), "-frames:v", "1", "-q:v", "3",

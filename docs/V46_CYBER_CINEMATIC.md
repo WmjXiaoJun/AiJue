@@ -72,6 +72,28 @@
 3. **重跑**：`_generate_hq_command` 读合同并追加 `--keyframe-candidates N` → hq 逐镜多 seed 出候选、拼选卡图、按 picks/自动分选一张。
 4. **实测**：`custom_tpl_v46_council`（合同 `keyframe_candidates: 2`）经 API 重跑，日志 `cands=2，pick=#0/auto`，无需手写命令。
 
+## 4.6 新角色 + 机器人组装模板（V47）
+
+两个新角色（`contract/v5/custom/characters/`，立绘 + 三视图在 `assets/v5/characters/`）：
+
+| id | 名称 | 年龄 | 音色 | 用途 |
+|---|---|---|---|---|
+| `custom_old_inventor` | 老秦 | 66 | `steady_male` | 底城老发明家，host |
+| `custom_street_kid` | 小满 | 12 | `young_male` | 底城小子，figure_a |
+
+立绘 prompt 追加了硬年龄约束（`elderly man, 66 years old, deeply wrinkled face, white full beard…` / `12 year old boy, child proportions, round face…`）；只靠合同的 age 字段，底模会把 66 岁画成灰发青年，必须有显式年龄句。
+
+新场景 `robot_assembly`（机器人组装车间）：图层栈复制 `arcane_workshop`，plate 为「半成品人形机器人 + 机械臂 + 焊花」。
+
+模板 `custom_tpl_v46_robot`「V46 2D·机器人组装」，4 幕 13.68s：
+
+1. broll 组装车间（dolly）
+2. 老秦：「这台老伙计，还差一颗心。」（push_in）
+3. 小满：「那我们把心脏装进去，试试？」（static）
+4. broll 底城霓虹巷（dolly）
+
+创建时自动 TTS（4 段音频）+ LLM 语义 brief；`keyframe_candidates: 2`。
+
 ## 5. 前端
 
 - `RenderStyle` 增加 `arcane_cinematic`；风格元信息「赛博电影感 / 赛博 / 绘画感半写实动画（Arcane 风）：厚涂笔触 + 青橙光比 + 电影景深」。

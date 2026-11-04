@@ -1,0 +1,94 @@
+{
+  "id": "custom_old_inventor",
+  "name": "老秦",
+  "title": "底城老发明家，修了四十年机器；嘴上嫌麻烦，手却停不下来，把废弃零件当宝贝。",
+  "persona": "底城老发明家，修了四十年机器；嘴上嫌麻烦，手却停不下来，把废弃零件当宝贝。",
+  "mode": "three_view",
+  "style": "anime",
+  "model": "animagine-xl-4.0.safetensors",
+  "steps": 28,
+  "cfg": 5.5,
+  "sampler": "euler_ancestral",
+  "scheduler": "normal",
+  "seed": 667263093,
+  "size": {
+    "portrait": [
+      832,
+      1216
+    ],
+    "other": [
+      1024,
+      1024
+    ]
+  },
+  "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, full body, multiple characters",
+  "prompt": {
+    "portrait": "masterpiece, best quality, anime style, solo, 1boy, male, middle-aged man, silver hair, short hair, swept bangs, dark grey eyes, brown coat, coat, formal, orange accents, upper body, looking at viewer, centered composition, studio lighting, dark background, elderly man, 66 years old, deeply wrinkled face, white full beard, gray hair, goggles pushed up on forehead, worn brown mechanic coat, weathered hands, tired but sharp eyes, clean lineart, vibrant colors, detailed face",
+    "front": "masterpiece, best quality, anime style, solo, 1boy, male, middle-aged man, silver hair, short hair, swept bangs, dark grey eyes, brown coat, coat, formal, orange accents, full body, front view, standing, arms at sides, simple background, white background, plain background, elderly man, 66 years old, deeply wrinkled face, white full beard, gray hair, goggles pushed up on forehead, worn brown mechanic coat, weathered hands, tired but sharp eyes, clean lineart, vibrant colors, detailed face",
+    "side": "masterpiece, best quality, anime style, solo, 1boy, male, middle-aged man, silver hair, short hair, swept bangs, dark grey eyes, brown coat, coat, formal, orange accents, full body, from side, profile, standing, simple background, white background, plain background, elderly man, 66 years old, deeply wrinkled face, white full beard, gray hair, goggles pushed up on forehead, worn brown mechanic coat, weathered hands, tired but sharp eyes, clean lineart, vibrant colors, detailed face",
+    "three_quarter": "masterpiece, best quality, anime style, solo, 1boy, male, middle-aged man, silver hair, short hair, swept bangs, dark grey eyes, brown coat, coat, formal, orange accents, full body, three-quarter view, standing, simple background, white background, plain background, elderly man, 66 years old, deeply wrinkled face, white full beard, gray hair, goggles pushed up on forehead, worn brown mechanic coat, weathered hands, tired but sharp eyes, clean lineart, vibrant colors, detailed face"
+  },
+  "created_at": "2026-11-05T02:15:40",
+  "elapsed_sec": 32.5,
+  "files": {
+    "portrait": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\custom_old_inventor\\portrait.png",
+    "three_view": {
+      "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\custom_old_inventor\\three_view\\front.png",
+      "side": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\custom_old_inventor\\three_view\\side.png",
+      "three_quarter": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\custom_old_inventor\\three_view\\three_quarter.png"
+    },
+    "expressions": {},
+    "scene": null,
+    "sheet": null
+  },
+  "images": [
+    {
+      "tag": "portrait",
+      "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\custom_old_inventor\\portrait.png",
+      "seed": 667250657,
+      "width": 832,
+      "height": 1216,
+      "gen_sec": 12.0,
+      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, middle-aged man, silver hair, short hair, swept bangs, dark grey eyes, brown coat, coat, formal, orange accents, upper body, looking at viewer, centered composition, studio lighting, dark background, elderly man, 66 years old, deeply wrinkled face, white full beard, gray hair, goggles pushed up on forehead, worn brown mechanic coat, weathered hands, tired but sharp eyes, clean lineart, vibrant colors, detailed face",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, full body, multiple characters",
+      "composition": "portrait",
+      "expression": null
+    },
+    {
+      "tag": "front",
+      "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\custom_old_inventor\\three_view/front.png",
+      "seed": 667263093,
+      "width": 1024,
+      "height": 1024,
+      "gen_sec": 12.1,
+      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, middle-aged man, silver hair, short hair, swept bangs, dark grey eyes, brown coat, coat, formal, orange accents, full body, front view, standing, arms at sides, simple background, white background, plain background, elderly man, 66 years old, deeply wrinkled face, white full beard, gray hair, goggles pushed up on forehead, worn brown mechanic coat, weathered hands, tired but sharp eyes, clean lineart, vibrant colors, detailed face",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, multiple views, split screen, cropped",
+      "composition": "front",
+      "expression": null
+    },
+    {
+      "tag": "side",
+      "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\custom_old_inventor\\three_view/side.png",
+      "seed": 667263094,
+      "width": 1024,
+      "height": 1024,
+      "gen_sec": 10.2,
+      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, middle-aged man, silver hair, short hair, swept bangs, dark grey eyes, brown coat, coat, formal, orange accents, full body, from side, profile, standing, simple background, white background, plain background, elderly man, 66 years old, deeply wrinkled face, white full beard, gray hair, goggles pushed up on forehead, worn brown mechanic coat, weathered hands, tired but sharp eyes, clean lineart, vibrant colors, detailed face",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, multiple views, split screen, cropped",
+      "composition": "side",
+      "expression": null
+    },
+    {
+      "tag": "three_quarter",
+      "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\custom_old_inventor\\three_view/three_quarter.png",
+      "seed": 667263095,
+      "width": 1024,
+      "height": 1024,
+      "gen_sec": 10.0,
+      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, middle-aged man, silver hair, short hair, swept bangs, dark grey eyes, brown coat, coat, formal, orange accents, full body, three-quarter view, standing, simple background, white background, plain background, elderly man, 66 years old, deeply wrinkled face, white full beard, gray hair, goggles pushed up on forehead, worn brown mechanic coat, weathered hands, tired but sharp eyes, clean lineart, vibrant colors, detailed face",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, multiple views, split screen, cropped",
+      "composition": "three_quarter",
+      "expression": null
+    }
+  ]
+}

@@ -372,6 +372,11 @@ FALLBACK_PROMPTS: dict[str, str] = {
         "tools and blueprints, warm desk lamp, brass gears, cool window light, "
         "no people, painted animation background"
     ),
+    "robot_assembly": (
+        "robot assembly workshop, half-built humanoid robot lying on a workbench, "
+        "articulated mechanical arms, gears and cables, welding sparks, industrial "
+        "ceiling lights, no people, painted animation background"
+    ),
     "council_hall": (
         "grand council hall interior, tall stone columns and stained glass windows, "
         "long table with an emblem, spotlights falling from above, dramatic "

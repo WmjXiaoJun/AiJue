@@ -1,0 +1,54 @@
+{
+  "id": "custom_old_inventor",
+  "label": "老秦",
+  "era": "modern",
+  "persona": "底城老发明家，修了四十年机器；嘴上嫌麻烦，手却停不下来，把废弃零件当宝贝。",
+  "tags": [],
+  "role_pool": [
+    "host",
+    "narrator"
+  ],
+  "voice": {
+    "provider": "breeze",
+    "voice_id": "steady_male",
+    "instruction": "38岁男性，中音稳，语速中快，职业化、清楚、有掌控感，尾音下压。"
+  },
+  "appearance": {
+    "gender": "male",
+    "age": 66,
+    "skin": "#E8C9AE",
+    "hair": "#C9CDD6",
+    "hair_style": "short_swept",
+    "eye": "#4A5568",
+    "eye_style": "sharp",
+    "brow": "bushy",
+    "beard": "full",
+    "face_ratio": 1.0,
+    "head_ratio": 1.1,
+    "chibi": 0.2,
+    "outfit": {
+      "type": "coat",
+      "main": "#5A4632",
+      "accent": "#C9A227"
+    },
+    "accessories": [
+      "goggles",
+      "wrench"
+    ]
+  },
+  "poses": [
+    "front",
+    "point",
+    "think"
+  ],
+  "mouth": [
+    "closed",
+    "a",
+    "o",
+    "e",
+    "i",
+    "u",
+    "m"
+  ],
+  "style_overrides": {}
+}

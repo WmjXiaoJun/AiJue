@@ -1,0 +1,102 @@
+{
+  "id": "custom_tpl_v46_robot",
+  "label": "V46 2D·机器人组装",
+  "description": "赛博电影感 4 幕：机器人组装车间里，老秦和小满给旧机器人装「心脏」。",
+  "tags": [
+    "custom",
+    "v21"
+  ],
+  "style": "neon_toon",
+  "target_duration": 13.68,
+  "aspect": [
+    16,
+    9
+  ],
+  "render_type": "2d",
+  "render_style": "arcane_cinematic",
+  "keyframe_candidates": 2,
+  "cast": [
+    {
+      "role": "host",
+      "character": "custom_old_inventor",
+      "name": "老秦"
+    },
+    {
+      "role": "figure_a",
+      "character": "custom_street_kid",
+      "name": "小满"
+    }
+  ],
+  "acts": [
+    {
+      "id": "act01",
+      "name": "第 1 幕",
+      "scene": "robot_assembly",
+      "camera": "dolly",
+      "camera_strength": 0.06,
+      "duration": 3.0,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    },
+    {
+      "id": "act02",
+      "name": "第 2 幕",
+      "scene": "robot_assembly",
+      "camera": "push_in",
+      "camera_strength": 0.06,
+      "duration": 4.03,
+      "line": "host",
+      "text": "这台老伙计，还差一颗心。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act03",
+      "name": "第 3 幕",
+      "scene": "robot_assembly",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 3.65,
+      "line": "figure_a",
+      "text": "那我们把心脏装进去，试试？",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act04",
+      "name": "第 4 幕",
+      "scene": "undercity_street",
+      "camera": "dolly",
+      "camera_strength": 0.06,
+      "duration": 3.0,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    }
+  ],
+  "packaging": {
+    "subtitle": "default",
+    "transition": "fade",
+    "title": "V46 2D·机器人组装"
+  },
+  "lipsync": {
+    "mode": "musetalk"
+  },
+  "audio": {},
+  "meta": {
+    "create_source": "v21",
+    "three_d": false,
+    "render_type": "2d",
+    "render_style": "arcane_cinematic",
+    "keyframe_candidates": 2,
+    "created_at": "2026-11-05 02:16:36",
+    "created_by": "api"
+  }
+}

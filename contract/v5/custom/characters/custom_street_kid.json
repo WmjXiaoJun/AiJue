@@ -1,0 +1,53 @@
+{
+  "id": "custom_street_kid",
+  "label": "小满",
+  "era": "modern",
+  "persona": "底城长大的十二岁小孩，嘴快、好奇心重，能从垃圾堆里翻出能用的零件。",
+  "tags": [],
+  "role_pool": [
+    "figure_a",
+    "guest"
+  ],
+  "voice": {
+    "provider": "breeze",
+    "voice_id": "young_male",
+    "instruction": "24岁男性，清亮干净，语速快而清楚，略带回怼的锐气，尾音利落。"
+  },
+  "appearance": {
+    "gender": "male",
+    "age": 12,
+    "skin": "#F0CBA8",
+    "hair": "#2B2B33",
+    "hair_style": "messy",
+    "eye": "#3A6EA5",
+    "eye_style": "sharp",
+    "brow": "thick",
+    "beard": "none",
+    "face_ratio": 1.0,
+    "head_ratio": 1.1,
+    "chibi": 0.2,
+    "outfit": {
+      "type": "hoodie",
+      "main": "#7A5CC0",
+      "accent": "#F5C518"
+    },
+    "accessories": [
+      "backpack"
+    ]
+  },
+  "poses": [
+    "front",
+    "point",
+    "think"
+  ],
+  "mouth": [
+    "closed",
+    "a",
+    "o",
+    "e",
+    "i",
+    "u",
+    "m"
+  ],
+  "style_overrides": {}
+}

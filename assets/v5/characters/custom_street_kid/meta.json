@@ -1,0 +1,94 @@
+{
+  "id": "custom_street_kid",
+  "name": "小满",
+  "title": "底城长大的十二岁小孩，嘴快、好奇心重，能从垃圾堆里翻出能用的零件。",
+  "persona": "底城长大的十二岁小孩，嘴快、好奇心重，能从垃圾堆里翻出能用的零件。",
+  "mode": "three_view",
+  "style": "anime",
+  "model": "animagine-xl-4.0.safetensors",
+  "steps": 28,
+  "cfg": 5.5,
+  "sampler": "euler_ancestral",
+  "scheduler": "normal",
+  "seed": 667313460,
+  "size": {
+    "portrait": [
+      832,
+      1216
+    ],
+    "other": [
+      1024,
+      1024
+    ]
+  },
+  "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, full body, multiple characters",
+  "prompt": {
+    "portrait": "masterpiece, best quality, anime style, solo, 1boy, male, young adult male, black hair, teal eyes, thick eyebrows, purple hoodie, hoodie, casual, gold accents, upper body, looking at viewer, centered composition, studio lighting, dark background, 12 year old boy, child proportions, round face, messy black hair, purple hoodie with drawstrings, backpack straps, freckles, curious grin, clean lineart, vibrant colors, detailed face",
+    "front": "masterpiece, best quality, anime style, solo, 1boy, male, young adult male, black hair, teal eyes, thick eyebrows, purple hoodie, hoodie, casual, gold accents, full body, front view, standing, arms at sides, simple background, white background, plain background, 12 year old boy, child proportions, round face, messy black hair, purple hoodie with drawstrings, backpack straps, freckles, curious grin, clean lineart, vibrant colors, detailed face",
+    "side": "masterpiece, best quality, anime style, solo, 1boy, male, young adult male, black hair, teal eyes, thick eyebrows, purple hoodie, hoodie, casual, gold accents, full body, from side, profile, standing, simple background, white background, plain background, 12 year old boy, child proportions, round face, messy black hair, purple hoodie with drawstrings, backpack straps, freckles, curious grin, clean lineart, vibrant colors, detailed face",
+    "three_quarter": "masterpiece, best quality, anime style, solo, 1boy, male, young adult male, black hair, teal eyes, thick eyebrows, purple hoodie, hoodie, casual, gold accents, full body, three-quarter view, standing, simple background, white background, plain background, 12 year old boy, child proportions, round face, messy black hair, purple hoodie with drawstrings, backpack straps, freckles, curious grin, clean lineart, vibrant colors, detailed face"
+  },
+  "created_at": "2026-11-05T02:16:22",
+  "elapsed_sec": 30.5,
+  "files": {
+    "portrait": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\custom_street_kid\\portrait.png",
+    "three_view": {
+      "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\custom_street_kid\\three_view\\front.png",
+      "side": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\custom_street_kid\\three_view\\side.png",
+      "three_quarter": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\custom_street_kid\\three_view\\three_quarter.png"
+    },
+    "expressions": {},
+    "scene": null,
+    "sheet": null
+  },
+  "images": [
+    {
+      "tag": "portrait",
+      "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\custom_street_kid\\portrait.png",
+      "seed": 667302941,
+      "width": 832,
+      "height": 1216,
+      "gen_sec": 10.2,
+      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, young adult male, black hair, teal eyes, thick eyebrows, purple hoodie, hoodie, casual, gold accents, upper body, looking at viewer, centered composition, studio lighting, dark background, 12 year old boy, child proportions, round face, messy black hair, purple hoodie with drawstrings, backpack straps, freckles, curious grin, clean lineart, vibrant colors, detailed face",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, full body, multiple characters",
+      "composition": "portrait",
+      "expression": null
+    },
+    {
+      "tag": "front",
+      "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\custom_street_kid\\three_view/front.png",
+      "seed": 667313460,
+      "width": 1024,
+      "height": 1024,
+      "gen_sec": 10.2,
+      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, young adult male, black hair, teal eyes, thick eyebrows, purple hoodie, hoodie, casual, gold accents, full body, front view, standing, arms at sides, simple background, white background, plain background, 12 year old boy, child proportions, round face, messy black hair, purple hoodie with drawstrings, backpack straps, freckles, curious grin, clean lineart, vibrant colors, detailed face",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, multiple views, split screen, cropped",
+      "composition": "front",
+      "expression": null
+    },
+    {
+      "tag": "side",
+      "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\custom_street_kid\\three_view/side.png",
+      "seed": 667313461,
+      "width": 1024,
+      "height": 1024,
+      "gen_sec": 10.0,
+      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, young adult male, black hair, teal eyes, thick eyebrows, purple hoodie, hoodie, casual, gold accents, full body, from side, profile, standing, simple background, white background, plain background, 12 year old boy, child proportions, round face, messy black hair, purple hoodie with drawstrings, backpack straps, freckles, curious grin, clean lineart, vibrant colors, detailed face",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, multiple views, split screen, cropped",
+      "composition": "side",
+      "expression": null
+    },
+    {
+      "tag": "three_quarter",
+      "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\custom_street_kid\\three_view/three_quarter.png",
+      "seed": 667313462,
+      "width": 1024,
+      "height": 1024,
+      "gen_sec": 10.1,
+      "prompt": "masterpiece, best quality, anime style, solo, 1boy, male, young adult male, black hair, teal eyes, thick eyebrows, purple hoodie, hoodie, casual, gold accents, full body, three-quarter view, standing, simple background, white background, plain background, 12 year old boy, child proportions, round face, messy black hair, purple hoodie with drawstrings, backpack straps, freckles, curious grin, clean lineart, vibrant colors, detailed face",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, realistic, multiple views, split screen, cropped",
+      "composition": "three_quarter",
+      "expression": null
+    }
+  ]
+}
