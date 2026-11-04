@@ -187,3 +187,15 @@ def test_duologue_template_alternates_cast():
     speakers = [act.get("line") for act in tpl["acts"] if act.get("text")]
     assert speakers == ["host", "figure_a", "host", "figure_a"], speakers
     assert tpl.get("keyframe_candidates") == 2
+
+
+def test_series_members_exist_and_are_cyber():
+    """V48：系列成员必须存在、都是赛博电影感、且成片已就绪（合同层面）。"""
+    import json as _json
+    repo = pathlib.Path(__file__).resolve().parents[1]
+    series = _json.loads((repo / "contract/v5/series/undercity_arc.json").read_text(encoding="utf-8"))
+    assert [m["template"] for m in series["members"]] == [
+        "custom_tpl_v46_undercity", "custom_tpl_v46_robot", "custom_tpl_v46_duologue"]
+    for member in series["members"]:
+        tpl = _json.loads((repo / f"contract/v5/custom/templates/{member['template']}.json").read_text(encoding="utf-8"))
+        assert tpl["render_style"] == "arcane_cinematic"

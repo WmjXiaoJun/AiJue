@@ -38,6 +38,7 @@ from .routers import pipeline_ui as pipeline_ui_router
 from .routers import publish_batches as publish_batches_router
 from .routers import v5_catalog as v5_catalog_router
 from .routers import v5_create as v5_create_router
+from .routers import v5_series as v5_series_router
 from .routers import v5_studio as v5_studio_router
 from .routers import v6_agent as v6_agent_router
 
@@ -2549,6 +2550,8 @@ app.include_router(character_dialogue_router.router)
 app.include_router(character_showcase_router.router)
 # V5 契约 API（/api/v5/*，独立前缀；不改变既有 V3/V4 接口）
 app.include_router(v5_studio_router.router)
+# V48 系列（同世界模板串成剧集，只读）
+app.include_router(v5_series_router.router)
 app.include_router(v5_catalog_router.router)
 # V6 Agent API（/api/v6/agent/* + /media/agent_runs/*）
 app.include_router(v6_agent_router.router)

@@ -1,0 +1,21 @@
+{
+  "id": "undercity_arc",
+  "label": "底城往事 · 三部曲",
+  "description": "同一个底城世界：街上的人、车间里的机器、深夜里的一场对话。",
+  "cover": "custom_tpl_v46_undercity",
+  "style": "赛博电影感",
+  "members": [
+    {
+      "template": "custom_tpl_v46_undercity",
+      "label": "第一部 · 底城往事"
+    },
+    {
+      "template": "custom_tpl_v46_robot",
+      "label": "第二部 · 机器人组装"
+    },
+    {
+      "template": "custom_tpl_v46_duologue",
+      "label": "第三部 · 装配夜话"
+    }
+  ]
+}

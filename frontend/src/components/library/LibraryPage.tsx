@@ -12,7 +12,7 @@ import type { PublishPackageBatch, PublishPackageBatchItem, PublishPlatform } fr
 import { downloadUrlAsBlob } from "../../lib/download";
 import { isBatchActive, isRunActive, pipelineApi, pipelineBatchApi } from "../../lib/pipeline";
 import type { PipelineBatch, PipelineBatchItem } from "../../lib/pipeline";
-import type { V5CatalogResponse } from "../../lib/v5";
+import type { V5CatalogResponse, V5Series } from "../../lib/v5";
 import { v5api } from "../../lib/v5";
 import { useToast } from "../Toast";
 import { Spinner } from "../ui";
@@ -549,6 +549,8 @@ function FinalLibrary({
   const [pubCanceling, setPubCanceling] = useState(false);
   const [downloadingAll, setDownloadingAll] = useState(false);
   const [downloadAllIndex, setDownloadAllIndex] = useState(0);
+  const [series, setSeries] = useState<V5Series[]>([]);
+  const [seriesPlaying, setSeriesPlaying] = useState<{ series: V5Series; index: number } | null>(null);
 
   useEffect(() => {
     if (!playing) return;
@@ -558,6 +560,24 @@ function FinalLibrary({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [playing]);
+
+  useEffect(() => {
+    let alive = true;
+    void v5api
+      .series()
+      .then((res) => { if (alive) setSeries(res.series || []); })
+      .catch(() => { if (alive) setSeries([]); });
+    return () => { alive = false; };
+  }, [templates.length]);
+
+  useEffect(() => {
+    if (!seriesPlaying) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSeriesPlaying(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [seriesPlaying]);
 
   const list = useMemo(() => {
     const keyword = query.trim().toLowerCase();
@@ -789,6 +809,57 @@ function FinalLibrary({
         {exportMode && <span className="v29-export-hint">勾选成片后使用底部批量条统一设置平台/竖版</span>}
         {pubError && !pubBatch && <span className="v25-batch-error">{pubError}</span>}
       </div>
+
+      {series.length > 0 && (
+        <div className="v20-series">
+          <div className="v20-series-head">
+            <b>系列</b>
+            <span>{series.length} 条 · 同世界观连续播放</span>
+          </div>
+          <div className="v20-series-grid">
+            {series.map((item) => (
+              <article key={item.id} className="v20-series-card">
+                <button
+                  type="button"
+                  className="v20-series-cover"
+                  onClick={() => setSeriesPlaying({ series: item, index: 0 })}
+                  title={item.label}
+                >
+                  {item.cover_url ? <img src={mediaSrc(item.cover_url)} alt={item.label} loading="lazy" /> : <span className="v20-final-fallback">{item.label.slice(0, 1)}</span>}
+                  <span className="v20-series-count">{item.members.length} 集</span>
+                  <span className="v20-final-play"><IconPlay size={18} /></span>
+                </button>
+                <div className="v20-series-body">
+                  <b>{item.label}</b>
+                  <span className="v20-series-desc">{item.description}</span>
+                  <div className="v20-series-meta">
+                    <span>{item.style}</span>
+                    <span>{item.ready_count}/{item.members.length} 可用</span>
+                    {item.total_duration ? <span>{fmtDuration(item.total_duration)}</span> : null}
+                  </div>
+                  <div className="v20-series-actions">
+                    <button
+                      type="button"
+                      className="cm-btn cm-btn-primary cm-btn-sm"
+                      onClick={() => setSeriesPlaying({ series: item, index: 0 })}
+                      disabled={!item.ready_count}
+                    >
+                      <IconPlay size={12} /> 连续播放
+                    </button>
+                    <button
+                      type="button"
+                      className="cm-btn cm-btn-sm cm-btn-ghost"
+                      onClick={() => setSeriesPlaying({ series: item, index: Math.max(0, item.members.findIndex((m) => m.ready)) })}
+                    >
+                      从第一部开始
+                    </button>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      )}
 
       {loading && !templates.length ? (
         <div className="v18-empty">
@@ -1125,6 +1196,61 @@ function FinalLibrary({
           </div>
         </div>
       )}
+
+      {seriesPlaying && (() => {
+        const item = seriesPlaying.series;
+        const index = Math.min(seriesPlaying.index, item.members.length - 1);
+        const current = item.members[index];
+        const nextIndex = item.members.findIndex((member, i) => i > index && member.ready);
+        return (
+          <div className="v20-modal-mask" onMouseDown={() => setSeriesPlaying(null)} role="dialog" aria-modal="true" aria-label={item.label}>
+            <div className="v20-modal v20-series-modal" onMouseDown={(event) => event.stopPropagation()}>
+              <header className="v20-modal-head">
+                <div>
+                  <span className="v20-modal-kicker">SERIES · {item.label} · {index + 1}/{item.members.length}</span>
+                  <h3 className="v20-modal-title">{current?.label || item.label}</h3>
+                </div>
+                <button type="button" className="v18-voice-close" onClick={() => setSeriesPlaying(null)} aria-label="关闭">
+                  <IconClose size={16} />
+                </button>
+              </header>
+              {current?.final_url ? (
+                <video
+                  key={current.template}
+                  className="v20-video"
+                  src={mediaSrc(current.final_url)}
+                  controls
+                  autoPlay
+                  playsInline
+                  preload="metadata"
+                  onEnded={() => {
+                    if (nextIndex >= 0) setSeriesPlaying({ series: item, index: nextIndex });
+                  }}
+                />
+              ) : (
+                <div className="v18-empty"><span>这一集还没生成成片</span></div>
+              )}
+              <footer className="v20-modal-foot v20-series-foot">
+                <div className="v20-series-queue">
+                  {item.members.map((member, i) => (
+                    <button
+                      key={member.template}
+                      type="button"
+                      className={"v20-series-item" + (i === index ? " is-active" : "")}
+                      onClick={() => setSeriesPlaying({ series: item, index: i })}
+                      disabled={!member.ready}
+                    >
+                      <span className="v20-series-index">{i + 1}</span>
+                      <span>{member.label}</span>
+                      {member.duration ? <em>{fmtDuration(member.duration)}</em> : null}
+                    </button>
+                  ))}
+                </div>
+              </footer>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

@@ -107,6 +107,13 @@
 
 同一场景内交替给两个角色，落 4 段 TTS 音频；`keyframe_candidates: 2`。注意：自动 brief 的 `look` 默认继承模板 style 的「霓虹演播厅」，必须改写成车间 look，否则 b-roll 会渲染成 talk show。
 
+## 4.7 系列（V48）
+
+- 合同：`contract/v5/series/undercity_arc.json`（label/description/cover/members[{template,label}]）。
+- 接口：`GET /api/v5/series` 返回系列 + 每集成片/海报 URL、时长、ready 状态；cover 取封面模板海报。
+- 前端「成片库」顶部新增系列横条：封面 + 集数 + 风格 + 可用集数/总时长 + 「连续播放」；播放器弹窗按队列自动续播，底部可点任意一集切换（未生成的集禁用）。
+- 当前系列「底城往事 · 三部曲」：底城往事 14.12s → 机器人组装 13.68s → 装配夜话 19.14s，合计 46.9s。
+
 ## 5. 前端
 
 - `RenderStyle` 增加 `arcane_cinematic`；风格元信息「赛博电影感 / 赛博 / 绘画感半写实动画（Arcane 风）：厚涂笔触 + 青橙光比 + 电影景深」。

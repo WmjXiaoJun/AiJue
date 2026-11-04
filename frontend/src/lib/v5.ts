@@ -27,6 +27,34 @@ export interface V5Output {
   mtime: string;
 }
 
+export interface V5SeriesMember {
+  template: string;
+  label: string;
+  render_style?: string | null;
+  duration?: number | null;
+  poster_url?: string | null;
+  final_url?: string | null;
+  ready: boolean;
+}
+
+export interface V5Series {
+  id: string;
+  label: string;
+  description: string;
+  style: string;
+  cover: string;
+  cover_url?: string | null;
+  members: V5SeriesMember[];
+  ready_count: number;
+  total_duration?: number | null;
+}
+
+export interface V5SeriesResponse {
+  ok: boolean;
+  count: number;
+  series: V5Series[];
+}
+
 export interface V5OutputsResponse {
   ok: boolean;
   root: string;
@@ -389,6 +417,7 @@ export const v5api = {
       { method: "PUT", body: JSON.stringify({ item, dry_run: dryRun }) },
       60000
     ),
+  series: () => request<V5SeriesResponse>("/v5/series"),
   voices: () => request<V5VoicesResponse>("/v5/voices"),
   characterVoice: (character: string) =>
     request<V5VoiceInfo>("/v5/voice/" + enc(character)),
