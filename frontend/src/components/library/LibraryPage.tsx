@@ -12,7 +12,7 @@ import type { PublishPackageBatch, PublishPackageBatchItem, PublishPlatform } fr
 import { downloadUrlAsBlob } from "../../lib/download";
 import { isBatchActive, isRunActive, pipelineApi, pipelineBatchApi } from "../../lib/pipeline";
 import type { PipelineBatch, PipelineBatchItem } from "../../lib/pipeline";
-import type { V5CatalogResponse, V5Series } from "../../lib/v5";
+import type { V5CatalogResponse, V5Series, V5SeriesExport } from "../../lib/v5";
 import { v5api } from "../../lib/v5";
 import { useToast } from "../Toast";
 import { Spinner } from "../ui";
@@ -551,6 +551,8 @@ function FinalLibrary({
   const [downloadAllIndex, setDownloadAllIndex] = useState(0);
   const [series, setSeries] = useState<V5Series[]>([]);
   const [seriesPlaying, setSeriesPlaying] = useState<{ series: V5Series; index: number } | null>(null);
+  const [seriesBusy, setSeriesBusy] = useState<string | null>(null);
+  const [seriesFiles, setSeriesFiles] = useState<Record<string, V5SeriesExport>>({});
 
   useEffect(() => {
     if (!playing) return;
@@ -569,6 +571,27 @@ function FinalLibrary({
       .catch(() => { if (alive) setSeries([]); });
     return () => { alive = false; };
   }, [templates.length]);
+
+  const exportSeries = useCallback(
+    async (item: V5Series) => {
+      setSeriesBusy(item.id);
+      try {
+        const res = await v5api.exportSeries(item.id);
+        setSeriesFiles((prev) => ({ ...prev, [item.id]: res }));
+        notify(
+          res.cached
+            ? `合集已存在：${item.label}（${fmtDuration(res.duration || 0)}）`
+            : `合集已生成：${item.label}（${fmtDuration(res.duration || 0)} · ${fmtSize(res.bytes || 0)}）`,
+          "success",
+        );
+      } catch (err) {
+        notify(`导出合集失败：${err instanceof Error ? err.message : String(err)}`, "error");
+      } finally {
+        setSeriesBusy(null);
+      }
+    },
+    [notify],
+  );
 
   useEffect(() => {
     if (!seriesPlaying) return;
@@ -853,6 +876,20 @@ function FinalLibrary({
                     >
                       从第一部开始
                     </button>
+                    <button
+                      type="button"
+                      className="cm-btn cm-btn-sm cm-btn-ghost"
+                      onClick={() => void exportSeries(item)}
+                      disabled={seriesBusy === item.id || !item.ready_count}
+                      title="片头卡 + 全部集数串成一个 mp4"
+                    >
+                      <IconDownload size={12} /> {seriesBusy === item.id ? "合成中…" : "导出合集"}
+                    </button>
+                    {seriesFiles[item.id]?.url ? (
+                      <a className="cm-btn cm-btn-sm v20-series-download" href={mediaSrc(seriesFiles[item.id].url)} download>
+                        <IconDownload size={12} /> 下载合集 {fmtDuration(seriesFiles[item.id].duration || 0)}
+                      </a>
+                    ) : null}
                   </div>
                 </div>
               </article>

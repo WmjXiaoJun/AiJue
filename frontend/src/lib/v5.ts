@@ -49,6 +49,16 @@ export interface V5Series {
   total_duration?: number | null;
 }
 
+export interface V5SeriesExport {
+  ok: boolean;
+  cached?: boolean;
+  url: string;
+  manifest_url?: string;
+  duration?: number | null;
+  bytes?: number | null;
+  build_sec?: number | null;
+}
+
 export interface V5SeriesResponse {
   ok: boolean;
   count: number;
@@ -418,6 +428,12 @@ export const v5api = {
       60000
     ),
   series: () => request<V5SeriesResponse>("/v5/series"),
+  exportSeries: (id: string, force = false) =>
+    request<V5SeriesExport>(
+      "/v5/series/" + enc(id) + "/export" + (force ? "?force=true" : ""),
+      { method: "POST" },
+      600000
+    ),
   voices: () => request<V5VoicesResponse>("/v5/voices"),
   characterVoice: (character: string) =>
     request<V5VoiceInfo>("/v5/voice/" + enc(character)),

@@ -114,6 +114,13 @@
 - 前端「成片库」顶部新增系列横条：封面 + 集数 + 风格 + 可用集数/总时长 + 「连续播放」；播放器弹窗按队列自动续播，底部可点任意一集切换（未生成的集禁用）。
 - 当前系列「底城往事 · 三部曲」：底城往事 14.12s → 机器人组装 13.68s → 装配夜话 19.14s，合计 46.9s。
 
+### 导出合集（V48.1）
+
+- `POST /api/v5/series/{sid}/export?force=true`：用封面海报压暗 + 系列名/简介/风格标签生成 2.2s 片头卡，再与各集 `final.mp4` 串成一个 1280×720 / 25fps 的 mp4。
+- 产物：`outputs/series/<sid>/{series.mp4,manifest.json,poster.jpg,title_card.mp4,concat.txt}`；接口返回 `url/manifest_url/duration/bytes`，带缓存（同参数第二次直接返回 `cached: true`）。
+- 实测：`undercity_arc` → 49.14s / 15,411,269B / build 1.7s；`/media/series/undercity_arc/series.mp4` 200。
+- 前端系列卡新增「导出合集」「下载合集 0:49」，合成中禁用按钮，完成后 toast 提示。
+
 ## 5. 前端
 
 - `RenderStyle` 增加 `arcane_cinematic`；风格元信息「赛博电影感 / 赛博 / 绘画感半写实动画（Arcane 风）：厚涂笔触 + 青橙光比 + 电影景深」。

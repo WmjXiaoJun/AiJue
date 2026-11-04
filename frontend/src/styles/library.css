@@ -246,7 +246,8 @@
 .v20-series-body b { font-family: var(--font-display); font-size: 18px; letter-spacing: 0.03em; }
 .v20-series-desc { color: var(--c-mut); font-size: 12px; line-height: 1.5; }
 .v20-series-meta { display: flex; flex-wrap: wrap; gap: 10px; font-size: 11px; color: var(--c-mut); }
-.v20-series-actions { display: flex; gap: 8px; margin-top: auto; padding-top: 4px; }
+.v20-series-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 4px; }
+.v20-series-download { text-decoration: none; color: var(--c-gold, #c9a227); border-color: rgba(201, 162, 39, 0.45); }
 .v20-series-modal { width: min(960px, 94vw); }
 .v20-series-foot { display: block; }
 .v20-series-queue { display: flex; flex-direction: column; gap: 6px; width: 100%; }

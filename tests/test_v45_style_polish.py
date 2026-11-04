@@ -199,3 +199,17 @@ def test_series_members_exist_and_are_cyber():
     for member in series["members"]:
         tpl = _json.loads((repo / f"contract/v5/custom/templates/{member['template']}.json").read_text(encoding="utf-8"))
         assert tpl["render_style"] == "arcane_cinematic"
+
+
+def test_series_export_manifest_shape():
+    """V48.1：合集 manifest 字段（集数/时长/字节/片头卡）齐全。"""
+    import json as _json
+    repo = pathlib.Path(__file__).resolve().parents[1]
+    path = repo / "outputs/series/undercity_arc/manifest.json"
+    if not path.is_file():
+        return  # 未导出过时跳过（CI 无产物）
+    data = _json.loads(path.read_text(encoding="utf-8"))
+    assert data["id"] == "undercity_arc"
+    assert len(data["episodes"]) == 3
+    assert data["duration"] and data["duration"] > 40
+    assert data["bytes"] > 1_000_000
