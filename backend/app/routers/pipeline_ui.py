@@ -118,6 +118,8 @@ def _template_contract(tid: str) -> Dict[str, Any]:
 
 
 _RENDER_TYPE_LABELS = {"2d": "2D 动画", "3d": "3D 电影", "realistic": "写实实拍"}
+_RENDER_STYLE_LABELS = {"jp_anime": "日漫电影感", "guoman": "国漫国风",
+                        "retro_cel": "复古赛璐璐", "soft_watercolor": "治愈手绘"}
 
 
 def _template_render_type(tid: str) -> str:
@@ -131,6 +133,19 @@ def _template_render_type(tid: str) -> str:
 def _template_render_type_label(tid: str) -> str:
     render_type = _template_render_type(tid)
     return _RENDER_TYPE_LABELS.get(render_type, render_type)
+
+
+def _template_render_style(tid: str) -> str | None:
+    """V44：2D 风格子类型；非 2D 返回 None，2D 缺省 jp_anime。"""
+    if _template_render_type(tid) != "2d":
+        return None
+    raw = str(_template_contract(tid).get("render_style") or "").strip().lower()
+    return raw if raw in _RENDER_STYLE_LABELS else "jp_anime"
+
+
+def _template_render_style_label(tid: str) -> str | None:
+    style = _template_render_style(tid)
+    return _RENDER_STYLE_LABELS.get(style) if style else None
 
 
 def _is_custom_template(tid: str) -> bool:
@@ -225,6 +240,8 @@ def _generate_hq_command(tid: str, style_mode: str = "3d",
     else:
         cmd = [sys.executable, "-m", "pipeline.templates3d_hq", "--template", tid]
     cmd.extend(["--style-mode", style_mode])
+    if style_mode == "2d":
+        cmd.extend(["--2d-style", _template_render_style(tid) or "jp_anime"])
     if reuse:
         cmd.append("--reuse-shots")
     return cmd
@@ -285,6 +302,8 @@ def _job_view(job: Dict[str, Any], *, tail: int = _TAIL_LINES) -> Dict[str, Any]
         "template_label": job.get("template_label"),
         "render_type": job.get("render_type") or _template_render_type(str(job.get("template_id") or "")),
         "render_type_label": _template_render_type_label(str(job.get("template_id") or "")),
+        "render_style": _template_render_style(str(job.get("template_id") or "")),
+        "render_style_label": _template_render_style_label(str(job.get("template_id") or "")),
         "status": job.get("status"),
         "stage": stage,
         "stage_index": int(stage_index.get(stage, 0)),
@@ -555,6 +574,8 @@ def start_pipeline_job(template_id: str, *, reuse_shots: bool = False,
             "template_label": _template_label(tid),
             "render_type": render_type,
             "render_type_label": _template_render_type_label(tid),
+            "render_style": _template_render_style(tid),
+            "render_style_label": _template_render_style_label(tid),
             "reuse_shots": reuse,
             "status": "dry_run",
             "dry_run": True,
@@ -648,6 +669,8 @@ def start_pipeline_job(template_id: str, *, reuse_shots: bool = False,
         "template_label": _template_label(tid),
         "render_type": render_type,
         "render_type_label": _template_render_type_label(tid),
+        "render_style": _template_render_style(tid),
+        "render_style_label": _template_render_style_label(tid),
         "reuse_shots": reuse,
         "status": "queued",
         "stages": [item["id"] for item in STAGES],

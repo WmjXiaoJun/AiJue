@@ -2,7 +2,7 @@
 // 提交 POST /api/v5/templates（后端会合成 TTS/episode 并生成 semantic brief；不触发 GPU）。
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { V5CatalogResponse, V5TemplateSummary } from "../../lib/v5";
-import { RENDER_TYPE_META, type RenderType } from "../../lib/cinema";
+import { RENDER_STYLE_META, RENDER_STYLE_ORDER, RENDER_TYPE_META, type RenderStyle, type RenderType } from "../../lib/cinema";
 import { creationApi, creationErrorMessage, isCreationNotReady, makeCustomId, type TemplateActInput, type TemplateCastInput, type TemplateCreateResponse } from "../../lib/creation";
 import { useToast } from "../Toast";
 import { Spinner } from "../ui";
@@ -57,6 +57,7 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
   const [label, setLabel] = useState("");
   const [style, setStyle] = useState("");
   const [renderType, setRenderType] = useState<RenderType>("3d");
+  const [renderStyle, setRenderStyle] = useState<RenderStyle>("jp_anime");
   const [aspect, setAspect] = useState("16:9");
   const [targetDuration, setTargetDuration] = useState("40");
   const [description, setDescription] = useState("");
@@ -78,6 +79,7 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
     setLabel("");
     setStyle(styles[0]?.id || "");
     setRenderType("3d");
+    setRenderStyle("jp_anime");
     setAspect("16:9");
     setTargetDuration("40");
     setDescription("");
@@ -176,6 +178,7 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
         label: label.trim(),
         style,
         render_type: renderType,
+        render_style: renderType === "2d" ? renderStyle : undefined,
         aspect,
         description: description.trim() || undefined,
         cast: castBody,
@@ -317,6 +320,30 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
                       : "写实实拍复用写实立绘/镜头并走 3D 生成路径，约 15–40 分钟"}
                 </span>
               </div>
+              {renderType === "2d" && (
+                <div className="v21-field is-wide v44-style-field">
+                  <span className="v21-label">2D 风格（画面子类型）</span>
+                  <div className="v44-style-grid" role="radiogroup" aria-label="2D 风格">
+                    {RENDER_STYLE_ORDER.map((id) => {
+                      const meta = RENDER_STYLE_META[id];
+                      return (
+                        <label key={id} className={"v44-style-option" + (renderStyle === id ? " is-active" : "")}>
+                          <input
+                            type="radio"
+                            name="v44_render_style"
+                            value={id}
+                            checked={renderStyle === id}
+                            onChange={() => setRenderStyle(id)}
+                          />
+                          <b>{meta.label}{id === "jp_anime" ? "（默认）" : ""}</b>
+                          <em>{meta.desc}</em>
+                        </label>
+                      );
+                    })}
+                  </div>
+                  <span className="v21-hint">仅 2D 动画生效；不同风格生成的关键帧/B-roll 画面不同</span>
+                </div>
+              )}
               <label className="v21-field">
                 <span className="v21-label">目标时长（参考，秒）</span>
                 <input className="v21-input" type="number" min={10} max={180} value={targetDuration} onChange={(event) => setTargetDuration(event.target.value)} />
@@ -458,7 +485,7 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
                 <div className="v21-summary-item"><span>Cast</span><b>{cast.length} 角色</b></div>
                 <div className="v21-summary-item"><span>分幕</span><b>{acts.length} 幕</b></div>
                 <div className="v21-summary-item"><span>将生成</span><b>{acts.length} 镜</b></div>
-                <div className="v21-summary-item"><span>节目类型</span><b>{RENDER_TYPE_META[renderType].label}</b></div>
+                <div className="v21-summary-item"><span>节目类型</span><b>{RENDER_TYPE_META[renderType].label}{renderType === "2d" ? ` · ${RENDER_STYLE_META[renderStyle].label}` : ""}</b></div>
                 <div className="v21-summary-item"><span>预计生成</span><b>{RENDER_TYPE_META[renderType].wait}</b></div>
               </div>
 

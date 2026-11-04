@@ -129,6 +129,34 @@ export interface CinemaTemplateFinal {
 
 export type RenderType = "2d" | "3d" | "realistic";
 
+export type RenderStyle = "jp_anime" | "guoman" | "retro_cel" | "soft_watercolor";
+
+export interface RenderStyleMeta {
+  id: RenderStyle;
+  label: string;
+  short: string;
+  desc: string;
+}
+
+/** V44：2D 风格子类型（默认日漫电影感） */
+export const RENDER_STYLE_META: Record<RenderStyle, RenderStyleMeta> = {
+  jp_anime: { id: "jp_anime", label: "日漫电影感", short: "日漫", desc: "日式电影感赛璐璐，细腻线稿 + 柔和光影（默认）" },
+  guoman: { id: "guoman", label: "国漫国风", short: "国风", desc: "国风动画电影感，水墨色彩点缀 + 精致中式美术" },
+  retro_cel: { id: "retro_cel", label: "复古赛璐璐", short: "赛璐璐", desc: "90 年代复古赛璐璐，粗描边 + 胶片颗粒" },
+  soft_watercolor: { id: "soft_watercolor", label: "治愈手绘", short: "手绘", desc: "手绘水彩质感，暖色调 + 温柔治愈氛围" },
+};
+
+export const RENDER_STYLE_ORDER: RenderStyle[] = ["jp_anime", "guoman", "retro_cel", "soft_watercolor"];
+
+export function resolveRenderStyle(input?: { render_style?: string } | string | null): RenderStyle {
+  const explicit = typeof input === "string" ? input : input?.render_style;
+  return explicit === "guoman" || explicit === "retro_cel" || explicit === "soft_watercolor" ? explicit : "jp_anime";
+}
+
+export function renderStyleMeta(input?: { render_style?: string } | string | null): RenderStyleMeta {
+  return RENDER_STYLE_META[resolveRenderStyle(input)];
+}
+
 export interface RenderTypeMeta {
   id: RenderType;
   label: string;
@@ -164,6 +192,9 @@ export interface CinemaTemplate {
   /** V41：节目类型（2d | 3d | realistic；缺省按 id 推导） */
   render_type?: RenderType | string;
   render_type_label?: string;
+  /** V44：2D 风格子类型（仅 2D 有意义；缺省 jp_anime） */
+  render_style?: RenderStyle | string;
+  render_style_label?: string;
   status: CinemaTemplateStatus;
   /** 0–100（后端按镜头数/时长估算；缺失时前端按 clips 兜底） */
   progress: number;
@@ -473,6 +504,8 @@ export function normalizeCinemaTemplate(
     style: looseString(rec.style) || fallback?.style || "",
     render_type: looseString(rec.render_type) || undefined,
     render_type_label: looseString(rec.render_type_label) || looseString(rec.type_label) || undefined,
+    render_style: looseString(rec.render_style) || undefined,
+    render_style_label: looseString(rec.render_style_label) || undefined,
     status,
     progress,
     clips: { done: clipsDone, total: clipsTotal },

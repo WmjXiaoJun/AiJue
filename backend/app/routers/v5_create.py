@@ -50,6 +50,13 @@ _HEX_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
 # V41：节目类型
 _RENDER_TYPES = ("2d", "3d", "realistic")
 _RENDER_TYPE_LABELS = {"2d": "2D 动画", "3d": "3D 电影", "realistic": "写实实拍"}
+# V44：2D 风格子类型
+_RENDER_STYLES = {
+    "jp_anime": "日漫电影感",
+    "guoman": "国漫国风",
+    "retro_cel": "复古赛璐璐",
+    "soft_watercolor": "治愈手绘",
+}
 
 #: V24 概念图（imagegen/SDXL）：单张 portrait；V28 扩展三视图/表情/设定图
 _ART_DIR = _REPO_ROOT / "assets" / "v5" / "characters"
@@ -1204,6 +1211,13 @@ def create_template(body: Dict[str, Any] = Body(default={})) -> dict:
         render_type = "realistic" if tid.startswith("real_") else "3d"
     if render_type not in _RENDER_TYPES:
         errors.append(f"render_type 只支持 {', '.join(_RENDER_TYPES)}（当前 {render_type!r}）")
+    # V44：2D 风格（仅 2D 有意义；缺省 jp_anime；3D/写实忽略）
+    render_style = None
+    if render_type == "2d":
+        render_style = str(data.get("render_style") or "jp_anime").strip().lower()
+        if render_style not in _RENDER_STYLES:
+            errors.append(f"render_style 只支持 {', '.join(_RENDER_STYLES)}"
+                          f"（当前 {render_style!r}）")
     aspect = _normalize_aspect(data.get("aspect"))
 
     cast_in = data.get("cast")
@@ -1347,12 +1361,14 @@ def create_template(body: Dict[str, Any] = Body(default={})) -> dict:
             "tags": ["custom", "v21"],
             "style": style_id, "target_duration": total_duration, "aspect": aspect,
             "render_type": render_type,
+            **({"render_style": render_style} if render_style else {}),
             "cast": cast, "acts": template_acts,
             "packaging": {"subtitle": "default", "transition": "fade", "title": label},
             "lipsync": {"mode": "musetalk"},
             "audio": {},
             "meta": {"create_source": "v21", "three_d": render_type != "2d",
                      "render_type": render_type,
+                     **({"render_style": render_style} if render_style else {}),
                      "created_at": _now_text(), "created_by": "api"},
         }
         result = v5_catalog.validate_item("templates", template_item, catalog, as_custom=True)
@@ -1394,6 +1410,9 @@ def create_template(body: Dict[str, Any] = Body(default={})) -> dict:
             "ok": True, "id": tid, "label": label, "style": style_id,
             "render_type": render_type,
             "render_type_label": _RENDER_TYPE_LABELS.get(render_type, render_type),
+            **({"render_style": render_style,
+                "render_style_label": _RENDER_STYLES.get(render_style, render_style)}
+               if render_style else {}),
             "shots": len(shots),
             "dialogue_shots": sum(1 for shot in shots if shot["line"]),
             "broll_shots": sum(1 for shot in shots if not shot["line"]),

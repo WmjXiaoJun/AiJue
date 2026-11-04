@@ -1,7 +1,7 @@
 // V18 · 制片控制台各步骤面板（Step 1–6）
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CinemaTemplate } from "../../lib/cinema";
-import { renderTypeMeta } from "../../lib/cinema";
+import { renderStyleMeta, renderTypeMeta } from "../../lib/cinema";
 import { fmtDuration, fmtSize, isRealTemplate } from "../../lib/cinema";
 import type { PipelineRun } from "../../lib/pipeline";
 import { PIPELINE_STAGE_LABEL, pipelineRunPercent } from "../../lib/pipeline";
@@ -591,6 +591,10 @@ export function StepRun({
 }) {
   const active = run && (run.status === "queued" || run.status === "running");
   const renderMeta = renderTypeMeta(template);
+  const style2d = renderMeta.id === "2d" ? renderStyleMeta(template) : null;
+  const typeChipText = `2D`.length && renderMeta.id === "2d" && style2d
+    ? `${renderMeta.short} · ${style2d.label} · ${renderMeta.wait}`
+    : `${renderMeta.short} · ${renderMeta.wait}`;
   const pct = pipelineRunPercent(run);
   const stageText = run ? PIPELINE_STAGE_LABEL[run.stage] || run.stage || "排队中" : "";
   const statusClass = run
@@ -610,12 +614,12 @@ export function StepRun({
             <IconSpark size={17} /> ④ 生成{renderMeta.short}
           </h3>
           <p className="v18-panel-sub">
-            GENERATE · {renderMeta.label} · 预计 {renderMeta.wait} · pipeline 任务（单并发）
+            GENERATE · {renderMeta.label}{style2d ? `（${style2d.label}）` : ""} · 预计 {renderMeta.wait} · pipeline 任务（单并发）
           </p>
         </div>
         <div className="v18-panel-actions">
           <span className={"v18-tag v41-type-chip is-" + renderMeta.id}>
-            {renderMeta.short} · {renderMeta.wait}
+            {typeChipText}
           </span>
           <span className="v18-crumb">{template ? template.id : "未选模板"}</span>
         </div>

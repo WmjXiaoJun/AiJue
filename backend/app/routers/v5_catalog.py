@@ -103,6 +103,8 @@ def _source_of(catalog: dict, kind: str, item_id: str) -> dict:
 
 
 _RENDER_TYPE_LABELS = {"2d": "2D 动画", "3d": "3D 电影", "realistic": "写实实拍"}
+_RENDER_STYLE_LABELS = {"jp_anime": "日漫电影感", "guoman": "国漫国风",
+                        "retro_cel": "复古赛璐璐", "soft_watercolor": "治愈手绘"}
 
 
 def _template_render_type(item_id: str, item: dict) -> str:
@@ -112,10 +114,22 @@ def _template_render_type(item_id: str, item: dict) -> str:
     return "realistic" if str(item_id).startswith("real_") else "3d"
 
 
+def _template_render_style(item_id: str, item: dict) -> str | None:
+    if _template_render_type(item_id, item) != "2d":
+        return None
+    raw = str((item or {}).get("render_style") or "").strip().lower()
+    return raw if raw in _RENDER_STYLE_LABELS else "jp_anime"
+
+
 def _template_type_fields(item_id: str, item: dict) -> dict:
     render_type = _template_render_type(item_id, item)
-    return {"render_type": render_type,
-            "render_type_label": _RENDER_TYPE_LABELS[render_type]}
+    fields = {"render_type": render_type,
+              "render_type_label": _RENDER_TYPE_LABELS[render_type]}
+    render_style = _template_render_style(item_id, item)
+    if render_style:
+        fields["render_style"] = render_style
+        fields["render_style_label"] = _RENDER_STYLE_LABELS[render_style]
+    return fields
 
 
 def _enrich_template_summaries(catalog: dict, summary: dict) -> None:

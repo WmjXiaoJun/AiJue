@@ -53,11 +53,46 @@ STYLE_2D_QUALITY = ("2D anime film quality, clean line art, flat cel-shaded colo
                     "hand-drawn animation, anime screenshot")
 STYLE_2D_BROLL = ("anime key visual, Japanese TV anime screenshot, clean lineart, "
                   "flat cel-shaded colors, detailed background, no 3D, no cgi")
-STYLE_2D_CACHE = "_2d_v43"
+STYLE_2D_CACHE = "_2d_v44"
+
+#: V44：2D 风格子类型 → imagegen style / 追加提示词
+STYLE_2D_STYLES = {
+    "jp_anime": {
+        "label": "日漫电影感",
+        "imagegen": "anime",
+        "prompt": ("Japanese anime film still, cinematic anime key visual, detailed lineart, "
+                   "soft cel shading, film grain"),
+    },
+    "guoman": {
+        "label": "国漫国风",
+        "imagegen": "guoman",
+        "prompt": ("Chinese guofeng animation film key visual, elegant ink-wash color accents, "
+                   "detailed Chinese animation"),
+    },
+    "retro_cel": {
+        "label": "复古赛璐璐",
+        "imagegen": "anime",
+        "prompt": ("90s retro cel anime, bold clean outlines, vintage anime screenshot, "
+                   "slight film grain"),
+    },
+    "soft_watercolor": {
+        "label": "治愈手绘",
+        "imagegen": "anime",
+        "prompt": ("hand-painted watercolor anime, soft warm palette, gentle healing atmosphere, "
+                   "hand-drawn textures"),
+    },
+}
 
 
-def apply_2d_style(prompt: str, broll: bool = False) -> str:
-    """V42/V43：把 3D/T2VA 提示词改写为 2D 动漫风格（cel-shaded/flat/line art）。"""
+def resolve_2d_style(style_id: str | None) -> str:
+    key = str(style_id or "jp_anime").strip().lower()
+    return key if key in STYLE_2D_STYLES else "jp_anime"
+
+
+def apply_2d_style(prompt: str, broll: bool = False, style_id: str = "jp_anime") -> str:
+    """V42/V43/V44：把 3D/T2VA 提示词改写为指定 2D 风格。"""
+    style_key = resolve_2d_style(style_id)
+    style = STYLE_2D_STYLES[style_key]
     text = str(prompt or "")
     text = re.sub(r"3D animated feature film quality[^.]*\.",
                   STYLE_2D_QUALITY + ".", text, flags=re.IGNORECASE)
@@ -68,7 +103,7 @@ def apply_2d_style(prompt: str, broll: bool = False) -> str:
     text = re.sub(r"\b(?:3D|3d)\b", "2D", text)
     text = re.sub(r"\brich physical materials,\s*", "", text, flags=re.IGNORECASE)
     text = re.sub(r"volumetric light", "flat cel-shaded lighting", text, flags=re.IGNORECASE)
-    text = STYLE_2D_PREFIX + ". " + text
+    text = STYLE_2D_PREFIX + ". " + style["prompt"] + ". " + text
     if broll:
         text += " " + STYLE_2D_BROLL + "."
     return text
@@ -140,8 +175,11 @@ def _imagegen_spec_for(cid: str, spec_dir: pathlib.Path) -> pathlib.Path:
     return path
 
 
-def _generate_keyframe(tid: str, shot: dict, visual: str, seed: int) -> pathlib.Path:
-    """SDXL anime 关键帧（scene 1280x720，portrait IP-Adapter 0.75）→ 1024×576。"""
+def _generate_keyframe(tid: str, shot: dict, visual: str, seed: int,
+                       style_id: str = "jp_anime") -> pathlib.Path:
+    """SDXL 关键帧（scene 1280x720，portrait IP-Adapter 0.75）→ 1024×576；V44 支持风格。"""
+    style_key = resolve_2d_style(style_id)
+    style = STYLE_2D_STYLES[style_key]
     shot_id = str(shot.get("id"))
     cid = _shot_character_id(tid, shot)
     if not cid:
@@ -149,22 +187,22 @@ def _generate_keyframe(tid: str, shot: dict, visual: str, seed: int) -> pathlib.
     portrait = REPO / "assets" / "v5" / "characters" / cid / "portrait.png"
     if not portrait.is_file():
         raise RuntimeError(f"{shot_id}: 缺少 anime 立绘 {portrait}")
-    key_dir = KEYFRAMES / tid
+    key_dir = KEYFRAMES / tid / style_key
     key_dir.mkdir(parents=True, exist_ok=True)
     key_png = key_dir / f"{shot_id}.png"
     if key_png.is_file() and key_png.stat().st_size > 100_000:
         return key_png
     spec_path = _imagegen_spec_for(cid, KEYFRAMES / "specs")
-    raw_dir = KEYFRAMES / tid / f"raw_{shot_id}"
+    raw_dir = KEYFRAMES / tid / style_key / f"raw_{shot_id}"
     prompt_extra = (
-        f"{visual or 'anime key visual scene'}; anime key visual, cel-shaded, clean lineart, "
-        "detailed eyes, official anime art, no text; detailed environment, background scenery, "
-        "wide shot, cinematic composition"
+        f"{visual or 'anime key visual scene'}; {style['prompt']}; "
+        "anime key visual, cel-shaded, clean lineart, detailed eyes, official anime art, no text; "
+        "detailed environment, background scenery, wide shot, cinematic composition"
     )
     cmd = [
         sys.executable, "-m", "imagegen.cli", "generate",
         "--spec", str(spec_path), "--outdir", str(raw_dir),
-        "--mode", "scene", "--style", "anime", "--size", "1280x720",
+        "--mode", "scene", "--style", style["imagegen"], "--size", "1280x720",
         "--ref", str(portrait), "--ip-adapter-strength", "0.75",
         "--prompt-extra", prompt_extra,
         "--negative-extra",
@@ -183,7 +221,7 @@ def _generate_keyframe(tid: str, shot: dict, visual: str, seed: int) -> pathlib.
         "-vf", "scale=1024:576:force_original_aspect_ratio=increase,crop=1024:576",
         str(key_png),
     ], check=True, capture_output=True, timeout=120)
-    log(f"[2D] 关键帧 {shot_id} ← {cid} ({raw_png.stat().st_size} B)")
+    log(f"[2D] 关键帧 {shot_id} ← {cid}（{style_key}/{style['label']}，{raw_png.stat().st_size} B）")
     return key_png
 
 
@@ -209,14 +247,15 @@ def frame_length(duration: float) -> int:
 
 
 def gen_t2va(tid: str, shot: dict, seed: int, style_mode: str = "3d",
-             broll: bool = False) -> pathlib.Path:
-    suffix = STYLE_2D_CACHE if style_mode == "2d" else ""
+             broll: bool = False, style_id: str = "jp_anime") -> pathlib.Path:
+    style_key = resolve_2d_style(style_id)
+    suffix = f"{STYLE_2D_CACHE}_{style_key}" if style_mode == "2d" else ""
     out = WORK / "clips" / f"{tid}_{shot['id']}_t2va1024{suffix}.mp4"
     if out.is_file() and out.stat().st_size > 200_000:
         return out
     duration = float(shot.get("duration") or 5.0)
     length = frame_length(duration)
-    prompt = apply_2d_style(str(shot["prompt"]), broll=broll) \
+    prompt = apply_2d_style(str(shot["prompt"]), broll=broll, style_id=style_key) \
         if style_mode == "2d" else str(shot["prompt"])
     wf = local.build_workflow(prompt, 1024, 576, length, seed,
                               f"v16/{tid}/{shot['id']}_t2va{suffix}")
@@ -227,7 +266,9 @@ def gen_t2va(tid: str, shot: dict, seed: int, style_mode: str = "3d",
     return out
 
 
-def motion_prompt(shot: dict, style_mode: str = "3d") -> str:
+def motion_prompt(shot: dict, style_mode: str = "3d", style_id: str = "jp_anime") -> str:
+    style_key = resolve_2d_style(style_id)
+    style = STYLE_2D_STYLES[style_key]
     visual = str(shot.get("semantic_visual") or "").strip()
     camera_text = ""
     prompt = str(shot.get("prompt") or "")
@@ -244,11 +285,11 @@ def motion_prompt(shot: dict, style_mode: str = "3d") -> str:
         return (
             "subject_definitions: Subject 1 is the character shown in the reference image, preserving their exact face, "
             "hairstyle, hair color, outfit, age and 2D anime art style; cel-shaded, clean line art, flat colors.\n\n"
-            f"summary: {STYLE_2D_PREFIX}. {visual or 'A cinematic 2D anime scene.'} The shot is a medium or medium-wide "
-            f"2D anime composition that keeps the surrounding set visible; {move}. The character speaks naturally with "
-            "lips moving in sync with the reference speech audio, blinking and gesturing, while the camera and body have "
-            "gentle hand-drawn motion. Keep the character identity consistent with the reference image. "
-            f"{STYLE_2D_QUALITY}. no text, no subtitles, no watermark.\n\n"
+            f"summary: {STYLE_2D_PREFIX}. {style['prompt']}. {visual or 'A cinematic 2D anime scene.'} "
+            f"The shot is a medium or medium-wide 2D anime composition that keeps the surrounding set visible; {move}. "
+            "The character speaks naturally with lips moving in sync with the reference speech audio, blinking and "
+            "gesturing, while the camera and body have gentle hand-drawn motion. Keep the character identity consistent "
+            f"with the reference image. {STYLE_2D_QUALITY}; {style['prompt']}. no text, no subtitles, no watermark.\n\n"
             "overall_soundscape: the same spoken sentence, close-mic voice, quiet room tone.\n\n"
             "non_diegetic_music: N/A"
         )
@@ -266,8 +307,10 @@ def motion_prompt(shot: dict, style_mode: str = "3d") -> str:
 
 
 def gen_ref2va(tid: str, shot: dict, t2va: pathlib.Path, seed: int,
-               style_mode: str = "3d", keyframe: pathlib.Path | None = None) -> pathlib.Path:
-    suffix = STYLE_2D_CACHE if style_mode == "2d" else ""
+               style_mode: str = "3d", keyframe: pathlib.Path | None = None,
+               style_id: str = "jp_anime") -> pathlib.Path:
+    style_key = resolve_2d_style(style_id)
+    suffix = f"{STYLE_2D_CACHE}_{style_key}" if style_mode == "2d" else ""
     out = WORK / "clips" / f"{tid}_{shot['id']}_ref2va1024{suffix}.mp4"
     if keyframe is not None:
         # 关键帧模式：旧 ref2va 缓存（V42 T2VA 首帧）不能复用，强制重生成
@@ -286,7 +329,7 @@ def gen_ref2va(tid: str, shot: dict, t2va: pathlib.Path, seed: int,
                         "-i", str(t2va), "-frames:v", "1", str(first)], check=False)
     audio = t3.V5_OUT / tid / "work" / "audio" / f"{shot['id']}.wav"
     prompt_file = WORK / "clips" / f"{tid}_{shot['id']}_prompt{suffix}.txt"
-    prompt_file.write_text(motion_prompt(shot, style_mode), encoding="utf-8")
+    prompt_file.write_text(motion_prompt(shot, style_mode, style_key), encoding="utf-8")
     duration = float(shot.get("duration") or 5.0)
     proc = subprocess.run([
         sys.executable, str(H3_REF), "--mode", "audio_ref",
@@ -342,6 +385,9 @@ def main(argv=None) -> int:
     ap.add_argument("--template", required=True)
     ap.add_argument("--style-mode", choices=("3d", "2d"), default="3d",
                     help="V42：2d 使用 AI 动漫(cel-shaded/线稿)提示词，3d 保持原 hq")
+    ap.add_argument("--2d-style", dest="style_2d", choices=tuple(STYLE_2D_STYLES),
+                    default="jp_anime",
+                    help="V44：2D 风格子类型（仅在 --style-mode 2d 时生效）")
     ap.add_argument("--skip-t2va", action="store_true")
     ap.add_argument("--skip-ref2va", action="store_true")
     ap.add_argument("--reuse-shots", action="store_true",
@@ -349,6 +395,7 @@ def main(argv=None) -> int:
     args = ap.parse_args(argv)
     tid = args.template
     style_mode = str(args.style_mode or "3d")
+    style_2d = resolve_2d_style(getattr(args, "style_2d", "jp_anime"))
     briefs = briefs_for(tid)
     shots = [s for s in briefs["shots"] if s.get("prompt")]
     archive = REPO / f"outputs/_archive_v15_ref2va_768/{tid}/shots"
@@ -360,7 +407,10 @@ def main(argv=None) -> int:
         dst = archive / f"{shot['id']}.mp4"
         if src.is_file() and not dst.is_file():
             shutil.copy2(src, dst)
-    log(f"=== {tid}: {len(shots)} 镜，1024×576 T2VA + ref2va（style_mode={style_mode}）===")
+    log(f"=== {tid}: {len(shots)} 镜，1024×576 T2VA + ref2va"
+        f"（style_mode={style_mode}"
+        + (f"，2d_style={style_2d}/{STYLE_2D_STYLES[style_2d]['label']}" if style_mode == "2d" else "")
+        + "）===")
     for i, shot in enumerate(shots, 1):
         existing = out_shots / f"{shot['id']}.mp4"
         if args.reuse_shots and existing.is_file() and existing.stat().st_size > 100_000:
@@ -372,18 +422,20 @@ def main(argv=None) -> int:
         if style_mode == "2d" and has_line and not args.skip_ref2va:
             visual = str(shot.get("semantic_visual") or "").strip()
             try:
-                keyframe = _generate_keyframe(tid, shot, visual, seed)
+                keyframe = _generate_keyframe(tid, shot, visual, seed, style_2d)
                 final_src = gen_ref2va(tid, shot, keyframe, seed, style_mode,
-                                       keyframe=keyframe)
+                                       keyframe=keyframe, style_id=style_2d)
                 log(f"[{i}/{len(shots)}] {shot['id']} ok (keyframe+ref2va)")
             except Exception as exc:  # noqa: BLE001 - 关键帧失败回退 T2VA
                 log(f"[{i}/{len(shots)}] {shot['id']} 关键帧失败，回退 T2VA：{exc}")
         if final_src is None:
             t2va = gen_t2va(tid, shot, seed, style_mode,
-                            broll=(style_mode == "2d" and not has_line))
+                            broll=(style_mode == "2d" and not has_line),
+                            style_id=style_2d)
             final_src = t2va
             if has_line and not args.skip_ref2va:
-                final_src = gen_ref2va(tid, shot, t2va, seed, style_mode)
+                final_src = gen_ref2va(tid, shot, t2va, seed, style_mode,
+                                       style_id=style_2d)
             log(f"[{i}/{len(shots)}] {shot['id']} ok "
                 f"({'ref2va' if final_src != t2va else 't2va'})")
         shutil.copy2(final_src, out_shots / f"{shot['id']}.mp4")

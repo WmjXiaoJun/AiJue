@@ -15,6 +15,7 @@ import {
   fmtDuration,
   fmtSize,
   isRealTemplate,
+  renderStyleMeta,
   renderTypeMeta,
   templateClipPercent,
   templateStatusDot,
@@ -584,6 +585,7 @@ function TemplateCard({
 }) {
   const { seed, template } = item;
   const renderMeta = resolveRenderTypeForCard(item);
+  const style2d = renderMeta.id === "2d" ? renderStyleMeta(template ?? undefined) : null;
   const [failedPoster, setFailedPoster] = useState("");
   const label = template?.label || seed.label;
   const style = template?.style || seed.style;
@@ -681,8 +683,11 @@ function TemplateCard({
           <span className="cm-tpl-style" title={style}>
             {style}
           </span>
-          <span className={"cm-tpl-type-tag is-" + renderMeta.id} title={renderMeta.label + " · " + renderMeta.wait}>
-            {renderMeta.short}
+          <span
+            className={"cm-tpl-type-tag is-" + renderMeta.id + (style2d ? " has-style" : "")}
+            title={renderMeta.label + (style2d ? " · " + style2d.label : "") + " · " + renderMeta.wait}
+          >
+            {style2d ? `2D·${style2d.short}` : renderMeta.short}
           </span>
           <span className="cm-tpl-en">{seed.en}</span>
         </div>

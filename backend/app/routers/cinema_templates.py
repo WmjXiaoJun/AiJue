@@ -387,6 +387,8 @@ def _template_style(tid: str) -> Optional[str]:
 
 
 _RENDER_TYPE_LABELS = {"2d": "2D 动画", "3d": "3D 电影", "realistic": "写实实拍"}
+_RENDER_STYLE_LABELS = {"jp_anime": "日漫电影感", "guoman": "国漫国风",
+                        "retro_cel": "复古赛璐璐", "soft_watercolor": "治愈手绘"}
 
 
 def _template_render_type(tid: str) -> str:
@@ -402,9 +404,22 @@ def _template_render_type_label(tid: str) -> str:
     return _RENDER_TYPE_LABELS.get(render_type, render_type)
 
 
+def _template_render_style(tid: str) -> str | None:
+    """V44：2D 风格子类型；非 2D 返回 None，2D 缺省 jp_anime。"""
+    if _template_render_type(tid) != "2d":
+        return None
+    raw = str(_template_contract(tid).get("render_style") or "").strip().lower()
+    return raw if raw in _RENDER_STYLE_LABELS else "jp_anime"
+
+
 def _template_type_fields(tid: str) -> Dict[str, str]:
-    return {"render_type": _template_render_type(tid),
-            "render_type_label": _template_render_type_label(tid)}
+    fields = {"render_type": _template_render_type(tid),
+              "render_type_label": _template_render_type_label(tid)}
+    render_style = _template_render_style(tid)
+    if render_style:
+        fields["render_style"] = render_style
+        fields["render_style_label"] = _RENDER_STYLE_LABELS[render_style]
+    return fields
 
 
 def _load_briefs(tid: str) -> Dict[str, Any]:
@@ -1300,6 +1315,7 @@ def _generate_2d_cmd(tid: str, force: bool) -> List[str]:
     else:
         cmd = [sys.executable, "-m", "pipeline.templates3d_hq",
                "--template", tid, "--style-mode", "2d"]
+    cmd.extend(["--2d-style", _template_render_style(tid) or "jp_anime"])
     if force:
         # hq 没有 --force，清空旧 shots 由 runner/pipeline 缓存逻辑处理；保留参数不传入
         pass

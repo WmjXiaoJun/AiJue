@@ -7,7 +7,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { api, errorText } from "../../lib/api";
 import type { Settings } from "../../types";
 import type { CinemaTemplate } from "../../lib/cinema";
-import { renderTypeMeta } from "../../lib/cinema";
+import { renderStyleMeta, renderTypeMeta } from "../../lib/cinema";
 import { cinemaApi } from "../../lib/cinema";
 import type { V5CatalogResponse, V5TemplateSummary } from "../../lib/v5";
 import { v5api, isV5NotFound } from "../../lib/v5";
@@ -479,6 +479,12 @@ export function PipelineConsole({ initialTemplateId, onExit, onOpenCharacters, o
   const activeRun = Boolean(run && (run.status === "queued" || run.status === "running"));
   const doneCount = templates.filter((item) => item.final.exists).length;
   const selectedRenderMeta = renderTypeMeta(selectedTemplate);
+  const selectedStyleMeta = selectedRenderMeta.id === "2d" ? renderStyleMeta(selectedTemplate) : null;
+  const selectedTypeValue = selectedTemplate
+    ? selectedRenderMeta.id === "2d" && selectedStyleMeta
+      ? `${selectedRenderMeta.short} · ${selectedStyleMeta.label}`
+      : `${selectedRenderMeta.short} · ${selectedRenderMeta.wait}`
+    : "未选模板";
 
   return (
     <AppShell
@@ -487,11 +493,15 @@ export function PipelineConsole({ initialTemplateId, onExit, onOpenCharacters, o
       title="制片控制台"
       breadcrumb={
         selectedTemplate
-          ? [{ label: "造片局" }, { label: `${selectedTemplate.id} · ${selectedTemplate.label}` }, { label: selectedRenderMeta.label }]
+          ? [
+              { label: "造片局" },
+              { label: `${selectedTemplate.id} · ${selectedTemplate.label}` },
+              { label: selectedRenderMeta.label + (selectedStyleMeta ? ` · ${selectedStyleMeta.label}` : "") },
+            ]
           : [{ label: "造片局" }]
       }
       chips={[
-        { label: "节目类型", value: selectedTemplate ? `${selectedRenderMeta.short} · ${selectedRenderMeta.wait}` : "未选模板", tone: selectedTemplate ? "gold" : "slate" },
+        { label: "节目类型", value: selectedTypeValue, tone: selectedTemplate ? "gold" : "slate" },
         { label: "成片", value: `${doneCount}/${templates.length || "—"}`, tone: "gold" },
         { label: "pipeline", value: runStatusText, tone: run?.status === "failed" ? "red" : activeRun ? "gold" : "jade" },
         { label: "音色", value: String(presets.length || "—"), tone: "slate" },

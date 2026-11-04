@@ -968,3 +968,5 @@
 .cm-tpl-type-badge.is-2d { color: #8fd0b8; border-color: rgba(79,143,124,.55); }
 .cm-tpl-type-badge.is-3d { color: var(--c-gold-soft); border-color: rgba(201,162,39,.5); }
 .cm-tpl-type-badge.is-realistic { color: #b7c7dd; border-color: rgba(140,160,190,.5); }
+
+.cm-tpl-type-tag.has-style { border-color: rgba(79,143,124,.55); color: #9bd6bf; background: rgba(79,143,124,.12); }
