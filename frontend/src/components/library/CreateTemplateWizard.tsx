@@ -125,6 +125,8 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
     acts.every((row) => row.scene && (row.broll || (row.speaker && row.text.trim())));
   const step1Valid = Boolean(label.trim()) && idValid && !idTaken && Boolean(style);
   const canNext = step === 1 ? step1Valid : step === 2 ? castValid : step === 3 ? actsValid : true;
+  /** V45：向导文案按节目类型走（2D/3D/写实），不再一律写「3D」 */
+  const renderShort = RENDER_TYPE_META[renderType].short;
 
   const addCast = () => {
     if (!castPick) return;
@@ -435,7 +437,8 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
                         className="v21-input"
                         value={sceneQuery}
                         onChange={(event) => setSceneQueries((prev) => ({ ...prev, [row.key]: event.target.value }))}
-                        placeholder="搜索场景…"
+                        placeholder="筛选场景"
+                        aria-label="筛选场景"
                       />
                     </div>
                     <select
@@ -453,6 +456,7 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
                         )
                       }
                     >
+                      <option value="" disabled>选择说话角色 / B-roll</option>
                       <option value="__broll__">B-roll（无台词）</option>
                       {cast.map((castRow) => (
                         <option key={castRow.key} value={castRow.role}>{castRow.role} · {castRow.name || castRow.character}</option>
@@ -497,7 +501,7 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
                   onChange={(event) => setAutoGenerate(event.target.checked)}
                 />
                 <span className="v21-autogen-text">
-                  <b>创建后立即生成 3D</b>
+                  <b>创建后立即生成 {renderShort}</b>
                   <em>约 10–45 分钟 · 后台任务，不阻塞页面</em>
                 </span>
                 <span className="v21-autogen-switch" aria-hidden="true" />
@@ -518,8 +522,8 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
               <div className="v21-hint">
                 创建会：写入模板合同、按 cast 合成 24k TTS 试听 wav、写 episode 分镜、生成 semantic brief；耗时约 20–60s。
                 {autoGenerate
-                  ? "随后自动提交 3D 生成任务（后台约 10–45 分钟，可离开页面）。"
-                  : "不自动生成；创建后可去「一键成片」手动开始 3D 生成。"}
+                  ? `随后自动提交 ${renderShort} 生成任务（后台约 10–45 分钟，可离开页面）。`
+                  : "不自动生成；创建后可去「一键成片」手动开始生成。"}
               </div>
             </>
           )}
@@ -528,14 +532,18 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
         <footer className="v21-wizard-foot">
           <span className="v21-foot-note">
             {step === 1
-              ? "填写 id / 中文名 / 风格后继续"
+              ? !idValid || idTaken
+                ? "模板 ID 需为英文小写（a-z0-9_）且不重复"
+                : !label.trim()
+                  ? "填写中文名后继续"
+                  : "确认基本信息后继续"
               : step === 2
                 ? "选择 3–5 个角色并指定 role"
                 : step === 3
                   ? "至少 4 幕，逐幕选场景与说话角色（或 B-roll）"
                   : autoGenerate
-                    ? "确认后创建并自动提交 3D 生成任务（后台运行，可离开页面）"
-                    : "确认后仅创建模板（不生成 3D）"}
+                    ? `确认后创建并自动提交 ${renderShort} 生成任务（后台运行，可离开页面）`
+                    : "确认后仅创建模板（不自动生成）"}
           </span>
           <div className="v18-actions-right" style={{ display: "flex", gap: 8, marginLeft: "auto" }}>
             <button type="button" className="cm-btn cm-btn-sm" onClick={onClose} disabled={creating}>
@@ -558,7 +566,7 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
                     ? "创建并生成中…"
                     : "创建中（TTS 合成，约 20–60s）…"
                   : autoGenerate
-                    ? "创建并生成 3D"
+                    ? `创建并生成 ${renderShort}`
                     : "仅创建模板"}
               </button>
             )}

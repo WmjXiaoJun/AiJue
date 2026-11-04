@@ -144,10 +144,10 @@
 .v21-step.is-active { border-color: rgba(201, 162, 39, 0.5); background: rgba(201, 162, 39, 0.12); color: var(--c-gold-soft); }
 .v21-step.is-done { border-color: rgba(79, 143, 124, 0.38); color: #8fc3ae; }
 .v21-step:disabled { opacity: 0.6; cursor: not-allowed; }
-.v21-wizard-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 16px 18px 20px; display: flex; flex-direction: column; gap: 14px; }
+.v21-wizard-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 16px 18px 26px; scroll-padding-bottom: 26px; display: flex; flex-direction: column; gap: 14px; }
 .v21-wizard-body::-webkit-scrollbar { width: 9px; }
 .v21-wizard-body::-webkit-scrollbar-thumb { background: rgba(201, 162, 39, 0.2); border-radius: 8px; }
-.v21-wizard-foot { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 12px 18px; border-top: 1px solid var(--c-line); background: rgba(6, 8, 12, 0.55); }
+.v21-wizard-foot { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 12px 18px; border-top: 1px solid var(--c-line); background: rgba(6, 8, 12, 0.55); box-shadow: 0 -20px 26px -24px rgba(0, 0, 0, 0.9); }
 
 .v21-chips { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .v21-chip {
@@ -166,7 +166,9 @@
 .v21-chip.is-active { border-color: rgba(201, 162, 39, 0.5); background: rgba(201, 162, 39, 0.12); color: var(--c-gold-soft); }
 .v21-cast-row { display: grid; grid-template-columns: 34px minmax(0, 1.2fr) 140px minmax(0, 1fr) 30px; gap: 8px; align-items: center; padding: 8px 10px; border: 1px solid var(--c-line); border-radius: 9px; background: rgba(255, 255, 255, 0.015); }
 .v21-cast-no { font-family: var(--font-mono); font-size: 9px; color: var(--c-mut); }
-.v21-cast-select { display: flex; flex-direction: column; gap: 6px; }
+/* V45：场景下拉 + 筛选框改同一行（原来筛选框独占一行，4 幕就有 4 条多余输入框，视觉上像重复字段） */
+.v21-cast-select { display: grid; grid-template-columns: minmax(0, 1fr) 108px; gap: 6px; align-items: center; }
+.v21-cast-select .v21-input { height: 30px; padding: 0 8px; font-size: 10.5px; }
 .v21-act-row { display: grid; grid-template-columns: 40px minmax(0, 1.25fr) 142px minmax(0, 1fr) 30px; gap: 8px; align-items: start; padding: 9px 10px; border: 1px solid var(--c-line); border-radius: 9px; background: rgba(255, 255, 255, 0.015); }
 .v21-act-no { font-family: var(--font-mono); font-size: 9px; color: var(--c-mut); padding-top: 10px; }
 .v21-act-text textarea { min-height: 58px; }
@@ -190,6 +192,7 @@
   .v21-cast-row > :nth-child(3), .v21-cast-row > :nth-child(4) { grid-column: 2 / 3; }
   .v21-act-row { grid-template-columns: 30px minmax(0, 1fr) 30px; }
   .v21-act-row > :nth-child(3), .v21-act-row > :nth-child(4) { grid-column: 2 / 3; }
+  .v21-cast-select { grid-template-columns: 1fr; }
   .v21-preview-row { grid-template-columns: 30px minmax(0, 1fr) 60px; }
   .v21-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
@@ -520,7 +523,8 @@
 .v41-render-option.is-active { border-color: rgba(201,162,39,.55); background: rgba(201,162,39,.08); box-shadow: inset 0 0 0 1px rgba(201,162,39,.18); }
 .v41-render-option.is-2d.is-active { border-color: rgba(79,143,124,.55); background: rgba(79,143,124,.08); }
 .v41-render-option.is-2d.is-active .v41-render-wait { color: #8fd0b8; }
-@media (max-width: 900px) { .v41-render-grid { grid-template-columns: 1fr; } }
+/* V45：节目类型三选一在 720px 以上保持三列（900px 视口下不再竖排成三条，把 2D 风格挤到折叠线以下） */
+@media (max-width: 720px) { .v41-render-grid { grid-template-columns: 1fr; } }
 
 /* V41：一键成片类型 chip */
 .v41-type-chip.is-2d { border-color: rgba(79,143,124,.5); color: #8fd0b8; }

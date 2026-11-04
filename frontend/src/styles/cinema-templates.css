@@ -268,8 +268,10 @@
 /* 卡片正文 */
 .cm-tpl-body { display: flex; flex-direction: column; gap: 9px; flex: 1 1 auto; padding: 13px 14px 14px; }
 
-.cm-tpl-title { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+/* V45：标题独占一行、ID 另起一行 —— 长中文模板名（如「V45 2D·吉卜力治愈系」）不再被截成「V45 2D·吉…」 */
+.cm-tpl-title { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; }
 .cm-tpl-title b {
+  max-width: 100%;
   font-family: var(--font-display);
   font-size: 16.5px;
   font-weight: 600;
@@ -280,7 +282,7 @@
   text-overflow: ellipsis;
 }
 .cm-tpl-id {
-  margin-left: auto;
+  margin-left: 0;
   flex: 0 0 auto;
   font-family: var(--font-mono);
   font-size: 9.5px;
@@ -294,6 +296,8 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  flex: 0 1 auto;
+  min-width: 0;
   max-width: 100%;
   height: 18px;
   padding: 0 7px;
@@ -309,6 +313,8 @@
   text-overflow: ellipsis;
 }
 .cm-tpl-en {
+  flex: 1 1 auto;
+  min-width: 0;
   font-family: var(--font-mono);
   font-size: 8.5px;
   letter-spacing: 0.22em;
@@ -960,7 +966,7 @@
 .cm-tpl-filter-search::placeholder { color: var(--c-mut); }
 
 /* V41：模板节目类型徽标 */
-.cm-tpl-type-tag { display: inline-flex; align-items: center; height: 18px; padding: 0 6px; border-radius: 4px; border: 1px solid var(--c-line); font-family: var(--font-mono); font-size: 8.5px; letter-spacing: .06em; }
+.cm-tpl-type-tag { display: inline-flex; flex: 0 0 auto; align-items: center; height: 18px; padding: 0 6px; border-radius: 4px; border: 1px solid var(--c-line); font-family: var(--font-mono); font-size: 8.5px; letter-spacing: .06em; white-space: nowrap; }
 .cm-tpl-type-tag.is-2d { border-color: rgba(79,143,124,.5); color: #8fd0b8; background: rgba(79,143,124,.1); }
 .cm-tpl-type-tag.is-3d { border-color: rgba(201,162,39,.45); color: var(--c-gold-soft); background: rgba(201,162,39,.1); }
 .cm-tpl-type-tag.is-realistic { border-color: rgba(140,160,190,.45); color: #b7c7dd; background: rgba(140,160,190,.08); }
