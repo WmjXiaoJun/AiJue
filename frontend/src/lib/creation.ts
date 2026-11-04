@@ -103,6 +103,8 @@ export interface TemplateCreateBody {
   render_type?: "2d" | "3d" | "realistic";
   /** V44：2D 风格子类型（仅 render_type=2d 有意义） */
   render_style?: "jp_anime" | "guoman" | "retro_cel" | "soft_watercolor" | "arcane_cinematic";
+  /** V46：2D 关键帧抽卡张数（1–6） */
+  keyframe_candidates?: number;
   aspect?: string;
   description?: string;
   cast: TemplateCastInput[];

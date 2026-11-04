@@ -166,3 +166,12 @@ def test_cyber_scene_templates_and_scenes():
         assert len(brief["shots"]) == len(tpl["acts"])
         for shot, act in zip(brief["shots"], tpl["acts"]):
             assert shot["scene"] == act["scene"]
+
+
+def test_cyber_templates_default_two_candidates():
+    """V46：两个赛博场景模板默认 2 张抽卡，创建 API 也会把 1 视为不落盘。"""
+    import json as _json
+    repo = pathlib.Path(__file__).resolve().parents[1]
+    for tid in ("custom_tpl_v46_undercity", "custom_tpl_v46_council"):
+        tpl = _json.loads((repo / f"contract/v5/custom/templates/{tid}.json").read_text(encoding="utf-8"))
+        assert int(tpl.get("keyframe_candidates") or 1) == 2

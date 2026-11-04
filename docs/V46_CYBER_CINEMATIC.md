@@ -65,6 +65,13 @@
 
 场景库：73 个场景（新增 3 个），模板库 2D 筛选 7 条；两页 0 console error、0 404。
 
+### 抽卡入口（全链路）
+
+1. **向导**：2D 风格下方新增「关键帧抽卡」下拉（1 张 / 2 张推荐 / 3 张），默认 2；值随创建请求提交 `keyframe_candidates`。
+2. **创建 API**：`v5_create` 校验 1–6 并写入模板合同 `keyframe_candidates` + `meta.keyframe_candidates`（1 不落盘）。
+3. **重跑**：`_generate_hq_command` 读合同并追加 `--keyframe-candidates N` → hq 逐镜多 seed 出候选、拼选卡图、按 picks/自动分选一张。
+4. **实测**：`custom_tpl_v46_council`（合同 `keyframe_candidates: 2`）经 API 重跑，日志 `cands=2，pick=#0/auto`，无需手写命令。
+
 ## 5. 前端
 
 - `RenderStyle` 增加 `arcane_cinematic`；风格元信息「赛博电影感 / 赛博 / 绘画感半写实动画（Arcane 风）：厚涂笔触 + 青橙光比 + 电影景深」。

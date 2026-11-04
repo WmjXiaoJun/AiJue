@@ -533,6 +533,9 @@
 
 /* V44：2D 风格子类型 */
 .v44-style-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; }
+.v46-pick-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+.v46-pick-row .v21-input { width: 160px; }
+.v46-pick-row .v21-label { margin: 0; }
 .v44-style-option { display: flex; flex-direction: column; gap: 3px; padding: 9px 10px; border: 1px solid var(--c-line); border-radius: 9px; background: rgba(255,255,255,.012); cursor: pointer; }
 .v44-style-option input { position: absolute; opacity: 0; pointer-events: none; }
 .v44-style-option b { font-family: var(--font-display); font-size: 12.5px; color: var(--c-text); letter-spacing: .03em; }

@@ -1214,11 +1214,17 @@ def create_template(body: Dict[str, Any] = Body(default={})) -> dict:
         errors.append(f"render_type 只支持 {', '.join(_RENDER_TYPES)}（当前 {render_type!r}）")
     # V44：2D 风格（仅 2D 有意义；缺省 jp_anime；3D/写实忽略）
     render_style = None
+    keyframe_candidates = None
     if render_type == "2d":
         render_style = str(data.get("render_style") or "jp_anime").strip().lower()
         if render_style not in _RENDER_STYLES:
             errors.append(f"render_style 只支持 {', '.join(_RENDER_STYLES)}"
                           f"（当前 {render_style!r}）")
+        # V46：2D 关键帧抽卡张数（1–6，默认 1）
+        try:
+            keyframe_candidates = max(1, min(6, int(data.get("keyframe_candidates") or 1)))
+        except (TypeError, ValueError):
+            errors.append("keyframe_candidates 必须是 1–6 的整数")
     aspect = _normalize_aspect(data.get("aspect"))
 
     cast_in = data.get("cast")
@@ -1363,6 +1369,7 @@ def create_template(body: Dict[str, Any] = Body(default={})) -> dict:
             "style": style_id, "target_duration": total_duration, "aspect": aspect,
             "render_type": render_type,
             **({"render_style": render_style} if render_style else {}),
+            **({"keyframe_candidates": keyframe_candidates} if keyframe_candidates and keyframe_candidates > 1 else {}),
             "cast": cast, "acts": template_acts,
             "packaging": {"subtitle": "default", "transition": "fade", "title": label},
             "lipsync": {"mode": "musetalk"},
@@ -1370,6 +1377,8 @@ def create_template(body: Dict[str, Any] = Body(default={})) -> dict:
             "meta": {"create_source": "v21", "three_d": render_type != "2d",
                      "render_type": render_type,
                      **({"render_style": render_style} if render_style else {}),
+                     **({"keyframe_candidates": keyframe_candidates}
+                        if keyframe_candidates and keyframe_candidates > 1 else {}),
                      "created_at": _now_text(), "created_by": "api"},
         }
         result = v5_catalog.validate_item("templates", template_item, catalog, as_custom=True)

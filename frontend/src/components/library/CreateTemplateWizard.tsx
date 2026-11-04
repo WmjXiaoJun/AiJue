@@ -58,6 +58,8 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
   const [style, setStyle] = useState("");
   const [renderType, setRenderType] = useState<RenderType>("3d");
   const [renderStyle, setRenderStyle] = useState<RenderStyle>("jp_anime");
+  // V46：2D 关键帧抽卡张数（1 = 不抽卡，2/3 多 seed 候选）
+  const [keyframeCandidates, setKeyframeCandidates] = useState("2");
   const [aspect, setAspect] = useState("16:9");
   const [targetDuration, setTargetDuration] = useState("40");
   const [description, setDescription] = useState("");
@@ -181,6 +183,7 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
         style,
         render_type: renderType,
         render_style: renderType === "2d" ? renderStyle : undefined,
+        keyframe_candidates: renderType === "2d" ? Number(keyframeCandidates) : undefined,
         aspect,
         description: description.trim() || undefined,
         cast: castBody,
@@ -344,6 +347,15 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
                     })}
                   </div>
                   <span className="v21-hint">仅 2D 动画生效；不同风格使用不同 checkpoint/提示词，会改变角色气质、关键帧与背景画面（IP 权重更低、背景更完整）</span>
+                  <div className="v46-pick-row">
+                    <span className="v21-label">关键帧抽卡</span>
+                    <select className="v21-input" value={keyframeCandidates} onChange={(event) => setKeyframeCandidates(event.target.value)}>
+                      <option value="1">1 张（最快）</option>
+                      <option value="2">2 张（推荐）</option>
+                      <option value="3">3 张（挑构图）</option>
+                    </select>
+                    <span className="v21-hint">每个对白镜头多 seed 出候选，重跑后可看选卡图；张数越多越慢（每张约 20s/镜）</span>
+                  </div>
                 </div>
               )}
               <label className="v21-field">
