@@ -29,6 +29,7 @@
     "seal_color": "#c0392b"
   },
   "transition": "ink_wipe",
+  "rep_scene": "lantern_market",
   "audio": {
     "bgm": "synth_guqin",
     "sfx": ["paper_scan", "taiko"],

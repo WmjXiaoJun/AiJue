@@ -252,6 +252,16 @@ def _character_look(cid: str) -> dict:
     else:
         gender_tag, noun = "androgynous", "person"
 
+    outfit = appearance.get("outfit") if isinstance(appearance.get("outfit"), dict) else {}
+    outfit_type = str(outfit.get("type") or "").strip().lower()
+    outfit_clause = ""
+    outfit_negative: list[str] = []
+    if outfit_type in ("suit", "business_suit"):
+        outfit_clause = "wearing a tailored business suit, white shirt and necktie, same suit as the reference"
+        outfit_negative = ["suspenders", "overalls", "casual clothes", "t-shirt", "different outfit"]
+    elif outfit_type:
+        outfit_clause = f"wearing the same {outfit_type.replace('_', ' ')} as the reference"
+
     if is_robot:
         identity = (f"android robot character {cid}, mechanical joints, metal panels, "
                     "non-human, humanoid robot, age-accurate")
@@ -267,8 +277,12 @@ def _character_look(cid: str) -> dict:
         if not persona_tags:
             persona_tags.append("natural, neutral expression")
         head = f"{age}-year-old {noun}" if age else f"adult {gender_tag}"
-        identity = ", ".join([head, *traits, *persona_tags])
-        motion = f"a {age}-year-old {noun}, {motion_tag}, {persona_tags[0]}" if age             else f"an adult {gender_tag}, {motion_tag}"
+        identity = ", ".join([part for part in (head, *traits, outfit_clause, *persona_tags) if part])
+        motion = (f"a {age}-year-old {noun}, {motion_tag}, {persona_tags[0]}" if age
+                  else f"an adult {gender_tag}, {motion_tag}")
+        if outfit_clause:
+            motion += f", {outfit_clause}"
+        negatives = [*negatives, *outfit_negative]
     return {"identity": identity, "motion": motion, "negatives": list(negatives),
             "age": age, "gender": gender_tag, "persona": persona, "robot": is_robot}
 

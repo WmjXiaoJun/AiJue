@@ -43,6 +43,7 @@ export function V5Styles({ catalog, templates3d, loading, error, onRefresh }: V5
   const previewFor = useCallback(
     (styleId: string, size: string): StylePreview => {
       const template = templates.find((item) => item.style === styleId) || null;
+      const style = styles.find((item) => item.id === styleId) || null;
       const tpl3d = template ? templates3d[template.id] : null;
       const sources: string[] = [];
       if (tpl3d && tpl3d.final.exists) {
@@ -50,12 +51,13 @@ export function V5Styles({ catalog, templates3d, loading, error, onRefresh }: V5
           tpl3d.poster_url ? mediaSrc(tpl3d.poster_url) : mediaSrc(`/media/templates_3d/${template?.id}/poster.jpg`),
         );
       }
-      sources.push(previewUrl("styles", styleId, undefined, size));
-      const repScene = (template?.scene_route || [])[0];
+      // V45：优先「场景 × 风格」代表画面（自定义风格没有模板时也能有真实封面），再退回程序化预览
+      const repScene = (template?.scene_route || [])[0] || style?.rep_scene;
       if (repScene) sources.push(previewUrl("scenes", repScene, styleId, size));
+      sources.push(previewUrl("styles", styleId, undefined, size));
       return { sources: Array.from(new Set(sources.filter(Boolean))), from3d: sources.length > 0 && Boolean(tpl3d?.final.exists) };
     },
-    [templates, templates3d],
+    [templates, templates3d, styles],
   );
 
   const filtered = useMemo(() => {

@@ -49,6 +49,8 @@ export interface V5StyleSummary {
   character_treatment?: string;
   transition?: string;
   palette?: V5Palette;
+  /** V45：风格代表场景（自定义风格无模板引用时，用它出「场景 × 风格」封面） */
+  rep_scene?: string;
   custom?: boolean;
 }
 

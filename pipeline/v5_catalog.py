@@ -895,6 +895,8 @@ def summarize_item(kind: Any, item: dict) -> dict:
             "technique": item.get("technique") or [],
             "character_treatment": item.get("character_treatment") or "",
             "transition": item.get("transition") or "",
+            # V45：风格代表场景（自定义风格没有模板引用时，前端用它渲染「场景 × 风格」封面）
+            "rep_scene": item.get("rep_scene") or "",
             "palette": {k: v for k, v in (item.get("palette") or {}).items()
                         if k in ("bg", "fg", "accent")},
         })

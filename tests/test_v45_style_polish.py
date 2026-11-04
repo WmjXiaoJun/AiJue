@@ -91,3 +91,12 @@ def test_keyframe_dir_encodes_style_ckpt_and_ip():
     assert d.name == "guoman_aamxlanimemix_ip48", d
     d2 = hq._keyframe_dir("tpl", "retro_cel", hq.STYLE_2D_STYLES["retro_cel"], None)
     assert d2.name.startswith("retro_cel_illustriousxlv_ip"), d2
+
+
+def test_outfit_is_pinned_from_contract():
+    """V45：关键帧/口型提示词要带合同里的 outfit（老周=西装），并禁掉吊带等替换服装。"""
+    look = hq._character_look("laozhou")
+    assert "business suit" in look["identity"]
+    assert "same suit" in look["identity"]
+    assert "suspenders" in look["negatives"]
+    assert "business suit" in look["motion"]

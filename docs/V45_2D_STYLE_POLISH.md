@@ -101,6 +101,7 @@
 - 成片库卡片：7 个操作按钮换行成「2+2+1」，最后一个「原片」图标单独占一行；改 `.v20-final-actions` 为 3 列网格（6 个按钮 2 行），「原片」移到元信息行右侧。
 - 项目大厅 hero 标题：长项目名在 38px 下断成「（5 分钟 / Demo）」；改 `clamp(26px,2.3vw,38px)` + `text-wrap: balance` + `max-width:26ch`。
 - 全站 8 个主路由浏览器巡检：0 console error、0 请求 404、无横向溢出。
+- **风格墙封面**：自定义风格「全息宣纸（示例）」原来只有程序化渐变当封面（灰卡）。现在排序改为「同风格 3D 海报 → 场景 × 风格代表画面 → 程序化预览」，并给风格摘要加 `rep_scene` 字段（`pipeline/v5_catalog.py` + `contract/v5/custom/styles/*.json`）；自定义风格卡现在显示 `/api/v5/preview/scenes/<rep>?style=<id>` 的真实绘景封面。
 - **模板卡**：「V45 2D·吉卜力治愈系」原先被截成「V45 2D·吉…」，风格徽标「2D·赛璐璐」被挤成两行——改为标题独占一行、ID 另起一行，徽标 `flex:0 0 auto; white-space:nowrap`，6 张 2D 卡标题全部完整（`clipped:false`）。
 - **新建模板向导**：≤900px 时节目类型的 1 列断点提前到 720px，三选一保持一行；2D 风格四选一在 900px 变 2×2 且完整可见（底边 798 < 底部栏 905），不再被折叠线切掉。
 - **分幕步骤**：每幕的「搜索场景」由独占一行改为与场景下拉同行（108px 小输入框，≤900px 再堆叠），4 幕少 4 条多余输入行；说话角色下拉补占位项「选择说话角色 / B-roll」，不再默认显示 B-roll 却校验失败。
@@ -128,7 +129,7 @@
 
 - 4 风格 3 底模（见 §1）；要完全一一对应可补一个 SDXL 动漫底模并改风格表 `ckpt`。
 - H3 ref2va 只吃关键帧首帧，年龄/气质靠首帧与口型句双重约束；若某风格脸仍偏年轻，优先降该风格 `ip_strength` 0.02 或加 `no youthful face` 负面。
-- 关键帧层仍有一次观察到的服装漂移：`soft_watercolor` 的 v5_002 被画成「白衬衫 + 吊带」（合同是深蓝西装），说明 outfit 一致性主要取决于关键帧 seed；需要更硬约束可在 `_keyframe_prompt` 追加 `wearing navy blue suit, white shirt, necktie` 并加负面 `suspenders`。
+- ~~关键帧服装漂移~~（已修）：`_character_look` 现在从合同 `appearance.outfit` 生成硬约束——西装角色追加 `wearing a tailored business suit, white shirt and necktie, same suit as the reference`，负面追加 `suspenders/overalls/casual clothes/t-shirt/different outfit`，并同步进 H3 口型句。`soft_watercolor` 已清关键帧 + 片段重跑（500.2s / 4,868,179B）：新关键帧、海报、成片第 3 秒均为深蓝西装 + 领带，不再出现吊带。
 - 成片阶段曾有 2 处 H3 抖动观察（与关键帧无关）：
   - `soft_watercolor` 第 2 幕把西装换成了「白衬衫 + 吊带」（关键帧里仍是西装），H3 对 outfit 的保持弱于脸；
   - `guoman` 第 3 幕窗面上出现一圈「发光线稿」残影，属于 H3 对 reference 线稿的误读，可后续在 motion prompt 加 `no glowing outline, no neon trace`。
