@@ -94,6 +94,10 @@ def _line_view(line: Dict[str, Any]) -> Dict[str, Any]:
         "character": line.get("character"),
         "label": line.get("label"),
         "text": line.get("text"),
+        "background": line.get("background"),
+        "background_label": line.get("background_label"),
+        "camera": line.get("camera"),
+        "camera_label": line.get("camera_label"),
         "status": line.get("status"),
         "segments": line.get("segments") or [],
         "duration_sec": line.get("duration_sec"),
@@ -115,6 +119,14 @@ def _view(dialogue: Dict[str, Any]) -> Dict[str, Any]:
         "background_label": dialogue.get("background_label"),
         "camera": dialogue.get("camera"),
         "camera_label": dialogue.get("camera_label"),
+        "scenes": dialogue.get("scenes") or {
+            key: {
+                "background": dialogue.get("background"),
+                "background_label": dialogue.get("background_label"),
+                "camera": dialogue.get("camera"),
+                "camera_label": dialogue.get("camera_label"),
+            } for key in ("a", "b")
+        },
         "title": dialogue.get("title"),
         "status": dialogue.get("status"),
         "stage": dialogue.get("stage"),
@@ -255,8 +267,8 @@ def _run_line_h3(dialogue: Dict[str, Any], line: Dict[str, Any], workdir: Path,
     character = (dialogue.get("characters") or {}).get(str(line.get("character"))) or {}
     prompt = audition._build_prompt(
         character, str(dialogue.get("style") or "realistic"), "",
-        background=str(dialogue.get("background") or "cafe"),
-        camera=str(dialogue.get("camera") or "medium"),
+        background=str(line.get("background") or dialogue.get("background") or "cafe"),
+        camera=str(line.get("camera") or dialogue.get("camera") or "medium"),
     )
     out = workdir / "line.mp4"
     proc = subprocess.Popen([
@@ -480,12 +492,19 @@ class DialogueLineBody(BaseModel):
     text: str
 
 
+class DialogueSceneBody(BaseModel):
+    background: Optional[str] = None
+    camera: Optional[str] = None
+
+
 class DialogueBody(BaseModel):
     character_a: str
     character_b: str
     style: str = "realistic"
     background: str = "cafe"
     camera: str = "medium"
+    scene_a: Optional[DialogueSceneBody] = None
+    scene_b: Optional[DialogueSceneBody] = None
     title: Optional[str] = None
     seed: Optional[int] = None
     lines: List[DialogueLineBody]
@@ -560,6 +579,29 @@ def create_dialogue(payload: DialogueBody = Body(default=DialogueBody(
         raise HTTPException(status_code=400,
                             detail=f"camera 只支持 {', '.join(audition._CAMERAS)}"
                                    f"（当前 {camera!r}）")
+
+    def resolve_scene(scene: Optional[DialogueSceneBody], name: str) -> Dict[str, Any]:
+        bg = str((scene.background if scene and scene.background else background)).strip().lower()
+        if bg not in audition._BACKGROUNDS:
+            raise HTTPException(status_code=400,
+                                detail=f"{name}.background 只支持 "
+                                       f"{', '.join(audition._BACKGROUNDS)}（当前 {bg!r}）")
+        cam = str((scene.camera if scene and scene.camera else camera)).strip().lower()
+        if cam not in audition._CAMERAS:
+            raise HTTPException(status_code=400,
+                                detail=f"{name}.camera 只支持 "
+                                       f"{', '.join(audition._CAMERAS)}（当前 {cam!r}）")
+        return {
+            "background": bg,
+            "background_label": audition._BACKGROUNDS[bg][0],
+            "camera": cam,
+            "camera_label": audition._CAMERAS[cam][0],
+        }
+
+    scenes = {
+        "a": resolve_scene(payload.scene_a, "scene_a"),
+        "b": resolve_scene(payload.scene_b, "scene_b"),
+    }
     raw_lines = payload.lines or []
     if not (2 <= len(raw_lines) <= _MAX_LINES):
         raise HTTPException(status_code=400, detail=f"lines 需要 2–{_MAX_LINES} 行")
@@ -578,9 +620,14 @@ def create_dialogue(payload: DialogueBody = Body(default=DialogueBody(
                                 detail=f"第 {index + 1} 行超过 {_MAX_LINE_CHARS} 字")
         cid = cid_a if speaker == "a" else cid_b
         char = char_a if speaker == "a" else char_b
+        scene = scenes[speaker]
         lines.append({
             "index": index, "speaker": speaker, "character": cid,
             "label": str(char.get("label") or cid), "text": text,
+            "background": scene["background"],
+            "background_label": scene["background_label"],
+            "camera": scene["camera"],
+            "camera_label": scene["camera_label"],
             "status": "queued", "segments": [],
         })
         texts.append(text)
@@ -613,6 +660,7 @@ def create_dialogue(payload: DialogueBody = Body(default=DialogueBody(
         "background_label": audition._BACKGROUNDS[background][0],
         "camera": camera,
         "camera_label": audition._CAMERAS[camera][0],
+        "scenes": scenes,
         "title": title,
         "seed": seed,
         "lines": lines,
@@ -665,6 +713,7 @@ def create_dialogue(payload: DialogueBody = Body(default=DialogueBody(
         "style": style,
         "background": background,
         "camera": camera,
+        "scenes": scenes,
         "title": title,
         "total_lines": len(lines),
         "status": "queued",

@@ -235,8 +235,8 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
   const [duoA, setDuoA] = useState("");
   const [duoB, setDuoB] = useState("");
   const [duoStyle, setDuoStyle] = useState<AuditionStyle>("realistic");
-  const [duoBackground, setDuoBackground] = useState<AuditionBackground>("cafe");
-  const [duoCamera, setDuoCamera] = useState<AuditionCamera>("medium");
+  const [duoSceneA, setDuoSceneA] = useState<{ background: AuditionBackground; camera: AuditionCamera }>({ background: "studio", camera: "closeup" });
+  const [duoSceneB, setDuoSceneB] = useState<{ background: AuditionBackground; camera: AuditionCamera }>({ background: "cafe", camera: "medium" });
   const [duoTitle, setDuoTitle] = useState("");
   const [duoLInes, setDuoLines] = useState<{ speaker: DialogueSpeaker; text: string }[]>([
     { speaker: "a", text: "这么晚还来喝咖啡？" },
@@ -255,6 +255,8 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
   const [showcaseLoading, setShowcaseLoading] = useState(false);
   const [showcaseBuilding, setShowcaseBuilding] = useState(false);
   const [showcaseError, setShowcaseError] = useState("");
+  const [showcaseVertical, setShowcaseVertical] = useState(true);
+  const [showcaseVerticalMode, setShowcaseVerticalMode] = useState<"blur_pad" | "crop">("blur_pad");
 
   const [previewChar, setPreviewChar] = useState<string | null>(null);
   const [previewError, setPreviewError] = useState("");
@@ -789,6 +791,27 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
 
   // V36：双人对戏 —— 行编辑/校验/提交/轮询/取消/最近列表
   const duoCharacters = useMemo(() => Object.values(contracts), [contracts]);
+  /** V37：双人双场景标签（A 场景 · B 场景，优先后端 scenes/每镜字段） */
+  const duoScenesLabel = useCallback(
+    (job: DialogueJob | null) => {
+      if (!job) return "";
+      const lineScene = (speaker: "a" | "b") => job.lines?.find((line) => line.speaker === speaker);
+      const sceneA = job.scenes?.a || (() => {
+        const line = lineScene("a");
+        return line ? { background: line.background, background_label: line.background_label, camera: line.camera, camera_label: line.camera_label } : undefined;
+      })();
+      const sceneB = job.scenes?.b || (() => {
+        const line = lineScene("b");
+        return line ? { background: line.background, background_label: line.background_label, camera: line.camera, camera_label: line.camera_label } : undefined;
+      })();
+      const label = (scene: typeof sceneA) =>
+        scene
+          ? `${auditionBackgroundLabel(scene.background, scene.background_label) || auditionBackgroundLabel(job.background, job.background_label)}·${auditionCameraLabel(scene.camera, scene.camera_label) || auditionCameraLabel(job.camera, job.camera_label)}`
+          : "";
+      return `A ${label(sceneA) || "—"} · B ${label(sceneB) || "—"}`;
+    },
+    [],
+  );
 
   const duoLineInfo = duoLInes.map((line) => {
     const text = line.text.trim();
@@ -882,8 +905,8 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
     setDuoA(Object.values(contracts)[0]?.id || "");
     setDuoB(Object.values(contracts)[1]?.id || "");
     setDuoStyle("realistic");
-    setDuoBackground("cafe");
-    setDuoCamera("medium");
+    setDuoSceneA({ background: "studio", camera: "closeup" });
+    setDuoSceneB({ background: "cafe", camera: "medium" });
     setDuoTitle("");
     setDuoLines([
       { speaker: "a", text: "这么晚还来喝咖啡？" },
@@ -907,8 +930,10 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
         character_a: duoA,
         character_b: duoB,
         style: duoStyle,
-        background: duoBackground,
-        camera: duoCamera,
+        background: duoSceneA.background,
+        camera: duoSceneA.camera,
+        scene_a: duoSceneA,
+        scene_b: duoSceneB,
         title: duoTitle.trim() || undefined,
         lines: duoLineInfo.map((line, index) => ({ speaker: duoLInes[index].speaker, text: line.text })),
       });
@@ -932,7 +957,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
     } finally {
       setDuoSubmitting(false);
     }
-  }, [duoA, duoB, duoBackground, duoCamera, duoErrorText, duoInvalid, duoLineInfo, duoLInes, duoStyle, duoTitle, notify]);
+  }, [duoA, duoB, duoErrorText, duoInvalid, duoLineInfo, duoLInes, duoSceneA, duoSceneB, duoStyle, duoTitle, notify]);
 
   const cancelDuo = useCallback(async () => {
     if (!duoJob?.id) return;
@@ -983,7 +1008,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
       setShowcaseBuilding(true);
       setShowcaseError("");
       try {
-        const pkg = await showcaseApi.build({ force });
+        const pkg = await showcaseApi.build({ force, vertical: showcaseVertical, vertical_mode: showcaseVerticalMode });
         setShowcasePkg(pkg);
         notify(force ? "合集发布包已重新构建" : pkg.cached ? "合集发布包已存在（cached）" : "合集发布包已生成", "success");
       } catch (err) {
@@ -995,7 +1020,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
         setShowcaseBuilding(false);
       }
     },
-    [notify],
+    [notify, showcaseVertical, showcaseVerticalMode],
   );
 
   const downloadShowcase = useCallback(async () => {
@@ -1332,9 +1357,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                       <span>{Math.round(Math.max(4, Math.min(100, duoJob.progress || duoStageInfo.progress)))}%</span>
                     </div>
                     <div className="v32-progress-meta">
-                      <span className="v34-scene-tag">
-                        {auditionBackgroundLabel(duoJob.background, duoJob.background_label)} · {auditionCameraLabel(duoJob.camera, duoJob.camera_label)}
-                      </span>
+                      <span className="v34-scene-tag">{duoScenesLabel(duoJob)}</span>
                       <span>{duoJob.total_lines || duoJob.lines?.length || 0} 句 · 正反打</span>
                       <button type="button" className="cm-btn cm-btn-sm cm-btn-ghost" onClick={() => void cancelDuo()}>取消任务</button>
                     </div>
@@ -1347,6 +1370,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                       <span className="v18-tag is-jade">已完成</span>
                       <span className="v18-tag">{AUDITION_STYLES.find((item) => item.id === duoJob.style)?.label || duoJob.style}</span>
                       <span className="cm-mono">{duoJob.total_lines || duoJob.lines?.length || 0} 句</span>
+                      <span className="v18-tag v34-scene-tag">{duoScenesLabel(duoJob)}</span>
                       <span className="cm-mono">{duoJob.duration_sec ? duoJob.duration_sec.toFixed(1) + "s" : "—"}</span>
                       <span className="cm-mono">{fmtAuditionSize(duoJob.size_bytes || 0)}</span>
                       <button
@@ -1398,6 +1422,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                         </span>
                         <span className="cm-mono">{(job.a_label || job.character_a) + " × " + (job.b_label || job.character_b)}</span>
                         <span className="cm-mono">{job.total_lines || job.lines?.length || 0} 句</span>
+                        <span className="v18-tag v34-scene-tag">{duoScenesLabel(job)}</span>
                         {job.title && <span className="v32-recent-id">{job.title}</span>}
                         <button
                           type="button"
@@ -2238,25 +2263,41 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                   );
                 })}
               </div>
-              <div className="v36-duo-options">
-                <label className="v21-field">
-                  <span className="v21-field-label">风格</span>
-                  <select className="v21-select" value={duoStyle} onChange={(event) => setDuoStyle(event.target.value as AuditionStyle)} disabled={duoSubmitting}>
-                    {AUDITION_STYLES.map((item) => (<option key={item.id} value={item.id}>{item.label}</option>))}
-                  </select>
-                </label>
-                <label className="v21-field">
-                  <span className="v21-field-label">背景</span>
-                  <select className="v21-select" value={duoBackground} onChange={(event) => setDuoBackground(event.target.value as AuditionBackground)} disabled={duoSubmitting}>
-                    {AUDITION_BACKGROUNDS.map((item) => (<option key={item.id} value={item.id}>{item.label}</option>))}
-                  </select>
-                </label>
-                <label className="v21-field">
-                  <span className="v21-field-label">机位</span>
-                  <select className="v21-select" value={duoCamera} onChange={(event) => setDuoCamera(event.target.value as AuditionCamera)} disabled={duoSubmitting}>
-                    {AUDITION_CAMERAS.map((item) => (<option key={item.id} value={item.id}>{item.label}</option>))}
-                  </select>
-                </label>
+              <label className="v21-field">
+                <span className="v21-field-label">风格</span>
+                <select className="v21-select" value={duoStyle} onChange={(event) => setDuoStyle(event.target.value as AuditionStyle)} disabled={duoSubmitting}>
+                  {AUDITION_STYLES.map((item) => (<option key={item.id} value={item.id}>{item.label}</option>))}
+                </select>
+              </label>
+              <div className="v37-scene-grid">
+                {([
+                  { key: "a", label: "角色 A 场景", value: duoSceneA, set: setDuoSceneA },
+                  { key: "b", label: "角色 B 场景", value: duoSceneB, set: setDuoSceneB },
+                ] as const).map((scene) => (
+                  <div key={scene.key} className="v37-scene">
+                    <span className="v37-scene-title">{scene.label}</span>
+                    <div className="v37-scene-row">
+                      <select
+                        className="v21-select"
+                        value={scene.value.background}
+                        onChange={(event) => scene.set((prev) => ({ ...prev, background: event.target.value as AuditionBackground }))}
+                        disabled={duoSubmitting}
+                        aria-label={scene.label + "背景"}
+                      >
+                        {AUDITION_BACKGROUNDS.map((item) => (<option key={item.id} value={item.id}>{item.label}</option>))}
+                      </select>
+                      <select
+                        className="v21-select"
+                        value={scene.value.camera}
+                        onChange={(event) => scene.set((prev) => ({ ...prev, camera: event.target.value as AuditionCamera }))}
+                        disabled={duoSubmitting}
+                        aria-label={scene.label + "机位"}
+                      >
+                        {AUDITION_CAMERAS.map((item) => (<option key={item.id} value={item.id}>{item.label}</option>))}
+                      </select>
+                    </div>
+                  </div>
+                ))}
               </div>
               <label className="v21-field">
                 <span className="v21-field-label">标题（可选，片头卡）</span>
@@ -2309,7 +2350,9 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
               )}
             </div>
             <footer className="v32-modal-foot">
-              <span className="v21-foot-note">{duoLInes.length} 句 · {AUDITION_STYLES.find((item) => item.id === duoStyle)?.label} · {auditionBackgroundLabel(duoBackground)} · {auditionCameraLabel(duoCamera)}</span>
+              <span className="v21-foot-note">
+                {duoLInes.length} 句 · {AUDITION_STYLES.find((item) => item.id === duoStyle)?.label} · A {auditionBackgroundLabel(duoSceneA.background)}·{auditionCameraLabel(duoSceneA.camera)} / B {auditionBackgroundLabel(duoSceneB.background)}·{auditionCameraLabel(duoSceneB.camera)}
+              </span>
               <button type="button" className="cm-btn cm-btn-sm" onClick={() => setDuoOpen(false)} disabled={duoSubmitting}>取消</button>
               <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" onClick={() => void submitDuo()} disabled={duoSubmitting || duoInvalid}>
                 {duoSubmitting ? <Spinner size={12} /> : <IconUsers size={12} />} 生成双人对戏
@@ -2340,6 +2383,42 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                   <span>打包内容：视频 + 封面 + metadata + README + 各角色 SRT</span>
                 </div>
               </div>
+              <div className="v37-showcase-vertical">
+                <label className={"v29-batchbar-toggle v37-vertical-toggle" + (showcaseVertical ? " is-on" : "")}>
+                  <input type="checkbox" checked={showcaseVertical} onChange={(event) => setShowcaseVertical(event.target.checked)} disabled={showcaseBuilding} />
+                  附带竖版 9:16（TikTok / IG）
+                </label>
+                <div className="v29-batchbar-modes" role="group" aria-label="合集竖版模式">
+                  <button
+                    type="button"
+                    className={"v28-vmode-btn" + (showcaseVerticalMode === "blur_pad" ? " is-active" : "")}
+                    onClick={() => setShowcaseVerticalMode("blur_pad")}
+                    disabled={!showcaseVertical || showcaseBuilding}
+                    title="模糊背景填充（完整保留 16:9 画面）"
+                  >
+                    模糊填充
+                  </button>
+                  <button
+                    type="button"
+                    className={"v28-vmode-btn" + (showcaseVerticalMode === "crop" ? " is-active" : "")}
+                    onClick={() => setShowcaseVerticalMode("crop")}
+                    disabled={!showcaseVertical || showcaseBuilding}
+                    title="中心裁切 9:16（主体居中素材）"
+                  >
+                    中心裁切
+                  </button>
+                </div>
+                <span className="v37-vertical-hint">打包竖版视频 1080×1920 + 竖版封面；重新构建按当前选项</span>
+              </div>
+              {showcasePkg && (
+                <div className="v37-vertical-state">
+                  {showcasePkg.files.some((file) => file.name.includes("_vertical")) ? (
+                    <span className="v18-tag is-jade">当前包已含竖版</span>
+                  ) : (
+                    <span className="v18-tag">当前包不含竖版 · 点「重新构建」按新选项生成</span>
+                  )}
+                </div>
+              )}
               {showcaseLoading && (
                 <div className="v32-audition-loading"><Spinner size={14} /> 正在读取已有发布包…</div>
               )}
@@ -2355,12 +2434,19 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                     </button>
                   </div>
                   <div className="v36-showcase-files">
-                    {showcasePkg.files.slice(0, 12).map((file) => (
-                      <div key={file.name} className="v36-showcase-file">
-                        <span className="cm-mono">{file.name}</span>
-                        <span className="cm-mono">{fmtAuditionSize(file.size_bytes || 0)}</span>
-                      </div>
-                    ))}
+                    {showcasePkg.files
+                      .slice()
+                      .sort((a, b) => Number(b.name.includes("_vertical")) - Number(a.name.includes("_vertical")))
+                      .slice(0, 14)
+                      .map((file) => (
+                        <div key={file.name} className={"v36-showcase-file" + (file.name.includes("_vertical") ? " is-vertical" : "")}>
+                          <span className="cm-mono">
+                            {file.name}
+                            {file.name.includes("_vertical") && <em className="v37-vertical-badge">竖版 9:16</em>}
+                          </span>
+                          <span className="cm-mono">{fmtAuditionSize(file.size_bytes || 0)}</span>
+                        </div>
+                      ))}
                   </div>
                 </div>
               )}

@@ -43,6 +43,8 @@ _BUILD_LOCK = threading.Lock()
 class ShowcaseBody(BaseModel):
     title: Optional[str] = None
     force: bool = False
+    vertical: bool = False
+    vertical_mode: str = "blur_pad"
 
 
 def _catalog() -> Dict[str, Any]:
@@ -130,36 +132,87 @@ def _make_cover(reel: Path, duration: float, dest: Path) -> bool:
     return proc.returncode == 0 and dest.is_file() and dest.stat().st_size > 0
 
 
-def _readme(metadata: Dict[str, Any], rows: List[Dict[str, str]]) -> str:
+def _make_vertical(reel: Path, duration: float, dest: Path, mode: str) -> bool:
+    """生成 1080×1920 竖版：blur_pad（模糊填充）或 crop（中心裁切）。"""
+    ffmpeg = str(jobs.ffmpeg_bin())
+    if mode == "crop":
+        video_filter = ("scale=1080:1920:force_original_aspect_ratio=increase,"
+                        "crop=1080:1920,format=yuv420p")
+        cmd = [ffmpeg, "-y", "-hide_banner", "-loglevel", "error", "-i", str(reel),
+               "-vf", video_filter, "-map", "0:v:0", "-map", "0:a?",
+               "-c:v", "libx264", "-preset", "medium", "-crf", "20",
+               "-c:a", "aac", "-b:a", "128k", "-ar", "48000", "-ac", "2",
+               "-movflags", "+faststart", str(dest)]
+    else:
+        filter_complex = (
+            "[0:v]scale=1080:1920:force_original_aspect_ratio=increase,"
+            "crop=1080:1920,gblur=sigma=30[bg];"
+            "[0:v]scale=1080:1920:force_original_aspect_ratio=decrease[fg];"
+            "[bg][fg]overlay=(W-w)/2:(H-h)/2,format=yuv420p[outv]"
+        )
+        cmd = [ffmpeg, "-y", "-hide_banner", "-loglevel", "error", "-i", str(reel),
+               "-filter_complex", filter_complex, "-map", "[outv]", "-map", "0:a?",
+               "-c:v", "libx264", "-preset", "medium", "-crf", "20",
+               "-c:a", "aac", "-b:a", "128k", "-ar", "48000", "-ac", "2",
+               "-movflags", "+faststart", str(dest)]
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8",
+                              errors="replace", timeout=600)
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return proc.returncode == 0 and dest.is_file() and dest.stat().st_size > 0
+
+
+def _readme(metadata: Dict[str, Any], rows: List[Dict[str, str]],
+            vertical: Optional[Dict[str, Any]] = None) -> str:
     chars = "、".join(f"{row['label']}（{row['character']}）" for row in rows) or "—"
     lines = [
         f"试镜合集发布包：{metadata['title']}",
         "",
         "一、包内文件",
-        "  video/character_audition_reel.mp4   合集视频（字幕已烧录）",
-        "  cover/cover.jpg                     封面帧",
+        "  video/character_audition_reel.mp4   合集视频（16:9，字幕已烧录）",
+        "  cover/cover.jpg                     16:9 封面帧",
         "  metadata.json                       标题/时长/分辨率/角色清单",
         "  subtitles/<character>.srt           各角色试镜 SRT",
         "  README.txt                          本说明",
+    ]
+    if vertical:
+        lines.extend([
+            "  video/character_audition_reel_vertical.mp4  竖版 1080×1920（TikTok/IG）",
+            "  cover/cover_vertical.jpg                    竖版封面 1080×1920",
+        ])
+    lines.extend([
         "",
         "二、上传步骤",
         "  1. 登录目标平台创作中心，选择上传视频；",
-        "  2. 上传 video/character_audition_reel.mp4（已含烧录中文字幕）；",
+        "  2. 上传 video/character_audition_reel.mp4（16:9，已含烧录中文字幕）；",
         "  3. 使用 cover/cover.jpg 作为封面；",
         "  4. 标题/简介/标签参考 metadata.json；",
         "  5. 如需平台字幕，可上传 subtitles/ 下对应角色 SRT。",
+    ])
+    if vertical:
+        lines.extend([
+            "",
+            "三、竖版 9:16 说明",
+            f"  模式：{vertical.get('mode')}（blur_pad=模糊填充；crop=中心裁切）；"
+            f"分辨率：{vertical.get('resolution')}",
+            "  竖版视频为同源内容转制，字幕已烧录；发布到 TikTok/IG/抖音时优先上传",
+            "  video/character_audition_reel_vertical.mp4 并使用 cover/cover_vertical.jpg。",
+        ])
+    lines.extend([
         "",
-        "三、说明",
+        "四、说明",
         f"  时长：{metadata.get('duration_sec')}s；分辨率：{metadata.get('resolution')}；"
         f"fps：{metadata.get('fps')}",
         f"  角色：{chars}",
         "  字幕已烧录在视频内；SRT 仅作备用/二次编辑。",
         "",
-    ]
+    ])
     return "\n".join(lines)
 
 
-def _build_package(title: str, force: bool) -> Dict[str, Any]:
+def _build_package(title: str, force: bool, vertical: bool = False,
+                   vertical_mode: str = "blur_pad") -> Dict[str, Any]:
     if not _REEL.is_file() or _REEL.stat().st_size <= 0:
         raise HTTPException(status_code=400,
                             detail=f"试镜合集视频不存在: {_REEL}（请先生成 10 角色试镜合集）")
@@ -168,33 +221,59 @@ def _build_package(title: str, force: bool) -> Dict[str, Any]:
     with _BUILD_LOCK:
         if target.is_file() and not force:
             cached = _read_zip_metadata(target)
-            if cached and str(cached.get("title") or "") == title:
+            if cached and _cache_matches(cached, title, vertical, vertical_mode):
                 return _package_view(target, cached=cached, cached_flag=True)
         info = _media_info(_REEL)
         rows = _audition_srts()
-        metadata = {
-            "title": title,
-            "description": "造片局 AI 角色试镜合集：多位角色的写实/动漫立绘 + 角色音色 + H3 图生视频口型同步，带中文字幕。",
-            "tags": ["角色试镜", "AI视频", "character audition", "showcase", "AI微综艺"],
-            "duration_sec": info.get("duration_sec"),
-            "resolution": f"{info.get('width')}x{info.get('height')}",
-            "width": info.get("width"),
-            "height": info.get("height"),
-            "fps": info.get("fps"),
-            "size_bytes": info.get("size_bytes"),
-            "characters": [{"id": row["character"], "label": row["label"]} for row in rows],
-            "srt_count": len(rows),
-            "source": str(_REEL),
-            "generated_at": _now_iso(),
-            "subtitles_burned": True,
-        }
         work = Path(tempfile.mkdtemp(prefix=".showcase-", dir=str(_DEMO_DIR)))
         try:
             cover = work / "cover.jpg"
             if not _make_cover(_REEL, float(info.get("duration_sec") or 0), cover):
                 raise RuntimeError("封面抽帧失败")
+            vertical_info: Optional[Dict[str, Any]] = None
+            vertical_video: Optional[Path] = None
+            vertical_cover: Optional[Path] = None
+            warnings: List[str] = []
+            if vertical:
+                try:
+                    vertical_video = work / "character_audition_reel_vertical.mp4"
+                    if not _make_vertical(_REEL, float(info.get("duration_sec") or 0),
+                                          vertical_video, vertical_mode):
+                        raise RuntimeError("ffmpeg 竖版转制失败")
+                    vertical_cover = work / "cover_vertical.jpg"
+                    if not _make_cover(vertical_video, float(info.get("duration_sec") or 0),
+                                       vertical_cover):
+                        raise RuntimeError("竖版封面抽帧失败")
+                    vertical_info = {
+                        "file": "video/character_audition_reel_vertical.mp4",
+                        "resolution": "1080x1920",
+                        "mode": vertical_mode,
+                    }
+                except Exception as exc:  # noqa: BLE001 - 竖版失败不阻塞 16:9
+                    warnings.append(f"竖版生成失败，已跳过（16:9 包正常）：{exc}")
+                    vertical_info = None
+                    vertical_video = None
+                    vertical_cover = None
+            metadata = {
+                "title": title,
+                "description": "造片局 AI 角色试镜合集：多位角色的写实/动漫立绘 + 角色音色 + H3 图生视频口型同步，带中文字幕。",
+                "tags": ["角色试镜", "AI视频", "character audition", "showcase", "AI微综艺"],
+                "duration_sec": info.get("duration_sec"),
+                "resolution": f"{info.get('width')}x{info.get('height')}",
+                "width": info.get("width"),
+                "height": info.get("height"),
+                "fps": info.get("fps"),
+                "size_bytes": info.get("size_bytes"),
+                "characters": [{"id": row["character"], "label": row["label"]} for row in rows],
+                "srt_count": len(rows),
+                "source": str(_REEL),
+                "generated_at": _now_iso(),
+                "subtitles_burned": True,
+            }
+            if vertical_info:
+                metadata["vertical"] = vertical_info
             metadata_bytes = json.dumps(metadata, ensure_ascii=False, indent=2).encode("utf-8")
-            readme_bytes = _readme(metadata, rows).encode("utf-8")
+            readme_bytes = _readme(metadata, rows, vertical_info).encode("utf-8")
             tmp_zip = target.with_name(f".{target.name}.tmp-{os.getpid()}-{threading.get_ident()}")
             files: List[Dict[str, Any]] = []
             with zipfile.ZipFile(tmp_zip, "w", compression=zipfile.ZIP_DEFLATED,
@@ -203,6 +282,13 @@ def _build_package(title: str, force: bool) -> Dict[str, Any]:
                 files.append({"name": f"video/{_REEL.name}", "size": _REEL.stat().st_size})
                 zf.write(cover, arcname="cover/cover.jpg")
                 files.append({"name": "cover/cover.jpg", "size": cover.stat().st_size})
+                if vertical_info and vertical_video and vertical_cover:
+                    zf.write(vertical_video, arcname=vertical_info["file"])
+                    files.append({"name": vertical_info["file"],
+                                  "size": vertical_video.stat().st_size})
+                    zf.write(vertical_cover, arcname="cover/cover_vertical.jpg")
+                    files.append({"name": "cover/cover_vertical.jpg",
+                                  "size": vertical_cover.stat().st_size})
                 zf.writestr("metadata.json", metadata_bytes)
                 files.append({"name": "metadata.json", "size": len(metadata_bytes)})
                 zf.writestr("README.txt", readme_bytes)
@@ -214,9 +300,21 @@ def _build_package(title: str, force: bool) -> Dict[str, Any]:
             os.replace(tmp_zip, target)
         finally:
             shutil.rmtree(work, ignore_errors=True)
-        view = _package_view(target, cached=metadata, cached_flag=False)
+        view = _package_view(target, cached=metadata, cached_flag=False, warnings=warnings)
         view["files"] = files
         return view
+
+
+def _cache_matches(cached: Dict[str, Any], title: str, vertical: bool,
+                   vertical_mode: str) -> bool:
+    if str(cached.get("title") or "") != title:
+        return False
+    cached_vertical = cached.get("vertical")
+    if not vertical:
+        return not cached_vertical
+    if not isinstance(cached_vertical, dict):
+        return False
+    return str(cached_vertical.get("mode") or "") == vertical_mode
 
 
 def _read_zip_metadata(path: Path) -> Optional[Dict[str, Any]]:
@@ -230,7 +328,8 @@ def _read_zip_metadata(path: Path) -> Optional[Dict[str, Any]]:
         return None
 
 
-def _package_view(path: Path, *, cached: Dict[str, Any], cached_flag: bool) -> Dict[str, Any]:
+def _package_view(path: Path, *, cached: Dict[str, Any], cached_flag: bool,
+                  warnings: Optional[List[str]] = None) -> Dict[str, Any]:
     files = []
     try:
         with zipfile.ZipFile(path) as zf:
@@ -253,6 +352,10 @@ def _package_view(path: Path, *, cached: Dict[str, Any], cached_flag: bool) -> D
         "resolution": cached.get("resolution"),
         "characters": rows,
         "srt_count": cached.get("srt_count"),
+        "vertical": bool(cached.get("vertical")),
+        "vertical_info": cached.get("vertical"),
+        "vertical_mode": (cached.get("vertical") or {}).get("mode") if isinstance(cached.get("vertical"), dict) else None,
+        "warnings": warnings or [],
         "video_url": f"/media/character_demos/{_REEL.name}?t={int(_REEL.stat().st_mtime)}",
         "generated_at": cached.get("generated_at"),
         "path": str(path),
@@ -265,7 +368,12 @@ def build_showcase_package(payload: ShowcaseBody = Body(default=ShowcaseBody()))
     title = str(payload.title or _DEFAULT_TITLE).strip() or _DEFAULT_TITLE
     if len(title) > 80:
         raise HTTPException(status_code=400, detail="title 不能超过 80 字")
-    return _build_package(title, bool(payload.force))
+    vertical_mode = str(payload.vertical_mode or "blur_pad").strip().lower()
+    if vertical_mode not in ("blur_pad", "crop"):
+        raise HTTPException(status_code=400,
+                            detail="vertical_mode 只支持 blur_pad/crop"
+                                   f"（当前 {vertical_mode!r}）")
+    return _build_package(title, bool(payload.force), bool(payload.vertical), vertical_mode)
 
 
 @router.get("/api/v5/character-showcase/publish-package",
@@ -286,6 +394,9 @@ def list_showcase_packages() -> Dict[str, Any]:
                 "duration_sec": metadata.get("duration_sec"),
                 "resolution": metadata.get("resolution"),
                 "srt_count": metadata.get("srt_count"),
+                "vertical": metadata.get("vertical"),
+                "vertical_mode": (metadata.get("vertical") or {}).get("mode")
+                                 if isinstance(metadata.get("vertical"), dict) else None,
                 "generated_at": metadata.get("generated_at"),
             })
     return {"ok": True, "count": len(rows), "packages": rows}

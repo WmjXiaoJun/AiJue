@@ -525,11 +525,23 @@ export interface DialogueLineInput {
   text: string;
 }
 
+export interface DialogueScene {
+  background?: string;
+  background_label?: string;
+  camera?: string;
+  camera_label?: string;
+}
+
 export interface DialogueJobLine extends DialogueLineInput {
   index?: number;
   start?: number;
   end?: number;
   duration_sec?: number;
+  background?: string;
+  background_label?: string;
+  camera?: string;
+  camera_label?: string;
+  character?: string;
 }
 
 export interface DialogueJob {
@@ -550,6 +562,7 @@ export interface DialogueJob {
   current_line?: number;
   total_lines?: number;
   lines?: DialogueJobLine[];
+  scenes?: { a?: DialogueScene; b?: DialogueScene };
   output_url?: string | null;
   poster_url?: string | null;
   srt_url?: string | null;
@@ -589,8 +602,28 @@ function normalizeDialogueJob(raw: unknown): DialogueJob {
         start: Number(line.start) || 0,
         end: Number(line.end) || 0,
         duration_sec: Number(line.duration_sec) || 0,
+        background: typeof line.background === "string" ? line.background : undefined,
+        background_label: typeof line.background_label === "string" ? line.background_label : undefined,
+        camera: typeof line.camera === "string" ? line.camera : undefined,
+        camera_label: typeof line.camera_label === "string" ? line.camera_label : undefined,
+        character: typeof line.character === "string" ? line.character : undefined,
       };
     }),
+    scenes: (() => {
+      const rawScenes = (rec.scenes && typeof rec.scenes === "object" ? rec.scenes : null) as Record<string, unknown> | null;
+      if (!rawScenes) return undefined;
+      const parse = (value: unknown): DialogueScene | undefined => {
+        if (!value || typeof value !== "object") return undefined;
+        const scene = value as Record<string, unknown>;
+        return {
+          background: typeof scene.background === "string" ? scene.background : undefined,
+          background_label: typeof scene.background_label === "string" ? scene.background_label : undefined,
+          camera: typeof scene.camera === "string" ? scene.camera : undefined,
+          camera_label: typeof scene.camera_label === "string" ? scene.camera_label : undefined,
+        };
+      };
+      return { a: parse(rawScenes.a), b: parse(rawScenes.b) };
+    })(),
     output_url: typeof rec.output_url === "string" ? rec.output_url : null,
     poster_url: typeof rec.poster_url === "string" ? rec.poster_url : null,
     srt_url: typeof rec.srt_url === "string" ? rec.srt_url : null,
@@ -614,6 +647,8 @@ export const dialogueApi = {
     background?: AuditionBackground;
     camera?: AuditionCamera;
     title?: string;
+    scene_a?: { background?: AuditionBackground; camera?: AuditionCamera };
+    scene_b?: { background?: AuditionBackground; camera?: AuditionCamera };
     lines: DialogueLineInput[];
   }): Promise<DialogueJob> => normalizeDialogueJob(await post("/v5/characters/dialogue", body, 60000)),
   get: async (jobId: string): Promise<DialogueJob> => normalizeDialogueJob(await get(`/v5/dialogues/${encodeURIComponent(jobId)}`)),
@@ -639,6 +674,7 @@ export interface ShowcasePackage {
   files: ShowcasePackageFile[];
   cached?: boolean;
   title?: string;
+  vertical?: { file?: string; resolution?: string; mode?: string } | null;
   created_at?: string | null;
   error?: string | null;
 }
@@ -659,14 +695,26 @@ function normalizeShowcasePackage(raw: unknown): ShowcasePackage {
     }),
     cached: Boolean(rec.cached),
     title: typeof rec.title === "string" ? rec.title : undefined,
+    vertical: (() => {
+      const value = rec.vertical;
+      if (!value || typeof value !== "object") return null;
+      const vertical = value as Record<string, unknown>;
+      return {
+        file: typeof vertical.file === "string" ? vertical.file : undefined,
+        resolution: typeof vertical.resolution === "string" ? vertical.resolution : undefined,
+        mode: typeof vertical.mode === "string" ? vertical.mode : undefined,
+      };
+    })(),
     created_at: typeof rec.created_at === "string" ? rec.created_at : null,
     error: typeof rec.error === "string" ? rec.error : null,
   };
 }
 
 export const showcaseApi = {
-  build: async (body: { title?: string; force?: boolean } = {}): Promise<ShowcasePackage> =>
-    normalizeShowcasePackage(await post("/v5/character-showcase/publish-package", body, 300000)),
+  build: async (body: { title?: string; force?: boolean; vertical?: boolean; vertical_mode?: "blur_pad" | "crop" } = {}): Promise<ShowcasePackage> =>
+    normalizeShowcasePackage(
+      await post("/v5/character-showcase/publish-package", { vertical: false, vertical_mode: "blur_pad", ...body }, 300000),
+    ),
   list: async (): Promise<ShowcasePackage[]> => {
     const res = (await get("/v5/character-showcase/publish-package")) as
       | { packages?: unknown[]; items?: unknown[]; package_url?: string; files?: unknown[] }

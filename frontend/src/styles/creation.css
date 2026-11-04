@@ -474,3 +474,15 @@
 .v36-showcase-files { display: flex; flex-direction: column; gap: 2px; max-height: 170px; overflow: auto; }
 .v36-showcase-file { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 3px 5px; border-bottom: 1px dashed rgba(255,255,255,.05); font-size: 9px; color: var(--c-sub); }
 .v36-showcase-file .cm-mono:last-child { color: var(--c-mut); }
+
+/* V37：双人双场景 + 合集竖版 */
+.v37-scene-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.v37-scene { display: flex; flex-direction: column; gap: 5px; padding: 8px 9px; border: 1px solid var(--c-line); border-radius: 9px; background: rgba(255,255,255,.015); }
+.v37-scene-title { font-family: var(--font-mono); font-size: 9px; letter-spacing: .08em; color: var(--c-gold-soft); text-transform: uppercase; }
+.v37-scene-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.v37-showcase-vertical { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; padding: 8px 10px; border: 1px solid var(--c-line); border-radius: 9px; background: rgba(255,255,255,.015); }
+.v37-vertical-toggle { height: 26px; }
+.v37-vertical-hint { font-size: 9.5px; color: var(--c-mut); }
+.v37-vertical-state { display: flex; align-items: center; gap: 6px; font-size: 9.5px; color: var(--c-mut); }
+.v36-showcase-file.is-vertical { background: rgba(201,162,39,.05); }
+.v37-vertical-badge { margin-left: 6px; padding: 0 4px; border-radius: 3px; background: rgba(201,162,39,.18); color: var(--c-gold-soft); font-style: normal; font-size: 7.5px; }

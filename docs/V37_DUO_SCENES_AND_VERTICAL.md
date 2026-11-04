@@ -45,3 +45,28 @@
 - **tpl-backend**：dialogue scene_a/scene_b + 合集 vertical/vertical_mode + 自测
 - **tpl-frontend**：双场景 UI + 合集竖版选项/清单 + 截图
 - **Lead**：真实双人双场景生成 + 竖版包验证、截图、docs、commit
+
+
+## 5. 交付结果（2026-11-04 08:22）
+
+### A. 双人对戏双场景（后端 23/23 PASS）
+- `POST /api/v5/characters/dialogue` 增加 `scene_a` / `scene_b`（background/camera，缺省沿用顶层）；每镜按 speaker 使用对应场景；任务返回 `scenes:{a,b}`（含中文 label）与每镜场景
+- 实测（后端）：laozhou × tianmei 2 行（A studio/closeup，B cafe/medium）**248.2s done**，1,242,384B / 12.59s / 1024×576 / 24fps / AAC；抽帧 A 棚拍近景老周、B 咖啡馆中景甜妹（差异 74.9%），字幕可见；非法场景 4 类 400
+- Lead 独立 E2E：2 行 244.1s done，1,241,157B / 12.59s；scenes 字段正确；抽帧确认双场景
+- 看片：`/media/character_demos/laozhou_tianmei_dual_scene.mp4`
+
+### B. 合集发布包竖版 9:16（后端 12/12 复核 PASS）
+- `POST /api/v5/character-showcase/publish-package` 增加 `vertical`（默认 false）与 `vertical_mode`（blur_pad/crop）；vertical=true 时 zip 额外含 1080×1920 竖版视频（H.264+AAC）、1080×1920 竖版封面、metadata.vertical、README 说明；缓存按开关/mode 判断；失败仅 warning
+- 实测：blur_pad **21,995,136B / 18 文件 / 13.0s**；竖版 ffprobe 1080×1920 + 音轨 72.69s；cached=true；vertical=false 回归 16 文件；crop 可重建
+- Lead E2E：下载解压 18 文件、竖版 1080×1920/72.688s/含音轨、封面 1080×1920、metadata.vertical 正确
+- 下载：`/media/character_demos/publish/character_audition_reel.zip`
+
+### 前端
+- 双人对戏弹层拆成「角色 A 场景」「角色 B 场景」两行（各自背景/机位），默认 A=棚拍·近景、B=咖啡馆·中景；完成/最近显示「A 场景 · B 场景」标签
+- 试镜合集弹层新增「附带竖版 9:16」checkbox（默认勾选）+ 模糊填充/中心裁切模式；清单竖版视频/封面置顶 + 徽标；重新构建按当前选项
+- 截图 `tmp/v37/ui/`（7 张）+ `tmp/v37/lead/`（2 张）；`tsc` 0 / build / console 无 error
+
+### 说明 / 遗留
+- 双人对戏每行约 5.167s（2 行 12.59s），真实生成约 4–8 分钟
+- 竖版包约 22MB（16:9 约 6.6MB），构建约 13s，之后按 title+vertical+mode 缓存
+- 片头卡/烧录字幕不随 scene 变化；H3/竖版均 24fps
