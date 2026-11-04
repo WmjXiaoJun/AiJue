@@ -1,0 +1,184 @@
+{
+  "id": "arcane_workshop",
+  "label": "发明家工坊",
+  "description": "Arcane 风发明家工坊：木架与金属零件、工作台、图纸与灯具，暖光与冷色金属对比。",
+  "tags": [
+    "modern",
+    "cyber",
+    "workshop",
+    "interior",
+    "warm"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "layers": [
+    {
+      "type": "paper",
+      "layer": "background",
+      "mottle": 0.6,
+      "edge": 0.55
+    },
+    {
+      "type": "shelves",
+      "layer": "midground",
+      "x": 0.0,
+      "y": 0.1,
+      "w": 0.3,
+      "h": 0.78,
+      "rows": 4,
+      "color": "wood"
+    },
+    {
+      "type": "shelves",
+      "layer": "midground",
+      "x": 0.7,
+      "y": 0.1,
+      "w": 0.3,
+      "h": 0.78,
+      "rows": 4,
+      "color": "wood",
+      "variants": {
+        "dusty": {
+          "rows": 5
+        },
+        "lit": {
+          "rows": 3
+        }
+      }
+    },
+    {
+      "type": "ladder",
+      "layer": "midground",
+      "x": 0.3,
+      "y": 0.16,
+      "w": 0.08,
+      "h": 0.68,
+      "rungs": 8,
+      "color": "wood"
+    },
+    {
+      "type": "desk",
+      "layer": "midground",
+      "x": 0.28,
+      "y": 0.62,
+      "w": 0.46,
+      "h": 0.28,
+      "color": "wood",
+      "items": [
+        {
+          "type": "scroll",
+          "x": 0.35,
+          "y": 0.5
+        },
+        {
+          "type": "inkstone",
+          "x": 0.62,
+          "y": 0.55
+        }
+      ]
+    },
+    {
+      "type": "scroll",
+      "layer": "midground",
+      "x": 0.32,
+      "y": 0.44,
+      "w": 0.34,
+      "h": 0.2,
+      "columns": 3,
+      "angle": -1.5,
+      "tie": true
+    },
+    {
+      "type": "bamboo_slips",
+      "layer": "midground",
+      "x": 0.36,
+      "y": 0.3,
+      "w": 0.24,
+      "h": 0.18,
+      "count": 10,
+      "angle": -2
+    },
+    {
+      "type": "particles",
+      "layer": "foreground",
+      "count": 50,
+      "color": "highlight",
+      "size": 0.0016,
+      "drift": 0.2,
+      "variants": {
+        "dusty": {
+          "count": 90
+        },
+        "lit": {
+          "count": 24
+        }
+      }
+    },
+    {
+      "type": "candle_glow",
+      "layer": "midground",
+      "count": 2,
+      "y": 0.52,
+      "x0": 0.22,
+      "x1": 0.72,
+      "size": 0.045
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.3
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0,
+      0,
+      1,
+      1
+    ],
+    "desk_top": [
+      0.24,
+      0.38,
+      0.52,
+      0.48
+    ],
+    "shelf_close": [
+      0.62,
+      0.08,
+      0.34,
+      0.74
+    ],
+    "scroll_close": [
+      0.28,
+      0.32,
+      0.44,
+      0.34
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.3,
+      0.96
+    ],
+    "figure_a": [
+      0.74,
+      0.96
+    ],
+    "figure_b": [
+      0.52,
+      0.97
+    ]
+  },
+  "variants": [
+    "dusty",
+    "lit"
+  ],
+  "depth": {
+    "background": 0.02,
+    "midground": 0.12,
+    "foreground": 0.3
+  },
+  "seed": 91702
+}

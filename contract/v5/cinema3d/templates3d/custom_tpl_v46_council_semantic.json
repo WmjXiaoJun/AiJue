@@ -1,0 +1,48 @@
+{
+ "template": "custom_tpl_v46_council",
+ "style": "neon_toon",
+ "look": "cinematic painted animation, semi-realistic stylized film still, painterly textures, teal and amber palette, volumetric light, thick brushwork",
+ "mode": "semantic",
+ "shots": [
+  {
+   "id": "v5_001",
+   "kind": "broll",
+   "scene": "council_hall",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": "",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic painted animation set in council hall. A grand council hall with tall stone columns and stained glass, a long table with an emblem, spotlights cutting down through haze. The camera surveys the space, atmospheric and cinematic. Camera: slow dolly move through the space. 3D animated feature film quality, rich materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people.\n\noverall_soundscape: soft ambience, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_002",
+   "kind": "dialogue",
+   "scene": "council_hall",
+   "duration": 4.3,
+   "line": "夜色入画，欢迎来到城市来信。",
+   "semantic_visual": "A grand council hall with tall stone columns and stained glass, a long table with an emblem, spotlights cutting down through haze.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic painted animation, painterly brushwork, volumetric light. Set in council hall. A grand council hall with tall stone columns and stained glass, a long table with an emblem, spotlights cutting down through haze. Framing: medium wide shot, environment visible. Camera: slow push-in toward the subject. 3D animated feature film quality, rich materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people.\n\noverall_soundscape: the same spoken sentence, close-mic voice, quiet room tone.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_003",
+   "kind": "dialogue",
+   "scene": "arcane_workshop",
+   "duration": 3.82,
+   "line": "窗外的灯，像一笔未干的水墨。",
+   "semantic_visual": "An inventor's workshop packed with brass gears, wooden shelves of tools, blueprints on a workbench, a warm desk lamp against cool window light.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic painted animation, painterly brushwork, volumetric light. Set in arcane workshop. An inventor's workshop packed with brass gears, wooden shelves of tools, blueprints on a workbench, a warm desk lamp against cool window light. Framing: medium wide shot, environment visible. Camera: slow push-in toward the subject. 3D animated feature film quality, rich materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people.\n\noverall_soundscape: the same spoken sentence, close-mic voice, quiet room tone.\n\nnon_diegetic_music: N/A"
+  },
+  {
+   "id": "v5_004",
+   "kind": "broll",
+   "scene": "undercity_street",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": "",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic painted animation set in undercity street. A rain-soaked undercity street at night, dense neon signs in teal and amber, steam venting from pipes, wet asphalt reflecting lights, market stalls and cables overhead. The camera surveys the space, atmospheric and cinematic. Camera: slow dolly move through the space. 3D animated feature film quality, rich materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people.\n\noverall_soundscape: soft ambience, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+  }
+ ]
+}

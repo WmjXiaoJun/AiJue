@@ -361,6 +361,22 @@ FALLBACK_PROMPTS: dict[str, str] = {
         "subway station exit at night, stairs leading up to the street, tiled "
         "walls, fluorescent light, city glow at the top of the stairs, anime background art"
     ),
+    # ---- V46 赛博 / Arcane 风场景 ----
+    "undercity_street": (
+        "cyberpunk undercity street at night, wet asphalt reflections, dense neon "
+        "signs, steam rising from vents, pipes and cables overhead, distant towers, "
+        "no people, painted animation background, teal and amber light"
+    ),
+    "arcane_workshop": (
+        "inventor workshop interior, wooden shelves and metal parts, workbench with "
+        "tools and blueprints, warm desk lamp, brass gears, cool window light, "
+        "no people, painted animation background"
+    ),
+    "council_hall": (
+        "grand council hall interior, tall stone columns and stained glass windows, "
+        "long table with an emblem, spotlights falling from above, dramatic "
+        "atmosphere, no people, painted animation background"
+    ),
 }
 
 # 历史场景（pilot/验收重点：必须有历史内容）

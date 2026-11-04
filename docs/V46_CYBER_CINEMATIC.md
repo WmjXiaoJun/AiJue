@@ -37,6 +37,34 @@
 - 五风格对比：`tmp/v46/films_compare_v46.png`（3×2 网格）；关键帧：`tmp/v16/keyframes/custom_tpl_v46_cyber/arcane_cinematic_dreamshaperxlt_ip45/`
 - 关键帧（老周）：1024×576，绘画感半写实、西装领带、青橙光比，与参考图的厚涂质感一致。
 
+## 4.5 赛博场景 + 两个场景模板
+
+新增 3 个场景（`contract/v5/scenes/`，图层栈复制现有可渲染场景后改 id/label/tags/seed）：
+
+| scene | label | 基础图层栈 | plate |
+|---|---|---|---|
+| `undercity_street` | 底城霓虹巷 | street_night | `assets/v5/scenes/undercity_street.png` |
+| `arcane_workshop` | 发明家工坊 | archive_vault | `assets/v5/scenes/arcane_workshop.png` |
+| `council_hall` | 议会审判厅 | palace_hall | `assets/v5/scenes/council_hall.png` |
+
+两个 4 幕模板（同 cast / 同台词，音频复用）：
+
+- `custom_tpl_v46_undercity`「V46 2D·底城往事」：底城 broll → 老周底城台词 → 阿栗工坊台词 → 议会 broll
+- `custom_tpl_v46_council`「V46 2D·议会夜审」：议会 broll → 老周议会台词 → 阿栗工坊台词 → 底城 broll
+
+### 出片与抽卡实测（2026-11-04 23:00–23:23）
+
+| 模板 | 时长 | 产物 | 说明 |
+|---|---|---|---|
+| `custom_tpl_v46_undercity` | 520.2s → 复跑（选卡） | 5,351,419B → **5,306,548B** | 每镜 3 候选：#0 街景中景 / #1 工坊全景，人工 pick `#0 / #1` |
+| `custom_tpl_v46_council` | 510.2s | 4,825,620B | 议会 broll + 老周议会台词 + 阿栗工坊台词 + 底城 broll |
+
+选卡图：`tmp/v16/keyframes/custom_tpl_v46_undercity/arcane_cinematic_dreamshaperxlt_ip45_c3/candidates/v5_002_sheet.jpg`、`v5_003_sheet.jpg`；picks 写入 `tmp/v16/keyframe_picks.json`。
+
+模板合同新增可选字段 `keyframe_candidates`（1–6），后端 `_generate_hq_command` 会透传成 `--keyframe-candidates`，UI 重跑也能抽卡。
+
+场景库：73 个场景（新增 3 个），模板库 2D 筛选 7 条；两页 0 console error、0 404。
+
 ## 5. 前端
 
 - `RenderStyle` 增加 `arcane_cinematic`；风格元信息「赛博电影感 / 赛博 / 绘画感半写实动画（Arcane 风）：厚涂笔触 + 青橙光比 + 电影景深」。

@@ -1,0 +1,105 @@
+{
+  "id": "custom_tpl_v46_undercity",
+  "label": "V46 2D·底城往事",
+  "description": "V46 2D·底城往事：赛博电影感 4 幕（底城 / 工坊 / 议会），同 cast。",
+  "tags": [
+    "custom",
+    "v21"
+  ],
+  "style": "neon_toon",
+  "target_duration": 14.12,
+  "aspect": [
+    16,
+    9
+  ],
+  "render_type": "2d",
+  "render_style": "arcane_cinematic",
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "name": "老周"
+    },
+    {
+      "role": "figure_a",
+      "character": "ali",
+      "name": "阿栗"
+    },
+    {
+      "role": "figure_b",
+      "character": "tianmei",
+      "name": "甜妹"
+    }
+  ],
+  "acts": [
+    {
+      "id": "act01",
+      "name": "第 1 幕",
+      "scene": "undercity_street",
+      "camera": "dolly",
+      "camera_strength": 0.06,
+      "duration": 3.0,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    },
+    {
+      "id": "act02",
+      "name": "第 2 幕",
+      "scene": "undercity_street",
+      "camera": "push_in",
+      "camera_strength": 0.06,
+      "duration": 4.3,
+      "line": "host",
+      "text": "夜色入画，欢迎来到城市来信。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act03",
+      "name": "第 3 幕",
+      "scene": "arcane_workshop",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 3.82,
+      "line": "figure_a",
+      "text": "窗外的灯，像一笔未干的水墨。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act04",
+      "name": "第 4 幕",
+      "scene": "council_hall",
+      "camera": "crane_up",
+      "camera_strength": 0.06,
+      "duration": 3.0,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    }
+  ],
+  "packaging": {
+    "subtitle": "default",
+    "transition": "fade",
+    "title": "V46 2D·底城往事"
+  },
+  "lipsync": {
+    "mode": "musetalk"
+  },
+  "audio": {},
+  "meta": {
+    "create_source": "v21",
+    "three_d": false,
+    "render_type": "2d",
+    "render_style": "arcane_cinematic",
+    "created_at": "2026-11-04 23:00:00",
+    "created_by": "api"
+  }
+}

@@ -243,6 +243,18 @@ def _generate_hq_command(tid: str, style_mode: str = "3d",
     cmd.extend(["--style-mode", style_mode])
     if style_mode == "2d":
         cmd.extend(["--2d-style", _template_render_style(tid) or "jp_anime"])
+        # V46：模板可选抽卡数（contract 里 keyframe_candidates，默认 1）
+        cands = 1
+        for path in (_TEMPLATE_CONTRACT_DIR / f"{tid}.json", _CUSTOM_TEMPLATE_DIR / f"{tid}.json"):
+            try:
+                data = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                continue
+            if isinstance(data, dict) and data.get("keyframe_candidates"):
+                cands = max(1, min(6, int(data["keyframe_candidates"])))
+            break
+        if cands > 1:
+            cmd.extend(["--keyframe-candidates", str(cands)])
     if reuse:
         cmd.append("--reuse-shots")
     return cmd

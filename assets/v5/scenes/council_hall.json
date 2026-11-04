@@ -1,0 +1,27 @@
+{
+  "scene": "council_hall",
+  "label": "议会审判厅",
+  "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\scenes\\council_hall.png",
+  "png": "council_hall.png",
+  "prompt": "masterpiece, best quality, very aesthetic, absurdres, anime style, detailed background art, cinematic lighting, scenery, no humans, grand council hall interior, tall stone columns and stained glass windows, long table with an emblem, spotlights falling from above, dramatic atmosphere, no people, painted animation background, wide shot, depth of field, 16:9, high detail, no text",
+  "raw_prompt": "grand council hall interior, tall stone columns and stained glass windows, long table with an emblem, spotlights falling from above, dramatic atmosphere, no people, painted animation background",
+  "prompt_source": "fallback",
+  "negative": "lowres, worst quality, low quality, bad anatomy, bad hands, text, watermark, signature, logo, jpeg artifacts, human, person, character, face, portrait, close-up, 3d render, photo, realistic, blurry",
+  "seed": 20261101,
+  "size": [
+    1280,
+    720
+  ],
+  "requested_size": [
+    1280,
+    720
+  ],
+  "model": "animagine-xl-4.0.safetensors",
+  "steps": 28,
+  "cfg": 5.5,
+  "sampler": "euler_ancestral",
+  "scheduler": "normal",
+  "prompt_id": "40f9bc88-c119-4805-9ad4-3ad86bf8e8f6",
+  "gen_sec": 10.0,
+  "created_at": "2026-11-04 22:58:54"
+}

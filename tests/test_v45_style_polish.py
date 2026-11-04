@@ -150,3 +150,19 @@ def test_arcane_cinematic_uses_lora():
     assert 0.5 <= float(style["lora_strength"]) <= 1.0
     prompt = hq._keyframe_prompt(style, "a studio", hq._character_look("laozhou"))
     assert "arcane style" in prompt
+
+
+def test_cyber_scene_templates_and_scenes():
+    """V46：两个赛博场景模板的 act.scene 必须在 contract/v5/scenes 里存在，且 brief 镜数对齐。"""
+    import json as _json
+    repo = pathlib.Path(__file__).resolve().parents[1]
+    scenes = {p.stem for p in (repo / "contract/v5/scenes").glob("*.json")}
+    for tid in ("custom_tpl_v46_undercity", "custom_tpl_v46_council"):
+        tpl = _json.loads((repo / f"contract/v5/custom/templates/{tid}.json").read_text(encoding="utf-8"))
+        assert tpl["render_style"] == "arcane_cinematic"
+        for act in tpl["acts"]:
+            assert act["scene"] in scenes, (tid, act["scene"])
+        brief = _json.loads((repo / f"contract/v5/cinema3d/templates3d/{tid}_semantic.json").read_text(encoding="utf-8"))
+        assert len(brief["shots"]) == len(tpl["acts"])
+        for shot, act in zip(brief["shots"], tpl["acts"]):
+            assert shot["scene"] == act["scene"]

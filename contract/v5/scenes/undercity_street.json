@@ -1,0 +1,120 @@
+{
+  "id": "undercity_street",
+  "label": "底城霓虹巷",
+  "description": "赛博底城街道：湿沥青反光、密集霓虹招牌、蒸汽管道、远处塔楼；适合底城街头与夜归 B-roll。",
+  "tags": [
+    "modern",
+    "cyber",
+    "street",
+    "night",
+    "neon",
+    "slum"
+  ],
+  "aspect": [
+    16,
+    9
+  ],
+  "size": [
+    1600,
+    900
+  ],
+  "seed": 91701,
+  "layers": [
+    {
+      "type": "canvas",
+      "layer": "background",
+      "color": "bg:0"
+    },
+    {
+      "type": "sky_gradient",
+      "layer": "background",
+      "color": "shadow",
+      "opacity": 0.9
+    },
+    {
+      "type": "skyline",
+      "layer": "background",
+      "color": "bg:1",
+      "opacity": 0.85
+    },
+    {
+      "type": "neon_signs",
+      "layer": "midground",
+      "color": "accent:1",
+      "opacity": 0.8
+    },
+    {
+      "type": "street_lamp",
+      "layer": "midground",
+      "color": "highlight",
+      "x": 0.18,
+      "opacity": 0.85
+    },
+    {
+      "type": "bokeh",
+      "layer": "background",
+      "color": "highlight",
+      "density": 0.3,
+      "opacity": 0.25
+    },
+    {
+      "type": "crowd",
+      "layer": "midground",
+      "color": "shadow",
+      "opacity": 0.22
+    },
+    {
+      "type": "rain",
+      "layer": "foreground",
+      "opacity": 0.16
+    },
+    {
+      "type": "grain",
+      "layer": "foreground",
+      "opacity": 0.4
+    },
+    {
+      "type": "vignette",
+      "layer": "foreground",
+      "strength": 0.3
+    }
+  ],
+  "camera_zones": {
+    "wide": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "medium": [
+      0.18,
+      0.1,
+      0.64,
+      0.84
+    ],
+    "close": [
+      0.3,
+      0.08,
+      0.42,
+      0.66
+    ]
+  },
+  "anchors": {
+    "host": [
+      0.4,
+      0.95
+    ],
+    "figure_a": [
+      0.58,
+      0.95
+    ],
+    "figure_b": [
+      0.5,
+      0.96
+    ]
+  },
+  "variants": [
+    "rainy",
+    "late"
+  ]
+}
