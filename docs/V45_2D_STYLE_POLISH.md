@@ -36,6 +36,15 @@
 - **实例**：老周 42 岁 → `42-year-old man, mature adult, middle-aged appearance, defined jawline, subtle facial age lines, composed, experienced, calm, confident`，负面 `teen, boy, shonen, smooth youthful skin, baby face, chibi…`；甜妹 20 岁 → `20-year-old woman, young adult, age-accurate, energetic, cheerful, expressive`，负面反过来禁 `middle-aged / elderly`。
 - 同一份身份句同时进入 `ref2va motion_prompt`（`The character is a 42-year-old man, mature adult, composed…`），保证口型镜头不把角色演回少年。
 
+## 2.5 关键帧抽卡（V45.2）：多 seed 候选 + 人工选卡
+- CLI：`--keyframe-candidates N`（默认 1）对每个有台词镜头同 prompt 多 seed 出图，落到
+  `tmp/v16/keyframes/<tid>/<style>_<ckpt>_ipNN_cN/candidates/<shot>_c0..N.png`，并拼一张
+  `<shot>_sheet.jpg`（每格标 `#index seed score subj`）。
+- 选卡优先级：`--keyframe-pick INDEX` > `tmp/v16/keyframe_picks.json`（`{tid: {shot: index}}`）> 自动分。
+- 自动分只是辅助（细节/饱和度 + 肤色连通域主体面积 + 多主体惩罚），实测会把「特写」排在「中景」前面；
+  **最终以选卡图人工挑选为准**，把索引写进 picks 文件后重跑同一条命令即可（候选图缓存复用，只重做 ref2va）。
+- 示例（日漫电影感，3 候选、人工选 #2/#2）：`python backend/app/routers/custom_hq_runner.py --template custom_tpl_v45_jp_anime --style-mode 2d --2d-style jp_anime --keyframe-candidates 3` → 关键帧日志 `cands=3，pick=#2/picks`，成片 4,763,895B；第 3/9 秒由特写变成带环境的中景。
+
 ## 3. 背景细化：把 IP-Adapter 从「糊背景」调到「保脸 + 出景」
 
 | 项 | V44（问题） | V45（现在） |
@@ -72,11 +81,17 @@
 - 关键帧对比：`tmp/v45/style_compare_v5.png`（4 风格 1024×576 关键帧 2×2）。
 - 前后对比：`tmp/v45/before_after_ip.png`（V44 0.75 → V45 draft 0.58 → V45 final 0.50 + style transfer）。
 
+## 4.5 抽卡实测（2026-11-04 22:24）
+- `v5_002`（老周）3 候选：#0 特写 score 4.161 / #1 远景 3.521 / #2 吧台前中景 2.203（自动分因肤色连通域误判给 #2 低分）
+- `v5_003`（阿栗）3 候选：#1 特写 4.874 / #2 咖啡桌中景 3.098 / #0 偏暗 0.663
+- 人工选 `#2/#2` 写入 `tmp/v16/keyframe_picks.json` 后重跑：关键帧/海报/成片均为中景构图，角色仍在画面主体。
+
 ## 5. 代码改动
 
 - `pipeline/templates3d_hq.py`：风格表加 `ckpt/cfg/steps/sampler/scheduler/ip_strength/ip_end/ip_weight_type/background`；新增 `_character_look`（年龄分层 + persona 映射 + 机器人分支）、`_keyframe_prompt`、`KEYFRAME_NEGATIVE`；`_generate_keyframe` 透传 checkpoint/采样/IP/构图并把参数写进 meta；CLI 新增 `--ip-end`（与 `--ip-strength` 并列）。
 - `imagegen/prompt.py`：新增 `scene_wide` 构图；`imagegen/cli.py`：新增 `--composition`、`--lora/--lora-strength`；`imagegen/workflow.py`：抽 `_base_nodes`，支持 `LoraLoaderModelOnly`（当前无匹配 LoRA，默认关闭）。
 - 后端/前端 label 统一为「吉卜力治愈系」（`cinema_templates/pipeline_ui/v5_catalog/v5_create` + `frontend/src/lib/cinema.ts` + 向导说明）。
+- 关键帧抽卡：`_generate_keyframe(candidates, pick)` + `_score_candidate` / `_contact_sheet` / `_resolve_pick`，CLI `--keyframe-candidates` / `--keyframe-pick`。
 - 新增单测 `tests/test_v45_style_polish.py`（8 项：风格参数齐全、IP 下调、老周 42 岁、年轻角色、机器人、关键帧提示词、B-roll 背景句、关键帧目录命名）。
 - poster 逻辑改关键帧；2D ref2va 的 subject_definitions 补 `outfit (same jacket, same necktie, same colors)`。
 - 镜头 seed 从内置 `hash()`（受 `PYTHONHASHSEED` 随机化，重跑会换 seed）改成 `zlib.crc32`，同一模板重跑可复现同一批镜头。

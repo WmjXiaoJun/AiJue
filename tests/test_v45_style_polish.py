@@ -6,6 +6,7 @@
 """
 from __future__ import annotations
 
+import json
 import pathlib
 import sys
 
@@ -111,3 +112,31 @@ def test_retro_has_age_bias_in_prompt():
     prompt = hq._keyframe_prompt(style, "a studio", hq._character_look("laozhou"))
     assert "45 years old" in prompt
     assert "weathered skin" in prompt
+
+
+def test_resolve_pick_priority(tmp_path, monkeypatch):
+    """V45.2：选卡优先级 CLI > picks 文件 > 自动分。"""
+    cands = [{"score": 1.0}, {"score": 5.0}, {"score": 3.0}]
+    monkeypatch.setattr(hq, "KEYFRAME_PICKS", tmp_path / "none.json")
+    assert hq._resolve_pick("t", "s", cands, 2) == (2, "cli")
+    assert hq._resolve_pick("t", "s", cands, None) == (1, "auto")
+    picks = tmp_path / "picks.json"
+    picks.write_text(json.dumps({"t": {"s": 0}}), encoding="utf-8")
+    monkeypatch.setattr(hq, "KEYFRAME_PICKS", picks)
+    assert hq._resolve_pick("t", "s", cands, None) == (0, "picks")
+    assert hq._resolve_pick("t", "s", cands, 1) == (1, "cli")
+
+
+def test_score_candidate_returns_metrics(tmp_path):
+    """V45.2：候选打分要给出 score/detail/subjects/subject_area（失败也要有默认值）。"""
+    from PIL import Image, ImageDraw
+    png = tmp_path / "cand.png"
+    im = Image.new("RGB", (320, 180), (30, 40, 60))
+    draw = ImageDraw.Draw(im)
+    draw.ellipse((120, 40, 200, 130), fill=(240, 190, 150))
+    im.save(png)
+    score = hq._score_candidate(png)
+    for key in ("score", "detail", "subjects", "subject_area"):
+        assert key in score
+    assert isinstance(score["score"], float)
+    assert hq._score_candidate(tmp_path / "missing.png")["score"] == 0.0

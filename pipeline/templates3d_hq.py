@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import pathlib
 import random
 import re
@@ -146,6 +147,8 @@ def apply_2d_style(prompt: str, broll: bool = False, style_id: str = "jp_anime")
 # V43：2D 对话镜头关键帧（SDXL anime + IP-Adapter 锁脸）
 # --------------------------------------------------------------------------- #
 KEYFRAMES = WORK / "keyframes"
+#: V45.2：2D 关键帧「抽卡」——多 seed 候选 + 人工/自动选优
+KEYFRAME_PICKS = WORK / "keyframe_picks.json"
 
 
 def _character_contract(cid: str) -> dict:
@@ -330,14 +333,126 @@ def _keyframe_dir(tid: str, style_key: str, style: dict,
     return KEYFRAMES / tid / f"{style_key}_{_ckpt_tag(style['ckpt'])}_ip{int(round(ip * 100))}"
 
 
+def _load_keyframe_pick(tid: str, shot_id: str) -> int | None:
+    """读取人工选卡：tmp/v16/keyframe_picks.json = {tid: {shot_id: index}}。"""
+    if not KEYFRAME_PICKS.is_file():
+        return None
+    try:
+        data = json.loads(KEYFRAME_PICKS.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    per_template = data.get(tid) if isinstance(data, dict) else None
+    if not isinstance(per_template, dict):
+        return None
+    try:
+        return int(per_template.get(shot_id))
+    except (TypeError, ValueError):
+        return None
+
+
+def _score_candidate(png: pathlib.Path) -> dict:
+    """候选关键帧打分（辅助）：细节/饱和度 + 主体面积 + 多主体惩罚。
+
+    肤色连通域只是粗代理，审美判断仍以选卡图 + 人工 picks 为准。
+    """
+    try:
+        import cv2  # noqa: PLC0415
+        import numpy as np  # noqa: PLC0415
+    except Exception:  # noqa: BLE001
+        return {"score": 0.0, "detail": 0.0, "subjects": 0, "subject_area": 0.0}
+    img = cv2.imread(str(png))
+    if img is None:
+        return {"score": 0.0, "detail": 0.0, "subjects": 0, "subject_area": 0.0}
+    h, w = img.shape[:2]
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    skin = cv2.inRange(hsv, np.array([0, 30, 60]), np.array([28, 200, 255]))
+    skin = cv2.morphologyEx(skin, cv2.MORPH_CLOSE, np.ones((9, 9), np.uint8))
+    skin = cv2.morphologyEx(skin, cv2.MORPH_OPEN, np.ones((5, 5), np.uint8))
+    n, _labels, stats, _cent = cv2.connectedComponentsWithStats(skin, connectivity=8)
+    total = float(h * w)
+    areas = []
+    for i in range(1, n):
+        _x, _y, bw, bh, area = stats[i]
+        ratio = area / total
+        if ratio < 0.012:
+            continue
+        aspect = bw / max(1, bh)
+        if 0.35 <= aspect <= 3.0:
+            areas.append(float(ratio))
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    detail = float(cv2.Laplacian(gray, cv2.CV_64F).var())
+    sat = float(np.std(hsv[:, :, 1]))
+    largest = max(areas, default=0.0)
+    score = 0.55 * math.log1p(detail) + 0.25 * (sat / 50.0)
+    if 0.03 <= largest <= 0.30:
+        score += 1.0
+    if len(areas) >= 2:
+        score -= 0.6 * (len(areas) - 1)
+    return {"score": round(score, 3), "detail": round(detail, 1),
+            "subjects": len(areas), "subject_area": round(largest, 3)}
+
+
+def _contact_sheet(items: list, out: pathlib.Path, title: str) -> None:
+    """把候选关键帧拼成带序号/seed/分数的选卡图。"""
+    try:
+        from PIL import Image, ImageDraw, ImageFont
+    except Exception:  # noqa: BLE001
+        return
+    if not items:
+        return
+    thumb_w, thumb_h, bar, pad = 512, 288, 34, 10
+    cols = min(2, len(items))
+    rows = (len(items) + cols - 1) // cols
+    canvas = Image.new("RGB", (thumb_w * cols + pad * (cols + 1),
+                               (thumb_h + bar) * rows + pad * (rows + 1)), (16, 18, 24))
+    draw = ImageDraw.Draw(canvas)
+    try:
+        font = ImageFont.truetype("C:/Windows/Fonts/arialbd.ttf", 18)
+    except OSError:
+        font = ImageFont.load_default()
+    for idx, item in enumerate(items):
+        try:
+            with Image.open(item["path"]) as im:
+                tile = im.convert("RGB").resize((thumb_w, thumb_h))
+        except OSError:
+            continue
+        col, row = idx % cols, idx // cols
+        x = pad + col * (thumb_w + pad)
+        y = pad + row * (thumb_h + bar + pad)
+        draw.text((x + 6, y + 6),
+                  f"#{idx} seed={item['seed']} score={item['score']} subj={item['subjects']}",
+                  fill=(255, 255, 255), font=font)
+        canvas.paste(tile, (x, y + bar))
+    draw.text((pad, 6), title, fill=(201, 162, 39), font=font)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    canvas.save(out, quality=90)
+
+
+def _resolve_pick(tid: str, shot_id: str, candidates: list, pick: int | None) -> tuple:
+    """选卡优先级：CLI > keyframe_picks.json > 自动最高分 > 0。"""
+    n = len(candidates)
+    if not n:
+        return 0, "none"
+    if pick is not None and 0 <= int(pick) < n:
+        return int(pick), "cli"
+    saved = _load_keyframe_pick(tid, shot_id)
+    if saved is not None and 0 <= saved < n:
+        return saved, "picks"
+    best = max(range(n), key=lambda i: candidates[i].get("score") or 0.0)
+    return best, "auto"
+
+
 def _generate_keyframe(tid: str, shot: dict, visual: str, seed: int,
                        style_id: str = "jp_anime",
                        ip_strength: float | None = None,
-                       ip_end: float | None = None) -> pathlib.Path:
+                       ip_end: float | None = None,
+                       candidates: int = 1,
+                       pick: int | None = None) -> pathlib.Path:
     """SDXL 关键帧（scene 1280x720，portrait IP-Adapter 锁脸）→ 1024×576。
 
-    V45：每种风格走自己的 checkpoint + 采样参数；IP-Adapter 权重降到 0.5 左右并切成
-    style transfer / 提前 end_at，让背景在采样后段充分生成（脸仍由参考立绘锁住）。
+    V45：每种风格自己的 checkpoint + 采样参数；IP 权重降到 0.5 左右并切 style transfer。
+    V45.2：candidates>1 时同 prompt 多 seed「抽卡」，落候选图 + 选卡图，
+    按 CLI 指定 > tmp/v16/keyframe_picks.json > 自动分 选一张作为正式关键帧。
     """
     style_key = resolve_2d_style(style_id)
     style = STYLE_2D_STYLES[style_key]
@@ -354,52 +469,87 @@ def _generate_keyframe(tid: str, shot: dict, visual: str, seed: int,
         raise RuntimeError(f"{shot_id}: 缺少 anime 立绘 {portrait}")
     look = _character_look(cid)
     ckpt_tag = _ckpt_tag(style["ckpt"])
-    key_dir = _keyframe_dir(tid, style_key, style, effective_ip)
+    n_cand = max(1, int(candidates))
+    base_dir = _keyframe_dir(tid, style_key, style, effective_ip)
+    key_dir = base_dir if n_cand == 1 else base_dir.parent / f"{base_dir.name}_c{n_cand}"
     key_dir.mkdir(parents=True, exist_ok=True)
     key_png = key_dir / f"{shot_id}.png"
     meta_path = key_dir / f"{shot_id}.meta.json"
+    saved_pick = _load_keyframe_pick(tid, shot_id)
+    expected_pick = int(pick) if pick is not None else saved_pick
     if key_png.is_file() and key_png.stat().st_size > 100_000 and meta_path.is_file():
         try:
             cached_meta = json.loads(meta_path.read_text(encoding="utf-8"))
         except (OSError, ValueError):
             cached_meta = {}
-        if (abs(float(cached_meta.get("ip_strength") or -1) - effective_ip) < 0.001
-                and abs(float(cached_meta.get("ip_end") or -1) - effective_end) < 0.001
-                and str(cached_meta.get("ckpt") or "") == str(style["ckpt"])):
+        cached_chosen = int(cached_meta.get("chosen") or 0)
+        params_ok = (abs(float(cached_meta.get("ip_strength") or -1) - effective_ip) < 0.001
+                     and abs(float(cached_meta.get("ip_end") or -1) - effective_end) < 0.001
+                     and str(cached_meta.get("ckpt") or "") == str(style["ckpt"])
+                     and int(cached_meta.get("candidates_count") or 1) == n_cand)
+        if params_ok and (expected_pick is None or expected_pick == cached_chosen):
             return key_png
     spec_path = _imagegen_spec_for(cid, KEYFRAMES / "specs")
-    raw_dir = KEYFRAMES / tid / f"{style_key}_{ckpt_tag}" / f"raw_{shot_id}"
     prompt_extra = _keyframe_prompt(style, visual, look)
     style_negative = str(style.get("negative_extra") or "").strip()
     negative_extra = ", ".join(
         part for part in (KEYFRAME_NEGATIVE, style_negative, ", ".join(look["negatives"])) if part)
-    cmd = [
-        sys.executable, "-m", "imagegen.cli", "generate",
-        "--spec", str(spec_path), "--outdir", str(raw_dir),
-        "--mode", "scene", "--style", style["imagegen"], "--size", "1280x720",
-        "--ckpt", str(style["ckpt"]),
-        "--composition", "scene_wide",
-        "--cfg", f"{float(style['cfg']):.1f}", "--steps", str(int(style["steps"])),
-        "--sampler", str(style["sampler"]), "--scheduler", str(style["scheduler"]),
-        "--ref", str(portrait), "--ip-adapter-strength", f"{effective_ip:.2f}",
-        "--ip-adapter-end-at", f"{effective_end:.2f}",
-        "--ip-adapter-weight-type", str(style["ip_weight_type"]),
-        "--prompt-extra", prompt_extra,
-        "--negative-extra", negative_extra,
-        "--seed", str(seed), "--timeout", "600",
-    ]
-    proc = subprocess.run(cmd, cwd=str(REPO), capture_output=True, text=True,
-                          encoding="utf-8", errors="replace", timeout=660)
-    raw_png = raw_dir / "scene.png"
-    if proc.returncode != 0 or not raw_png.is_file():
-        tail = "\n".join(((proc.stdout or "") + "\n" + (proc.stderr or "")).strip().splitlines()[-8:])
-        raise RuntimeError(f"{shot_id}: imagegen 关键帧失败：{tail[-700:]}")
-    subprocess.run([
-        str(FFMPEG), "-y", "-hide_banner", "-loglevel", "error",
-        "-i", str(raw_png),
-        "-vf", "scale=1024:576:force_original_aspect_ratio=increase,crop=1024:576",
-        str(key_png),
-    ], check=True, capture_output=True, timeout=120)
+
+    def _render(seed_value: int, raw_dir: pathlib.Path, dest: pathlib.Path) -> int:
+        if dest.is_file() and dest.stat().st_size > 100_000:
+            return dest.stat().st_size
+        cmd = [
+            sys.executable, "-m", "imagegen.cli", "generate",
+            "--spec", str(spec_path), "--outdir", str(raw_dir),
+            "--mode", "scene", "--style", style["imagegen"], "--size", "1280x720",
+            "--ckpt", str(style["ckpt"]),
+            "--composition", "scene_wide",
+            "--cfg", f"{float(style['cfg']):.1f}", "--steps", str(int(style["steps"])),
+            "--sampler", str(style["sampler"]), "--scheduler", str(style["scheduler"]),
+            "--ref", str(portrait), "--ip-adapter-strength", f"{effective_ip:.2f}",
+            "--ip-adapter-end-at", f"{effective_end:.2f}",
+            "--ip-adapter-weight-type", str(style["ip_weight_type"]),
+            "--prompt-extra", prompt_extra,
+            "--negative-extra", negative_extra,
+            "--seed", str(seed_value), "--timeout", "600",
+        ]
+        proc = subprocess.run(cmd, cwd=str(REPO), capture_output=True, text=True,
+                              encoding="utf-8", errors="replace", timeout=660)
+        raw_png = raw_dir / "scene.png"
+        if proc.returncode != 0 or not raw_png.is_file():
+            tail = "\n".join(((proc.stdout or "") + "\n" + (proc.stderr or "")).strip().splitlines()[-8:])
+            raise RuntimeError(f"{shot_id}: imagegen 关键帧失败：{tail[-700:]}")
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        subprocess.run([
+            str(FFMPEG), "-y", "-hide_banner", "-loglevel", "error",
+            "-i", str(raw_png),
+            "-vf", "scale=1024:576:force_original_aspect_ratio=increase,crop=1024:576",
+            str(dest),
+        ], check=True, capture_output=True, timeout=120)
+        return dest.stat().st_size
+
+    items: list[dict] = []
+    chosen, pick_source = 0, "single"
+    if n_cand == 1:
+        size = _render(seed, KEYFRAMES / tid / f"{style_key}_{ckpt_tag}" / f"raw_{shot_id}", key_png)
+        score = _score_candidate(key_png)
+        items = [{"index": 0, "seed": seed, "path": str(key_png), "bytes": size, **score}]
+        sheet_path = None
+    else:
+        cand_dir = key_dir / "candidates"
+        for k in range(n_cand):
+            seed_k = seed + k * 7919
+            cand_png = cand_dir / f"{shot_id}_c{k}.png"
+            raw_dir_k = KEYFRAMES / tid / f"{style_key}_{ckpt_tag}" / f"raw_{shot_id}_c{k}"
+            size = _render(seed_k, raw_dir_k, cand_png)
+            score = _score_candidate(cand_png)
+            items.append({"index": k, "seed": seed_k, "path": str(cand_png),
+                          "bytes": size, **score})
+        sheet = cand_dir / f"{shot_id}_sheet.jpg"
+        _contact_sheet(items, sheet, f"{tid} · {shot_id} · {style_key} · {n_cand} cands")
+        chosen, pick_source = _resolve_pick(tid, shot_id, items, pick)
+        shutil.copy2(items[chosen]["path"], key_png)
+        sheet_path = str(sheet)
     meta = {
         "shot": shot_id, "character": cid, "style_2d": style_key,
         "style_label": style["label"], "imagegen_style": style["imagegen"],
@@ -408,6 +558,8 @@ def _generate_keyframe(tid: str, shot: dict, visual: str, seed: int,
         "composition": "scene_wide",
         "ip_strength": effective_ip, "ip_end": effective_end,
         "ip_weight_type": style["ip_weight_type"],
+        "candidates_count": n_cand, "chosen": chosen, "pick_source": pick_source,
+        "candidates": items, "sheet": sheet_path,
         "age_identity": look["identity"], "age": look["age"], "gender": look["gender"],
         "age_negatives": look["negatives"],
         "prompt_extra": prompt_extra, "negative_extra": negative_extra,
@@ -416,9 +568,8 @@ def _generate_keyframe(tid: str, shot: dict, visual: str, seed: int,
     meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
     log(f"[2D] 关键帧 {shot_id} ← {cid}（{style_key}/{style['label']}，{ckpt_tag}，"
         f"IP={effective_ip:.2f}→{effective_end:.2f}/{style['ip_weight_type']}，"
-        f"{raw_png.stat().st_size} B）")
+        f"cands={n_cand}，pick=#{chosen}/{pick_source}）")
     return key_png
-
 
 def log(message: str) -> None:
     line = f"[{time.strftime('%H:%M:%S')}] {message}"
@@ -593,6 +744,10 @@ def main(argv=None) -> int:
                     help="V45：覆盖 2D 关键帧 IP-Adapter 权重（默认按风格，0.45~0.5）")
     ap.add_argument("--ip-end", dest="ip_end", type=float, default=None,
                     help="V45：覆盖 IP-Adapter 结束步（默认按风格，越早结束背景越自由）")
+    ap.add_argument("--keyframe-candidates", dest="keyframe_candidates", type=int, default=1,
+                    help="V45.2：2D 关键帧抽卡数（>1 时同 prompt 多 seed，出候选图+选卡图）")
+    ap.add_argument("--keyframe-pick", dest="keyframe_pick", type=int, default=None,
+                    help="V45.2：指定候选序号（缺省读 tmp/v16/keyframe_picks.json，再退回自动分）")
     ap.add_argument("--skip-t2va", action="store_true")
     ap.add_argument("--skip-ref2va", action="store_true")
     ap.add_argument("--reuse-shots", action="store_true",
@@ -603,6 +758,8 @@ def main(argv=None) -> int:
     style_2d = resolve_2d_style(getattr(args, "style_2d", "jp_anime"))
     ip_strength = getattr(args, "ip_strength", None)
     ip_end = getattr(args, "ip_end", None)
+    keyframe_candidates = max(1, int(getattr(args, "keyframe_candidates", 1) or 1))
+    keyframe_pick = getattr(args, "keyframe_pick", None)
     briefs = briefs_for(tid)
     shots = [s for s in briefs["shots"] if s.get("prompt")]
     archive = REPO / f"outputs/_archive_v15_ref2va_768/{tid}/shots"
@@ -639,7 +796,9 @@ def main(argv=None) -> int:
             visual = str(shot.get("semantic_visual") or "").strip()
             try:
                 keyframe = _generate_keyframe(tid, shot, visual, seed, style_2d,
-                                             ip_strength, ip_end)
+                                             ip_strength, ip_end,
+                                             candidates=keyframe_candidates,
+                                             pick=keyframe_pick)
                 final_src = gen_ref2va(tid, shot, keyframe, seed, style_mode,
                                        keyframe=keyframe, style_id=style_2d,
                                        age_identity=age_identity)
