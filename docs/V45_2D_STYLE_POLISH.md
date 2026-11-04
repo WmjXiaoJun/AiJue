@@ -49,16 +49,23 @@
 
 效果对比：`tmp/v45/before_after_ip.png`（V44 0.75 线性 → 大特写 + 光效糊底；V45 0.50 style transfer → 中景 + 完整房间/街景）。关键帧 meta 里记录 `ckpt / cfg / steps / ip_strength / ip_end / ip_weight_type / age_identity`，可直接复查每次生成用了什么。
 
-## 4. 四风格对比（同一角色 / 同一场景 / 同一 seed）
+## 4. 四风格对比（同一角色 / 同一场景）
 
-`tmp/v45/style_compare_v5.png`（2×2 拼图）+ `tmp/v45/frames/<style>/frame_01~06.png`（成片抽帧）。
+`tmp/v45/style_compare_v5.png`（关键帧 2×2）、`tmp/v45/posters_compare_v5.png`（新海报 2×2）、`tmp/v45/films_compare_v5.png`（成片 3s 处）、`tmp/v45/frames/<style>/frame_01~06.png`。
 
-| 风格 | 关键帧 | 成片 | 耗时 |
+**2026-11-04 18:28–18:59 全量重跑**（清 `tmp/v16/clips` 缓存 → 经 `POST /api/pipeline/run` 重跑 H3 → 剪辑 → 同步 2D）：
+
+| 风格 | 关键帧目录 | 成片 | 本轮耗时 / 体积 |
 |---|---|---|---|
-| 日漫电影感 | `tmp/v16/keyframes/custom_tpl_v45_jp_anime/jp_anime_animaginexl4_ip50` | `outputs/templates_3d/custom_tpl_v45_jp_anime/final.mp4` | **272.8s**，4,641,372B |
-| 国漫国风 | `.../guoman_aamxlanimemix_ip48` | `outputs/templates_3d/custom_tpl_v45_guoman/final.mp4` | **~267s**，4,962,538B |
-| 复古赛璐璐 | `.../retro_cel_illustriousxlv_ip55` | `outputs/templates_3d/custom_tpl_v45_retro_cel/final.mp4` | **289s**（IP 0.55 复跑），4,252,030B |
-| 吉卜力治愈系 | `.../soft_watercolor_aamxlanimemix_ip48` | `outputs/templates_3d/custom_tpl_v45_soft_watercolor/final.mp4` | **~517s**，5,261,985B |
+| 日漫电影感 | `.../jp_anime_animaginexl4_ip50` | `outputs/templates_3d/custom_tpl_v45_jp_anime/final.mp4` | **460.2s**，4,492,509B |
+| 国漫国风 | `.../guoman_aamxlanimemix_ip48` | `outputs/templates_3d/custom_tpl_v45_guoman/final.mp4` | **470.2s**，4,836,850B |
+| 复古赛璐璐 | `.../retro_cel_illustriousxlv_ip55` | `outputs/templates_3d/custom_tpl_v45_retro_cel/final.mp4` | **470.2s**，5,030,942B |
+| 吉卜力治愈系 | `.../soft_watercolor_aamxlanimemix_ip48` | `outputs/templates_3d/custom_tpl_v45_soft_watercolor/final.mp4` | **470.2s**，4,886,364B |
+
+### 4.1 海报（poster）改为角色关键帧
+- 旧逻辑：海报取「第 1 幕 B-roll」= 同一个霓虹演播室，4 张卡只有色差。
+- 新逻辑（`templates3d_hq.main`）：优先取**有台词镜头的风格关键帧**（`_keyframe_dir(...)/<shot>.png` → ffmpeg 缩 960×540），没有关键帧时回落到该镜头 1.2s 抽帧；日志会写 `海报 ← 关键帧 v5_002`。
+- 同步：API 跑完 `_sync_2d_outputs` 会把 `final.mp4` + `poster.jpg` 复制到 `templates_2d`，模板库卡片立刻换成角色封面（4 张卡一眼可辨：霓虹演播室 / 中式窗棂 / 90s 蓝调 / 暖金手绘）。
 
 - 抽帧：`tmp/v45/frames/<style>/frame_01~06.png`（1/3/5/7/9/12s）。
 - 成片对比：`tmp/v45/films_compare_v5.png`（4 条成片 3s 处，同角色同机位）。
@@ -70,7 +77,9 @@
 - `pipeline/templates3d_hq.py`：风格表加 `ckpt/cfg/steps/sampler/scheduler/ip_strength/ip_end/ip_weight_type/background`；新增 `_character_look`（年龄分层 + persona 映射 + 机器人分支）、`_keyframe_prompt`、`KEYFRAME_NEGATIVE`；`_generate_keyframe` 透传 checkpoint/采样/IP/构图并把参数写进 meta；CLI 新增 `--ip-end`（与 `--ip-strength` 并列）。
 - `imagegen/prompt.py`：新增 `scene_wide` 构图；`imagegen/cli.py`：新增 `--composition`、`--lora/--lora-strength`；`imagegen/workflow.py`：抽 `_base_nodes`，支持 `LoraLoaderModelOnly`（当前无匹配 LoRA，默认关闭）。
 - 后端/前端 label 统一为「吉卜力治愈系」（`cinema_templates/pipeline_ui/v5_catalog/v5_create` + `frontend/src/lib/cinema.ts` + 向导说明）。
-- 新增单测 `tests/test_v45_style_polish.py`（7 项：风格参数齐全、IP 下调、老周 42 岁、年轻角色、机器人、关键帧提示词、B-roll 背景句）。
+- 新增单测 `tests/test_v45_style_polish.py`（8 项：风格参数齐全、IP 下调、老周 42 岁、年轻角色、机器人、关键帧提示词、B-roll 背景句、关键帧目录命名）。
+- poster 逻辑改关键帧；2D ref2va 的 subject_definitions 补 `outfit (same jacket, same necktie, same colors)`。
+- 镜头 seed 从内置 `hash()`（受 `PYTHONHASHSEED` 随机化，重跑会换 seed）改成 `zlib.crc32`，同一模板重跑可复现同一批镜头。
 
 ## 6. 验收
 
@@ -107,7 +116,8 @@
 
 - 4 风格 3 底模（见 §1）；要完全一一对应可补一个 SDXL 动漫底模并改风格表 `ckpt`。
 - H3 ref2va 只吃关键帧首帧，年龄/气质靠首帧与口型句双重约束；若某风格脸仍偏年轻，优先降该风格 `ip_strength` 0.02 或加 `no youthful face` 负面。
-- 成片阶段仍有 2 处观察到的 H3 抖动（与关键帧无关）：
+- 关键帧层仍有一次观察到的服装漂移：`soft_watercolor` 的 v5_002 被画成「白衬衫 + 吊带」（合同是深蓝西装），说明 outfit 一致性主要取决于关键帧 seed；需要更硬约束可在 `_keyframe_prompt` 追加 `wearing navy blue suit, white shirt, necktie` 并加负面 `suspenders`。
+- 成片阶段曾有 2 处 H3 抖动观察（与关键帧无关）：
   - `soft_watercolor` 第 2 幕把西装换成了「白衬衫 + 吊带」（关键帧里仍是西装），H3 对 outfit 的保持弱于脸；
   - `guoman` 第 3 幕窗面上出现一圈「发光线稿」残影，属于 H3 对 reference 线稿的误读，可后续在 motion prompt 加 `no glowing outline, no neon trace`。
 - 旧 2D demo 模板（`custom_tpl_v41_2d_demo` / `custom_tpl_v44_guoman`）保留作历史对照，未删除，避免 V41–V44 文档里的看片链接失效。

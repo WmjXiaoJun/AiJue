@@ -83,3 +83,11 @@ def test_broll_prompt_has_background_detail():
     assert hq.STYLE_2D_STYLES["guoman"]["prompt"] in prompt
     assert "detailed background" in prompt
     assert "no 3D" in prompt
+
+def test_keyframe_dir_encodes_style_ckpt_and_ip():
+    """V45：关键帧目录按 风格_底模_IP 分层，poster 与生成共用同一路径（换权重不会串图）。"""
+    style = hq.STYLE_2D_STYLES["guoman"]
+    d = hq._keyframe_dir("tpl", "guoman", style, 0.48)
+    assert d.name == "guoman_aamxlanimemix_ip48", d
+    d2 = hq._keyframe_dir("tpl", "retro_cel", hq.STYLE_2D_STYLES["retro_cel"], None)
+    assert d2.name.startswith("retro_cel_illustriousxlv_ip"), d2

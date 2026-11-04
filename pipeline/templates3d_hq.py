@@ -22,6 +22,7 @@ import shutil
 import subprocess
 import sys
 import time
+import zlib
 
 REPO = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
@@ -298,6 +299,14 @@ def _ckpt_tag(ckpt: str) -> str:
     return re.sub(r"[^a-z0-9]+", "", str(ckpt).split(".")[0].lower())[:14] or "ckpt"
 
 
+def _keyframe_dir(tid: str, style_key: str, style: dict,
+                  ip_strength: float | None = None) -> pathlib.Path:
+    """V45：关键帧缓存目录（风格 _ 底模 _ IP 权重），poster/生成共用同一套命名。"""
+    ip = float(ip_strength) if ip_strength is not None else float(style["ip_strength"])
+    ip = max(0.0, min(1.0, ip))
+    return KEYFRAMES / tid / f"{style_key}_{_ckpt_tag(style['ckpt'])}_ip{int(round(ip * 100))}"
+
+
 def _generate_keyframe(tid: str, shot: dict, visual: str, seed: int,
                        style_id: str = "jp_anime",
                        ip_strength: float | None = None,
@@ -322,7 +331,7 @@ def _generate_keyframe(tid: str, shot: dict, visual: str, seed: int,
         raise RuntimeError(f"{shot_id}: 缺少 anime 立绘 {portrait}")
     look = _character_look(cid)
     ckpt_tag = _ckpt_tag(style["ckpt"])
-    key_dir = KEYFRAMES / tid / f"{style_key}_{ckpt_tag}_ip{int(round(effective_ip * 100))}"
+    key_dir = _keyframe_dir(tid, style_key, style, effective_ip)
     key_dir.mkdir(parents=True, exist_ok=True)
     key_png = key_dir / f"{shot_id}.png"
     meta_path = key_dir / f"{shot_id}.meta.json"
@@ -447,7 +456,8 @@ def motion_prompt(shot: dict, style_mode: str = "3d", style_id: str = "jp_anime"
         age_line = f" The character is {age_identity}." if age_identity else ""
         return (
             "subject_definitions: Subject 1 is the character shown in the reference image, preserving their exact face, "
-            "hairstyle, hair color, outfit, age and 2D anime art style; cel-shaded, clean line art, flat colors."
+            "hairstyle, hair color, outfit (same jacket, same necktie, same colors), age and 2D anime art style; "
+            "cel-shaded, clean line art, flat colors."
             f"{age_line}\n\n"
             f"summary: {STYLE_2D_PREFIX}. {style['prompt']}. {visual or 'A cinematic 2D anime scene.'} "
             f"The shot is a medium or medium-wide 2D anime composition that keeps the surrounding set visible; {move}. "
@@ -591,7 +601,8 @@ def main(argv=None) -> int:
         if args.reuse_shots and existing.is_file() and existing.stat().st_size > 100_000:
             log(f"[{i}/{len(shots)}] {shot['id']} ok (reuse)")
             continue
-        seed = 20261102 + abs(hash(tid + shot["id"])) % 100000
+        # V45：用 crc32 而不是内置 hash()（后者受 PYTHONHASHSEED 随机化，重跑同模板会换 seed）
+        seed = 20261102 + zlib.crc32((tid + shot["id"]).encode("utf-8")) % 100000
         has_line = bool(str(shot.get("line") or "").strip())
         age_identity = ""
         if style_mode == "2d" and has_line:
@@ -625,13 +636,27 @@ def main(argv=None) -> int:
     _ensure_card_shots(tid)
     report = t3.assemble(tid)
     final = t3.OUT3D / tid / "final.mp4"
-    # 海报取无台词镜头
-    broll = next((s for s in shots if not str(s.get("line") or "").strip()), shots[0])
-    clip = out_shots / f"{broll['id']}.mp4"
-    if clip.is_file():
+    # V45：海报优先用「有台词镜头」的风格关键帧（带角色 + 该风格的脸/服装），
+    # 这样 4 种风格的封面才看得出差异；没有关键帧时回落到该镜头 1.2s 处抽帧。
+    poster_out = t3.OUT3D / tid / "poster.jpg"
+    poster_shot = next((s for s in shots if str(s.get("line") or "").strip()), None) or shots[0]
+    clip = out_shots / f"{poster_shot['id']}.mp4"
+    poster_key = None
+    if style_mode == "2d":
+        key_candidate = _keyframe_dir(tid, style_2d, STYLE_2D_STYLES[style_2d],
+                                      ip_strength) / f"{poster_shot['id']}.png"
+        if key_candidate.is_file():
+            poster_key = key_candidate
+    if poster_key is not None:
         subprocess.run([str(FFMPEG), "-y", "-hide_banner", "-loglevel", "error",
-                        "-ss", "2.2", "-i", str(clip), "-frames:v", "1", "-q:v", "3",
-                        "-vf", "scale=960:-1", str(t3.OUT3D / tid / "poster.jpg")], check=False)
+                        "-i", str(poster_key), "-frames:v", "1", "-q:v", "3",
+                        "-vf", "scale=960:-1", str(poster_out)], check=False)
+        log(f"海报 ← 关键帧 {poster_shot['id']}（{style_2d}）")
+    elif clip.is_file():
+        subprocess.run([str(FFMPEG), "-y", "-hide_banner", "-loglevel", "error",
+                        "-ss", "1.2", "-i", str(clip), "-frames:v", "1", "-q:v", "3",
+                        "-vf", "scale=960:-1", str(poster_out)], check=False)
+        log(f"海报 ← 镜头 {poster_shot['id']} @1.2s")
     log(f"完成: {json.dumps(report.get('probe', {}).get('format', {}), ensure_ascii=False)}")
     return 0
 
