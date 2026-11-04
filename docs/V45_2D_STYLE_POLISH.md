@@ -74,10 +74,26 @@
 
 ## 6. 验收
 
+### 6.0 全流程自检（2026-11-04 17:39–17:55，真实跑）
+`python scripts/verify_v45_2d_flow.py` → **33/33 passed**（证据 `tmp/v45_flow_check.json`）：
+- 健康 `/api/health` 200；`/api/v5/catalog` 30 个模板，4 个 V45 模板都带 `render_style` + 中文 label（`soft_watercolor` = 吉卜力治愈系）
+- 负例：非法 `render_style` → 400 且报错列出 4 个合法值
+- 新建 `render_type=2d, render_style=soft_watercolor` 模板 → 合同 / `episode.json` / 4 镜 semantic brief 全部落盘（TTS 4 条音频）
+- 分派命令：4 个风格各自 `--style-mode 2d --2d-style <style>`；3D 模板（tonight_show）只有 `--style-mode 3d`，无 `--2d-style`
+- 新模板真生成：4/4 镜完成 → `templates_3d/final.mp4` 4,817,172B → 同步 `templates_2d` → `/media/...` 200 可播；关键帧 meta 记录 `ckpt=AAM_XL_Anime_Mix / ip 0.48→0.55 / age=42`
+- 删除：有终稿时 400（保护）；清掉产物后删除 200，合同 + semantic + workdir 全清，模板数回到 30
+- 前端：`/` 200，`frontend/dist/assets/*.js` 内含「吉卜力治愈系」
+
+### 6.1 4 条样片可播（同一 cast / 同一 4 幕）
+`/media/templates_2d/<tid>/final.mp4` 全部 200：jp_anime 4,641,372B / guoman 4,962,538B / retro_cel 4,252,030B / soft_watercolor 5,261,985B。
+
+> 注意：`custom_hq_runner`/`templates3d_hq` **命令行直跑**只写 `outputs/templates_3d`；同步到 `templates_2d`（`/media` 用的目录）要走 `POST /api/pipeline/run` 或 `cinema_templates._sync_2d_outputs`。本次 4 条已全部走 API 重剪辑同步。
+
+### 6.2 原有验收项
 1. 4 条样片全部 done，可直接播放对比（同一 cast / 同一 4 幕）。
 2. 老周在 4 条样片里都是 40+ 成熟男性（关键帧 meta 记录 `age 42` 约束）。
 3. 背景不再是抽象色块/光效：四风格各有可辨识环境（霓虹演播室 / 中式木构窗棂 / 雨夜 90s 窗景 / 暖金手绘窗景）。
-4. `python -m pytest tests/test_v45_style_polish.py` 7 passed；`tests/test_v5_catalog.py` 24 passed / 2 failed（`custom_lin` 缺示例角色、`relic_talk` 缺 packaging，均为本次改动之外的既有数据问题）。
+4. `python -m pytest tests/test_v45_style_polish.py` 7 passed；`tests/test_api.py -k "render or template or style"` 3 passed；`tests/test_v5_catalog.py` 24 passed / 2 failed——两个失败是既有数据问题：`git grep custom_lin fe55c3d` 为空（V45 之前就没有该示例角色合同）、`relic_talk.json` 的 packaging 自 v6.3 起未改动。
 5. 前端 `npm run build`（tsc + vite）通过。
 
 ## 7. 遗留
