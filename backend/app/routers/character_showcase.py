@@ -400,3 +400,247 @@ def list_showcase_packages() -> Dict[str, Any]:
                 "generated_at": metadata.get("generated_at"),
             })
     return {"ok": True, "count": len(rows), "packages": rows}
+
+
+# --------------------------------------------------------------------------- #
+# V38：合集单角色切条包（每个角色一条 audition.mp4 + srt + meta）
+# --------------------------------------------------------------------------- #
+class SplitShowcaseBody(BaseModel):
+    force: bool = False
+
+
+_SPLIT_SLUG = "character_audition_clips"
+
+
+def _split_jobs() -> List[Dict[str, Any]]:
+    """每个角色取最新 done + subtitles_burned 的试镜任务（视频/SRT 均存在）。"""
+    catalog = _catalog()
+    latest: Dict[str, tuple] = {}
+    if not _AUDITION_DIR.is_dir():
+        return []
+    for path in _AUDITION_DIR.glob("*.json"):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if data.get("status") != "done" or not data.get("subtitles_burned"):
+            continue
+        cid = str(data.get("character") or "")
+        if not cid:
+            continue
+        job_id = str(data.get("id") or "")
+        video = _DEMO_DIR / f"{cid}_{job_id}_sub.mp4"
+        srt_url = str(data.get("srt_url") or "")
+        if not srt_url:
+            continue
+        rel = urllib.parse.unquote(srt_url.split("?")[0])
+        if rel.startswith("/media/"):
+            rel = rel[len("/media/"):]
+        srt = Path(config.OUTPUTS_DIR) / rel
+        if not video.is_file() or video.stat().st_size <= 0:
+            continue
+        if not srt.is_file() or srt.stat().st_size <= 0:
+            continue
+        mtime = path.stat().st_mtime
+        if cid not in latest or mtime > latest[cid][0]:
+            latest[cid] = (mtime, data, video, srt)
+    rows: List[Dict[str, Any]] = []
+    for cid, (_mtime, data, video, srt) in sorted(latest.items()):
+        label = str((catalog.get(cid) or {}).get("label") or cid)
+        lines = data.get("lines") or []
+        if not lines and data.get("text"):
+            lines = [str(data.get("text"))]
+        rows.append({
+            "character": cid,
+            "label": label,
+            "job_id": str(data.get("id") or ""),
+            "style": data.get("style"),
+            "background": data.get("background") or "studio",
+            "background_label": data.get("background_label") or "棚拍",
+            "camera": data.get("camera") or "medium",
+            "camera_label": data.get("camera_label") or "中景",
+            "lines": [str(line) for line in lines if str(line).strip()],
+            "duration_sec": data.get("duration_sec"),
+            "size_bytes": video.stat().st_size,
+            "video": video,
+            "srt": srt,
+        })
+    return rows
+
+
+def _split_signature(rows: List[Dict[str, Any]]) -> str:
+    return "|".join(f"{row['character']}:{row['job_id']}" for row in rows)
+
+
+def _read_zip_json(path: Path, name: str) -> Optional[Dict[str, Any]]:
+    try:
+        with zipfile.ZipFile(path) as zf:
+            if name not in zf.namelist():
+                return None
+            data = json.loads(zf.read(name).decode("utf-8"))
+            return data if isinstance(data, dict) else None
+    except (OSError, ValueError, zipfile.BadZipFile, UnicodeDecodeError):
+        return None
+
+
+def _split_readme(manifest: Dict[str, Any]) -> str:
+    lines = [
+        "试镜合集 · 单角色切条包",
+        "",
+        "一、包内文件",
+        "  clips/<character>/audition.mp4   该角色试镜视频（字幕已烧录）",
+        "  clips/<character>/audition.srt   该角色试镜 SRT",
+        "  clips/<character>/meta.json      角色/台词/时长/背景/机位/风格",
+        "  manifest.json                    角色清单 + 条目数 + 总时长",
+        "  README.txt                       本说明",
+        "",
+        "二、角色条目（%d 个）" % len(manifest.get("characters") or []),
+    ]
+    for row in manifest.get("characters") or []:
+        lines.append(f"  - {row.get('label')}（{row.get('character')}）："
+                     f"{row.get('duration_sec')}s，{row.get('job_id')}")
+    lines.extend([
+        "",
+        "三、使用说明",
+        "  每个角色的视频与 SRT 已按目录拆好，可直接逐个上传/剪辑；",
+        "  标题/简介可用 meta.json 中的角色 label 与台词；",
+        "  字幕已烧录，SRT 可用于平台字幕或二次剪辑。",
+        "",
+    ])
+    return "\n".join(lines)
+
+
+def _build_split_package(force: bool = False) -> Dict[str, Any]:
+    rows = _split_jobs()
+    if not rows:
+        raise HTTPException(status_code=400,
+                            detail="没有可用的已完成试镜任务（需 done + 烧录字幕 + 视频/SRT 存在）")
+    _PUBLISH_DIR.mkdir(parents=True, exist_ok=True)
+    target = _PUBLISH_DIR / f"{_SPLIT_SLUG}.zip"
+    signature = _split_signature(rows)
+    with _BUILD_LOCK:
+        if target.is_file() and not force:
+            cached = _read_zip_json(target, "manifest.json")
+            if cached and str(cached.get("signature") or "") == signature:
+                return _split_view(target, cached, cached_flag=True)
+        work = Path(tempfile.mkdtemp(prefix=".split-", dir=str(_DEMO_DIR)))
+        try:
+            meta_rows: List[Dict[str, Any]] = []
+            files: List[Dict[str, Any]] = []
+            for row in rows:
+                cid = row["character"]
+                folder = work / "clips" / cid
+                folder.mkdir(parents=True, exist_ok=True)
+                video_dest = folder / "audition.mp4"
+                srt_dest = folder / "audition.srt"
+                shutil.copy2(row["video"], video_dest)
+                shutil.copy2(row["srt"], srt_dest)
+                meta = {
+                    "character": cid,
+                    "label": row["label"],
+                    "job_id": row["job_id"],
+                    "style": row["style"],
+                    "background": row["background"],
+                    "background_label": row["background_label"],
+                    "camera": row["camera"],
+                    "camera_label": row["camera_label"],
+                    "lines": row["lines"],
+                    "duration_sec": row["duration_sec"],
+                    "size_bytes": row["size_bytes"],
+                    "video": f"clips/{cid}/audition.mp4",
+                    "srt": f"clips/{cid}/audition.srt",
+                }
+                (folder / "meta.json").write_text(
+                    json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
+                for name, path in (("audition.mp4", video_dest),
+                                   ("audition.srt", srt_dest),
+                                   ("meta.json", folder / "meta.json")):
+                    files.append({"name": f"clips/{cid}/{name}",
+                                  "size": path.stat().st_size})
+                meta_rows.append({
+                    "character": cid, "label": row["label"], "job_id": row["job_id"],
+                    "duration_sec": row["duration_sec"], "size_bytes": row["size_bytes"],
+                    "video": f"clips/{cid}/audition.mp4",
+                    "srt": f"clips/{cid}/audition.srt",
+                    "meta": f"clips/{cid}/meta.json",
+                })
+            total_duration = round(sum(float(row.get("duration_sec") or 0) for row in rows), 2)
+            manifest = {
+                "title": "试镜合集 · 单角色切条包",
+                "generated_at": _now_iso(),
+                "count": len(meta_rows),
+                "total_duration_sec": total_duration,
+                "total_size_bytes": sum(int(row["size_bytes"] or 0) for row in rows),
+                "signature": signature,
+                "characters": meta_rows,
+            }
+            manifest_bytes = json.dumps(manifest, ensure_ascii=False, indent=2).encode("utf-8")
+            readme_bytes = _split_readme(manifest).encode("utf-8")
+            tmp_zip = target.with_name(f".{target.name}.tmp-{os.getpid()}-{threading.get_ident()}")
+            with zipfile.ZipFile(tmp_zip, "w", compression=zipfile.ZIP_DEFLATED,
+                                 compresslevel=6) as zf:
+                for file_row in files:
+                    zf.write(work / file_row["name"], arcname=file_row["name"])
+                zf.writestr("manifest.json", manifest_bytes)
+                zf.writestr("README.txt", readme_bytes)
+            files.append({"name": "manifest.json", "size": len(manifest_bytes)})
+            files.append({"name": "README.txt", "size": len(readme_bytes)})
+            os.replace(tmp_zip, target)
+        finally:
+            shutil.rmtree(work, ignore_errors=True)
+        view = _split_view(target, manifest, cached_flag=False)
+        view["files"] = files
+        return view
+
+
+def _split_view(path: Path, manifest: Dict[str, Any], *, cached_flag: bool) -> Dict[str, Any]:
+    stat = path.stat()
+    files = []
+    try:
+        with zipfile.ZipFile(path) as zf:
+            files = [{"name": entry.filename, "size": int(entry.file_size)}
+                     for entry in zf.infolist() if not entry.is_dir()]
+    except (OSError, zipfile.BadZipFile):
+        pass
+    return {
+        "ok": True,
+        "package_url": f"/media/character_demos/publish/{path.name}?t={int(stat.st_mtime)}",
+        "filename": path.name,
+        "size_bytes": int(stat.st_size),
+        "files": files,
+        "characters": manifest.get("characters") or [],
+        "count": int(manifest.get("count") or 0),
+        "total_duration_sec": manifest.get("total_duration_sec"),
+        "total_size_bytes": manifest.get("total_size_bytes"),
+        "cached": cached_flag,
+        "generated_at": manifest.get("generated_at"),
+        "path": str(path),
+    }
+
+
+@router.post("/api/v5/character-showcase/split-packages",
+             summary="构建合集单角色切条包（每角色 mp4+srt+meta）")
+def build_split_package(payload: SplitShowcaseBody = Body(default=SplitShowcaseBody())) -> Dict[str, Any]:
+    return _build_split_package(bool(payload.force))
+
+
+@router.get("/api/v5/character-showcase/split-packages",
+            summary="列出合集单角色切条包")
+def list_split_packages() -> Dict[str, Any]:
+    rows: List[Dict[str, Any]] = []
+    if _PUBLISH_DIR.is_dir():
+        for path in sorted(_PUBLISH_DIR.glob(f"{_SPLIT_SLUG}*.zip"),
+                           key=lambda item: item.stat().st_mtime, reverse=True):
+            manifest = _read_zip_json(path, "manifest.json") or {}
+            stat = path.stat()
+            rows.append({
+                "filename": path.name,
+                "package_url": f"/media/character_demos/publish/{path.name}"
+                               f"?t={int(stat.st_mtime)}",
+                "size_bytes": int(stat.st_size),
+                "count": manifest.get("count"),
+                "total_duration_sec": manifest.get("total_duration_sec"),
+                "characters": manifest.get("characters") or [],
+                "generated_at": manifest.get("generated_at"),
+            })
+    return {"ok": True, "count": len(rows), "packages": rows}

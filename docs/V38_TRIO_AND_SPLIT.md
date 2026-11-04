@@ -40,3 +40,29 @@ body `{force?: bool}`
 - **tpl-backend**：dialogue 三人扩展 + split-packages + 自测
 - **tpl-frontend**：三人对戏 UI + 切条包 UI + 截图
 - **Lead**：真实三人生成 + 切条包验证、截图、docs、commit
+
+
+## 5. 交付结果（2026-11-04 09:32）
+
+### A. 三人对戏（后端 24/24 PASS）
+- `POST /api/v5/characters/dialogue` 增加 `character_c` / `scene_c`；speaker 支持 `c`；A/B/C 互不相同、三人立绘齐全；lines 2–6、每行 ≤60、总估算 ≤24s；新增 7 类 400
+- 返回 `characters:{a,b,c}`、`scenes:{a,b,c}` 与每镜角色/场景；片头卡「A × B × C」；其余沿用 V37
+- 实测（后端）：老周 studio/closeup × 甜妹 cafe/medium × 大魏 street/medium 3 行 **done，372.4s**；1,945,837B / 17.77s / 1024×576 / 24fps / AAC；三镜场景/角色正确、差异 57–75%；SRT 3 条
+- 看片：`/media/character_demos/dialogue_dlg_e65683b51eb2.mp4`
+- 帧：`tmp/v38/frame_line1~3.png`（老周棚拍近景 / 甜妹咖啡馆中景 / 大魏霓虹街头）
+
+### B. 单角色切条包（后端 24/24 PASS）
+- 新增 `POST/GET /api/v5/character-showcase/split-packages`：取每角色最新 done+subtitles_burned 试镜任务，zip 含 `clips/<char>/{audition.mp4,audition.srt,meta.json}` + `manifest.json` + README；无任务 400；按角色→job 签名缓存，force 重建
+- 实测：**8,568,988B / 38 文件 / 12 角色 / 总时长 69.79s**；12 个 meta 可解析、12 个 SRT 非空；cached/force 正常
+- 下载：`/media/character_demos/publish/character_audition_clips.zip`
+- Lead E2E：下载解压 38 文件（12 mp4 + 12 srt + 12 meta + manifest + README），manifest 含 12 角色
+
+### 前端
+- 双人对戏弹层新增「加入第三角色（三人群聊）」开关：角色 C 下拉 + 场景 C 行；台词行 speaker 下拉 A/B/C；校验（重复/C 未选/speaker C 无角色 C）；完成/最近列表显示 2–3 人 + A/B/C 场景标签
+- 试镜合集弹层新增「单角色切条包」区块：构建/重新构建（force）、下载 zip、角色数/文件数/大小/cached、角色 chips + 文件清单
+- 截图 `tmp/v38/ui/`（8 张）+ `tmp/v38/lead/`（2 张）；`tsc` 0 / build / console 无 error
+
+### 说明 / 遗留
+- 三行约 6–7 分钟（loading 建议 ≥10 分钟）；每行 H3 约 5.167s
+- 切条包旧任务缺背景/机位字段时会回退棚拍/中景；重新生成某角色后下次构建自动替换
+- 三人对戏总时长上限 24s；H3 原生 24fps

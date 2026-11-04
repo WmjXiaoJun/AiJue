@@ -5,8 +5,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { errorText } from "../../lib/api";
 import type { V5CatalogResponse, V5CharacterSummary } from "../../lib/v5";
 import { mediaSrc, characterArtUrl, characterPreviewUrl, v5api } from "../../lib/v5";
-import { auditionApi, CreationError, creationApi, creationErrorMessage, dialogueApi, isAuditionActive, isDialogueActive, isPromoActive, promoApi, showcaseApi } from "../../lib/creation";
-import type { AuditionBackground, AuditionCamera, AuditionJob, AuditionStyle, DialogueJob, DialogueSpeaker, PromoJob, PromoSceneInput, ShowcasePackage } from "../../lib/creation";
+import { auditionApi, CreationError, creationApi, creationErrorMessage, dialogueApi, isAuditionActive, isDialogueActive, isPromoActive, promoApi, showcaseApi, splitPackageApi } from "../../lib/creation";
+import type { AuditionBackground, AuditionCamera, AuditionJob, AuditionStyle, DialogueJob, DialogueSpeaker, PromoJob, PromoSceneInput, ShowcasePackage, SplitPackage } from "../../lib/creation";
 import { downloadUrlAsBlob } from "../../lib/download";
 import type { CharacterAssets } from "../../lib/creation";
 import type { CharacterContract, VoicePreset } from "../../lib/voice";
@@ -238,6 +238,9 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
   const [duoSceneA, setDuoSceneA] = useState<{ background: AuditionBackground; camera: AuditionCamera }>({ background: "studio", camera: "closeup" });
   const [duoSceneB, setDuoSceneB] = useState<{ background: AuditionBackground; camera: AuditionCamera }>({ background: "cafe", camera: "medium" });
   const [duoTitle, setDuoTitle] = useState("");
+  const [duoUseThird, setDuoUseThird] = useState(false);
+  const [duoC, setDuoC] = useState("");
+  const [duoSceneC, setDuoSceneC] = useState<{ background: AuditionBackground; camera: AuditionCamera }>({ background: "street", camera: "medium" });
   const [duoLInes, setDuoLines] = useState<{ speaker: DialogueSpeaker; text: string }[]>([
     { speaker: "a", text: "这么晚还来喝咖啡？" },
     { speaker: "b", text: "睡不着，想找个人聊聊。" },
@@ -257,6 +260,10 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
   const [showcaseError, setShowcaseError] = useState("");
   const [showcaseVertical, setShowcaseVertical] = useState(true);
   const [showcaseVerticalMode, setShowcaseVerticalMode] = useState<"blur_pad" | "crop">("blur_pad");
+  const [splitPkg, setSplitPkg] = useState<SplitPackage | null>(null);
+  const [splitLoading, setSplitLoading] = useState(false);
+  const [splitBuilding, setSplitBuilding] = useState(false);
+  const [splitError, setSplitError] = useState("");
 
   const [previewChar, setPreviewChar] = useState<string | null>(null);
   const [previewError, setPreviewError] = useState("");
@@ -789,9 +796,51 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
     return { label: promoJob.status === "running" ? "生成中" : stage || "处理中", progress: promoJob.progress || 5 };
   })();
 
+  const buildSplitPackage = useCallback(
+    async (force = false) => {
+      setSplitBuilding(true);
+      setSplitError("");
+      try {
+        const pkg = await splitPackageApi.build({ force });
+        setSplitPkg(pkg);
+        notify(force ? "单角色切条包已重新构建" : pkg.cached ? "单角色切条包已存在（cached）" : "单角色切条包已生成", "success");
+      } catch (err) {
+        const status = err instanceof CreationError ? err.status : 0;
+        const message = creationErrorMessage(err).join("；");
+        if (status === 404 || status === 405) setSplitError("切条包接口尚未就绪（后端 V38 实现中）");
+        else setSplitError("构建切条包失败：" + message);
+      } finally {
+        setSplitBuilding(false);
+      }
+    },
+    [notify],
+  );
+
+  const downloadSplitPackage = useCallback(async () => {
+    if (!splitPkg?.package_url) return;
+    try {
+      const res = await downloadUrlAsBlob(mediaSrc(splitPkg.package_url), "character_audition_clips.zip");
+      notify(`已开始下载单角色切条包（${fmtAuditionSize(res.size)}）`, "success");
+    } catch (err) {
+      notify("下载切条包失败：" + (err instanceof Error ? err.message : String(err)), "error");
+    }
+  }, [notify, splitPkg?.package_url]);
+
   // V36：双人对戏 —— 行编辑/校验/提交/轮询/取消/最近列表
   const duoCharacters = useMemo(() => Object.values(contracts), [contracts]);
   /** V37：双人双场景标签（A 场景 · B 场景，优先后端 scenes/每镜字段） */
+  /** V38：对戏角色标签（2–3 人） */
+  const duoCastLabel = useCallback((job: DialogueJob | null) => {
+    if (!job) return "";
+    const thirdId = job.character_c || job.characters?.c || "";
+    const list = [
+      job.a_label || job.character_a || job.characters?.a,
+      job.b_label || job.character_b || job.characters?.b,
+      thirdId ? job.c_label || thirdId : "",
+    ].filter(Boolean);
+    return list.join(" × ");
+  }, []);
+
   const duoScenesLabel = useCallback(
     (job: DialogueJob | null) => {
       if (!job) return "";
@@ -808,7 +857,8 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
         scene
           ? `${auditionBackgroundLabel(scene.background, scene.background_label) || auditionBackgroundLabel(job.background, job.background_label)}·${auditionCameraLabel(scene.camera, scene.camera_label) || auditionCameraLabel(job.camera, job.camera_label)}`
           : "";
-      return `A ${label(sceneA) || "—"} · B ${label(sceneB) || "—"}`;
+      const sceneC = job.scenes?.c;
+      return [`A ${label(sceneA) || "—"}`, `B ${label(sceneB) || "—"}`, sceneC ? `C ${label(sceneC)}` : ""].filter(Boolean).join(" · ");
     },
     [],
   );
@@ -819,24 +869,35 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
     return { text, estimate, tooLong: text.length > 60, empty: !text };
   });
   const duoEstimatedSec = Math.round((duoLineInfo.reduce((sum, line) => sum + line.estimate, 0) + Math.max(0, duoLInes.length - 1) * 0.35) * 10) / 10;
+  const duoEstimateLimit = duoUseThird ? 24 : 16;
+  const duoCastIds = [duoA, duoB, ...(duoUseThird ? [duoC] : [])].filter(Boolean);
+  const duoDuplicateCast = new Set(duoCastIds).size !== duoCastIds.length;
+  const duoMissingThird = duoUseThird && !duoC;
+  const duoSpeakerMissingC = duoLInes.some((line) => line.speaker === "c") && !duoUseThird;
   const duoInvalid =
     duoLInes.length < 2 ||
     duoLInes.length > 6 ||
     duoLineInfo.some((line) => line.empty || line.tooLong) ||
-    duoEstimatedSec > 16 ||
+    duoEstimatedSec > duoEstimateLimit ||
     !duoA ||
     !duoB ||
-    duoA === duoB;
+    duoDuplicateCast ||
+    duoMissingThird ||
+    duoSpeakerMissingC;
   const duoErrorText =
-    duoA === duoB
-      ? "角色 A 与角色 B 不能相同"
-      : duoLineInfo.some((line) => line.empty)
-        ? "每行台词不能为空"
-        : duoLineInfo.some((line) => line.tooLong)
-          ? "单行台词最多 60 字"
-          : duoEstimatedSec > 16
-            ? "台词总时长预计超过 16s，请精简"
-            : "";
+    duoDuplicateCast
+      ? "角色 A/B/C 不能重复"
+      : duoMissingThird
+        ? "已开启第三角色但未选择角色 C"
+        : duoSpeakerMissingC
+          ? "台词中有 C 说话，但未开启第三角色"
+          : duoLineInfo.some((line) => line.empty)
+            ? "每行台词不能为空"
+            : duoLineInfo.some((line) => line.tooLong)
+              ? "单行台词最多 60 字"
+              : duoEstimatedSec > duoEstimateLimit
+                ? `台词总时长预计超过 ${duoEstimateLimit}s，请精简`
+                : "";
 
   const loadDialogues = useCallback(async () => {
     setDuoLoading(true);
@@ -907,6 +968,9 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
     setDuoStyle("realistic");
     setDuoSceneA({ background: "studio", camera: "closeup" });
     setDuoSceneB({ background: "cafe", camera: "medium" });
+    setDuoUseThird(false);
+    setDuoC(Object.values(contracts)[2]?.id || "");
+    setDuoSceneC({ background: "street", camera: "medium" });
     setDuoTitle("");
     setDuoLines([
       { speaker: "a", text: "这么晚还来喝咖啡？" },
@@ -934,6 +998,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
         camera: duoSceneA.camera,
         scene_a: duoSceneA,
         scene_b: duoSceneB,
+        ...(duoUseThird && duoC ? { character_c: duoC, scene_c: duoSceneC } : {}),
         title: duoTitle.trim() || undefined,
         lines: duoLineInfo.map((line, index) => ({ speaker: duoLInes[index].speaker, text: line.text })),
       });
@@ -957,7 +1022,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
     } finally {
       setDuoSubmitting(false);
     }
-  }, [duoA, duoB, duoErrorText, duoInvalid, duoLineInfo, duoLInes, duoSceneA, duoSceneB, duoStyle, duoTitle, notify]);
+  }, [duoA, duoB, duoC, duoErrorText, duoInvalid, duoLineInfo, duoLInes, duoSceneA, duoSceneB, duoSceneC, duoStyle, duoTitle, duoUseThird, notify]);
 
   const cancelDuo = useCallback(async () => {
     if (!duoJob?.id) return;
@@ -994,6 +1059,10 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
     try {
       const packages = await showcaseApi.list();
       setShowcasePkg(packages[0] || null);
+      splitPackageApi
+        .list()
+        .then((items) => setSplitPkg(items[0] || null))
+        .catch(() => setSplitPkg(null));
     } catch (err) {
       const status = err instanceof CreationError ? err.status : 0;
       if (status === 404 || status === 405) setShowcaseError("合集发布包接口尚未就绪（后端 V36 实现中）；可点「导出发布包」重试");
@@ -1358,6 +1427,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                     </div>
                     <div className="v32-progress-meta">
                       <span className="v34-scene-tag">{duoScenesLabel(duoJob)}</span>
+                      <span>{duoCastLabel(duoJob)}</span>
                       <span>{duoJob.total_lines || duoJob.lines?.length || 0} 句 · 正反打</span>
                       <button type="button" className="cm-btn cm-btn-sm cm-btn-ghost" onClick={() => void cancelDuo()}>取消任务</button>
                     </div>
@@ -1369,6 +1439,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                     <div className="v32-video-meta">
                       <span className="v18-tag is-jade">已完成</span>
                       <span className="v18-tag">{AUDITION_STYLES.find((item) => item.id === duoJob.style)?.label || duoJob.style}</span>
+                      <span className="v18-tag v38-cast-tag">{duoCastLabel(duoJob)}</span>
                       <span className="cm-mono">{duoJob.total_lines || duoJob.lines?.length || 0} 句</span>
                       <span className="v18-tag v34-scene-tag">{duoScenesLabel(duoJob)}</span>
                       <span className="cm-mono">{duoJob.duration_sec ? duoJob.duration_sec.toFixed(1) + "s" : "—"}</span>
@@ -1420,7 +1491,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                         <span className={"v18-tag" + (job.status === "done" ? " is-jade" : job.status === "failed" ? " is-red" : job.status === "canceled" ? "" : " is-gold")}>
                           {job.status === "done" ? "已完成" : job.status === "failed" ? "失败" : job.status === "canceled" ? "已取消" : job.status === "running" ? "生成中" : "排队中"}
                         </span>
-                        <span className="cm-mono">{(job.a_label || job.character_a) + " × " + (job.b_label || job.character_b)}</span>
+                        <span className="cm-mono">{duoCastLabel(job)}</span>
                         <span className="cm-mono">{job.total_lines || job.lines?.length || 0} 句</span>
                         <span className="v18-tag v34-scene-tag">{duoScenesLabel(job)}</span>
                         {job.title && <span className="v32-recent-id">{job.title}</span>}
@@ -2263,16 +2334,52 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                   );
                 })}
               </div>
+              <label className="v38-third-toggle">
+                <input type="checkbox" checked={duoUseThird} onChange={(event) => setDuoUseThird(event.target.checked)} disabled={duoSubmitting} />
+                <span>加入第三角色（三人群聊）</span>
+                <em>开启后可设置角色 C 与场景 C，台词 speaker 可选 C</em>
+              </label>
+              {duoUseThird && (
+                <label className="v21-field">
+                  <span className="v21-field-label">角色 C</span>
+                  <div className="v36-duo-char">
+                    <div className="v36-duo-mini">
+                      {duoC && contracts[duoC] ? (
+                        <img
+                          src={characterArtUrl(
+                            duoC,
+                            duoStyle === "realistic" ? "portrait_real.png" : duoStyle === "stylized_25d" ? "portrait_25d.png" : "portrait.png",
+                            artBust[duoC],
+                          )}
+                          alt={contracts[duoC]?.label || duoC}
+                          onError={(event) => {
+                            (event.currentTarget as HTMLImageElement).style.visibility = "hidden";
+                          }}
+                        />
+                      ) : (
+                        <IconUser size={16} />
+                      )}
+                    </div>
+                    <select className="v21-select" value={duoC} onChange={(event) => setDuoC(event.target.value)} disabled={duoSubmitting}>
+                      <option value="">选择角色 C…</option>
+                      {duoCharacters.map((item) => (
+                        <option key={item.id} value={item.id}>{item.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                </label>
+              )}
               <label className="v21-field">
                 <span className="v21-field-label">风格</span>
                 <select className="v21-select" value={duoStyle} onChange={(event) => setDuoStyle(event.target.value as AuditionStyle)} disabled={duoSubmitting}>
                   {AUDITION_STYLES.map((item) => (<option key={item.id} value={item.id}>{item.label}</option>))}
                 </select>
               </label>
-              <div className="v37-scene-grid">
+              <div className={"v37-scene-grid" + (duoUseThird ? " is-three" : "")}>
                 {([
                   { key: "a", label: "角色 A 场景", value: duoSceneA, set: setDuoSceneA },
                   { key: "b", label: "角色 B 场景", value: duoSceneB, set: setDuoSceneB },
+                  ...(duoUseThird ? [{ key: "c" as const, label: "角色 C 场景", value: duoSceneC, set: setDuoSceneC }] : []),
                 ] as const).map((scene) => (
                   <div key={scene.key} className="v37-scene">
                     <span className="v37-scene-title">{scene.label}</span>
@@ -2306,19 +2413,24 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
               <div className="v36-duo-lines">
                 <div className="v36-duo-lines-head">
                   <span>台词（每行一句，2–6 句）</span>
-                  <span className={duoEstimatedSec > 16 ? "is-error" : ""}>预计约 {duoEstimatedSec}s（上限 16s）</span>
+                  <span className={duoEstimatedSec > duoEstimateLimit ? "is-error" : ""}>预计约 {duoEstimatedSec}s（上限 {duoEstimateLimit}s）{duoUseThird ? " · 三人" : ""}</span>
                 </div>
                 {duoLInes.map((line, index) => (
                   <div key={index} className="v36-duo-line">
-                    <button
-                      type="button"
-                      className={"v36-speaker " + (line.speaker === "b" ? "is-b" : "is-a")}
-                      onClick={() => setDuoLines((prev) => prev.map((item, i) => (i === index ? { ...item, speaker: item.speaker === "a" ? "b" : "a" } : item)))}
+                    <select
+                      className={"v38-speaker-select is-" + line.speaker}
+                      value={line.speaker}
+                      onChange={(event) =>
+                        setDuoLines((prev) => prev.map((item, i) => (i === index ? { ...item, speaker: event.target.value as DialogueSpeaker } : item)))
+                      }
                       disabled={duoSubmitting}
-                      title="点击切换 A/B 说话"
+                      title="选择说话角色"
+                      aria-label={"第 " + (index + 1) + " 句说话角色"}
                     >
-                      {line.speaker.toUpperCase()}
-                    </button>
+                      <option value="a">A</option>
+                      <option value="b">B</option>
+                      <option value="c" disabled={!duoUseThird}>C</option>
+                    </select>
                     <input
                       className="v21-input"
                       value={line.text}
@@ -2336,7 +2448,12 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                   </div>
                 ))}
                 {duoLInes.length < 6 && (
-                  <button type="button" className="cm-btn cm-btn-sm cm-btn-ghost" onClick={() => setDuoLines((prev) => [...prev, { speaker: prev.length % 2 === 0 ? "a" : "b", text: "" }])} disabled={duoSubmitting}>
+                  <button type="button" className="cm-btn cm-btn-sm cm-btn-ghost" onClick={() =>
+                      setDuoLines((prev) => [
+                        ...prev,
+                        { speaker: (duoUseThird ? (["a", "b", "c"] as const)[prev.length % 3] : prev.length % 2 === 0 ? "a" : "b") as DialogueSpeaker, text: "" },
+                      ])
+                    } disabled={duoSubmitting}>
                     <IconPlus size={12} /> 添加台词
                   </button>
                 )}
@@ -2450,6 +2567,62 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
                   </div>
                 </div>
               )}
+              <div className="v38-split">
+                <div className="v36-showcase-pkg-head">
+                  <span className="v38-split-title">
+                    <IconFilm size={12} /> 单角色切条包
+                  </span>
+                  <span className="v38-split-desc">每角色最新一条已烧录字幕试镜条（mp4 + srt + meta + manifest）</span>
+                  {splitPkg && (
+                    <>
+                      <span className="v18-tag is-jade">{splitPkg.cached ? "cached" : "已生成"}</span>
+                      <span className="cm-mono">{splitPkg.characters.length} 角色</span>
+                      <span className="cm-mono">{splitPkg.files.length} 文件</span>
+                      <span className="cm-mono">{fmtAuditionSize(splitPkg.size_bytes || 0)}</span>
+                    </>
+                  )}
+                  {splitBuilding ? (
+                    <span className="v38-split-loading"><Spinner size={11} /> 构建中…</span>
+                  ) : (
+                    <button type="button" className="cm-btn cm-btn-sm cm-btn-ghost" onClick={() => void buildSplitPackage(true)}>
+                      重新构建（force）
+                    </button>
+                  )}
+                  <button type="button" className="cm-btn cm-btn-sm" onClick={() => void buildSplitPackage(false)} disabled={splitBuilding}>
+                    {splitBuilding ? <Spinner size={11} /> : <IconDownload size={11} />} 构建切条包
+                  </button>
+                  {splitPkg?.package_url && (
+                    <button type="button" className="cm-btn cm-btn-sm cm-btn-primary" onClick={() => void downloadSplitPackage()}>
+                      <IconDownload size={11} /> 下载 zip
+                    </button>
+                  )}
+                </div>
+                {splitLoading && <div className="v36-showcase-file"><span>正在读取切条包…</span></div>}
+                {splitPkg && (
+                  <>
+                    <div className="v38-split-chars">
+                      {splitPkg.characters.slice(0, 16).map((character) => (
+                        <span key={character} className="v18-tag">{character}</span>
+                      ))}
+                    </div>
+                    <div className="v36-showcase-files">
+                      {splitPkg.files.slice(0, 8).map((file) => (
+                        <div key={file.name} className="v36-showcase-file">
+                          <span className="cm-mono">{file.name}</span>
+                          <span className="cm-mono">{fmtAuditionSize(file.size_bytes || 0)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+                {splitError && (
+                  <div className="v24-art-error" role="alert">
+                    <b>单角色切条包</b>
+                    <span>{splitError}</span>
+                  </div>
+                )}
+                <p className="v21-hint">切条包 = 每个角色一条独立试镜视频 + SRT + meta，按角色逐个发布；缺失试镜任务时原生提示。</p>
+              </div>
               {showcaseError && (
                 <div className="v24-art-error" role="alert">
                   <b>试镜合集发布包</b>

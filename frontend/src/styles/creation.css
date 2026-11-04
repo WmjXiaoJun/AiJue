@@ -486,3 +486,22 @@
 .v37-vertical-state { display: flex; align-items: center; gap: 6px; font-size: 9.5px; color: var(--c-mut); }
 .v36-showcase-file.is-vertical { background: rgba(201,162,39,.05); }
 .v37-vertical-badge { margin-left: 6px; padding: 0 4px; border-radius: 3px; background: rgba(201,162,39,.18); color: var(--c-gold-soft); font-style: normal; font-size: 7.5px; }
+
+/* V38：三人对戏 + 单角色切条包 */
+.v38-third-toggle { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px dashed var(--c-line); border-radius: 9px; cursor: pointer; font-size: 11px; color: var(--c-sub); }
+.v38-third-toggle input { width: 14px; height: 14px; accent-color: var(--c-gold); cursor: pointer; }
+.v38-third-toggle span { color: var(--c-text); }
+.v38-third-toggle em { font-style: normal; font-size: 9.5px; color: var(--c-mut); }
+.v37-scene-grid.is-three { grid-template-columns: repeat(3, 1fr); }
+.v38-speaker-select { width: 46px; height: 26px; flex: 0 0 auto; border-radius: 7px; border: 1px solid var(--c-line); background: rgba(90,140,200,.12); color: #9dc0e8; font-family: var(--font-mono); font-size: 10px; cursor: pointer; padding: 0 4px; }
+.v38-speaker-select.is-b { background: rgba(201,162,39,.14); color: var(--c-gold-soft); border-color: rgba(201,162,39,.4); }
+.v38-speaker-select.is-c { background: rgba(170,110,190,.16); color: #d3a8e6; border-color: rgba(170,110,190,.4); }
+.v38-cast-tag { border-color: rgba(201,162,39,.3); color: var(--c-gold-soft); }
+.v38-split { display: flex; flex-direction: column; gap: 7px; padding: 9px 10px; border: 1px solid var(--c-line); border-radius: 10px; background: rgba(255,255,255,.015); }
+.v38-split-title { display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-display); font-size: 12.5px; color: var(--c-text); }
+.v38-split-desc { font-size: 9px; color: var(--c-mut); }
+.v38-split-loading { display: inline-flex; align-items: center; gap: 4px; font-size: 9.5px; color: var(--c-mut); }
+.v38-split-chars { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.v36-showcase-pkg-head .cm-btn { margin-left: 0; }
+.v38-split .v36-showcase-pkg-head .v38-split-desc { flex: 1 1 180px; }
+.v38-split .v36-showcase-pkg-head .cm-btn { margin-left: 0; }

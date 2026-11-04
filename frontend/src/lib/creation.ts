@@ -518,7 +518,7 @@ export const promoApi = {
 };
 
 /* ------------------------------ V36：双人对戏 + 试镜合集发布包 ------------------------------ */
-export type DialogueSpeaker = "a" | "b";
+export type DialogueSpeaker = "a" | "b" | "c";
 
 export interface DialogueLineInput {
   speaker: DialogueSpeaker;
@@ -562,7 +562,10 @@ export interface DialogueJob {
   current_line?: number;
   total_lines?: number;
   lines?: DialogueJobLine[];
-  scenes?: { a?: DialogueScene; b?: DialogueScene };
+  scenes?: { a?: DialogueScene; b?: DialogueScene; c?: DialogueScene };
+  characters?: { a?: string; b?: string; c?: string };
+  character_c?: string;
+  c_label?: string;
   output_url?: string | null;
   poster_url?: string | null;
   srt_url?: string | null;
@@ -587,6 +590,18 @@ function normalizeDialogueJob(raw: unknown): DialogueJob {
     background_label: typeof rec.background_label === "string" ? rec.background_label : undefined,
     camera: typeof rec.camera === "string" ? rec.camera : undefined,
     camera_label: typeof rec.camera_label === "string" ? rec.camera_label : undefined,
+    character_c: typeof rec.character_c === "string" ? rec.character_c : undefined,
+    c_label: typeof rec.c_label === "string" ? rec.c_label : undefined,
+    characters: (() => {
+      const value = rec.characters;
+      if (!value || typeof value !== "object") return undefined;
+      const chars = value as Record<string, unknown>;
+      return {
+        a: typeof chars.a === "string" ? chars.a : undefined,
+        b: typeof chars.b === "string" ? chars.b : undefined,
+        c: typeof chars.c === "string" ? chars.c : undefined,
+      };
+    })(),
     title: typeof rec.title === "string" ? rec.title : undefined,
     status: (String(rec.status ?? "queued") as DialogueJob["status"]) || "queued",
     stage: typeof rec.stage === "string" ? rec.stage : undefined,
@@ -596,7 +611,7 @@ function normalizeDialogueJob(raw: unknown): DialogueJob {
     lines: linesRaw.map((item) => {
       const line = (item && typeof item === "object" ? item : {}) as Record<string, unknown>;
       return {
-        speaker: (String(line.speaker ?? "a") === "b" ? "b" : "a") as DialogueSpeaker,
+        speaker: ((value): DialogueSpeaker => (value === "b" ? "b" : value === "c" ? "c" : "a"))(String(line.speaker ?? "a")),
         text: String(line.text ?? ""),
         index: Number(line.index) || undefined,
         start: Number(line.start) || 0,
@@ -622,7 +637,7 @@ function normalizeDialogueJob(raw: unknown): DialogueJob {
           camera_label: typeof scene.camera_label === "string" ? scene.camera_label : undefined,
         };
       };
-      return { a: parse(rawScenes.a), b: parse(rawScenes.b) };
+      return { a: parse(rawScenes.a), b: parse(rawScenes.b), c: parse(rawScenes.c) };
     })(),
     output_url: typeof rec.output_url === "string" ? rec.output_url : null,
     poster_url: typeof rec.poster_url === "string" ? rec.poster_url : null,
@@ -649,6 +664,8 @@ export const dialogueApi = {
     title?: string;
     scene_a?: { background?: AuditionBackground; camera?: AuditionCamera };
     scene_b?: { background?: AuditionBackground; camera?: AuditionCamera };
+    character_c?: string;
+    scene_c?: { background?: AuditionBackground; camera?: AuditionCamera };
     lines: DialogueLineInput[];
   }): Promise<DialogueJob> => normalizeDialogueJob(await post("/v5/characters/dialogue", body, 60000)),
   get: async (jobId: string): Promise<DialogueJob> => normalizeDialogueJob(await get(`/v5/dialogues/${encodeURIComponent(jobId)}`)),
@@ -709,6 +726,51 @@ function normalizeShowcasePackage(raw: unknown): ShowcasePackage {
     error: typeof rec.error === "string" ? rec.error : null,
   };
 }
+
+export interface SplitPackage {
+  ok: boolean;
+  package_url?: string | null;
+  size_bytes?: number;
+  files: ShowcasePackageFile[];
+  characters: string[];
+  cached?: boolean;
+  created_at?: string | null;
+  error?: string | null;
+}
+
+function normalizeSplitPackage(raw: unknown): SplitPackage {
+  const rec = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
+  const files = Array.isArray(rec.files) ? rec.files : [];
+  const characters = Array.isArray(rec.characters) ? rec.characters.map((item) => String(item)) : [];
+  return {
+    ok: rec.ok !== false,
+    package_url: typeof rec.package_url === "string" ? rec.package_url : null,
+    size_bytes: Number(rec.size_bytes) || 0,
+    files: files.map((item) => {
+      const file = (item && typeof item === "object" ? item : {}) as Record<string, unknown>;
+      return { name: String(file.name ?? file.character ?? ""), size_bytes: Number(file.size_bytes ?? file.size) || 0 };
+    }),
+    characters,
+    cached: Boolean(rec.cached),
+    created_at: typeof rec.created_at === "string" ? rec.created_at : null,
+    error: typeof rec.error === "string" ? rec.error : null,
+  };
+}
+
+export const splitPackageApi = {
+  build: async (body: { force?: boolean } = {}): Promise<SplitPackage> =>
+    normalizeSplitPackage(await post("/v5/character-showcase/split-packages", { force: false, ...body }, 300000)),
+  list: async (): Promise<SplitPackage[]> => {
+    const res = (await get("/v5/character-showcase/split-packages")) as
+      | { packages?: unknown[]; items?: unknown[]; package_url?: string; files?: unknown[] }
+      | unknown[];
+    if (Array.isArray(res)) return res.map(normalizeSplitPackage);
+    if (res && Array.isArray(res.packages)) return res.packages.map(normalizeSplitPackage);
+    if (res && Array.isArray(res.items)) return res.items.map(normalizeSplitPackage);
+    if (res && (res.package_url || Array.isArray(res.files))) return [normalizeSplitPackage(res)];
+    return [];
+  },
+};
 
 export const showcaseApi = {
   build: async (body: { title?: string; force?: boolean; vertical?: boolean; vertical_mode?: "blur_pad" | "crop" } = {}): Promise<ShowcasePackage> =>

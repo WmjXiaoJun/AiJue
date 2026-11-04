@@ -37,7 +37,7 @@ _PORTRAIT_BY_STYLE = audition._PORTRAIT_BY_STYLE
 _STYLES = audition._STYLES
 _MAX_LINES = 6
 _MAX_LINE_CHARS = 60
-_MAX_TOTAL_AUDIO_SECONDS = 16.0
+_MAX_TOTAL_AUDIO_SECONDS = 24.0
 _TITLE_CHARS = 40
 _TITLE_CARD_SECONDS = 2.2
 _WIDTH = 1024
@@ -112,8 +112,17 @@ def _view(dialogue: Dict[str, Any]) -> Dict[str, Any]:
         "job_id": dialogue.get("id"),
         "character_a": dialogue.get("character_a"),
         "character_b": dialogue.get("character_b"),
+        "character_c": dialogue.get("character_c"),
         "character_a_label": dialogue.get("character_a_label"),
         "character_b_label": dialogue.get("character_b_label"),
+        "character_c_label": dialogue.get("character_c_label"),
+        "characters": {
+            key: {
+                "id": dialogue.get(f"character_{key}"),
+                "label": dialogue.get(f"character_{key}_label"),
+            }
+            for key in ("a", "b", "c") if dialogue.get(f"character_{key}")
+        },
         "style": dialogue.get("style"),
         "background": dialogue.get("background"),
         "background_label": dialogue.get("background_label"),
@@ -125,7 +134,7 @@ def _view(dialogue: Dict[str, Any]) -> Dict[str, Any]:
                 "background_label": dialogue.get("background_label"),
                 "camera": dialogue.get("camera"),
                 "camera_label": dialogue.get("camera_label"),
-            } for key in ("a", "b")
+            } for key in ("a", "b", "c") if dialogue.get(f"character_{key}")
         },
         "title": dialogue.get("title"),
         "status": dialogue.get("status"),
@@ -218,6 +227,9 @@ def _title_card(dialogue: Dict[str, Any], path: Path) -> None:
     draw.rectangle([72, 330, 952, 336], fill=(245, 197, 24))
     label_a = str(dialogue.get("character_a_label") or dialogue.get("character_a") or "")
     label_b = str(dialogue.get("character_b_label") or dialogue.get("character_b") or "")
+    labels = [label_a, label_b]
+    if dialogue.get("character_c"):
+        labels.append(str(dialogue.get("character_c_label") or dialogue.get("character_c") or ""))
 
     def center(text: str, y: int, size: int, fill) -> None:
         font = promo_mod._font(size)
@@ -228,8 +240,8 @@ def _title_card(dialogue: Dict[str, Any], path: Path) -> None:
             width = len(text) * size
         draw.text((( _WIDTH - width) // 2, y), text, font=font, fill=fill)
 
-    center("双人对戏", 90, 28, (150, 158, 170))
-    center(f"{label_a}  ×  {label_b}", 165, 62, (245, 245, 248))
+    center("三人对戏" if len(labels) >= 3 else "双人对戏", 90, 28, (150, 158, 170))
+    center("  ×  ".join(labels), 165, 62 if len(labels) == 2 else 52, (245, 245, 248))
     center(str(dialogue.get("title") or ""), 265, 32, (245, 197, 24))
     center("DIALOGUE SCENE", 420, 22, (110, 120, 135))
     image.save(path, "PNG")
@@ -264,7 +276,8 @@ def _normalize(src: Path, out: Path, dialogue_id: str) -> None:
 def _run_line_h3(dialogue: Dict[str, Any], line: Dict[str, Any], workdir: Path,
                  ref: Path, audio: Path, duration: float) -> Path:
     dialogue_id = str(dialogue["id"])
-    character = (dialogue.get("characters") or {}).get(str(line.get("character"))) or {}
+    character = ((dialogue.get("character_data") or dialogue.get("characters") or {})
+                 .get(str(line.get("character"))) or {})
     prompt = audition._build_prompt(
         character, str(dialogue.get("style") or "realistic"), "",
         background=str(line.get("background") or dialogue.get("background") or "cafe"),
@@ -400,7 +413,7 @@ def _run_dialogue(dialogue_id: str) -> None:
             _persist(dialogue)
         style = str(dialogue.get("style") or "realistic")
         lines = dialogue.get("lines") or []
-        characters = dialogue.get("characters") or {}
+        characters = dialogue.get("character_data") or dialogue.get("characters") or {}
         workdir = _DIALOGUE_DIR / f"{dialogue_id}_work"
         workdir.mkdir(parents=True, exist_ok=True)
         for line in lines:
@@ -500,11 +513,13 @@ class DialogueSceneBody(BaseModel):
 class DialogueBody(BaseModel):
     character_a: str
     character_b: str
+    character_c: Optional[str] = None
     style: str = "realistic"
     background: str = "cafe"
     camera: str = "medium"
     scene_a: Optional[DialogueSceneBody] = None
     scene_b: Optional[DialogueSceneBody] = None
+    scene_c: Optional[DialogueSceneBody] = None
     title: Optional[str] = None
     seed: Optional[int] = None
     lines: List[DialogueLineBody]
@@ -552,19 +567,28 @@ def create_dialogue(payload: DialogueBody = Body(default=DialogueBody(
     global _ACTIVE_DIALOGUE
     cid_a = str(payload.character_a or "").strip().lower()
     cid_b = str(payload.character_b or "").strip().lower()
+    cid_c = str(payload.character_c or "").strip().lower() or None
     characters = audition._catalog_characters()
     char_a = characters.get(cid_a)
     char_b = characters.get(cid_b)
-    if not isinstance(char_a, dict) or not isinstance(char_b, dict):
-        missing = [cid for cid, char in ((cid_a, char_a), (cid_b, char_b))
-                   if not isinstance(char, dict)]
+    char_c = characters.get(cid_c) if cid_c else None
+    missing = [cid for cid, char in ((cid_a, char_a), (cid_b, char_b),
+                                     (cid_c, char_c)) if cid and not isinstance(char, dict)]
+    if missing:
         raise HTTPException(status_code=404, detail=f"角色不存在: {', '.join(missing)}")
+    if not isinstance(char_a, dict) or not isinstance(char_b, dict):
+        raise HTTPException(status_code=404, detail="角色 A/B 不能为空")
+    ids = [cid_a, cid_b] + ([cid_c] if cid_c else [])
+    if len(set(ids)) != len(ids):
+        raise HTTPException(status_code=400, detail="角色 A/B/C 不能相同")
+    if payload.scene_c is not None and not cid_c:
+        raise HTTPException(status_code=400, detail="scene_c 需要同时提供 character_c")
     style = str(payload.style or "realistic").strip().lower()
     if style not in _PORTRAIT_BY_STYLE:
         raise HTTPException(status_code=400,
                             detail=f"style 只支持 {', '.join(_STYLES)}（当前 {style!r}）")
     portrait_file = _PORTRAIT_BY_STYLE[style]
-    for cid in (cid_a, cid_b):
+    for cid in ids:
         portrait = _REPO / "assets" / "v5" / "characters" / cid / portrait_file
         if not portrait.is_file() or portrait.stat().st_size <= 0:
             raise HTTPException(status_code=400,
@@ -602,24 +626,34 @@ def create_dialogue(payload: DialogueBody = Body(default=DialogueBody(
         "a": resolve_scene(payload.scene_a, "scene_a"),
         "b": resolve_scene(payload.scene_b, "scene_b"),
     }
+    if cid_c:
+        scenes["c"] = resolve_scene(payload.scene_c, "scene_c")
     raw_lines = payload.lines or []
     if not (2 <= len(raw_lines) <= _MAX_LINES):
         raise HTTPException(status_code=400, detail=f"lines 需要 2–{_MAX_LINES} 行")
     lines: List[Dict[str, Any]] = []
     texts: List[str] = []
+    speaker_char = {"a": cid_a, "b": cid_b}
+    speaker_data = {"a": char_a, "b": char_b}
+    if cid_c:
+        speaker_char["c"] = cid_c
+        speaker_data["c"] = char_c
     for index, raw in enumerate(raw_lines):
         speaker = str(raw.speaker or "").strip().lower()
-        if speaker not in ("a", "b"):
+        if speaker not in ("a", "b", "c"):
             raise HTTPException(status_code=400,
-                                detail=f"第 {index + 1} 行 speaker 必须是 a/b（当前 {speaker!r}）")
+                                detail=f"第 {index + 1} 行 speaker 必须是 a/b/c（当前 {speaker!r}）")
+        if speaker == "c" and not cid_c:
+            raise HTTPException(status_code=400,
+                                detail=f"第 {index + 1} 行 speaker=c，但未提供 character_c")
         text = str(raw.text or "").strip()
         if not text:
             raise HTTPException(status_code=400, detail=f"第 {index + 1} 行台词不能为空")
         if len(text) > _MAX_LINE_CHARS:
             raise HTTPException(status_code=400,
                                 detail=f"第 {index + 1} 行超过 {_MAX_LINE_CHARS} 字")
-        cid = cid_a if speaker == "a" else cid_b
-        char = char_a if speaker == "a" else char_b
+        cid = speaker_char[speaker]
+        char = speaker_data[speaker]
         scene = scenes[speaker]
         lines.append({
             "index": index, "speaker": speaker, "character": cid,
@@ -634,10 +668,16 @@ def create_dialogue(payload: DialogueBody = Body(default=DialogueBody(
     estimated = audition._estimate_audio_seconds(texts)
     if estimated > _MAX_TOTAL_AUDIO_SECONDS:
         raise HTTPException(status_code=400,
-                            detail=f"台词总时长估算 {estimated:.1f}s 超过 16s，请精简")
+                            detail=f"台词总时长估算 {estimated:.1f}s 超过 "
+                                   f"{_MAX_TOTAL_AUDIO_SECONDS:.0f}s，请精简")
     title = str(payload.title or "").strip()
     if not title:
-        title = f"{str(char_a.get('label') or cid_a)} & {str(char_b.get('label') or cid_b)} · 双人对戏"
+        labels = [str(char_a.get("label") or cid_a), str(char_b.get("label") or cid_b)]
+        if cid_c:
+            labels.append(str(char_c.get("label") or cid_c))
+            title = " × ".join(labels)
+        else:
+            title = f"{labels[0]} & {labels[1]} · 双人对戏"
     if len(title) > _TITLE_CHARS:
         raise HTTPException(status_code=400, detail=f"title 不能超过 {_TITLE_CHARS} 字")
     try:
@@ -653,7 +693,18 @@ def create_dialogue(payload: DialogueBody = Body(default=DialogueBody(
         "character_a": cid_a, "character_b": cid_b,
         "character_a_label": str(char_a.get("label") or cid_a),
         "character_b_label": str(char_b.get("label") or cid_b),
-        "characters": {cid_a: char_a, cid_b: char_b},
+        "character_c": cid_c,
+        "character_c_label": str(char_c.get("label") or cid_c) if cid_c else None,
+        "characters": {
+            "a": {"id": cid_a, "label": str(char_a.get("label") or cid_a)},
+            "b": {"id": cid_b, "label": str(char_b.get("label") or cid_b)},
+            **({"c": {"id": cid_c,
+                      "label": str(char_c.get("label") or cid_c)}} if cid_c else {}),
+        },
+        "character_data": {
+            cid_a: char_a, cid_b: char_b,
+            **({cid_c: char_c} if cid_c else {}),
+        },
         "style": style,
         "portrait_file": portrait_file,
         "background": background,
@@ -710,6 +761,13 @@ def create_dialogue(payload: DialogueBody = Body(default=DialogueBody(
         "job_id": dialogue_id,
         "character_a": cid_a,
         "character_b": cid_b,
+        "character_c": cid_c,
+        "characters": {
+            "a": {"id": cid_a, "label": str(char_a.get("label") or cid_a)},
+            "b": {"id": cid_b, "label": str(char_b.get("label") or cid_b)},
+            **({"c": {"id": cid_c,
+                      "label": str(char_c.get("label") or cid_c)}} if cid_c else {}),
+        },
         "style": style,
         "background": background,
         "camera": camera,
@@ -718,6 +776,7 @@ def create_dialogue(payload: DialogueBody = Body(default=DialogueBody(
         "total_lines": len(lines),
         "status": "queued",
         "estimated_sec": len(lines) * 120 + 30,
+        "characters_count": len(ids),
     }
 
 
