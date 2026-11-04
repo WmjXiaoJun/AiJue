@@ -388,7 +388,8 @@ def _template_style(tid: str) -> Optional[str]:
 
 _RENDER_TYPE_LABELS = {"2d": "2D 动画", "3d": "3D 电影", "realistic": "写实实拍"}
 _RENDER_STYLE_LABELS = {"jp_anime": "日漫电影感", "guoman": "国漫国风",
-                        "retro_cel": "复古赛璐璐", "soft_watercolor": "吉卜力治愈系"}
+                        "retro_cel": "复古赛璐璐", "soft_watercolor": "吉卜力治愈系",
+                        "arcane_cinematic": "赛博电影感"}
 
 
 def _template_render_type(tid: str) -> str:

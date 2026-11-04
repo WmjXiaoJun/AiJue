@@ -56,6 +56,7 @@ _RENDER_STYLES = {
     "guoman": "国漫国风",
     "retro_cel": "复古赛璐璐",
     "soft_watercolor": "吉卜力治愈系",
+    "arcane_cinematic": "赛博电影感",
 }
 
 #: V24 概念图（imagegen/SDXL）：单张 portrait；V28 扩展三视图/表情/设定图

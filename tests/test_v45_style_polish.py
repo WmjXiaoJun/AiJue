@@ -140,3 +140,13 @@ def test_score_candidate_returns_metrics(tmp_path):
         assert key in score
     assert isinstance(score["score"], float)
     assert hq._score_candidate(tmp_path / "missing.png")["score"] == 0.0
+
+
+def test_arcane_cinematic_uses_lora():
+    """V46：赛博电影感 = DreamShaper + arcane LoRA，关键帧要透传 lora 参数。"""
+    style = hq.STYLE_2D_STYLES["arcane_cinematic"]
+    assert style["ckpt"].startswith("DreamShaperXL")
+    assert style["lora"] == "arcane-style-xl.safetensors"
+    assert 0.5 <= float(style["lora_strength"]) <= 1.0
+    prompt = hq._keyframe_prompt(style, "a studio", hq._character_look("laozhou"))
+    assert "arcane style" in prompt

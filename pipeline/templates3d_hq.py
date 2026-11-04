@@ -99,6 +99,30 @@ STYLE_2D_STYLES = {
         "age_extra": ("older mature adult, 45 years old, weathered skin, faint wrinkles, "
                       "sharp cheekbones, mature male face"),
     },
+    "arcane_cinematic": {
+        "label": "赛博电影感",
+        "imagegen": "anime",
+        # Arcane / 双城之战那类「绘画感半写实动画」：DreamShaper + arcane LoRA
+        "ckpt": "DreamShaperXL_Turbo_v2_1.safetensors",
+        "lora": "arcane-style-xl.safetensors",
+        "lora_strength": 0.85,
+        "cfg": 4.0, "steps": 16, "sampler": "dpmpp_sde", "scheduler": "karras",
+        "ip_strength": 0.45, "ip_end": 0.55, "ip_weight_type": "style transfer",
+        "prompt": ("arcane style, league of legends painted animation, cinematic semi-realistic "
+                   "animation film still, painterly brushwork, volumetric light, "
+                   "teal and amber palette"),
+        "background": ("detailed painted background, cinematic depth, atmospheric perspective, "
+                       "painterly environment"),
+        # 这条风格不能沿用「平涂/赛璐璐」前缀，H3 视频也要写「绘画感半写实」
+        "prefix": ("cinematic painted animation, semi-realistic stylized film still, "
+                   "painterly textures, volumetric lighting, film grain"),
+        "quality": ("cinematic animated film quality, painterly shading, detailed faces, "
+                    "volumetric light, no flat cel shading"),
+        "art_style": "painted semi-realistic animation art style",
+        "finish": "painterly brushwork, volumetric light, semi-realistic shading",
+        "negative_extra": ("multiple characters, 2boys, twin, close-up, photo, 3d render, "
+                           "cartoon outline, flat colors"),
+    },
     "soft_watercolor": {
         "label": "吉卜力治愈系",
         "imagegen": "anime",
@@ -126,9 +150,11 @@ def apply_2d_style(prompt: str, broll: bool = False, style_id: str = "jp_anime")
     """V42/V43/V44：把 3D/T2VA 提示词改写为指定 2D 风格。"""
     style_key = resolve_2d_style(style_id)
     style = STYLE_2D_STYLES[style_key]
+    prefix = str(style.get("prefix") or STYLE_2D_PREFIX)
+    quality = str(style.get("quality") or STYLE_2D_QUALITY)
     text = str(prompt or "")
     text = re.sub(r"3D animated feature film quality[^.]*\.",
-                  STYLE_2D_QUALITY + ".", text, flags=re.IGNORECASE)
+                  quality + ".", text, flags=re.IGNORECASE)
     text = re.sub(r"(?:3D|3d)\s+toon", "2D anime", text)
     text = re.sub(r"stylized\s+(?:3D|3d)\s+animated", "stylized 2D anime", text)
     text = re.sub(r"(?:3D|3d)\s+animated", "2D anime", text)
@@ -136,7 +162,7 @@ def apply_2d_style(prompt: str, broll: bool = False, style_id: str = "jp_anime")
     text = re.sub(r"\b(?:3D|3d)\b", "2D", text)
     text = re.sub(r"\brich physical materials,\s*", "", text, flags=re.IGNORECASE)
     text = re.sub(r"volumetric light", "flat cel-shaded lighting", text, flags=re.IGNORECASE)
-    text = STYLE_2D_PREFIX + ". " + style["prompt"] + ". " + text
+    text = prefix + ". " + style["prompt"] + ". " + text
     if broll:
         text += (" " + STYLE_2D_BROLL
                  + " detailed background, environment art, rich scene detail.")
@@ -509,6 +535,9 @@ def _generate_keyframe(tid: str, shot: dict, visual: str, seed: int,
             "--ref", str(portrait), "--ip-adapter-strength", f"{effective_ip:.2f}",
             "--ip-adapter-end-at", f"{effective_end:.2f}",
             "--ip-adapter-weight-type", str(style["ip_weight_type"]),
+            *(["--lora", str(style["lora"]),
+               "--lora-strength", f"{float(style.get('lora_strength', 0.85)):.2f}"]
+              if style.get("lora") else []),
             "--prompt-extra", prompt_extra,
             "--negative-extra", negative_extra,
             "--seed", str(seed_value), "--timeout", "600",
@@ -632,14 +661,15 @@ def motion_prompt(shot: dict, style_mode: str = "3d", style_id: str = "jp_anime"
         age_line = f" The character is {age_identity}." if age_identity else ""
         return (
             "subject_definitions: Subject 1 is the character shown in the reference image, preserving their exact face, "
-            "hairstyle, hair color, outfit (same jacket, same necktie, same colors), age and 2D anime art style; "
-            "cel-shaded, clean line art, flat colors."
+            "hairstyle, hair color, outfit (same jacket, same necktie, same colors), age and "
+            f"{str(style.get('art_style') or '2D anime art style')}; "
+            f"{str(style.get('finish') or 'cel-shaded, clean line art, flat colors')}."
             f"{age_line}\n\n"
-            f"summary: {STYLE_2D_PREFIX}. {style['prompt']}. {visual or 'A cinematic 2D anime scene.'} "
+            f"summary: {str(style.get('prefix') or STYLE_2D_PREFIX)}. {style['prompt']}. {visual or 'A cinematic 2D anime scene.'} "
             f"The shot is a medium or medium-wide 2D anime composition that keeps the surrounding set visible; {move}. "
             "The character speaks naturally with lips moving in sync with the reference speech audio, blinking and "
             "gesturing, while the camera and body have gentle hand-drawn motion. Keep the character identity consistent "
-            f"with the reference image.{age_line} {STYLE_2D_QUALITY}; {style['prompt']}. "
+            f"with the reference image.{age_line} {str(style.get('quality') or STYLE_2D_QUALITY)}; {style['prompt']}. "
             "no text, no subtitles, no watermark.\n\n"
             "overall_soundscape: the same spoken sentence, close-mic voice, quiet room tone.\n\n"
             "non_diegetic_music: N/A"

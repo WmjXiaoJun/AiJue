@@ -129,7 +129,7 @@ export interface CinemaTemplateFinal {
 
 export type RenderType = "2d" | "3d" | "realistic";
 
-export type RenderStyle = "jp_anime" | "guoman" | "retro_cel" | "soft_watercolor";
+export type RenderStyle = "jp_anime" | "guoman" | "retro_cel" | "soft_watercolor" | "arcane_cinematic";
 
 export interface RenderStyleMeta {
   id: RenderStyle;
@@ -144,13 +144,17 @@ export const RENDER_STYLE_META: Record<RenderStyle, RenderStyleMeta> = {
   guoman: { id: "guoman", label: "国漫国风", short: "国风", desc: "国风动画电影感：水墨色彩 + 中式建筑/美术，画面更典雅" },
   retro_cel: { id: "retro_cel", label: "复古赛璐璐", short: "赛璐璐", desc: "90 年代复古赛璐璐：粗描边 + 有限色板 + 胶片颗粒" },
   soft_watercolor: { id: "soft_watercolor", label: "吉卜力治愈系", short: "治愈", desc: "手绘水彩吉卜力风：暖色柔光 + 温柔治愈的氛围" },
+  arcane_cinematic: { id: "arcane_cinematic", label: "赛博电影感", short: "赛博", desc: "绘画感半写实动画（Arcane 风）：厚涂笔触 + 青橙光比 + 电影景深" },
 };
 
-export const RENDER_STYLE_ORDER: RenderStyle[] = ["jp_anime", "guoman", "retro_cel", "soft_watercolor"];
+export const RENDER_STYLE_ORDER: RenderStyle[] = ["jp_anime", "guoman", "retro_cel", "soft_watercolor", "arcane_cinematic"];
 
 export function resolveRenderStyle(input?: { render_style?: string } | string | null): RenderStyle {
   const explicit = typeof input === "string" ? input : input?.render_style;
-  return explicit === "guoman" || explicit === "retro_cel" || explicit === "soft_watercolor" ? explicit : "jp_anime";
+  return explicit === "guoman" || explicit === "retro_cel"
+    || explicit === "soft_watercolor" || explicit === "arcane_cinematic"
+    ? explicit
+    : "jp_anime";
 }
 
 export function renderStyleMeta(input?: { render_style?: string } | string | null): RenderStyleMeta {
