@@ -101,13 +101,17 @@ STYLE_2D_STYLES = {
     "soft_watercolor": {
         "label": "吉卜力治愈系",
         "imagegen": "anime",
-        "ckpt": "AAM_XL_Anime_Mix.safetensors",
-        "cfg": 6.5, "steps": 32, "sampler": "euler_ancestral", "scheduler": "normal",
+        # DreamShaper XL（turbo）：SDXL 通用/插画底模，手绘/水彩质感比 AAM 更接近吉卜力
+        "ckpt": "DreamShaperXL_Turbo_v2_1.safetensors",
+        "cfg": 4.0, "steps": 16, "sampler": "dpmpp_sde", "scheduler": "karras",
         "ip_strength": 0.48, "ip_end": 0.55, "ip_weight_type": "style transfer",
         "prompt": ("studio ghibli inspired watercolor anime, gouache painting, hand-painted, "
                    "warm golden hour palette, gentle healing mood"),
         "background": ("hand-painted watercolor background, warm greens and amber, "
                        "lush painterly detail, soft dappled light"),
+        # turbo 底模容易补出第二个人，额外压人数
+        "negative_extra": ("2boys, multiple characters, twin, clone, duplicate person, "
+                           "extra person, mirror image"),
     },
 }
 
@@ -366,7 +370,9 @@ def _generate_keyframe(tid: str, shot: dict, visual: str, seed: int,
     spec_path = _imagegen_spec_for(cid, KEYFRAMES / "specs")
     raw_dir = KEYFRAMES / tid / f"{style_key}_{ckpt_tag}" / f"raw_{shot_id}"
     prompt_extra = _keyframe_prompt(style, visual, look)
-    negative_extra = ", ".join([KEYFRAME_NEGATIVE, *look["negatives"]]) if look["negatives"]         else KEYFRAME_NEGATIVE
+    style_negative = str(style.get("negative_extra") or "").strip()
+    negative_extra = ", ".join(
+        part for part in (KEYFRAME_NEGATIVE, style_negative, ", ".join(look["negatives"])) if part)
     cmd = [
         sys.executable, "-m", "imagegen.cli", "generate",
         "--spec", str(spec_path), "--outdir", str(raw_dir),

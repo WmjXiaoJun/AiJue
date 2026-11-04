@@ -25,11 +25,13 @@ def test_styles_have_own_checkpoint_and_sampling():
         style = hq.STYLE_2D_STYLES[style_id]
         assert style["ckpt"].endswith(".safetensors"), style
         assert 0.0 < float(style["cfg"]) < 12.0
-        assert int(style["steps"]) >= 24
+        # turbo 底模只要 8~16 步，普通 SDXL 24+；这里只保证不是空配置
+        assert int(style["steps"]) >= 8
         assert style["sampler"]
         assert style["prompt"] and style["background"]
         ckpts[style_id] = style["ckpt"]
-    assert len(set(ckpts.values())) >= 3, ckpts
+    # V45.1：4 种风格 4 个不同底模（animagine / AAM / Illustrious / DreamShaper）
+    assert len(set(ckpts.values())) == 4, ckpts
 
 
 def test_ip_adapter_weight_lowered_and_early_end():

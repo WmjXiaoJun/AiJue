@@ -10,13 +10,13 @@
 | `jp_anime` | 日漫电影感 | `animagine-xl-4.0.safetensors` | 5.5 / 30 | 0.50 → 0.58 | Japanese anime film still, soft cel shading, thin detailed lineart, muted cinematic color |
 | `guoman` | 国漫国风 | `AAM_XL_Anime_Mix.safetensors` | 6.0 / 30 | 0.48 → 0.56 | Chinese guofeng animation film still, ink-wash accents, Chinese architecture, 中式木构/灯笼环境句 |
 | `retro_cel` | 复古赛璐璐 | `Illustrious-XL-v1.0.safetensors` | 5.5 / 32 | 0.55 → 0.62 | 90s retro cel anime, bold outlines, limited palette, vintage film grain |
-| `soft_watercolor` | 吉卜力治愈系 | `AAM_XL_Anime_Mix.safetensors` | 6.5 / 32 | 0.48 → 0.55 | studio ghibli inspired watercolor, gouache, warm golden hour palette, 手绘水彩环境句 |
+| `soft_watercolor` | 吉卜力治愈系 | `DreamShaperXL_Turbo_v2_1.safetensors` | 4.0 / 16（dpmpp_sde + karras） | 0.48 → 0.55 | studio ghibli inspired watercolor, gouache, warm golden hour palette + 人数负面（2boys/multiple characters/twin…） |
 
 - 统一 `--ip-adapter-weight-type "style transfer"`：只借参考图的风格/气质，不再把参考立绘的「大特写 + 黑底 + 光效」构图带进关键帧。
 - 权重按底模微调：Illustrious 在 0.50 时脸部漂移偏大（`tmp/v16/keyframes/.../retro_cel_illustriousxlv_ip50|ip55|ip60` 三档对比），最终定 0.55；AAM 两个风格 0.48 已足够锁脸。
 - 构图切到新的 `scene_wide`（中远景 + environment visible + detailed background），替代原来 scene 预设里的 `medium shot + dark studio background`。
 - 采样参数随风格走（cfg/steps/sampler/scheduler 可在 `STYLE_2D_STYLES` 单独调），关键帧缓存目录按 `<style>_<ckpt>_ipNN` 分层，换 checkpoint/权重不会误用旧图。
-- **底模现状**：本机只有 3 个可用动漫/插画 SDXL 底模（animagine / AAM / Illustrious），4 种风格里国风与治愈共用 AAM，靠提示词 + 调色 + 负面词区分；另装了 `NoobAI-XL-v1.0` 备选（实测偏平，未启用）。若要 4 个完全独立底模，只需在风格表里改 `ckpt` 字段。
+- **底模现状（V45.1 起）**：4 种风格 = **4 个不同底模**：animagine-xl-4.0 / AAM_XL_Anime_Mix / Illustrious-XL-v1.0 / DreamShaperXL_Turbo_v2_1（吉卜力治愈系）。DreamShaper 是通用插画 SDXL，手绘/水彩质感比 AAM 更接近吉卜力，但 turbo 底模容易补出第二个人，已加风格级 `negative_extra`（2boys / multiple characters / twin / clone / duplicate person / extra person / mirror image）压人数；另装 `NoobAI-XL-v1.0` 备选（实测偏平，未启用）。
 
 ## 2. 角色还原度：按年龄/气质写进关键帧与口型提示词
 
@@ -129,7 +129,7 @@
 
 ## 8. 遗留
 
-- 4 风格 3 底模（见 §1）；要完全一一对应可补一个 SDXL 动漫底模并改风格表 `ckpt`。
+- ~~4 风格 3 底模~~（已解决）：吉卜力治愈系换 DreamShaperXL_Turbo_v2_1（cfg 4 / 16 步 / dpmpp_sde+karras），4 风格 4 底模；重跑 520.2s / 5,097,103B，海报与成片均已同步。
 - H3 ref2va 只吃关键帧首帧，年龄/气质靠首帧与口型句双重约束；若某风格脸仍偏年轻，优先降该风格 `ip_strength` 0.02 或加 `no youthful face` 负面。
 - ~~关键帧服装漂移~~（已修）：`_character_look` 现在从合同 `appearance.outfit` 生成硬约束——西装角色追加 `wearing a tailored business suit, white shirt and necktie, same suit as the reference`，负面追加 `suspenders/overalls/casual clothes/t-shirt/different outfit`，并同步进 H3 口型句。`soft_watercolor` 已清关键帧 + 片段重跑（500.2s / 4,868,179B）：新关键帧、海报、成片第 3 秒均为深蓝西装 + 领带，不再出现吊带。
 - 成片阶段曾有 2 处 H3 抖动观察（与关键帧无关）：
