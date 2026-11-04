@@ -53,33 +53,57 @@ STYLE_2D_QUALITY = ("2D anime film quality, clean line art, flat cel-shaded colo
                     "hand-drawn animation, anime screenshot")
 STYLE_2D_BROLL = ("anime key visual, Japanese TV anime screenshot, clean lineart, "
                   "flat cel-shaded colors, detailed background, no 3D, no cgi")
-STYLE_2D_CACHE = "_2d_v44"
+STYLE_2D_CACHE = "_2d_v45"
 
-#: V44：2D 风格子类型 → imagegen style / 追加提示词
+#: V45：2D 风格子类型 → 独立 checkpoint + 采样参数 + IP-Adapter 权重 + 提示词
+#: - ckpt：每种风格一个真实 SDXL checkpoint（不同底模，画风差异来自模型而非只靠提示词）
+#: - ip_strength / ip_end / ip_weight_type：V45 把 0.75 的「锁脸权重」降下来，并改成
+#:   style transfer，让背景在采样后段自由生成（脸稳、背景不再是一团抽象色块）
+#: - prompt：风格句（关键帧 / B-roll / ref2va 共用）；background：只压关键帧的环境句
 STYLE_2D_STYLES = {
     "jp_anime": {
         "label": "日漫电影感",
         "imagegen": "anime",
-        "prompt": ("Japanese anime film still, cinematic anime key visual, detailed lineart, "
-                   "soft cel shading, film grain"),
+        "ckpt": "animagine-xl-4.0.safetensors",
+        "cfg": 5.5, "steps": 30, "sampler": "euler_ancestral", "scheduler": "normal",
+        "ip_strength": 0.50, "ip_end": 0.58, "ip_weight_type": "style transfer",
+        "prompt": ("Japanese anime film still, soft cel shading, thin detailed lineart, "
+                   "muted cinematic color"),
+        "background": ("detailed anime background art, painted environment, layered depth, "
+                       "atmospheric perspective"),
     },
     "guoman": {
         "label": "国漫国风",
         "imagegen": "guoman",
-        "prompt": ("Chinese guofeng animation film key visual, elegant ink-wash color accents, "
-                   "detailed Chinese animation"),
+        "ckpt": "AAM_XL_Anime_Mix.safetensors",
+        "cfg": 6.0, "steps": 30, "sampler": "euler_ancestral", "scheduler": "normal",
+        "ip_strength": 0.48, "ip_end": 0.56, "ip_weight_type": "style transfer",
+        "prompt": ("Chinese guofeng animation film still, elegant ink-wash color accents, "
+                   "Chinese architecture, elegant color"),
+        "background": ("guofeng environment art, Chinese wooden lattice, lanterns, "
+                       "ink-wash atmosphere, painted background"),
     },
     "retro_cel": {
         "label": "复古赛璐璐",
-        "imagegen": "anime",
-        "prompt": ("90s retro cel anime, bold clean outlines, vintage anime screenshot, "
-                   "slight film grain"),
+        "imagegen": "illustrious",
+        "ckpt": "Illustrious-XL-v1.0.safetensors",
+        "cfg": 5.5, "steps": 32, "sampler": "euler_ancestral", "scheduler": "normal",
+        "ip_strength": 0.55, "ip_end": 0.62, "ip_weight_type": "style transfer",
+        "prompt": ("90s retro cel anime, bold clean outlines, limited palette, "
+                   "vintage film grain, hand-painted cel"),
+        "background": ("90s hand-painted anime background art, painted city night, "
+                       "soft gradients, sharp background detail"),
     },
     "soft_watercolor": {
-        "label": "治愈手绘",
+        "label": "吉卜力治愈系",
         "imagegen": "anime",
-        "prompt": ("hand-painted watercolor anime, soft warm palette, gentle healing atmosphere, "
-                   "hand-drawn textures"),
+        "ckpt": "AAM_XL_Anime_Mix.safetensors",
+        "cfg": 6.5, "steps": 32, "sampler": "euler_ancestral", "scheduler": "normal",
+        "ip_strength": 0.48, "ip_end": 0.55, "ip_weight_type": "style transfer",
+        "prompt": ("studio ghibli inspired watercolor anime, gouache painting, hand-painted, "
+                   "warm golden hour palette, gentle healing mood"),
+        "background": ("hand-painted watercolor background, warm greens and amber, "
+                       "lush painterly detail, soft dappled light"),
     },
 }
 
@@ -105,7 +129,8 @@ def apply_2d_style(prompt: str, broll: bool = False, style_id: str = "jp_anime")
     text = re.sub(r"volumetric light", "flat cel-shaded lighting", text, flags=re.IGNORECASE)
     text = STYLE_2D_PREFIX + ". " + style["prompt"] + ". " + text
     if broll:
-        text += " " + STYLE_2D_BROLL + "."
+        text += (" " + STYLE_2D_BROLL
+                 + " detailed background, environment art, rich scene detail.")
     return text
 
 
@@ -175,11 +200,119 @@ def _imagegen_spec_for(cid: str, spec_dir: pathlib.Path) -> pathlib.Path:
     return path
 
 
+#: V45：角色气质关键词（中文合同 persona）→ 英文提示词；顺序即优先级
+_PERSONA_RULES = (
+    (("老练", "毒舌", "冷幽默", "控场", "沉稳", "经验", "保守", "从容", "胸襟", "务实", "克制"),
+     "composed, experienced, calm, confident"),
+    (("语速快", "乐观", "脑洞", "元气", "开心", "活泼", "快乐", "直爽", "真诚", "自嘲"),
+     "energetic, cheerful, expressive"),
+    (("威严", "寡言", "杀伐", "雄猜", "不容置疑", "雍容", "锋利", "命令句"),
+     "dignified, authoritative, stern"),
+    (("逻辑", "条理", "学霸", "效率", "焦虑", "冷静", "胜负"), "focused, sharp, intelligent"),
+    (("狂放", "不羁", "夸张", "旷达", "比喻"), "charismatic, theatrical"),
+    (("冷面", "面无表情"), "deadpan expression"),
+    (("紧张", "萌新"), "slightly nervous, earnest"),
+)
+
+#: 年龄分层：身份硬约束 / 口型句 / 负面词（V45 核心：老角色不许再画成少年）
+_AGE_TIERS = (
+    (60, ("mature adult", "senior presence", "grey hair", "deep facial lines", "weathered face"),
+     "senior adult", ["teen", "teenager", "boy", "shonen", "young adult", "baby face", "chibi"]),
+    (45, ("mature adult", "defined jawline", "subtle facial age lines", "mature presence"),
+     "mature adult", ["teen", "teenager", "boy", "shonen", "young adult", "baby face", "chibi"]),
+    (35, ("mature adult", "middle-aged appearance", "defined jawline", "subtle facial age lines"),
+     "mature adult", ["teen", "teenager", "boy", "shonen", "young adult", "smooth youthful skin",
+                      "baby face", "chibi", "boyish"]),
+    (30, ("adult", "age-accurate"), "adult", ["teen", "teenager", "child", "chibi", "elderly"]),
+    (18, ("young adult", "age-accurate"), "young adult", ["middle-aged", "elderly", "old man"]),
+    (0, ("child", "age-accurate"), "child", ["adult", "middle-aged", "elderly"]),
+)
+
+
+def _character_look(cid: str) -> dict:
+    """V45：角色合同（age/gender/persona）→ 关键帧年龄/气质硬约束 + 负面词 + 口型句。
+
+    关键帧提示词与 H3 ref2va 共用同一份「年龄 + 气质」描述，保证 AI 生成的 42 岁老周
+    不会因为参考立绘偏年轻而被画回少年感。
+    """
+    contract = _character_contract(cid)
+    appearance = contract.get("appearance") if isinstance(contract.get("appearance"), dict) else {}
+    persona = str(contract.get("persona") or "")
+    try:
+        age = int(appearance.get("age") or 0)
+    except (TypeError, ValueError):
+        age = 0
+    gender_raw = str(appearance.get("gender") or "").strip().lower()
+    is_robot = ("robot" in cid.lower() or "机器人" in persona or "机械" in persona)
+    if gender_raw.startswith("f") or gender_raw in ("woman", "girl", "女"):
+        gender_tag, noun = "female", "woman"
+    elif gender_raw.startswith("m") or gender_raw in ("man", "boy", "男"):
+        gender_tag, noun = "male", "man"
+    else:
+        gender_tag, noun = "androgynous", "person"
+
+    if is_robot:
+        identity = (f"android robot character {cid}, mechanical joints, metal panels, "
+                    "non-human, humanoid robot, age-accurate")
+        motion = "a humanoid robot assistant, non-human, mechanical"
+        negatives = ["human skin", "realistic human face", "wrinkles", "child"]
+    else:
+        tier = next(item for item in _AGE_TIERS if age >= item[0])
+        _, traits, motion_tag, negatives = tier
+        persona_tags = []
+        for words, tag in _PERSONA_RULES:
+            if any(word in persona for word in words) and tag not in persona_tags:
+                persona_tags.append(tag)
+        if not persona_tags:
+            persona_tags.append("natural, neutral expression")
+        head = f"{age}-year-old {noun}" if age else f"adult {gender_tag}"
+        identity = ", ".join([head, *traits, *persona_tags])
+        motion = f"a {age}-year-old {noun}, {motion_tag}, {persona_tags[0]}" if age             else f"an adult {gender_tag}, {motion_tag}"
+    return {"identity": identity, "motion": motion, "negatives": list(negatives),
+            "age": age, "gender": gender_tag, "persona": persona, "robot": is_robot}
+
+
+def _character_age_persona(cid: str) -> tuple[str, list[str]]:
+    """兼容旧调用：返回 (身份约束, 负面词)。"""
+    look = _character_look(cid)
+    return look["identity"], look["negatives"]
+
+
+#: V45：关键帧负面词（压掉 IP-Adapter 从参考立绘带进来的光效/黑底/大特写构图）
+KEYFRAME_NEGATIVE = (
+    "abstract background, gradient backdrop, solid color background, black background, "
+    "empty background, close-up, face fills frame, bust portrait, cropped face, multiple views, "
+    "split screen, duplicated face, mirrored, collage, diptych, poster, character sheet, "
+    "energy aura, glowing aura, magic circle, floating sparks, flame, fire, lightning, "
+    "swirling light, abstract shapes, speed lines, text")
+
+
+def _keyframe_prompt(style: dict, visual: str, look: dict) -> str:
+    """V45：风格句 + 场景句 + 环境句 + 角色年龄气质句（环境在前，避免只画脸）。"""
+    scene = visual or "a cinematic interior scene with a fully visible background"
+    return (f"{style['prompt']}; {scene}; {style['background']}; {look['identity']}; "
+            "detailed face, cel-shaded, clean lineart, official anime art")
+
+
+def _ckpt_tag(ckpt: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "", str(ckpt).split(".")[0].lower())[:14] or "ckpt"
+
+
 def _generate_keyframe(tid: str, shot: dict, visual: str, seed: int,
-                       style_id: str = "jp_anime") -> pathlib.Path:
-    """SDXL 关键帧（scene 1280x720，portrait IP-Adapter 0.75）→ 1024×576；V44 支持风格。"""
+                       style_id: str = "jp_anime",
+                       ip_strength: float | None = None,
+                       ip_end: float | None = None) -> pathlib.Path:
+    """SDXL 关键帧（scene 1280x720，portrait IP-Adapter 锁脸）→ 1024×576。
+
+    V45：每种风格走自己的 checkpoint + 采样参数；IP-Adapter 权重降到 0.5 左右并切成
+    style transfer / 提前 end_at，让背景在采样后段充分生成（脸仍由参考立绘锁住）。
+    """
     style_key = resolve_2d_style(style_id)
     style = STYLE_2D_STYLES[style_key]
+    effective_ip = float(ip_strength) if ip_strength is not None else float(style["ip_strength"])
+    effective_ip = max(0.0, min(1.0, effective_ip))
+    effective_end = float(ip_end) if ip_end is not None else float(style["ip_end"])
+    effective_end = max(0.0, min(1.0, effective_end))
     shot_id = str(shot.get("id"))
     cid = _shot_character_id(tid, shot)
     if not cid:
@@ -187,26 +320,38 @@ def _generate_keyframe(tid: str, shot: dict, visual: str, seed: int,
     portrait = REPO / "assets" / "v5" / "characters" / cid / "portrait.png"
     if not portrait.is_file():
         raise RuntimeError(f"{shot_id}: 缺少 anime 立绘 {portrait}")
-    key_dir = KEYFRAMES / tid / style_key
+    look = _character_look(cid)
+    ckpt_tag = _ckpt_tag(style["ckpt"])
+    key_dir = KEYFRAMES / tid / f"{style_key}_{ckpt_tag}_ip{int(round(effective_ip * 100))}"
     key_dir.mkdir(parents=True, exist_ok=True)
     key_png = key_dir / f"{shot_id}.png"
-    if key_png.is_file() and key_png.stat().st_size > 100_000:
-        return key_png
+    meta_path = key_dir / f"{shot_id}.meta.json"
+    if key_png.is_file() and key_png.stat().st_size > 100_000 and meta_path.is_file():
+        try:
+            cached_meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            cached_meta = {}
+        if (abs(float(cached_meta.get("ip_strength") or -1) - effective_ip) < 0.001
+                and abs(float(cached_meta.get("ip_end") or -1) - effective_end) < 0.001
+                and str(cached_meta.get("ckpt") or "") == str(style["ckpt"])):
+            return key_png
     spec_path = _imagegen_spec_for(cid, KEYFRAMES / "specs")
-    raw_dir = KEYFRAMES / tid / style_key / f"raw_{shot_id}"
-    prompt_extra = (
-        f"{visual or 'anime key visual scene'}; {style['prompt']}; "
-        "anime key visual, cel-shaded, clean lineart, detailed eyes, official anime art, no text; "
-        "detailed environment, background scenery, wide shot, cinematic composition"
-    )
+    raw_dir = KEYFRAMES / tid / f"{style_key}_{ckpt_tag}" / f"raw_{shot_id}"
+    prompt_extra = _keyframe_prompt(style, visual, look)
+    negative_extra = ", ".join([KEYFRAME_NEGATIVE, *look["negatives"]]) if look["negatives"]         else KEYFRAME_NEGATIVE
     cmd = [
         sys.executable, "-m", "imagegen.cli", "generate",
         "--spec", str(spec_path), "--outdir", str(raw_dir),
         "--mode", "scene", "--style", style["imagegen"], "--size", "1280x720",
-        "--ref", str(portrait), "--ip-adapter-strength", "0.75",
+        "--ckpt", str(style["ckpt"]),
+        "--composition", "scene_wide",
+        "--cfg", f"{float(style['cfg']):.1f}", "--steps", str(int(style["steps"])),
+        "--sampler", str(style["sampler"]), "--scheduler", str(style["scheduler"]),
+        "--ref", str(portrait), "--ip-adapter-strength", f"{effective_ip:.2f}",
+        "--ip-adapter-end-at", f"{effective_end:.2f}",
+        "--ip-adapter-weight-type", str(style["ip_weight_type"]),
         "--prompt-extra", prompt_extra,
-        "--negative-extra",
-        "abstract background, solid color background, plain background, close-up portrait, flames",
+        "--negative-extra", negative_extra,
         "--seed", str(seed), "--timeout", "600",
     ]
     proc = subprocess.run(cmd, cwd=str(REPO), capture_output=True, text=True,
@@ -221,7 +366,23 @@ def _generate_keyframe(tid: str, shot: dict, visual: str, seed: int,
         "-vf", "scale=1024:576:force_original_aspect_ratio=increase,crop=1024:576",
         str(key_png),
     ], check=True, capture_output=True, timeout=120)
-    log(f"[2D] 关键帧 {shot_id} ← {cid}（{style_key}/{style['label']}，{raw_png.stat().st_size} B）")
+    meta = {
+        "shot": shot_id, "character": cid, "style_2d": style_key,
+        "style_label": style["label"], "imagegen_style": style["imagegen"],
+        "ckpt": style["ckpt"], "cfg": style["cfg"], "steps": style["steps"],
+        "sampler": style["sampler"], "scheduler": style["scheduler"],
+        "composition": "scene_wide",
+        "ip_strength": effective_ip, "ip_end": effective_end,
+        "ip_weight_type": style["ip_weight_type"],
+        "age_identity": look["identity"], "age": look["age"], "gender": look["gender"],
+        "age_negatives": look["negatives"],
+        "prompt_extra": prompt_extra, "negative_extra": negative_extra,
+        "prompt": prompt_extra, "path": str(key_png),
+    }
+    meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
+    log(f"[2D] 关键帧 {shot_id} ← {cid}（{style_key}/{style['label']}，{ckpt_tag}，"
+        f"IP={effective_ip:.2f}→{effective_end:.2f}/{style['ip_weight_type']}，"
+        f"{raw_png.stat().st_size} B）")
     return key_png
 
 
@@ -266,7 +427,8 @@ def gen_t2va(tid: str, shot: dict, seed: int, style_mode: str = "3d",
     return out
 
 
-def motion_prompt(shot: dict, style_mode: str = "3d", style_id: str = "jp_anime") -> str:
+def motion_prompt(shot: dict, style_mode: str = "3d", style_id: str = "jp_anime",
+                  age_identity: str = "") -> str:
     style_key = resolve_2d_style(style_id)
     style = STYLE_2D_STYLES[style_key]
     visual = str(shot.get("semantic_visual") or "").strip()
@@ -282,14 +444,17 @@ def motion_prompt(shot: dict, style_mode: str = "3d", style_id: str = "jp_anime"
     if not move:
         move = "the camera drifts gently across the scene"
     if style_mode == "2d":
+        age_line = f" The character is {age_identity}." if age_identity else ""
         return (
             "subject_definitions: Subject 1 is the character shown in the reference image, preserving their exact face, "
-            "hairstyle, hair color, outfit, age and 2D anime art style; cel-shaded, clean line art, flat colors.\n\n"
+            "hairstyle, hair color, outfit, age and 2D anime art style; cel-shaded, clean line art, flat colors."
+            f"{age_line}\n\n"
             f"summary: {STYLE_2D_PREFIX}. {style['prompt']}. {visual or 'A cinematic 2D anime scene.'} "
             f"The shot is a medium or medium-wide 2D anime composition that keeps the surrounding set visible; {move}. "
             "The character speaks naturally with lips moving in sync with the reference speech audio, blinking and "
             "gesturing, while the camera and body have gentle hand-drawn motion. Keep the character identity consistent "
-            f"with the reference image. {STYLE_2D_QUALITY}; {style['prompt']}. no text, no subtitles, no watermark.\n\n"
+            f"with the reference image.{age_line} {STYLE_2D_QUALITY}; {style['prompt']}. "
+            "no text, no subtitles, no watermark.\n\n"
             "overall_soundscape: the same spoken sentence, close-mic voice, quiet room tone.\n\n"
             "non_diegetic_music: N/A"
         )
@@ -308,7 +473,7 @@ def motion_prompt(shot: dict, style_mode: str = "3d", style_id: str = "jp_anime"
 
 def gen_ref2va(tid: str, shot: dict, t2va: pathlib.Path, seed: int,
                style_mode: str = "3d", keyframe: pathlib.Path | None = None,
-               style_id: str = "jp_anime") -> pathlib.Path:
+               style_id: str = "jp_anime", age_identity: str = "") -> pathlib.Path:
     style_key = resolve_2d_style(style_id)
     suffix = f"{STYLE_2D_CACHE}_{style_key}" if style_mode == "2d" else ""
     out = WORK / "clips" / f"{tid}_{shot['id']}_ref2va1024{suffix}.mp4"
@@ -329,7 +494,8 @@ def gen_ref2va(tid: str, shot: dict, t2va: pathlib.Path, seed: int,
                         "-i", str(t2va), "-frames:v", "1", str(first)], check=False)
     audio = t3.V5_OUT / tid / "work" / "audio" / f"{shot['id']}.wav"
     prompt_file = WORK / "clips" / f"{tid}_{shot['id']}_prompt{suffix}.txt"
-    prompt_file.write_text(motion_prompt(shot, style_mode, style_key), encoding="utf-8")
+    prompt_file.write_text(motion_prompt(shot, style_mode, style_key, age_identity),
+                           encoding="utf-8")
     duration = float(shot.get("duration") or 5.0)
     proc = subprocess.run([
         sys.executable, str(H3_REF), "--mode", "audio_ref",
@@ -387,7 +553,11 @@ def main(argv=None) -> int:
                     help="V42：2d 使用 AI 动漫(cel-shaded/线稿)提示词，3d 保持原 hq")
     ap.add_argument("--2d-style", dest="style_2d", choices=tuple(STYLE_2D_STYLES),
                     default="jp_anime",
-                    help="V44：2D 风格子类型（仅在 --style-mode 2d 时生效）")
+                    help="V44/V45：2D 风格子类型（仅在 --style-mode 2d 时生效）")
+    ap.add_argument("--ip-strength", dest="ip_strength", type=float, default=None,
+                    help="V45：覆盖 2D 关键帧 IP-Adapter 权重（默认按风格，0.45~0.5）")
+    ap.add_argument("--ip-end", dest="ip_end", type=float, default=None,
+                    help="V45：覆盖 IP-Adapter 结束步（默认按风格，越早结束背景越自由）")
     ap.add_argument("--skip-t2va", action="store_true")
     ap.add_argument("--skip-ref2va", action="store_true")
     ap.add_argument("--reuse-shots", action="store_true",
@@ -396,6 +566,8 @@ def main(argv=None) -> int:
     tid = args.template
     style_mode = str(args.style_mode or "3d")
     style_2d = resolve_2d_style(getattr(args, "style_2d", "jp_anime"))
+    ip_strength = getattr(args, "ip_strength", None)
+    ip_end = getattr(args, "ip_end", None)
     briefs = briefs_for(tid)
     shots = [s for s in briefs["shots"] if s.get("prompt")]
     archive = REPO / f"outputs/_archive_v15_ref2va_768/{tid}/shots"
@@ -407,10 +579,13 @@ def main(argv=None) -> int:
         dst = archive / f"{shot['id']}.mp4"
         if src.is_file() and not dst.is_file():
             shutil.copy2(src, dst)
-    log(f"=== {tid}: {len(shots)} 镜，1024×576 T2VA + ref2va"
-        f"（style_mode={style_mode}"
-        + (f"，2d_style={style_2d}/{STYLE_2D_STYLES[style_2d]['label']}" if style_mode == "2d" else "")
-        + "）===")
+    style_note = ""
+    if style_mode == "2d":
+        style_conf = STYLE_2D_STYLES[style_2d]
+        style_note = (f"，2d_style={style_2d}/{style_conf['label']}，ckpt={style_conf['ckpt']}，"
+                      f"IP={style_conf['ip_strength']:.2f}→{style_conf['ip_end']:.2f}"
+                      f"/{style_conf['ip_weight_type']}")
+    log(f"=== {tid}: {len(shots)} 镜，1024×576 T2VA + ref2va（style_mode={style_mode}{style_note}）===")
     for i, shot in enumerate(shots, 1):
         existing = out_shots / f"{shot['id']}.mp4"
         if args.reuse_shots and existing.is_file() and existing.stat().st_size > 100_000:
@@ -418,13 +593,20 @@ def main(argv=None) -> int:
             continue
         seed = 20261102 + abs(hash(tid + shot["id"])) % 100000
         has_line = bool(str(shot.get("line") or "").strip())
+        age_identity = ""
+        if style_mode == "2d" and has_line:
+            cid = _shot_character_id(tid, shot)
+            if cid:
+                age_identity = _character_look(cid)["motion"]
         final_src = None
         if style_mode == "2d" and has_line and not args.skip_ref2va:
             visual = str(shot.get("semantic_visual") or "").strip()
             try:
-                keyframe = _generate_keyframe(tid, shot, visual, seed, style_2d)
+                keyframe = _generate_keyframe(tid, shot, visual, seed, style_2d,
+                                             ip_strength, ip_end)
                 final_src = gen_ref2va(tid, shot, keyframe, seed, style_mode,
-                                       keyframe=keyframe, style_id=style_2d)
+                                       keyframe=keyframe, style_id=style_2d,
+                                       age_identity=age_identity)
                 log(f"[{i}/{len(shots)}] {shot['id']} ok (keyframe+ref2va)")
             except Exception as exc:  # noqa: BLE001 - 关键帧失败回退 T2VA
                 log(f"[{i}/{len(shots)}] {shot['id']} 关键帧失败，回退 T2VA：{exc}")
@@ -435,7 +617,7 @@ def main(argv=None) -> int:
             final_src = t2va
             if has_line and not args.skip_ref2va:
                 final_src = gen_ref2va(tid, shot, t2va, seed, style_mode,
-                                       style_id=style_2d)
+                                       style_id=style_2d, age_identity=age_identity)
             log(f"[{i}/{len(shots)}] {shot['id']} ok "
                 f"({'ref2va' if final_src != t2va else 't2va'})")
         shutil.copy2(final_src, out_shots / f"{shot['id']}.mp4")

@@ -299,6 +299,11 @@ COMPOSITIONS = {
     "expressions": ["upper body", "looking at viewer", "studio lighting", "dark background"],
     "scene": ["cinematic anime film still", "medium shot", "dramatic lighting",
               "dark studio background", "depth of field"],
+    # V45：关键帧用「环境优先」构图（角色在画面中但背景必须成景，避免 IP-Adapter 把参考立绘的
+    # 纯色/黑色底 + 光效带进来，出现「脸很大、背景抽象」的问题）
+    "scene_wide": ["cinematic anime film still", "medium wide shot", "wide composition",
+                   "environment visible", "detailed background", "cinematic lighting",
+                   "depth of field"],
 }
 
 EXPRESSION_TAGS = {

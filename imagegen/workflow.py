@@ -24,6 +24,26 @@ SQUARE_SIZE = (1024, 1024)
 DEFAULT_NEGATIVE_CHECKPOINT = DEFAULT_CKPT
 
 
+def _base_nodes(positive: str, negative: str, filename_prefix: str, ckpt_name: str,
+                lora_name: str = "", lora_strength: float = 1.0) -> dict:
+    """V45：checkpoint + 正负提示词节点；有 LoRA 时加 11 号 LoraLoaderModelOnly。
+
+    返回 {1 ckpt, 2 pos, 3 neg[, 11 lora]}，下游 KSampler/IPAdapter 按是否有 LoRA 取 model。
+    """
+    nodes = {
+        "1": {"class_type": "CheckpointLoaderSimple", "inputs": {"ckpt_name": ckpt_name}},
+        "2": {"class_type": "CLIPTextEncode", "inputs": {"text": positive, "clip": ["1", 1]}},
+        "3": {"class_type": "CLIPTextEncode", "inputs": {"text": negative, "clip": ["1", 1]}},
+    }
+    if lora_name:
+        nodes["11"] = {
+            "class_type": "LoraLoaderModelOnly",
+            "inputs": {"model": ["1", 0], "lora_name": str(lora_name),
+                       "strength_model": float(lora_strength)},
+        }
+    return nodes
+
+
 def build_workflow(positive: str,
                    negative: str,
                    width: int = 1024,
@@ -35,23 +55,18 @@ def build_workflow(positive: str,
                    cfg: float = DEFAULT_CFG,
                    sampler_name: str = DEFAULT_SAMPLER,
                    scheduler: str = DEFAULT_SCHEDULER,
-                   batch_size: int = 1) -> dict:
-    """构造给 POST /prompt 的 API prompt（class_type + inputs）。节点 id 固定，便于复现/调试。"""
+                   batch_size: int = 1,
+                   lora_name: str = "",
+                   lora_strength: float = 1.0) -> dict:
+    """构造给 POST /prompt 的 API prompt（class_type + inputs）。节点 id 固定，便于复现/调试。
+
+    V45：lora_name 非空时在 checkpoint 后串一个 LoraLoaderModelOnly（节点 11），
+    KSampler 的 model 改为取 LoRA 输出。
+    """
     if width % 8 or height % 8:
         raise ValueError("SDXL 宽高必须是 8 的倍数: %dx%d" % (width, height))
-    return {
-        "1": {
-            "class_type": "CheckpointLoaderSimple",
-            "inputs": {"ckpt_name": ckpt_name},
-        },
-        "2": {
-            "class_type": "CLIPTextEncode",
-            "inputs": {"text": positive, "clip": ["1", 1]},
-        },
-        "3": {
-            "class_type": "CLIPTextEncode",
-            "inputs": {"text": negative, "clip": ["1", 1]},
-        },
+    wf = _base_nodes(positive, negative, filename_prefix, ckpt_name, lora_name, lora_strength)
+    wf.update({
         "4": {
             "class_type": "EmptyLatentImage",
             "inputs": {"width": int(width), "height": int(height), "batch_size": int(batch_size)},
@@ -59,7 +74,7 @@ def build_workflow(positive: str,
         "5": {
             "class_type": "KSampler",
             "inputs": {
-                "model": ["1", 0],
+                "model": ["11", 0] if lora_name else ["1", 0],
                 "positive": ["2", 0],
                 "negative": ["3", 0],
                 "latent_image": ["4", 0],
@@ -79,7 +94,8 @@ def build_workflow(positive: str,
             "class_type": "SaveImage",
             "inputs": {"images": ["6", 0], "filename_prefix": filename_prefix},
         },
-    }
+    })
+    return wf
 
 
 
@@ -102,7 +118,9 @@ def build_ipadapter_workflow(positive: str,
                              ipadapter_end: float = 0.85,
                              ipadapter_weight_type: str = "linear",
                              ipadapter_combine_embeds: str = "concat",
-                             ipadapter_embeds_scaling: str = "V only") -> dict:
+                             ipadapter_embeds_scaling: str = "V only",
+                             lora_name: str = "",
+                             lora_strength: float = 1.0) -> dict:
     """SDXL txt2img + IP-Adapter（角色一致性）。
 
     ref_image 是相对 ComfyUI/input 的路径（如 "zaopianju_concepts/laozhou_ref.png"），
@@ -113,10 +131,8 @@ def build_ipadapter_workflow(positive: str,
     """
     if width % 8 or height % 8:
         raise ValueError("SDXL 宽高必须是 8 的倍数: %dx%d" % (width, height))
-    return {
-        "1": {"class_type": "CheckpointLoaderSimple", "inputs": {"ckpt_name": ckpt_name}},
-        "2": {"class_type": "CLIPTextEncode", "inputs": {"text": positive, "clip": ["1", 1]}},
-        "3": {"class_type": "CLIPTextEncode", "inputs": {"text": negative, "clip": ["1", 1]}},
+    wf = _base_nodes(positive, negative, filename_prefix, ckpt_name, lora_name, lora_strength)
+    wf.update({
         "4": {"class_type": "EmptyLatentImage",
               "inputs": {"width": int(width), "height": int(height), "batch_size": 1}},
         "5": {"class_type": "KSampler",
@@ -127,7 +143,8 @@ def build_ipadapter_workflow(positive: str,
         "6": {"class_type": "VAEDecode", "inputs": {"samples": ["5", 0], "vae": ["1", 2]}},
         "7": {"class_type": "SaveImage", "inputs": {"images": ["6", 0], "filename_prefix": filename_prefix}},
         "8": {"class_type": "IPAdapterUnifiedLoader",
-              "inputs": {"model": ["1", 0], "preset": ipadapter_preset}},
+              "inputs": {"model": ["11", 0] if lora_name else ["1", 0],
+                         "preset": ipadapter_preset}},
         "9": {"class_type": "IPAdapterAdvanced",
               "inputs": {"model": ["8", 0], "ipadapter": ["8", 1], "image": ["10", 0],
                          "weight": float(ipadapter_weight), "weight_type": ipadapter_weight_type,
@@ -135,7 +152,8 @@ def build_ipadapter_workflow(positive: str,
                          "combine_embeds": ipadapter_combine_embeds,
                          "embeds_scaling": ipadapter_embeds_scaling}},
         "10": {"class_type": "LoadImage", "inputs": {"image": ref_image}},
-    }
+    })
+    return wf
 
 # 每个 input 期望的连线类型（用于本地轻量校验，避免不必要的 400）
 _LINK_TYPES = {

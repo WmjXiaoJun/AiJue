@@ -100,6 +100,10 @@ def build_plan(args, spec: dict) -> list:
     if getattr(args, "views", None):
         want = {v.strip() for v in str(args.views).split(",") if v.strip()}
         jobs = [j for j in jobs if j["tag"] in want]
+    override = getattr(args, "composition", None)
+    if override:
+        for job in jobs:  # V45：构图覆盖（scene → scene_wide 等），尺寸仍按 --size
+            job["composition"] = override
     return jobs
 
 
@@ -135,6 +139,8 @@ def generate_one(job, spec, args, object_info, outdir, log):
             ipadapter_weight=args.ip_adapter_strength,
             ipadapter_end=args.ip_adapter_end_at,
             ipadapter_weight_type=args.ip_adapter_weight_type,
+            lora_name=getattr(args, "lora", None) or "",
+            lora_strength=float(getattr(args, "lora_strength", 0.9)),
         )
     else:
         wf = build_workflow(
@@ -142,6 +148,8 @@ def generate_one(job, spec, args, object_info, outdir, log):
             seed=job["seed"], filename_prefix=prefix, ckpt_name=args.ckpt,
             steps=args.steps, cfg=args.cfg, sampler_name=args.sampler,
             scheduler=args.scheduler,
+            lora_name=getattr(args, "lora", None) or "",
+            lora_strength=float(getattr(args, "lora_strength", 0.9)),
         )
     for warn in validate_workflow(wf, object_info):
         log("[warn] " + warn)
@@ -426,6 +434,11 @@ def build_parser() -> argparse.ArgumentParser:
                        help="IPAdapter weight_type（linear/ease in/ease out/style transfer/composition）")
     p_gen.add_argument("--negative-extra", default="",
                        help="追加 negative tag（逗号分隔，给一致性模式压背景/风格漂移用）")
+    p_gen.add_argument("--composition", default=None,
+                       help="V45：覆盖构图预设（如 scene_wide；默认按 mode 决定）")
+    p_gen.add_argument("--lora", default=None,
+                       help="V45：追加 LoRA（models/loras 下的文件名，如 GhibliArt.safetensors）")
+    p_gen.add_argument("--lora-strength", type=float, default=0.9, help="LoRA strength_model")
     p_gen.add_argument("--views", default=None,
                        help="只生成指定视图（逗号分隔，如 side / front,side），配合 --mode three_view")
     add_common(p_gen)

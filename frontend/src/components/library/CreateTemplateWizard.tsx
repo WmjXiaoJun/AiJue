@@ -322,7 +322,7 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
               </div>
               {renderType === "2d" && (
                 <div className="v21-field is-wide v44-style-field">
-                  <span className="v21-label">2D 风格（画面子类型）</span>
+                  <span className="v21-label">2D 风格（影响角色气质与背景）</span>
                   <div className="v44-style-grid" role="radiogroup" aria-label="2D 风格">
                     {RENDER_STYLE_ORDER.map((id) => {
                       const meta = RENDER_STYLE_META[id];
@@ -341,7 +341,7 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
                       );
                     })}
                   </div>
-                  <span className="v21-hint">仅 2D 动画生效；不同风格生成的关键帧/B-roll 画面不同</span>
+                  <span className="v21-hint">仅 2D 动画生效；不同风格使用不同 checkpoint/提示词，会改变角色气质、关键帧与背景画面（IP 权重更低、背景更完整）</span>
                 </div>
               )}
               <label className="v21-field">

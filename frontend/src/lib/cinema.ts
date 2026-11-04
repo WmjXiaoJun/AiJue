@@ -140,10 +140,10 @@ export interface RenderStyleMeta {
 
 /** V44：2D 风格子类型（默认日漫电影感） */
 export const RENDER_STYLE_META: Record<RenderStyle, RenderStyleMeta> = {
-  jp_anime: { id: "jp_anime", label: "日漫电影感", short: "日漫", desc: "日式电影感赛璐璐，细腻线稿 + 柔和光影（默认）" },
-  guoman: { id: "guoman", label: "国漫国风", short: "国风", desc: "国风动画电影感，水墨色彩点缀 + 精致中式美术" },
-  retro_cel: { id: "retro_cel", label: "复古赛璐璐", short: "赛璐璐", desc: "90 年代复古赛璐璐，粗描边 + 胶片颗粒" },
-  soft_watercolor: { id: "soft_watercolor", label: "治愈手绘", short: "手绘", desc: "手绘水彩质感，暖色调 + 温柔治愈氛围" },
+  jp_anime: { id: "jp_anime", label: "日漫电影感", short: "日漫", desc: "日式动画电影感：赛璐璐上色 + 电影光影，角色更年轻" },
+  guoman: { id: "guoman", label: "国漫国风", short: "国风", desc: "国风动画电影感：水墨色彩 + 中式建筑/美术，画面更典雅" },
+  retro_cel: { id: "retro_cel", label: "复古赛璐璐", short: "赛璐璐", desc: "90 年代复古赛璐璐：粗描边 + 有限色板 + 胶片颗粒" },
+  soft_watercolor: { id: "soft_watercolor", label: "吉卜力治愈系", short: "治愈", desc: "手绘水彩吉卜力风：暖色柔光 + 温柔治愈的氛围" },
 };
 
 export const RENDER_STYLE_ORDER: RenderStyle[] = ["jp_anime", "guoman", "retro_cel", "soft_watercolor"];

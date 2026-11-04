@@ -210,6 +210,12 @@ outputs/concepts/{cid}/
 | `--server/--comfy-root/--no-start` | 127.0.0.1:8188 / 本机 ComfyUI | 服务地址与自动启动 |
 | `--skip-existing` | 关 | 已存在的图跳过（断点续跑） |
 | `--dry-run` | 关 | 只打印 prompt/workflow，不提交 |
+| `--ckpt` | animagine-xl-4.0 | 换底模（V45：2D 风格各自用不同 checkpoint） |
+| `--composition` | 按 mode | 覆盖构图预设（V45 关键帧用 `scene_wide`：中远景 + 环境可见） |
+| `--lora / --lora-strength` | 空 / 0.9 | 追加 LoRA（`LoraLoaderModelOnly`，模型版底模不匹配时勿用） |
+| `--ip-adapter-strength` | 0.65 | IP-Adapter 权重（V45 关键帧降到 0.48~0.50） |
+| `--ip-adapter-end-at` | 0.85 | IP-Adapter 结束步（V45 关键帧 0.55~0.58：背景在采样后段自由生成） |
+| `--ip-adapter-weight-type` | linear | `linear / style transfer`（V45 用 style transfer 减少构图被参考图带走） |
 
 ## 5. Prompt 构建（prompt.py）
 

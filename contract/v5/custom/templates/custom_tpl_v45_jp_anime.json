@@ -1,0 +1,105 @@
+{
+  "id": "custom_tpl_v45_jp_anime",
+  "label": "V45 2D·日漫电影感",
+  "description": "V45 2D 风格示例：V45 2D·日漫电影感，4 幕同 cast/场景。",
+  "tags": [
+    "custom",
+    "v21"
+  ],
+  "style": "neon_toon",
+  "target_duration": 14.12,
+  "aspect": [
+    16,
+    9
+  ],
+  "render_type": "2d",
+  "render_style": "jp_anime",
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "name": "老周"
+    },
+    {
+      "role": "figure_a",
+      "character": "ali",
+      "name": "阿栗"
+    },
+    {
+      "role": "figure_b",
+      "character": "tianmei",
+      "name": "甜妹"
+    }
+  ],
+  "acts": [
+    {
+      "id": "act01",
+      "name": "第 1 幕",
+      "scene": "neon_skyline",
+      "camera": "dolly",
+      "camera_strength": 0.06,
+      "duration": 3.0,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    },
+    {
+      "id": "act02",
+      "name": "第 2 幕",
+      "scene": "late_night_studio",
+      "camera": "push_in",
+      "camera_strength": 0.06,
+      "duration": 4.3,
+      "line": "host",
+      "text": "夜色入画，欢迎来到城市来信。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act03",
+      "name": "第 3 幕",
+      "scene": "cafe_window",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 3.82,
+      "line": "figure_a",
+      "text": "窗外的灯，像一笔未干的水墨。",
+      "characters": [
+        "figure_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act04",
+      "name": "第 4 幕",
+      "scene": "rainy_street",
+      "camera": "crane_up",
+      "camera_strength": 0.06,
+      "duration": 3.0,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    }
+  ],
+  "packaging": {
+    "subtitle": "default",
+    "transition": "fade",
+    "title": "V45 2D·日漫电影感"
+  },
+  "lipsync": {
+    "mode": "musetalk"
+  },
+  "audio": {},
+  "meta": {
+    "create_source": "v21",
+    "three_d": false,
+    "render_type": "2d",
+    "render_style": "jp_anime",
+    "created_at": "2026-11-04 16:25:37",
+    "created_by": "api"
+  }
+}
