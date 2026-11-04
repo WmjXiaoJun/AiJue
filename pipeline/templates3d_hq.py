@@ -51,14 +51,13 @@ STYLE_2D_PREFIX = ("2D anime, cel-shaded, flat colors, clean line art, "
                    "hand-drawn animation, anime screenshot")
 STYLE_2D_QUALITY = ("2D anime film quality, clean line art, flat cel-shaded colors, "
                     "hand-drawn animation, anime screenshot")
-_3D_QUALITY_RE = re.compile(
-    r"3D animated feature film quality[^.]*\.",
-    re.IGNORECASE,
-)
+STYLE_2D_BROLL = ("anime key visual, Japanese TV anime screenshot, clean lineart, "
+                  "flat cel-shaded colors, detailed background, no 3D, no cgi")
+STYLE_2D_CACHE = "_2d_v43"
 
 
-def apply_2d_style(prompt: str) -> str:
-    """V42：把 3D/T2VA 提示词改写为 2D 动漫风格（cel-shaded/flat/line art）。"""
+def apply_2d_style(prompt: str, broll: bool = False) -> str:
+    """V42/V43：把 3D/T2VA 提示词改写为 2D 动漫风格（cel-shaded/flat/line art）。"""
     text = str(prompt or "")
     text = re.sub(r"3D animated feature film quality[^.]*\.",
                   STYLE_2D_QUALITY + ".", text, flags=re.IGNORECASE)
@@ -69,11 +68,123 @@ def apply_2d_style(prompt: str) -> str:
     text = re.sub(r"\b(?:3D|3d)\b", "2D", text)
     text = re.sub(r"\brich physical materials,\s*", "", text, flags=re.IGNORECASE)
     text = re.sub(r"volumetric light", "flat cel-shaded lighting", text, flags=re.IGNORECASE)
-    if "2D anime" not in text:
-        text = STYLE_2D_PREFIX + ". " + text
-    else:
-        text = STYLE_2D_PREFIX + ". " + text
+    text = STYLE_2D_PREFIX + ". " + text
+    if broll:
+        text += " " + STYLE_2D_BROLL + "."
     return text
+
+
+# --------------------------------------------------------------------------- #
+# V43：2D 对话镜头关键帧（SDXL anime + IP-Adapter 锁脸）
+# --------------------------------------------------------------------------- #
+KEYFRAMES = WORK / "keyframes"
+
+
+def _character_contract(cid: str) -> dict:
+    for path in (
+        REPO / "contract" / "characters" / f"{cid}.json",
+        REPO / "contract" / "v5" / "characters" / f"{cid}.json",
+        REPO / "contract" / "v5" / "custom" / "characters" / f"{cid}.json",
+    ):
+        if path.is_file():
+            try:
+                data = json.loads(path.read_text(encoding="utf-8"))
+                if isinstance(data, dict):
+                    return data
+            except (OSError, ValueError):
+                continue
+    return {}
+
+
+def _shot_character_id(tid: str, shot: dict) -> str:
+    """用 episode.json 的 shots 映射 shot id → 角色 id（brief 只保留 prompt）。"""
+    try:
+        episode = t3.load_episode(tid)
+    except SystemExit:
+        return ""
+    for item in episode.get("shots") or []:
+        if str(item.get("id")) == str(shot.get("id")):
+            return str(item.get("character") or "")
+    return ""
+
+
+def _imagegen_spec_for(cid: str, spec_dir: pathlib.Path) -> pathlib.Path:
+    """写 imagegen spec（优先精选 spec，否则用角色合同构造），返回 spec 路径。"""
+    contract = _character_contract(cid)
+    curated = REPO / "tmp" / "v52_art" / "specs" / f"{cid}.json"
+    spec: dict = {}
+    if curated.is_file():
+        try:
+            loaded = json.loads(curated.read_text(encoding="utf-8"))
+            if isinstance(loaded, dict):
+                spec = loaded
+        except (OSError, ValueError):
+            spec = {}
+    if not spec:
+        spec = {
+            "id": cid,
+            "name": str(contract.get("name") or contract.get("label") or cid),
+            "title": str(contract.get("title") or ""),
+            "persona": str(contract.get("persona") or ""),
+            "accent_color": str(contract.get("accent_color") or "#F5C518"),
+            "style": contract.get("style") or {"primary": "2d_cel", "variants": ["2d_cel"]},
+            "appearance": contract.get("appearance") or {},
+            "extra_tags": ["anime", "cel-shaded"],
+        }
+    spec["id"] = cid
+    if contract.get("name") or contract.get("label"):
+        spec["name"] = str(contract.get("name") or contract.get("label"))
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    path = spec_dir / f"{cid}.json"
+    path.write_text(json.dumps(spec, ensure_ascii=False, indent=2), encoding="utf-8")
+    return path
+
+
+def _generate_keyframe(tid: str, shot: dict, visual: str, seed: int) -> pathlib.Path:
+    """SDXL anime 关键帧（scene 1280x720，portrait IP-Adapter 0.75）→ 1024×576。"""
+    shot_id = str(shot.get("id"))
+    cid = _shot_character_id(tid, shot)
+    if not cid:
+        raise RuntimeError(f"{shot_id}: 找不到说话角色")
+    portrait = REPO / "assets" / "v5" / "characters" / cid / "portrait.png"
+    if not portrait.is_file():
+        raise RuntimeError(f"{shot_id}: 缺少 anime 立绘 {portrait}")
+    key_dir = KEYFRAMES / tid
+    key_dir.mkdir(parents=True, exist_ok=True)
+    key_png = key_dir / f"{shot_id}.png"
+    if key_png.is_file() and key_png.stat().st_size > 100_000:
+        return key_png
+    spec_path = _imagegen_spec_for(cid, KEYFRAMES / "specs")
+    raw_dir = KEYFRAMES / tid / f"raw_{shot_id}"
+    prompt_extra = (
+        f"{visual or 'anime key visual scene'}; anime key visual, cel-shaded, clean lineart, "
+        "detailed eyes, official anime art, no text; detailed environment, background scenery, "
+        "wide shot, cinematic composition"
+    )
+    cmd = [
+        sys.executable, "-m", "imagegen.cli", "generate",
+        "--spec", str(spec_path), "--outdir", str(raw_dir),
+        "--mode", "scene", "--style", "anime", "--size", "1280x720",
+        "--ref", str(portrait), "--ip-adapter-strength", "0.75",
+        "--prompt-extra", prompt_extra,
+        "--negative-extra",
+        "abstract background, solid color background, plain background, close-up portrait, flames",
+        "--seed", str(seed), "--timeout", "600",
+    ]
+    proc = subprocess.run(cmd, cwd=str(REPO), capture_output=True, text=True,
+                          encoding="utf-8", errors="replace", timeout=660)
+    raw_png = raw_dir / "scene.png"
+    if proc.returncode != 0 or not raw_png.is_file():
+        tail = "\n".join(((proc.stdout or "") + "\n" + (proc.stderr or "")).strip().splitlines()[-8:])
+        raise RuntimeError(f"{shot_id}: imagegen 关键帧失败：{tail[-700:]}")
+    subprocess.run([
+        str(FFMPEG), "-y", "-hide_banner", "-loglevel", "error",
+        "-i", str(raw_png),
+        "-vf", "scale=1024:576:force_original_aspect_ratio=increase,crop=1024:576",
+        str(key_png),
+    ], check=True, capture_output=True, timeout=120)
+    log(f"[2D] 关键帧 {shot_id} ← {cid} ({raw_png.stat().st_size} B)")
+    return key_png
 
 
 def log(message: str) -> None:
@@ -97,14 +208,16 @@ def frame_length(duration: float) -> int:
     return 17 * k + 5
 
 
-def gen_t2va(tid: str, shot: dict, seed: int, style_mode: str = "3d") -> pathlib.Path:
-    suffix = "_2d" if style_mode == "2d" else ""
+def gen_t2va(tid: str, shot: dict, seed: int, style_mode: str = "3d",
+             broll: bool = False) -> pathlib.Path:
+    suffix = STYLE_2D_CACHE if style_mode == "2d" else ""
     out = WORK / "clips" / f"{tid}_{shot['id']}_t2va1024{suffix}.mp4"
     if out.is_file() and out.stat().st_size > 200_000:
         return out
     duration = float(shot.get("duration") or 5.0)
     length = frame_length(duration)
-    prompt = apply_2d_style(str(shot["prompt"])) if style_mode == "2d" else str(shot["prompt"])
+    prompt = apply_2d_style(str(shot["prompt"]), broll=broll) \
+        if style_mode == "2d" else str(shot["prompt"])
     wf = local.build_workflow(prompt, 1024, 576, length, seed,
                               f"v16/{tid}/{shot['id']}_t2va{suffix}")
     pid = local.submit(wf)
@@ -153,14 +266,24 @@ def motion_prompt(shot: dict, style_mode: str = "3d") -> str:
 
 
 def gen_ref2va(tid: str, shot: dict, t2va: pathlib.Path, seed: int,
-               style_mode: str = "3d") -> pathlib.Path:
-    suffix = "_2d" if style_mode == "2d" else ""
+               style_mode: str = "3d", keyframe: pathlib.Path | None = None) -> pathlib.Path:
+    suffix = STYLE_2D_CACHE if style_mode == "2d" else ""
     out = WORK / "clips" / f"{tid}_{shot['id']}_ref2va1024{suffix}.mp4"
-    if out.is_file() and out.stat().st_size > 200_000:
+    if keyframe is not None:
+        # 关键帧模式：旧 ref2va 缓存（V42 T2VA 首帧）不能复用，强制重生成
+        try:
+            if out.is_file():
+                out.unlink()
+        except OSError:
+            pass
+    elif out.is_file() and out.stat().st_size > 200_000:
         return out
-    first = WORK / "clips" / f"{tid}_{shot['id']}_first{suffix}.png"
-    subprocess.run([str(FFMPEG), "-y", "-hide_banner", "-loglevel", "error",
-                    "-i", str(t2va), "-frames:v", "1", str(first)], check=False)
+    if keyframe is not None and keyframe.is_file():
+        first = keyframe
+    else:
+        first = WORK / "clips" / f"{tid}_{shot['id']}_first{suffix}.png"
+        subprocess.run([str(FFMPEG), "-y", "-hide_banner", "-loglevel", "error",
+                        "-i", str(t2va), "-frames:v", "1", str(first)], check=False)
     audio = t3.V5_OUT / tid / "work" / "audio" / f"{shot['id']}.wav"
     prompt_file = WORK / "clips" / f"{tid}_{shot['id']}_prompt{suffix}.txt"
     prompt_file.write_text(motion_prompt(shot, style_mode), encoding="utf-8")
@@ -244,12 +367,26 @@ def main(argv=None) -> int:
             log(f"[{i}/{len(shots)}] {shot['id']} ok (reuse)")
             continue
         seed = 20261102 + abs(hash(tid + shot["id"])) % 100000
-        t2va = gen_t2va(tid, shot, seed, style_mode)
-        final_src = t2va
-        if str(shot.get("line") or "").strip() and not args.skip_ref2va:
-            final_src = gen_ref2va(tid, shot, t2va, seed, style_mode)
+        has_line = bool(str(shot.get("line") or "").strip())
+        final_src = None
+        if style_mode == "2d" and has_line and not args.skip_ref2va:
+            visual = str(shot.get("semantic_visual") or "").strip()
+            try:
+                keyframe = _generate_keyframe(tid, shot, visual, seed)
+                final_src = gen_ref2va(tid, shot, keyframe, seed, style_mode,
+                                       keyframe=keyframe)
+                log(f"[{i}/{len(shots)}] {shot['id']} ok (keyframe+ref2va)")
+            except Exception as exc:  # noqa: BLE001 - 关键帧失败回退 T2VA
+                log(f"[{i}/{len(shots)}] {shot['id']} 关键帧失败，回退 T2VA：{exc}")
+        if final_src is None:
+            t2va = gen_t2va(tid, shot, seed, style_mode,
+                            broll=(style_mode == "2d" and not has_line))
+            final_src = t2va
+            if has_line and not args.skip_ref2va:
+                final_src = gen_ref2va(tid, shot, t2va, seed, style_mode)
+            log(f"[{i}/{len(shots)}] {shot['id']} ok "
+                f"({'ref2va' if final_src != t2va else 't2va'})")
         shutil.copy2(final_src, out_shots / f"{shot['id']}.mp4")
-        log(f"[{i}/{len(shots)}] {shot['id']} ok ({'ref2va' if final_src != t2va else 't2va'})")
     log("=== 剪辑 ===")
     _ensure_card_shots(tid)
     report = t3.assemble(tid)

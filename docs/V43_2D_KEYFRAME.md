@@ -27,3 +27,30 @@
 ## 3. 分工
 - **tpl-backend**：hq 2D 对话镜头关键帧 + IP-Adapter + ref2va 改造 + B-roll 提示词强化 + 样本
 - **Lead**：审片（不行继续迭代：更强 key visual / 国漫风格 / 不同 checkpoint）、端到端、docs、commit
+
+
+## 4. 交付结果（2026-11-04 16:06）
+
+### 实现
+- `pipeline/templates3d_hq.py` 2D 模式：
+  - 对话镜头：episode role→character → anime 立绘 → imagegen `--mode scene --style anime --size 1280x720 --ref <portrait> --ip-adapter-strength 0.75 --prompt-extra "<semantic_visual>; anime key visual, cel-shaded, clean lineart, detailed eyes, official anime art, no text"` → `scene.png` 转 1024×576 → H3 ref2va（TTS + 2D anime motion prompt）
+  - 关键帧缓存 `tmp/v16/keyframes/<tid>/<shot>.png`；失败回退 T2VA
+  - B-roll：T2VA prompt 追加 `anime key visual, Japanese TV anime screenshot, clean lineart, flat cel-shaded colors, detailed background, no 3D, no cgi`
+  - 2D 缓存 `_2d_v43` 防复用旧版；3D/写实不变
+- backend 沿用 V42 hq 2D 分派，无需改动
+
+### 真实样本（custom_tpl_v41_2d_demo，4 幕）
+- job `pl_4b3fac6d24f9` **done 495.4s（8m15s）**
+- 成片：**3,931,209B / 13.49s / 1280×720 / 25fps / H.264 / AAC**，poster 已覆盖；`/media/templates_2d/custom_tpl_v41_2d_demo/final.mp4` 200
+- 抽帧：`tmp/v43/frames/frame_01~06.png`；关键帧：`tmp/v43/keyframes/v5_002.png`（老周）、`v5_003.png`（阿栗）
+- 对比图：`tmp/v43/2d_v42_vs_v43.jpg`（V42 T2VA 直出 vs V43 关键帧+IP-Adapter）
+- 观感：对话镜脸部/线稿/演播室（麦克风/台灯/音箱）与咖啡馆窗边细节明显更完整；字幕/口型正常
+
+### 3D/写实回归
+- `tonight_show` / `real_street` dry-run 仍 `--style-mode 3d`，未被 2D 关键帧分支影响
+
+### 说明 / 遗留
+- SDXL 关键帧背景仍略抽象（IP-Adapter 锁脸权重 0.75），但 H3 成片重建了正确场景背景
+- 4 幕样本 8m15s（比 V42 的 11m50s 更快，因对话镜省掉 T2VA）
+- 成片 1280×720/25fps（H3 镜头 1024×576，V5 剪辑统一输出）
+- 可继续迭代方向：关键帧 prompt/权重、2D 风格子类型（日漫/国漫/赛璐璐）、角色年龄感约束
