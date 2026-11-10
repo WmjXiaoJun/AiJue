@@ -33,11 +33,11 @@ def cmd_list(args) -> int:
     cat = v5_catalog.load_catalog()
     rows = []
     for tid, tpl in sorted(cat.get("templates", {}).items()):
-        if tid.startswith("custom_"):
-            continue
         wf = load_workflow(tid, tpl)
         rows.append({"template": tid, "label": tpl.get("label"),
                      "style": tpl.get("style"),
+                     "kind": "custom" if tid.startswith("custom_") else "base",
+                     "stack": wf.get("stack"),
                      "stages": [s["id"] for s in wf.get("stages") or []
                                 if s.get("enabled", True)],
                      "workflow_file": str(WORKFLOW_DIR / f"{tid}.json"),
@@ -60,10 +60,22 @@ def cmd_inspect(args) -> int:
 
 def cmd_run(args) -> int:
     stages = [x.strip() for x in (args.stages or "").split(",") if x.strip()] or None
-    run = run_template(args.template, duration=args.duration, seed=args.seed,
-                       force=args.force, stages=stages, start=args.start,
-                       goal=args.goal or "", dry_run=args.dry_run,
-                       prog=lambda sid, msg: print(f"[{sid}] {msg}", flush=True))
+    stage_params = None
+    if getattr(args, "stage_params", None):
+        stage_params = json.loads(args.stage_params)
+    try:
+        run = run_template(args.template, duration=args.duration, seed=args.seed,
+                           force=args.force, stages=stages, start=args.start,
+                           goal=args.goal or "", dry_run=args.dry_run,
+                           stage_params=stage_params, with_deps=bool(args.with_deps),
+                           prog=lambda sid, msg: print(f"[{sid}] {msg}", flush=True))
+    except ValueError as exc:  # 未知阶段/起始阶段/stage_params 键/未知模板：干净报错，不甩 traceback
+        print(f"[error] {exc}", file=sys.stderr)
+        return 2
+    if run.status == "partial":
+        skipped = [s["id"] for s in run.stages
+                   if s.get("status") == "skipped" and not s.get("optional")]
+        print(f"[warn] 有必需阶段被跳过: {skipped}（run 状态 partial）", file=sys.stderr)
     _print(run.to_dict())
     return 0 if run.status in ("ok", "planned") else 1
 
@@ -110,13 +122,19 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = sub.add_parser("run", help="按工作流执行（支持增量）")
     p.add_argument("--template", required=True)
-    p.add_argument("--duration", type=float, default=40.0)
+    p.add_argument("--duration", type=float, default=None,
+                   help="目标时长（秒）；不传 → 模板 duration → 40")
     p.add_argument("--seed", type=int, default=20261101)
-    p.add_argument("--stages", default=None, help="逗号分隔阶段（自动补依赖）")
-    p.add_argument("--start", default=None, help="从某阶段开始")
+    p.add_argument("--stages", default=None,
+                   help="逗号分隔阶段（默认只跑这些阶段，依赖只用于排序；要连带依赖用 --with-deps）")
+    p.add_argument("--with-deps", action="store_true",
+                   help="显式 --stages 时把依赖阶段一并执行（旧行为，可能拉起 GPU 阶段）")
+    p.add_argument("--start", default=None, help="从某阶段开始（不能与 --stages 同时给）")
     p.add_argument("--goal", default=None, help="本次编排目标（写入 run 证据）")
     p.add_argument("--force", action="store_true")
     p.add_argument("--dry-run", action="store_true")
+    p.add_argument("--stage-params", default=None,
+                   help='阶段参数覆盖，JSON，例如 {"muse":{"apply":true}}')
     p.set_defaults(func=cmd_run)
 
     p = sub.add_parser("edit", help="智能体修改（声音/剪辑/模板/工作流）")

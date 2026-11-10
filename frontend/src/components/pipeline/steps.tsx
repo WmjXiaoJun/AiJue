@@ -113,7 +113,7 @@ function StepNav({
 }
 
 function StatusTag({ template }: { template: CinemaTemplate | null }) {
-  if (!template) return <span className="v18-tag is-slate">接口未就绪</span>;
+  if (!template) return <span className="v18-tag is-slate">暂无音色</span>;
   if (template.status === "done") return <span className="v18-tag is-jade"><IconCheck size={10} /> 已完成</span>;
   if (template.status === "generating") return <span className="v18-tag is-gold">生成中</span>;
   if (template.status === "generated") return <span className="v18-tag is-gold">镜头就绪</span>;
@@ -124,6 +124,7 @@ function StatusTag({ template }: { template: CinemaTemplate | null }) {
 /* ------------------------------ Step 1 · 选模板 ------------------------------ */
 export function StepTemplates({
   templates,
+  targets,
   selectedId,
   onSelect,
   loading,
@@ -134,6 +135,8 @@ export function StepTemplates({
   totalHint,
 }: {
   templates: CinemaTemplate[];
+  /** V54：目标时长（秒），来自 /api/v5/catalog 的 target_duration */
+  targets?: Record<string, number>;
   selectedId: string | null;
   onSelect: (id: string) => void;
   loading: boolean;
@@ -245,6 +248,27 @@ export function StepTemplates({
                     </span>
                     <span>{fmtSize(template.final.size)}</span>
                   </div>
+                  {(() => {
+                    const target = targets?.[template.id] || 0;
+                    if (!target) return null;
+                    const finalDur = template.final.duration || 0;
+                    // 后端 final.duration 可能为 0（未回填）→ 不判达标，避免假「未达标」
+                    const known = finalDur > 0;
+                    const ok = known && finalDur >= target - 1;
+                    return (
+                      <div className="v18-tpl-meta">
+                        <span
+                          className={"v54-dur" + (known ? (ok ? " is-ok" : " is-miss") : "")}
+                          title={"目标 " + target + "s" + (known ? " · 成片 " + fmtDuration(finalDur) : " · 成片时长未回填")}
+                        >
+                          目标 {target}s
+                        </span>
+                        <span className={"v54-dur" + (known ? (ok ? " is-ok" : " is-miss") : " is-live")}>
+                          {known ? (ok ? "达标" : "未达标") : "时长未记录"}
+                        </span>
+                      </div>
+                    );
+                  })()}
                 </div>
               </button>
             ))}
@@ -351,7 +375,7 @@ export function StepCast({
         const message = errorText(err);
         setPreviewError(
           message.includes("404") || message.includes("Not Found")
-            ? "试听接口尚未就绪（V18 后端 API 实现中）；可先应用音色保存，生成时生效。"
+            ? "试听接口返回 404；可先应用音色保存，生成时生效。"
             : "试听失败：" + message,
         );
       }
@@ -392,7 +416,7 @@ export function StepCast({
           <EmptyBlock
             icon={<IconUsers size={26} />}
             title="该模板没有 cast 数据"
-            desc="模板合同里没有 cast 字段，或后端 casting 接口尚未就绪；可到角色与声音页统一调整音色。"
+            desc="模板合同里没有 cast 字段，或 casting 接口返回 404；可到角色与声音页统一调整音色。"
             actions={
               <button type="button" className="cm-btn cm-btn-sm" onClick={onOpenCharacters}>
                 去角色与声音

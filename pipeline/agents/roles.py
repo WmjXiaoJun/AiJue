@@ -44,14 +44,16 @@ ROLES: dict[str, dict] = {
     "video_director": {
         "id": "video_director", "name": "视频导演", "emoji": "🎥",
         "desc": "2D 动效渲染（17 运镜）与 H3 3D hero 镜",
-        "tools": ["render_shots", "render_h3"],
+        "tools": ["render_shots", "render_h3", "render_2d_hq", "muse_lipsync"],
         "prompt": "你是视频导演。2D 渲染走 motion2d（17 种运镜 + 角色表演 + 音频口型）；"
-                  "H3 hero 镜走 pipeline/h3_v5.py（每镜 ~2-3 分钟 GPU，先小样再批量）。",
+                  "H3 hero 镜走 pipeline/h3_v5.py（每镜 ~2-3 分钟 GPU，先小样再批量）；"
+                  "短片 HQ 栈走 templates3d_hq（render_2d_hq）；口型精修走 MuseTalk"
+                  "（muse_lipsync，GPU 串行 ~20s/3s 镜头，apply=true 才回写 shots 并重新合成）。",
     },
     "qa": {
         "id": "qa", "name": "质检", "emoji": "✅",
         "desc": "QC 硬门（时长/分辨率/blackdetect/voice_fixed/P1 头部等）+ 抽帧",
-        "tools": ["evaluate_qc"],
+        "tools": ["evaluate_qc", "evaluate_hq_qc"],
         "prompt": "你是质检。跑 qc_v5 全部硬门，任何一项失败即打回对应阶段；"
                   "同时抽帧人眼复核（头部完整/角色不畸形/转场无黑帧）。",
     },

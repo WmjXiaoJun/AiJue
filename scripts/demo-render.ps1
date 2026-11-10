@@ -1,4 +1,4 @@
-# 直接渲染样例成片（demo，mock 画面 + edge-tts）
+﻿# 直接渲染样例成片（demo，mock 画面 + edge-tts）
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 Set-Location $root

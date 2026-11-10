@@ -788,8 +788,16 @@ def create_audition(character: str, payload: AuditionBody = Body(default=Auditio
         "finished_ts": None,
     }
     with _LOCK:
+        # 双检：检查与占位必须在同一把锁里，否则双击能同时通过
+        running = _JOBS.get(_ACTIVE_JOB) or {}
+        if str(running.get("status")) in ("queued", "running"):
+            raise HTTPException(status_code=409, detail=f"已有试镜任务在跑: {_ACTIVE_JOB}")
         _JOBS[job_id] = job
         _ACTIVE_JOB = job_id
+        if len(_JOBS) > 50:  # 内存上限：只留最近 50 条（持久化文件仍在）
+            for old_id in sorted(_JOBS, key=lambda k: _JOBS[k].get("created_ts") or 0)[:-50]:
+                if old_id != _ACTIVE_JOB:
+                    _JOBS.pop(old_id, None)
     _persist(job)
     try:
         threading.Thread(target=_run_audition, args=(job_id,), daemon=True,

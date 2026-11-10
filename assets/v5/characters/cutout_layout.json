@@ -1,0 +1,366 @@
+{
+ "ali/cutout_2d/front.png": {
+  "derived_from": "ali/cutout.png",
+  "sha1_16": "b0e6267ffd1213f8",
+  "bytes": 384772,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "ali/cutout_3d/front.png": {
+  "derived_from": "ali/cutout.png",
+  "sha1_16": "b0e6267ffd1213f8",
+  "bytes": 384772,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "caocao/cutout_2d/front.png": {
+  "derived_from": "caocao/cutout.png",
+  "sha1_16": "15dabfb545ded992",
+  "bytes": 374491,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "caocao/cutout_3d/front.png": {
+  "derived_from": "caocao/cutout.png",
+  "sha1_16": "15dabfb545ded992",
+  "bytes": 374491,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "custom_old_inventor/cutout_2d/front.png": {
+  "derived_from": "custom_old_inventor/cutout.png",
+  "sha1_16": "820d15080b520c44",
+  "bytes": 276047,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "custom_old_inventor/cutout_3d/front.png": {
+  "derived_from": "custom_old_inventor/cutout.png",
+  "sha1_16": "820d15080b520c44",
+  "bytes": 276047,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "custom_street_kid/cutout_2d/front.png": {
+  "derived_from": "custom_street_kid/cutout.png",
+  "sha1_16": "9a0908304e88ff7f",
+  "bytes": 343657,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "custom_street_kid/cutout_3d/front.png": {
+  "derived_from": "custom_street_kid/cutout.png",
+  "sha1_16": "9a0908304e88ff7f",
+  "bytes": 343657,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "dawei/cutout_2d/front.png": {
+  "derived_from": "dawei/cutout.png",
+  "sha1_16": "15cd727f90089095",
+  "bytes": 246807,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "dawei/cutout_3d/front.png": {
+  "derived_from": "dawei/cutout.png",
+  "sha1_16": "15cd727f90089095",
+  "bytes": 246807,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "guanyu/cutout_2d/front.png": {
+  "derived_from": "guanyu/cutout.png",
+  "sha1_16": "476009e26746f274",
+  "bytes": 504993,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "guanyu/cutout_3d/front.png": {
+  "derived_from": "guanyu/cutout.png",
+  "sha1_16": "476009e26746f274",
+  "bytes": 504993,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "juanwang/cutout_2d/front.png": {
+  "derived_from": "juanwang/cutout.png",
+  "sha1_16": "dfc70ec736b61d63",
+  "bytes": 270535,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "juanwang/cutout_3d/front.png": {
+  "derived_from": "juanwang/cutout.png",
+  "sha1_16": "dfc70ec736b61d63",
+  "bytes": 270535,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "laozhou/cutout_2d/front.png": {
+  "derived_from": "laozhou/cutout.png",
+  "sha1_16": "c9d73fb7844972cb",
+  "bytes": 226930,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "laozhou/cutout_3d/front.png": {
+  "derived_from": "laozhou/cutout_25d.png",
+  "sha1_16": "6c7129fefa6abaef",
+  "bytes": 248456,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "lengmian/cutout_2d/front.png": {
+  "derived_from": "lengmian/cutout.png",
+  "sha1_16": "2d7d3c9b3ab14660",
+  "bytes": 254958,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "lengmian/cutout_3d/front.png": {
+  "derived_from": "lengmian/cutout.png",
+  "sha1_16": "2d7d3c9b3ab14660",
+  "bytes": 254958,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "libai/cutout_2d/front.png": {
+  "derived_from": "libai/cutout.png",
+  "sha1_16": "716415338a8d6ce4",
+  "bytes": 535210,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "libai/cutout_3d/front.png": {
+  "derived_from": "libai/cutout.png",
+  "sha1_16": "716415338a8d6ce4",
+  "bytes": 535210,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "mengxin/cutout_2d/front.png": {
+  "derived_from": "mengxin/cutout.png",
+  "sha1_16": "f05f79f8f866de6d",
+  "bytes": 338894,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "mengxin/cutout_3d/front.png": {
+  "derived_from": "mengxin/cutout.png",
+  "sha1_16": "f05f79f8f866de6d",
+  "bytes": 338894,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "mulan/cutout_2d/front.png": {
+  "derived_from": "mulan/cutout.png",
+  "sha1_16": "09e23fb7ba0915c8",
+  "bytes": 565524,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "mulan/cutout_3d/front.png": {
+  "derived_from": "mulan/cutout.png",
+  "sha1_16": "09e23fb7ba0915c8",
+  "bytes": 565524,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "mystery_guest/cutout_2d/front.png": {
+  "derived_from": "mystery_guest/cutout.png",
+  "sha1_16": "e11975ea59284c1e",
+  "bytes": 951781,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "mystery_guest/cutout_3d/front.png": {
+  "derived_from": "mystery_guest/cutout.png",
+  "sha1_16": "e11975ea59284c1e",
+  "bytes": 951781,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "pangzi/cutout_2d/front.png": {
+  "derived_from": "pangzi/cutout.png",
+  "sha1_16": "5252e9cb66664a0e",
+  "bytes": 257672,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "pangzi/cutout_3d/front.png": {
+  "derived_from": "pangzi/cutout.png",
+  "sha1_16": "5252e9cb66664a0e",
+  "bytes": 257672,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "producer/cutout_2d/front.png": {
+  "derived_from": "producer/cutout.png",
+  "sha1_16": "9282e5e30ceab38f",
+  "bytes": 288407,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "producer/cutout_3d/front.png": {
+  "derived_from": "producer/cutout.png",
+  "sha1_16": "9282e5e30ceab38f",
+  "bytes": 288407,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "qinshihuang/cutout_2d/front.png": {
+  "derived_from": "qinshihuang/cutout.png",
+  "sha1_16": "0922f799c8821acf",
+  "bytes": 1196766,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "qinshihuang/cutout_3d/front.png": {
+  "derived_from": "qinshihuang/cutout.png",
+  "sha1_16": "0922f799c8821acf",
+  "bytes": 1196766,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "robot/cutout_2d/front.png": {
+  "derived_from": "robot/cutout.png",
+  "sha1_16": "4be585385d5cfea2",
+  "bytes": 920161,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "robot/cutout_3d/front.png": {
+  "derived_from": "robot/cutout.png",
+  "sha1_16": "4be585385d5cfea2",
+  "bytes": 920161,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "simaqian/cutout_2d/front.png": {
+  "derived_from": "simaqian/cutout.png",
+  "sha1_16": "d879b0992a8fadf3",
+  "bytes": 491004,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "simaqian/cutout_3d/front.png": {
+  "derived_from": "simaqian/cutout_25d.png",
+  "sha1_16": "d83ac78fd7783d8c",
+  "bytes": 499569,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "sunwu/cutout_2d/front.png": {
+  "derived_from": "sunwu/cutout.png",
+  "sha1_16": "7763cccf8882e3bd",
+  "bytes": 385933,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "sunwu/cutout_3d/front.png": {
+  "derived_from": "sunwu/cutout.png",
+  "sha1_16": "7763cccf8882e3bd",
+  "bytes": 385933,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "sushi/cutout_2d/front.png": {
+  "derived_from": "sushi/cutout.png",
+  "sha1_16": "60dd32131466716c",
+  "bytes": 806324,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "sushi/cutout_3d/front.png": {
+  "derived_from": "sushi/cutout_25d.png",
+  "sha1_16": "4fb14af14d15c8b8",
+  "bytes": 782520,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "tianmei/cutout_2d/front.png": {
+  "derived_from": "tianmei/cutout.png",
+  "sha1_16": "30c730ed3edda7ec",
+  "bytes": 445813,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "tianmei/cutout_3d/front.png": {
+  "derived_from": "tianmei/cutout.png",
+  "sha1_16": "30c730ed3edda7ec",
+  "bytes": 445813,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "wuzetian/cutout_2d/front.png": {
+  "derived_from": "wuzetian/cutout.png",
+  "sha1_16": "170eb877711f2248",
+  "bytes": 1003321,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "wuzetian/cutout_3d/front.png": {
+  "derived_from": "wuzetian/cutout_25d.png",
+  "sha1_16": "57daa677da6ffb67",
+  "bytes": 1021531,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "xueba/cutout_2d/front.png": {
+  "derived_from": "xueba/cutout.png",
+  "sha1_16": "f8e069e3baa13384",
+  "bytes": 322369,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "xueba/cutout_3d/front.png": {
+  "derived_from": "xueba/cutout.png",
+  "sha1_16": "f8e069e3baa13384",
+  "bytes": 322369,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "zhangqian/cutout_2d/front.png": {
+  "derived_from": "zhangqian/cutout.png",
+  "sha1_16": "25fd247a30015040",
+  "bytes": 489159,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "zhangqian/cutout_3d/front.png": {
+  "derived_from": "zhangqian/cutout.png",
+  "sha1_16": "25fd247a30015040",
+  "bytes": 489159,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "zhenghe/cutout_2d/front.png": {
+  "derived_from": "zhenghe/cutout.png",
+  "sha1_16": "1bac6250640e7a5b",
+  "bytes": 749890,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "zhenghe/cutout_3d/front.png": {
+  "derived_from": "zhenghe/cutout.png",
+  "sha1_16": "1bac6250640e7a5b",
+  "bytes": 749890,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "zhuge/cutout_2d/front.png": {
+  "derived_from": "zhuge/cutout.png",
+  "sha1_16": "775d5b5d231a34b3",
+  "bytes": 684065,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ },
+ "zhuge/cutout_3d/front.png": {
+  "derived_from": "zhuge/cutout.png",
+  "sha1_16": "775d5b5d231a34b3",
+  "bytes": 684065,
+  "at": "2026-11-06T23:52:57",
+  "note": "布局派生（非新绘），源文件是资产库既有 RGBA cutout"
+ }
+}

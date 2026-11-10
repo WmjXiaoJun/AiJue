@@ -418,9 +418,11 @@ def test_real_catalog_smoke():
     assert catalog["root"] == str(REAL_ROOT)
     result = v5_catalog.validate_catalog(catalog)
     assert {"ok", "errors", "warnings", "stats"} <= set(result)
+    # V19 角色清理删掉了 custom_lin；这里换成当前真实存在的 4 类 custom 示例
+    # （V47 新增角色的 custom_old_inventor 仍是 custom_ 前缀的“新增对象”语义）。
     custom_ids = {
         "styles": "custom_holo_paper",
-        "characters": "custom_lin",
+        "characters": "custom_old_inventor",
         "scenes": "custom_holo_gallery",
         "templates": "custom_holo_talk",
     }

@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CostReport, Job, Shot } from "../../types";
 import type { StudioTabProps } from "../../lib/studio";
+import { MuseTemplateCard } from "./MuseTemplateCard";
 import {
   JOB_STATUS_TEXT,
   JOB_TYPE_TEXT,
@@ -81,7 +82,7 @@ function jobTypeText(type: string): string {
   return JOB_TYPE_TEXT[type] || type || "任务";
 }
 
-export function StudioRender({ episode, onNavigate }: StudioTabProps) {
+export function StudioRender({ project, episode, onNavigate }: StudioTabProps) {
   const notify = useToast();
 
   const [jobs, setJobs] = useState<Job[] | null>(null);
@@ -300,6 +301,8 @@ export function StudioRender({ episode, onNavigate }: StudioTabProps) {
           </button>
         </div>
       </header>
+
+      <MuseTemplateCard project={project} episode={episode} />
 
       <section className="st-kpis">
         <div className="st-kpi">

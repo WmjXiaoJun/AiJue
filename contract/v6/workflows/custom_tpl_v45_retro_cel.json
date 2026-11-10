@@ -1,0 +1,104 @@
+{
+  "version": 2,
+  "id": "custom_tpl_v45_retro_cel",
+  "name": "V45 2D·复古赛璐璐 工作流",
+  "description": "模板 custom_tpl_v45_retro_cel 的智能体编排（可编辑 stages/params）；栈=HQ 短片",
+  "stack": "hq_shorts",
+  "variables": {
+    "template": "custom_tpl_v45_retro_cel",
+    "duration": 40.0,
+    "seed": 20261101
+  },
+  "stages": [
+    {
+      "id": "story",
+      "agent": "story_architect",
+      "tool": "check_story",
+      "depends": [],
+      "enabled": true,
+      "optional": false,
+      "params": {},
+      "desc": "核对分幕/台词/时长 + 语义 brief 是否齐备（episode.json）"
+    },
+    {
+      "id": "art",
+      "agent": "art_director",
+      "tool": "list_art",
+      "depends": [
+        "story"
+      ],
+      "enabled": false,
+      "optional": true,
+      "params": {},
+      "desc": "列出角色/场景资产状态（默认只读）"
+    },
+    {
+      "id": "shots",
+      "agent": "video_director",
+      "tool": "render_2d_hq",
+      "depends": [
+        "story"
+      ],
+      "enabled": true,
+      "optional": false,
+      "params": {
+        "keyframe_candidates": 2,
+        "reuse_shots": true
+      },
+      "desc": "2D 关键帧 + H3 逐镜 + 合成（GPU，单片约 6–10 分钟）"
+    },
+    {
+      "id": "muse",
+      "agent": "video_director",
+      "tool": "muse_lipsync",
+      "depends": ["shots"],
+      "enabled": false,
+      "optional": true,
+      "params": {
+        "limit": 2,
+        "apply": false,
+        "reassemble": true
+      },
+      "desc": "MuseTalk 1.5 口型修正（GPU 串行，~20s/3s 镜头；apply=true 回写 shots 并重合成）"
+    },
+    {
+      "id": "musev",
+      "agent": "video_director",
+      "tool": "muse_video",
+      "depends": [],
+      "enabled": false,
+      "optional": true,
+      "params": {
+        "prompt": "",
+        "duration": 4,
+        "aspect": "16:9",
+        "provider": ""
+      },
+      "desc": "Muse 视频生成（MuseV/MusePose/云端；未接入时自动跳过）"
+    },
+    {
+      "id": "qc",
+      "agent": "qa",
+      "tool": "evaluate_hq_qc",
+      "depends": [
+        "shots"
+      ],
+      "enabled": true,
+      "optional": false,
+      "params": {},
+      "desc": "成片存在性/时长/海报/抽帧 QC"
+    },
+    {
+      "id": "publish",
+      "agent": "publisher",
+      "tool": "write_shorts_report",
+      "depends": [
+        "qc"
+      ],
+      "enabled": true,
+      "optional": false,
+      "params": {},
+      "desc": "短片交付摘要（final/时长/QC/证据）"
+    }
+  ]
+}

@@ -495,26 +495,9 @@ def get_casting(template: str = Query(default="", description="3D 模板 id（�
     }
 
 
-@router.get("/voice/{character}")
-def get_character_voice(character: str) -> dict:
-    """读取角色当前固定声音（resolved + 锁状态；V18 支持 edge 写实角色）。"""
-    from pipeline import v5_voices
-
-    catalog = _catalog()
-    char = (catalog.get("characters") or {}).get(character)
-    if not char:
-        raise HTTPException(status_code=404, detail=f"角色不存在: {character}")
-    try:
-        spec = _effective_voice(char)
-    except Exception as exc:  # noqa: BLE001
-        raise HTTPException(status_code=400, detail=f"角色声音解析失败: {exc}") from exc
-    info = v5_voices.lock_info(character, spec)
-    return {"ok": True, "character": character, "voice_id": spec["voice_id"],
-            "seed": spec.get("seed"), "cfg_scale": spec.get("cfg_scale"),
-            "instruction": spec.get("instruction"), "key": spec["key"],
-            "provider": spec.get("provider"), "label": spec.get("label"),
-            "rate": spec.get("rate"),
-            "ref_text": spec.get("ref_text") or "", "lock": info}
+# 注意：GET /api/v5/voice/{character} 的唯一实现在 v5_studio.py（更完整：needs_relock / stale_locks）。
+# 本模块只保留 lock / preview 两个 POST（路径不同，不与 /{kind}/{item_id} 冲突）。
+# 如要在此加 GET voice 路由，必须注册在 /{kind}/{item_id} 之前，否则会被它吃掉。
 
 
 @router.post("/voice/{character}/lock")

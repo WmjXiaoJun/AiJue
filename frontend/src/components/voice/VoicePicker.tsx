@@ -149,7 +149,7 @@ export function VoicePicker({
         setPreviewing(null);
         const message = errorText(err);
         if (message.includes("404") || message.includes("Not Found")) {
-          setError("试听接口尚未就绪（V18 后端 API 实现中）；音色仍可「应用」保存，保存后由生成任务使用。");
+          setError("试听接口返回 404；音色仍可「应用」保存，保存后由生成任务使用。");
         } else {
           setError("试听失败：" + message);
         }

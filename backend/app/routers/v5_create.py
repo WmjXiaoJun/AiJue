@@ -34,14 +34,16 @@ if str(_REPO_ROOT) not in sys.path:
 
 from pipeline import v5_catalog  # noqa: E402
 
+from .. import config  # noqa: E402
+
 router = APIRouter(prefix="/api/v5", tags=["v5-create"])
 
 _CONTRACT = _REPO_ROOT / "contract" / "v5"
 _CUSTOM_DIR = _CONTRACT / "custom"
 _BUILTIN_TEMPLATES = _CONTRACT / "templates"
 _SEMANTIC_DIR = _CONTRACT / "cinema3d" / "templates3d"
-_V5_OUT = _REPO_ROOT / "outputs" / "templates_v5"
-_OUT3D = _REPO_ROOT / "outputs" / "templates_3d"
+_V5_OUT = Path(config.OUTPUTS_DIR) / "templates_v5"
+_OUT3D = Path(config.OUTPUTS_DIR) / "templates_3d"
 _FFMPEG = _REPO_ROOT / "tools" / "node_modules" / "ffmpeg-static" / "ffmpeg.exe"
 
 _ID_RE = re.compile(r"^[a-z][a-z0-9_]{1,60}$")

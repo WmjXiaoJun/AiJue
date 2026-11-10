@@ -16,6 +16,7 @@
 """
 from __future__ import annotations
 
+import hashlib
 import io
 import json
 import os
@@ -96,6 +97,38 @@ def voice_for(role: str, overrides: dict | None = None) -> dict:
     if isinstance(overrides, dict):
         voice.update({k: v for k, v in overrides.items() if v is not None})
     return voice
+
+
+# ---------------------------------------------------------------------------
+# 内容寻址：文件名按「台词内容」而不是「批内下标」
+#   P0（AUDIT_render.md P0-1）：旧命名 streamb_<role>_<idx>.wav 只含批内下标，
+#   同一 role 的台词列表一改，idx 就会位移 → 新句覆盖旧句的音频，而 voice_cache
+#   （key=台词原文）仍指向被覆盖的文件 → 成片「字幕 A / 声音 A2」且被旧时长截断。
+#   现在：streamb_<role>_<sha1(text)[:10]>.wav；旧文件不删（留一轮便于对比）。
+# ---------------------------------------------------------------------------
+STREAM_PREFIX = "streamb_"
+
+
+def text_sha1(text: str) -> str:
+    """台词内容指纹（10 位）：同 role 同文本 → 同名文件 → 可安全复用。"""
+    return hashlib.sha1(str(text or "").encode("utf-8")).hexdigest()[:10]
+
+
+def content_wav_path(out_dir: Path | str, role: str, text: str) -> Path:
+    """内容寻址的台词语音路径：streamb_<role>_<sha1(text)[:10]>.wav。"""
+    return Path(out_dir) / f"{STREAM_PREFIX}{role}_{text_sha1(text)}.wav"
+
+
+def existing_content_wav(out_dir: Path | str, role: str, text: str,
+                         min_bytes: int = 45) -> Path | None:
+    """已存在且非空（>44 字节 wave 头）的同名音频 → 可复用，省一次合成。"""
+    path = content_wav_path(out_dir, role, text)
+    try:
+        if path.is_file() and path.stat().st_size > min_bytes:
+            return path
+    except OSError:
+        pass
+    return None
 
 
 def voice_spec_from_character(char: dict) -> dict:
@@ -269,16 +302,42 @@ def synthesize_batch(texts: list[str], role: str, *, out_dir: Path,
                      voice_spec: dict | None = None,
                      ref_audio: str | Path | None = None,
                      ref_text: str = "") -> list[dict]:
-    """单角色批量合成：返回 [{index, path(24k mono wav), duration, text}]。"""
+    """单角色批量合成：返回 [{index, path(24k mono wav), duration, text}]。
+
+    - 文件名按**台词内容**寻址（`streamb_<role>_<sha1(text)[:10]>.wav`），
+      改一句台词只会新增/复用属于那一句的文件，不会覆盖别的台词（P0-1）；
+    - 同 role 同文本已存在同名音频 → 直接复用（不再提交合成，也不覆盖）；
+    - 返回顺序与 `texts` 一致，`index` 是原始下标（调用方按 index 对齐）。
+    """
     base = (base or DEFAULT_BASE).rstrip("/")
     if not texts:
         return []
+    out_dir = Path(out_dir)
+    utils.ensure_dir(out_dir)
     voice = voice_for(role, voice_spec)
+    voice_sig = _voice_sig(voice, ref_audio, ref_text)
+    # 1) 先按内容寻址分流：已存在且 voice 一致的直接复用（省一次合成）
+    slots: list[dict | None] = [None] * len(texts)
+    todo: list[tuple[int, str]] = []
+    seen: set[str] = set()
+    for pos, text in enumerate(texts):
+        cached = existing_content_wav(out_dir, role, text)
+        if cached is not None and _wav_voice_ok(cached, voice_sig):
+            slots[pos] = _result_for(cached, role, text, pos, voice, voice_sig, reused=True)
+            continue
+        if text in seen:  # 同一批里重复句：只合成一次，结果共享
+            continue
+        seen.add(text)
+        todo.append((pos, text))
+    if not todo:
+        LOG.info("Breeze TTS：%d 句全部命中已有音频（role=%s），跳过合成", len(texts), role)
+        return [slot for slot in slots if slot is not None]
     if not server_alive(base):
         raise BreezeTTSUnavailable(f"Breeze TTS 服务不可用: {base}（先 ensure_server/start_server）")
-    results: list[dict] = []
-    for start in range(0, len(texts), MAX_BATCH_TEXTS):
-        chunk = texts[start:start + MAX_BATCH_TEXTS]
+    by_text: dict[str, dict] = {}
+    for start in range(0, len(todo), MAX_BATCH_TEXTS):
+        chunk_pairs = todo[start:start + MAX_BATCH_TEXTS]
+        chunk = [text for _pos, text in chunk_pairs]
         payload_texts = json.dumps([clean_text(t) for t in chunk], ensure_ascii=False)
         data = {
             "texts": payload_texts,
@@ -353,23 +412,88 @@ def synthesize_batch(texts: list[str], role: str, *, out_dir: Path,
         for i, nbytes in enumerate(seg_bytes):
             seg = pcm[cursor:cursor + nbytes]
             cursor += nbytes
-            idx = start + i
-            wav_path = Path(out_dir) / f"streamb_{role}_{idx:03d}.wav"
-            _write_wav(wav_path, seg, sr)
-            results.append({
-                "index": idx,
-                "role": role,
-                "text": chunk[i],
-                "path": str(wav_path),
-                "duration": round(utils.probe_duration(wav_path), 3),
-                "sample_rate": sr,
-                "gen_sec": gen_sec,
-                "provider": "breeze",
-                "voice": voice["label"],
-                "seed": int(seed if seed is not None else voice["seed"]),
-                "cfg_scale": float(cfg_scale if cfg_scale is not None else voice["cfg_scale"]),
-            })
+            text = chunk[i]
+            # 内容寻址：同名文件 = 同一句台词；存在就复用（不覆盖），否则写新文件
+            wav_path = content_wav_path(out_dir, role, text)
+            reused = (existing_content_wav(out_dir, role, text) is not None
+                      and _wav_voice_ok(wav_path, voice_sig))
+            if reused:
+                LOG.info("Breeze TTS 复用已有音频（同 role 同文本）: %s", wav_path.name)
+            else:
+                _write_wav(wav_path, seg, sr)
+                _write_wav_meta(wav_path, role, text, voice_sig, voice, seed, cfg_scale)
+            by_text[text] = _result_for(
+                wav_path, role, text, -1, voice, voice_sig, reused=reused,
+                gen_sec=0.0 if reused else gen_sec, sample_rate=sr,
+                seed=seed, cfg_scale=cfg_scale)
+    # 3) 按原始下标回填（含复用句、含批内重复句）
+    results: list[dict] = []
+    for pos, text in enumerate(texts):
+        item = slots[pos] or by_text.get(text)
+        if item is None:
+            raise BreezeTTSUnavailable(f"{role}: 台词未拿到音频（内部错误）: {text[:30]}")
+        merged = dict(item)
+        merged["index"] = pos
+        results.append(merged)
     return results
+
+
+def _voice_sig(voice: dict, ref_audio: str | Path | None, ref_text: str) -> str:
+    """音色签名：instruction + seed + cfg + 参考音频/参考文本。
+
+    文件名只按台词内容（P0-1 要求），音色变了靠 meta 里的这个签名判定「该重合成」。
+    """
+    return hashlib.sha1("|".join([
+        str(voice.get("instruction") or ""), str(voice.get("seed") or ""),
+        str(voice.get("cfg_scale") or ""), str(ref_audio or "").strip(),
+        str(ref_text or "").strip()]).encode("utf-8")).hexdigest()[:10]
+
+
+def _wav_meta_path(wav: Path) -> Path:
+    return wav.with_name(wav.name + ".meta.json")
+
+
+def _write_wav_meta(wav: Path, role: str, text: str, voice_sig: str,
+                    voice: dict, seed: int | None, cfg_scale: float | None) -> None:
+    utils.write_json(_wav_meta_path(wav), {
+        "text": text, "role": role, "text_sha1": text_sha1(text),
+        "voice_sig": voice_sig, "voice": voice.get("label", ""),
+        "seed": int(seed if seed is not None else (voice.get("seed") or 0)),
+        "cfg_scale": float(cfg_scale if cfg_scale is not None else (voice.get("cfg_scale") or 0.0)),
+        "bytes": wav.stat().st_size if wav.is_file() else 0,
+        "provider": "breeze",
+        "created_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+    })
+
+
+def _wav_voice_ok(wav: Path, voice_sig: str) -> bool:
+    """已有音频是否就是当前音色合成的：没有 meta 时按「可用」处理（旧文件兼容）。"""
+    meta = utils.read_json(_wav_meta_path(wav)) or {}
+    recorded = str((meta or {}).get("voice_sig") or "")
+    return (not recorded) or recorded == str(voice_sig)
+
+
+def _result_for(wav: Path, role: str, text: str, index: int, voice: dict,
+                voice_sig: str, *, reused: bool = False, gen_sec: float = 0.0,
+                sample_rate: int = SAMPLE_RATE, seed: int | None = None,
+                cfg_scale: float | None = None) -> dict:
+    return {
+        "index": index,
+        "role": role,
+        "text": text,
+        "path": str(wav),
+        "duration": round(utils.probe_duration(wav), 3),  # 永远 probe 文件真实长度
+        "sample_rate": int(sample_rate or SAMPLE_RATE),
+        "gen_sec": round(float(gen_sec or 0.0), 2),
+        "provider": "breeze",
+        "voice": voice["label"],
+        "voice_sig": voice_sig,
+        "text_sha1": text_sha1(text),
+        "bytes": wav.stat().st_size if wav.is_file() else 0,
+        "reused": bool(reused),
+        "seed": int(seed if seed is not None else (voice.get("seed") or 0)),
+        "cfg_scale": float(cfg_scale if cfg_scale is not None else (voice.get("cfg_scale") or 0.0)),
+    }
 
 
 def synthesize(role_texts: dict[str, list[str]], out_dir: Path, *,

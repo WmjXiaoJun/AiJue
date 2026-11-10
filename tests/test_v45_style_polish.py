@@ -153,8 +153,17 @@ def test_arcane_cinematic_uses_lora():
 
 
 def test_cyber_scene_templates_and_scenes():
-    """V46：两个赛博场景模板的 act.scene 必须在 contract/v5/scenes 里存在，且 brief 镜数对齐。"""
+    """V46：赛博场景模板的 act.scene 必须在 contract/v5/scenes 里存在；brief 覆盖全部幕。
+
+    2026-11 修订：`scripts/expand_3d_shots.py` 会把 brief 从「一镜一幕」扩写到 5 分钟片长
+    （4 幕 → 89 镜），因此原断言 `len(brief.shots) == len(tpl.acts)` 已不成立（它是旧设计）。
+    真正要守住的合同是：
+      1) brief 的镜数 ≥ 幕数（每幕都要有镜头）；
+      2) brief 的前 N 镜与 N 个 act 一一对应（scene 相同、act_index == i）；
+      3) 全篇 shot id 唯一（同 id 会写同一个 shots/<id>.mp4 并共用 seed）。
+    """
     import json as _json
+    from collections import Counter
     repo = pathlib.Path(__file__).resolve().parents[1]
     scenes = {p.stem for p in (repo / "contract/v5/scenes").glob("*.json")}
     for tid in ("custom_tpl_v46_undercity", "custom_tpl_v46_council"):
@@ -163,9 +172,15 @@ def test_cyber_scene_templates_and_scenes():
         for act in tpl["acts"]:
             assert act["scene"] in scenes, (tid, act["scene"])
         brief = _json.loads((repo / f"contract/v5/cinema3d/templates3d/{tid}_semantic.json").read_text(encoding="utf-8"))
-        assert len(brief["shots"]) == len(tpl["acts"])
-        for shot, act in zip(brief["shots"], tpl["acts"]):
-            assert shot["scene"] == act["scene"]
+        shots = brief["shots"]
+        ids = [str(s.get("id") or "") for s in shots]
+        dupes = {k: v for k, v in Counter(ids).items() if v > 1}
+        assert not dupes, f"{tid}: brief shot id 重复（会互相覆盖 shots/<id>.mp4）：{dupes}"
+        assert len(shots) >= len(tpl["acts"]), (
+            f"{tid}: brief 只有 {len(shots)} 镜，覆盖不了 {len(tpl['acts'])} 幕")
+        for i, act in enumerate(tpl["acts"]):
+            assert shots[i]["scene"] == act["scene"], (tid, i, shots[i]["scene"], act["scene"])
+            assert shots[i].get("act_index") == i, (tid, i, shots[i].get("act_index"))
 
 
 def test_cyber_templates_default_two_candidates():

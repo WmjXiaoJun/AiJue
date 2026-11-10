@@ -1458,6 +1458,101 @@ export const TEMPLATES: TemplateInfo[] = [
         "variety"
       ]
     ]
+  },
+  {
+    "id": "relic_talk_5min",
+    "name": "国宝会说话 · 5 分钟",
+    "tagline": "国宝会说话：一件文物一个故事 + 主持讲解 + 花字收口",
+    "aspect": "16:9",
+    "target_duration": 306,
+    "accent": "#EAB308",
+    "segments": [
+      {
+        "id": "open",
+        "name": "片头",
+        "duration": 6,
+        "pattern": [
+          "title_card"
+        ]
+      },
+      {
+        "id": "opening",
+        "name": "开场 · 走进博物馆",
+        "duration": 40,
+        "pattern": [
+          "host_to_camera",
+          "b_roll",
+          "meme_card"
+        ]
+      },
+      {
+        "id": "relic_sword",
+        "name": "第一件 · 越王勾践剑",
+        "duration": 75,
+        "pattern": [
+          "host_to_camera",
+          "shot_reverse",
+          "reaction",
+          "b_roll"
+        ]
+      },
+      {
+        "id": "relic_painting",
+        "name": "第二件 · 千里江山图",
+        "duration": 70,
+        "pattern": [
+          "host_to_camera",
+          "shot_reverse",
+          "b_roll"
+        ]
+      },
+      {
+        "id": "relic_bells",
+        "name": "第三件 · 曾侯乙编钟",
+        "duration": 70,
+        "pattern": [
+          "host_to_camera",
+          "shot_reverse",
+          "b_roll"
+        ]
+      },
+      {
+        "id": "closing",
+        "name": "结尾 · 千年的对话",
+        "duration": 45,
+        "pattern": [
+          "host_to_camera",
+          "b_roll",
+          "end_card"
+        ]
+      }
+    ],
+    "packaging": [
+      [
+        "片头",
+        "logo_sting"
+      ],
+      [
+        "片尾",
+        "end_card"
+      ],
+      [
+        "花字",
+        "zaopianju_yellow"
+      ],
+      [
+        "转场",
+        "hard_cut"
+      ],
+      [
+        "BGM",
+        "talk_light"
+      ],
+      [
+        "字幕",
+        "variety"
+      ]
+    ]
   }
 ];
 

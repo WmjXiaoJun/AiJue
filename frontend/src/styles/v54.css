@@ -1,0 +1,75 @@
+/* =========================================================================
+   V54 · 5 分钟长版（Longform）+ 成片库删除 + 目标时长徽标
+   与 v18.css / library.css 同口径（深色面板 / 发丝线 / mono 辅助字）
+   ========================================================================= */
+
+/* ---------------- 目标时长徽标 ---------------- */
+.v54-dur {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 17px;
+  padding: 0 6px;
+  border: 1px solid var(--c-line);
+  border-radius: 4px;
+  color: var(--c-sub);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.v54-dur.is-ok { border-color: rgba(79, 143, 124, 0.45); color: #8fc3ae; }
+.v54-dur.is-miss { border-color: rgba(194, 84, 63, 0.42); color: #e29a87; }
+.v54-dur.is-live { border-color: rgba(201, 162, 39, 0.45); color: var(--c-gold-soft); }
+
+/* ---------------- 管线页 · 长版面板 ---------------- */
+.v54-longform .v18-panel-body { gap: 10px; }
+.v54-longform-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.v54-longform-actions .cm-btn { height: 29px; }
+.v54-longform-progress { display: flex; flex-direction: column; gap: 5px; padding: 9px 11px; border: 1px solid var(--c-line); border-radius: 9px; background: rgba(255, 255, 255, 0.02); }
+.v54-longform-progress-head { display: flex; align-items: baseline; gap: 8px; font-family: var(--font-mono); font-size: 9.5px; color: var(--c-sub); }
+.v54-longform-progress-head b { font-family: var(--font-body); font-size: 12px; color: var(--c-text); letter-spacing: 0.02em; }
+.v54-longform-progress-head em { margin-left: auto; font-style: normal; color: var(--c-gold-soft); }
+.v54-longform-msg { font-family: var(--font-mono); font-size: 9px; color: var(--c-mut); overflow-wrap: anywhere; }
+.v54-bar { position: relative; height: 5px; border-radius: 999px; background: rgba(255, 255, 255, 0.06); overflow: hidden; }
+.v54-bar > i { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: linear-gradient(90deg, #8f6f12, var(--c-gold-soft)); box-shadow: 0 0 10px rgba(201, 162, 39, 0.5); transition: width 0.4s ease; }
+.v54-longform-jobs { display: flex; flex-direction: column; gap: 4px; }
+.v54-longform-jobs-head { display: flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.12em; color: var(--c-mut); }
+.v54-longform-jobs-head em { margin-left: auto; font-style: normal; color: var(--c-gold-soft); }
+.v54-job { display: flex; align-items: center; gap: 7px; padding: 5px 8px; border: 1px solid var(--c-line); border-radius: 7px; background: rgba(255, 255, 255, 0.015); font-size: 10px; }
+.v54-job b { font-weight: 500; color: var(--c-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.v54-job em { margin-left: auto; font-style: normal; font-size: 9px; color: var(--c-mut); }
+.v54-job-link { font-size: 9.5px; color: var(--c-gold-soft); text-decoration: none; }
+.v54-job-link:hover { text-decoration: underline; }
+.v54-dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--c-mut); }
+.v54-dot.is-live { background: var(--c-gold); box-shadow: 0 0 8px rgba(201, 162, 39, 0.8); animation: cm-breathe 1.8s ease-in-out infinite; }
+
+/* ---------------- 成片库 · 删除 ---------------- */
+.v54-final-toolbar-actions { display: flex; align-items: center; gap: 6px; margin-left: auto; flex-wrap: wrap; }
+.v54-card-check {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(201, 162, 39, 0.45);
+  border-radius: 7px;
+  background: rgba(8, 9, 13, 0.8);
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+}
+.v54-card-check input { width: 14px; height: 14px; accent-color: var(--c-gold); cursor: pointer; }
+.v20-final-card.is-del-selected { border-color: rgba(194, 84, 63, 0.6) !important; box-shadow: 0 0 0 1px rgba(194, 84, 63, 0.35); }
+.v54-del-btn { color: #e29a87; border-color: rgba(194, 84, 63, 0.4); }
+.v54-del-btn:hover { background: rgba(194, 84, 63, 0.12); color: #f0b9aa; }
+.v54-del-list { display: flex; flex-direction: column; gap: 4px; max-height: 220px; overflow-y: auto; padding: 6px 8px; border: 1px solid var(--c-line); border-radius: 8px; background: rgba(4, 5, 8, 0.6); font-family: var(--font-mono); font-size: 9.5px; color: var(--c-sub); }
+.v54-del-ok { color: #8fc3ae; }
+.v54-del-warn { display: flex; gap: 7px; align-items: flex-start; padding: 9px 11px; border: 1px solid rgba(217, 169, 127, 0.4); border-radius: 8px; background: rgba(217, 169, 127, 0.08); color: #d9a97f; font-size: 10.5px; line-height: 1.6; }
+.v54-del-warn code { font-family: var(--font-mono); font-size: 9.5px; color: #f0d1a8; }
+
+@media (max-width: 1023.98px) {
+  .v54-longform-actions .cm-btn { flex: 1 1 160px; justify-content: center; }
+}

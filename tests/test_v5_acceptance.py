@@ -860,8 +860,10 @@ def test_subtitle_quality(tid: str):
     assert not leaks, (
         f"{tid}: final.ass 出现裸 ASS 绘图指令文本（已知问题①回归）：{leaks[:3]}")
     styles = _parse_ass_styles(ass)
+    # 平台字幕样式：早期是 "V…/SUB…"，render_v5 现行主字幕样式叫 "Main"（见 final.ass）。
     text_styles = [s for name, s in styles.items()
-                   if "V" in name.upper() or "SUB" in name.upper()]
+                   if any(key in name.upper()
+                          for key in ("V", "SUB", "MAIN", "DIALOG", "CAPTION"))]
     assert text_styles, f"{tid}: final.ass 无字幕后样式"
     worst = None
     for style in text_styles:

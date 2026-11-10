@@ -13,20 +13,34 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import os
 import re
 import shutil
+import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+from urllib.parse import urlsplit
 
 import httpx
-from fastapi import APIRouter, Depends, FastAPI, HTTPException
+from fastapi import APIRouter, Body, Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from . import character_files, concept_files, config, jobs, llm, models, schemas, script_parser, seed
+from . import (
+    character_files,
+    concept_files,
+    config,
+    ids,
+    jobs,
+    llm,
+    models,
+    schemas,
+    script_parser,
+    seed,
+)
 from .db import SessionLocal, get_db, init_db
 from .routers import character_audition as character_audition_router
 from .routers import character_dialogue as character_dialogue_router
@@ -41,10 +55,54 @@ from .routers import v5_create as v5_create_router
 from .routers import v5_series as v5_series_router
 from .routers import v5_studio as v5_studio_router
 from .routers import v6_agent as v6_agent_router
+from .routers import longform as longform_router
+from .routers import muse as muse_router
 
 logger = logging.getLogger(__name__)
 
 VERSION = config.VERSION
+# 导入期"上次进程退出 -> 把 queued/running 标 failed"的开关（审查 P1-3）。
+# `uvicorn --reload` 每次保存都会重新 import；不关就会把仍在跑的 GPU 任务判成 failed。
+# backend/run.ps1 默认已不带 --reload，显式 -Reload 时自动置 ZAOPIANJU_JOBS_RECOVER=0。
+JOBS_RECOVER = ids.env_flag("ZAOPIANJU_JOBS_RECOVER", True)
+
+# 隐私档位映射的唯一来源在 publish/upload_post.py（纯函数，不联网）。
+# 这里只做"预检/台账预览"的引用：映射规则绝不在 backend 里抄第二份。
+_pub_privacy_levels = None
+try:  # publish/ 在仓库根；uvicorn --app-dir backend 时 cwd 就是仓库根
+    if str(config.REPO_ROOT) not in sys.path:
+        sys.path.insert(0, str(config.REPO_ROOT))
+    from publish.upload_post import _privacy_levels as _pub_privacy_levels  # noqa: E402
+except Exception:  # noqa: BLE001 - 只影响预检提示，不影响发布主流程
+    _pub_privacy_levels = None
+
+
+def _privacy_levels_preview(platforms: List[str], privacy: str) -> Dict[str, str]:
+    """每个平台**实际会用**的隐私档位（只读预览；不抛"拒发"，加载失败就返回空）。"""
+    if _pub_privacy_levels is None:
+        return {}
+    try:
+        return _pub_privacy_levels(platforms, privacy, allow_public_fallback=True)
+    except Exception:  # noqa: BLE001
+        logger.warning("privacy_levels 预览失败（不影响发布）", exc_info=True)
+        return {}
+
+
+def _url_host(url: str) -> str:
+    """URL 的 host（小写）；解析失败返回空串。用于判断 LLM 地址是否换了服务商。"""
+    try:
+        return (urlsplit(str(url or "")).hostname or "").lower()
+    except ValueError:
+        return ""
+
+
+def _privacy_warning(privacy: str, levels: Dict[str, str]) -> str:
+    """给 dry_run / 台账用的一句人话：哪些平台会落到"仅互关可见"。"""
+    risky = {p: lv for p, lv in (levels or {}).items() if not p.startswith("youtube")}
+    if privacy != "unlisted" or not risky:
+        return ""
+    parts = "、".join(f"{p}={lv}" for p, lv in risky.items())
+    return f"unlisted 在 {parts}（仅互关可见）：真实发布默认拒发，需显式 allow_public_fallback"
 SHOT_STATUSES = {"pending", "queued", "generating", "ready", "failed"}
 SHOT_TYPES = {
     "title_card",
@@ -58,6 +116,8 @@ SHOT_TYPES = {
 }
 ASSET_ROLES = {"host", "guest"}
 ASSET_TYPES = {"character", "scene", "prop", "style"}
+# 角色/资产 id 只允许小写字母开头 + 数字下划线；防止 .. \ 路径逃逸
+CHAR_ID_RE = re.compile(r"^[a-z][a-z0-9_]{1,60}$")
 STYLE_PRESETS = {"3d_toon", "3d_cel", "2d_cel", "2d_paint", "anime", "guoman"}
 DEFAULT_STYLE = "3d_toon"
 # 多语种本地化支持语言（MVP en/es，另支持 ja/ko/pt；fr/de/ar 预留）
@@ -149,12 +209,28 @@ PUBLISH_LIMITS = {
 init_db()
 
 
-def _recover_stale_jobs() -> None:
+STALE_JOB_ERROR = "上次进程退出（服务重启），任务中断（可用 retry）"
+
+
+def _recover_stale_jobs(force: bool = False) -> None:
     """服务重启后，把上一个进程遗留的 queued/running 任务标记为 failed（可 retry）。
 
     demo 用进程内线程执行任务，进程退出后线程即消失；不做恢复会让前端一直看到
     幽灵任务。标记 failed 并保留 error 语义，用户可点 retry 重新入队。
+
+    开关（P1-3）：``ZAOPIANJU_JOBS_RECOVER=0|off|false|no`` 时**完全跳过**恢复。
+    原因是本恢复跑在模块导入期，而 ``uvicorn --reload`` 每次保存文件都会重新 import 一次；
+    那样"改一行代码 → 上一轮 GPU 任务被标 failed（子进程还在渲）"是必然路径。
+    ``backend/run.ps1`` 默认不再带 ``--reload``，显式 ``-Reload`` 时会自动置位本开关。
     """
+    if not force and not JOBS_RECOVER:
+        logger.warning(
+            "启动恢复已跳过（ZAOPIANJU_JOBS_RECOVER=0）：保留 queued/running 任务原状，"
+            "不把可能仍在跑的上一次任务判成 failed"
+        )
+        return
+    if force and not JOBS_RECOVER:
+        logger.warning("启动恢复被显式调用（force=True），忽略 ZAOPIANJU_JOBS_RECOVER=0")
     with SessionLocal() as db:
         stale = (
             db.query(models.Job)
@@ -165,8 +241,8 @@ def _recover_stale_jobs() -> None:
             return
         for job in stale:
             job.status = "failed"
-            job.error = "服务重启，任务中断，可点重试"
-            job.message = "服务重启，任务中断"
+            job.error = STALE_JOB_ERROR
+            job.message = "上次进程退出，任务中断"
             job.updated_at = models.utcnow()
             if job.type == "shot" and job.shot_id:
                 shot = db.get(models.Shot, job.shot_id)
@@ -194,17 +270,37 @@ def _recover_stale_jobs() -> None:
                     "publishing",
                 ):
                     pub_record.status = "failed"
-                    pub_record.error = "服务重启，发布任务中断；结果不确定，请先核对 request_id 再决定是否重新发布"
+                    pub_record.error = (
+                        "上次进程退出，发布任务中断；结果不确定，请先核对 request_id 再决定是否重新发布"
+                    )
         db.commit()
         logger.warning("启动恢复：%d 个未完成任务已标记 failed（可重试）", len(stale))
 
 
 _recover_stale_jobs()
 
+#: 本机 demo 无鉴权：CORS 只放行本机前端端口，绝不用通配。
+#: 安全背景（2026-11-08 审查）：`allow_origins=["*"]` 让任意网页都能驱动
+#: 127.0.0.1:8090 的写接口（改 LLM base_url / 起渲染 / 花钱）；收紧到本机来源后，
+#: 浏览器会拦掉跨源写请求。局域网访问/反向代理需要显式加：
+#:   $env:ZAOPIANJU_CORS_ORIGINS="http://192.168.1.10:8090"
+_DEFAULT_CORS_ORIGINS = (
+    "http://127.0.0.1:8090", "http://localhost:8090",
+    "http://127.0.0.1:5173", "http://localhost:5173",
+)
+
+
+def _cors_origins() -> List[str]:
+    raw = os.environ.get("ZAOPIANJU_CORS_ORIGINS", "").strip()
+    if raw:
+        return [item.strip() for item in raw.split(",") if item.strip()]
+    return list(_DEFAULT_CORS_ORIGINS)
+
+
 app = FastAPI(title=config.APP_NAME, version=VERSION)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # demo 无鉴权，允许前端 5173 直连
+    allow_origins=_cors_origins(),  # 只允许本机前端；见上方安全说明
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -345,14 +441,48 @@ def _sync_character(db: Session, character: models.Character, commit: bool = Tru
     return changed
 
 
+def available_formats() -> List[str]:
+    """contract/formats/*.json 里真实存在的节目模板 id（升序，供 422 提示可用值）。"""
+    if not config.FORMATS_DIR.is_dir():
+        return []
+    return sorted(path.stem for path in config.FORMATS_DIR.glob("*.json"))
+
+
 def _load_format(format_id: str) -> Dict[str, Any]:
-    path = config.FORMATS_DIR / f"{format_id}.json"
+    """读取 contract/formats/<format_id>.json。
+
+    id 先过统一校验（`backend/app/ids.py`），不再直接 `FORMATS_DIR / f"{id}.json"`：
+    审查 P1-1 实测 `format_id="..\\\\..\\\\contract\\\\demo_episode"` 能读到 formats 之外的任意 json。
+    - id 形态非法（含 `..`/`\\`/绝对路径）→ 400（这是调用方参数错误，不是"模板不存在"）
+    - id 形态合法但文件不存在 → `{}`（保持既有"未知模板"语义，由调用方决定 400/422）
+    """
+    ident = ids.check_id(format_id, "format_id")
+    path = ids.resolve_under(config.FORMATS_DIR, f"{ident}.json", "format_id")
     if path.is_file():
         try:
             return json.loads(path.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
             logger.exception("格式文件解析失败: %s", path)
     return {}
+
+
+def _require_format(format_id: str) -> Dict[str, Any]:
+    """API 边界校验：format_id 必须是 contract/formats/*.json 里真实存在的一份。
+
+    审查 P2 实测：`POST /api/projects {"format_id":"no_such_format"}` 曾直接 **200**，
+    这个 id 还会写进 projects.format_id 长期驻留（前端 16 项下拉恰好掩盖了它）。
+    现在不合法 → **422**，detail 里带上可用模板列表，前端能直接把选项摆出来。
+    """
+    choices = available_formats()
+    hint = " / ".join(choices) or "（contract/formats 下没有可用模板）"
+    try:
+        ident = ids.check_id(format_id, "format_id")
+    except HTTPException as exc:
+        raise HTTPException(status_code=422, detail=f"{exc.detail}；可用模板: {hint}") from exc
+    spec = _load_format(ident)
+    if not spec:
+        raise HTTPException(status_code=422, detail=f"未知节目模板: {ident}；可用模板: {hint}")
+    return spec
 
 
 def _create_skeleton_shots(db: Session, episode: models.Episode) -> int:
@@ -518,7 +648,7 @@ def list_projects(db: Session = Depends(get_db)):
 @router.post("/projects", response_model=schemas.ProjectOut)
 def create_project(payload: schemas.ProjectCreate, db: Session = Depends(get_db)):
     setting = seed.get_settings(db)
-    fmt = _load_format(payload.format_id)
+    fmt = _require_format(payload.format_id)
     project = models.Project(
         id=models.new_id("proj"),
         name=payload.name.strip(),
@@ -593,9 +723,18 @@ def patch_project(
                 detail=f"项目名称过长：{len(new_name)} 字（最多 200 字）",
             )
     if "format_id" in changes:
-        new_format_id = str(changes["format_id"]).strip()
-        if not new_format_id or not _load_format(new_format_id):
-            raise HTTPException(status_code=400, detail=f"未知节目模板: {new_format_id}")
+        raw_format_id = str(changes["format_id"]).strip()
+        choices = available_formats()
+        hint = " / ".join(choices) or "（contract/formats 下没有可用模板）"
+        try:
+            new_format_id = ids.check_id(raw_format_id, "format_id")
+            spec = _load_format(new_format_id)
+        except HTTPException:  # 非法 id（含 ..\ 穿越）与"不存在"统一按未知模板处理
+            spec = {}
+        if not spec:
+            raise HTTPException(
+                status_code=400, detail=f"未知节目模板: {raw_format_id}；可用模板: {hint}"
+            )
     if "aspect" in changes:
         new_aspect = str(changes["aspect"]).strip()
         if new_aspect not in PROJECT_ASPECTS:
@@ -849,6 +988,10 @@ def create_character(
             detail="缺少角色 spec：请传扁平对象或 {spec:{...}}",
         )
     character_id = str(provided_id or "").strip() or models.new_id("char")
+    if not CHAR_ID_RE.match(character_id):
+        raise HTTPException(status_code=400, detail=f"非法角色 id: {character_id}")
+    if ".." in character_id or "/" in character_id or "\\" in character_id:
+        raise HTTPException(status_code=400, detail=f"非法角色 id: {character_id}")
     if db.get(models.Character, character_id) is not None:
         raise HTTPException(status_code=409, detail=f"角色 id 已存在: {character_id}")
 
@@ -979,20 +1122,21 @@ def get_character_files(cid: str, db: Session = Depends(get_db)):
 # AI 概念图 / H3 动画（contract/CONCEPT.md）
 # --------------------------------------------------------------------------- #
 def _resolve_output_file(raw: Any) -> Optional[Path]:
-    """把 /media/... URL 或仓库相对/绝对路径解析为 outputs 内存在的文件（限制在 outputs）。"""
+    """把 /media/... URL 或仓库相对/绝对路径解析为 outputs 内存在的文件（限制在 outputs）。
+
+    containment 统一走 `backend/app/ids.py::resolve_under`（与三处合同 json 入口、`/media`
+    证据路由同一套判定），不再各写一段 `relative_to`；越界一律按"不是产物文件"返回 None，
+    保持本函数既有的 Optional 契约（调用方据此 400/回退），只记 warning 便于排障。
+    """
     text = str(raw or "").strip()
     if not text or text.lower().startswith(("http://", "https://", "data:")):
         return None
     prefix = config.MEDIA_URL_PREFIX + "/"
-    if text.startswith(prefix):
-        path = config.OUTPUTS_DIR / text[len(prefix):]
-    else:
-        candidate = Path(text)
-        path = candidate if candidate.is_absolute() else config.REPO_ROOT / candidate
+    rel = text[len(prefix):] if text.startswith(prefix) else text
     try:
-        resolved = path.resolve()
-        resolved.relative_to(config.OUTPUTS_DIR.resolve())
-    except (ValueError, OSError):
+        resolved = ids.resolve_under(config.OUTPUTS_DIR, rel, "产物路径")
+    except HTTPException:
+        logger.warning("产物路径越出 outputs，已忽略: %r", text)
         return None
     return resolved if resolved.is_file() else None
 
@@ -1598,7 +1742,14 @@ def retry_job(jid: str, db: Session = Depends(get_db)):
             status_code=400,
             detail="发布任务失败不自动重试（避免重复发布）；请先核对 request_id，再重新发起发布",
         )
-    job, _created = jobs.retry_job(db, job)
+    job, created = jobs.retry_job(db, job)
+    if not created:
+        # 审查 P2：这里曾把 jobs.retry_job 的 (job, False) 丢掉 → running 任务点"重试"
+        # 既不报错也没动作（200 + 状态不变）。现在明确 409，前端能显示"正在运行，不能重试"。
+        raise HTTPException(
+            status_code=409,
+            detail=f"任务正在运行，不能重试（job={job.id}，status={job.status}）；请等它结束或在任务面板取消",
+        )
     return job
 
 
@@ -1754,7 +1905,8 @@ def llm_providers():
 
 @router.post("/llm/test", response_model=schemas.LLMTestResult)
 def llm_test(payload: Optional[schemas.LLMTestRequest] = None):
-    provider = payload.provider if payload is not None and payload.provider else None
+    payload = payload or schemas.LLMTestRequest()
+    provider = payload.provider
     if provider is not None:
         provider = str(provider).strip().lower()
         if provider not in llm.SUPPORTED_PROVIDERS:
@@ -1762,7 +1914,14 @@ def llm_test(payload: Optional[schemas.LLMTestRequest] = None):
                 status_code=400,
                 detail=f"不支持的 LLM provider: {provider}；可选 {list(llm.SUPPORTED_PROVIDERS)}",
             )
-    return llm.test_connection(provider)
+    base_url = str(payload.base_url or "").strip()
+    if base_url and not base_url.lower().startswith(("http://", "https://")):
+        raise HTTPException(status_code=400, detail="base_url 必须是 http(s) URL")
+    model = str(payload.model or "").strip()
+    api_key = str(payload.api_key or "").strip()
+    # 覆盖值只用于本次测试，不落库；传了 base_url 又没传 key 时 test_connection 不会复用旧 Key。
+    return llm.test_connection(provider, base_url=base_url or None,
+                               model=model or None, api_key=api_key or None)
 
 
 @router.post("/projects/{pid}/generate-script", response_model=schemas.ScriptGenerateResult)
@@ -2084,10 +2243,14 @@ def _publish_preflight_checks(
         .filter(models.Localization.episode_id == episode.id)
         .all()
     )
+    # 只有真正出片的版本才算：status=ready 且 video_url 非空（只有 draft 记录不算）
+    ready_rows = [row for row in loc_rows
+                  if str(getattr(row, "status", "") or "").lower() == "ready"
+                  and str(getattr(row, "video_url", "") or "").strip()]
     langs = sorted(
         {
             str(row.lang or "").strip().lower()
-            for row in loc_rows
+            for row in ready_rows
             if str(row.lang or "").strip()
         }
     )
@@ -2181,6 +2344,24 @@ def _publish_preflight_checks(
                     "Upload-Post 未连接任何社交账号（需在 upload-post.com 后台 OAuth 连接账号）",
                 )
 
+    # 7) 可见性映射（P1-18）：把"每个平台实际会用哪个隐私档"提前摊给用户看。
+    #    unlisted 在 TikTok/Instagram 只能落到 MUTUAL_FOLLOW_FRIENDS（仅互关可见），
+    #    既不是"公开"也不是"不公开"；真发布时默认拒发，dry_run 只警告不拦。
+    selected = list(publish_cfg["platforms"] or PUBLISH_PLATFORMS)
+    privacy = str(publish_cfg.get("youtube_privacy") or "unlisted").strip().lower()
+    if privacy not in ("public", "unlisted", "private"):
+        privacy = "unlisted"
+    levels = _privacy_levels_preview(selected, privacy)
+    if levels:
+        warning = _privacy_warning(privacy, levels)
+        add(
+            "privacy",
+            "可见性映射",
+            "warn" if warning else "pass",
+            " · ".join(f"{p}={lv}" for p, lv in levels.items()),
+            warning or None,
+        )
+
     return checks, warnings, publish_cfg
 
 
@@ -2215,8 +2396,17 @@ def publish_preflight(eid: str, db: Session = Depends(get_db)):
 def publish_episode(
     eid: str,
     payload: Optional[schemas.PublishRequest] = None,
+    allow_public_fallback: bool = False,
     db: Session = Depends(get_db),
 ):
+    """发起一次发布（入队 job，真正的上传在后台线程 + publish.cli 子进程里）。
+
+    ``allow_public_fallback``（query 参数，默认 False）：审查 P1-18 —— `privacy=unlisted`
+    而平台含 TikTok/Instagram 时，Upload-Post 只有 `MUTUAL_FOLLOW_FRIENDS` 这种"仅互关可见"
+    的档位，与"不公开"并不等价；此前的实现把 `privacy_level` 硬编码成 `PUBLIC_TO_EVERYONE`，
+    等于 **TikTok/IG 永远公开**（全仓唯一不可撤回的外部副作用）。现在默认**拒发**，只有显式
+    传 true 才允许映射到"仅互关可见"并继续发布。
+    """
     episode = _get_or_404(db, models.Episode, eid, "集")
     setting = seed.get_settings(db)
     body = payload or schemas.PublishRequest()
@@ -2246,6 +2436,22 @@ def publish_episode(
     privacy = str(body.privacy or setting.upload_post_youtube_privacy_status or "unlisted").strip().lower()
     if privacy not in ("public", "unlisted", "private"):
         raise HTTPException(status_code=400, detail="privacy 只能是 public / unlisted / private")
+    # P1-18：unlisted 在 TikTok/Instagram 上没有等价档位（Upload-Post 只有
+    # MUTUAL_FOLLOW_FRIENDS「仅互关可见」）。默认拒发，别让"不公开"变成"永远公开"。
+    # dry_run 只是预检、一个字节都不上传，因此放行（否则连"先看看会发成什么"都做不到）；
+    # 真上传时 upload_post._privacy_levels 还有同一道闸门（防其它调用方绕过）。
+    public_risky = [p for p in platforms if not p.startswith("youtube")]
+    if privacy == "unlisted" and public_risky and not allow_public_fallback and not body.dry_run:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"privacy=unlisted 无法安全映射到 {public_risky}："
+                "TikTok/Instagram 最接近的档位是 MUTUAL_FOLLOW_FRIENDS（仅互关可见），不是「不公开」。"
+                "请改用 privacy=private（SELF_ONLY），或只发 youtube，"
+                "或确认可接受该可见范围后加 ?allow_public_fallback=true 重发"
+                "（dry_run=true 的预检不受此限制）"
+            ),
+        )
 
     candidates = _publish_video_candidates(episode, lang, version)
     if lang == "zh" and version == "final":
@@ -2253,10 +2459,12 @@ def publish_episode(
         # 覆盖 3D/relic 等成片不在 outputs/episodes/<eid>/ 的情况。
         video_path = resolve_episode_video(episode.id, episode.render_url)
     else:
-        # 多语种/动态版仍先按语言/版本取片；取不到再回退到统一解析（保持原行为）
+        # 多语种/动态版先按语言/版本取片；取不到回退统一解析（保持既有 API 行为），
+        # 但必须在记录里标记 video_fallback，避免记录写着 lang=en 实际是中文母版还看不出来。
         video_path = next((candidate for candidate in candidates if candidate.is_file()), None)
         if video_path is None:
             video_path = resolve_episode_video(episode.id, episode.render_url)
+            video_fallback = True
     if video_path is None:
         detail = (
             "待发布视频不存在（请先渲染"
@@ -2298,6 +2506,14 @@ def publish_episode(
             publish_meta.get("hashtags") or DEFAULT_PUBLISH_HASHTAGS
         )
 
+    # 真判断：多语种/动态版最终落到母版 final.mp4 才算 fallback（candidates 里本来也含 final.mp4）
+    fallback_flag = bool((lang != "zh" or version != "final")
+                         and Path(video_path).name == "final.mp4")
+    # 台账回显（P1-18）：每个平台实际会用哪个隐私档 + 一句人话警告。
+    # 落进 record.meta（GET /episodes/{eid}/publishes 可见），dry_run 时再写进 job.message，
+    # 让 200 响应当场就能看到"这次预检会发成什么"，不必等发布完成。
+    privacy_levels = _privacy_levels_preview(platforms, privacy)
+    privacy_warning = _privacy_warning(privacy, privacy_levels)
     record = models.PublishRecord(
         id=models.new_id("pub"),
         episode_id=episode.id,
@@ -2311,8 +2527,12 @@ def publish_episode(
             "description": description,
             "hashtags": hashtags,
             "privacy": privacy,
+            "privacy_levels": privacy_levels,
+            "privacy_warnings": [privacy_warning] if privacy_warning else [],
+            "allow_public_fallback": bool(allow_public_fallback),
             "dry_run": bool(body.dry_run),
             "version": version,
+            "video_fallback": fallback_flag,
             "video_rel": str(video_path.relative_to(config.OUTPUTS_DIR).as_posix()),
         },
         error=None,
@@ -2329,9 +2549,22 @@ def publish_episode(
             "platforms": platforms,
             "lang": lang,
             "version": version,
+            "allow_public_fallback": bool(allow_public_fallback),
             "video_rel": str(video_path.relative_to(config.OUTPUTS_DIR).as_posix()),
         },
     )
+    if not _created:
+        # 命中去重（已有同参数发布任务在跑）：保留这条记录做审计，
+        # 但标成 duplicate，不能永远 queued（幽灵记录）。
+        record.status = "duplicate"
+        record.error = "与进行中的同参数发布任务合并"
+    if body.dry_run:
+        # dry_run 不产生任何外网副作用，因此上面不拦；但必须把"会发成什么"当场回显：
+        # JobOut 没有 meta 字段，能当场看到的就是 message（台账再看 /publishes 的 record.meta）。
+        preview = " · ".join(f"{p}={lv}" for p, lv in (privacy_levels or {}).items())
+        job.message = ("预检：" + (preview or "privacy 映射未知")
+                       + (f"｜{privacy_warning}" if privacy_warning else ""))
+        job.updated_at = models.utcnow()
     db.commit()
     return job
 
@@ -2418,6 +2651,14 @@ def patch_settings(payload: schemas.SettingsUpdate, db: Session = Depends(get_db
     llm_api_key = changes.pop("llm_api_key", None)
     if llm_api_key is not None:
         llm_updates["LLM_API_KEY"] = str(llm_api_key).strip()
+    if (llm_base_url is not None and llm_api_key is None
+            and str(llm_updates.get("LLM_BASE_URL") or "").strip()):
+        old_base = llm.load_config().base_url
+        new_base = str(llm_updates.get("LLM_BASE_URL") or "").strip()
+        if _url_host(new_base) != _url_host(old_base):
+            # 换地址/换服务商时必须重新填 Key：否则旧 Key 会被发到调用方指定的新地址
+            # （审查 2026-11-08：CORS 通配 + 可改 base_url 的 Key 外泄链）。
+            llm_updates["LLM_API_KEY"] = ""
     if changes.get("generation_mode") is not None and changes["generation_mode"] not in ("mock", "comfyui"):
         raise HTTPException(status_code=400, detail="generation_mode 只能是 mock 或 comfyui")
     provider = changes.get("h3_provider")
@@ -2508,29 +2749,49 @@ def patch_settings(payload: schemas.SettingsUpdate, db: Session = Depends(get_db
 # --------------------------------------------------------------------------- #
 # SSE（可选；前端默认轮询）
 # --------------------------------------------------------------------------- #
+def _jobs_snapshot(episode_id: Optional[str]) -> Dict[str, Any]:
+    """SSE 用的一次快照（同步 DB 调用，必须放到线程里跑，别堵事件循环）。"""
+    with SessionLocal() as db:
+        query = db.query(models.Job)
+        if episode_id:
+            query = query.filter(models.Job.episode_id == episode_id)
+        rows = query.order_by(models.Job.created_at.desc()).limit(20).all()
+        return {
+            "jobs": [
+                schemas.JobOut.model_validate(row).model_dump(mode="json")
+                for row in rows
+            ]
+        }
+
+
 @router.get("/events")
-async def events(episode_id: Optional[str] = None):
+async def events(request: Request, episode_id: Optional[str] = None):
+    """任务状态 SSE（前端默认轮询，此端点可选）。
+
+    审查 P2-3：原实现把同步 SQLAlchemy 直接跑在 async 生成器里 —— 每 2s 一次 SQLite 查询
+    会卡住整个事件循环（所有并发请求一起排队）；DB 一旦出错只 `logger.exception` 然后照旧
+    `yield data: {}`，客户端无法区分"没有任务"和"后端挂了"。
+
+    现在：① 查询丢到 `asyncio.to_thread`；② 异常时发一条 `event: error` 后结束（不再吞成 `{}`）；
+    ③ 用 `request.is_disconnected()` 提前结束，最长仍保留 5 分钟上限。
+    """
+
     async def event_stream():
         yield "retry: 2000\n\n"
         for _ in range(150):
-            payload_json = "{}"
+            if await request.is_disconnected():
+                return
             try:
-                with SessionLocal() as db:
-                    query = db.query(models.Job)
-                    if episode_id:
-                        query = query.filter(models.Job.episode_id == episode_id)
-                    rows = query.order_by(models.Job.created_at.desc()).limit(20).all()
-                    payload_json = json.dumps(
-                        {
-                            "jobs": [
-                                schemas.JobOut.model_validate(row).model_dump(mode="json")
-                                for row in rows
-                            ]
-                        },
-                        ensure_ascii=False,
-                    )
-            except Exception:  # noqa: BLE001 - SSE 断流不 crash
+                payload = await asyncio.to_thread(_jobs_snapshot, episode_id)
+                payload_json = json.dumps(payload, ensure_ascii=False)
+            except Exception as exc:  # noqa: BLE001 - 出错必须让客户端看得见
                 logger.exception("SSE 查询失败")
+                error = json.dumps(
+                    {"error": "任务状态查询失败", "detail": f"{type(exc).__name__}: {exc}"},
+                    ensure_ascii=False,
+                )
+                yield f"event: error\ndata: {error}\n\n"
+                return
             yield f"data: {payload_json}\n\n"
             await asyncio.sleep(2)
 
@@ -2552,9 +2813,14 @@ app.include_router(character_showcase_router.router)
 app.include_router(v5_studio_router.router)
 # V48 系列（同世界模板串成剧集，只读）
 app.include_router(v5_series_router.router)
+app.include_router(longform_router.router)
 app.include_router(v5_catalog_router.router)
 # V6 Agent API（/api/v6/agent/* + /media/agent_runs/*）
 app.include_router(v6_agent_router.router)
+# V50 Muse（MuseTalk 1.5）口型生成（/api/v6/muse/*）
+app.include_router(muse_router.router)
+# R5：视频模型优先级（GET /api/v6/video/provider → Muse → 本地 ComfyUI → 其它云端）
+app.include_router(muse_router.video_router)
 # V7 Cinema Studio API（/api/cinema/*，3D 电影制片工作台）
 app.include_router(cinema3d_router.router)
 # V8 16 模板 3D 化 API（/api/cinema/templates/*，复用 cinema3d 的任务队列）
@@ -2586,6 +2852,33 @@ class MediaStaticFiles(StaticFiles):
             response.media_type = "application/zip"
             response.headers["content-type"] = "application/zip"
         return response
+
+
+@app.post("/api/settings/metaso-test", summary="测试 Metaso H3 Key（/v1/models）")
+def metaso_key_test(payload: dict = Body(default=None)) -> dict:
+    """用给定 key（或已保存的）请求 Metaso 的模型列表，验证 key 与网络。"""
+    import urllib.error
+    import urllib.request
+
+    key = str((payload or {}).get("metaso_key") or "").strip() or (config.metaso_key() or "")
+    if not key:
+        return {"ok": False, "error": "未配置 Metaso Key"}
+    base = "https://metaso.cn/api/openai"
+    req = urllib.request.Request(f"{base}/v1/models",
+                                 headers={"Authorization": f"Bearer {key}"})
+    try:
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            data = json.loads(resp.read().decode("utf-8") or "{}")
+        models = [str(m.get("id")) for m in (data.get("data") or []) if m.get("id")]
+        return {"ok": True, "models": models, "base": base}
+    except urllib.error.HTTPError as exc:
+        try:
+            detail = exc.read().decode("utf-8", "replace")[:300]
+        except Exception:  # noqa: BLE001
+            detail = ""
+        return {"ok": False, "status": exc.code, "error": detail or str(exc)}
+    except Exception as exc:  # noqa: BLE001
+        return {"ok": False, "error": f"{type(exc).__name__}: {exc}"}
 
 
 app.mount(

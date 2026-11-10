@@ -130,12 +130,12 @@ export const api = {
       throw err;
     }
   },
-  /** 批量生成全部镜头动态版本 */
-  generateAllDynamic: async (eid: string): Promise<{ created?: number; jobs?: Job[]; count?: number }> => {
-    return request<{ created?: number; jobs?: Job[]; count?: number }>(
-      "/episodes/" + eid + "/shots/generate-dynamic",
-      { method: "POST", body: "{}" }
-    );
+  /** 批量生成全部镜头动态版本（后端 response_model=List[JobOut]，返回纯数组） */
+  generateAllDynamic: async (eid: string): Promise<Job[]> => {
+    return request<Job[]>("/episodes/" + eid + "/shots/generate-dynamic", {
+      method: "POST",
+      body: "{}",
+    });
   },
   versions: (sid: string) => request<ShotVersion[]>("/shots/" + sid + "/versions"),
   selectVersion: (sid: string, vid: string) =>
@@ -268,7 +268,7 @@ export const api = {
     const res = await request<GenerateScriptResult | Job>("/projects/" + pid + "/generate-script", {
       method: "POST",
       body: JSON.stringify(body),
-    }, 60000);
+    }, 300000); // 后端 LLM 超时 120s × 2 次重试；60s 会在后台仍在生成时误报超时并造成二次计费
     if (res && typeof (res as GenerateScriptResult).script === "string") return res as GenerateScriptResult;
     const job = res as Job;
     if (job && typeof job.id === "string") {

@@ -24,3 +24,17 @@ local_models/
 backend/data/*.db-wal
 backend/data/*.db-shm
 backend/data/jobs/
+
+# 合同改写脚本留下的原文备份（expand_3d_shots / repair_semantic_briefs）
+*.json.bak
+*.broken
+contract/**/*.json.tmp
+
+# 审查/整改过程产物
+docs/audit/_tools/*.txt
+docs/audit/_tools/*.json
+tmp_*.py
+
+# 运行期 pid / 本地数据库不入库（首次启动自动建表 + seed demo）
+backend/data/*.pid
+backend/data/*.db

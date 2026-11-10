@@ -7,7 +7,8 @@
   {
    "id": "v5_card_title",
    "kind": "card",
-   "prompt": null
+   "prompt": null,
+   "act_index": -1
   },
   {
    "id": "v5_001",
@@ -17,7 +18,8 @@
    "line": "",
    "semantic_visual": "",
    "framing": "",
-   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a round wooden table in a warm salon with velvet chairs and candles. The camera surveys the space, atmospheric and cinematic. Camera: slow crane descend. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: fire crackle, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a round wooden table in a warm salon with velvet chairs and candles. The camera surveys the space, atmospheric and cinematic. Camera: slow crane descend. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: fire crackle, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_002",
@@ -27,7 +29,8 @@
    "line": "苏轼和李白，两位文坛巨匠来聊聊传统与创新的话题吧。",
    "semantic_visual": "In a warm oil-painted library, two robed scholar figures stand beside towering bookshelves, gesturing toward ancient scrolls unrolled on a wooden table. Golden lamplight glows over aged paper and ink brushes.",
    "framing": "wide",
-   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a library of leather books and oil paintings, a fire in the hearth. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: In a warm oil-painted library, two robed scholar figures stand beside towering bookshelves, gesturing toward ancient scrolls unrolled on a wooden table. Golden lamplight glows over aged paper and ink brushes.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: fire crackle, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a library of leather books and oil paintings, a fire in the hearth. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: In a warm oil-painted library, two robed scholar figures stand beside towering bookshelves, gesturing toward ancient scrolls unrolled on a wooden table. Golden lamplight glows over aged paper and ink brushes.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: fire crackle, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_003",
@@ -37,7 +40,8 @@
    "line": "李白来了，咱们先聊聊，咱们古人诗词里，传统和创新是啥样？",
    "semantic_visual": "Candlelit gallery: a white-robed poet enters through an arched doorway as another scholar rises from a low table, both framed by flickering candle flames and hanging scrolls. Warm amber glow, intimate mood.",
    "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Candlelit gallery: a white-robed poet enters through an arched doorway as another scholar rises from a low table, both framed by flickering candle flames and hanging scrolls. Warm amber glow, intimate mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: smooth lateral pan. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: fire crackle, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Candlelit gallery: a white-robed poet enters through an arched doorway as another scholar rises from a low table, both framed by flickering candle flames and hanging scrolls. Warm amber glow, intimate mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: smooth lateral pan. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: fire crackle, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_004",
@@ -47,7 +51,8 @@
    "line": "李白那可是活在唐诗里的活神仙，苏轼兄弟，您怎么看？",
    "semantic_visual": "Close view of a bearded scholar in the lamplit library tilting his head toward a companion, one hand raised as if weighing a thought. Books and scrolls surround them in soft golden light.",
    "framing": "close",
-   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a library of leather books and oil paintings, a fire in the hearth. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Close view of a bearded scholar in the lamplit library tilting his head toward a companion, one hand raised as if weighing a thought. Books and scrolls surround them in soft golden light.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: fire crackle, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a library of leather books and oil paintings, a fire in the hearth. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Close view of a bearded scholar in the lamplit library tilting his head toward a companion, one hand raised as if weighing a thought. Books and scrolls surround them in soft golden light.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: fire crackle, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_005",
@@ -57,7 +62,8 @@
    "line": "咱们苏轼，就是想突破传统，创新一下嘛。",
    "semantic_visual": "In the candle gallery, the white-robed poet sweeps one arm toward a blank hanging scroll, inviting his companion forward. Candle flames bend in the motion, casting dancing shadows on painted walls.",
    "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. Featuring a stylized 3D animated man in his 30s, long loose black hair, wearing a white hanfu with blue accents, with flagon and sword. The shot shows the idea through visible action: In the candle gallery, the white-robed poet sweeps one arm toward a blank hanging scroll, inviting his companion forward. Candle flames bend in the motion, casting dancing shadows on painted walls.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: fire crackle, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. Featuring a stylized 3D animated man in his 30s, long loose black hair, wearing a white hanfu with blue accents, with flagon and sword. The shot shows the idea through visible action: In the candle gallery, the white-robed poet sweeps one arm toward a blank hanging scroll, inviting his companion forward. Candle flames bend in the motion, casting dancing shadows on painted walls.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: fire crackle, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_006",
@@ -67,7 +73,8 @@
    "line": "创新也要有根，不然就成无本之木了。",
    "semantic_visual": "The scholar in the oil-lit library presses a palm flat on a wooden table beside a small rooted plant in a pot, books stacked behind. Warm lamp glow, contemplative stillness.",
    "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a library of leather books and oil paintings, a fire in the hearth. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: The scholar in the oil-lit library presses a palm flat on a wooden table beside a small rooted plant in a pot, books stacked behind. Warm lamp glow, contemplative stillness.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: smooth lateral pan. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: fire crackle, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a library of leather books and oil paintings, a fire in the hearth. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: The scholar in the oil-lit library presses a palm flat on a wooden table beside a small rooted plant in a pot, books stacked behind. Warm lamp glow, contemplative stillness.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: smooth lateral pan. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: fire crackle, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_007",
@@ -77,7 +84,8 @@
    "line": "那咱们写诗作画，是不是得从古人身上找找灵感？",
    "semantic_visual": "In the candle gallery, a scholar lifts an old ink brush from a stand and holds it toward a companion, an open scroll of classical calligraphy between them. Soft candlelight, thoughtful atmosphere.",
    "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: In the candle gallery, a scholar lifts an old ink brush from a stand and holds it toward a companion, an open scroll of classical calligraphy between them. Soft candlelight, thoughtful atmosphere.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: fire crackle, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: In the candle gallery, a scholar lifts an old ink brush from a stand and holds it toward a companion, an open scroll of classical calligraphy between them. Soft candlelight, thoughtful atmosphere.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: fire crackle, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_008",
@@ -87,12 +95,685 @@
    "line": "",
    "semantic_visual": "",
    "framing": "",
-   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. The camera surveys the space, atmospheric and cinematic. Camera: slow pull-back revealing the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: fire crackle, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. The camera surveys the space, atmospheric and cinematic. Camera: slow pull-back revealing the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: fire crackle, quiet room tone. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_card_end",
    "kind": "card",
-   "prompt": null
+   "prompt": null,
+   "act_index": -1
+  },
+  {
+   "id": "v5_e001",
+   "kind": "broll",
+   "scene": "oil_roundtable",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a round wooden table in a warm salon with velvet chairs and candles. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e002",
+   "kind": "dialogue",
+   "scene": "oil_library",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In a warm oil-painted library, two robed scholar figures stand beside towering bookshelves, gesturing toward ancient scrolls unrolled on a wooden table. Golden lamplight glows over aged paper and ink brushes. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a library of leather books and oil paintings, a fire in the hearth. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: In a warm oil-painted library, two robed scholar figures stand beside towering bookshelves, gesturing toward ancient scrolls unrolled on a wooden table. Golden lamplight glows over aged paper and ink brushes.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e003",
+   "kind": "dialogue",
+   "scene": "candle_gallery",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Candlelit gallery: a white-robed poet enters through an arched doorway as another scholar rises from a low table, both framed by flickering candle flames and hanging scrolls. Warm amber glow, intimate mood. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Candlelit gallery: a white-robed poet enters through an arched doorway as another scholar rises from a low table, both framed by flickering candle flames and hanging scrolls. Warm amber glow, intimate mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e004",
+   "kind": "dialogue",
+   "scene": "oil_library",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Close view of a bearded scholar in the lamplit library tilting his head toward a companion, one hand raised as if weighing a thought. Books and scrolls surround them in soft golden light. The character turns toward the window, thinking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a library of leather books and oil paintings, a fire in the hearth. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Close view of a bearded scholar in the lamplit library tilting his head toward a companion, one hand raised as if weighing a thought. Books and scrolls surround them in soft golden light.. Framing: close shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e005",
+   "kind": "dialogue",
+   "scene": "candle_gallery",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In the candle gallery, the white-robed poet sweeps one arm toward a blank hanging scroll, inviting his companion forward. Candle flames bend in the motion, casting dancing shadows on painted walls. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. Featuring a stylized 3D animated man in his 30s, long loose black hair, wearing a white hanfu with blue accents, with flagon and sword. The shot shows the idea through visible action: In the candle gallery, the white-robed poet sweeps one arm toward a blank hanging scroll, inviting his companion forward. Candle flames bend in the motion, casting dancing shadows on painted walls.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e006",
+   "kind": "dialogue",
+   "scene": "oil_library",
+   "duration": 3.97,
+   "line": "",
+   "semantic_visual": "The scholar in the oil-lit library presses a palm flat on a wooden table beside a small rooted plant in a pot, books stacked behind. Warm lamp glow, contemplative stillness. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a library of leather books and oil paintings, a fire in the hearth. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: The scholar in the oil-lit library presses a palm flat on a wooden table beside a small rooted plant in a pot, books stacked behind. Warm lamp glow, contemplative stillness.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e007",
+   "kind": "dialogue",
+   "scene": "candle_gallery",
+   "duration": 4.61,
+   "line": "",
+   "semantic_visual": "In the candle gallery, a scholar lifts an old ink brush from a stand and holds it toward a companion, an open scroll of classical calligraphy between them. Soft candlelight, thoughtful atmosphere. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: In the candle gallery, a scholar lifts an old ink brush from a stand and holds it toward a companion, an open scroll of classical calligraphy between them. Soft candlelight, thoughtful atmosphere.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e008",
+   "kind": "broll",
+   "scene": "candle_gallery",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character leans on the table and gestures while speaking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. The camera surveys the space, atmospheric and cinematic. The character leans on the table and gestures while speaking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e009",
+   "kind": "broll",
+   "scene": "oil_roundtable",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character walks slowly through the space, glancing around.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a round wooden table in a warm salon with velvet chairs and candles. The camera surveys the space, atmospheric and cinematic. The character walks slowly through the space, glancing around. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e010",
+   "kind": "dialogue",
+   "scene": "oil_library",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In a warm oil-painted library, two robed scholar figures stand beside towering bookshelves, gesturing toward ancient scrolls unrolled on a wooden table. Golden lamplight glows over aged paper and ink brushes. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a library of leather books and oil paintings, a fire in the hearth. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: In a warm oil-painted library, two robed scholar figures stand beside towering bookshelves, gesturing toward ancient scrolls unrolled on a wooden table. Golden lamplight glows over aged paper and ink brushes.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e011",
+   "kind": "dialogue",
+   "scene": "candle_gallery",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Candlelit gallery: a white-robed poet enters through an arched doorway as another scholar rises from a low table, both framed by flickering candle flames and hanging scrolls. Warm amber glow, intimate mood. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Candlelit gallery: a white-robed poet enters through an arched doorway as another scholar rises from a low table, both framed by flickering candle flames and hanging scrolls. Warm amber glow, intimate mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e012",
+   "kind": "dialogue",
+   "scene": "oil_library",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Close view of a bearded scholar in the lamplit library tilting his head toward a companion, one hand raised as if weighing a thought. Books and scrolls surround them in soft golden light. The character picks up an object and examines it.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a library of leather books and oil paintings, a fire in the hearth. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Close view of a bearded scholar in the lamplit library tilting his head toward a companion, one hand raised as if weighing a thought. Books and scrolls surround them in soft golden light.. Framing: close shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e013",
+   "kind": "dialogue",
+   "scene": "candle_gallery",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In the candle gallery, the white-robed poet sweeps one arm toward a blank hanging scroll, inviting his companion forward. Candle flames bend in the motion, casting dancing shadows on painted walls. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. Featuring a stylized 3D animated man in his 30s, long loose black hair, wearing a white hanfu with blue accents, with flagon and sword. The shot shows the idea through visible action: In the candle gallery, the white-robed poet sweeps one arm toward a blank hanging scroll, inviting his companion forward. Candle flames bend in the motion, casting dancing shadows on painted walls.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e014",
+   "kind": "dialogue",
+   "scene": "oil_library",
+   "duration": 3.97,
+   "line": "",
+   "semantic_visual": "The scholar in the oil-lit library presses a palm flat on a wooden table beside a small rooted plant in a pot, books stacked behind. Warm lamp glow, contemplative stillness. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a library of leather books and oil paintings, a fire in the hearth. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: The scholar in the oil-lit library presses a palm flat on a wooden table beside a small rooted plant in a pot, books stacked behind. Warm lamp glow, contemplative stillness.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e015",
+   "kind": "dialogue",
+   "scene": "candle_gallery",
+   "duration": 4.61,
+   "line": "",
+   "semantic_visual": "In the candle gallery, a scholar lifts an old ink brush from a stand and holds it toward a companion, an open scroll of classical calligraphy between them. Soft candlelight, thoughtful atmosphere. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: In the candle gallery, a scholar lifts an old ink brush from a stand and holds it toward a companion, an open scroll of classical calligraphy between them. Soft candlelight, thoughtful atmosphere.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e016",
+   "kind": "broll",
+   "scene": "candle_gallery",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character turns toward the window, thinking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. The camera surveys the space, atmospheric and cinematic. The character turns toward the window, thinking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e017",
+   "kind": "broll",
+   "scene": "oil_roundtable",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " Two characters exchange a look; one nods.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a round wooden table in a warm salon with velvet chairs and candles. The camera surveys the space, atmospheric and cinematic. Two characters exchange a look; one nods. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e018",
+   "kind": "dialogue",
+   "scene": "oil_library",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In a warm oil-painted library, two robed scholar figures stand beside towering bookshelves, gesturing toward ancient scrolls unrolled on a wooden table. Golden lamplight glows over aged paper and ink brushes. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a library of leather books and oil paintings, a fire in the hearth. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: In a warm oil-painted library, two robed scholar figures stand beside towering bookshelves, gesturing toward ancient scrolls unrolled on a wooden table. Golden lamplight glows over aged paper and ink brushes.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e019",
+   "kind": "dialogue",
+   "scene": "candle_gallery",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Candlelit gallery: a white-robed poet enters through an arched doorway as another scholar rises from a low table, both framed by flickering candle flames and hanging scrolls. Warm amber glow, intimate mood. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Candlelit gallery: a white-robed poet enters through an arched doorway as another scholar rises from a low table, both framed by flickering candle flames and hanging scrolls. Warm amber glow, intimate mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e020",
+   "kind": "dialogue",
+   "scene": "oil_library",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Close view of a bearded scholar in the lamplit library tilting his head toward a companion, one hand raised as if weighing a thought. Books and scrolls surround them in soft golden light. The character leans on the table and gestures while speaking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a library of leather books and oil paintings, a fire in the hearth. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Close view of a bearded scholar in the lamplit library tilting his head toward a companion, one hand raised as if weighing a thought. Books and scrolls surround them in soft golden light.. Framing: close shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e021",
+   "kind": "dialogue",
+   "scene": "candle_gallery",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In the candle gallery, the white-robed poet sweeps one arm toward a blank hanging scroll, inviting his companion forward. Candle flames bend in the motion, casting dancing shadows on painted walls. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. Featuring a stylized 3D animated man in his 30s, long loose black hair, wearing a white hanfu with blue accents, with flagon and sword. The shot shows the idea through visible action: In the candle gallery, the white-robed poet sweeps one arm toward a blank hanging scroll, inviting his companion forward. Candle flames bend in the motion, casting dancing shadows on painted walls.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e022",
+   "kind": "dialogue",
+   "scene": "oil_library",
+   "duration": 3.97,
+   "line": "",
+   "semantic_visual": "The scholar in the oil-lit library presses a palm flat on a wooden table beside a small rooted plant in a pot, books stacked behind. Warm lamp glow, contemplative stillness. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a library of leather books and oil paintings, a fire in the hearth. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: The scholar in the oil-lit library presses a palm flat on a wooden table beside a small rooted plant in a pot, books stacked behind. Warm lamp glow, contemplative stillness.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e023",
+   "kind": "dialogue",
+   "scene": "candle_gallery",
+   "duration": 4.61,
+   "line": "",
+   "semantic_visual": "In the candle gallery, a scholar lifts an old ink brush from a stand and holds it toward a companion, an open scroll of classical calligraphy between them. Soft candlelight, thoughtful atmosphere. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: In the candle gallery, a scholar lifts an old ink brush from a stand and holds it toward a companion, an open scroll of classical calligraphy between them. Soft candlelight, thoughtful atmosphere.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e024",
+   "kind": "broll",
+   "scene": "candle_gallery",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character picks up an object and examines it.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. The camera surveys the space, atmospheric and cinematic. The character picks up an object and examines it. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e025",
+   "kind": "broll",
+   "scene": "oil_roundtable",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a round wooden table in a warm salon with velvet chairs and candles. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e026",
+   "kind": "dialogue",
+   "scene": "oil_library",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In a warm oil-painted library, two robed scholar figures stand beside towering bookshelves, gesturing toward ancient scrolls unrolled on a wooden table. Golden lamplight glows over aged paper and ink brushes. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a library of leather books and oil paintings, a fire in the hearth. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: In a warm oil-painted library, two robed scholar figures stand beside towering bookshelves, gesturing toward ancient scrolls unrolled on a wooden table. Golden lamplight glows over aged paper and ink brushes.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e027",
+   "kind": "dialogue",
+   "scene": "candle_gallery",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Candlelit gallery: a white-robed poet enters through an arched doorway as another scholar rises from a low table, both framed by flickering candle flames and hanging scrolls. Warm amber glow, intimate mood. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Candlelit gallery: a white-robed poet enters through an arched doorway as another scholar rises from a low table, both framed by flickering candle flames and hanging scrolls. Warm amber glow, intimate mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e028",
+   "kind": "dialogue",
+   "scene": "oil_library",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Close view of a bearded scholar in the lamplit library tilting his head toward a companion, one hand raised as if weighing a thought. Books and scrolls surround them in soft golden light. The character turns toward the window, thinking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a library of leather books and oil paintings, a fire in the hearth. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Close view of a bearded scholar in the lamplit library tilting his head toward a companion, one hand raised as if weighing a thought. Books and scrolls surround them in soft golden light.. Framing: close shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e029",
+   "kind": "dialogue",
+   "scene": "candle_gallery",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In the candle gallery, the white-robed poet sweeps one arm toward a blank hanging scroll, inviting his companion forward. Candle flames bend in the motion, casting dancing shadows on painted walls. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. Featuring a stylized 3D animated man in his 30s, long loose black hair, wearing a white hanfu with blue accents, with flagon and sword. The shot shows the idea through visible action: In the candle gallery, the white-robed poet sweeps one arm toward a blank hanging scroll, inviting his companion forward. Candle flames bend in the motion, casting dancing shadows on painted walls.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e030",
+   "kind": "dialogue",
+   "scene": "oil_library",
+   "duration": 3.97,
+   "line": "",
+   "semantic_visual": "The scholar in the oil-lit library presses a palm flat on a wooden table beside a small rooted plant in a pot, books stacked behind. Warm lamp glow, contemplative stillness. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a library of leather books and oil paintings, a fire in the hearth. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: The scholar in the oil-lit library presses a palm flat on a wooden table beside a small rooted plant in a pot, books stacked behind. Warm lamp glow, contemplative stillness.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e031",
+   "kind": "dialogue",
+   "scene": "candle_gallery",
+   "duration": 4.61,
+   "line": "",
+   "semantic_visual": "In the candle gallery, a scholar lifts an old ink brush from a stand and holds it toward a companion, an open scroll of classical calligraphy between them. Soft candlelight, thoughtful atmosphere. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: In the candle gallery, a scholar lifts an old ink brush from a stand and holds it toward a companion, an open scroll of classical calligraphy between them. Soft candlelight, thoughtful atmosphere.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e032",
+   "kind": "broll",
+   "scene": "candle_gallery",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character leans on the table and gestures while speaking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. The camera surveys the space, atmospheric and cinematic. The character leans on the table and gestures while speaking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e033",
+   "kind": "broll",
+   "scene": "oil_roundtable",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character walks slowly through the space, glancing around.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a round wooden table in a warm salon with velvet chairs and candles. The camera surveys the space, atmospheric and cinematic. The character walks slowly through the space, glancing around. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e034",
+   "kind": "dialogue",
+   "scene": "oil_library",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In a warm oil-painted library, two robed scholar figures stand beside towering bookshelves, gesturing toward ancient scrolls unrolled on a wooden table. Golden lamplight glows over aged paper and ink brushes. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a library of leather books and oil paintings, a fire in the hearth. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: In a warm oil-painted library, two robed scholar figures stand beside towering bookshelves, gesturing toward ancient scrolls unrolled on a wooden table. Golden lamplight glows over aged paper and ink brushes.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e035",
+   "kind": "dialogue",
+   "scene": "candle_gallery",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Candlelit gallery: a white-robed poet enters through an arched doorway as another scholar rises from a low table, both framed by flickering candle flames and hanging scrolls. Warm amber glow, intimate mood. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Candlelit gallery: a white-robed poet enters through an arched doorway as another scholar rises from a low table, both framed by flickering candle flames and hanging scrolls. Warm amber glow, intimate mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e036",
+   "kind": "dialogue",
+   "scene": "oil_library",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Close view of a bearded scholar in the lamplit library tilting his head toward a companion, one hand raised as if weighing a thought. Books and scrolls surround them in soft golden light. The character picks up an object and examines it.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a library of leather books and oil paintings, a fire in the hearth. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Close view of a bearded scholar in the lamplit library tilting his head toward a companion, one hand raised as if weighing a thought. Books and scrolls surround them in soft golden light.. Framing: close shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e037",
+   "kind": "dialogue",
+   "scene": "candle_gallery",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In the candle gallery, the white-robed poet sweeps one arm toward a blank hanging scroll, inviting his companion forward. Candle flames bend in the motion, casting dancing shadows on painted walls. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. Featuring a stylized 3D animated man in his 30s, long loose black hair, wearing a white hanfu with blue accents, with flagon and sword. The shot shows the idea through visible action: In the candle gallery, the white-robed poet sweeps one arm toward a blank hanging scroll, inviting his companion forward. Candle flames bend in the motion, casting dancing shadows on painted walls.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e038",
+   "kind": "dialogue",
+   "scene": "oil_library",
+   "duration": 3.97,
+   "line": "",
+   "semantic_visual": "The scholar in the oil-lit library presses a palm flat on a wooden table beside a small rooted plant in a pot, books stacked behind. Warm lamp glow, contemplative stillness. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a library of leather books and oil paintings, a fire in the hearth. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: The scholar in the oil-lit library presses a palm flat on a wooden table beside a small rooted plant in a pot, books stacked behind. Warm lamp glow, contemplative stillness.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e039",
+   "kind": "dialogue",
+   "scene": "candle_gallery",
+   "duration": 4.61,
+   "line": "",
+   "semantic_visual": "In the candle gallery, a scholar lifts an old ink brush from a stand and holds it toward a companion, an open scroll of classical calligraphy between them. Soft candlelight, thoughtful atmosphere. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: In the candle gallery, a scholar lifts an old ink brush from a stand and holds it toward a companion, an open scroll of classical calligraphy between them. Soft candlelight, thoughtful atmosphere.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e040",
+   "kind": "broll",
+   "scene": "candle_gallery",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character turns toward the window, thinking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. The camera surveys the space, atmospheric and cinematic. The character turns toward the window, thinking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e041",
+   "kind": "broll",
+   "scene": "oil_roundtable",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " Two characters exchange a look; one nods.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a round wooden table in a warm salon with velvet chairs and candles. The camera surveys the space, atmospheric and cinematic. Two characters exchange a look; one nods. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e042",
+   "kind": "dialogue",
+   "scene": "oil_library",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In a warm oil-painted library, two robed scholar figures stand beside towering bookshelves, gesturing toward ancient scrolls unrolled on a wooden table. Golden lamplight glows over aged paper and ink brushes. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a library of leather books and oil paintings, a fire in the hearth. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: In a warm oil-painted library, two robed scholar figures stand beside towering bookshelves, gesturing toward ancient scrolls unrolled on a wooden table. Golden lamplight glows over aged paper and ink brushes.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e043",
+   "kind": "dialogue",
+   "scene": "candle_gallery",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Candlelit gallery: a white-robed poet enters through an arched doorway as another scholar rises from a low table, both framed by flickering candle flames and hanging scrolls. Warm amber glow, intimate mood. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Candlelit gallery: a white-robed poet enters through an arched doorway as another scholar rises from a low table, both framed by flickering candle flames and hanging scrolls. Warm amber glow, intimate mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e044",
+   "kind": "dialogue",
+   "scene": "oil_library",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Close view of a bearded scholar in the lamplit library tilting his head toward a companion, one hand raised as if weighing a thought. Books and scrolls surround them in soft golden light. The character leans on the table and gestures while speaking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a library of leather books and oil paintings, a fire in the hearth. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Close view of a bearded scholar in the lamplit library tilting his head toward a companion, one hand raised as if weighing a thought. Books and scrolls surround them in soft golden light.. Framing: close shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e045",
+   "kind": "dialogue",
+   "scene": "candle_gallery",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In the candle gallery, the white-robed poet sweeps one arm toward a blank hanging scroll, inviting his companion forward. Candle flames bend in the motion, casting dancing shadows on painted walls. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. Featuring a stylized 3D animated man in his 30s, long loose black hair, wearing a white hanfu with blue accents, with flagon and sword. The shot shows the idea through visible action: In the candle gallery, the white-robed poet sweeps one arm toward a blank hanging scroll, inviting his companion forward. Candle flames bend in the motion, casting dancing shadows on painted walls.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e046",
+   "kind": "dialogue",
+   "scene": "oil_library",
+   "duration": 3.97,
+   "line": "",
+   "semantic_visual": "The scholar in the oil-lit library presses a palm flat on a wooden table beside a small rooted plant in a pot, books stacked behind. Warm lamp glow, contemplative stillness. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a library of leather books and oil paintings, a fire in the hearth. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: The scholar in the oil-lit library presses a palm flat on a wooden table beside a small rooted plant in a pot, books stacked behind. Warm lamp glow, contemplative stillness.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e047",
+   "kind": "dialogue",
+   "scene": "candle_gallery",
+   "duration": 4.61,
+   "line": "",
+   "semantic_visual": "In the candle gallery, a scholar lifts an old ink brush from a stand and holds it toward a companion, an open scroll of classical calligraphy between them. Soft candlelight, thoughtful atmosphere. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: In the candle gallery, a scholar lifts an old ink brush from a stand and holds it toward a companion, an open scroll of classical calligraphy between them. Soft candlelight, thoughtful atmosphere.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e048",
+   "kind": "broll",
+   "scene": "candle_gallery",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character picks up an object and examines it.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. The camera surveys the space, atmospheric and cinematic. The character picks up an object and examines it. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e049",
+   "kind": "broll",
+   "scene": "oil_roundtable",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a round wooden table in a warm salon with velvet chairs and candles. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e050",
+   "kind": "dialogue",
+   "scene": "oil_library",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In a warm oil-painted library, two robed scholar figures stand beside towering bookshelves, gesturing toward ancient scrolls unrolled on a wooden table. Golden lamplight glows over aged paper and ink brushes. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a library of leather books and oil paintings, a fire in the hearth. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: In a warm oil-painted library, two robed scholar figures stand beside towering bookshelves, gesturing toward ancient scrolls unrolled on a wooden table. Golden lamplight glows over aged paper and ink brushes.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e051",
+   "kind": "dialogue",
+   "scene": "candle_gallery",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Candlelit gallery: a white-robed poet enters through an arched doorway as another scholar rises from a low table, both framed by flickering candle flames and hanging scrolls. Warm amber glow, intimate mood. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Candlelit gallery: a white-robed poet enters through an arched doorway as another scholar rises from a low table, both framed by flickering candle flames and hanging scrolls. Warm amber glow, intimate mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e052",
+   "kind": "dialogue",
+   "scene": "oil_library",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Close view of a bearded scholar in the lamplit library tilting his head toward a companion, one hand raised as if weighing a thought. Books and scrolls surround them in soft golden light. The character turns toward the window, thinking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a library of leather books and oil paintings, a fire in the hearth. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Close view of a bearded scholar in the lamplit library tilting his head toward a companion, one hand raised as if weighing a thought. Books and scrolls surround them in soft golden light.. Framing: close shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e053",
+   "kind": "dialogue",
+   "scene": "candle_gallery",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In the candle gallery, the white-robed poet sweeps one arm toward a blank hanging scroll, inviting his companion forward. Candle flames bend in the motion, casting dancing shadows on painted walls. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a candlelit gallery of old oil paintings, warm gold light. Featuring a stylized 3D animated man in his 30s, long loose black hair, wearing a white hanfu with blue accents, with flagon and sword. The shot shows the idea through visible action: In the candle gallery, the white-robed poet sweeps one arm toward a blank hanging scroll, inviting his companion forward. Candle flames bend in the motion, casting dancing shadows on painted walls.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_x001",
+   "kind": "broll",
+   "scene": "oil_roundtable",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a round wooden table in a warm salon with velvet chairs and candles. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_x002",
+   "kind": "broll",
+   "scene": "oil_roundtable",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a round wooden table in a warm salon with velvet chairs and candles. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_x003",
+   "kind": "broll",
+   "scene": "oil_roundtable",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a round wooden table in a warm salon with velvet chairs and candles. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_x004",
+   "kind": "broll",
+   "scene": "oil_roundtable",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a round wooden table in a warm salon with velvet chairs and candles. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_x005",
+   "kind": "broll",
+   "scene": "oil_roundtable",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a round wooden table in a warm salon with velvet chairs and candles. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_x006",
+   "kind": "broll",
+   "scene": "oil_roundtable",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a round wooden table in a warm salon with velvet chairs and candles. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_x007",
+   "kind": "broll",
+   "scene": "oil_roundtable",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a round wooden table in a warm salon with velvet chairs and candles. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_x008",
+   "kind": "broll",
+   "scene": "oil_roundtable",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm Renaissance-oil-painting style 3D film, candlelight, velvet and old books. Set in a round wooden table in a warm salon with velvet chairs and candles. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
   }
  ]
 }

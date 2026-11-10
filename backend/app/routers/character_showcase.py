@@ -221,7 +221,8 @@ def _build_package(title: str, force: bool, vertical: bool = False,
     with _BUILD_LOCK:
         if target.is_file() and not force:
             cached = _read_zip_metadata(target)
-            if cached and _cache_matches(cached, title, vertical, vertical_mode):
+            if cached and _cache_matches(cached, title, vertical, vertical_mode,
+                                         _reel_sig()):
                 return _package_view(target, cached=cached, cached_flag=True)
         info = _media_info(_REEL)
         rows = _audition_srts()
@@ -267,6 +268,7 @@ def _build_package(title: str, force: bool, vertical: bool = False,
                 "characters": [{"id": row["character"], "label": row["label"]} for row in rows],
                 "srt_count": len(rows),
                 "source": str(_REEL),
+                "reel_sig": _reel_sig(),
                 "generated_at": _now_iso(),
                 "subtitles_burned": True,
             }
@@ -305,9 +307,20 @@ def _build_package(title: str, force: bool, vertical: bool = False,
         return view
 
 
+def _reel_sig() -> str:
+    """试镜合集的 (size, mtime) 指纹：合集重生成后缓存必须失效。"""
+    try:
+        st = _REEL.stat()
+        return f"{st.st_size}:{int(st.st_mtime)}"
+    except OSError:
+        return ""
+
+
 def _cache_matches(cached: Dict[str, Any], title: str, vertical: bool,
-                   vertical_mode: str) -> bool:
+                   vertical_mode: str, reel_sig: str = "") -> bool:
     if str(cached.get("title") or "") != title:
+        return False
+    if reel_sig and str(cached.get("reel_sig") or "") != reel_sig:
         return False
     cached_vertical = cached.get("vertical")
     if not vertical:

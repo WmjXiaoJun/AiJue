@@ -44,7 +44,7 @@ function fmtBytes(bytes: number): string {
 
 function friendlyPublishError(err: unknown): string[] {
   if (err instanceof ApiError) {
-    if (err.status === 404 || err.status === 405) return ["发布包接口尚未就绪（后端 V26 实现中），请稍后重试"];
+    if (err.status === 404 || err.status === 405) return ["发布包接口返回 404：请确认模板 id 存在、后端已启动，稍后重试"];
     if (err.status === 400) return [err.message || "该模板暂无成片，无法导出发布包"];
     return [`发布包导出失败（${err.status}）：${err.message}`];
   }

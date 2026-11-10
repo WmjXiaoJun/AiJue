@@ -379,7 +379,7 @@ export function CinemaShots() {
           <div className="cm-shots-error-main">
             <strong>镜头清单加载失败</strong>
             <p>{error}</p>
-            <p>后端 /api/cinema/shots 可能尚未就绪；可重试，或稍后刷新。</p>
+            <p>后端 /api/cinema/shots 暂不可用；可重试，或稍后刷新。</p>
           </div>
           <button type="button" className="cm-btn cm-shots-btn" onClick={() => void load("initial")}>
             <IconRefresh size={15} />

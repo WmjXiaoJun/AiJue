@@ -129,6 +129,33 @@ export interface CinemaTemplateFinal {
 
 export type RenderType = "2d" | "3d" | "realistic";
 
+/* ------------------------------ V62：观感（look） ------------------------------ */
+/** 成片观感：3D 动画 / 2D 动画 / 真实；缺省 = 当前观感（不传 look） */
+export type CinemaLook = "3d_anim" | "2d_anim" | "realistic";
+
+export interface CinemaLookMeta {
+  id: CinemaLook;
+  label: string;
+  short: string;
+  tone: string;
+}
+
+export const CINEMA_LOOK_META: Record<CinemaLook, CinemaLookMeta> = {
+  "3d_anim": { id: "3d_anim", label: "3D 动画", short: "3D", tone: "gold" },
+  "2d_anim": { id: "2d_anim", label: "2D 动画", short: "2D", tone: "jade" },
+  realistic: { id: "realistic", label: "真实", short: "真实", tone: "slate" },
+};
+
+export const CINEMA_LOOK_ORDER: CinemaLook[] = ["3d_anim", "2d_anim", "realistic"];
+
+/** 模板自身观感（render_type → look；用于「全部观感」下给卡片打徽章） */
+export function lookOfTemplate(input?: { render_type?: string } | null): CinemaLook {
+  const type = String(input?.render_type || "").toLowerCase();
+  if (type === "2d") return "2d_anim";
+  if (type === "realistic") return "realistic";
+  return "3d_anim";
+}
+
 export type RenderStyle = "jp_anime" | "guoman" | "retro_cel" | "soft_watercolor" | "arcane_cinematic";
 
 export interface RenderStyleMeta {
@@ -204,6 +231,8 @@ export interface CinemaTemplate {
   progress: number;
   clips: CinemaTemplateClips;
   final: CinemaTemplateFinal;
+  /** V62：三种观感的成片（旧接口可能没有 → UI 降级为单成片展示） */
+  looks?: Partial<Record<CinemaLook, CinemaTemplateFinal>>;
   poster_url: string;
   report_url: string;
   error: string;
@@ -333,9 +362,11 @@ export const cinemaApi = {
     request(`/cinema/jobs/${encodeURIComponent(id)}/cancel`, { method: "POST" }),
   report: (): Promise<CinemaReport> => request("/cinema/report"),
   workers: (): Promise<CinemaWorkers> => request("/cinema/workers"),
-  /** 16 模板 3D 制作总表（后端 404 时由调用方降级处理；此处已做字段归一化） */
-  templates: async (): Promise<CinemaTemplatesResponse> =>
-    normalizeTemplatesResponse(await request<unknown>("/cinema/templates")),
+  /** 模板总表（后端 404 时由调用方降级处理；V62：look 传观感，响应 final=该观感成片 + looks 三态） */
+  templates: async (look?: CinemaLook | ""): Promise<CinemaTemplatesResponse> =>
+    normalizeTemplatesResponse(
+      await request<unknown>("/cinema/templates" + (look ? "?look=" + encodeURIComponent(look) : "")),
+    ),
   /** 单模板详情：总表字段 + shots[]（逐镜 3D 生成状态） */
   templateDetail: async (id: string): Promise<CinemaTemplateDetail> =>
     normalizeTemplateDetail(await request<unknown>(`/cinema/templates/${encodeURIComponent(id)}`)),
@@ -476,6 +507,21 @@ function normalizeTemplateFinal(raw: unknown): CinemaTemplateFinal {
 }
 
 /** 单模板归一化；fallback 用于后端只返回部分字段时补 id/label/style */
+/** V62：解析 looks（缺失/坏数据 → undefined，调用方降级） */
+export function normalizeLooks(raw: unknown): Partial<Record<CinemaLook, CinemaTemplateFinal>> | undefined {
+  const rec = looseRecord(raw);
+  if (!rec) return undefined;
+  const out: Partial<Record<CinemaLook, CinemaTemplateFinal>> = {};
+  let has = false;
+  for (const look of CINEMA_LOOK_ORDER) {
+    const entry = looseRecord(rec[look]);
+    if (!entry) continue;
+    has = true;
+    out[look] = normalizeTemplateFinal(entry);
+  }
+  return has ? out : undefined;
+}
+
 export function normalizeCinemaTemplate(
   raw: unknown,
   fallback?: { id?: string; label?: string; style?: string },
@@ -514,6 +560,7 @@ export function normalizeCinemaTemplate(
     progress,
     clips: { done: clipsDone, total: clipsTotal },
     final,
+    looks: normalizeLooks(rec.looks),
     poster_url: looseString(rec.poster_url) || looseString(rec.poster) || "",
     report_url: looseString(rec.report_url) || looseString(rec.report) || "",
     error: looseString(rec.error) || "",

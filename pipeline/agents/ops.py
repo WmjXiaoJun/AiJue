@@ -5,8 +5,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from .. import config, utils
-from .workflow import default_workflow, load_workflow, merge_dict, save_workflow
+from .. import config, utils, v5_catalog
+from .workflow import (WORKFLOW_DIR, default_workflow, load_workflow, merge_dict,
+                       save_workflow)
 
 REPO = Path(config.REPO_ROOT)
 CONTRACT = REPO / "contract" / "v5"
@@ -57,11 +58,20 @@ def set_voice(template: str, character: str, value: str) -> dict:
     data.setdefault("voice", {})["voice_id"] = value
     data["voice"]["provider"] = presets[value].get("provider") or "breeze"
     _write(char_path, data)
+    catalog = v5_catalog.load_catalog()
+    affected_templates = sorted(
+        tid for tid, tpl in (catalog.get("templates") or {}).items()
+        if any(str(e.get("character")) == character
+               for e in (tpl.get("cast") or []) if isinstance(e, dict)))
     return {"ok": True, "op": "set_voice", "template": template,
             "character": character, "old": old, "new": value,
+            "scope": "global",  # 角色音色是全局资产；受影响模板全部列出
+            "affected_templates": affected_templates,
             "affected_stages": AFFECTED["set_voice"],
-            "rerun": f"python -m pipeline.agents run --template {template} "
-                     f"--stages {','.join(AFFECTED['set_voice'])}"}
+            "rerun": " && ".join(
+                f"python -m pipeline.agents run --template {tid} "
+                f"--stages {','.join(AFFECTED['set_voice'])}"
+                for tid in (affected_templates or [template])[:5])}
 
 
 def set_pose(template: str, character: str, pose: str, enabled: bool = True) -> dict:
@@ -85,8 +95,12 @@ def patch_editorial(template: str, patch: dict) -> dict:
 
 
 def patch_template(template: str, patch: dict) -> dict:
-    """修改模板（风格/角色/场景/时长等），深合并。"""
+    """修改模板（风格/角色/场景/时长等），深合并；custom_tpl_* 落 custom 目录。"""
     path = CONTRACT / "templates" / f"{template}.json"
+    if not path.is_file():
+        custom = CONTRACT / "custom" / "templates" / f"{template}.json"
+        if custom.is_file():
+            path = custom
     data = _read(path, {})
     if not data:
         raise FileNotFoundError(f"模板不存在: {path}")
@@ -99,26 +113,45 @@ def patch_template(template: str, patch: dict) -> dict:
 def patch_workflow(template: str, patch: dict) -> dict:
     """修改工作流：{"enable":[...],"disable":[...],"params":{"shots":{...}}}
 
-    也支持 {"stages":[...]} 整体替换。
+    也支持 {"stages":[...]} 整体替换。合同损坏（degraded）时拒绝改写，避免把默认栈覆盖进用户文件。
     """
     wf = load_workflow(template)
+    if wf.get("degraded"):
+        raise ValueError("工作流合同已损坏（degraded），请先 reset_workflow 或手工修复后再改")
     patch = patch or {}
     if "stages" in patch:
         wf["stages"] = patch["stages"]
     else:
-        enable = set(patch.get("enable") or [])
-        disable = set(patch.get("disable") or [])
+        enable = {str(x) for x in (patch.get("enable") or [])}
+        disable = {str(x) for x in (patch.get("disable") or [])}
         params = patch.get("params") or {}
+        known = {str(s.get("id")) for s in wf.get("stages") or []}
+        unknown = sorted((enable | disable | {str(k) for k in params}) - known)
+        if unknown:   # 阶段名写错就报错，别静默空转（P3-7 / set_stage_param 空操作）
+            raise ValueError(f"未知阶段: {unknown}；可用: {sorted(known)}")
+        changed = False
         for stage in wf.get("stages") or []:
             sid = stage.get("id")
-            if sid in enable:
+            if sid in enable and not stage.get("enabled", True):
                 stage["enabled"] = True
-            if sid in disable:
+                changed = True
+            if sid in disable and stage.get("enabled", True):
                 stage["enabled"] = False
+                changed = True
             if sid in params:
-                stage["params"] = merge_dict(stage.get("params") or {}, params[sid])
+                merged = merge_dict(stage.get("params") or {}, params[sid])
+                if merged != (stage.get("params") or {}):
+                    stage["params"] = merged
+                    changed = True
         if "variables" in patch:
             wf["variables"] = merge_dict(wf.get("variables") or {}, patch["variables"])
+            changed = True
+        if not changed:      # 空操作不重写合同（不刷 mtime、不制造 git 噪声）
+            return {"ok": True, "op": "patch_workflow", "template": template,
+                    "path": str(WORKFLOW_DIR / f"{template}.json"),
+                    "noop": True, "affected_stages": [],
+                    "stages": [{"id": s.get("id"), "enabled": s.get("enabled", True)}
+                               for s in wf.get("stages") or []]}
     path = save_workflow(wf)
     return {"ok": True, "op": "patch_workflow", "template": template,
             "path": str(path), "affected_stages": [],

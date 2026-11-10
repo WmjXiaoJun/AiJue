@@ -23,12 +23,18 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import subprocess
 import time
 from pathlib import Path
 
+from . import config, utils
+
+FFMPEG = str(config.FFMPEG_BIN)
+
 REPO = Path(__file__).resolve().parents[1]
-V5_OUT = REPO / "outputs/templates_v5"
-OUT3D = REPO / "outputs/templates_3d"
+V5_OUT = config.OUTPUTS_ROOT / "templates_v5"
+OUT3D = config.OUTPUTS_ROOT / "templates_3d"
 BRIEFS_DIR = REPO / "contract/v5/cinema3d/templates3d"
 PROGRESS = OUT3D / "progress.json"
 FFPROBE = REPO / "tools/node_modules/ffprobe-static/bin/win32/x64/ffprobe.exe"
@@ -354,6 +360,146 @@ def load_episode(tid: str) -> dict:
     return json.loads(ep.read_text(encoding="utf-8"))
 
 
+# ---------------------------------------------------------------------------
+# 时间线解析（V49 修复：episode / brief 两套 id 空间的统一入口）
+#
+# 历史问题：`templates3d.assemble` 固定读 templates_v5 的 episode（如 78 镜），
+# 而 HQ 短片栈按 semantic brief 渲镜头（如 89 镜），两套 id 互不存在 —— assemble
+# 拿 78 个 id 去 shots/ 找片，必然把缺失路径喂给 ffmpeg（exit 4294967294）。
+#
+# 现在：按**磁盘上真实存在的镜头**选时间线来源，顺序
+#   1) OUT3D/<tid>/work/episode.json（本栈显式写下的权威时间线）
+#   2) templates_v5 的 episode
+#   3) semantic brief（把 brief 转成 episode 结构）
+# 谁覆盖率高用谁；最高覆盖率 < 0.9 直接给出可读错误，不喂 ffmpeg。
+# ---------------------------------------------------------------------------
+
+def _brief_path(tid: str) -> Path:
+    return REPO / f"contract/v5/cinema3d/templates3d/{tid}_semantic.json"
+
+
+def _brief_shots(tid: str) -> list[dict]:
+    p = _brief_path(tid)
+    if not p.is_file():
+        return []
+    try:
+        data = json.loads(p.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        return []
+    return [s for s in (data.get("shots") or []) if isinstance(s, dict) and s.get("id")]
+
+
+def episode_from_brief(tid: str, base: dict | None = None) -> dict | None:
+    """把 semantic brief 转成 render_v5.assemble 能吃的时间线（保留 base 的 meta/cast/style）。"""
+    brief_shots = _brief_shots(tid)
+    if not brief_shots:
+        return None
+    ep = json.loads(json.dumps(base)) if base else {}
+    ep.setdefault("episode", {})
+    ep.setdefault("meta", {})
+    ep["episode"].setdefault("id", tid)
+    ep["episode"].setdefault("label", tid)
+    ep["meta"].setdefault("template", tid)
+    shots: list[dict] = []
+    for idx, b in enumerate(brief_shots, start=1):
+        kind = str(b.get("kind") or "")
+        roles = [str(r) for r in (b.get("roles") or []) if r]
+        sid = str(b.get("id"))
+        is_card = kind == "card" or sid.startswith(("v5_card", "v5_title", "v5_end"))
+        line = str(b.get("line") or "")
+        shots.append({
+            "id": sid, "no": idx,
+            "type": "card" if is_card else ("dialogue" if line else "broll"),
+            "duration": float(b.get("duration") or 3.0),
+            "line": line,
+            "scene": str(b.get("scene") or ""),
+            "characters": roles,
+            "roles": roles,
+            "speaker": roles[0] if roles else "",
+            "character": roles[0] if roles else "",
+            "act_index": b.get("act_index"),
+            "prompt_source": "semantic_brief",
+        })
+    ep["shots"] = shots
+    total = round(sum(s["duration"] for s in shots), 3)
+    ep["episode"]["total_duration"] = total
+    ep["meta"]["timeline_source"] = "semantic_brief"
+    ep["meta"]["target_duration"] = float(ep["meta"].get("target_duration") or total)
+    return ep
+
+
+def _coverage(ep: dict, shots_dir: Path) -> tuple[int, int, list[str]]:
+    """(存在的镜数, 需要的镜数, 缺失 id 前 8 个)。卡片镜允许缺失（会从 V5 复制）。"""
+    need = 0
+    have = 0
+    missing: list[str] = []
+    for s in ep.get("shots") or []:
+        sid = str(s.get("id") or "")
+        if not sid or str(s.get("type")) == "card":
+            continue
+        need += 1
+        if (shots_dir / f"{sid}.mp4").is_file():
+            have += 1
+        elif len(missing) < 8:
+            missing.append(sid)
+    return have, need, missing
+
+
+def resolve_timeline(tid: str) -> tuple[dict, str, dict]:
+    """按镜头实际落盘情况选时间线。返回 (episode, source, report)。"""
+    shots_dir = OUT3D / tid / "shots"
+    own = OUT3D / tid / "work" / "episode.json"
+    v5 = V5_OUT / tid / "work" / "episode.json"
+
+    base = None
+    if v5.is_file():
+        try:
+            base = json.loads(v5.read_text(encoding="utf-8"))
+        except Exception:  # noqa: BLE001
+            base = None
+
+    cands: list[tuple[str, dict]] = []
+    if own.is_file():
+        try:
+            own_ep = json.loads(own.read_text(encoding="utf-8"))
+        except Exception:  # noqa: BLE001
+            own_ep = None
+        # 只认"本栈自己写下的权威时间线"（带 timeline_source 标记）。
+        # 早期的 OUT3D/<tid>/work/episode.json 是 V5 时间线的陈旧副本（11 镜 vs 78 镜），
+        # 无任何代码读它却极容易被误改 —— 不带标记就跳过，避免它抢占候选。
+        marked = str((((own_ep or {}).get("meta") or {}).get("timeline_source") or "")).strip()
+        if own_ep and marked:
+            cands.append((f"out3d:{marked}", own_ep))
+    if base:
+        cands.append(("templates_v5", base))
+    brief_ep = episode_from_brief(tid, base)
+    if brief_ep:
+        cands.append(("semantic_brief", brief_ep))
+    if not cands:
+        raise RuntimeError(
+            f"{tid}: 找不到任何时间线（{own} / {v5} / {_brief_path(tid)} 都不存在）；"
+            f"请先跑 story 阶段生成 episode.json")
+
+    scored = []
+    for name, ep in cands:
+        have, need, missing = _coverage(ep, shots_dir)
+        scored.append({"source": name, "have": have, "need": need,
+                       "ratio": round(have / need, 3) if need else 1.0,
+                       "missing_head": missing, "episode": ep})
+    scored.sort(key=lambda r: (r["ratio"], r["have"]), reverse=True)
+    best = scored[0]
+    report = {"chosen": best["source"], "ratio": best["ratio"], "have": best["have"],
+              "need": best["need"], "missing_head": best["missing_head"],
+              "candidates": [{k: v for k, v in r.items() if k != "episode"} for r in scored]}
+    if best["need"] and best["ratio"] < 0.9:
+        raise RuntimeError(
+            f"{tid}: 镜头与时间线严重不匹配（最佳来源 {best['source']} 只命中 "
+            f"{best['have']}/{best['need']}，缺 {best['missing_head']}…）。"
+            f"多半是先渲染了 brief 却用 V5 episode 剪辑，或相反 —— 请重跑 shots 阶段"
+            f"（render_2d_hq）后不要手工替换 episode.json。候选：{report['candidates']}")
+    return best["episode"], best["source"], report
+
+
 def load_template(tid: str) -> dict:
     p = REPO / "contract/v5/templates" / f"{tid}.json"
     return json.loads(p.read_text(encoding="utf-8"))
@@ -505,7 +651,9 @@ def generate(templates: list[str], resolution: tuple[int, int], force: bool = Fa
 def assemble(tid: str) -> dict:
     from . import render_v5, v5_catalog
     catalog = v5_catalog.load_catalog()
-    episode = load_episode(tid)
+    # V49 修复：时间线按"镜头实际存在"选择（out3d > templates_v5 > semantic brief），
+    # 并在喂给 ffmpeg 之前断言镜头齐备 —— 见 resolve_timeline 的注释。
+    episode, source, timeline_report = resolve_timeline(tid)
     template = load_template(tid)
     style = catalog["styles"][template["style"]]
     out_dir = OUT3D / tid
@@ -528,17 +676,73 @@ def assemble(tid: str) -> dict:
             dst_audio = workdir / "audio" / f"{sid}.wav"
             if not dst_audio.is_file():
                 dst_audio.write_bytes(aw.read_bytes())
+    # 2) 卡片镜缺失不算失败：片头/片尾卡只是包装，缺了就把这一镜从时间线摘掉（记录在案）。
+    #    （R6：classics 的 v5_card_title.mp4 不存在，旧逻辑会把整条 assemble 打断。）
+    dropped_cards = [s["id"] for s in episode["shots"]
+                     if str(s.get("type")) == "card"
+                     and not (shots_dir / f"{s['id']}.mp4").is_file()]
+    if dropped_cards:
+        print(f"[info] {tid}: 缺 {len(dropped_cards)} 张卡片镜（{dropped_cards[:4]}），已从时间线摘除",
+              flush=True)
+        episode["shots"] = [s for s in episode["shots"]
+                            if (shots_dir / f"{s['id']}.mp4").is_file()]
+    # 3) 出片前硬门：非卡片镜必须都有 mp4（缺一个就让 ffmpeg 报 exit 4294967294）
+    missing = [s["id"] for s in episode["shots"]
+               if str(s.get("type")) != "card" and not (shots_dir / f"{s['id']}.mp4").is_file()]
+    if missing:
+        raise RuntimeError(
+            f"{tid}: 时间线（{source}）要求 {len(episode['shots'])} 镜，但 shots/ 里缺 "
+            f"{len(missing)} 个：{missing[:6]}{'…' if len(missing) > 6 else ''}。"
+            f"请重跑 shots 阶段（render_2d_hq，会按同一 brief 补渲）；"
+            f"候选时间线覆盖率：{timeline_report['candidates']}")
+    # 3) 音频兜底：render_v5.assemble 的旁白拼接要求每镜都有 work/audio/<sid>.wav。
+    #    HQ 的 b-roll 镜本来就没配音，缺文件会让 ffmpeg 直接 "Impossible to open"，
+    #    所以按镜头时长补一段静音（与 templates3d_hq._ensure_silence 同策略）。
+    audio_dir = workdir / "audio"
+    audio_dir.mkdir(parents=True, exist_ok=True)
+    silenced = []
+    for s in episode["shots"]:
+        wav = audio_dir / f"{s['id']}.wav"
+        if wav.is_file() and wav.stat().st_size > 1000:
+            continue
+        dur = max(0.2, float(s.get("duration") or 0.4))
+        subprocess.run([str(FFMPEG), "-y", "-hide_banner", "-loglevel", "error",
+                        "-f", "lavfi", "-i", "anullsrc=r=48000:cl=stereo",
+                        "-t", f"{dur:.3f}", str(wav)], check=False)
+        silenced.append(s["id"])
+    if silenced:
+        print(f"[info] {tid}: {len(silenced)} 个镜头没有配音，已按镜头时长补静音"
+              f"（{silenced[:5]}{'…' if len(silenced) > 5 else ''}）", flush=True)
     paths = {"out": out_dir / "final.mp4", "out_dir": out_dir, "workdir": workdir,
              "shots_dir": shots_dir, "frames_dir": out_dir / "frames",
              "assets_dir": workdir / "assets"}
+    # 校验通过后才把选中的时间线落成本栈权威文件（带 timeline_source 标记，
+    # 下次 resolve_timeline 会优先命中它）；失败时不污染磁盘。
+    try:
+        episode.setdefault("meta", {})["timeline_source"] = source
+        utils.write_json(workdir / "episode.json", episode)
+    except Exception as exc:  # noqa: BLE001 - 证据写失败不影响出片
+        print(f"[warn] 写 work/episode.json 失败: {exc}", flush=True)
     plan = json.loads(json.dumps(episode))
 
     def _noop(progress: float, message: str = "") -> None:  # final_encode 会无条件调用 prog
         return None
 
     res = render_v5.assemble(plan, catalog, style, paths, _noop)
+    # 4) 曝光归一：H3 出的镜头常"四周全黑、中间一团光"，成片实测平均亮度只有 68。
+    #    这里自动抬到 ~104（用户反馈"外面都是黑色的"）。ZAOPIANJU_AUTO_EXPOSURE=0 可关。
+    exposure_info = {}
+    if str(os.environ.get("ZAOPIANJU_AUTO_EXPOSURE", "1")).lower() not in ("0", "off", "false", "no"):
+        try:
+            from . import exposure
+
+            exposure_info = exposure.fix(out_dir / "final.mp4", target=104.0)
+        except Exception as exc:  # noqa: BLE001 - 曝光修不了不能挡住出片
+            exposure_info = {"error": f"{type(exc).__name__}: {exc}"[:300]}
+            print(f"[warn] 曝光归一失败: {exc}", flush=True)
     probe = _probe(out_dir / "final.mp4")
     report = {"template": tid, "final": str(out_dir / "final.mp4"), "probe": probe,
+              "timeline": timeline_report, "exposure": exposure_info,
               "assemble": {k: v for k, v in res.items() if k != "timeline"}}
     (out_dir / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8")
     return report

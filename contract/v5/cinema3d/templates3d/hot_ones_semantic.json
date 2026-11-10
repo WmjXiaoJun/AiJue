@@ -7,7 +7,8 @@
   {
    "id": "v5_card_title",
    "kind": "card",
-   "prompt": null
+   "prompt": null,
+   "act_index": -1
   },
   {
    "id": "v5_001",
@@ -17,7 +18,8 @@
    "line": "",
    "semantic_visual": "",
    "framing": "",
-   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a cozy interview lounge with leather sofas and warm lamps. The camera surveys the space, atmospheric and cinematic. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft room tone, rain on glass. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a cozy interview lounge with leather sofas and warm lamps. The camera surveys the space, atmospheric and cinematic. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft room tone, rain on glass. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_002",
@@ -27,7 +29,8 @@
    "line": "老周，你这回可真够辣的，和大魏聊中年人的体面，这话题我可是听新鲜了。",
    "semantic_visual": "A woman leans forward over a cafe table by a rain-streaked window, eyebrows raised in amused surprise, steam curling from her cup. Warm afternoon light catches her grin; the mood is playful and intrigued.",
    "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm cafe by a rainy window, amber pendant lights and bokeh. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A woman leans forward over a cafe table by a rain-streaked window, eyebrows raised in amused surprise, steam curling from her cup. Warm afternoon light catches her grin; the mood is playful and intrigued.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft room tone, rain on glass. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm cafe by a rainy window, amber pendant lights and bokeh. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A woman leans forward over a cafe table by a rain-streaked window, eyebrows raised in amused surprise, steam curling from her cup. Warm afternoon light catches her grin; the mood is playful and intrigued.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft room tone, rain on glass. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_003",
@@ -37,7 +40,8 @@
    "line": "是啊，咱们这辈人，年轻时拼事业，现在该拼点啥？",
    "semantic_visual": "A young woman in a softly lit kitchen rests her chin on her hand, gazing past a steaming kettle toward the window. Her expression turns thoughtful, wondering what comes next in life.",
    "framing": "close",
-   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm film-lit kitchen with copper pots and steam. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A young woman in a softly lit kitchen rests her chin on her hand, gazing past a steaming kettle toward the window. Her expression turns thoughtful, wondering what comes next in life.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow rack focus between foreground and background. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft room tone, rain on glass. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm film-lit kitchen with copper pots and steam. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A young woman in a softly lit kitchen rests her chin on her hand, gazing past a steaming kettle toward the window. Her expression turns thoughtful, wondering what comes next in life.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow rack focus between foreground and background. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft room tone, rain on glass. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_004",
@@ -47,7 +51,8 @@
    "line": "对了大魏，你这回是怎么看的？",
    "semantic_visual": "A strip of film frames unspools across a table, and a hand taps one frame, turning it toward a seated man. Shallow depth of field, warm lamplight, curious and inviting mood.",
    "framing": "close",
-   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A strip of film frames unspools across a table, and a hand taps one frame, turning it toward a seated man. Shallow depth of field, warm lamplight, curious and inviting mood.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow rack focus between foreground and background. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft room tone, rain on glass. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A strip of film frames unspools across a table, and a hand taps one frame, turning it toward a seated man. Shallow depth of field, warm lamplight, curious and inviting mood.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow rack focus between foreground and background. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft room tone, rain on glass. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_005",
@@ -57,7 +62,8 @@
    "line": "我觉得啊，老周说的没错，体面不光是面子，更是生活的质量。",
    "semantic_visual": "A broad-shouldered man gestures calmly with open palms at a cafe table, nodding as he speaks. Morning light through the window warms his face; the mood is steady and sincere.",
    "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm cafe by a rainy window, amber pendant lights and bokeh. Featuring a stylized 3D animated man in his 50s, bald black hair, wearing a black jacket with red-brown accents, with glasses. The shot shows the idea through visible action: A broad-shouldered man gestures calmly with open palms at a cafe table, nodding as he speaks. Morning light through the window warms his face; the mood is steady and sincere.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft room tone, rain on glass. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm cafe by a rainy window, amber pendant lights and bokeh. Featuring a stylized 3D animated man in his 50s, bald black hair, wearing a black jacket with red-brown accents, with glasses. The shot shows the idea through visible action: A broad-shouldered man gestures calmly with open palms at a cafe table, nodding as he speaks. Morning light through the window warms his face; the mood is steady and sincere.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft room tone, rain on glass. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_006",
@@ -67,7 +73,8 @@
    "line": "那你们俩的体面，是不是也体现在这节目上呢？",
    "semantic_visual": "A woman tilts her head with a teasing smile, one finger raised toward the camera in a kitchen set. Soft film lighting glints off copper pans behind her; the mood is playful and probing.",
    "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm film-lit kitchen with copper pots and steam. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A woman tilts her head with a teasing smile, one finger raised toward the camera in a kitchen set. Soft film lighting glints off copper pans behind her; the mood is playful and probing.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow rack focus between foreground and background. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft room tone, rain on glass. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm film-lit kitchen with copper pots and steam. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A woman tilts her head with a teasing smile, one finger raised toward the camera in a kitchen set. Soft film lighting glints off copper pans behind her; the mood is playful and probing.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow rack focus between foreground and background. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft room tone, rain on glass. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_007",
@@ -77,7 +84,8 @@
    "line": "这节目确实挺接地气儿的，咱们聊的就是生活里的真事儿。",
    "semantic_visual": "A young woman laughs warmly, gesturing around a cozy kitchen set with hanging herbs and worn wooden shelves. Golden light spills across the counter; the mood is relaxed and genuine.",
    "framing": "wide",
-   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A young woman laughs warmly, gesturing around a cozy kitchen set with hanging herbs and worn wooden shelves. Golden light spills across the counter; the mood is relaxed and genuine.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft room tone, rain on glass. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A young woman laughs warmly, gesturing around a cozy kitchen set with hanging herbs and worn wooden shelves. Golden light spills across the counter; the mood is relaxed and genuine.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft room tone, rain on glass. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_008",
@@ -87,12 +95,685 @@
    "line": "",
    "semantic_visual": "",
    "framing": "",
-   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. The camera surveys the space, atmospheric and cinematic. Camera: slow pull-back revealing the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft room tone, rain on glass. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. The camera surveys the space, atmospheric and cinematic. Camera: slow pull-back revealing the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft room tone, rain on glass. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_card_end",
    "kind": "card",
-   "prompt": null
+   "prompt": null,
+   "act_index": -1
+  },
+  {
+   "id": "v5_e001",
+   "kind": "broll",
+   "scene": "interview_sofa",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a cozy interview lounge with leather sofas and warm lamps. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e002",
+   "kind": "dialogue",
+   "scene": "cafe_window",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A woman leans forward over a cafe table by a rain-streaked window, eyebrows raised in amused surprise, steam curling from her cup. Warm afternoon light catches her grin; the mood is playful and intrigued. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm cafe by a rainy window, amber pendant lights and bokeh. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A woman leans forward over a cafe table by a rain-streaked window, eyebrows raised in amused surprise, steam curling from her cup. Warm afternoon light catches her grin; the mood is playful and intrigued.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e003",
+   "kind": "dialogue",
+   "scene": "kitchen_film",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A young woman in a softly lit kitchen rests her chin on her hand, gazing past a steaming kettle toward the window. Her expression turns thoughtful, wondering what comes next in life. The character walks slowly through the space, glancing around.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm film-lit kitchen with copper pots and steam. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A young woman in a softly lit kitchen rests her chin on her hand, gazing past a steaming kettle toward the window. Her expression turns thoughtful, wondering what comes next in life.. Framing: close shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e004",
+   "kind": "dialogue",
+   "scene": "film_strip",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A strip of film frames unspools across a table, and a hand taps one frame, turning it toward a seated man. Shallow depth of field, warm lamplight, curious and inviting mood. The character turns toward the window, thinking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A strip of film frames unspools across a table, and a hand taps one frame, turning it toward a seated man. Shallow depth of field, warm lamplight, curious and inviting mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e005",
+   "kind": "dialogue",
+   "scene": "cafe_window",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A broad-shouldered man gestures calmly with open palms at a cafe table, nodding as he speaks. Morning light through the window warms his face; the mood is steady and sincere. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm cafe by a rainy window, amber pendant lights and bokeh. Featuring a stylized 3D animated man in his 50s, bald black hair, wearing a black jacket with red-brown accents, with glasses. The shot shows the idea through visible action: A broad-shouldered man gestures calmly with open palms at a cafe table, nodding as he speaks. Morning light through the window warms his face; the mood is steady and sincere.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e006",
+   "kind": "dialogue",
+   "scene": "kitchen_film",
+   "duration": 4.45,
+   "line": "",
+   "semantic_visual": "A woman tilts her head with a teasing smile, one finger raised toward the camera in a kitchen set. Soft film lighting glints off copper pans behind her; the mood is playful and probing. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm film-lit kitchen with copper pots and steam. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A woman tilts her head with a teasing smile, one finger raised toward the camera in a kitchen set. Soft film lighting glints off copper pans behind her; the mood is playful and probing.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e007",
+   "kind": "dialogue",
+   "scene": "film_strip",
+   "duration": 4.13,
+   "line": "",
+   "semantic_visual": "A young woman laughs warmly, gesturing around a cozy kitchen set with hanging herbs and worn wooden shelves. Golden light spills across the counter; the mood is relaxed and genuine. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A young woman laughs warmly, gesturing around a cozy kitchen set with hanging herbs and worn wooden shelves. Golden light spills across the counter; the mood is relaxed and genuine.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e008",
+   "kind": "broll",
+   "scene": "film_strip",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character leans on the table and gestures while speaking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. The camera surveys the space, atmospheric and cinematic. The character leans on the table and gestures while speaking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e009",
+   "kind": "broll",
+   "scene": "interview_sofa",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character walks slowly through the space, glancing around.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a cozy interview lounge with leather sofas and warm lamps. The camera surveys the space, atmospheric and cinematic. The character walks slowly through the space, glancing around. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e010",
+   "kind": "dialogue",
+   "scene": "cafe_window",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A woman leans forward over a cafe table by a rain-streaked window, eyebrows raised in amused surprise, steam curling from her cup. Warm afternoon light catches her grin; the mood is playful and intrigued. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm cafe by a rainy window, amber pendant lights and bokeh. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A woman leans forward over a cafe table by a rain-streaked window, eyebrows raised in amused surprise, steam curling from her cup. Warm afternoon light catches her grin; the mood is playful and intrigued.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e011",
+   "kind": "dialogue",
+   "scene": "kitchen_film",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A young woman in a softly lit kitchen rests her chin on her hand, gazing past a steaming kettle toward the window. Her expression turns thoughtful, wondering what comes next in life. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm film-lit kitchen with copper pots and steam. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A young woman in a softly lit kitchen rests her chin on her hand, gazing past a steaming kettle toward the window. Her expression turns thoughtful, wondering what comes next in life.. Framing: close shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e012",
+   "kind": "dialogue",
+   "scene": "film_strip",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A strip of film frames unspools across a table, and a hand taps one frame, turning it toward a seated man. Shallow depth of field, warm lamplight, curious and inviting mood. The character picks up an object and examines it.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A strip of film frames unspools across a table, and a hand taps one frame, turning it toward a seated man. Shallow depth of field, warm lamplight, curious and inviting mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e013",
+   "kind": "dialogue",
+   "scene": "cafe_window",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A broad-shouldered man gestures calmly with open palms at a cafe table, nodding as he speaks. Morning light through the window warms his face; the mood is steady and sincere. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm cafe by a rainy window, amber pendant lights and bokeh. Featuring a stylized 3D animated man in his 50s, bald black hair, wearing a black jacket with red-brown accents, with glasses. The shot shows the idea through visible action: A broad-shouldered man gestures calmly with open palms at a cafe table, nodding as he speaks. Morning light through the window warms his face; the mood is steady and sincere.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e014",
+   "kind": "dialogue",
+   "scene": "kitchen_film",
+   "duration": 4.45,
+   "line": "",
+   "semantic_visual": "A woman tilts her head with a teasing smile, one finger raised toward the camera in a kitchen set. Soft film lighting glints off copper pans behind her; the mood is playful and probing. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm film-lit kitchen with copper pots and steam. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A woman tilts her head with a teasing smile, one finger raised toward the camera in a kitchen set. Soft film lighting glints off copper pans behind her; the mood is playful and probing.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e015",
+   "kind": "dialogue",
+   "scene": "film_strip",
+   "duration": 4.13,
+   "line": "",
+   "semantic_visual": "A young woman laughs warmly, gesturing around a cozy kitchen set with hanging herbs and worn wooden shelves. Golden light spills across the counter; the mood is relaxed and genuine. The character walks slowly through the space, glancing around.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A young woman laughs warmly, gesturing around a cozy kitchen set with hanging herbs and worn wooden shelves. Golden light spills across the counter; the mood is relaxed and genuine.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e016",
+   "kind": "broll",
+   "scene": "film_strip",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character turns toward the window, thinking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. The camera surveys the space, atmospheric and cinematic. The character turns toward the window, thinking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e017",
+   "kind": "broll",
+   "scene": "interview_sofa",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " Two characters exchange a look; one nods.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a cozy interview lounge with leather sofas and warm lamps. The camera surveys the space, atmospheric and cinematic. Two characters exchange a look; one nods. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e018",
+   "kind": "dialogue",
+   "scene": "cafe_window",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A woman leans forward over a cafe table by a rain-streaked window, eyebrows raised in amused surprise, steam curling from her cup. Warm afternoon light catches her grin; the mood is playful and intrigued. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm cafe by a rainy window, amber pendant lights and bokeh. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A woman leans forward over a cafe table by a rain-streaked window, eyebrows raised in amused surprise, steam curling from her cup. Warm afternoon light catches her grin; the mood is playful and intrigued.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e019",
+   "kind": "dialogue",
+   "scene": "kitchen_film",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A young woman in a softly lit kitchen rests her chin on her hand, gazing past a steaming kettle toward the window. Her expression turns thoughtful, wondering what comes next in life. The character pauses, looks off frame, then continues.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm film-lit kitchen with copper pots and steam. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A young woman in a softly lit kitchen rests her chin on her hand, gazing past a steaming kettle toward the window. Her expression turns thoughtful, wondering what comes next in life.. Framing: close shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e020",
+   "kind": "dialogue",
+   "scene": "film_strip",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A strip of film frames unspools across a table, and a hand taps one frame, turning it toward a seated man. Shallow depth of field, warm lamplight, curious and inviting mood. The character leans on the table and gestures while speaking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A strip of film frames unspools across a table, and a hand taps one frame, turning it toward a seated man. Shallow depth of field, warm lamplight, curious and inviting mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e021",
+   "kind": "dialogue",
+   "scene": "cafe_window",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A broad-shouldered man gestures calmly with open palms at a cafe table, nodding as he speaks. Morning light through the window warms his face; the mood is steady and sincere. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm cafe by a rainy window, amber pendant lights and bokeh. Featuring a stylized 3D animated man in his 50s, bald black hair, wearing a black jacket with red-brown accents, with glasses. The shot shows the idea through visible action: A broad-shouldered man gestures calmly with open palms at a cafe table, nodding as he speaks. Morning light through the window warms his face; the mood is steady and sincere.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e022",
+   "kind": "dialogue",
+   "scene": "kitchen_film",
+   "duration": 4.45,
+   "line": "",
+   "semantic_visual": "A woman tilts her head with a teasing smile, one finger raised toward the camera in a kitchen set. Soft film lighting glints off copper pans behind her; the mood is playful and probing. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm film-lit kitchen with copper pots and steam. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A woman tilts her head with a teasing smile, one finger raised toward the camera in a kitchen set. Soft film lighting glints off copper pans behind her; the mood is playful and probing.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e023",
+   "kind": "dialogue",
+   "scene": "film_strip",
+   "duration": 4.13,
+   "line": "",
+   "semantic_visual": "A young woman laughs warmly, gesturing around a cozy kitchen set with hanging herbs and worn wooden shelves. Golden light spills across the counter; the mood is relaxed and genuine. Two characters exchange a look; one nods.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A young woman laughs warmly, gesturing around a cozy kitchen set with hanging herbs and worn wooden shelves. Golden light spills across the counter; the mood is relaxed and genuine.. Framing: wide shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e024",
+   "kind": "broll",
+   "scene": "film_strip",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character picks up an object and examines it.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. The camera surveys the space, atmospheric and cinematic. The character picks up an object and examines it. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e025",
+   "kind": "broll",
+   "scene": "interview_sofa",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a cozy interview lounge with leather sofas and warm lamps. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e026",
+   "kind": "dialogue",
+   "scene": "cafe_window",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A woman leans forward over a cafe table by a rain-streaked window, eyebrows raised in amused surprise, steam curling from her cup. Warm afternoon light catches her grin; the mood is playful and intrigued. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm cafe by a rainy window, amber pendant lights and bokeh. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A woman leans forward over a cafe table by a rain-streaked window, eyebrows raised in amused surprise, steam curling from her cup. Warm afternoon light catches her grin; the mood is playful and intrigued.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e027",
+   "kind": "dialogue",
+   "scene": "kitchen_film",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A young woman in a softly lit kitchen rests her chin on her hand, gazing past a steaming kettle toward the window. Her expression turns thoughtful, wondering what comes next in life. The character walks slowly through the space, glancing around.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm film-lit kitchen with copper pots and steam. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A young woman in a softly lit kitchen rests her chin on her hand, gazing past a steaming kettle toward the window. Her expression turns thoughtful, wondering what comes next in life.. Framing: close shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e028",
+   "kind": "dialogue",
+   "scene": "film_strip",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A strip of film frames unspools across a table, and a hand taps one frame, turning it toward a seated man. Shallow depth of field, warm lamplight, curious and inviting mood. The character turns toward the window, thinking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A strip of film frames unspools across a table, and a hand taps one frame, turning it toward a seated man. Shallow depth of field, warm lamplight, curious and inviting mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e029",
+   "kind": "dialogue",
+   "scene": "cafe_window",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A broad-shouldered man gestures calmly with open palms at a cafe table, nodding as he speaks. Morning light through the window warms his face; the mood is steady and sincere. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm cafe by a rainy window, amber pendant lights and bokeh. Featuring a stylized 3D animated man in his 50s, bald black hair, wearing a black jacket with red-brown accents, with glasses. The shot shows the idea through visible action: A broad-shouldered man gestures calmly with open palms at a cafe table, nodding as he speaks. Morning light through the window warms his face; the mood is steady and sincere.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e030",
+   "kind": "dialogue",
+   "scene": "kitchen_film",
+   "duration": 4.45,
+   "line": "",
+   "semantic_visual": "A woman tilts her head with a teasing smile, one finger raised toward the camera in a kitchen set. Soft film lighting glints off copper pans behind her; the mood is playful and probing. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm film-lit kitchen with copper pots and steam. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A woman tilts her head with a teasing smile, one finger raised toward the camera in a kitchen set. Soft film lighting glints off copper pans behind her; the mood is playful and probing.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e031",
+   "kind": "dialogue",
+   "scene": "film_strip",
+   "duration": 4.13,
+   "line": "",
+   "semantic_visual": "A young woman laughs warmly, gesturing around a cozy kitchen set with hanging herbs and worn wooden shelves. Golden light spills across the counter; the mood is relaxed and genuine. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A young woman laughs warmly, gesturing around a cozy kitchen set with hanging herbs and worn wooden shelves. Golden light spills across the counter; the mood is relaxed and genuine.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e032",
+   "kind": "broll",
+   "scene": "film_strip",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character leans on the table and gestures while speaking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. The camera surveys the space, atmospheric and cinematic. The character leans on the table and gestures while speaking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e033",
+   "kind": "broll",
+   "scene": "interview_sofa",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character walks slowly through the space, glancing around.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a cozy interview lounge with leather sofas and warm lamps. The camera surveys the space, atmospheric and cinematic. The character walks slowly through the space, glancing around. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e034",
+   "kind": "dialogue",
+   "scene": "cafe_window",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A woman leans forward over a cafe table by a rain-streaked window, eyebrows raised in amused surprise, steam curling from her cup. Warm afternoon light catches her grin; the mood is playful and intrigued. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm cafe by a rainy window, amber pendant lights and bokeh. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A woman leans forward over a cafe table by a rain-streaked window, eyebrows raised in amused surprise, steam curling from her cup. Warm afternoon light catches her grin; the mood is playful and intrigued.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e035",
+   "kind": "dialogue",
+   "scene": "kitchen_film",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A young woman in a softly lit kitchen rests her chin on her hand, gazing past a steaming kettle toward the window. Her expression turns thoughtful, wondering what comes next in life. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm film-lit kitchen with copper pots and steam. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A young woman in a softly lit kitchen rests her chin on her hand, gazing past a steaming kettle toward the window. Her expression turns thoughtful, wondering what comes next in life.. Framing: close shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e036",
+   "kind": "dialogue",
+   "scene": "film_strip",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A strip of film frames unspools across a table, and a hand taps one frame, turning it toward a seated man. Shallow depth of field, warm lamplight, curious and inviting mood. The character picks up an object and examines it.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A strip of film frames unspools across a table, and a hand taps one frame, turning it toward a seated man. Shallow depth of field, warm lamplight, curious and inviting mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e037",
+   "kind": "dialogue",
+   "scene": "cafe_window",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A broad-shouldered man gestures calmly with open palms at a cafe table, nodding as he speaks. Morning light through the window warms his face; the mood is steady and sincere. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm cafe by a rainy window, amber pendant lights and bokeh. Featuring a stylized 3D animated man in his 50s, bald black hair, wearing a black jacket with red-brown accents, with glasses. The shot shows the idea through visible action: A broad-shouldered man gestures calmly with open palms at a cafe table, nodding as he speaks. Morning light through the window warms his face; the mood is steady and sincere.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e038",
+   "kind": "dialogue",
+   "scene": "kitchen_film",
+   "duration": 4.45,
+   "line": "",
+   "semantic_visual": "A woman tilts her head with a teasing smile, one finger raised toward the camera in a kitchen set. Soft film lighting glints off copper pans behind her; the mood is playful and probing. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm film-lit kitchen with copper pots and steam. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A woman tilts her head with a teasing smile, one finger raised toward the camera in a kitchen set. Soft film lighting glints off copper pans behind her; the mood is playful and probing.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e039",
+   "kind": "dialogue",
+   "scene": "film_strip",
+   "duration": 4.13,
+   "line": "",
+   "semantic_visual": "A young woman laughs warmly, gesturing around a cozy kitchen set with hanging herbs and worn wooden shelves. Golden light spills across the counter; the mood is relaxed and genuine. The character walks slowly through the space, glancing around.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A young woman laughs warmly, gesturing around a cozy kitchen set with hanging herbs and worn wooden shelves. Golden light spills across the counter; the mood is relaxed and genuine.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e040",
+   "kind": "broll",
+   "scene": "film_strip",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character turns toward the window, thinking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. The camera surveys the space, atmospheric and cinematic. The character turns toward the window, thinking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e041",
+   "kind": "broll",
+   "scene": "interview_sofa",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " Two characters exchange a look; one nods.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a cozy interview lounge with leather sofas and warm lamps. The camera surveys the space, atmospheric and cinematic. Two characters exchange a look; one nods. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e042",
+   "kind": "dialogue",
+   "scene": "cafe_window",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A woman leans forward over a cafe table by a rain-streaked window, eyebrows raised in amused surprise, steam curling from her cup. Warm afternoon light catches her grin; the mood is playful and intrigued. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm cafe by a rainy window, amber pendant lights and bokeh. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A woman leans forward over a cafe table by a rain-streaked window, eyebrows raised in amused surprise, steam curling from her cup. Warm afternoon light catches her grin; the mood is playful and intrigued.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e043",
+   "kind": "dialogue",
+   "scene": "kitchen_film",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A young woman in a softly lit kitchen rests her chin on her hand, gazing past a steaming kettle toward the window. Her expression turns thoughtful, wondering what comes next in life. The character pauses, looks off frame, then continues.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm film-lit kitchen with copper pots and steam. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A young woman in a softly lit kitchen rests her chin on her hand, gazing past a steaming kettle toward the window. Her expression turns thoughtful, wondering what comes next in life.. Framing: close shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e044",
+   "kind": "dialogue",
+   "scene": "film_strip",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A strip of film frames unspools across a table, and a hand taps one frame, turning it toward a seated man. Shallow depth of field, warm lamplight, curious and inviting mood. The character leans on the table and gestures while speaking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A strip of film frames unspools across a table, and a hand taps one frame, turning it toward a seated man. Shallow depth of field, warm lamplight, curious and inviting mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e045",
+   "kind": "dialogue",
+   "scene": "cafe_window",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A broad-shouldered man gestures calmly with open palms at a cafe table, nodding as he speaks. Morning light through the window warms his face; the mood is steady and sincere. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm cafe by a rainy window, amber pendant lights and bokeh. Featuring a stylized 3D animated man in his 50s, bald black hair, wearing a black jacket with red-brown accents, with glasses. The shot shows the idea through visible action: A broad-shouldered man gestures calmly with open palms at a cafe table, nodding as he speaks. Morning light through the window warms his face; the mood is steady and sincere.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e046",
+   "kind": "dialogue",
+   "scene": "kitchen_film",
+   "duration": 4.45,
+   "line": "",
+   "semantic_visual": "A woman tilts her head with a teasing smile, one finger raised toward the camera in a kitchen set. Soft film lighting glints off copper pans behind her; the mood is playful and probing. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm film-lit kitchen with copper pots and steam. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A woman tilts her head with a teasing smile, one finger raised toward the camera in a kitchen set. Soft film lighting glints off copper pans behind her; the mood is playful and probing.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e047",
+   "kind": "dialogue",
+   "scene": "film_strip",
+   "duration": 4.13,
+   "line": "",
+   "semantic_visual": "A young woman laughs warmly, gesturing around a cozy kitchen set with hanging herbs and worn wooden shelves. Golden light spills across the counter; the mood is relaxed and genuine. Two characters exchange a look; one nods.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A young woman laughs warmly, gesturing around a cozy kitchen set with hanging herbs and worn wooden shelves. Golden light spills across the counter; the mood is relaxed and genuine.. Framing: wide shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e048",
+   "kind": "broll",
+   "scene": "film_strip",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character picks up an object and examines it.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. The camera surveys the space, atmospheric and cinematic. The character picks up an object and examines it. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e049",
+   "kind": "broll",
+   "scene": "interview_sofa",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a cozy interview lounge with leather sofas and warm lamps. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e050",
+   "kind": "dialogue",
+   "scene": "cafe_window",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A woman leans forward over a cafe table by a rain-streaked window, eyebrows raised in amused surprise, steam curling from her cup. Warm afternoon light catches her grin; the mood is playful and intrigued. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm cafe by a rainy window, amber pendant lights and bokeh. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A woman leans forward over a cafe table by a rain-streaked window, eyebrows raised in amused surprise, steam curling from her cup. Warm afternoon light catches her grin; the mood is playful and intrigued.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e051",
+   "kind": "dialogue",
+   "scene": "kitchen_film",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A young woman in a softly lit kitchen rests her chin on her hand, gazing past a steaming kettle toward the window. Her expression turns thoughtful, wondering what comes next in life. The character walks slowly through the space, glancing around.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm film-lit kitchen with copper pots and steam. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A young woman in a softly lit kitchen rests her chin on her hand, gazing past a steaming kettle toward the window. Her expression turns thoughtful, wondering what comes next in life.. Framing: close shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e052",
+   "kind": "dialogue",
+   "scene": "film_strip",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A strip of film frames unspools across a table, and a hand taps one frame, turning it toward a seated man. Shallow depth of field, warm lamplight, curious and inviting mood. The character turns toward the window, thinking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A strip of film frames unspools across a table, and a hand taps one frame, turning it toward a seated man. Shallow depth of field, warm lamplight, curious and inviting mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e053",
+   "kind": "dialogue",
+   "scene": "cafe_window",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A broad-shouldered man gestures calmly with open palms at a cafe table, nodding as he speaks. Morning light through the window warms his face; the mood is steady and sincere. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm cafe by a rainy window, amber pendant lights and bokeh. Featuring a stylized 3D animated man in his 50s, bald black hair, wearing a black jacket with red-brown accents, with glasses. The shot shows the idea through visible action: A broad-shouldered man gestures calmly with open palms at a cafe table, nodding as he speaks. Morning light through the window warms his face; the mood is steady and sincere.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e054",
+   "kind": "dialogue",
+   "scene": "kitchen_film",
+   "duration": 4.45,
+   "line": "",
+   "semantic_visual": "A woman tilts her head with a teasing smile, one finger raised toward the camera in a kitchen set. Soft film lighting glints off copper pans behind her; the mood is playful and probing. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a warm film-lit kitchen with copper pots and steam. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A woman tilts her head with a teasing smile, one finger raised toward the camera in a kitchen set. Soft film lighting glints off copper pans behind her; the mood is playful and probing.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e055",
+   "kind": "dialogue",
+   "scene": "film_strip",
+   "duration": 4.13,
+   "line": "",
+   "semantic_visual": "A young woman laughs warmly, gesturing around a cozy kitchen set with hanging herbs and worn wooden shelves. Golden light spills across the counter; the mood is relaxed and genuine. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: A young woman laughs warmly, gesturing around a cozy kitchen set with hanging herbs and worn wooden shelves. Golden light spills across the counter; the mood is relaxed and genuine.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e056",
+   "kind": "broll",
+   "scene": "film_strip",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character leans on the table and gestures while speaking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a film-strip lit corridor with soft amber light. The camera surveys the space, atmospheric and cinematic. The character leans on the table and gestures while speaking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e057",
+   "kind": "broll",
+   "scene": "interview_sofa",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character walks slowly through the space, glancing around.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a cozy interview lounge with leather sofas and warm lamps. The camera surveys the space, atmospheric and cinematic. The character walks slowly through the space, glancing around. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_x001",
+   "kind": "broll",
+   "scene": "interview_sofa",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a cozy interview lounge with leather sofas and warm lamps. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_x002",
+   "kind": "broll",
+   "scene": "interview_sofa",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a cozy interview lounge with leather sofas and warm lamps. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_x003",
+   "kind": "broll",
+   "scene": "interview_sofa",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a cozy interview lounge with leather sofas and warm lamps. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_x004",
+   "kind": "broll",
+   "scene": "interview_sofa",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] warm 35mm film look 3D animated interview, amber practical lights, soft bokeh. Set in a cozy interview lounge with leather sofas and warm lamps. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
   }
  ]
 }

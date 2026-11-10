@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Episode, Job, Project } from "../../types";
 import { api, mediaUrl } from "../../lib/api";
-import { cinemaApi, isRealTemplate } from "../../lib/cinema";
-import type { CinemaTemplate, CinemaTemplatesResponse } from "../../lib/cinema";
 import { TEMPLATES, templateLabel } from "../../lib/templates";
 import { EPISODE_STATUS_TEXT, JOB_TYPE_TEXT, fmtDateTime, relativeTime, isActiveJob } from "../../lib/studio";
 import { useToast } from "../Toast";
@@ -81,7 +79,6 @@ export function PlatformHome({
 }: Props) {
   const notify = useToast();
   const [episodeMap, setEpisodeMap] = useState<EpisodeMap>({});
-  const [tpl, setTpl] = useState<CinemaTemplatesResponse | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -97,11 +94,6 @@ export function PlatformHome({
       if (res.status === "fulfilled") map[list[index].id] = res.value;
     });
     setEpisodeMap(map);
-    try {
-      setTpl(await cinemaApi.templates());
-    } catch {
-      setTpl(null);
-    }
     try {
       const all = await api.jobs({});
       setJobs([...all].sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()));
@@ -148,22 +140,17 @@ export function PlatformHome({
     })[0];
   }, [projects, episodeMap]);
 
-  const tplSummary = tpl?.summary;
-  const tplDone = tplSummary?.done ?? 0;
-  // V17：3D 模板总数动态（16 → 19+）；接口失败时保留原 16 fallback
-  const tplTotal = tplSummary?.total ?? 16;
   const activeJobs = jobs.filter(isActiveJob).length;
 
   return (
     <AppShell
       active="projects"
-      kicker="PRODUCTION BOARD · 造片局"
+      kicker="造片局"
       title="项目大厅"
       chips={[
         { label: "项目", value: String(projects.length) },
         { label: "期数", value: String(allEpisodes.length), tone: "slate" },
         { label: "成片", value: String(finishedCount), tone: "jade" },
-        { label: "3D 模板", value: `${tplDone}/${tplTotal}`, tone: "gold" },
         ...(activeJobs > 0 ? [{ label: "进行中", value: String(activeJobs), tone: "gold" as const }] : []),
       ]}
       primaryAction={{ label: "新建项目", onClick: () => setNewOpen(true), icon: <IconPlus />, title: "新建项目（从节目模板开始）" }}
@@ -182,7 +169,9 @@ export function PlatformHome({
                 <section className="pl-hero">
                   <div className="pl-hero-body">
                     <span className="cm-kicker">CONTINUE PRODUCTION · 继续制作</span>
-                    <h2 className="pl-hero-title">{heroPick.project.name}</h2>
+                    <h2 className="pl-hero-title">
+                      {heroPick.project.name.replace(/\s*（[^）]*）\s*/g, "").trim() || heroPick.project.name}
+                    </h2>
                     <div className="pl-hero-ep">
                       <span className="pl-ep-no">第 {heroPick.episode.no} 期</span>
                       <span className="pl-hero-ep-title">{heroPick.episode.title}</span>
@@ -212,6 +201,10 @@ export function PlatformHome({
                     </div>
                   </div>
                   <div className="pl-hero-media">
+                    <div className="pl-hero-fallback" aria-hidden="true">
+                      <b>{templateLabel(heroPick.project.format_id).slice(0, 1) || "漫"}</b>
+                      <span>剧本 · 角色 · 分镜 · 成片</span>
+                    </div>
                     <img src={posterOf(heroPick.project)} alt={heroPick.project.name} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
                     <div className="pl-hero-glow" />
                     <div className="pl-hero-frame" />
@@ -220,6 +213,30 @@ export function PlatformHome({
                       <b>3D</b>
                     </div>
                   </div>
+                </section>
+              )}
+
+              {heroPick && (
+                <section className="pl-flow" aria-label="创作流程">
+                  {[
+                    { no: "01", label: "剧本", desc: "分集 · 台词 · 节奏", key: "script" },
+                    { no: "02", label: "角色", desc: "资产 · 音色 · 一致性", key: "assets" },
+                    { no: "03", label: "分镜", desc: "镜头 · 画面 · 动态", key: "storyboard" },
+                    { no: "04", label: "成片", desc: "剪辑 · 字幕 · 导出", key: "finish" },
+                  ].map((step) => (
+                    <a
+                      key={step.no}
+                      className="pl-flow-step"
+                      href={`#/episodes/${heroPick.episode.id}/${step.key}`}
+                    >
+                      <span className="pl-flow-no">{step.no}</span>
+                      <span className="pl-flow-text">
+                        <b>{step.label}</b>
+                        <i>{step.desc}</i>
+                      </span>
+                      <span className="pl-flow-arrow" aria-hidden="true">→</span>
+                    </a>
+                  ))}
                 </section>
               )}
 
@@ -235,9 +252,11 @@ export function PlatformHome({
                   {projects.map((project) => {
                     const eps = episodeMap[project.id] || [];
                     const latest = latestEpisode(eps);
+                    const progress = Math.max(0, Math.min(100, Math.round(Number(latest?.progress) || 0)));
                     return (
                       <article key={project.id} className="pl-project" onClick={() => onOpenProject(project)}>
                         <div className="pl-project-cover">
+                          <span className="pl-cover-mark" aria-hidden="true">{templateLabel(project.format_id).slice(0, 1) || "影"}</span>
                           <img src={posterOf(project)} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
                           <div className="pl-cover-shade" />
                           <span className="pl-cover-format">{templateLabel(project.format_id)}</span>
@@ -246,11 +265,12 @@ export function PlatformHome({
                         <div className="pl-project-body">
                           <h3 className="pl-project-name">{project.name}</h3>
                           <div className="pl-project-meta">
-                            <span>{eps.length} 期</span>
-                            <span className="pl-dot" />
-                            <span>{eps.filter((ep) => ep.render_url).length} 支成片</span>
-                            <span className="pl-dot" />
-                            <span className="cm-mono">¥{Number(project.spent || 0).toFixed(2)}</span>
+                            <span><b>{eps.length}</b><i>期</i></span>
+                            <span><b>{eps.filter((ep) => ep.render_url).length}</b><i>成片</i></span>
+                            <span><b>¥{Number(project.spent || 0).toFixed(1)}</b><i>花费</i></span>
+                          </div>
+                          <div className="pl-project-progress" aria-hidden="true">
+                            <i style={{ width: `${progress}%` }} />
                           </div>
                           <div className="pl-project-latest">
                             {latest ? (
@@ -286,45 +306,7 @@ export function PlatformHome({
               </section>
 
               <div className="pl-two-col">
-                <section className="pl-panel">
-                  <div className="pl-sec-head">
-                    <h2 className="pl-h2">{tplTotal} 模板 · 3D 影库</h2>
-                    <span className="pl-sec-sub">已完成 {tplDone}/{tplTotal}</span>
-                    <a className="cm-btn cm-btn-ghost cm-btn-sm pl-sec-action" href="#/library/templates">
-                      全部 {tplTotal} 支 →
-                    </a>
-                  </div>
-                  <div className="pl-tpl-grid">
-                    {(tpl?.templates || []).slice(0, 6).map((item: CinemaTemplate) => (
-                      <a key={item.id} className="pl-tpl" href={`#/library/templates`} title={item.label}>
-                        <div className="pl-tpl-thumb">
-                          {item.poster_url ? (
-                            <img src={mediaUrl(item.poster_url)} alt={item.label} />
-                          ) : (
-                            <span className="pl-tpl-letter">{String(item.label || "?").slice(0, 1)}</span>
-                          )}
-                          <span
-                            className={
-                              "pl-tpl-badge " +
-                              (item.status === "done" ? "is-done" : item.status === "pending" ? "is-pending" : "")
-                            }
-                          >
-                            {item.status === "done"
-                              ? "3D"
-                              : item.status === "pending"
-                                ? "待生成"
-                                : `${item.clips?.done ?? 0}/${item.clips?.total ?? 0}`}
-                          </span>
-                        </div>
-                        <div className="pl-tpl-name-line">
-                          <div className="pl-tpl-name">{item.label}</div>
-                          {isRealTemplate(item.id) && <span className="tpl-real-badge">写实</span>}
-                        </div>
-                        <div className="pl-tpl-sub cm-mono">{item.id}</div>
-                      </a>
-                    ))}
-                  </div>
-                </section>
+                
 
                 <section className="pl-panel">
                   <div className="pl-sec-head">

@@ -1,4 +1,4 @@
-# 启动造片局后端（默认 http://127.0.0.1:8090）
+﻿# 启动造片局后端（默认 http://127.0.0.1:8090）
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 Set-Location $root

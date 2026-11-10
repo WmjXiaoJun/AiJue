@@ -12,6 +12,7 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
+from typing import Any
 
 from . import config, utils
 
@@ -65,11 +66,17 @@ def style_fingerprint(video: Path, frames: int = 6) -> dict:
     edges: list[float] = []
     try:
         import subprocess
-        for i in range(frames):
-            t = dur * (i + 0.5) / frames
+        usable = max(1, min(int(frames), max(1, int(dur))))
+        for i in range(usable):
+            t = max(0.0, min(dur - 0.05, dur * (i + 0.5) / usable))
             png = tmp / f"{i:02d}.png"
-            utils.ffmpeg(["-ss", f"{t:.2f}", "-i", str(video), "-frames:v", "1",
-                          "-y", str(png)])
+            try:
+                utils.ffmpeg(["-ss", f"{t:.2f}", "-i", str(video), "-frames:v", "1",
+                              "-y", str(png)])
+            except Exception:  # noqa: BLE001
+                continue
+            if not png.is_file() or png.stat().st_size == 0:
+                continue  # 抽帧失败就跳过这一帧，不能让整个渲染在 QC 阶段崩
             from PIL import Image
             img = Image.open(png).convert("RGB").resize((160, 90))
             arr = np.asarray(img, dtype=np.float32) / 255.0
@@ -120,6 +127,41 @@ def _fmt_shots(plan: dict) -> list[dict]:
     return [s for s in shots if isinstance(s, dict)]
 
 
+def _lip_sync_check(lip: Any, dialogue: list[dict]) -> dict:
+    """口型门（不再 fail-open）：缺数据 = ok=False + reason="no_data"。
+
+    P2-16：以前 `qc_extra` 里没有 `lip_sync`（或 per_shot 为空）时这一项根本不进
+    `checks`（等价通过）→ 音频全缺也报「口型覆盖达标」。现在：
+    - 有对白镜 + 无数据            → ok=False, reason="no_data"
+    - 有对白镜 + 部分镜取数失败     → ok=False, reason="partial_data"
+    - 明确给了 ok=False            → 原样失败
+    - 无对白镜                     → ok=True（不适用）
+    """
+    if not dialogue:
+        return _check(True, "无对白镜（不适用）", reason="not_applicable",
+                      shots=0, per_shot=[])
+    if not isinstance(lip, dict):
+        return _check(False, "no_data: 有对白镜但 QC 未提供口型数据", reason="no_data",
+                      shots=len(dialogue), per_shot=[])
+    per_shot = lip.get("per_shot") or []
+    failures = lip.get("failures") or []
+    reason = str(lip.get("reason") or "").strip()
+    if not per_shot:
+        ok, reason = False, reason or "no_data"
+    elif failures:
+        ok, reason = False, reason or "partial_data"
+    else:
+        ok = bool(lip.get("ok", False))
+        if not ok and not reason:
+            reason = "low_coverage"
+    return _check(ok, str(lip.get("detail") or ""), reason=reason,
+                  provider=lip.get("provider"),
+                  shots=lip.get("shots", len(dialogue)),
+                  no_speech=lip.get("no_speech") or [],
+                  low_coverage=lip.get("low_coverage") or [],
+                  per_shot=per_shot, failures=failures)
+
+
 def evaluate(*, video: Path, plan: dict, qc_extra: dict | None = None,
              subtitles: Path | None = None) -> dict:
     """V5 QC 主入口；返回 {ok, checks, stats, fingerprint}。"""
@@ -129,6 +171,10 @@ def evaluate(*, video: Path, plan: dict, qc_extra: dict | None = None,
     shots = _fmt_shots(plan)
     loss = float(((plan.get("meta") or {}).get("transition_loss") or 0.0))
     expected = round(sum(float(s.get("duration") or 0) for s in shots) - loss, 3)
+    # 长版会在编码后做时长对齐（转场重叠/补齐）：以 episode.total_duration 为准
+    conformed = float((plan.get("episode") or {}).get("total_duration") or 0.0)
+    if conformed and abs(conformed - expected) > 0.5:
+        expected = round(conformed, 3)
     checks: dict[str, dict] = {}
 
     actual = float(probe.get("duration") or 0.0)
@@ -246,17 +292,22 @@ def evaluate(*, video: Path, plan: dict, qc_extra: dict | None = None,
         missing=missing_voice, inconsistent=inconsistent)
 
     extra = qc_extra or {}
-    if extra.get("lip_sync"):
-        ls = extra["lip_sync"]
-        ok = bool(ls.get("ok", True))
-        checks["lip_sync"] = _check(ok, ls.get("detail", ""), **{
-            k: v for k, v in ls.items() if k not in ("ok", "detail")})
+    dialogue = [s for s in body_shots if str(s.get("line") or "").strip()]
+    checks["lip_sync"] = _lip_sync_check(extra.get("lip_sync"), dialogue)
     if extra.get("style"):
         checks["style"] = _check(bool(extra["style"].get("style")), 
                                  str(extra["style"].get("style")))
     if extra.get("fallbacks") is not None:
         checks["fallbacks"] = _check(not extra["fallbacks"],
                                      f"fallbacks={extra['fallbacks']}")
+    # 时长门（下限而不是等号）：render_v5 已经 raise 过，这里把它写进报告可供复盘
+    gate = (plan.get("meta") or {}).get("duration_gate")
+    if isinstance(gate, dict):
+        checks["duration_gate"] = _check(
+            bool(gate.get("ok")), str(gate.get("detail") or ""),
+            target=gate.get("target"), actual=gate.get("actual"),
+            floor=gate.get("floor"), delta=gate.get("delta"),
+            ratio=gate.get("ratio"))
 
     ok = all(v.get("ok") for v in checks.values())
     fp = style_fingerprint(video) if video.is_file() else {}

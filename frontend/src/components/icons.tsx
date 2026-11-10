@@ -146,6 +146,7 @@ export const IconPlay = make(<path d="M8 5.5v13l11-6.5-11-6.5z" />);
 export const IconChevronRight = make(<path d="M9 5l7 7-7 7" />);
 export const IconChevronLeft = make(<path d="M15 5l-7 7 7 7" />);
 export const IconChevronDown = make(<path d="M5 9l7 7 7-7" />);
+export const IconChevronUp = make(<path d="M5 15l7-7 7 7" />);
 export const IconClose = make(<path d="M5.5 5.5l13 13M18.5 5.5l-13 13" />);
 export const IconCheck = make(<path d="M4.5 12.5l5 5 10-11" />);
 export const IconPlus = make(<path d="M12 5v14M5 12h14" />);
@@ -300,3 +301,28 @@ export const IconVolume = make(
   </>
 );
 export const IconSpin = make(<path d="M21 12a9 9 0 11-6.2-8.6" />);
+
+/* ------------------------------ V49：智能体编排 ------------------------------ */
+/** 智能体（机器人头） */
+export const IconAgent = make(
+  <>
+    <rect x="4" y="7" width="16" height="11" rx="3.4" />
+    <path d="M12 7V4.4" />
+    <circle cx="12" cy="3.3" r="1.1" />
+    <circle cx="9.2" cy="12.2" r="1.1" fill="currentColor" stroke="none" />
+    <circle cx="14.8" cy="12.2" r="1.1" fill="currentColor" stroke="none" />
+    <path d="M9.6 15.2h4.8" />
+    <path d="M2.4 11v3.2M21.6 11v3.2" />
+  </>
+);
+
+/** 工作流（阶段编排） */
+export const IconFlow = make(
+  <>
+    <rect x="2.6" y="3.4" width="6" height="4.6" rx="1.4" />
+    <rect x="15.4" y="3.4" width="6" height="4.6" rx="1.4" />
+    <rect x="9" y="16" width="6" height="4.6" rx="1.4" />
+    <path d="M8.6 5.7h2.1A2.3 2.3 0 0113 8v5.7M15.4 5.7h-2.1A2.3 2.3 0 0011 8v5.7" />
+  </>
+);
+

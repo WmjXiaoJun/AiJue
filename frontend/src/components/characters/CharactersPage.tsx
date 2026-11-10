@@ -514,7 +514,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
       } catch (err) {
         if (!alive) return;
         const status = err instanceof CreationError ? err.status : 0;
-        if (status === 404 || status === 405) setAuditionError("试镜任务接口尚未就绪（后端 V32 实现中）");
+        if (status === 404 || status === 405) setAuditionError("试镜任务接口返回 404：请确认角色 id 存在、后端已启动");
         else setAuditionError("试镜任务状态读取失败：" + creationErrorMessage(err).join("；"));
       }
     }, 3000);
@@ -561,8 +561,8 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
       const status = err instanceof CreationError ? err.status : 0;
       const message = creationErrorMessage(err).join("；");
       if (status === 404 || status === 405) {
-        setAuditionError("试镜视频接口尚未就绪（后端 V32 实现中）");
-        notify("试镜视频接口尚未就绪（后端 V32 实现中）", "info");
+        setAuditionError("试镜视频接口返回 404：请确认任务 id 存在、后端已启动");
+        notify("试镜视频接口返回 404：请确认任务 id 存在、后端已启动", "info");
       } else if (status === 409) {
         setAuditionError("GPU 正忙：" + message);
         notify("GPU 正忙：" + message, "info");
@@ -706,7 +706,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
       } catch (err) {
         if (!alive) return;
         const status = err instanceof CreationError ? err.status : 0;
-        if (status === 404 || status === 405) setPromoError("宣传片任务接口尚未就绪（后端 V35 实现中）");
+        if (status === 404 || status === 405) setPromoError("宣传片任务接口返回 404：请确认角色 id 存在、后端已启动");
         else setPromoError("宣传片状态读取失败：" + creationErrorMessage(err).join("；"));
       }
     }, 3000);
@@ -753,8 +753,8 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
       const status = err instanceof CreationError ? err.status : 0;
       const message = creationErrorMessage(err).join("；");
       if (status === 404 || status === 405) {
-        setPromoError("角色宣传片接口尚未就绪（后端 V35 实现中）");
-        notify("角色宣传片接口尚未就绪（后端 V35 实现中）", "info");
+        setPromoError("角色宣传片接口返回 404：请确认角色 id 存在、后端已启动");
+        notify("角色宣传片接口返回 404：请确认角色 id 存在、后端已启动", "info");
       } else if (status === 409) {
         setPromoError("GPU 正忙：" + message);
         notify("GPU 正忙：" + message, "info");
@@ -807,7 +807,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
       } catch (err) {
         const status = err instanceof CreationError ? err.status : 0;
         const message = creationErrorMessage(err).join("；");
-        if (status === 404 || status === 405) setSplitError("切条包接口尚未就绪（后端 V38 实现中）");
+        if (status === 404 || status === 405) setSplitError("切条包接口返回 404：请确认角色 id 存在、后端已启动");
         else setSplitError("构建切条包失败：" + message);
       } finally {
         setSplitBuilding(false);
@@ -950,7 +950,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
           } catch {
             /* 列表也失败则走友好提示 */
           }
-          setDuoError("双人对戏接口尚未就绪（后端 V36 实现中）");
+          setDuoError("双人对戏接口返回 404：请确认 A/B 角色 id 存在、后端已启动");
         } else {
           setDuoError("双人对戏状态读取失败：" + creationErrorMessage(err).join("；"));
         }
@@ -1010,8 +1010,8 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
       const status = err instanceof CreationError ? err.status : 0;
       const message = creationErrorMessage(err).join("；");
       if (status === 404 || status === 405) {
-        setDuoError("双人对戏接口尚未就绪（后端 V36 实现中）");
-        notify("双人对戏接口尚未就绪（后端 V36 实现中）", "info");
+        setDuoError("双人对戏接口返回 404：请确认 A/B 角色 id 存在、后端已启动");
+        notify("双人对戏接口返回 404：请确认 A/B 角色 id 存在、后端已启动", "info");
       } else if (status === 409) {
         setDuoError("GPU 正忙：" + message);
         notify("GPU 正忙：" + message, "info");
@@ -1065,7 +1065,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
         .catch(() => setSplitPkg(null));
     } catch (err) {
       const status = err instanceof CreationError ? err.status : 0;
-      if (status === 404 || status === 405) setShowcaseError("合集发布包接口尚未就绪（后端 V36 实现中）；可点「导出发布包」重试");
+      if (status === 404 || status === 405) setShowcaseError("合集发布包接口返回 404：请确认角色 id 存在，可再点「导出发布包」重试");
       else setShowcaseError("读取合集发布包失败：" + creationErrorMessage(err).join("；"));
     } finally {
       setShowcaseLoading(false);
@@ -1083,7 +1083,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
       } catch (err) {
         const status = err instanceof CreationError ? err.status : 0;
         const message = creationErrorMessage(err).join("；");
-        if (status === 404 || status === 405) setShowcaseError("合集发布包接口尚未就绪（后端 V36 实现中）");
+        if (status === 404 || status === 405) setShowcaseError("合集发布包接口返回 404：请确认角色 id 存在、后端已启动");
         else setShowcaseError("导出合集发布包失败：" + message);
       } finally {
         setShowcaseBuilding(false);
@@ -1269,7 +1269,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
         const message = errorText(err);
         setPreviewError(
           message.includes("404") || message.includes("Not Found")
-            ? "试听接口尚未就绪（V18 后端 API 实现中）；保存音色不受影响，生成时生效。"
+            ? "试听接口返回 404：保存音色不受影响，生成时生效。"
             : "试听失败：" + message,
         );
       }
@@ -1307,7 +1307,7 @@ export function CharactersPage({ onExit, onOpenPipeline, onOpenCinema, onOpenSet
     setBatch({ running: false, index: 0, total: 0, label: "" });
     notify(
       failed
-        ? `批量试听结束：${list.length - failed} 个成功 / ${failed} 个失败（试听接口可能尚未就绪）`
+        ? `批量试听结束：${list.length - failed} 个成功 / ${failed} 个失败（部分试听接口返回 404）`
         : `批量试听完成：${list.length} 个角色`,
       failed ? "info" : "success",
     );

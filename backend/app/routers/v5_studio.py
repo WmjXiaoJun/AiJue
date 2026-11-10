@@ -42,7 +42,7 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 from .. import config  # noqa: E402
-from pipeline import v5_catalog  # noqa: E402
+from pipeline import utils, v5_catalog  # noqa: E402
 
 router = APIRouter(tags=["v5-studio"])
 
@@ -83,7 +83,7 @@ def _repo() -> Path:
 def _outputs_root() -> Path:
     """成片产物根目录（优先 config.OUTPUTS_DIR，回退仓库 outputs/）。"""
     configured = Path(config.OUTPUTS_DIR) / "templates_v5"
-    fallback = _repo() / "outputs" / "templates_v5"
+    fallback = Path(config.OUTPUTS_DIR) / "templates_v5"
     if configured.is_dir():
         return configured
     return fallback
@@ -197,7 +197,24 @@ def _summarize_output(template_id: str, out_dir: Path, catalog: dict) -> dict:
     if not isinstance(duration, (int, float)):
         duration = None
 
+    # V49：templates_v5 里的旧成片可能已被清理；真实成片在 templates_3d /
+    # templates_2d（HQ 短片栈）。这里回退，避免画廊出现"有 QC 没有片"的条目。
     final_path = out_dir / "final.mp4"
+    final_url = _template_file_url(template_id, final_path, "final.mp4")
+    final_source = "templates_v5" if final_url else None
+    if final_url is None:
+        for root in (Path(config.OUTPUTS_DIR) / "templates_2d",
+                     Path(config.OUTPUTS_DIR) / "templates_3d"):
+            candidate = root / template_id / "final.mp4"
+            if candidate.is_file() and candidate.stat().st_size > 0:
+                final_url = f"/media/{root.name}/{template_id}/final.mp4"
+                final_source = root.name
+                if not duration:
+                    probe = utils.probe_video(candidate)
+                    duration = probe.get("duration") or None
+                    if probe.get("width"):
+                        resolution_text = f"{probe['width']}x{probe['height']}"
+                break
     poster_path = out_dir / "contact_sheet.png"
     poster_rel = "contact_sheet.png"
     if not poster_path.is_file():
@@ -227,7 +244,9 @@ def _summarize_output(template_id: str, out_dir: Path, catalog: dict) -> dict:
         "shots": shots,
         "scenes": scenes,
         "characters": characters,
-        "final_url": _template_file_url(template_id, final_path, "final.mp4"),
+        "final_url": final_url,
+        "final_source": final_source,
+        "legacy": final_url is None,
         "timeline_url": _template_file_url(
             template_id, out_dir / "timeline.html", "timeline.html"
         ),
@@ -280,6 +299,32 @@ def list_outputs(include_custom: bool = Query(default=False),
         "missing": missing,
         "generated_at": _now(),
     }
+
+
+@router.delete("/api/v5/outputs/{template}", summary="删除单个模板的成片（final*.mp4）")
+def delete_output(template: str) -> dict:
+    """只删成片文件（final*.mp4），镜头/关键帧/合同一律保留，可随时重合成。"""
+    if not TEMPLATE_ID_RE.fullmatch(template):
+        raise HTTPException(status_code=400, detail=f"非法 template: {template}")
+    roots = [Path(config.OUTPUTS_DIR) / name / template
+             for name in ("templates_v5", "templates_3d", "templates_2d")]
+    removed: list[dict] = []
+    for root in roots:
+        if not root.is_dir():
+            continue
+        for path in sorted(root.glob("final*.mp4")):
+            try:
+                size = path.stat().st_size
+                path.unlink()
+                removed.append({"path": str(path), "bytes": size})
+            except OSError as exc:
+                raise HTTPException(status_code=500,
+                                    detail=f"删除失败: {path.name}: {exc}") from exc
+    if not removed:
+        raise HTTPException(status_code=404, detail=f"没有可删除的成片: {template}")
+    return {"ok": True, "template": template, "removed": removed,
+            "removed_bytes": sum(item["bytes"] for item in removed),
+            "note": "只删 final*.mp4；镜头/关键帧保留，可重新合成或重渲"}
 
 
 # ---------------------------------------------------------------------------
@@ -532,13 +577,22 @@ def put_voice(character: str, body: Dict[str, Any] = Body(default={})):
                                 detail=f"未知 voice_id: {updates['voice_id']}（{exc}）") from exc
     if not updates:
         raise HTTPException(status_code=400, detail="没有可更新的声音字段（voice_id/seed/cfg_scale/instruction）")
-    payload = {"id": character, "voice": updates}
+    # P0 修复：只有存在内建基线时才写 partial（加载时深合并）；
+    # custom-only 角色没有基线，写 partial 会把 label/persona/appearance/poses 全冲掉。
+    source = v5_catalog.item_source(catalog, "characters", character)
+    has_base = bool(source.get("base"))
+    path = v5_catalog.custom_path("characters", character,
+                                  root=catalog.get("root") or None)
+    if has_base:
+        payload = {"id": character, "voice": updates}
+    else:
+        existing = _read_json_file(path) if path.is_file() else {}
+        payload = {**existing, "id": character,
+                   "voice": {**(existing.get("voice") or {}), **updates}}
     ok = v5_catalog.validate_item("characters", payload, catalog, as_custom=True)
     if not ok.get("ok"):
         raise HTTPException(status_code=400, detail={
-            "message": "声音修改校验失败", "errors": ok.get("errors") or []})
-    path = v5_catalog.custom_path("characters", character,
-                                  root=catalog.get("root") or None)
+            "message": "声音修改校验失败（未写入）", "errors": ok.get("errors") or []})
     v5_catalog.write_json_atomic(path, payload)
     # 重新加载目录 + 解析（确保落盘后声音可用）
     catalog_after = _catalog()
@@ -686,7 +740,7 @@ def start_render(payload: Dict[str, Any] = Body(default={})):
                 "job": _job_public(_RENDER_JOBS[_RENDER_ACTIVE], log_lines=5),
             })
         job_id = "r" + uuid.uuid4().hex[:10]
-        out_dir = _repo() / "outputs" / "templates_v5" / template
+        out_dir = Path(config.OUTPUTS_DIR) / "templates_v5" / template
         job: dict = {
             "id": job_id, "template": template, "duration": duration, "force": force,
             "status": "queued", "progress": 0.0, "message": "排队中",

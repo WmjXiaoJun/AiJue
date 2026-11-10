@@ -18,7 +18,7 @@ from . import config
 REPO = config.REPO_ROOT
 PRESETS_PATH = REPO / "contract" / "style_presets.json"
 PLATE_DIR = REPO / "outputs" / "scene_plates"
-CHARS_DIR = REPO / "outputs" / "characters"
+CHARS_DIR = config.CHARS_ROOT  # 真相源在 assets/v5/characters（见 config）
 FFMPEG = str(config.FFMPEG_BIN)
 _ALPHA_CACHE: dict[str, float | None] = {}
 
@@ -122,10 +122,8 @@ def plate_path(profile: dict, scene_plate: str,
         p = base_dir / fname
         if p.is_file():
             return p, level, level != "style_v2"
-    for alt in ("late_night_desk", "history_study", "roundtable_studio"):
-        p = base_dir / f"{alt}.png"
-        if p.is_file():
-            return p, "base-fallback", True
+    # 不再"借一张存在的底板"兜底：旧逻辑会让缺底板的模板静默复用
+    # late_night_desk/history_study/roundtable_studio（16 部片同一背景，无人报错）。
     return base_dir / f"{name}.png", "missing", True
 
 
@@ -137,7 +135,9 @@ def cutout_path(profile: dict, char_id: str,
     style = str((profile or {}).get("character_style") or "cutout_2d")
     if os.environ.get("STYLE_V2_FORCE_2D") == "1":
         style = "cutout_2d"
-    order = [style, "cutout_3d", "cutout_2d",
+    # "cutout.png" 是资产库的实际落点（RGBA 全身透明），必须排在头像兜底之前；
+    # 早前遗漏这一项 → 26 个角色全部落进 portrait.png（RGB 无 alpha），合成出方框。
+    order = [style, "cutout_3d", "cutout_2d", "cutout.png",
              "cutout/portrait.png", "2d/portrait.png", "portrait.png"]
     seen = set()
     for item in order:

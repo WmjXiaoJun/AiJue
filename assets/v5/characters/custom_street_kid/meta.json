@@ -39,7 +39,9 @@
     },
     "expressions": {},
     "scene": null,
-    "sheet": null
+    "sheet": null,
+    "front": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\custom_street_kid\\front.png",
+    "cutout": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\custom_street_kid\\cutout.png"
   },
   "images": [
     {
@@ -90,5 +92,71 @@
       "composition": "three_quarter",
       "expression": null
     }
-  ]
+  ],
+  "face_norm": {
+    "score": 0.45,
+    "estimated": false,
+    "source": "haar",
+    "bbox": [
+      0.24633431085043989,
+      0.11926605504587157,
+      0.39296187683284456,
+      0.17023445463812437
+    ],
+    "mouth": {
+      "cx": 0.3196480938416422,
+      "cy": 0.15902140672782875,
+      "w": 0.04985337243401759,
+      "h": 0.007798165137614679
+    },
+    "eyes": {
+      "y": 0.14067278287461774,
+      "w": 0.03225806451612903,
+      "cx": [
+        0.2844574780058651,
+        0.3548387096774194
+      ]
+    },
+    "skin": "#d9ceb5",
+    "lip": "#543a47",
+    "line": "#000005",
+    "face_w": 50.0
+  },
+  "face_portrait_norm": {
+    "score": 0.45,
+    "estimated": false,
+    "source": "haar",
+    "bbox": [
+      0.515625,
+      0.19736842105263158,
+      0.6923076923076923,
+      0.3182565789473684
+    ],
+    "mouth": {
+      "cx": 0.6039663461538461,
+      "cy": 0.29166118421052634,
+      "w": 0.060072115384615384,
+      "h": 0.018495065789473682
+    },
+    "eyes": {
+      "y": 0.24814144736842106,
+      "w": 0.038870192307692314,
+      "cx": [
+        0.5615625000000001,
+        0.6463701923076923
+      ]
+    },
+    "skin": "#f1d9bf",
+    "lip": "#5b4847",
+    "line": "#04050c",
+    "face_w": 147.0
+  },
+  "sizes": {
+    "cutout": [
+      341,
+      981
+    ]
+  },
+  "face_norm_updated_at": "2026-11-05T11:29:16",
+  "face_norm_source": "pipeline/v5_art._norm_geom(face_geometry(cutout))"
 }

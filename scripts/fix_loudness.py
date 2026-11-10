@@ -63,11 +63,17 @@ def probe_loudness(video: Path) -> dict:
             "lra": round(info["lra"], 2), "in_range": in_range}
 
 
-def _backup(final: Path) -> str:
+def _backup(final: Path) -> tuple[str, bool]:
+    """备份成片原件 → (路径, 是否本次新建)。
+
+    口径：`.preloud.mp4` 必须是**修复前**的文件。已存在就复用（可能是上一轮的好原件），
+    本次新建返回 True。调用方必须把 `_backup` 放在任何就地改写之前。
+    """
     bak = final.with_name(final.stem + ".preloud" + final.suffix)
-    if not bak.is_file():
-        shutil.copy2(final, bak)
-    return str(bak)
+    if bak.is_file():
+        return str(bak), False
+    shutil.copy2(final, bak)
+    return str(bak), True
 
 
 def rebuild_from_workdir(out_dir: Path, template_id: str,
@@ -168,7 +174,8 @@ def fix_one(out_dir: Path, template_id: str, *, audio_only: bool = False,
             if not after.get("in_range"):
                 raise RuntimeError(f"重建+兜底修正后仍不达标: {after}")
             method = "rebuild"
-            backup = _backup(final)
+            backup, backup_created = _backup(final)
+            record["backup_created"] = backup_created
             os.replace(rebuilt, final)
             record["after"] = after
         except Exception as exc:  # noqa: BLE001
@@ -180,15 +187,29 @@ def fix_one(out_dir: Path, template_id: str, *, audio_only: bool = False,
                     pass
             rebuilt = None
     if not method:
+        # 先备份**原件**，再就地改写（与 rebuild 路径顺序一致；rebuilt 也是先 _backup 再 replace）
+        backup, backup_created = _backup(final)
+        record["backup_created"] = backup_created
+        # 复用旧 .preloud 时核一次音量：确认它真的是"修复前"的原件（而不是上一轮修好的副本）
+        record["backup_lufs"] = (probe_loudness(Path(backup)) or {}).get("lufs")
+        before_lufs = (before or {}).get("lufs")
+        try:
+            record["backup_matches_before"] = (
+                record["backup_lufs"] is not None and before_lufs is not None
+                and abs(float(record["backup_lufs"]) - float(before_lufs)) <= 0.5)
+        except (TypeError, ValueError):
+            record["backup_matches_before"] = False
         res = audio_only_fix(final, max_rounds=max_rounds)
         method = "audio_only"
-        backup = _backup(final) if res.get("ok") else ""
         record["after"] = res.get("after")
         if not res.get("ok"):
             record.update({"ok": False, "method": method, "backup": backup,
+                           "backup_valid": Path(backup).is_file(),
                            "reason": "音频修复后仍不达标"})
             return record
     record.update({"ok": True, "method": method, "backup": backup,
+                   "backup_valid": bool(backup) and Path(backup).is_file()
+                                   and record.get("backup_matches_before", True),
                    "skipped": False})
     try:
         report = re_eval_qc(out_dir, template_id, final)

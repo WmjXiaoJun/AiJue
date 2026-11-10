@@ -1,4 +1,4 @@
-# Chrome headless 截图（用于最终交付预览）
+﻿# Chrome headless 截图（用于最终交付预览）
 param(
   [string]$Url = "http://127.0.0.1:8090/",
   [string]$Out = "outputs/screenshots/app.png",

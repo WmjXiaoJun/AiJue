@@ -740,8 +740,15 @@ def create_dialogue(payload: DialogueBody = Body(default=DialogueBody(
         "finished_ts": None,
     }
     with _LOCK:
+        running = _DIALOGUES.get(_ACTIVE_DIALOGUE) or {}
+        if str(running.get("status")) in ("queued", "running"):
+            raise HTTPException(status_code=409, detail=f"已有对谈任务在跑: {_ACTIVE_DIALOGUE}")
         _DIALOGUES[dialogue_id] = dialogue
         _ACTIVE_DIALOGUE = dialogue_id
+        if len(_DIALOGUES) > 50:
+            for old_id in sorted(_DIALOGUES, key=lambda k: _DIALOGUES[k].get("created_ts") or 0)[:-50]:
+                if old_id != _ACTIVE_DIALOGUE:
+                    _DIALOGUES.pop(old_id, None)
     _persist(dialogue)
     try:
         threading.Thread(target=_run_dialogue, args=(dialogue_id,), daemon=True,

@@ -1,0 +1,60 @@
+{
+  "id": "laozhou",
+  "name": "老周",
+  "title": null,
+  "persona": "造片局主持人，老练毒舌、控场一流；爱用冷幽默拆穿嘉宾的场面话。",
+  "mode": "portrait",
+  "style": "realistic",
+  "model": "animagine-xl-4.0.safetensors",
+  "steps": 28,
+  "cfg": 5.5,
+  "sampler": "euler_ancestral",
+  "scheduler": "normal",
+  "seed": 20261106,
+  "size": "832x1216",
+  "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, anime, cartoon, illustration, 2d, cel shading, flat colors, sketch, painting, cgi, 3d render, doll, plastic skin, full body, multiple characters",
+  "prompt": {
+    "portrait": "photorealistic, raw photo, masterpiece, best quality, ultra realistic, solo, detailed skin texture, professional photography, 1boy, male, mature male, dark hair, short hair, swept bangs, dark eyes, thick eyebrows, navy blue suit, business suit, necktie, white shirt, formal, gold accents, wristwatch, confident expression, smirk, confident, looking at viewer, upper body, centered composition, studio lighting, dark background, 3d animated feature film character, pixar-style cg rendering, stylized but realistic materials, subsurface skin, soft rim light, neutral background, sharp focus, detailed face, detailed makeup, cinematic lighting, 8k"
+  },
+  "created_at": "2026-11-06T08:47:08",
+  "elapsed_sec": 104.7,
+  "files": {
+    "portrait": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\laozhou\\_look_3d\\portrait.png",
+    "three_view": {},
+    "expressions": {},
+    "scene": null,
+    "sheet": null
+  },
+  "images": [
+    {
+      "tag": "portrait",
+      "path": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\laozhou\\_look_3d\\portrait.png",
+      "seed": 20261106,
+      "width": 832,
+      "height": 1216,
+      "gen_sec": 104.5,
+      "prompt": "photorealistic, raw photo, masterpiece, best quality, ultra realistic, solo, detailed skin texture, professional photography, 1boy, male, mature male, dark hair, short hair, swept bangs, dark eyes, thick eyebrows, navy blue suit, business suit, necktie, white shirt, formal, gold accents, wristwatch, confident expression, smirk, confident, looking at viewer, upper body, centered composition, studio lighting, dark background, 3d animated feature film character, pixar-style cg rendering, stylized but realistic materials, subsurface skin, soft rim light, neutral background, sharp focus, detailed face, detailed makeup, cinematic lighting, 8k",
+      "negative": "lowres, bad anatomy, bad hands, text, watermark, extra fingers, deformed, anime, cartoon, illustration, 2d, cel shading, flat colors, sketch, painting, cgi, 3d render, doll, plastic skin, full body, multiple characters, anime, cel shading, flat colors, line art, 2d, photorealistic human",
+      "composition": "portrait",
+      "expression": null,
+      "ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\laozhou\\portrait.png",
+      "ip_adapter": {
+        "preset": "PLUS (high strength)",
+        "weight": 0.42,
+        "start_at": 0.0,
+        "end_at": 0.8
+      }
+    }
+  ],
+  "ip_adapter": {
+    "enabled": true,
+    "ref": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\AiJue\\assets\\v5\\characters\\laozhou\\portrait.png",
+    "ref_comfy_input": "zaopianju_concepts/laozhou_ref_portrait.png",
+    "preset": "PLUS (high strength)",
+    "weight": 0.42,
+    "weight_type": "linear",
+    "start_at": 0.0,
+    "end_at": 0.8,
+    "ckpt": "animagine-xl-4.0.safetensors"
+  }
+}

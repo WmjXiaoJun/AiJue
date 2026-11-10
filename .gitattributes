@@ -1,0 +1,13 @@
+# 统一换行与二进制识别（Windows / macOS / Linux 协作）
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.gif binary
+*.mp4 binary
+*.wav binary
+*.mp3 binary
+*.db binary
+*.ttf binary
+*.ttc binary

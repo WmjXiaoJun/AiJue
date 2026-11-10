@@ -205,7 +205,7 @@ function normalizeAssets(raw: Record<string, unknown>): CharacterAssets {
 
 function errorItems(status: number, detail: unknown, statusText: string): string[] {
   if (status === 404 || status === 405) {
-    return ["接口尚未就绪（后端创建/概念图 API 实现中），请稍后重试"];
+    return ["接口返回 404：请确认后端已启动，稍后重试"];
   }
   if (detail && typeof detail === "object" && !Array.isArray(detail)) {
     const rec = detail as Record<string, unknown>;

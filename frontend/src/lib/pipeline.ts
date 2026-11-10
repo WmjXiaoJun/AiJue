@@ -126,7 +126,7 @@ export function isRunActive(run: PipelineRun | null | undefined): boolean {
   return Boolean(run && (run.status === "queued" || run.status === "running"));
 }
 
-/** 404/405 → 后端接口尚未就绪（友好提示用） */
+/** 404/405/501 → 接口不可用（友好提示用） */
 export function isPipelineNotReady(err: unknown): boolean {
   return err instanceof ApiError && (err.status === 404 || err.status === 405 || err.status === 501);
 }

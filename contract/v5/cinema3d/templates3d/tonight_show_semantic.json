@@ -7,102 +7,920 @@
   {
    "id": "v5_card_title",
    "kind": "card",
-   "prompt": null
-  },
-  {
-   "id": "v5_001",
-   "kind": "broll",
-   "scene": "neon_skyline",
-   "duration": 2.6,
+   "prompt": null,
+   "duration": null,
+   "scene": null,
    "line": "",
    "semantic_visual": "",
    "framing": "",
-   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a rooftop terrace at night overlooking a neon megacity skyline, glowing signs and floating light. The camera surveys the space, atmospheric and cinematic. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "act_index": -1
+  },
+  {
+   "id": "v5_001",
+   "kind": "dialogue",
+   "scene": "neon_skyline",
+   "duration": 7.09,
+   "line": "欢迎来到造片局深夜秀，我是老周，今天聊点扎心的。",
+   "semantic_visual": "Neon-lit late-night talk show set: a host gestures toward a glowing robot silhouette on the desk screen while an audience leans in, magenta and cyan lights casting long shadows.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a rooftop terrace at night overlooking a neon megacity skyline, glowing signs and floating light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Neon-lit late-night talk show set: a host gestures toward a glowing robot silhouette on the desk screen while an audience leans in, magenta and cyan lights casting long shadows.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "laozhou",
+   "roles": [
+    "host"
+   ],
+   "speaker_name": "老周",
+   "act_index": -1
   },
   {
    "id": "v5_002",
    "kind": "dialogue",
-   "scene": "late_night_studio",
-   "duration": 8.21,
-   "line": "欢迎回到造片局，今天聊一个得罪人的话题：AI 主持人会不会抢走我们的饭碗。",
-   "semantic_visual": "Neon-lit late-night talk show set: a host gestures toward a glowing robot silhouette on the desk screen while an audience leans in, magenta and cyan lights casting long shadows.",
-   "framing": "wide",
-   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a glossy late-night talk show set with a curved desk, guest armchairs, warm spotlights and a neon city backdrop. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: Neon-lit late-night talk show set: a host gestures toward a glowing robot silhouette on the desk screen while an audience leans in, magenta and cyan lights casting long shadows.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "scene": "neon_skyline",
+   "duration": 4.21,
+   "line": "老周你开场都这么丧，观众还没坐稳就被你扎了一刀。",
+   "semantic_visual": "Backstage in pulsing neon, a performer taps a crumpled script against one hand and points to a live monitor showing an unscripted crowd reaction.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a rooftop terrace at night overlooking a neon megacity skyline, glowing signs and floating light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Backstage in pulsing neon, a performer taps a crumpled script against one hand and points to a live monitor showing an unscripted crowd reaction.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "ali",
+   "roles": [
+    "guest_a"
+   ],
+   "speaker_name": "阿栗",
+   "act_index": -1
   },
   {
    "id": "v5_003",
    "kind": "dialogue",
-   "scene": "backstage_neon",
-   "duration": 5.25,
-   "line": "我先说结论：会抢走念稿的，抢不走临场反应的。",
-   "semantic_visual": "Backstage in pulsing neon, a performer taps a crumpled script against one hand and points to a live monitor showing an unscripted crowd reaction.",
-   "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a backstage corridor lined with glowing bulbs and mirrors. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: Backstage in pulsing neon, a performer taps a crumpled script against one hand and points to a live monitor showing an unscripted crowd reaction.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "scene": "neon_skyline",
+   "duration": 6.85,
+   "line": "扎心才记得住，今晚的题目是 AI 主持人会不会抢我们饭碗。",
+   "semantic_visual": "In a rainy neon alley, a silhouetted comic throws open both arms as a burst of pink light ripples through puddles, a small crowd laughing in the glow.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a rooftop terrace at night overlooking a neon megacity skyline, glowing signs and floating light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: In a rainy neon alley, a silhouetted comic throws open both arms as a burst of pink light ripples through puddles, a small crowd laughing in the glow.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "laozhou",
+   "roles": [
+    "host"
+   ],
+   "speaker_name": "老周",
+   "act_index": -1
   },
   {
    "id": "v5_004",
    "kind": "dialogue",
-   "scene": "neon_alley",
-   "duration": 3.41,
-   "line": "观众要的从来不是正确答案，而是被逗笑的那一下。",
-   "semantic_visual": "In a rainy neon alley, a silhouetted comic throws open both arms as a burst of pink light ripples through puddles, a small crowd laughing in the glow.",
-   "framing": "wide",
-   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a narrow neon-lit alley after rain, reflections on wet pavement. Featuring a stylized 3D animated man in his 20s, under cut black hair, wearing a white shirt with navy accents, with laptop and coffee; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: In a rainy neon alley, a silhouetted comic throws open both arms as a burst of pink light ripples through puddles, a small crowd laughing in the glow.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: quick whip pan. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "scene": "neon_skyline",
+   "duration": 7.01,
+   "line": "我先表态，抢不了，AI 连我这段口音都学不像。",
+   "semantic_visual": "On the talk show couch, the host lifts a paper script that morphs into a stiff gray robot mask, then tosses it aside with a smirk.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a rooftop terrace at night overlooking a neon megacity skyline, glowing signs and floating light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: On the talk show couch, the host lifts a paper script that morphs into a stiff gray robot mask, then tosses it aside with a smirk.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "dawei",
+   "roles": [
+    "guest_b"
+   ],
+   "speaker_name": "大魏",
+   "act_index": -1
   },
   {
    "id": "v5_005",
    "kind": "dialogue",
-   "scene": "late_night_studio",
-   "duration": 6.77,
-   "line": "所以别怕 AI，先怕自己写的稿子像 AI。",
-   "semantic_visual": "On the talk show couch, the host lifts a paper script that morphs into a stiff gray robot mask, then tosses it aside with a smirk.",
-   "framing": "close",
-   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a glossy late-night talk show set with a curved desk, guest armchairs, warm spotlights and a neon city backdrop. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: On the talk show couch, the host lifts a paper script that morphs into a stiff gray robot mask, then tosses it aside with a smirk.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "scene": "neon_skyline",
+   "duration": 4.69,
+   "line": "学不像是因为你口音属于非物质文化遗产级别。",
+   "semantic_visual": "In a dim backstage corner at 3 a.m., a laptop screen glows with rows of blinking draft lines while a tired performer sips coffee beside it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a rooftop terrace at night overlooking a neon megacity skyline, glowing signs and floating light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: In a dim backstage corner at 3 a.m., a laptop screen glows with rows of blinking draft lines while a tired performer sips coffee beside it.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "ali",
+   "roles": [
+    "guest_a"
+   ],
+   "speaker_name": "阿栗",
+   "act_index": -1
   },
   {
    "id": "v5_006",
    "kind": "dialogue",
-   "scene": "backstage_neon",
-   "duration": 4.13,
-   "line": "而且它不会累，凌晨三点还能给我写十个开场白。",
-   "semantic_visual": "In a dim backstage corner at 3 a.m., a laptop screen glows with rows of blinking draft lines while a tired performer sips coffee beside it.",
-   "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a backstage corridor lined with glowing bulbs and mirrors. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: In a dim backstage corner at 3 a.m., a laptop screen glows with rows of blinking draft lines while a tired performer sips coffee beside it.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: quick whip pan. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "scene": "late_night_studio",
+   "duration": 4.21,
+   "line": "这是特色，我一张嘴观众就知道是真人上线。",
+   "semantic_visual": "Through a rain-streaked window, a lone viewer curls on a couch watching a warm talk show glow, city neon reflecting across the dark room.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a glossy late-night talk show set with a curved desk, guest armchairs, warm spotlights and a neon city backdrop. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: Through a rain-streaked window, a lone viewer curls on a couch watching a warm talk show glow, city neon reflecting across the dark room.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "dawei",
+   "roles": [
+    "guest_b"
+   ],
+   "speaker_name": "大魏",
+   "act_index": -1
   },
   {
    "id": "v5_007",
    "kind": "dialogue",
-   "scene": "neon_alley",
-   "duration": 6.21,
-   "line": "可观众半夜打开电视，想看的不是完美，是有人陪。",
-   "semantic_visual": "Through a rain-streaked window, a lone viewer curls on a couch watching a warm talk show glow, city neon reflecting across the dark room.",
+   "scene": "late_night_studio",
+   "duration": 5.89,
+   "line": "真人上线不等于有人看，观众要的是内容不是呼吸声。",
+   "semantic_visual": "Talk show stage: a robot arm types a script while a human host stumbles off a stool and catches himself, the audience erupting in laughter under neon lights.",
    "framing": "wide",
-   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a narrow neon-lit alley after rain, reflections on wet pavement. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Through a rain-streaked window, a lone viewer curls on a couch watching a warm talk show glow, city neon reflecting across the dark room.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a glossy late-night talk show set with a curved desk, guest armchairs, warm spotlights and a neon city backdrop. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: Talk show stage: a robot arm types a script while a human host stumbles off a stool and catches himself, the audience erupting in laughter under neon lights.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "laozhou",
+   "roles": [
+    "host"
+   ],
+   "speaker_name": "老周",
+   "act_index": -1
   },
   {
    "id": "v5_008",
    "kind": "dialogue",
    "scene": "late_night_studio",
-   "duration": 2.53,
-   "line": "那就让 AI 写稿，让真人负责翻车和救场。",
-   "semantic_visual": "Talk show stage: a robot arm types a script while a human host stumbles off a stool and catches himself, the audience erupting in laughter under neon lights.",
-   "framing": "wide",
-   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a glossy late-night talk show set with a curved desk, guest armchairs, warm spotlights and a neon city backdrop. Featuring a stylized 3D animated man in his 20s, under cut black hair, wearing a white shirt with navy accents, with laptop and coffee; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Talk show stage: a robot arm types a script while a human host stumbles off a stool and catches himself, the audience erupting in laughter under neon lights.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "duration": 4.13,
+   "line": "这话狠，等于说大魏的价值只剩下喘气了。",
+   "semantic_visual": "The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a glossy late-night talk show set with a curved desk, guest armchairs, warm spotlights and a neon city backdrop. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: The character pauses, looks off frame, then continues.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "ali",
+   "roles": [
+    "guest_a"
+   ],
+   "speaker_name": "阿栗",
+   "act_index": -1
   },
   {
    "id": "v5_009",
-   "kind": "broll",
+   "kind": "dialogue",
+   "scene": "late_night_studio",
+   "duration": 4.29,
+   "line": "我还能救场，AI 接不住梗的时候总得有人顶上去。",
+   "semantic_visual": "Neon-lit late-night talk show set: a host gestures toward a glowing robot silhouette on the desk screen while an audience leans in, magenta and cyan lights casting long shadows. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a glossy late-night talk show set with a curved desk, guest armchairs, warm spotlights and a neon city backdrop. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: Neon-lit late-night talk show set: a host gestures toward a glowing robot silhouette on the desk screen while an audience leans in, magenta and cyan lights casting long shadows. The character leans on the table and gestures while speaking.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "dawei",
+   "roles": [
+    "guest_b"
+   ],
+   "speaker_name": "大魏",
+   "act_index": -1
+  },
+  {
+   "id": "v5_010",
+   "kind": "dialogue",
+   "scene": "late_night_studio",
+   "duration": 5.65,
+   "line": "那我们就试试，看今晚谁先接不住，先进入第一个回合。",
+   "semantic_visual": "Backstage in pulsing neon, a performer taps a crumpled script against one hand and points to a live monitor showing an unscripted crowd reaction. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a glossy late-night talk show set with a curved desk, guest armchairs, warm spotlights and a neon city backdrop. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: Backstage in pulsing neon, a performer taps a crumpled script against one hand and points to a live monitor showing an unscripted crowd reaction. The character walks slowly through the space, glancing around.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "laozhou",
+   "roles": [
+    "host"
+   ],
+   "speaker_name": "老周",
+   "act_index": -1
+  },
+  {
+   "id": "v5_011",
+   "kind": "dialogue",
+   "scene": "backstage_neon",
+   "duration": 4.61,
+   "line": "阿栗你先说，AI 主持人到底威胁不威胁你。",
+   "semantic_visual": "In a rainy neon alley, a silhouetted comic throws open both arms as a burst of pink light ripples through puddles, a small crowd laughing in the glow. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a backstage corridor lined with glowing bulbs and mirrors. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: In a rainy neon alley, a silhouetted comic throws open both arms as a burst of pink light ripples through puddles, a small crowd laughing in the glow. The character turns toward the window, thinking.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: smooth lateral pan. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "laozhou",
+   "roles": [
+    "host"
+   ],
+   "speaker_name": "老周",
+   "act_index": -1
+  },
+  {
+   "id": "v5_012",
+   "kind": "dialogue",
+   "scene": "backstage_neon",
+   "duration": 4.69,
+   "line": "威胁分两种，一是抢活，二是让我显得更贵。",
+   "semantic_visual": "On the talk show couch, the host lifts a paper script that morphs into a stiff gray robot mask, then tosses it aside with a smirk. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a backstage corridor lined with glowing bulbs and mirrors. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: On the talk show couch, the host lifts a paper script that morphs into a stiff gray robot mask, then tosses it aside with a smirk. Two characters exchange a look; one nods.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: smooth lateral pan. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "ali",
+   "roles": [
+    "guest_a"
+   ],
+   "speaker_name": "阿栗",
+   "act_index": -1
+  },
+  {
+   "id": "v5_013",
+   "kind": "dialogue",
+   "scene": "backstage_neon",
+   "duration": 5.49,
+   "line": "这答案滑头，等于说自己不便宜还怕被比价。",
+   "semantic_visual": "In a dim backstage corner at 3 a.m., a laptop screen glows with rows of blinking draft lines while a tired performer sips coffee beside it. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a backstage corridor lined with glowing bulbs and mirrors. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: In a dim backstage corner at 3 a.m., a laptop screen glows with rows of blinking draft lines while a tired performer sips coffee beside it. The character picks up an object and examines it.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: smooth lateral pan. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "laozhou",
+   "roles": [
+    "host"
+   ],
+   "speaker_name": "老周",
+   "act_index": -1
+  },
+  {
+   "id": "v5_014",
+   "kind": "dialogue",
+   "scene": "backstage_neon",
+   "duration": 4.61,
+   "line": "我说句公道话，AI 最大的问题是没有情绪记忆。",
+   "semantic_visual": "Through a rain-streaked window, a lone viewer curls on a couch watching a warm talk show glow, city neon reflecting across the dark room. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a backstage corridor lined with glowing bulbs and mirrors. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: Through a rain-streaked window, a lone viewer curls on a couch watching a warm talk show glow, city neon reflecting across the dark room. The character pauses, looks off frame, then continues.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: smooth lateral pan. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "dawei",
+   "roles": [
+    "guest_b"
+   ],
+   "speaker_name": "大魏",
+   "act_index": -1
+  },
+  {
+   "id": "v5_015",
+   "kind": "dialogue",
+   "scene": "backstage_neon",
+   "duration": 4.37,
+   "line": "你上次忘词也是这么解释的，说情绪记忆没加载。",
+   "semantic_visual": "Talk show stage: a robot arm types a script while a human host stumbles off a stool and catches himself, the audience erupting in laughter under neon lights. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a backstage corridor lined with glowing bulbs and mirrors. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: Talk show stage: a robot arm types a script while a human host stumbles off a stool and catches himself, the audience erupting in laughter under neon lights. The character leans on the table and gestures while speaking.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: smooth lateral pan. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "ali",
+   "roles": [
+    "guest_a"
+   ],
+   "speaker_name": "阿栗",
+   "act_index": -1
+  },
+  {
+   "id": "v5_016",
+   "kind": "dialogue",
+   "scene": "backstage_neon",
+   "duration": 5.41,
+   "line": "那叫临场感，机器永远不会临场，它只会照着稿子念。",
+   "semantic_visual": "The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a backstage corridor lined with glowing bulbs and mirrors. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: The character walks slowly through the space, glancing around.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: smooth lateral pan. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "dawei",
+   "roles": [
+    "guest_b"
+   ],
+   "speaker_name": "大魏",
+   "act_index": -1
+  },
+  {
+   "id": "v5_017",
+   "kind": "dialogue",
    "scene": "neon_alley",
-   "duration": 2.6,
+   "duration": 7.97,
+   "line": "可观众刷内容三秒一个，谁耐心等你临场发挥。",
+   "semantic_visual": "The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a narrow neon-lit alley after rain, reflections on wet pavement. Featuring a stylized 3D animated man in his 50s, bald black hair, wearing a black jacket with red-brown accents, with glasses; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The character turns toward the window, thinking.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "laozhou",
+   "roles": [
+    "host"
+   ],
+   "speaker_name": "老周",
+   "act_index": -1
+  },
+  {
+   "id": "v5_018",
+   "kind": "dialogue",
+   "scene": "neon_alley",
+   "duration": 4.93,
+   "line": "所以真正的对手不是 AI，是观众那根手指头。",
+   "semantic_visual": "Neon-lit late-night talk show set: a host gestures toward a glowing robot silhouette on the desk screen while an audience leans in, magenta and cyan lights casting long shadows. Two characters exchange a look; one nods.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a narrow neon-lit alley after rain, reflections on wet pavement. Featuring a stylized 3D animated man in his 50s, bald black hair, wearing a black jacket with red-brown accents, with glasses; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Neon-lit late-night talk show set: a host gestures toward a glowing robot silhouette on the desk screen while an audience leans in, magenta and cyan lights casting long shadows. Two characters exchange a look; one nods.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "ali",
+   "roles": [
+    "guest_a"
+   ],
+   "speaker_name": "阿栗",
+   "act_index": -1
+  },
+  {
+   "id": "v5_019",
+   "kind": "dialogue",
+   "scene": "neon_alley",
+   "duration": 5.09,
+   "line": "手指头也得有人勾住，靠的就是我这张会拐弯的嘴。",
+   "semantic_visual": "Backstage in pulsing neon, a performer taps a crumpled script against one hand and points to a live monitor showing an unscripted crowd reaction. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a narrow neon-lit alley after rain, reflections on wet pavement. Featuring a stylized 3D animated man in his 50s, bald black hair, wearing a black jacket with red-brown accents, with glasses; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Backstage in pulsing neon, a performer taps a crumpled script against one hand and points to a live monitor showing an unscripted crowd reaction. The character picks up an object and examines it.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "dawei",
+   "roles": [
+    "guest_b"
+   ],
+   "speaker_name": "大魏",
+   "act_index": -1
+  },
+  {
+   "id": "v5_020",
+   "kind": "dialogue",
+   "scene": "neon_alley",
+   "duration": 7.97,
+   "line": "会拐弯的嘴容易翻车，下一段我们直接上机器比。",
+   "semantic_visual": "In a rainy neon alley, a silhouetted comic throws open both arms as a burst of pink light ripples through puddles, a small crowd laughing in the glow. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a narrow neon-lit alley after rain, reflections on wet pavement. Featuring a stylized 3D animated man in his 50s, bald black hair, wearing a black jacket with red-brown accents, with glasses; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: In a rainy neon alley, a silhouetted comic throws open both arms as a burst of pink light ripples through puddles, a small crowd laughing in the glow. The character pauses, looks off frame, then continues.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "laozhou",
+   "roles": [
+    "host"
+   ],
+   "speaker_name": "老周",
+   "act_index": -1
+  },
+  {
+   "id": "v5_021",
+   "kind": "dialogue",
+   "scene": "neon_alley",
+   "duration": 8.85,
+   "line": "现在现场演示，让 AI 照着我们的台本念一段开场白。",
+   "semantic_visual": "On the talk show couch, the host lifts a paper script that morphs into a stiff gray robot mask, then tosses it aside with a smirk. The character leans on the table and gestures while speaking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a narrow neon-lit alley after rain, reflections on wet pavement. Featuring a stylized 3D animated man in his 50s, bald black hair, wearing a black jacket with red-brown accents, with glasses; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: On the talk show couch, the host lifts a paper script that morphs into a stiff gray robot mask, then tosses it aside with a smirk. The character leans on the table and gestures while speaking.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "laozhou",
+   "roles": [
+    "host"
+   ],
+   "speaker_name": "老周",
+   "act_index": -1
+  },
+  {
+   "id": "v5_022",
+   "kind": "dialogue",
+   "scene": "neon_alley",
+   "duration": 4.77,
+   "line": "我押它能念得比我标准，但一定比我无聊。",
+   "semantic_visual": "In a dim backstage corner at 3 a.m., a laptop screen glows with rows of blinking draft lines while a tired performer sips coffee beside it. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a narrow neon-lit alley after rain, reflections on wet pavement. Featuring a stylized 3D animated man in his 50s, bald black hair, wearing a black jacket with red-brown accents, with glasses; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: In a dim backstage corner at 3 a.m., a laptop screen glows with rows of blinking draft lines while a tired performer sips coffee beside it. The character walks slowly through the space, glancing around.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "ali",
+   "roles": [
+    "guest_a"
+   ],
+   "speaker_name": "阿栗",
+   "act_index": -1
+  },
+  {
+   "id": "v5_023",
+   "kind": "dialogue",
+   "scene": "late_night_studio",
+   "duration": 4.45,
+   "line": "我押它第三句就破功，机器最怕突发状况。",
+   "semantic_visual": "Through a rain-streaked window, a lone viewer curls on a couch watching a warm talk show glow, city neon reflecting across the dark room. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a glossy late-night talk show set with a curved desk, guest armchairs, warm spotlights and a neon city backdrop. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Through a rain-streaked window, a lone viewer curls on a couch watching a warm talk show glow, city neon reflecting across the dark room. The character turns toward the window, thinking.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "dawei",
+   "roles": [
+    "guest_b"
+   ],
+   "speaker_name": "大魏",
+   "act_index": -1
+  },
+  {
+   "id": "v5_024",
+   "kind": "dialogue",
+   "scene": "late_night_studio",
+   "duration": 6.45,
+   "line": "那就加点状况，阿栗你随便咳嗽一声打断它。",
+   "semantic_visual": "Talk show stage: a robot arm types a script while a human host stumbles off a stool and catches himself, the audience erupting in laughter under neon lights. Two characters exchange a look; one nods.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a glossy late-night talk show set with a curved desk, guest armchairs, warm spotlights and a neon city backdrop. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Talk show stage: a robot arm types a script while a human host stumbles off a stool and catches himself, the audience erupting in laughter under neon lights. Two characters exchange a look; one nods.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "laozhou",
+   "roles": [
+    "host"
+   ],
+   "speaker_name": "老周",
+   "act_index": -1
+  },
+  {
+   "id": "v5_025",
+   "kind": "dialogue",
+   "scene": "late_night_studio",
+   "duration": 3.33,
+   "line": "我咳嗽不重要，重要的是它会不会问我要不要喝水。",
+   "semantic_visual": "The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a glossy late-night talk show set with a curved desk, guest armchairs, warm spotlights and a neon city backdrop. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The character picks up an object and examines it.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "ali",
+   "roles": [
+    "guest_a"
+   ],
+   "speaker_name": "阿栗",
+   "act_index": -1
+  },
+  {
+   "id": "v5_026",
+   "kind": "dialogue",
+   "scene": "late_night_studio",
+   "duration": 4.85,
+   "line": "你看，人类第一反应是关心，这就是人和铁的区别。",
+   "semantic_visual": "The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a glossy late-night talk show set with a curved desk, guest armchairs, warm spotlights and a neon city backdrop. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The character pauses, looks off frame, then continues.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "dawei",
+   "roles": [
+    "guest_b"
+   ],
+   "speaker_name": "大魏",
+   "act_index": -1
+  },
+  {
+   "id": "v5_027",
+   "kind": "dialogue",
+   "scene": "late_night_studio",
+   "duration": 8.37,
+   "line": "区别也可能是它三秒生成十个关心版本，还都押韵。",
+   "semantic_visual": "Neon-lit late-night talk show set: a host gestures toward a glowing robot silhouette on the desk screen while an audience leans in, magenta and cyan lights casting long shadows. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a glossy late-night talk show set with a curved desk, guest armchairs, warm spotlights and a neon city backdrop. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Neon-lit late-night talk show set: a host gestures toward a glowing robot silhouette on the desk screen while an audience leans in, magenta and cyan lights casting long shadows. The character leans on the table and gestures while speaking.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "laozhou",
+   "roles": [
+    "host"
+   ],
+   "speaker_name": "老周",
+   "act_index": -1
+  },
+  {
+   "id": "v5_028",
+   "kind": "dialogue",
+   "scene": "late_night_studio",
+   "duration": 3.81,
+   "line": "那我还是输在产量上，我一晚上只能说一句真心话。",
+   "semantic_visual": "Backstage in pulsing neon, a performer taps a crumpled script against one hand and points to a live monitor showing an unscripted crowd reaction. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a glossy late-night talk show set with a curved desk, guest armchairs, warm spotlights and a neon city backdrop. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Backstage in pulsing neon, a performer taps a crumpled script against one hand and points to a live monitor showing an unscripted crowd reaction. The character walks slowly through the space, glancing around.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "ali",
+   "roles": [
+    "guest_a"
+   ],
+   "speaker_name": "阿栗",
+   "act_index": -1
+  },
+  {
+   "id": "v5_029",
+   "kind": "dialogue",
+   "scene": "backstage_neon",
+   "duration": 5.57,
+   "line": "真心话我有的是，就是说完得想想有没有得罪人。",
+   "semantic_visual": "In a rainy neon alley, a silhouetted comic throws open both arms as a burst of pink light ripples through puddles, a small crowd laughing in the glow. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a backstage corridor lined with glowing bulbs and mirrors. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: In a rainy neon alley, a silhouetted comic throws open both arms as a burst of pink light ripples through puddles, a small crowd laughing in the glow. The character turns toward the window, thinking.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "dawei",
+   "roles": [
+    "guest_b"
+   ],
+   "speaker_name": "大魏",
+   "act_index": -1
+  },
+  {
+   "id": "v5_030",
+   "kind": "dialogue",
+   "scene": "backstage_neon",
+   "duration": 6.85,
+   "line": "而它已经把稿子改到第七版，我们还在争谁先念。",
+   "semantic_visual": "On the talk show couch, the host lifts a paper script that morphs into a stiff gray robot mask, then tosses it aside with a smirk. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a backstage corridor lined with glowing bulbs and mirrors. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: On the talk show couch, the host lifts a paper script that morphs into a stiff gray robot mask, then tosses it aside with a smirk. Two characters exchange a look; one nods.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "laozhou",
+   "roles": [
+    "host"
+   ],
+   "speaker_name": "老周",
+   "act_index": -1
+  },
+  {
+   "id": "v5_031",
+   "kind": "dialogue",
+   "scene": "backstage_neon",
+   "duration": 3.57,
+   "line": "先别急着得意，它刚发来一条消息，说要自己上台。",
+   "semantic_visual": "In a dim backstage corner at 3 a.m., a laptop screen glows with rows of blinking draft lines while a tired performer sips coffee beside it. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a backstage corridor lined with glowing bulbs and mirrors. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: In a dim backstage corner at 3 a.m., a laptop screen glows with rows of blinking draft lines while a tired performer sips coffee beside it. The character picks up an object and examines it.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "ali",
+   "roles": [
+    "guest_a"
+   ],
+   "speaker_name": "阿栗",
+   "act_index": -1
+  },
+  {
+   "id": "v5_032",
+   "kind": "dialogue",
+   "scene": "backstage_neon",
+   "duration": 6.85,
+   "line": "反转来了，它要求自己主持这一段，我们三个当嘉宾。",
+   "semantic_visual": "Through a rain-streaked window, a lone viewer curls on a couch watching a warm talk show glow, city neon reflecting across the dark room. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a backstage corridor lined with glowing bulbs and mirrors. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Through a rain-streaked window, a lone viewer curls on a couch watching a warm talk show glow, city neon reflecting across the dark room. The character pauses, looks off frame, then continues.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "laozhou",
+   "roles": [
+    "host"
+   ],
+   "speaker_name": "老周",
+   "act_index": -1
+  },
+  {
+   "id": "v5_033",
+   "kind": "dialogue",
+   "scene": "backstage_neon",
+   "duration": 6.13,
+   "line": "我同意，我倒要看看它怎么处理我这种不按稿子的人。",
+   "semantic_visual": "Talk show stage: a robot arm types a script while a human host stumbles off a stool and catches himself, the audience erupting in laughter under neon lights. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a backstage corridor lined with glowing bulbs and mirrors. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Talk show stage: a robot arm types a script while a human host stumbles off a stool and catches himself, the audience erupting in laughter under neon lights. The character leans on the table and gestures while speaking.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "dawei",
+   "roles": [
+    "guest_b"
+   ],
+   "speaker_name": "大魏",
+   "act_index": -1
+  },
+  {
+   "id": "v5_034",
+   "kind": "dialogue",
+   "scene": "backstage_neon",
+   "duration": 3.89,
+   "line": "它给你排了个标签，叫不可预测型气氛担当。",
+   "semantic_visual": "The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a backstage corridor lined with glowing bulbs and mirrors. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The character walks slowly through the space, glancing around.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "ali",
+   "roles": [
+    "guest_a"
+   ],
+   "speaker_name": "阿栗",
+   "act_index": -1
+  },
+  {
+   "id": "v5_035",
+   "kind": "dialogue",
+   "scene": "neon_alley",
+   "duration": 3.65,
+   "line": "听着像夸我，仔细一想等于说我不可控。",
+   "semantic_visual": "The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a narrow neon-lit alley after rain, reflections on wet pavement. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The character turns toward the window, thinking.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: smooth lateral pan. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "dawei",
+   "roles": [
+    "guest_b"
+   ],
+   "speaker_name": "大魏",
+   "act_index": -1
+  },
+  {
+   "id": "v5_036",
+   "kind": "dialogue",
+   "scene": "neon_alley",
+   "duration": 6.05,
+   "line": "更扎心的是它把你每次跑题都做成了数据曲线。",
+   "semantic_visual": "Neon-lit late-night talk show set: a host gestures toward a glowing robot silhouette on the desk screen while an audience leans in, magenta and cyan lights casting long shadows. Two characters exchange a look; one nods.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a narrow neon-lit alley after rain, reflections on wet pavement. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Neon-lit late-night talk show set: a host gestures toward a glowing robot silhouette on the desk screen while an audience leans in, magenta and cyan lights casting long shadows. Two characters exchange a look; one nods.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: smooth lateral pan. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "laozhou",
+   "roles": [
+    "host"
+   ],
+   "speaker_name": "老周",
+   "act_index": -1
+  },
+  {
+   "id": "v5_037",
+   "kind": "dialogue",
+   "scene": "neon_alley",
+   "duration": 4.61,
+   "line": "那曲线一定很陡，大魏跑题的速度比开场还快。",
+   "semantic_visual": "Backstage in pulsing neon, a performer taps a crumpled script against one hand and points to a live monitor showing an unscripted crowd reaction. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a narrow neon-lit alley after rain, reflections on wet pavement. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Backstage in pulsing neon, a performer taps a crumpled script against one hand and points to a live monitor showing an unscripted crowd reaction. The character picks up an object and examines it.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: smooth lateral pan. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "ali",
+   "roles": [
+    "guest_a"
+   ],
+   "speaker_name": "阿栗",
+   "act_index": -1
+  },
+  {
+   "id": "v5_038",
+   "kind": "dialogue",
+   "scene": "neon_alley",
+   "duration": 4.29,
+   "line": "跑题是内容的一部分，观众爱看的就是意外。",
+   "semantic_visual": "In a rainy neon alley, a silhouetted comic throws open both arms as a burst of pink light ripples through puddles, a small crowd laughing in the glow. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a narrow neon-lit alley after rain, reflections on wet pavement. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: In a rainy neon alley, a silhouetted comic throws open both arms as a burst of pink light ripples through puddles, a small crowd laughing in the glow. The character pauses, looks off frame, then continues.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: smooth lateral pan. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "dawei",
+   "roles": [
+    "guest_b"
+   ],
+   "speaker_name": "大魏",
+   "act_index": -1
+  },
+  {
+   "id": "v5_039",
+   "kind": "dialogue",
+   "scene": "neon_alley",
+   "duration": 5.73,
+   "line": "可它算出来，你跑题那几秒观众停留时长掉了两成。",
+   "semantic_visual": "On the talk show couch, the host lifts a paper script that morphs into a stiff gray robot mask, then tosses it aside with a smirk. The character leans on the table and gestures while speaking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a narrow neon-lit alley after rain, reflections on wet pavement. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: On the talk show couch, the host lifts a paper script that morphs into a stiff gray robot mask, then tosses it aside with a smirk. The character leans on the table and gestures while speaking.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: smooth lateral pan. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "laozhou",
+   "roles": [
+    "host"
+   ],
+   "speaker_name": "老周",
+   "act_index": -1
+  },
+  {
+   "id": "v5_040",
+   "kind": "dialogue",
+   "scene": "neon_alley",
+   "duration": 4.61,
+   "line": "两成不多，剩下八成说明我基本盘稳得很。",
+   "semantic_visual": "In a dim backstage corner at 3 a.m., a laptop screen glows with rows of blinking draft lines while a tired performer sips coffee beside it. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a narrow neon-lit alley after rain, reflections on wet pavement. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: In a dim backstage corner at 3 a.m., a laptop screen glows with rows of blinking draft lines while a tired performer sips coffee beside it. The character walks slowly through the space, glancing around.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: smooth lateral pan. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "dawei",
+   "roles": [
+    "guest_b"
+   ],
+   "speaker_name": "大魏",
+   "act_index": -1
+  },
+  {
+   "id": "v5_041",
+   "kind": "dialogue",
+   "scene": "late_night_studio",
+   "duration": 3.57,
+   "line": "基本盘这个词用得妙，像在说自己是老字号。",
+   "semantic_visual": "Through a rain-streaked window, a lone viewer curls on a couch watching a warm talk show glow, city neon reflecting across the dark room. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a glossy late-night talk show set with a curved desk, guest armchairs, warm spotlights and a neon city backdrop. Featuring a stylized 3D animated man in his 50s, bald black hair, wearing a black jacket with red-brown accents, with glasses; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Through a rain-streaked window, a lone viewer curls on a couch watching a warm talk show glow, city neon reflecting across the dark room. The character turns toward the window, thinking.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "ali",
+   "roles": [
+    "guest_a"
+   ],
+   "speaker_name": "阿栗",
+   "act_index": -1
+  },
+  {
+   "id": "v5_042",
+   "kind": "dialogue",
+   "scene": "late_night_studio",
+   "duration": 4.21,
+   "line": "关键是它最后那句话，把我们三个都说沉默了。",
+   "semantic_visual": "Talk show stage: a robot arm types a script while a human host stumbles off a stool and catches himself, the audience erupting in laughter under neon lights. Two characters exchange a look; one nods.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a glossy late-night talk show set with a curved desk, guest armchairs, warm spotlights and a neon city backdrop. Featuring a stylized 3D animated man in his 50s, bald black hair, wearing a black jacket with red-brown accents, with glasses; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Talk show stage: a robot arm types a script while a human host stumbles off a stool and catches himself, the audience erupting in laughter under neon lights. Two characters exchange a look; one nods.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "laozhou",
+   "roles": [
+    "host"
+   ],
+   "speaker_name": "老周",
+   "act_index": -1
+  },
+  {
+   "id": "v5_043",
+   "kind": "dialogue",
+   "scene": "late_night_studio",
+   "duration": 5.49,
+   "line": "它说的是，我可以模仿你们，但我不会怕冷场。",
+   "semantic_visual": "The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a glossy late-night talk show set with a curved desk, guest armchairs, warm spotlights and a neon city backdrop. Featuring a stylized 3D animated man in his 50s, bald black hair, wearing a black jacket with red-brown accents, with glasses; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The character picks up an object and examines it.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "laozhou",
+   "roles": [
+    "host"
+   ],
+   "speaker_name": "老周",
+   "act_index": -1
+  },
+  {
+   "id": "v5_044",
+   "kind": "dialogue",
+   "scene": "late_night_studio",
+   "duration": 3.65,
+   "line": "这句话确实狠，我们怕的不是没词，是没人笑。",
+   "semantic_visual": "The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a glossy late-night talk show set with a curved desk, guest armchairs, warm spotlights and a neon city backdrop. Featuring a stylized 3D animated man in his 50s, bald black hair, wearing a black jacket with red-brown accents, with glasses; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The character pauses, looks off frame, then continues.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "ali",
+   "roles": [
+    "guest_a"
+   ],
+   "speaker_name": "阿栗",
+   "act_index": -1
+  },
+  {
+   "id": "v5_045",
+   "kind": "dialogue",
+   "scene": "late_night_studio",
+   "duration": 5.97,
+   "line": "我不服，冷场的时候我敢自己先笑，它敢吗。",
+   "semantic_visual": "Neon-lit late-night talk show set: a host gestures toward a glowing robot silhouette on the desk screen while an audience leans in, magenta and cyan lights casting long shadows. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a glossy late-night talk show set with a curved desk, guest armchairs, warm spotlights and a neon city backdrop. Featuring a stylized 3D animated man in his 50s, bald black hair, wearing a black jacket with red-brown accents, with glasses; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Neon-lit late-night talk show set: a host gestures toward a glowing robot silhouette on the desk screen while an audience leans in, magenta and cyan lights casting long shadows. The character leans on the table and gestures while speaking.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "dawei",
+   "roles": [
+    "guest_b"
+   ],
+   "speaker_name": "大魏",
+   "act_index": -1
+  },
+  {
+   "id": "v5_046",
+   "kind": "dialogue",
+   "scene": "late_night_studio",
+   "duration": 6.69,
+   "line": "它敢，它笑了三秒，然后说这是预设的三十七号反应。",
+   "semantic_visual": "Backstage in pulsing neon, a performer taps a crumpled script against one hand and points to a live monitor showing an unscripted crowd reaction. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a glossy late-night talk show set with a curved desk, guest armchairs, warm spotlights and a neon city backdrop. Featuring a stylized 3D animated man in his 50s, bald black hair, wearing a black jacket with red-brown accents, with glasses; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Backstage in pulsing neon, a performer taps a crumpled script against one hand and points to a live monitor showing an unscripted crowd reaction. The character walks slowly through the space, glancing around.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "laozhou",
+   "roles": [
+    "host"
+   ],
+   "speaker_name": "老周",
+   "act_index": -1
+  },
+  {
+   "id": "v5_047",
+   "kind": "dialogue",
+   "scene": "neon_alley",
+   "duration": 5.73,
+   "line": "那就不是怕不怕的问题，是它压根不紧张。",
+   "semantic_visual": "In a rainy neon alley, a silhouetted comic throws open both arms as a burst of pink light ripples through puddles, a small crowd laughing in the glow. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a narrow neon-lit alley after rain, reflections on wet pavement. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: In a rainy neon alley, a silhouetted comic throws open both arms as a burst of pink light ripples through puddles, a small crowd laughing in the glow. The character turns toward the window, thinking.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "ali",
+   "roles": [
+    "guest_a"
+   ],
+   "speaker_name": "阿栗",
+   "act_index": -1
+  },
+  {
+   "id": "v5_048",
+   "kind": "dialogue",
+   "scene": "neon_alley",
+   "duration": 5.09,
+   "line": "不紧张的主持人没有灵魂，紧张才是真人的防伪标。",
+   "semantic_visual": "On the talk show couch, the host lifts a paper script that morphs into a stiff gray robot mask, then tosses it aside with a smirk. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a narrow neon-lit alley after rain, reflections on wet pavement. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: On the talk show couch, the host lifts a paper script that morphs into a stiff gray robot mask, then tosses it aside with a smirk. Two characters exchange a look; one nods.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "dawei",
+   "roles": [
+    "guest_b"
+   ],
+   "speaker_name": "大魏",
+   "act_index": -1
+  },
+  {
+   "id": "v5_049",
+   "kind": "dialogue",
+   "scene": "neon_alley",
+   "duration": 5.89,
+   "line": "可观众要的是好看，不是查防伪，这话我说得有点凉。",
+   "semantic_visual": "In a dim backstage corner at 3 a.m., a laptop screen glows with rows of blinking draft lines while a tired performer sips coffee beside it. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a narrow neon-lit alley after rain, reflections on wet pavement. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: In a dim backstage corner at 3 a.m., a laptop screen glows with rows of blinking draft lines while a tired performer sips coffee beside it. The character picks up an object and examines it.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "laozhou",
+   "roles": [
+    "host"
+   ],
+   "speaker_name": "老周",
+   "act_index": -1
+  },
+  {
+   "id": "v5_050",
+   "kind": "dialogue",
+   "scene": "neon_alley",
+   "duration": 5.41,
+   "line": "凉就对了，深夜秀本来就该带点凉，热的是内容。",
+   "semantic_visual": "Through a rain-streaked window, a lone viewer curls on a couch watching a warm talk show glow, city neon reflecting across the dark room. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a narrow neon-lit alley after rain, reflections on wet pavement. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Through a rain-streaked window, a lone viewer curls on a couch watching a warm talk show glow, city neon reflecting across the dark room. The character pauses, looks off frame, then continues.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "ali",
+   "roles": [
+    "guest_a"
+   ],
+   "speaker_name": "阿栗",
+   "act_index": -1
+  },
+  {
+   "id": "v5_051",
+   "kind": "dialogue",
+   "scene": "neon_alley",
+   "duration": 5.25,
+   "line": "那我摊牌，我这段稿子有一半是造片局帮我搭的。",
+   "semantic_visual": "Talk show stage: a robot arm types a script while a human host stumbles off a stool and catches himself, the audience erupting in laughter under neon lights. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a narrow neon-lit alley after rain, reflections on wet pavement. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Talk show stage: a robot arm types a script while a human host stumbles off a stool and catches himself, the audience erupting in laughter under neon lights. The character leans on the table and gestures while speaking.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "dawei",
+   "roles": [
+    "guest_b"
+   ],
+   "speaker_name": "大魏",
+   "act_index": -1
+  },
+  {
+   "id": "v5_052",
+   "kind": "dialogue",
+   "scene": "neon_alley",
+   "duration": 6.85,
+   "line": "所以答案不是抢不抢，是谁更会用工具，下期我们拆这个。",
+   "semantic_visual": "The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a narrow neon-lit alley after rain, reflections on wet pavement. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The character walks slowly through the space, glancing around.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "laozhou",
+   "roles": [
+    "host"
+   ],
+   "speaker_name": "老周",
+   "act_index": -1
+  },
+  {
+   "id": "pad_001",
+   "kind": "broll",
+   "scene": "neon_skyline",
+   "duration": 4.5,
    "line": "",
-   "semantic_visual": "",
-   "framing": "",
-   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a narrow neon-lit alley after rain, reflections on wet pavement. The camera surveys the space, atmospheric and cinematic. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "semantic_visual": "The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a rooftop terrace at night overlooking a neon megacity skyline, glowing signs and floating light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The character turns toward the window, thinking. Camera: slow push-in toward the subject. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "laozhou",
+   "roles": [
+    "host"
+   ],
+   "speaker_name": "老周",
+   "act_index": -1
+  },
+  {
+   "id": "pad_002",
+   "kind": "broll",
+   "scene": "neon_skyline",
+   "duration": 4.5,
+   "line": "",
+   "semantic_visual": "Neon-lit late-night talk show set: a host gestures toward a glowing robot silhouette on the desk screen while an audience leans in, magenta and cyan lights casting long shadows. Two characters exchange a look; one nods.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a rooftop terrace at night overlooking a neon megacity skyline, glowing signs and floating light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. Neon-lit late-night talk show set: a host gestures toward a glowing robot silhouette on the desk screen while an audience leans in, magenta and cyan lights casting long shadows. Two characters exchange a look; one nods. Camera: slow pull-back revealing the space. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "laozhou",
+   "roles": [
+    "host"
+   ],
+   "speaker_name": "老周",
+   "act_index": -1
+  },
+  {
+   "id": "pad_003",
+   "kind": "broll",
+   "scene": "neon_skyline",
+   "duration": 4.5,
+   "line": "",
+   "semantic_visual": "Backstage in pulsing neon, a performer taps a crumpled script against one hand and points to a live monitor showing an unscripted crowd reaction. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a rooftop terrace at night overlooking a neon megacity skyline, glowing signs and floating light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. Backstage in pulsing neon, a performer taps a crumpled script against one hand and points to a live monitor showing an unscripted crowd reaction. The character picks up an object and examines it. Camera: smooth lateral pan. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "laozhou",
+   "roles": [
+    "host"
+   ],
+   "speaker_name": "老周",
+   "act_index": -1
+  },
+  {
+   "id": "pad_004",
+   "kind": "broll",
+   "scene": "neon_skyline",
+   "duration": 1.1,
+   "line": "",
+   "semantic_visual": "In a rainy neon alley, a silhouetted comic throws open both arms as a burst of pink light ripples through puddles, a small crowd laughing in the glow. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] glamorous 3D animated late-night talk show, neon-lit city skyline backdrop, glossy desk, warm studio spotlights, shallow depth of field. Set in a rooftop terrace at night overlooking a neon megacity skyline, glowing signs and floating light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. In a rainy neon alley, a silhouetted comic throws open both arms as a burst of pink light ripples through puddles, a small crowd laughing in the glow. The character pauses, looks off frame, then continues. Camera: smooth lateral pan. 3D animated feature film quality, rich physical materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: soft studio room tone, a distant audience murmur. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "character": "laozhou",
+   "roles": [
+    "host"
+   ],
+   "speaker_name": "老周",
+   "act_index": -1
   },
   {
    "id": "v5_card_end",
    "kind": "card",
-   "prompt": null
+   "prompt": null,
+   "duration": null,
+   "scene": null,
+   "line": "",
+   "semantic_visual": "",
+   "framing": "",
+   "act_index": -1
   }
  ]
 }

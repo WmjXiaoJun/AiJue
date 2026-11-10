@@ -20,6 +20,7 @@ import { IconAlert, IconFilm, IconGlobe, IconGrid, IconLock, IconRefresh, IconSe
 import { AppShell } from "../shell/AppShell";
 import { PublishPackageModal } from "../publish/PublishPackageModal";
 import { PipelineStepper, type PipelineStepMeta } from "./PipelineStepper";
+import { LongformPanel } from "./LongformPanel";
 import {
   ErrorBar,
   StepCast,
@@ -107,6 +108,15 @@ export function PipelineConsole({ initialTemplateId, onExit, onOpenCharacters, o
     () => templates.find((item) => item.id === selectedId) || null,
     [selectedId, templates],
   );
+  /** V54：模板目标时长（v5 catalog.target_duration；缺省不回退，UI 不显示徽标） */
+  const targetDurations = useMemo(() => {
+    const map: Record<string, number> = {};
+    (catalog?.templates || []).forEach((item) => {
+      const value = Number((item as { target_duration?: number }).target_duration);
+      if (item?.id && Number.isFinite(value) && value > 0) map[item.id] = value;
+    });
+    return map;
+  }, [catalog]);
   const finalReady = Boolean(selectedTemplate?.final.exists && selectedTemplate.final.url);
 
   /* ------------------------------ 数据加载 ------------------------------ */
@@ -193,7 +203,7 @@ export function PipelineConsole({ initialTemplateId, onExit, onOpenCharacters, o
         setCastingSource("fallback");
         setCastingError(
           isV5NotFound(err)
-            ? "casting 接口尚未就绪（V18 后端实现中），已用 catalog + 角色合同兜底；音色信息以后端为准。"
+            ? "casting 接口返回 404，已用 catalog + 角色合同兜底；音色信息以后端为准。"
             : "casting 读取失败：" + errorText(err),
         );
       } finally {
@@ -277,7 +287,7 @@ export function PipelineConsole({ initialTemplateId, onExit, onOpenCharacters, o
             if (!aliveRef.current) return;
             setSettingsError(
               isPipelineNotReady(err) || (err instanceof Error && err.message.includes("404"))
-                ? "设置接口未就绪；发布账号状态无法读取。"
+                ? "设置接口不可用；发布账号状态无法读取。"
                 : errorText(err),
             );
           })
@@ -331,7 +341,7 @@ export function PipelineConsole({ initialTemplateId, onExit, onOpenCharacters, o
         if (!alive || !aliveRef.current) return;
         setPollError(
           isPipelineNotReady(err)
-            ? "pipeline 状态接口不可用（后端 V18 API 实现中）；请稍后刷新后重试。"
+            ? "pipeline 状态接口不可用；请稍后刷新后重试。"
             : "任务状态读取失败：" + errorText(err),
         );
       }
@@ -382,7 +392,7 @@ export function PipelineConsole({ initialTemplateId, onExit, onOpenCharacters, o
           setStartError("已有运行中的 pipeline 任务（409）：单并发限制，等当前任务结束或先取消，再启动新的生成。");
         } else if (isPipelineNotReady(err)) {
           setStartError(
-            "pipeline 接口尚未就绪（V18 后端 API 实现中，404）。可先用 Cinema 模板库 / 工作台 3D 模板页手动生成与合成；接口就绪后此处即可一键运行。",
+            "pipeline 接口返回 404。可先用 Cinema 模板库 / 工作台 3D 模板页手动生成与合成；接口恢复后此处即可一键运行。",
           );
         } else {
           setStartError("启动生成失败：" + errorText(err));
@@ -528,9 +538,17 @@ export function PipelineConsole({ initialTemplateId, onExit, onOpenCharacters, o
             )}
             <PipelineStepper steps={steps} current={step} onSelect={gotoStep} />
 
+            {/* V54：5 分钟长版入口（单模板 / 全部模板 + 状态与进度） */}
+            <LongformPanel
+              selectedId={selectedId}
+              selectedLabel={selectedTemplate?.label}
+              total={templates.length}
+            />
+
             {step === 1 && (
               <StepTemplates
                 templates={templates}
+                targets={targetDurations}
                 selectedId={selectedId}
                 onSelect={selectTemplate}
                 loading={loading}

@@ -61,7 +61,7 @@ function submitErrorText(action: "生成" | "合成", err: unknown): string {
   if (err instanceof ApiError) {
     if (err.status === 409) return `${action}冲突：该模板/队列已有进行中的任务（409），等当前任务结束后再提交`;
     if (err.status === 429) return `${action}提交过于频繁（429），稍后再试`;
-    if (err.status === 404) return `${action}接口未就绪（404）`;
+    if (err.status === 404) return `${action}接口返回 404`;
   }
   return `提交${action}失败：${errorText(err)}`;
 }
@@ -386,7 +386,7 @@ export function CinemaTemplates({
         <div className="cm-error cm-tpl-errorbar" role="alert">
           <IconAlert size={16} />
           <span>
-            {data ? "刷新模板库失败：" : "模板库接口尚未就绪："}
+            {data ? "刷新模板库失败：" : "模板库接口不可用："}
             {error}
           </span>
           <button type="button" className="cm-btn cm-btn-sm" onClick={() => void load(false)} disabled={loading}>
@@ -594,7 +594,7 @@ function TemplateCard({
   const final = template?.final ?? null;
   const hasFinal = Boolean(final?.exists && final.url);
   const pct = templateClipPercent(template);
-  const statusLabel = status ? TEMPLATE_STATUS_LABEL[status] : "接口未就绪";
+  const statusLabel = status ? TEMPLATE_STATUS_LABEL[status] : "未生成";
   const cardClass =
     "cm-tpl-card" +
     (status ? " is-" + status : " is-unknown") +
@@ -742,7 +742,7 @@ function TemplateCard({
             aria-disabled={!canGenerate || genBlocked}
             title={
               !template
-                ? "模板进度接口未就绪，无法提交生成"
+                ? "模板进度不可用，无法提交生成"
                 : genBlocked
                   ? "已有进行中的生成任务，等当前任务结束"
                   : template.status === "pending"

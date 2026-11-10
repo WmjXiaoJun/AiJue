@@ -232,14 +232,7 @@ export function StudioStoryboard({ episode, onEpisode, onNavigate }: StudioTabPr
     setBusy("dynamic");
     try {
       const result = await studioApi.generateAllDynamic(episode.id);
-      const count =
-        typeof result?.created === "number"
-          ? result.created
-          : Array.isArray(result?.jobs)
-            ? result.jobs.length
-            : typeof result?.count === "number"
-              ? result.count
-              : null;
+      const count = Array.isArray(result) ? result.length : null;
       notify(`已提交批量动态生成任务${count !== null ? " · " + count + " 个" : ""}，去生成台查看进度`, "success");
       onNavigate("generate");
     } catch (err) {

@@ -849,5 +849,6 @@
       ],
       "broll": false
     }
-  ]
+  ],
+  "packaging": {"subtitle": "museum_gold", "transition": "museum_gold", "title": "国宝会说话", "end_card": "下期见"}
 }

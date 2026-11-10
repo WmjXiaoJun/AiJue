@@ -1475,7 +1475,7 @@ export function StudioAssets({ project, episode }: StudioTabProps) {
         const status = err instanceof ApiError ? err.status : 0;
         const message =
           status === 404 || status === 405
-            ? "H3 接口未就绪：后端未提供 /characters/{cid}/h3-animate，请稍后再试"
+            ? "H3 接口返回 404：请确认角色 id 存在、后端已启动，稍后再试"
             : "H3 动画提交失败：" + errorText(err);
         setH3Error({ cid: character.id, message });
         notify(message, "error");

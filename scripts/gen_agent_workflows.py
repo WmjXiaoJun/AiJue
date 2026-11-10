@@ -4,7 +4,7 @@ import json
 import sys
 from pathlib import Path
 
-REPO = Path(".").resolve()
+REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 from pipeline import v5_catalog  # noqa: E402
 from pipeline.agents.workflow import WORKFLOW_DIR, default_workflow, save_workflow  # noqa: E402

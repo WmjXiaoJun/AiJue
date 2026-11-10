@@ -1,0 +1,182 @@
+{
+  "id": "tonight_show",
+  "label": "美式深夜秀",
+  "version": 5,
+  "description": "V5 模板：美式深夜秀（风格 neon_toon）",
+  "tags": [
+    "v5",
+    "neon_toon"
+  ],
+  "style": "neon_toon",
+  "target_duration": 38,
+  "aspect": [
+    16,
+    9
+  ],
+  "cast": [
+    {
+      "role": "host",
+      "character": "laozhou",
+      "name": "老周"
+    },
+    {
+      "role": "guest_a",
+      "character": "ali",
+      "name": "阿栗"
+    },
+    {
+      "role": "guest_b",
+      "character": "dawei",
+      "name": "大魏"
+    }
+  ],
+  "acts": [
+    {
+      "id": "act01",
+      "name": "第 1 幕",
+      "scene": "neon_skyline",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 2.8,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    },
+    {
+      "id": "act02",
+      "name": "第 2 幕",
+      "scene": "late_night_studio",
+      "camera": "dolly",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "host",
+      "text": "欢迎回到造片局，今天聊一个得罪人的话题：AI 主持人会不会抢走我们的饭碗。",
+      "characters": [
+        "host",
+        "guest_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act03",
+      "name": "第 3 幕",
+      "scene": "backstage_neon",
+      "camera": "pan_left",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "guest_a",
+      "text": "我先说结论：会抢走念稿的，抢不走临场反应的。",
+      "characters": [
+        "guest_a"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act04",
+      "name": "第 4 幕",
+      "scene": "neon_alley",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "guest_b",
+      "text": "观众要的从来不是正确答案，而是被逗笑的那一下。",
+      "characters": [
+        "guest_b",
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act05",
+      "name": "第 5 幕",
+      "scene": "late_night_studio",
+      "camera": "push_in",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "host",
+      "text": "所以别怕 AI，先怕自己写的稿子像 AI。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act06",
+      "name": "第 6 幕",
+      "scene": "backstage_neon",
+      "camera": "dolly",
+      "camera_strength": 0.1,
+      "duration": 6.4,
+      "line": "guest_a",
+      "text": "而且它不会累，凌晨三点还能给我写十个开场白。",
+      "characters": [
+        "guest_a",
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act07",
+      "name": "第 7 幕",
+      "scene": "neon_alley",
+      "camera": "pan_left",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "host",
+      "text": "可观众半夜打开电视，想看的不是完美，是有人陪。",
+      "characters": [
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act08",
+      "name": "第 8 幕",
+      "scene": "late_night_studio",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 6.4,
+      "line": "guest_b",
+      "text": "那就让 AI 写稿，让真人负责翻车和救场。",
+      "characters": [
+        "guest_b",
+        "host"
+      ],
+      "broll": false
+    },
+    {
+      "id": "act09",
+      "name": "第 9 幕",
+      "scene": "neon_alley",
+      "camera": "static",
+      "camera_strength": 0.06,
+      "duration": 3.0,
+      "line": "",
+      "text": "",
+      "characters": [],
+      "broll": true
+    }
+  ],
+  "packaging": {
+    "subtitle": "neon_toon",
+    "transition": "neon_toon",
+    "title": "美式深夜秀",
+    "end_card": "下期见"
+  },
+  "audio": {
+    "bgm": "synthwave",
+    "sfx": [
+      "whoosh",
+      "click"
+    ]
+  },
+  "lipsync": {
+    "mode": "viseme"
+  },
+  "meta": {
+    "source": "v3_remap",
+    "script_lines": 7
+  },
+  "script_mode": "script"
+}

@@ -7,7 +7,8 @@
   {
    "id": "v5_card_title",
    "kind": "card",
-   "prompt": null
+   "prompt": null,
+   "act_index": -1
   },
   {
    "id": "v5_001",
@@ -17,7 +18,8 @@
    "line": "",
    "semantic_visual": "",
    "framing": "",
-   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a baroque castle hall with a long stone table and candelabras. The camera surveys the space, atmospheric and cinematic. Camera: slow crane rise. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a baroque castle hall with a long stone table and candelabras. The camera surveys the space, atmospheric and cinematic. Camera: slow crane rise. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_002",
@@ -27,7 +29,8 @@
    "line": "烛光摇曳，武则天与曹操对视，气氛紧张",
    "semantic_visual": "Flickering candlelight casts long shadows across a stone corridor as two robed figures lock eyes, tension thick in the air. Golden baroque glow, deep chiaroscuro, wary mood.",
    "framing": "wide",
-   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a long castle corridor lined with hundreds of candles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: Flickering candlelight casts long shadows across a stone corridor as two robed figures lock eyes, tension thick in the air. Golden baroque glow, deep chiaroscuro, wary mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a long castle corridor lined with hundreds of candles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: Flickering candlelight casts long shadows across a stone corridor as two robed figures lock eyes, tension thick in the air. Golden baroque glow, deep chiaroscuro, wary mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_003",
@@ -37,7 +40,8 @@
    "line": "我武则天何许人也？你曹操可是深谙权谋啊。",
    "semantic_visual": "A regal woman in ornate robes leans forward over a stone roundtable, chin raised, one hand gesturing sharply toward a stern armored man opposite her. Candlelight glints on carved stone.",
    "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a round stone table in a candlelit hall, heavy drapery. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: A regal woman in ornate robes leans forward over a stone roundtable, chin raised, one hand gesturing sharply toward a stern armored man opposite her. Candlelight glints on carved stone.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a round stone table in a candlelit hall, heavy drapery. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: A regal woman in ornate robes leans forward over a stone roundtable, chin raised, one hand gesturing sharply toward a stern armored man opposite her. Candlelight glints on carved stone.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_004",
@@ -47,7 +51,8 @@
    "line": "那咱俩得来个真心话大冒险，试探试探对方。",
    "semantic_visual": "A bearded warlord in dark armor smirks and slides a small carved token across a crypt table toward his rival, candle flames wavering between them. Dusty stone vaults, conspiratorial mood.",
    "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A bearded warlord in dark armor smirks and slides a small carved token across a crypt table toward his rival, candle flames wavering between them. Dusty stone vaults, conspiratorial mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A bearded warlord in dark armor smirks and slides a small carved token across a crypt table toward his rival, candle flames wavering between them. Dusty stone vaults, conspiratorial mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_005",
@@ -57,7 +62,8 @@
    "line": "就怕这冒险，一不小心就成了千古遗恨。",
    "semantic_visual": "An old adviser hovers at the edge of a candlelit corridor, brow furrowed, one hand raised as if to warn. Shadows stretch and tremble along the stone walls, ominous mood.",
    "framing": "close",
-   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a long castle corridor lined with hundreds of candles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: An old adviser hovers at the edge of a candlelit corridor, brow furrowed, one hand raised as if to warn. Shadows stretch and tremble along the stone walls, ominous mood.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow crane rise. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a long castle corridor lined with hundreds of candles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: An old adviser hovers at the edge of a candlelit corridor, brow furrowed, one hand raised as if to warn. Shadows stretch and tremble along the stone walls, ominous mood.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow crane rise. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_006",
@@ -67,7 +73,8 @@
    "line": "放心，我武某人从不轻易下结论。",
    "semantic_visual": "The regal woman settles back in her chair at the stone roundtable, palm raised in calm reassurance, candlelight steady on her composed face. Carved pillars loom behind her.",
    "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a round stone table in a candlelit hall, heavy drapery. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The regal woman settles back in her chair at the stone roundtable, palm raised in calm reassurance, candlelight steady on her composed face. Carved pillars loom behind her.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a round stone table in a candlelit hall, heavy drapery. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The regal woman settles back in her chair at the stone roundtable, palm raised in calm reassurance, candlelight steady on her composed face. Carved pillars loom behind her.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_007",
@@ -77,7 +84,8 @@
    "line": "那咱俩就从你开始，你先来。",
    "semantic_visual": "The bearded warlord extends an open hand across the crypt table, inviting his rival to begin, candle flames reflected in his sharp gaze. Grim stone walls, challenging mood.",
    "framing": "close",
-   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: The bearded warlord extends an open hand across the crypt table, inviting his rival to begin, candle flames reflected in his sharp gaze. Grim stone walls, challenging mood.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: The bearded warlord extends an open hand across the crypt table, inviting his rival to begin, candle flames reflected in his sharp gaze. Grim stone walls, challenging mood.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_008",
@@ -87,12 +95,685 @@
    "line": "",
    "semantic_visual": "",
    "framing": "",
-   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. The camera surveys the space, atmospheric and cinematic. Camera: slow pull-back revealing the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. The camera surveys the space, atmospheric and cinematic. Camera: slow pull-back revealing the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: candle flames, a deep stone reverb. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_card_end",
    "kind": "card",
-   "prompt": null
+   "prompt": null,
+   "act_index": -1
+  },
+  {
+   "id": "v5_e001",
+   "kind": "broll",
+   "scene": "castle_hall_baroque",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a baroque castle hall with a long stone table and candelabras. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e002",
+   "kind": "dialogue",
+   "scene": "candle_corridor",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Flickering candlelight casts long shadows across a stone corridor as two robed figures lock eyes, tension thick in the air. Golden baroque glow, deep chiaroscuro, wary mood. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a long castle corridor lined with hundreds of candles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: Flickering candlelight casts long shadows across a stone corridor as two robed figures lock eyes, tension thick in the air. Golden baroque glow, deep chiaroscuro, wary mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e003",
+   "kind": "dialogue",
+   "scene": "stone_roundtable",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A regal woman in ornate robes leans forward over a stone roundtable, chin raised, one hand gesturing sharply toward a stern armored man opposite her. Candlelight glints on carved stone. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a round stone table in a candlelit hall, heavy drapery. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: A regal woman in ornate robes leans forward over a stone roundtable, chin raised, one hand gesturing sharply toward a stern armored man opposite her. Candlelight glints on carved stone.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e004",
+   "kind": "dialogue",
+   "scene": "crypt",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A bearded warlord in dark armor smirks and slides a small carved token across a crypt table toward his rival, candle flames wavering between them. Dusty stone vaults, conspiratorial mood. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A bearded warlord in dark armor smirks and slides a small carved token across a crypt table toward his rival, candle flames wavering between them. Dusty stone vaults, conspiratorial mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e005",
+   "kind": "dialogue",
+   "scene": "candle_corridor",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An old adviser hovers at the edge of a candlelit corridor, brow furrowed, one hand raised as if to warn. Shadows stretch and tremble along the stone walls, ominous mood. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a long castle corridor lined with hundreds of candles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: An old adviser hovers at the edge of a candlelit corridor, brow furrowed, one hand raised as if to warn. Shadows stretch and tremble along the stone walls, ominous mood.. Framing: close shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e006",
+   "kind": "dialogue",
+   "scene": "stone_roundtable",
+   "duration": 3.65,
+   "line": "",
+   "semantic_visual": "The regal woman settles back in her chair at the stone roundtable, palm raised in calm reassurance, candlelight steady on her composed face. Carved pillars loom behind her. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a round stone table in a candlelit hall, heavy drapery. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The regal woman settles back in her chair at the stone roundtable, palm raised in calm reassurance, candlelight steady on her composed face. Carved pillars loom behind her.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e007",
+   "kind": "dialogue",
+   "scene": "crypt",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The bearded warlord extends an open hand across the crypt table, inviting his rival to begin, candle flames reflected in his sharp gaze. Grim stone walls, challenging mood. The character pauses, looks off frame, then continues.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: The bearded warlord extends an open hand across the crypt table, inviting his rival to begin, candle flames reflected in his sharp gaze. Grim stone walls, challenging mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e008",
+   "kind": "broll",
+   "scene": "crypt",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character leans on the table and gestures while speaking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. The camera surveys the space, atmospheric and cinematic. The character leans on the table and gestures while speaking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e009",
+   "kind": "broll",
+   "scene": "castle_hall_baroque",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character walks slowly through the space, glancing around.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a baroque castle hall with a long stone table and candelabras. The camera surveys the space, atmospheric and cinematic. The character walks slowly through the space, glancing around. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e010",
+   "kind": "dialogue",
+   "scene": "candle_corridor",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Flickering candlelight casts long shadows across a stone corridor as two robed figures lock eyes, tension thick in the air. Golden baroque glow, deep chiaroscuro, wary mood. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a long castle corridor lined with hundreds of candles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: Flickering candlelight casts long shadows across a stone corridor as two robed figures lock eyes, tension thick in the air. Golden baroque glow, deep chiaroscuro, wary mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e011",
+   "kind": "dialogue",
+   "scene": "stone_roundtable",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A regal woman in ornate robes leans forward over a stone roundtable, chin raised, one hand gesturing sharply toward a stern armored man opposite her. Candlelight glints on carved stone. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a round stone table in a candlelit hall, heavy drapery. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: A regal woman in ornate robes leans forward over a stone roundtable, chin raised, one hand gesturing sharply toward a stern armored man opposite her. Candlelight glints on carved stone.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e012",
+   "kind": "dialogue",
+   "scene": "crypt",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A bearded warlord in dark armor smirks and slides a small carved token across a crypt table toward his rival, candle flames wavering between them. Dusty stone vaults, conspiratorial mood. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A bearded warlord in dark armor smirks and slides a small carved token across a crypt table toward his rival, candle flames wavering between them. Dusty stone vaults, conspiratorial mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e013",
+   "kind": "dialogue",
+   "scene": "candle_corridor",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An old adviser hovers at the edge of a candlelit corridor, brow furrowed, one hand raised as if to warn. Shadows stretch and tremble along the stone walls, ominous mood. The character pauses, looks off frame, then continues.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a long castle corridor lined with hundreds of candles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: An old adviser hovers at the edge of a candlelit corridor, brow furrowed, one hand raised as if to warn. Shadows stretch and tremble along the stone walls, ominous mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e014",
+   "kind": "dialogue",
+   "scene": "stone_roundtable",
+   "duration": 3.65,
+   "line": "",
+   "semantic_visual": "The regal woman settles back in her chair at the stone roundtable, palm raised in calm reassurance, candlelight steady on her composed face. Carved pillars loom behind her. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a round stone table in a candlelit hall, heavy drapery. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The regal woman settles back in her chair at the stone roundtable, palm raised in calm reassurance, candlelight steady on her composed face. Carved pillars loom behind her.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e015",
+   "kind": "dialogue",
+   "scene": "crypt",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The bearded warlord extends an open hand across the crypt table, inviting his rival to begin, candle flames reflected in his sharp gaze. Grim stone walls, challenging mood. The character walks slowly through the space, glancing around.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: The bearded warlord extends an open hand across the crypt table, inviting his rival to begin, candle flames reflected in his sharp gaze. Grim stone walls, challenging mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e016",
+   "kind": "broll",
+   "scene": "crypt",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character turns toward the window, thinking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. The camera surveys the space, atmospheric and cinematic. The character turns toward the window, thinking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e017",
+   "kind": "broll",
+   "scene": "castle_hall_baroque",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " Two characters exchange a look; one nods.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a baroque castle hall with a long stone table and candelabras. The camera surveys the space, atmospheric and cinematic. Two characters exchange a look; one nods. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e018",
+   "kind": "dialogue",
+   "scene": "candle_corridor",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Flickering candlelight casts long shadows across a stone corridor as two robed figures lock eyes, tension thick in the air. Golden baroque glow, deep chiaroscuro, wary mood. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a long castle corridor lined with hundreds of candles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: Flickering candlelight casts long shadows across a stone corridor as two robed figures lock eyes, tension thick in the air. Golden baroque glow, deep chiaroscuro, wary mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e019",
+   "kind": "dialogue",
+   "scene": "stone_roundtable",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A regal woman in ornate robes leans forward over a stone roundtable, chin raised, one hand gesturing sharply toward a stern armored man opposite her. Candlelight glints on carved stone. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a round stone table in a candlelit hall, heavy drapery. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: A regal woman in ornate robes leans forward over a stone roundtable, chin raised, one hand gesturing sharply toward a stern armored man opposite her. Candlelight glints on carved stone.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e020",
+   "kind": "dialogue",
+   "scene": "crypt",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A bearded warlord in dark armor smirks and slides a small carved token across a crypt table toward his rival, candle flames wavering between them. Dusty stone vaults, conspiratorial mood. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A bearded warlord in dark armor smirks and slides a small carved token across a crypt table toward his rival, candle flames wavering between them. Dusty stone vaults, conspiratorial mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e021",
+   "kind": "dialogue",
+   "scene": "candle_corridor",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An old adviser hovers at the edge of a candlelit corridor, brow furrowed, one hand raised as if to warn. Shadows stretch and tremble along the stone walls, ominous mood. The character walks slowly through the space, glancing around.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a long castle corridor lined with hundreds of candles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: An old adviser hovers at the edge of a candlelit corridor, brow furrowed, one hand raised as if to warn. Shadows stretch and tremble along the stone walls, ominous mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e022",
+   "kind": "dialogue",
+   "scene": "stone_roundtable",
+   "duration": 3.65,
+   "line": "",
+   "semantic_visual": "The regal woman settles back in her chair at the stone roundtable, palm raised in calm reassurance, candlelight steady on her composed face. Carved pillars loom behind her. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a round stone table in a candlelit hall, heavy drapery. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The regal woman settles back in her chair at the stone roundtable, palm raised in calm reassurance, candlelight steady on her composed face. Carved pillars loom behind her.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e023",
+   "kind": "dialogue",
+   "scene": "crypt",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The bearded warlord extends an open hand across the crypt table, inviting his rival to begin, candle flames reflected in his sharp gaze. Grim stone walls, challenging mood. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: The bearded warlord extends an open hand across the crypt table, inviting his rival to begin, candle flames reflected in his sharp gaze. Grim stone walls, challenging mood.. Framing: close shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e024",
+   "kind": "broll",
+   "scene": "crypt",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character picks up an object and examines it.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. The camera surveys the space, atmospheric and cinematic. The character picks up an object and examines it. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e025",
+   "kind": "broll",
+   "scene": "castle_hall_baroque",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a baroque castle hall with a long stone table and candelabras. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e026",
+   "kind": "dialogue",
+   "scene": "candle_corridor",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Flickering candlelight casts long shadows across a stone corridor as two robed figures lock eyes, tension thick in the air. Golden baroque glow, deep chiaroscuro, wary mood. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a long castle corridor lined with hundreds of candles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: Flickering candlelight casts long shadows across a stone corridor as two robed figures lock eyes, tension thick in the air. Golden baroque glow, deep chiaroscuro, wary mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e027",
+   "kind": "dialogue",
+   "scene": "stone_roundtable",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A regal woman in ornate robes leans forward over a stone roundtable, chin raised, one hand gesturing sharply toward a stern armored man opposite her. Candlelight glints on carved stone. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a round stone table in a candlelit hall, heavy drapery. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: A regal woman in ornate robes leans forward over a stone roundtable, chin raised, one hand gesturing sharply toward a stern armored man opposite her. Candlelight glints on carved stone.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e028",
+   "kind": "dialogue",
+   "scene": "crypt",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A bearded warlord in dark armor smirks and slides a small carved token across a crypt table toward his rival, candle flames wavering between them. Dusty stone vaults, conspiratorial mood. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A bearded warlord in dark armor smirks and slides a small carved token across a crypt table toward his rival, candle flames wavering between them. Dusty stone vaults, conspiratorial mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e029",
+   "kind": "dialogue",
+   "scene": "candle_corridor",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An old adviser hovers at the edge of a candlelit corridor, brow furrowed, one hand raised as if to warn. Shadows stretch and tremble along the stone walls, ominous mood. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a long castle corridor lined with hundreds of candles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: An old adviser hovers at the edge of a candlelit corridor, brow furrowed, one hand raised as if to warn. Shadows stretch and tremble along the stone walls, ominous mood.. Framing: close shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e030",
+   "kind": "dialogue",
+   "scene": "stone_roundtable",
+   "duration": 3.65,
+   "line": "",
+   "semantic_visual": "The regal woman settles back in her chair at the stone roundtable, palm raised in calm reassurance, candlelight steady on her composed face. Carved pillars loom behind her. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a round stone table in a candlelit hall, heavy drapery. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The regal woman settles back in her chair at the stone roundtable, palm raised in calm reassurance, candlelight steady on her composed face. Carved pillars loom behind her.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e031",
+   "kind": "dialogue",
+   "scene": "crypt",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The bearded warlord extends an open hand across the crypt table, inviting his rival to begin, candle flames reflected in his sharp gaze. Grim stone walls, challenging mood. The character pauses, looks off frame, then continues.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: The bearded warlord extends an open hand across the crypt table, inviting his rival to begin, candle flames reflected in his sharp gaze. Grim stone walls, challenging mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e032",
+   "kind": "broll",
+   "scene": "crypt",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character leans on the table and gestures while speaking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. The camera surveys the space, atmospheric and cinematic. The character leans on the table and gestures while speaking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e033",
+   "kind": "broll",
+   "scene": "castle_hall_baroque",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character walks slowly through the space, glancing around.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a baroque castle hall with a long stone table and candelabras. The camera surveys the space, atmospheric and cinematic. The character walks slowly through the space, glancing around. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e034",
+   "kind": "dialogue",
+   "scene": "candle_corridor",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Flickering candlelight casts long shadows across a stone corridor as two robed figures lock eyes, tension thick in the air. Golden baroque glow, deep chiaroscuro, wary mood. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a long castle corridor lined with hundreds of candles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: Flickering candlelight casts long shadows across a stone corridor as two robed figures lock eyes, tension thick in the air. Golden baroque glow, deep chiaroscuro, wary mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e035",
+   "kind": "dialogue",
+   "scene": "stone_roundtable",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A regal woman in ornate robes leans forward over a stone roundtable, chin raised, one hand gesturing sharply toward a stern armored man opposite her. Candlelight glints on carved stone. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a round stone table in a candlelit hall, heavy drapery. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: A regal woman in ornate robes leans forward over a stone roundtable, chin raised, one hand gesturing sharply toward a stern armored man opposite her. Candlelight glints on carved stone.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e036",
+   "kind": "dialogue",
+   "scene": "crypt",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A bearded warlord in dark armor smirks and slides a small carved token across a crypt table toward his rival, candle flames wavering between them. Dusty stone vaults, conspiratorial mood. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A bearded warlord in dark armor smirks and slides a small carved token across a crypt table toward his rival, candle flames wavering between them. Dusty stone vaults, conspiratorial mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e037",
+   "kind": "dialogue",
+   "scene": "candle_corridor",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An old adviser hovers at the edge of a candlelit corridor, brow furrowed, one hand raised as if to warn. Shadows stretch and tremble along the stone walls, ominous mood. The character pauses, looks off frame, then continues.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a long castle corridor lined with hundreds of candles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: An old adviser hovers at the edge of a candlelit corridor, brow furrowed, one hand raised as if to warn. Shadows stretch and tremble along the stone walls, ominous mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e038",
+   "kind": "dialogue",
+   "scene": "stone_roundtable",
+   "duration": 3.65,
+   "line": "",
+   "semantic_visual": "The regal woman settles back in her chair at the stone roundtable, palm raised in calm reassurance, candlelight steady on her composed face. Carved pillars loom behind her. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a round stone table in a candlelit hall, heavy drapery. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The regal woman settles back in her chair at the stone roundtable, palm raised in calm reassurance, candlelight steady on her composed face. Carved pillars loom behind her.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e039",
+   "kind": "dialogue",
+   "scene": "crypt",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The bearded warlord extends an open hand across the crypt table, inviting his rival to begin, candle flames reflected in his sharp gaze. Grim stone walls, challenging mood. The character walks slowly through the space, glancing around.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: The bearded warlord extends an open hand across the crypt table, inviting his rival to begin, candle flames reflected in his sharp gaze. Grim stone walls, challenging mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e040",
+   "kind": "broll",
+   "scene": "crypt",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character turns toward the window, thinking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. The camera surveys the space, atmospheric and cinematic. The character turns toward the window, thinking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e041",
+   "kind": "broll",
+   "scene": "castle_hall_baroque",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " Two characters exchange a look; one nods.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a baroque castle hall with a long stone table and candelabras. The camera surveys the space, atmospheric and cinematic. Two characters exchange a look; one nods. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e042",
+   "kind": "dialogue",
+   "scene": "candle_corridor",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Flickering candlelight casts long shadows across a stone corridor as two robed figures lock eyes, tension thick in the air. Golden baroque glow, deep chiaroscuro, wary mood. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a long castle corridor lined with hundreds of candles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: Flickering candlelight casts long shadows across a stone corridor as two robed figures lock eyes, tension thick in the air. Golden baroque glow, deep chiaroscuro, wary mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e043",
+   "kind": "dialogue",
+   "scene": "stone_roundtable",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A regal woman in ornate robes leans forward over a stone roundtable, chin raised, one hand gesturing sharply toward a stern armored man opposite her. Candlelight glints on carved stone. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a round stone table in a candlelit hall, heavy drapery. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: A regal woman in ornate robes leans forward over a stone roundtable, chin raised, one hand gesturing sharply toward a stern armored man opposite her. Candlelight glints on carved stone.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e044",
+   "kind": "dialogue",
+   "scene": "crypt",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A bearded warlord in dark armor smirks and slides a small carved token across a crypt table toward his rival, candle flames wavering between them. Dusty stone vaults, conspiratorial mood. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A bearded warlord in dark armor smirks and slides a small carved token across a crypt table toward his rival, candle flames wavering between them. Dusty stone vaults, conspiratorial mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e045",
+   "kind": "dialogue",
+   "scene": "candle_corridor",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An old adviser hovers at the edge of a candlelit corridor, brow furrowed, one hand raised as if to warn. Shadows stretch and tremble along the stone walls, ominous mood. The character walks slowly through the space, glancing around.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a long castle corridor lined with hundreds of candles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: An old adviser hovers at the edge of a candlelit corridor, brow furrowed, one hand raised as if to warn. Shadows stretch and tremble along the stone walls, ominous mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e046",
+   "kind": "dialogue",
+   "scene": "stone_roundtable",
+   "duration": 3.65,
+   "line": "",
+   "semantic_visual": "The regal woman settles back in her chair at the stone roundtable, palm raised in calm reassurance, candlelight steady on her composed face. Carved pillars loom behind her. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a round stone table in a candlelit hall, heavy drapery. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The regal woman settles back in her chair at the stone roundtable, palm raised in calm reassurance, candlelight steady on her composed face. Carved pillars loom behind her.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e047",
+   "kind": "dialogue",
+   "scene": "crypt",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The bearded warlord extends an open hand across the crypt table, inviting his rival to begin, candle flames reflected in his sharp gaze. Grim stone walls, challenging mood. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: The bearded warlord extends an open hand across the crypt table, inviting his rival to begin, candle flames reflected in his sharp gaze. Grim stone walls, challenging mood.. Framing: close shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e048",
+   "kind": "broll",
+   "scene": "crypt",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character picks up an object and examines it.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. The camera surveys the space, atmospheric and cinematic. The character picks up an object and examines it. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e049",
+   "kind": "broll",
+   "scene": "castle_hall_baroque",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a baroque castle hall with a long stone table and candelabras. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e050",
+   "kind": "dialogue",
+   "scene": "candle_corridor",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Flickering candlelight casts long shadows across a stone corridor as two robed figures lock eyes, tension thick in the air. Golden baroque glow, deep chiaroscuro, wary mood. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a long castle corridor lined with hundreds of candles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: Flickering candlelight casts long shadows across a stone corridor as two robed figures lock eyes, tension thick in the air. Golden baroque glow, deep chiaroscuro, wary mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e051",
+   "kind": "dialogue",
+   "scene": "stone_roundtable",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A regal woman in ornate robes leans forward over a stone roundtable, chin raised, one hand gesturing sharply toward a stern armored man opposite her. Candlelight glints on carved stone. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a round stone table in a candlelit hall, heavy drapery. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: A regal woman in ornate robes leans forward over a stone roundtable, chin raised, one hand gesturing sharply toward a stern armored man opposite her. Candlelight glints on carved stone.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e052",
+   "kind": "dialogue",
+   "scene": "crypt",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A bearded warlord in dark armor smirks and slides a small carved token across a crypt table toward his rival, candle flames wavering between them. Dusty stone vaults, conspiratorial mood. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A bearded warlord in dark armor smirks and slides a small carved token across a crypt table toward his rival, candle flames wavering between them. Dusty stone vaults, conspiratorial mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e053",
+   "kind": "dialogue",
+   "scene": "candle_corridor",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An old adviser hovers at the edge of a candlelit corridor, brow furrowed, one hand raised as if to warn. Shadows stretch and tremble along the stone walls, ominous mood. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a long castle corridor lined with hundreds of candles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: An old adviser hovers at the edge of a candlelit corridor, brow furrowed, one hand raised as if to warn. Shadows stretch and tremble along the stone walls, ominous mood.. Framing: close shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e054",
+   "kind": "dialogue",
+   "scene": "stone_roundtable",
+   "duration": 3.65,
+   "line": "",
+   "semantic_visual": "The regal woman settles back in her chair at the stone roundtable, palm raised in calm reassurance, candlelight steady on her composed face. Carved pillars loom behind her. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a round stone table in a candlelit hall, heavy drapery. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The regal woman settles back in her chair at the stone roundtable, palm raised in calm reassurance, candlelight steady on her composed face. Carved pillars loom behind her.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e055",
+   "kind": "dialogue",
+   "scene": "crypt",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The bearded warlord extends an open hand across the crypt table, inviting his rival to begin, candle flames reflected in his sharp gaze. Grim stone walls, challenging mood. The character pauses, looks off frame, then continues.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: The bearded warlord extends an open hand across the crypt table, inviting his rival to begin, candle flames reflected in his sharp gaze. Grim stone walls, challenging mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e056",
+   "kind": "broll",
+   "scene": "crypt",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character leans on the table and gestures while speaking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a stone crypt lit by candles, cold shadows. The camera surveys the space, atmospheric and cinematic. The character leans on the table and gestures while speaking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e057",
+   "kind": "broll",
+   "scene": "castle_hall_baroque",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character walks slowly through the space, glancing around.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a baroque castle hall with a long stone table and candelabras. The camera surveys the space, atmospheric and cinematic. The character walks slowly through the space, glancing around. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e058",
+   "kind": "dialogue",
+   "scene": "candle_corridor",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Flickering candlelight casts long shadows across a stone corridor as two robed figures lock eyes, tension thick in the air. Golden baroque glow, deep chiaroscuro, wary mood. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a long castle corridor lined with hundreds of candles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: Flickering candlelight casts long shadows across a stone corridor as two robed figures lock eyes, tension thick in the air. Golden baroque glow, deep chiaroscuro, wary mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_x001",
+   "kind": "broll",
+   "scene": "castle_hall_baroque",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a baroque castle hall with a long stone table and candelabras. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_x002",
+   "kind": "broll",
+   "scene": "castle_hall_baroque",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a baroque castle hall with a long stone table and candelabras. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_x003",
+   "kind": "broll",
+   "scene": "castle_hall_baroque",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] baroque candlelit 3D film, stone castle hall, hundreds of candles, gold and shadow. Set in a baroque castle hall with a long stone table and candelabras. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
   }
  ]
 }

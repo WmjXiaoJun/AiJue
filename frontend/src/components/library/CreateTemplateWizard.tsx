@@ -220,7 +220,7 @@ export function CreateTemplateWizard({ open, catalog, existingTemplates, onClose
     }
   };
 
-  const toastNotReady = () => notify("创建接口尚未就绪（后端 V21 API 实现中），可稍后重试", "info");
+  const toastNotReady = () => notify("创建接口返回 404：请确认后端已启动，可稍后重试", "info");
 
   if (!open) return null;
 

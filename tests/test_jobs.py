@@ -30,7 +30,7 @@ def _shot_of(client, episode_id, shot_id):
 
 
 def _fake_shot_cli(calls, duration=5.0):
-    def fake_run_cli(cmd, cwd=None, on_line=None):
+    def fake_run_cli(cmd, cwd=None, on_line=None, **_kwargs):
         calls.append(list(cmd))
         out_path = Path(cmd[cmd.index("--out") + 1])
         out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -141,7 +141,7 @@ def test_shot_job_cli_failure_marks_failed(client, monkeypatch):
     shot = shots[1]
     queued = client.post(f"/api/shots/{shot['id']}/generate", json={}).json()
 
-    def fake_run_cli(cmd, cwd=None, on_line=None):
+    def fake_run_cli(cmd, cwd=None, on_line=None, **_kwargs):
         return 1, ["begin"], "ModuleNotFoundError: No module named 'pipeline'"
 
     monkeypatch.setattr(jobs, "run_cli", fake_run_cli)
@@ -162,7 +162,7 @@ def test_shot_job_launch_exception_marks_failed(client, monkeypatch):
     shot = shots[2]
     queued = client.post(f"/api/shots/{shot['id']}/generate", json={}).json()
 
-    def fake_run_cli(cmd, cwd=None, on_line=None):
+    def fake_run_cli(cmd, cwd=None, on_line=None, **_kwargs):
         raise FileNotFoundError("python 不可用")
 
     monkeypatch.setattr(jobs, "run_cli", fake_run_cli)
@@ -180,7 +180,7 @@ def test_render_job_success(client, monkeypatch):
     queued = client.post(f"/api/episodes/{episode['id']}/render", json={}).json()
     assert queued["type"] == "render"
 
-    def fake_run_cli(cmd, cwd=None, on_line=None):
+    def fake_run_cli(cmd, cwd=None, on_line=None, **_kwargs):
         assert cmd[1:4] == ["-m", "pipeline.cli", "render"]
         assert "--episode" in cmd and "--workdir" in cmd and "--out" in cmd
         rel_out = Path(cmd[cmd.index("--out") + 1])
@@ -223,7 +223,7 @@ def test_render_job_failure(client, monkeypatch, fresh_episode):
     episode = fresh_episode["episode"]
     queued = client.post(f"/api/episodes/{episode['id']}/render", json={}).json()
 
-    def fake_run_cli(cmd, cwd=None, on_line=None):
+    def fake_run_cli(cmd, cwd=None, on_line=None, **_kwargs):
         if on_line is not None:
             on_line("PROGRESS 30 合成中")
         return 2, [], "ffmpeg not found"

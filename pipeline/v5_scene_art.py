@@ -618,15 +618,36 @@ def _valid_plate(path: Path) -> bool:
 
 
 def _meta_matches(meta: dict, *, prompt: str, negative: str, seed: int,
-                  size: tuple[int, int], model: str) -> bool:
+                  size: tuple[int, int], model: str,
+                  steps: int | None = None, cfg: float | None = None,
+                  sampler: str | None = None, scheduler: str | None = None) -> bool:
+    """meta 是否可按缓存复用。
+
+    V49 修复：原来只比 prompt/negative/seed/size/model，改 steps/cfg/sampler/scheduler
+    后仍命中缓存 → 拿旧图当新参数的结果（缓存毒化）。四个可选参数给了就必须一致。
+    """
     if not isinstance(meta, dict):
         return False
     try:
-        return (str(meta.get("prompt")) == prompt
+        if not (str(meta.get("prompt")) == prompt
                 and str(meta.get("negative")) == negative
                 and int(meta.get("seed")) == int(seed)
                 and [int(v) for v in (meta.get("size") or [])] == [int(size[0]), int(size[1])]
-                and str(meta.get("model")) == model)
+                and str(meta.get("model")) == model):
+            return False
+        if steps is not None and str(meta.get("steps")) != str(int(steps)):
+            return False
+        if cfg is not None:
+            try:
+                if abs(float(meta.get("cfg")) - float(cfg)) > 1e-6:
+                    return False
+            except (TypeError, ValueError):
+                return False
+        if sampler is not None and str(meta.get("sampler")) != str(sampler):
+            return False
+        if scheduler is not None and str(meta.get("scheduler")) != str(scheduler):
+            return False
+        return True
     except (TypeError, ValueError):
         return False
 
@@ -684,7 +705,8 @@ def generate_scene_plate(scene_id: str, out_png: str | Path | None = None, *,
     existing = utils.read_json(meta_path) or {}
     if not force and _valid_plate(png) and _meta_matches(
             existing, prompt=positive, negative=neg, seed=seed,
-            size=(w, h), model=model):
+            size=(w, h), model=model, steps=steps, cfg=cfg,
+            sampler=sampler, scheduler=scheduler):
         log(f"[skip] {scene_id} 已存在且参数一致: {png.name}")
         return {**existing, "reused": True, "path": str(png),
                 "meta": str(meta_path), "scene": scene_id}

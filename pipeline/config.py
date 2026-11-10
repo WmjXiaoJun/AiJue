@@ -6,6 +6,9 @@ import shutil
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+# 唯一输出根：与后端 app/config.OUTPUTS_DIR 同口径（环境变量优先）。
+# templates3d / templates3d_hq / registry / lipsync / muse_video / orchestrator 都从这取。
+OUTPUTS_ROOT = Path(os.environ.get("ZAOPIANJU_OUTPUTS_DIR") or (REPO_ROOT / "outputs"))
 
 # ---- 视频参数 -------------------------------------------------------------
 VIDEO_W = 1280
@@ -41,6 +44,17 @@ ACCENT_GUEST_A = "#5AC8FA"
 ACCENT_GUEST_B = "#FF6B6B"
 
 TEMPLATES_DIR = Path(__file__).resolve().parent / "templates"
+
+# ---- 角色资产根 -----------------------------------------------------------
+# 真相源是 assets/v5/characters（26 个角色：portrait.png / cutout.png / pose_* …）；
+# 旧代码写死 outputs/characters（那里只剩 3 个 meta.json），于是所有镜头"无角色"。
+# 优先级：环境变量 > assets/v5/characters > outputs/characters（兼容旧布局）。
+ASSETS_ROOT = Path(os.environ.get("ZAOPIANJU_ASSETS_DIR") or (REPO_ROOT / "assets"))
+CHARS_ROOT = Path(
+    os.environ.get("ZAOPIANJU_CHARS_DIR")
+    or ((ASSETS_ROOT / "v5" / "characters") if (ASSETS_ROOT / "v5" / "characters").is_dir()
+        else (OUTPUTS_ROOT / "characters"))
+)
 
 
 def _resolve_bin(env_var: str, rel_path: str, exe_name: str) -> str:

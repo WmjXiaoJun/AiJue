@@ -14,12 +14,13 @@ import os
 import subprocess
 import sys
 import threading
+import time
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from sqlalchemy import func
 
-from . import character_files, concept_files, config, models, seed
+from . import character_files, concept_files, config, ids, models, seed
 from .db import SessionLocal
 
 logger = logging.getLogger(__name__)
@@ -42,6 +43,54 @@ def utcnow():
 # --------------------------------------------------------------------------- #
 # 外部命令执行
 # --------------------------------------------------------------------------- #
+def _prune_job_files(keep: int = 300) -> int:
+    """job 的 spec/manifest JSON 会无限增长：只保留最近 keep 个。"""
+    try:
+        files = sorted(config.JOBS_TMP_DIR.glob("*.json"),
+                       key=lambda p: p.stat().st_mtime, reverse=True)
+    except OSError:
+        return 0
+    removed = 0
+    now = time.time()
+    for path in files[keep:]:
+        try:
+            # 只删“超量且超过 7 天”的，避免删掉别人正在读的 spec
+            if now - path.stat().st_mtime < 7 * 86400:
+                continue
+            path.unlink()
+            removed += 1
+        except OSError:
+            pass
+    return removed
+
+
+def _kill_tree(proc) -> None:
+    """Windows 上 kill 只收父进程，ffmpeg/uvicorn 之类孙进程会残留成孤儿。
+
+    与仓库其它 4 处保持一致：先 taskkill /T /F，失败再退回 proc.kill()。
+    """
+    import os
+    import signal
+    if os.name == "nt":
+        try:
+            import subprocess as _sp
+            _sp.run(["taskkill", "/T", "/F", "/PID", str(proc.pid)],
+                    capture_output=True, timeout=15)
+            return
+        except Exception:  # noqa: BLE001
+            pass
+    else:
+        try:
+            os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+            return
+        except Exception:  # noqa: BLE001
+            pass
+    try:
+        proc.kill()
+    except Exception:  # noqa: BLE001
+        pass
+
+
 def run_cli(
     cmd: List[str],
     cwd: Optional[str | Path] = None,
@@ -108,7 +157,7 @@ def run_cli(
         timed_out = True
         returncode = -9
         try:
-            proc.kill()
+            _kill_tree(proc)
         except Exception:  # noqa: BLE001
             pass
         logger.warning("命令超时 %ss，已终止: %s", timeout, cmd[:4])
@@ -463,6 +512,7 @@ def run_shot_job(db, job: models.Job) -> None:
     config.JOBS_TMP_DIR.mkdir(parents=True, exist_ok=True)
     spec_path = config.JOBS_TMP_DIR / f"{job.id}.json"
     spec_path.write_text(json.dumps(spec, ensure_ascii=False, indent=2), encoding="utf-8")
+    _prune_job_files()
 
     out_path = config.OUTPUTS_DIR / "episodes" / episode.id / "shots" / f"{shot.id}.mp4"
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -484,7 +534,8 @@ def run_shot_job(db, job: models.Job) -> None:
     db.commit()
 
     try:
-        returncode, stdout_lines, stderr_text = run_cli(cmd)
+        returncode, stdout_lines, stderr_text = run_cli(
+            cmd, timeout=float(os.environ.get("GEN_SHOT_TIMEOUT", "3600")))
     except Exception as exc:  # noqa: BLE001 - CLI 无法启动
         _fail(db, job, f"gen-shot 启动失败: {exc}", shot=shot)
         return
@@ -1673,6 +1724,22 @@ def enqueue_publish_job(db, episode: models.Episode, record: models.PublishRecor
     return job, True
 
 
+def _privacy_ledger(platforms: List[str], privacy: str,
+                    allow_public_fallback: bool = False) -> Dict[str, str]:
+    """台账：每个平台实际会发送的隐私档位。
+
+    直接复用 `publish/upload_post.py::_privacy_levels`（同一个纯函数，不再抄一份映射）；
+    `publish/cli.py` 的末行 JSON 目前只回传 ok/request_id/results，所以真正的值在这里补算，
+    等 cli 以后顺手透传时会优先用它的真实回显（见调用处的 `result.get(...) or`）。
+    """
+    try:
+        from publish.upload_post import _privacy_levels  # 局部导入：避免 API 启动期依赖 publish
+        return _privacy_levels(platforms, privacy, allow_public_fallback)
+    except Exception:  # noqa: BLE001 - 台账失败不能影响发布本身
+        logger.warning("无法计算 privacy_levels 台账（不影响发布）", exc_info=True)
+        return {}
+
+
 def run_publish_job(db, job: models.Job) -> None:
     params = dict(job.params or {})
     record = db.get(models.PublishRecord, params.get("publish_id")) if params.get("publish_id") else None
@@ -1749,10 +1816,17 @@ def run_publish_job(db, job: models.Job) -> None:
         cmd.append("--youtube-made-for-kids")
     if dry_run:
         cmd.append("--dry-run")
-    env_overrides = {"UPLOAD_POST_API_KEY": api_key} if api_key else None
+    env_overrides: Dict[str, str] = {}
+    if api_key:
+        env_overrides["UPLOAD_POST_API_KEY"] = api_key
+    # P1-18：unlisted + TikTok/Instagram 默认拒发（upload_post._privacy_levels）。
+    # 调用方显式 allow_public_fallback=True 时用环境变量透传给子进程 —— publish/cli.py
+    # 不需要改动（它继承 env），upload_post 在算 privacy_levels 时读取。
+    if ids.as_bool(params.get("allow_public_fallback")):
+        env_overrides["UPLOAD_POST_ALLOW_PUBLIC_FALLBACK"] = "1"
     try:
         returncode, stdout_lines, stderr_text = run_cli(
-            cmd, timeout=PUBLISH_TIMEOUT_SECONDS, env_overrides=env_overrides
+            cmd, timeout=PUBLISH_TIMEOUT_SECONDS, env_overrides=env_overrides or None
         )
     except Exception as exc:  # noqa: BLE001 - CLI 无法启动
         message = f"publish.cli 启动失败: {exc}"
@@ -1777,6 +1851,14 @@ def run_publish_job(db, job: models.Job) -> None:
             "configured": result.get("configured"),
             "results": result.get("results"),
             "version": params.get("version"),
+            # P1-18 台账：每个平台**实际发送**的隐私档位（youtube=privacyStatus 取值，
+            # tiktok/instagram=privacy_level 枚举）。记录里的 privacy 只是用户意图。
+            # 映射与 publish/upload_post.py::_privacy_levels 同源（同一个纯函数）。
+            "privacy_levels": result.get("privacy_levels") or _privacy_ledger(
+                platforms, privacy, ids.as_bool(params.get("allow_public_fallback"))
+            ),
+            "privacy_effective": result.get("privacy") or privacy,
+            "allow_public_fallback": ids.as_bool(params.get("allow_public_fallback")),
         }
     )
     record.meta = record_meta
@@ -1925,7 +2007,12 @@ def enqueue_render_job(db, episode: models.Episode, params: Optional[Dict[str, A
 
 
 def retry_job(db, job: models.Job):
-    """重置失败/完成的任务并重新入队。返回 (job, created)。"""
+    """重置失败/完成的任务并重新入队。返回 ``(job, created)``。
+
+    ``created=False`` 只表示"这次请求没有产生新动作"，**调用方必须据此报错**，
+    不能像审查 P2-6 那样把返回值丢掉然后照旧回 200（用户点了重试、状态却没变）。
+    目前只有 ``running`` 会走到这里：任务正在跑，不能重试（API 层转 409）。
+    """
     if job.status == "running":
         return job, False
     job.status = "queued"

@@ -7,7 +7,8 @@
   {
    "id": "v5_card_title",
    "kind": "card",
-   "prompt": null
+   "prompt": null,
+   "act_index": -1
   },
   {
    "id": "v5_002",
@@ -17,7 +18,8 @@
    "line": "苏轼、武则天，咱们今天聊一聊关于青铜鼎和《清明上河图》的故事。",
    "semantic_visual": "A museum guide gestures toward a glowing glass display case holding an ancient bronze ding and a rolled silk scroll, warm gold spotlights casting long shadows across the marble floor.",
    "framing": "wide",
-   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a black stone pedestal with a glass display case under a single spotlight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: A museum guide gestures toward a glowing glass display case holding an ancient bronze ding and a rolled silk scroll, warm gold spotlights casting long shadows across the marble floor.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow crane descend. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet museum room tone, faint metallic shimmer. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a black stone pedestal with a glass display case under a single spotlight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: A museum guide gestures toward a glowing glass display case holding an ancient bronze ding and a rolled silk scroll, warm gold spotlights casting long shadows across the marble floor.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow crane descend. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet museum room tone, faint metallic shimmer. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_003",
@@ -27,7 +29,8 @@
    "line": "哦？这可是两件国宝啊，背后肯定有不少故事。",
    "semantic_visual": "Two figures lean closer to a dim archive vault shelf, eyes wide with curiosity as golden light spills over an antique scroll and a bronze vessel behind glass.",
    "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a dark museum archive with bronze vessels and sealed scrolls. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Two figures lean closer to a dim archive vault shelf, eyes wide with curiosity as golden light spills over an antique scroll and a bronze vessel behind glass.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow rack focus between foreground and background. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet museum room tone, faint metallic shimmer. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a dark museum archive with bronze vessels and sealed scrolls. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Two figures lean closer to a dim archive vault shelf, eyes wide with curiosity as golden light spills over an antique scroll and a bronze vessel behind glass.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow rack focus between foreground and background. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet museum room tone, faint metallic shimmer. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_004",
@@ -37,7 +40,8 @@
    "line": "没错，这青铜鼎可是商朝的宝贝，承载着古人的智慧。",
    "semantic_visual": "A regal woman in Tang-dynasty robes extends a hand toward a towering bronze tripod cauldron, its ornate patterns gleaming under amber palace lanterns.",
    "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a grand Chinese palace hall with gold details and silk banners. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A regal woman in Tang-dynasty robes extends a hand toward a towering bronze tripod cauldron, its ornate patterns gleaming under amber palace lanterns.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow orbiting camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet museum room tone, faint metallic shimmer. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a grand Chinese palace hall with gold details and silk banners. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A regal woman in Tang-dynasty robes extends a hand toward a towering bronze tripod cauldron, its ornate patterns gleaming under amber palace lanterns.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow orbiting camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet museum room tone, faint metallic shimmer. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_005",
@@ -47,7 +51,8 @@
    "line": "没错，还有《清明上河图》描绘的北宋繁华，两件宝贝都是宝。",
    "semantic_visual": "The guide sweeps an arm between a bronze ding and an unrolled painted scroll of a bustling river city, both bathed in soft museum spotlight.",
    "framing": "wide",
-   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a black stone pedestal with a glass display case under a single spotlight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The guide sweeps an arm between a bronze ding and an unrolled painted scroll of a bustling river city, both bathed in soft museum spotlight.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow crane descend. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet museum room tone, faint metallic shimmer. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a black stone pedestal with a glass display case under a single spotlight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The guide sweeps an arm between a bronze ding and an unrolled painted scroll of a bustling river city, both bathed in soft museum spotlight.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow crane descend. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet museum room tone, faint metallic shimmer. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_006",
@@ -57,7 +62,8 @@
    "line": "那我先来问个问题，苏轼你对青铜鼎研究多深？",
    "semantic_visual": "A robed scholar turns toward the guide, tilting his head in a questioning pose, the bronze cauldron reflected faintly in the glass beside him.",
    "framing": "close",
-   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a dark museum archive with bronze vessels and sealed scrolls. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed scholar turns toward the guide, tilting his head in a questioning pose, the bronze cauldron reflected faintly in the glass beside him.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow rack focus between foreground and background. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet museum room tone, faint metallic shimmer. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a dark museum archive with bronze vessels and sealed scrolls. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed scholar turns toward the guide, tilting his head in a questioning pose, the bronze cauldron reflected faintly in the glass beside him.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow rack focus between foreground and background. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet museum room tone, faint metallic shimmer. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_007",
@@ -67,12 +73,619 @@
    "line": "还好啦，你武则天研究国宝也是个中高手。",
    "semantic_visual": "The regal woman smiles with a modest shrug, gesturing gracefully toward an ornate bronze vessel as warm palace light glints off her jewelry.",
    "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a grand Chinese palace hall with gold details and silk banners. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: The regal woman smiles with a modest shrug, gesturing gracefully toward an ornate bronze vessel as warm palace light glints off her jewelry.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow pull-back revealing the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet museum room tone, faint metallic shimmer. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a grand Chinese palace hall with gold details and silk banners. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: The regal woman smiles with a modest shrug, gesturing gracefully toward an ornate bronze vessel as warm palace light glints off her jewelry.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow pull-back revealing the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: quiet museum room tone, faint metallic shimmer. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_card_end",
    "kind": "card",
-   "prompt": null
+   "prompt": null,
+   "act_index": -1
+  },
+  {
+   "id": "v5_e001",
+   "kind": "dialogue",
+   "scene": "display_case",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A museum guide gestures toward a glowing glass display case holding an ancient bronze ding and a rolled silk scroll, warm gold spotlights casting long shadows across the marble floor. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a black stone pedestal with a glass display case under a single spotlight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: A museum guide gestures toward a glowing glass display case holding an ancient bronze ding and a rolled silk scroll, warm gold spotlights casting long shadows across the marble floor.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e002",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Two figures lean closer to a dim archive vault shelf, eyes wide with curiosity as golden light spills over an antique scroll and a bronze vessel behind glass. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a dark museum archive with bronze vessels and sealed scrolls. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Two figures lean closer to a dim archive vault shelf, eyes wide with curiosity as golden light spills over an antique scroll and a bronze vessel behind glass.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e003",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A regal woman in Tang-dynasty robes extends a hand toward a towering bronze tripod cauldron, its ornate patterns gleaming under amber palace lanterns. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a grand Chinese palace hall with gold details and silk banners. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A regal woman in Tang-dynasty robes extends a hand toward a towering bronze tripod cauldron, its ornate patterns gleaming under amber palace lanterns.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e004",
+   "kind": "dialogue",
+   "scene": "display_case",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The guide sweeps an arm between a bronze ding and an unrolled painted scroll of a bustling river city, both bathed in soft museum spotlight. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a black stone pedestal with a glass display case under a single spotlight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The guide sweeps an arm between a bronze ding and an unrolled painted scroll of a bustling river city, both bathed in soft museum spotlight.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e005",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A robed scholar turns toward the guide, tilting his head in a questioning pose, the bronze cauldron reflected faintly in the glass beside him. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a dark museum archive with bronze vessels and sealed scrolls. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed scholar turns toward the guide, tilting his head in a questioning pose, the bronze cauldron reflected faintly in the glass beside him.. Framing: close shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e006",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The regal woman smiles with a modest shrug, gesturing gracefully toward an ornate bronze vessel as warm palace light glints off her jewelry. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a grand Chinese palace hall with gold details and silk banners. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: The regal woman smiles with a modest shrug, gesturing gracefully toward an ornate bronze vessel as warm palace light glints off her jewelry.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e007",
+   "kind": "dialogue",
+   "scene": "display_case",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A museum guide gestures toward a glowing glass display case holding an ancient bronze ding and a rolled silk scroll, warm gold spotlights casting long shadows across the marble floor. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a black stone pedestal with a glass display case under a single spotlight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: A museum guide gestures toward a glowing glass display case holding an ancient bronze ding and a rolled silk scroll, warm gold spotlights casting long shadows across the marble floor.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e008",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Two figures lean closer to a dim archive vault shelf, eyes wide with curiosity as golden light spills over an antique scroll and a bronze vessel behind glass. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a dark museum archive with bronze vessels and sealed scrolls. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Two figures lean closer to a dim archive vault shelf, eyes wide with curiosity as golden light spills over an antique scroll and a bronze vessel behind glass.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e009",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A regal woman in Tang-dynasty robes extends a hand toward a towering bronze tripod cauldron, its ornate patterns gleaming under amber palace lanterns. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a grand Chinese palace hall with gold details and silk banners. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A regal woman in Tang-dynasty robes extends a hand toward a towering bronze tripod cauldron, its ornate patterns gleaming under amber palace lanterns.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e010",
+   "kind": "dialogue",
+   "scene": "display_case",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The guide sweeps an arm between a bronze ding and an unrolled painted scroll of a bustling river city, both bathed in soft museum spotlight. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a black stone pedestal with a glass display case under a single spotlight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The guide sweeps an arm between a bronze ding and an unrolled painted scroll of a bustling river city, both bathed in soft museum spotlight.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e011",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A robed scholar turns toward the guide, tilting his head in a questioning pose, the bronze cauldron reflected faintly in the glass beside him. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a dark museum archive with bronze vessels and sealed scrolls. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed scholar turns toward the guide, tilting his head in a questioning pose, the bronze cauldron reflected faintly in the glass beside him.. Framing: close shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e012",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The regal woman smiles with a modest shrug, gesturing gracefully toward an ornate bronze vessel as warm palace light glints off her jewelry. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a grand Chinese palace hall with gold details and silk banners. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: The regal woman smiles with a modest shrug, gesturing gracefully toward an ornate bronze vessel as warm palace light glints off her jewelry.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e013",
+   "kind": "dialogue",
+   "scene": "display_case",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A museum guide gestures toward a glowing glass display case holding an ancient bronze ding and a rolled silk scroll, warm gold spotlights casting long shadows across the marble floor. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a black stone pedestal with a glass display case under a single spotlight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: A museum guide gestures toward a glowing glass display case holding an ancient bronze ding and a rolled silk scroll, warm gold spotlights casting long shadows across the marble floor.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e014",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Two figures lean closer to a dim archive vault shelf, eyes wide with curiosity as golden light spills over an antique scroll and a bronze vessel behind glass. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a dark museum archive with bronze vessels and sealed scrolls. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Two figures lean closer to a dim archive vault shelf, eyes wide with curiosity as golden light spills over an antique scroll and a bronze vessel behind glass.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e015",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A regal woman in Tang-dynasty robes extends a hand toward a towering bronze tripod cauldron, its ornate patterns gleaming under amber palace lanterns. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a grand Chinese palace hall with gold details and silk banners. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A regal woman in Tang-dynasty robes extends a hand toward a towering bronze tripod cauldron, its ornate patterns gleaming under amber palace lanterns.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e016",
+   "kind": "dialogue",
+   "scene": "display_case",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The guide sweeps an arm between a bronze ding and an unrolled painted scroll of a bustling river city, both bathed in soft museum spotlight. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a black stone pedestal with a glass display case under a single spotlight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The guide sweeps an arm between a bronze ding and an unrolled painted scroll of a bustling river city, both bathed in soft museum spotlight.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e017",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A robed scholar turns toward the guide, tilting his head in a questioning pose, the bronze cauldron reflected faintly in the glass beside him. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a dark museum archive with bronze vessels and sealed scrolls. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed scholar turns toward the guide, tilting his head in a questioning pose, the bronze cauldron reflected faintly in the glass beside him.. Framing: close shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e018",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The regal woman smiles with a modest shrug, gesturing gracefully toward an ornate bronze vessel as warm palace light glints off her jewelry. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a grand Chinese palace hall with gold details and silk banners. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: The regal woman smiles with a modest shrug, gesturing gracefully toward an ornate bronze vessel as warm palace light glints off her jewelry.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e019",
+   "kind": "dialogue",
+   "scene": "display_case",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A museum guide gestures toward a glowing glass display case holding an ancient bronze ding and a rolled silk scroll, warm gold spotlights casting long shadows across the marble floor. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a black stone pedestal with a glass display case under a single spotlight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: A museum guide gestures toward a glowing glass display case holding an ancient bronze ding and a rolled silk scroll, warm gold spotlights casting long shadows across the marble floor.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e020",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Two figures lean closer to a dim archive vault shelf, eyes wide with curiosity as golden light spills over an antique scroll and a bronze vessel behind glass. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a dark museum archive with bronze vessels and sealed scrolls. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Two figures lean closer to a dim archive vault shelf, eyes wide with curiosity as golden light spills over an antique scroll and a bronze vessel behind glass.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e021",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A regal woman in Tang-dynasty robes extends a hand toward a towering bronze tripod cauldron, its ornate patterns gleaming under amber palace lanterns. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a grand Chinese palace hall with gold details and silk banners. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A regal woman in Tang-dynasty robes extends a hand toward a towering bronze tripod cauldron, its ornate patterns gleaming under amber palace lanterns.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e022",
+   "kind": "dialogue",
+   "scene": "display_case",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The guide sweeps an arm between a bronze ding and an unrolled painted scroll of a bustling river city, both bathed in soft museum spotlight. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a black stone pedestal with a glass display case under a single spotlight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The guide sweeps an arm between a bronze ding and an unrolled painted scroll of a bustling river city, both bathed in soft museum spotlight.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e023",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A robed scholar turns toward the guide, tilting his head in a questioning pose, the bronze cauldron reflected faintly in the glass beside him. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a dark museum archive with bronze vessels and sealed scrolls. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed scholar turns toward the guide, tilting his head in a questioning pose, the bronze cauldron reflected faintly in the glass beside him.. Framing: close shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e024",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The regal woman smiles with a modest shrug, gesturing gracefully toward an ornate bronze vessel as warm palace light glints off her jewelry. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a grand Chinese palace hall with gold details and silk banners. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: The regal woman smiles with a modest shrug, gesturing gracefully toward an ornate bronze vessel as warm palace light glints off her jewelry.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e025",
+   "kind": "dialogue",
+   "scene": "display_case",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A museum guide gestures toward a glowing glass display case holding an ancient bronze ding and a rolled silk scroll, warm gold spotlights casting long shadows across the marble floor. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a black stone pedestal with a glass display case under a single spotlight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: A museum guide gestures toward a glowing glass display case holding an ancient bronze ding and a rolled silk scroll, warm gold spotlights casting long shadows across the marble floor.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e026",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Two figures lean closer to a dim archive vault shelf, eyes wide with curiosity as golden light spills over an antique scroll and a bronze vessel behind glass. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a dark museum archive with bronze vessels and sealed scrolls. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Two figures lean closer to a dim archive vault shelf, eyes wide with curiosity as golden light spills over an antique scroll and a bronze vessel behind glass.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e027",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A regal woman in Tang-dynasty robes extends a hand toward a towering bronze tripod cauldron, its ornate patterns gleaming under amber palace lanterns. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a grand Chinese palace hall with gold details and silk banners. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A regal woman in Tang-dynasty robes extends a hand toward a towering bronze tripod cauldron, its ornate patterns gleaming under amber palace lanterns.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e028",
+   "kind": "dialogue",
+   "scene": "display_case",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The guide sweeps an arm between a bronze ding and an unrolled painted scroll of a bustling river city, both bathed in soft museum spotlight. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a black stone pedestal with a glass display case under a single spotlight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The guide sweeps an arm between a bronze ding and an unrolled painted scroll of a bustling river city, both bathed in soft museum spotlight.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e029",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A robed scholar turns toward the guide, tilting his head in a questioning pose, the bronze cauldron reflected faintly in the glass beside him. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a dark museum archive with bronze vessels and sealed scrolls. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed scholar turns toward the guide, tilting his head in a questioning pose, the bronze cauldron reflected faintly in the glass beside him.. Framing: close shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e030",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The regal woman smiles with a modest shrug, gesturing gracefully toward an ornate bronze vessel as warm palace light glints off her jewelry. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a grand Chinese palace hall with gold details and silk banners. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: The regal woman smiles with a modest shrug, gesturing gracefully toward an ornate bronze vessel as warm palace light glints off her jewelry.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e031",
+   "kind": "dialogue",
+   "scene": "display_case",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A museum guide gestures toward a glowing glass display case holding an ancient bronze ding and a rolled silk scroll, warm gold spotlights casting long shadows across the marble floor. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a black stone pedestal with a glass display case under a single spotlight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: A museum guide gestures toward a glowing glass display case holding an ancient bronze ding and a rolled silk scroll, warm gold spotlights casting long shadows across the marble floor.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e032",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Two figures lean closer to a dim archive vault shelf, eyes wide with curiosity as golden light spills over an antique scroll and a bronze vessel behind glass. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a dark museum archive with bronze vessels and sealed scrolls. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Two figures lean closer to a dim archive vault shelf, eyes wide with curiosity as golden light spills over an antique scroll and a bronze vessel behind glass.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e033",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A regal woman in Tang-dynasty robes extends a hand toward a towering bronze tripod cauldron, its ornate patterns gleaming under amber palace lanterns. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a grand Chinese palace hall with gold details and silk banners. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A regal woman in Tang-dynasty robes extends a hand toward a towering bronze tripod cauldron, its ornate patterns gleaming under amber palace lanterns.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e034",
+   "kind": "dialogue",
+   "scene": "display_case",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The guide sweeps an arm between a bronze ding and an unrolled painted scroll of a bustling river city, both bathed in soft museum spotlight. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a black stone pedestal with a glass display case under a single spotlight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The guide sweeps an arm between a bronze ding and an unrolled painted scroll of a bustling river city, both bathed in soft museum spotlight.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e035",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A robed scholar turns toward the guide, tilting his head in a questioning pose, the bronze cauldron reflected faintly in the glass beside him. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a dark museum archive with bronze vessels and sealed scrolls. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed scholar turns toward the guide, tilting his head in a questioning pose, the bronze cauldron reflected faintly in the glass beside him.. Framing: close shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e036",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The regal woman smiles with a modest shrug, gesturing gracefully toward an ornate bronze vessel as warm palace light glints off her jewelry. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a grand Chinese palace hall with gold details and silk banners. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: The regal woman smiles with a modest shrug, gesturing gracefully toward an ornate bronze vessel as warm palace light glints off her jewelry.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e037",
+   "kind": "dialogue",
+   "scene": "display_case",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A museum guide gestures toward a glowing glass display case holding an ancient bronze ding and a rolled silk scroll, warm gold spotlights casting long shadows across the marble floor. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a black stone pedestal with a glass display case under a single spotlight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: A museum guide gestures toward a glowing glass display case holding an ancient bronze ding and a rolled silk scroll, warm gold spotlights casting long shadows across the marble floor.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e038",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Two figures lean closer to a dim archive vault shelf, eyes wide with curiosity as golden light spills over an antique scroll and a bronze vessel behind glass. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a dark museum archive with bronze vessels and sealed scrolls. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Two figures lean closer to a dim archive vault shelf, eyes wide with curiosity as golden light spills over an antique scroll and a bronze vessel behind glass.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e039",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A regal woman in Tang-dynasty robes extends a hand toward a towering bronze tripod cauldron, its ornate patterns gleaming under amber palace lanterns. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a grand Chinese palace hall with gold details and silk banners. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A regal woman in Tang-dynasty robes extends a hand toward a towering bronze tripod cauldron, its ornate patterns gleaming under amber palace lanterns.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e040",
+   "kind": "dialogue",
+   "scene": "display_case",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The guide sweeps an arm between a bronze ding and an unrolled painted scroll of a bustling river city, both bathed in soft museum spotlight. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a black stone pedestal with a glass display case under a single spotlight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The guide sweeps an arm between a bronze ding and an unrolled painted scroll of a bustling river city, both bathed in soft museum spotlight.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e041",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A robed scholar turns toward the guide, tilting his head in a questioning pose, the bronze cauldron reflected faintly in the glass beside him. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a dark museum archive with bronze vessels and sealed scrolls. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed scholar turns toward the guide, tilting his head in a questioning pose, the bronze cauldron reflected faintly in the glass beside him.. Framing: close shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e042",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The regal woman smiles with a modest shrug, gesturing gracefully toward an ornate bronze vessel as warm palace light glints off her jewelry. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a grand Chinese palace hall with gold details and silk banners. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: The regal woman smiles with a modest shrug, gesturing gracefully toward an ornate bronze vessel as warm palace light glints off her jewelry.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e043",
+   "kind": "dialogue",
+   "scene": "display_case",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A museum guide gestures toward a glowing glass display case holding an ancient bronze ding and a rolled silk scroll, warm gold spotlights casting long shadows across the marble floor. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a black stone pedestal with a glass display case under a single spotlight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: A museum guide gestures toward a glowing glass display case holding an ancient bronze ding and a rolled silk scroll, warm gold spotlights casting long shadows across the marble floor.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e044",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Two figures lean closer to a dim archive vault shelf, eyes wide with curiosity as golden light spills over an antique scroll and a bronze vessel behind glass. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a dark museum archive with bronze vessels and sealed scrolls. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Two figures lean closer to a dim archive vault shelf, eyes wide with curiosity as golden light spills over an antique scroll and a bronze vessel behind glass.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e045",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A regal woman in Tang-dynasty robes extends a hand toward a towering bronze tripod cauldron, its ornate patterns gleaming under amber palace lanterns. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a grand Chinese palace hall with gold details and silk banners. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A regal woman in Tang-dynasty robes extends a hand toward a towering bronze tripod cauldron, its ornate patterns gleaming under amber palace lanterns.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e046",
+   "kind": "dialogue",
+   "scene": "display_case",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The guide sweeps an arm between a bronze ding and an unrolled painted scroll of a bustling river city, both bathed in soft museum spotlight. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a black stone pedestal with a glass display case under a single spotlight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The guide sweeps an arm between a bronze ding and an unrolled painted scroll of a bustling river city, both bathed in soft museum spotlight.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e047",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A robed scholar turns toward the guide, tilting his head in a questioning pose, the bronze cauldron reflected faintly in the glass beside him. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a dark museum archive with bronze vessels and sealed scrolls. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed scholar turns toward the guide, tilting his head in a questioning pose, the bronze cauldron reflected faintly in the glass beside him.. Framing: close shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e048",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The regal woman smiles with a modest shrug, gesturing gracefully toward an ornate bronze vessel as warm palace light glints off her jewelry. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a grand Chinese palace hall with gold details and silk banners. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: The regal woman smiles with a modest shrug, gesturing gracefully toward an ornate bronze vessel as warm palace light glints off her jewelry.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e049",
+   "kind": "dialogue",
+   "scene": "display_case",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A museum guide gestures toward a glowing glass display case holding an ancient bronze ding and a rolled silk scroll, warm gold spotlights casting long shadows across the marble floor. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a black stone pedestal with a glass display case under a single spotlight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: A museum guide gestures toward a glowing glass display case holding an ancient bronze ding and a rolled silk scroll, warm gold spotlights casting long shadows across the marble floor.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e050",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Two figures lean closer to a dim archive vault shelf, eyes wide with curiosity as golden light spills over an antique scroll and a bronze vessel behind glass. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a dark museum archive with bronze vessels and sealed scrolls. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: Two figures lean closer to a dim archive vault shelf, eyes wide with curiosity as golden light spills over an antique scroll and a bronze vessel behind glass.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e051",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A regal woman in Tang-dynasty robes extends a hand toward a towering bronze tripod cauldron, its ornate patterns gleaming under amber palace lanterns. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a grand Chinese palace hall with gold details and silk banners. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A regal woman in Tang-dynasty robes extends a hand toward a towering bronze tripod cauldron, its ornate patterns gleaming under amber palace lanterns.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e052",
+   "kind": "dialogue",
+   "scene": "display_case",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The guide sweeps an arm between a bronze ding and an unrolled painted scroll of a bustling river city, both bathed in soft museum spotlight. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a black stone pedestal with a glass display case under a single spotlight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: The guide sweeps an arm between a bronze ding and an unrolled painted scroll of a bustling river city, both bathed in soft museum spotlight.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e053",
+   "kind": "dialogue",
+   "scene": "archive_vault",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A robed scholar turns toward the guide, tilting his head in a questioning pose, the bronze cauldron reflected faintly in the glass beside him. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a dark museum archive with bronze vessels and sealed scrolls. Featuring a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed scholar turns toward the guide, tilting his head in a questioning pose, the bronze cauldron reflected faintly in the glass beside him.. Framing: close shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e054",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The regal woman smiles with a modest shrug, gesturing gracefully toward an ornate bronze vessel as warm palace light glints off her jewelry. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a grand Chinese palace hall with gold details and silk banners. Featuring a stylized 3D animated woman in her 30s, high chignon black hair, wearing a red-brown imperial robe with gold accents, with jade pendant and fan. The shot shows the idea through visible action: The regal woman smiles with a modest shrug, gesturing gracefully toward an ornate bronze vessel as warm palace light glints off her jewelry.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e055",
+   "kind": "dialogue",
+   "scene": "display_case",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A museum guide gestures toward a glowing glass display case holding an ancient bronze ding and a rolled silk scroll, warm gold spotlights casting long shadows across the marble floor. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] grand 3D museum film, dark lacquered columns, gold display cases, volumetric light. Set in a black stone pedestal with a glass display case under a single spotlight. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, scholar bun black hair, wearing a white robe with green accents, with brush and scroll. The shot shows the idea through visible action: A museum guide gestures toward a glowing glass display case holding an ancient bronze ding and a rolled silk scroll, warm gold spotlights casting long shadows across the marble floor.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
   }
  ]
 }

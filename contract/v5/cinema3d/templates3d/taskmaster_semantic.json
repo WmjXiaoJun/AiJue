@@ -7,7 +7,8 @@
   {
    "id": "v5_card_title",
    "kind": "card",
-   "prompt": null
+   "prompt": null,
+   "act_index": -1
   },
   {
    "id": "v5_001",
@@ -17,7 +18,8 @@
    "line": "",
    "semantic_visual": "",
    "framing": "",
-   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a bright game stage with oversized props and painted panels. The camera surveys the space, atmospheric and cinematic. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: bright studio room tone, distant applause. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a bright game stage with oversized props and painted panels. The camera surveys the space, atmospheric and cinematic. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: bright studio room tone, distant applause. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_002",
@@ -27,7 +29,8 @@
    "line": "胖子，你这次能不能不靠吃东西逗笑裁判？",
    "semantic_visual": "A stout man eyes a long table of glossy candy props while a stern older man gestures toward a judge's panel, camera gliding across colorful collage textures. Bright studio lighting, playful tension.",
    "framing": "wide",
-   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a table covered with playful props, prizes and paper cutouts. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A stout man eyes a long table of glossy candy props while a stern older man gestures toward a judge's panel, camera gliding across colorful collage textures. Bright studio lighting, playful tension.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: bright studio room tone, distant applause. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a table covered with playful props, prizes and paper cutouts. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A stout man eyes a long table of glossy candy props while a stern older man gestures toward a judge's panel, camera gliding across colorful collage textures. Bright studio lighting, playful tension.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: bright studio room tone, distant applause. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_003",
@@ -37,7 +40,8 @@
    "line": "那可不行，我的笑点只在美食上。",
    "semantic_visual": "The stout man pats his round belly and points at a towering leaderboard of candy cutouts, shaking his head with a smug grin. Pastel collage backdrop, warm cheerful glow.",
    "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a glowing leaderboard wall in a playful studio. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The stout man pats his round belly and points at a towering leaderboard of candy cutouts, shaking his head with a smug grin. Pastel collage backdrop, warm cheerful glow.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: bright studio room tone, distant applause. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a glowing leaderboard wall in a playful studio. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The stout man pats his round belly and points at a towering leaderboard of candy cutouts, shaking his head with a smug grin. Pastel collage backdrop, warm cheerful glow.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: bright studio room tone, distant applause. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_004",
@@ -47,7 +51,8 @@
    "line": "那甜妹，你准备好了吗？",
    "semantic_visual": "The older host turns to a young woman in a candy-colored dress standing on a confetti-strewn stage, extending a hand as paper scraps drift down. Festive lighting, expectant mood.",
    "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The older host turns to a young woman in a candy-colored dress standing on a confetti-strewn stage, extending a hand as paper scraps drift down. Festive lighting, expectant mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: bright studio room tone, distant applause. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The older host turns to a young woman in a candy-colored dress standing on a confetti-strewn stage, extending a hand as paper scraps drift down. Festive lighting, expectant mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: bright studio room tone, distant applause. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_005",
@@ -57,7 +62,8 @@
    "line": "准备好了，不过我可不想被胖哥吃掉。",
    "semantic_visual": "The young woman nods firmly while glancing sideways at the stout man, who licks his lips near a table of oversized sweets. Tension and humor under soft stage lights.",
    "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a table covered with playful props, prizes and paper cutouts. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: The young woman nods firmly while glancing sideways at the stout man, who licks his lips near a table of oversized sweets. Tension and humor under soft stage lights.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: bright studio room tone, distant applause. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a table covered with playful props, prizes and paper cutouts. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: The young woman nods firmly while glancing sideways at the stout man, who licks his lips near a table of oversized sweets. Tension and humor under soft stage lights.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: bright studio room tone, distant applause. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_006",
@@ -67,7 +73,8 @@
    "line": "放心，这次不许吃，只能逗！",
    "semantic_visual": "The host raises a palm flatly between the two contestants, shaking his finger, while the leaderboard collage glitters behind them. Bright even lighting, comedic authority.",
    "framing": "wide",
-   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a glowing leaderboard wall in a playful studio. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The host raises a palm flatly between the two contestants, shaking his finger, while the leaderboard collage glitters behind them. Bright even lighting, comedic authority.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: bright studio room tone, distant applause. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a glowing leaderboard wall in a playful studio. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The host raises a palm flatly between the two contestants, shaking his finger, while the leaderboard collage glitters behind them. Bright even lighting, comedic authority.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: bright studio room tone, distant applause. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_007",
@@ -77,7 +84,8 @@
    "line": "那还不简单，给他们来点糖果拼贴吧。",
    "semantic_visual": "The stout man grins and tosses handfuls of colorful candy pieces into the air, which stick into a swirling collage across the confetti stage. Vibrant playful lighting, joyful chaos.",
    "framing": "wide",
-   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The stout man grins and tosses handfuls of colorful candy pieces into the air, which stick into a swirling collage across the confetti stage. Vibrant playful lighting, joyful chaos.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: quick whip pan. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: bright studio room tone, distant applause. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The stout man grins and tosses handfuls of colorful candy pieces into the air, which stick into a swirling collage across the confetti stage. Vibrant playful lighting, joyful chaos.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: quick whip pan. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: bright studio room tone, distant applause. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_008",
@@ -87,12 +95,773 @@
    "line": "",
    "semantic_visual": "",
    "framing": "",
-   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. The camera surveys the space, atmospheric and cinematic. Camera: slow pull-back revealing the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: bright studio room tone, distant applause. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. The camera surveys the space, atmospheric and cinematic. Camera: slow pull-back revealing the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: bright studio room tone, distant applause. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_card_end",
    "kind": "card",
-   "prompt": null
+   "prompt": null,
+   "act_index": -1
+  },
+  {
+   "id": "v5_e001",
+   "kind": "broll",
+   "scene": "game_stage_collage",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a bright game stage with oversized props and painted panels. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e002",
+   "kind": "dialogue",
+   "scene": "prop_table",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A stout man eyes a long table of glossy candy props while a stern older man gestures toward a judge's panel, camera gliding across colorful collage textures. Bright studio lighting, playful tension. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a table covered with playful props, prizes and paper cutouts. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A stout man eyes a long table of glossy candy props while a stern older man gestures toward a judge's panel, camera gliding across colorful collage textures. Bright studio lighting, playful tension.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e003",
+   "kind": "dialogue",
+   "scene": "leaderboard_collage",
+   "duration": 3.01,
+   "line": "",
+   "semantic_visual": "The stout man pats his round belly and points at a towering leaderboard of candy cutouts, shaking his head with a smug grin. Pastel collage backdrop, warm cheerful glow. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a glowing leaderboard wall in a playful studio. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The stout man pats his round belly and points at a towering leaderboard of candy cutouts, shaking his head with a smug grin. Pastel collage backdrop, warm cheerful glow.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e004",
+   "kind": "dialogue",
+   "scene": "confetti_stage",
+   "duration": 4.29,
+   "line": "",
+   "semantic_visual": "The older host turns to a young woman in a candy-colored dress standing on a confetti-strewn stage, extending a hand as paper scraps drift down. Festive lighting, expectant mood. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The older host turns to a young woman in a candy-colored dress standing on a confetti-strewn stage, extending a hand as paper scraps drift down. Festive lighting, expectant mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e005",
+   "kind": "dialogue",
+   "scene": "prop_table",
+   "duration": 4.05,
+   "line": "",
+   "semantic_visual": "The young woman nods firmly while glancing sideways at the stout man, who licks his lips near a table of oversized sweets. Tension and humor under soft stage lights. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a table covered with playful props, prizes and paper cutouts. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: The young woman nods firmly while glancing sideways at the stout man, who licks his lips near a table of oversized sweets. Tension and humor under soft stage lights.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e006",
+   "kind": "dialogue",
+   "scene": "leaderboard_collage",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The host raises a palm flatly between the two contestants, shaking his finger, while the leaderboard collage glitters behind them. Bright even lighting, comedic authority. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a glowing leaderboard wall in a playful studio. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The host raises a palm flatly between the two contestants, shaking his finger, while the leaderboard collage glitters behind them. Bright even lighting, comedic authority.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e007",
+   "kind": "dialogue",
+   "scene": "confetti_stage",
+   "duration": 3.73,
+   "line": "",
+   "semantic_visual": "The stout man grins and tosses handfuls of colorful candy pieces into the air, which stick into a swirling collage across the confetti stage. Vibrant playful lighting, joyful chaos. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The stout man grins and tosses handfuls of colorful candy pieces into the air, which stick into a swirling collage across the confetti stage. Vibrant playful lighting, joyful chaos.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e008",
+   "kind": "broll",
+   "scene": "confetti_stage",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character leans on the table and gestures while speaking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. The camera surveys the space, atmospheric and cinematic. The character leans on the table and gestures while speaking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e009",
+   "kind": "broll",
+   "scene": "game_stage_collage",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character walks slowly through the space, glancing around.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a bright game stage with oversized props and painted panels. The camera surveys the space, atmospheric and cinematic. The character walks slowly through the space, glancing around. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e010",
+   "kind": "dialogue",
+   "scene": "prop_table",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A stout man eyes a long table of glossy candy props while a stern older man gestures toward a judge's panel, camera gliding across colorful collage textures. Bright studio lighting, playful tension. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a table covered with playful props, prizes and paper cutouts. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A stout man eyes a long table of glossy candy props while a stern older man gestures toward a judge's panel, camera gliding across colorful collage textures. Bright studio lighting, playful tension.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e011",
+   "kind": "dialogue",
+   "scene": "leaderboard_collage",
+   "duration": 3.01,
+   "line": "",
+   "semantic_visual": "The stout man pats his round belly and points at a towering leaderboard of candy cutouts, shaking his head with a smug grin. Pastel collage backdrop, warm cheerful glow. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a glowing leaderboard wall in a playful studio. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The stout man pats his round belly and points at a towering leaderboard of candy cutouts, shaking his head with a smug grin. Pastel collage backdrop, warm cheerful glow.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e012",
+   "kind": "dialogue",
+   "scene": "confetti_stage",
+   "duration": 4.29,
+   "line": "",
+   "semantic_visual": "The older host turns to a young woman in a candy-colored dress standing on a confetti-strewn stage, extending a hand as paper scraps drift down. Festive lighting, expectant mood. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The older host turns to a young woman in a candy-colored dress standing on a confetti-strewn stage, extending a hand as paper scraps drift down. Festive lighting, expectant mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e013",
+   "kind": "dialogue",
+   "scene": "prop_table",
+   "duration": 4.05,
+   "line": "",
+   "semantic_visual": "The young woman nods firmly while glancing sideways at the stout man, who licks his lips near a table of oversized sweets. Tension and humor under soft stage lights. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a table covered with playful props, prizes and paper cutouts. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: The young woman nods firmly while glancing sideways at the stout man, who licks his lips near a table of oversized sweets. Tension and humor under soft stage lights.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e014",
+   "kind": "dialogue",
+   "scene": "leaderboard_collage",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The host raises a palm flatly between the two contestants, shaking his finger, while the leaderboard collage glitters behind them. Bright even lighting, comedic authority. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a glowing leaderboard wall in a playful studio. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The host raises a palm flatly between the two contestants, shaking his finger, while the leaderboard collage glitters behind them. Bright even lighting, comedic authority.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e015",
+   "kind": "dialogue",
+   "scene": "confetti_stage",
+   "duration": 3.73,
+   "line": "",
+   "semantic_visual": "The stout man grins and tosses handfuls of colorful candy pieces into the air, which stick into a swirling collage across the confetti stage. Vibrant playful lighting, joyful chaos. The character walks slowly through the space, glancing around.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The stout man grins and tosses handfuls of colorful candy pieces into the air, which stick into a swirling collage across the confetti stage. Vibrant playful lighting, joyful chaos.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e016",
+   "kind": "broll",
+   "scene": "confetti_stage",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character turns toward the window, thinking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. The camera surveys the space, atmospheric and cinematic. The character turns toward the window, thinking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e017",
+   "kind": "broll",
+   "scene": "game_stage_collage",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " Two characters exchange a look; one nods.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a bright game stage with oversized props and painted panels. The camera surveys the space, atmospheric and cinematic. Two characters exchange a look; one nods. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e018",
+   "kind": "dialogue",
+   "scene": "prop_table",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A stout man eyes a long table of glossy candy props while a stern older man gestures toward a judge's panel, camera gliding across colorful collage textures. Bright studio lighting, playful tension. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a table covered with playful props, prizes and paper cutouts. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A stout man eyes a long table of glossy candy props while a stern older man gestures toward a judge's panel, camera gliding across colorful collage textures. Bright studio lighting, playful tension.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e019",
+   "kind": "dialogue",
+   "scene": "leaderboard_collage",
+   "duration": 3.01,
+   "line": "",
+   "semantic_visual": "The stout man pats his round belly and points at a towering leaderboard of candy cutouts, shaking his head with a smug grin. Pastel collage backdrop, warm cheerful glow. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a glowing leaderboard wall in a playful studio. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The stout man pats his round belly and points at a towering leaderboard of candy cutouts, shaking his head with a smug grin. Pastel collage backdrop, warm cheerful glow.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e020",
+   "kind": "dialogue",
+   "scene": "confetti_stage",
+   "duration": 4.29,
+   "line": "",
+   "semantic_visual": "The older host turns to a young woman in a candy-colored dress standing on a confetti-strewn stage, extending a hand as paper scraps drift down. Festive lighting, expectant mood. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The older host turns to a young woman in a candy-colored dress standing on a confetti-strewn stage, extending a hand as paper scraps drift down. Festive lighting, expectant mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e021",
+   "kind": "dialogue",
+   "scene": "prop_table",
+   "duration": 4.05,
+   "line": "",
+   "semantic_visual": "The young woman nods firmly while glancing sideways at the stout man, who licks his lips near a table of oversized sweets. Tension and humor under soft stage lights. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a table covered with playful props, prizes and paper cutouts. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: The young woman nods firmly while glancing sideways at the stout man, who licks his lips near a table of oversized sweets. Tension and humor under soft stage lights.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e022",
+   "kind": "dialogue",
+   "scene": "leaderboard_collage",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The host raises a palm flatly between the two contestants, shaking his finger, while the leaderboard collage glitters behind them. Bright even lighting, comedic authority. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a glowing leaderboard wall in a playful studio. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The host raises a palm flatly between the two contestants, shaking his finger, while the leaderboard collage glitters behind them. Bright even lighting, comedic authority.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e023",
+   "kind": "dialogue",
+   "scene": "confetti_stage",
+   "duration": 3.73,
+   "line": "",
+   "semantic_visual": "The stout man grins and tosses handfuls of colorful candy pieces into the air, which stick into a swirling collage across the confetti stage. Vibrant playful lighting, joyful chaos. Two characters exchange a look; one nods.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The stout man grins and tosses handfuls of colorful candy pieces into the air, which stick into a swirling collage across the confetti stage. Vibrant playful lighting, joyful chaos.. Framing: wide shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e024",
+   "kind": "broll",
+   "scene": "confetti_stage",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character picks up an object and examines it.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. The camera surveys the space, atmospheric and cinematic. The character picks up an object and examines it. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e025",
+   "kind": "broll",
+   "scene": "game_stage_collage",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a bright game stage with oversized props and painted panels. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e026",
+   "kind": "dialogue",
+   "scene": "prop_table",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A stout man eyes a long table of glossy candy props while a stern older man gestures toward a judge's panel, camera gliding across colorful collage textures. Bright studio lighting, playful tension. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a table covered with playful props, prizes and paper cutouts. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A stout man eyes a long table of glossy candy props while a stern older man gestures toward a judge's panel, camera gliding across colorful collage textures. Bright studio lighting, playful tension.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e027",
+   "kind": "dialogue",
+   "scene": "leaderboard_collage",
+   "duration": 3.01,
+   "line": "",
+   "semantic_visual": "The stout man pats his round belly and points at a towering leaderboard of candy cutouts, shaking his head with a smug grin. Pastel collage backdrop, warm cheerful glow. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a glowing leaderboard wall in a playful studio. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The stout man pats his round belly and points at a towering leaderboard of candy cutouts, shaking his head with a smug grin. Pastel collage backdrop, warm cheerful glow.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e028",
+   "kind": "dialogue",
+   "scene": "confetti_stage",
+   "duration": 4.29,
+   "line": "",
+   "semantic_visual": "The older host turns to a young woman in a candy-colored dress standing on a confetti-strewn stage, extending a hand as paper scraps drift down. Festive lighting, expectant mood. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The older host turns to a young woman in a candy-colored dress standing on a confetti-strewn stage, extending a hand as paper scraps drift down. Festive lighting, expectant mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e029",
+   "kind": "dialogue",
+   "scene": "prop_table",
+   "duration": 4.05,
+   "line": "",
+   "semantic_visual": "The young woman nods firmly while glancing sideways at the stout man, who licks his lips near a table of oversized sweets. Tension and humor under soft stage lights. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a table covered with playful props, prizes and paper cutouts. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: The young woman nods firmly while glancing sideways at the stout man, who licks his lips near a table of oversized sweets. Tension and humor under soft stage lights.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e030",
+   "kind": "dialogue",
+   "scene": "leaderboard_collage",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The host raises a palm flatly between the two contestants, shaking his finger, while the leaderboard collage glitters behind them. Bright even lighting, comedic authority. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a glowing leaderboard wall in a playful studio. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The host raises a palm flatly between the two contestants, shaking his finger, while the leaderboard collage glitters behind them. Bright even lighting, comedic authority.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e031",
+   "kind": "dialogue",
+   "scene": "confetti_stage",
+   "duration": 3.73,
+   "line": "",
+   "semantic_visual": "The stout man grins and tosses handfuls of colorful candy pieces into the air, which stick into a swirling collage across the confetti stage. Vibrant playful lighting, joyful chaos. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The stout man grins and tosses handfuls of colorful candy pieces into the air, which stick into a swirling collage across the confetti stage. Vibrant playful lighting, joyful chaos.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e032",
+   "kind": "broll",
+   "scene": "confetti_stage",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character leans on the table and gestures while speaking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. The camera surveys the space, atmospheric and cinematic. The character leans on the table and gestures while speaking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e033",
+   "kind": "broll",
+   "scene": "game_stage_collage",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character walks slowly through the space, glancing around.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a bright game stage with oversized props and painted panels. The camera surveys the space, atmospheric and cinematic. The character walks slowly through the space, glancing around. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e034",
+   "kind": "dialogue",
+   "scene": "prop_table",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A stout man eyes a long table of glossy candy props while a stern older man gestures toward a judge's panel, camera gliding across colorful collage textures. Bright studio lighting, playful tension. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a table covered with playful props, prizes and paper cutouts. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A stout man eyes a long table of glossy candy props while a stern older man gestures toward a judge's panel, camera gliding across colorful collage textures. Bright studio lighting, playful tension.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e035",
+   "kind": "dialogue",
+   "scene": "leaderboard_collage",
+   "duration": 3.01,
+   "line": "",
+   "semantic_visual": "The stout man pats his round belly and points at a towering leaderboard of candy cutouts, shaking his head with a smug grin. Pastel collage backdrop, warm cheerful glow. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a glowing leaderboard wall in a playful studio. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The stout man pats his round belly and points at a towering leaderboard of candy cutouts, shaking his head with a smug grin. Pastel collage backdrop, warm cheerful glow.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e036",
+   "kind": "dialogue",
+   "scene": "confetti_stage",
+   "duration": 4.29,
+   "line": "",
+   "semantic_visual": "The older host turns to a young woman in a candy-colored dress standing on a confetti-strewn stage, extending a hand as paper scraps drift down. Festive lighting, expectant mood. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The older host turns to a young woman in a candy-colored dress standing on a confetti-strewn stage, extending a hand as paper scraps drift down. Festive lighting, expectant mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e037",
+   "kind": "dialogue",
+   "scene": "prop_table",
+   "duration": 4.05,
+   "line": "",
+   "semantic_visual": "The young woman nods firmly while glancing sideways at the stout man, who licks his lips near a table of oversized sweets. Tension and humor under soft stage lights. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a table covered with playful props, prizes and paper cutouts. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: The young woman nods firmly while glancing sideways at the stout man, who licks his lips near a table of oversized sweets. Tension and humor under soft stage lights.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e038",
+   "kind": "dialogue",
+   "scene": "leaderboard_collage",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The host raises a palm flatly between the two contestants, shaking his finger, while the leaderboard collage glitters behind them. Bright even lighting, comedic authority. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a glowing leaderboard wall in a playful studio. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The host raises a palm flatly between the two contestants, shaking his finger, while the leaderboard collage glitters behind them. Bright even lighting, comedic authority.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e039",
+   "kind": "dialogue",
+   "scene": "confetti_stage",
+   "duration": 3.73,
+   "line": "",
+   "semantic_visual": "The stout man grins and tosses handfuls of colorful candy pieces into the air, which stick into a swirling collage across the confetti stage. Vibrant playful lighting, joyful chaos. The character walks slowly through the space, glancing around.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The stout man grins and tosses handfuls of colorful candy pieces into the air, which stick into a swirling collage across the confetti stage. Vibrant playful lighting, joyful chaos.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e040",
+   "kind": "broll",
+   "scene": "confetti_stage",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character turns toward the window, thinking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. The camera surveys the space, atmospheric and cinematic. The character turns toward the window, thinking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e041",
+   "kind": "broll",
+   "scene": "game_stage_collage",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " Two characters exchange a look; one nods.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a bright game stage with oversized props and painted panels. The camera surveys the space, atmospheric and cinematic. Two characters exchange a look; one nods. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e042",
+   "kind": "dialogue",
+   "scene": "prop_table",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A stout man eyes a long table of glossy candy props while a stern older man gestures toward a judge's panel, camera gliding across colorful collage textures. Bright studio lighting, playful tension. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a table covered with playful props, prizes and paper cutouts. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A stout man eyes a long table of glossy candy props while a stern older man gestures toward a judge's panel, camera gliding across colorful collage textures. Bright studio lighting, playful tension.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e043",
+   "kind": "dialogue",
+   "scene": "leaderboard_collage",
+   "duration": 3.01,
+   "line": "",
+   "semantic_visual": "The stout man pats his round belly and points at a towering leaderboard of candy cutouts, shaking his head with a smug grin. Pastel collage backdrop, warm cheerful glow. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a glowing leaderboard wall in a playful studio. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The stout man pats his round belly and points at a towering leaderboard of candy cutouts, shaking his head with a smug grin. Pastel collage backdrop, warm cheerful glow.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e044",
+   "kind": "dialogue",
+   "scene": "confetti_stage",
+   "duration": 4.29,
+   "line": "",
+   "semantic_visual": "The older host turns to a young woman in a candy-colored dress standing on a confetti-strewn stage, extending a hand as paper scraps drift down. Festive lighting, expectant mood. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The older host turns to a young woman in a candy-colored dress standing on a confetti-strewn stage, extending a hand as paper scraps drift down. Festive lighting, expectant mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e045",
+   "kind": "dialogue",
+   "scene": "prop_table",
+   "duration": 4.05,
+   "line": "",
+   "semantic_visual": "The young woman nods firmly while glancing sideways at the stout man, who licks his lips near a table of oversized sweets. Tension and humor under soft stage lights. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a table covered with playful props, prizes and paper cutouts. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: The young woman nods firmly while glancing sideways at the stout man, who licks his lips near a table of oversized sweets. Tension and humor under soft stage lights.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e046",
+   "kind": "dialogue",
+   "scene": "leaderboard_collage",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The host raises a palm flatly between the two contestants, shaking his finger, while the leaderboard collage glitters behind them. Bright even lighting, comedic authority. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a glowing leaderboard wall in a playful studio. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The host raises a palm flatly between the two contestants, shaking his finger, while the leaderboard collage glitters behind them. Bright even lighting, comedic authority.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e047",
+   "kind": "dialogue",
+   "scene": "confetti_stage",
+   "duration": 3.73,
+   "line": "",
+   "semantic_visual": "The stout man grins and tosses handfuls of colorful candy pieces into the air, which stick into a swirling collage across the confetti stage. Vibrant playful lighting, joyful chaos. Two characters exchange a look; one nods.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The stout man grins and tosses handfuls of colorful candy pieces into the air, which stick into a swirling collage across the confetti stage. Vibrant playful lighting, joyful chaos.. Framing: wide shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e048",
+   "kind": "broll",
+   "scene": "confetti_stage",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character picks up an object and examines it.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. The camera surveys the space, atmospheric and cinematic. The character picks up an object and examines it. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e049",
+   "kind": "broll",
+   "scene": "game_stage_collage",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a bright game stage with oversized props and painted panels. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e050",
+   "kind": "dialogue",
+   "scene": "prop_table",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A stout man eyes a long table of glossy candy props while a stern older man gestures toward a judge's panel, camera gliding across colorful collage textures. Bright studio lighting, playful tension. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a table covered with playful props, prizes and paper cutouts. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A stout man eyes a long table of glossy candy props while a stern older man gestures toward a judge's panel, camera gliding across colorful collage textures. Bright studio lighting, playful tension.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e051",
+   "kind": "dialogue",
+   "scene": "leaderboard_collage",
+   "duration": 3.01,
+   "line": "",
+   "semantic_visual": "The stout man pats his round belly and points at a towering leaderboard of candy cutouts, shaking his head with a smug grin. Pastel collage backdrop, warm cheerful glow. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a glowing leaderboard wall in a playful studio. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The stout man pats his round belly and points at a towering leaderboard of candy cutouts, shaking his head with a smug grin. Pastel collage backdrop, warm cheerful glow.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e052",
+   "kind": "dialogue",
+   "scene": "confetti_stage",
+   "duration": 4.29,
+   "line": "",
+   "semantic_visual": "The older host turns to a young woman in a candy-colored dress standing on a confetti-strewn stage, extending a hand as paper scraps drift down. Festive lighting, expectant mood. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The older host turns to a young woman in a candy-colored dress standing on a confetti-strewn stage, extending a hand as paper scraps drift down. Festive lighting, expectant mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e053",
+   "kind": "dialogue",
+   "scene": "prop_table",
+   "duration": 4.05,
+   "line": "",
+   "semantic_visual": "The young woman nods firmly while glancing sideways at the stout man, who licks his lips near a table of oversized sweets. Tension and humor under soft stage lights. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a table covered with playful props, prizes and paper cutouts. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: The young woman nods firmly while glancing sideways at the stout man, who licks his lips near a table of oversized sweets. Tension and humor under soft stage lights.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e054",
+   "kind": "dialogue",
+   "scene": "leaderboard_collage",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The host raises a palm flatly between the two contestants, shaking his finger, while the leaderboard collage glitters behind them. Bright even lighting, comedic authority. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a glowing leaderboard wall in a playful studio. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The host raises a palm flatly between the two contestants, shaking his finger, while the leaderboard collage glitters behind them. Bright even lighting, comedic authority.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e055",
+   "kind": "dialogue",
+   "scene": "confetti_stage",
+   "duration": 3.73,
+   "line": "",
+   "semantic_visual": "The stout man grins and tosses handfuls of colorful candy pieces into the air, which stick into a swirling collage across the confetti stage. Vibrant playful lighting, joyful chaos. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The stout man grins and tosses handfuls of colorful candy pieces into the air, which stick into a swirling collage across the confetti stage. Vibrant playful lighting, joyful chaos.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e056",
+   "kind": "broll",
+   "scene": "confetti_stage",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character leans on the table and gestures while speaking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. The camera surveys the space, atmospheric and cinematic. The character leans on the table and gestures while speaking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e057",
+   "kind": "broll",
+   "scene": "game_stage_collage",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character walks slowly through the space, glancing around.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a bright game stage with oversized props and painted panels. The camera surveys the space, atmospheric and cinematic. The character walks slowly through the space, glancing around. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e058",
+   "kind": "dialogue",
+   "scene": "prop_table",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A stout man eyes a long table of glossy candy props while a stern older man gestures toward a judge's panel, camera gliding across colorful collage textures. Bright studio lighting, playful tension. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a table covered with playful props, prizes and paper cutouts. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A stout man eyes a long table of glossy candy props while a stern older man gestures toward a judge's panel, camera gliding across colorful collage textures. Bright studio lighting, playful tension.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e059",
+   "kind": "dialogue",
+   "scene": "leaderboard_collage",
+   "duration": 3.01,
+   "line": "",
+   "semantic_visual": "The stout man pats his round belly and points at a towering leaderboard of candy cutouts, shaking his head with a smug grin. Pastel collage backdrop, warm cheerful glow. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a glowing leaderboard wall in a playful studio. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The stout man pats his round belly and points at a towering leaderboard of candy cutouts, shaking his head with a smug grin. Pastel collage backdrop, warm cheerful glow.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e060",
+   "kind": "dialogue",
+   "scene": "confetti_stage",
+   "duration": 4.29,
+   "line": "",
+   "semantic_visual": "The older host turns to a young woman in a candy-colored dress standing on a confetti-strewn stage, extending a hand as paper scraps drift down. Festive lighting, expectant mood. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The older host turns to a young woman in a candy-colored dress standing on a confetti-strewn stage, extending a hand as paper scraps drift down. Festive lighting, expectant mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e061",
+   "kind": "dialogue",
+   "scene": "prop_table",
+   "duration": 4.05,
+   "line": "",
+   "semantic_visual": "The young woman nods firmly while glancing sideways at the stout man, who licks his lips near a table of oversized sweets. Tension and humor under soft stage lights. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a table covered with playful props, prizes and paper cutouts. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: The young woman nods firmly while glancing sideways at the stout man, who licks his lips near a table of oversized sweets. Tension and humor under soft stage lights.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e062",
+   "kind": "dialogue",
+   "scene": "leaderboard_collage",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The host raises a palm flatly between the two contestants, shaking his finger, while the leaderboard collage glitters behind them. Bright even lighting, comedic authority. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a glowing leaderboard wall in a playful studio. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The host raises a palm flatly between the two contestants, shaking his finger, while the leaderboard collage glitters behind them. Bright even lighting, comedic authority.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e063",
+   "kind": "dialogue",
+   "scene": "confetti_stage",
+   "duration": 3.73,
+   "line": "",
+   "semantic_visual": "The stout man grins and tosses handfuls of colorful candy pieces into the air, which stick into a swirling collage across the confetti stage. Vibrant playful lighting, joyful chaos. The character walks slowly through the space, glancing around.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The stout man grins and tosses handfuls of colorful candy pieces into the air, which stick into a swirling collage across the confetti stage. Vibrant playful lighting, joyful chaos.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e064",
+   "kind": "broll",
+   "scene": "confetti_stage",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character turns toward the window, thinking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. The camera surveys the space, atmospheric and cinematic. The character turns toward the window, thinking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e065",
+   "kind": "broll",
+   "scene": "game_stage_collage",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " Two characters exchange a look; one nods.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a bright game stage with oversized props and painted panels. The camera surveys the space, atmospheric and cinematic. Two characters exchange a look; one nods. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e066",
+   "kind": "dialogue",
+   "scene": "prop_table",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A stout man eyes a long table of glossy candy props while a stern older man gestures toward a judge's panel, camera gliding across colorful collage textures. Bright studio lighting, playful tension. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a table covered with playful props, prizes and paper cutouts. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A stout man eyes a long table of glossy candy props while a stern older man gestures toward a judge's panel, camera gliding across colorful collage textures. Bright studio lighting, playful tension.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e067",
+   "kind": "dialogue",
+   "scene": "leaderboard_collage",
+   "duration": 3.01,
+   "line": "",
+   "semantic_visual": "The stout man pats his round belly and points at a towering leaderboard of candy cutouts, shaking his head with a smug grin. Pastel collage backdrop, warm cheerful glow. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a glowing leaderboard wall in a playful studio. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The stout man pats his round belly and points at a towering leaderboard of candy cutouts, shaking his head with a smug grin. Pastel collage backdrop, warm cheerful glow.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e068",
+   "kind": "dialogue",
+   "scene": "confetti_stage",
+   "duration": 4.29,
+   "line": "",
+   "semantic_visual": "The older host turns to a young woman in a candy-colored dress standing on a confetti-strewn stage, extending a hand as paper scraps drift down. Festive lighting, expectant mood. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a colorful game-show stage with confetti falling and giant props. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: The older host turns to a young woman in a candy-colored dress standing on a confetti-strewn stage, extending a hand as paper scraps drift down. Festive lighting, expectant mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e069",
+   "kind": "dialogue",
+   "scene": "prop_table",
+   "duration": 4.05,
+   "line": "",
+   "semantic_visual": "The young woman nods firmly while glancing sideways at the stout man, who licks his lips near a table of oversized sweets. Tension and humor under soft stage lights. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] playful candy-colored 3D game show, giant props, confetti, bright studio lights. Set in a table covered with playful props, prizes and paper cutouts. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone. The shot shows the idea through visible action: The young woman nods firmly while glancing sideways at the stout man, who licks his lips near a table of oversized sweets. Tension and humor under soft stage lights.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
   }
  ]
 }

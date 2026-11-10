@@ -177,5 +177,6 @@
   "meta": {
     "source": "v3_remap",
     "script_lines": 7
-  }
+  },
+  "script_mode": "script"
 }

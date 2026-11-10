@@ -337,7 +337,7 @@ export function StudioTemplates3D({ project, episode, onProjectFormatChange }: T
       } catch (err) {
         const status = err instanceof ApiError ? err.status : 0;
         if (status === 404 || status === 405) {
-          notify("切换接口未就绪：后端 PATCH /api/projects/{id} 尚未上线（tpl-backend 开发中），请稍后重试", "error");
+          notify("切换模板失败：PATCH /api/projects/{id} 返回 404，请确认项目 id 存在后重试", "error");
         } else {
           notify("切换项目模板失败：" + errorText(err), "error");
         }
@@ -353,7 +353,7 @@ export function StudioTemplates3D({ project, episode, onProjectFormatChange }: T
     async (card: TemplateCard) => {
       const template = card.template;
       if (!template) {
-        notify("模板库接口未就绪，暂不能提交 3D 生成任务", "error");
+        notify("模板库接口不可用，暂不能提交 3D 生成任务", "error");
         return;
       }
       const confirmed = window.confirm(
@@ -373,7 +373,7 @@ export function StudioTemplates3D({ project, episode, onProjectFormatChange }: T
         if (status === 409) {
           notify("已有 3D 生成 / 合成任务在运行（GPU 串行）：" + errorText(err), "error");
         } else if (status === 404 || status === 405) {
-          notify("3D 生成接口未就绪，先跳 Cinema 模板库查看进度", "info");
+          notify("3D 生成接口不可用，先跳 Cinema 模板库查看进度", "info");
           window.location.hash = LIBRARY_HREF.replace(/^#/, "");
         } else {
           notify("提交 3D 生成失败：" + errorText(err), "error");
@@ -563,7 +563,7 @@ export function StudioTemplates3D({ project, episode, onProjectFormatChange }: T
                       <span className="st-tpl3d-hero-badges">
                         <span className={"st-tag " + currentTag}>
                           <i className="cm-status-dot" style={{ background: "currentColor" }} />
-                          {currentTemplate ? statusText(currentTemplate.status) : "接口未就绪"}
+                          {currentTemplate ? statusText(currentTemplate.status) : "暂无状态"}
                         </span>
                         {currentFinal?.exists && (
                           <span className="st-tag is-slate cm-mono">{fmtClock(currentFinal.duration)}</span>
@@ -831,7 +831,7 @@ export function StudioTemplates3D({ project, episode, onProjectFormatChange }: T
                           </span>
                         )}
                         <span className={"st-tpl3d-status st-tag " + (template ? statusTagClass(template.status) : "is-slate")}>
-                          {template ? statusText(template.status) : "接口未就绪"}
+                          {template ? statusText(template.status) : "暂无状态"}
                         </span>
                         {isCurrent && <span className="st-tpl3d-current-badge">当前</span>}
                         {final?.exists && (
@@ -875,7 +875,7 @@ export function StudioTemplates3D({ project, episode, onProjectFormatChange }: T
                           className="cm-btn cm-btn-sm"
                           onClick={() => void regenerateTemplate(card)}
                           disabled={generatingId !== null || !template}
-                          title={template ? "提交 3D 生成任务（本地 GPU，串行）" : "模板库接口未就绪"}
+                          title={template ? "提交 3D 生成任务（本地 GPU，串行）" : "模板库接口不可用"}
                         >
                           {generatingId === card.id ? <Spinner size={12} /> : <IconSpark size={12} />}
                           {final?.exists ? "重新生成 3D" : "生成该模板 3D"}

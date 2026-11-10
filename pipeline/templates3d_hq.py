@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
 import pathlib
 import random
 import re
@@ -29,6 +30,8 @@ REPO = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
 from pipeline import cinema3d_local as local  # noqa: E402
+from pipeline import fingerprint  # noqa: E402
+from pipeline import utils  # noqa: E402
 from pipeline import templates3d as t3  # noqa: E402
 
 FFMPEG = REPO / "tools/node_modules/ffmpeg-static/ffmpeg.exe"
@@ -194,7 +197,27 @@ def _character_contract(cid: str) -> dict:
 
 
 def _shot_character_id(tid: str, shot: dict) -> str:
-    """用 episode.json 的 shots 映射 shot id → 角色 id（brief 只保留 prompt）。"""
+    """shot → 角色 id。**优先 brief 自带的字段**，再退回 episode.json 映射。
+
+    R5：brief 现在从台本派生，每镜自带 `character`（老周/阿栗/大魏 → laozhou/ali/dawei）。
+    只看 episode 会踩到两份时间线不同步（V5 旧 episode 78 镜 / 新 brief 56 镜），
+    结果所有镜都"找不到说话角色"→ 全部回退 T2VA（冒烟就是这么发现的）。
+    """
+    direct = str(shot.get("character") or "").strip()
+    if direct:
+        return direct
+    roles = [str(r) for r in (shot.get("roles") or []) if str(r).strip()]
+    if roles:
+        try:
+            episode = t3.load_episode(tid)
+        except SystemExit:
+            episode = {}
+        cast = (episode.get("meta") or {}).get("cast") or {}
+        for role in roles:
+            item = cast.get(role)
+            if isinstance(item, dict) and item.get("character"):
+                return str(item["character"])
+        return ""  # role 有但 cast 里没有 → 不要瞎猜
     try:
         episode = t3.load_episode(tid)
     except SystemExit:
@@ -454,6 +477,58 @@ def _contact_sheet(items: list, out: pathlib.Path, title: str) -> None:
     canvas.save(out, quality=90)
 
 
+def _cache_hit(asset: pathlib.Path, sig: str,
+               min_bytes: int = fingerprint.MIN_ASSET_BYTES) -> bool:
+    """缓存命中判定：产物存在 + meta 指纹一致 + 体积与 meta 记录一致。
+
+    不用体积当命中判据（那是 P1-1/P1-2 的根因）：`min_bytes` 只排除空文件，
+    `bytes` 只用来发现「产物被截断/改写但 meta 还留着」的情况。
+    """
+    path = pathlib.Path(asset)
+    if not fingerprint.meta_matches(path, sig, min_bytes=min_bytes):
+        if path.is_file():  # 文件在、但输入变了 → 记为未命中（写进报告）
+            _remember_miss(f"{path.name}: 指纹不符/meta 缺失 → 重渲")
+        return False
+    meta = fingerprint.read_meta(path)
+    try:
+        recorded = int(meta.get("bytes") or 0)
+    except (TypeError, ValueError):
+        recorded = 0
+    if recorded:
+        try:
+            if path.stat().st_size != recorded:
+                _remember_miss(f"{path.name}: size≠meta({recorded}) → 重渲")
+                return False
+        except OSError:
+            return False
+    return True
+
+
+#: 最近一次运行里「有文件但指纹不符 → 视为未命中」的记录（写进报告，解释为什么重渲）
+LOG_HIT_MISS: list[str] = []
+
+
+def _remember_miss(message: str) -> None:
+    LOG_HIT_MISS.append(message)
+    if len(LOG_HIT_MISS) > 200:
+        del LOG_HIT_MISS[:100]
+
+
+def _clip_sig(kind: str, **fields) -> str:
+    """镜头级指纹（kind=t2va/ref2va）；字段即决定画面的全部输入。"""
+    return fingerprint.signature(kind, **fields)
+
+
+def _render_meta(asset: pathlib.Path, sig: str, extra: dict) -> None:
+    """写 `<asset>.meta.json`（指纹 + 证据）；体积一起记，用于截断检测。"""
+    payload = dict(extra)
+    try:
+        payload.setdefault("bytes", pathlib.Path(asset).stat().st_size)
+    except OSError:
+        pass
+    fingerprint.write_meta(asset, sig, payload)
+
+
 def _resolve_pick(tid: str, shot_id: str, candidates: list, pick: int | None) -> tuple:
     """选卡优先级：CLI > keyframe_picks.json > 自动最高分 > 0。"""
     n = len(candidates)
@@ -473,7 +548,8 @@ def _generate_keyframe(tid: str, shot: dict, visual: str, seed: int,
                        ip_strength: float | None = None,
                        ip_end: float | None = None,
                        candidates: int = 1,
-                       pick: int | None = None) -> pathlib.Path:
+                       pick: int | None = None,
+                       force: bool = False) -> pathlib.Path:
     """SDXL 关键帧（scene 1280x720，portrait IP-Adapter 锁脸）→ 1024×576。
 
     V45：每种风格自己的 checkpoint + 采样参数；IP 权重降到 0.5 左右并切 style transfer。
@@ -500,29 +576,43 @@ def _generate_keyframe(tid: str, shot: dict, visual: str, seed: int,
     key_dir = base_dir if n_cand == 1 else base_dir.parent / f"{base_dir.name}_c{n_cand}"
     key_dir.mkdir(parents=True, exist_ok=True)
     key_png = key_dir / f"{shot_id}.png"
-    meta_path = key_dir / f"{shot_id}.meta.json"
-    saved_pick = _load_keyframe_pick(tid, shot_id)
-    expected_pick = int(pick) if pick is not None else saved_pick
-    if key_png.is_file() and key_png.stat().st_size > 100_000 and meta_path.is_file():
-        try:
-            cached_meta = json.loads(meta_path.read_text(encoding="utf-8"))
-        except (OSError, ValueError):
-            cached_meta = {}
-        cached_chosen = int(cached_meta.get("chosen") or 0)
-        params_ok = (abs(float(cached_meta.get("ip_strength") or -1) - effective_ip) < 0.001
-                     and abs(float(cached_meta.get("ip_end") or -1) - effective_end) < 0.001
-                     and str(cached_meta.get("ckpt") or "") == str(style["ckpt"])
-                     and int(cached_meta.get("candidates_count") or 1) == n_cand)
-        if params_ok and (expected_pick is None or expected_pick == cached_chosen):
-            return key_png
-    spec_path = _imagegen_spec_for(cid, KEYFRAMES / "specs")
+    # 缓存有效性必须包含 prompt 指纹：改台词/语义 brief 后不能继续吃旧关键帧
     prompt_extra = _keyframe_prompt(style, visual, look)
     style_negative = str(style.get("negative_extra") or "").strip()
     negative_extra = ", ".join(
-        part for part in (KEYFRAME_NEGATIVE, style_negative, ", ".join(look["negatives"])) if part)
+        part for part in (KEYFRAME_NEGATIVE, style_negative, ", ".join(look["negatives"]))
+        if part)
+    prompt_sig = f"{zlib.crc32(prompt_extra.encode('utf-8')):08x}"
+    saved_pick = _load_keyframe_pick(tid, shot_id)
+    expected_pick = int(pick) if pick is not None else saved_pick
+    # 关键帧指纹：prompt/负面词/seed/底模/**采样参数(steps/cfg/sampler/scheduler)**/
+    # IP 参数/抽卡数/选卡/尺寸。少一项就会出现「改了参数仍吃旧图」。
+    sig_fields = dict(
+        template=tid, shot_id=shot_id, character=cid, prompt=prompt_extra,
+        negative=negative_extra, seed=int(seed), style_key=style_key,
+        ckpt=str(style["ckpt"]), cfg=float(style["cfg"]), steps=int(style["steps"]),
+        sampler=str(style["sampler"]), scheduler=str(style["scheduler"]),
+        ip_strength=effective_ip, ip_end=effective_end,
+        ip_weight_type=str(style["ip_weight_type"]), candidates=n_cand,
+        width=1024, height=576)
+    cached_meta = fingerprint.read_meta(key_png) if key_png.is_file() else {}
+    if not force and cached_meta:
+        try:
+            cached_chosen = int(cached_meta.get("chosen") or 0)
+        except (TypeError, ValueError):
+            cached_chosen = 0
+        cached_sig = fingerprint.keyframe_signature(chosen=cached_chosen, **sig_fields)
+        if (_cache_hit(key_png, cached_sig, min_bytes=100_000)
+                and (expected_pick is None or int(expected_pick) == cached_chosen)):
+            return key_png
+    spec_path = _imagegen_spec_for(cid, KEYFRAMES / "specs")
 
     def _render(seed_value: int, raw_dir: pathlib.Path, dest: pathlib.Path) -> int:
-        if dest.is_file() and dest.stat().st_size > 100_000:
+        # 短路也走指纹：只有"这张图确实是这组参数画的"才复用。
+        # 只用体积判会把旧图当成新 prompt 的结果，并让外层把新签名写在旧图上（缓存毒化）。
+        cand_sig = fingerprint.keyframe_signature(chosen=0, **{**sig_fields,
+                                                               "seed": int(seed_value)})
+        if (not force) and _cache_hit(dest, cand_sig, min_bytes=100_000):
             return dest.stat().st_size
         cmd = [
             sys.executable, "-m", "imagegen.cli", "generate",
@@ -555,6 +645,17 @@ def _generate_keyframe(tid: str, shot: dict, visual: str, seed: int,
             "-vf", "scale=1024:576:force_original_aspect_ratio=increase,crop=1024:576",
             str(dest),
         ], check=True, capture_output=True, timeout=120)
+        # 只有真渲出来的图才写指纹：否则外层会把新签名登记在旧图上
+        _render_meta(dest, cand_sig, {
+            "kind": "keyframe", "shot": shot_id, "character": cid,
+            "style_2d": style_key, "ckpt": style["ckpt"], "cfg": style["cfg"],
+            "steps": style["steps"], "sampler": style["sampler"],
+            "scheduler": style["scheduler"], "seed": int(seed_value),
+            "prompt_sig": prompt_sig, "prompt_extra": prompt_extra,
+            "negative_extra": negative_extra, "ip_strength": effective_ip,
+            "ip_end": effective_end, "ip_weight_type": style["ip_weight_type"],
+            "candidates_count": n_cand, "path": str(dest),
+        })
         return dest.stat().st_size
 
     items: list[dict] = []
@@ -588,13 +689,15 @@ def _generate_keyframe(tid: str, shot: dict, visual: str, seed: int,
         "ip_strength": effective_ip, "ip_end": effective_end,
         "ip_weight_type": style["ip_weight_type"],
         "candidates_count": n_cand, "chosen": chosen, "pick_source": pick_source,
+        "prompt_sig": prompt_sig, "base_seed": seed,
         "candidates": items, "sheet": sheet_path,
         "age_identity": look["identity"], "age": look["age"], "gender": look["gender"],
         "age_negatives": look["negatives"],
         "prompt_extra": prompt_extra, "negative_extra": negative_extra,
         "prompt": prompt_extra, "path": str(key_png),
     }
-    meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
+    # 写盘只在真渲完之后发生：签名与图同步，杜绝「新签名 + 旧图」
+    _render_meta(key_png, fingerprint.keyframe_signature(chosen=int(chosen), **sig_fields), meta)
     log(f"[2D] 关键帧 {shot_id} ← {cid}（{style_key}/{style['label']}，{ckpt_tag}，"
         f"IP={effective_ip:.2f}→{effective_end:.2f}/{style['ip_weight_type']}，"
         f"cands={n_cand}，pick=#{chosen}/{pick_source}）")
@@ -621,23 +724,156 @@ def frame_length(duration: float) -> int:
     return 17 * k + 5
 
 
+#: V61：三种观感（3D 动画 / 2D 动画 / 真实）
+LOOK_PREFIX = {
+    "3d_anim": ("high-end 3D animated feature film still, stylized CG characters, "
+                "subsurface skin, cinematic rim light, shallow depth of field. "),
+    "2d_anim": "",
+    "realistic": ("photorealistic live-action cinematic film still, real human actors, "
+                  "natural skin texture, 35mm lens, shallow depth of field, "
+                  "practical lighting, film grain. "),
+}
+LOOK_AVOID = {
+    "3d_anim": " Avoid: flat 2d anime, cel shading, photorealism, live action.",
+    "2d_anim": "",
+    "realistic": " Avoid: anime, cartoon, cel shading, 3d render, illustration, painting, doll.",
+}
+
+
+def identity_lock_prompt(tid: str, shot: dict, prompt: str) -> str:
+    """把资产库里该角色的固定描述（年龄/性别/发型/服装/气质）写进提示词，
+    让 3D/真实 观感的每一条镜头都是同一个人，而不是每次重新“随机长相”。"""
+    cid = _shot_character_id(tid, shot)
+    if not cid:
+        return prompt
+    try:
+        look = _character_look(cid)
+    except Exception:  # noqa: BLE001
+        return prompt
+    contract = _character_contract(cid)
+    name = str(contract.get("label") or contract.get("name") or cid)
+    identity = str(look.get("identity") or "").strip()
+    motion = str(look.get("motion") or "").strip()
+    lock = (f"Character lock — always the same person: {name}, {identity}. "
+            f"{motion}. Keep identical face, hairstyle, hair color and outfit "
+            f"in every shot; never change age or ethnicity. ")
+    return (lock + str(prompt or "")).strip()
+
+
+IMAGE_STYLE_BY_LOOK = {"3d_anim": "realistic", "realistic": "realistic", "2d_anim": "anime"}
+
+
+def _identity_keyframe(tid: str, shot: dict, seed: int, look: str) -> pathlib.Path:
+    """用角色立绘做 IP-Adapter 参考，生成 1024×576 关键帧（锁脸）。"""
+    cid = _shot_character_id(tid, shot)
+    if not cid:
+        raise RuntimeError("该镜头没有角色，无法锁脸")
+    # 资产库角色：优先用同风格的 3D/真实头像（由 portrait.png 生成），否则回退原立绘
+    style_key = {"3d_anim": "3d", "realistic": "realistic"}.get(look, "")
+    base_dir = REPO / "assets" / "v5" / "characters" / cid
+    portrait = base_dir / f"portrait_{style_key}.png" if style_key else base_dir / "portrait.png"
+    if not portrait.is_file():
+        portrait = base_dir / "portrait.png"
+    if not portrait.is_file():
+        raise RuntimeError(f"缺少角色立绘: {portrait}")
+    spec = _imagegen_spec_for(cid, KEYFRAMES / "specs")
+    out_dir = utils.ensure_dir(KEYFRAMES / tid / f"{look}_identity")
+    raw_dir = out_dir / f"raw_{shot['id']}"
+    utils.ensure_dir(raw_dir)
+    prompt = identity_lock_prompt(
+        tid, shot, apply_look(str(shot.get("prompt") or ""), look, anchor=True))
+    cmd = [
+        sys.executable, "-m", "imagegen.cli", "generate",
+        "--spec", str(spec), "--outdir", str(raw_dir),
+        "--mode", "scene", "--style", IMAGE_STYLE_BY_LOOK.get(look, "stylized_25d"),
+        "--size", "1024x576", "--composition", "scene_wide",
+        "--prompt-extra", prompt, "--negative-extra",
+        "text, watermark, multiple people with different faces, face swap",
+        "--ref", str(portrait), "--ip-adapter-strength", "0.68",
+        "--ip-adapter-end-at", "0.85", "--seed", str(seed), "--timeout", "600",
+    ]
+    proc = subprocess.run(cmd, cwd=str(REPO), capture_output=True, text=True,
+                          encoding="utf-8", errors="replace", timeout=660)
+    png = raw_dir / "scene.png"
+    if proc.returncode != 0 or not png.is_file():
+        tail = "\n".join(((proc.stdout or "") + "\n" + (proc.stderr or "")).strip().splitlines()[-6:])
+        raise RuntimeError(f"关键帧生成失败: {tail[-500:]}")
+    return png
+
+
+def _ensure_silence(tid: str, shot: dict) -> pathlib.Path:
+    path = t3.V5_OUT / tid / "work" / "audio" / f"{shot['id']}.wav"
+    if path.is_file() and path.stat().st_size > 1000:
+        return path
+    utils.ensure_dir(path.parent)
+    dur = float(shot.get("duration") or 5.0)
+    subprocess.run([str(FFMPEG), "-y", "-hide_banner", "-loglevel", "error",
+                    "-f", "lavfi", "-i", f"anullsrc=r=48000:cl=stereo",
+                    "-t", f"{dur:.3f}", str(path)], check=False)
+    return path
+
+
+#: R5：人脸锚点（3D/真实观感的 T2VA 提示词用）。
+#: classics 实测 3d_anim 无脸率 50%（30 帧抽检），主因是纯文本 prompt + "feature film still /
+#: shallow depth of field" 让模型给胸/道具特写；2d 反而正常。这里对**有角色的**镜头追加
+#: 人脸锚点 + 负向词，指纹会随之变化 → 只会重渲受影响的镜头。
+FACE_ANCHOR = (" Centered medium shot, one single character, the character's face clearly "
+               "visible, head fully in frame, looking toward camera, upper body framing. ")
+FACE_AVOID = (" Avoid: faceless, head out of frame, cropped head, back view, extreme close-up "
+              "of torso, hands only, duplicated person, two identical faces, twins.")
+FACE_ANCHOR_LOOKS = ("3d_anim", "realistic")
+
+
+def apply_look(prompt: str, look: str, *, anchor: bool = False) -> str:
+    prefix = LOOK_PREFIX.get(look, "")
+    avoid = LOOK_AVOID.get(look, "")
+    extra = (FACE_ANCHOR + FACE_AVOID) if (anchor and look in FACE_ANCHOR_LOOKS) else ""
+    return (prefix + str(prompt or "") + extra + avoid).strip()
+
+
 def gen_t2va(tid: str, shot: dict, seed: int, style_mode: str = "3d",
-             broll: bool = False, style_id: str = "jp_anime") -> pathlib.Path:
+             broll: bool = False, style_id: str = "jp_anime",
+             look: str = "3d_anim", force: bool = False) -> pathlib.Path:
     style_key = resolve_2d_style(style_id)
     suffix = f"{STYLE_2D_CACHE}_{style_key}" if style_mode == "2d" else ""
+    if look in ("realistic", "3d_anim"):
+        suffix += f"_{look}"
     out = WORK / "clips" / f"{tid}_{shot['id']}_t2va1024{suffix}.mp4"
-    if out.is_file() and out.stat().st_size > 200_000:
-        return out
     duration = float(shot.get("duration") or 5.0)
     length = frame_length(duration)
-    prompt = apply_2d_style(str(shot["prompt"]), broll=broll, style_id=style_key) \
-        if style_mode == "2d" else str(shot["prompt"])
+    if style_mode == "2d":
+        prompt = apply_2d_style(str(shot["prompt"]), broll=broll, style_id=style_key)
+    else:
+        # 有角色的镜头才加人脸锚点（空镜/远景不加，避免"无脸"误判变成"多出来的人"）
+        prompt = apply_look(str(shot["prompt"]), look,
+                            anchor=bool(_shot_character_id(tid, shot)))
+        prompt = identity_lock_prompt(tid, shot, prompt)
+    # 输入指纹：prompt + seed + 尺寸 + 帧数(时长) + mode + look + style_id
+    sig = _clip_sig("hq-t2va", prompt=prompt, seed=int(seed), width=1024, height=576,
+                    length=int(length), duration=round(duration, 3), mode=style_mode,
+                    look=look, style_id=style_key, broll=bool(broll),
+                    template=tid, shot=str(shot["id"]))
+    if not force and _cache_hit(out, sig):
+        return out
+    if force:
+        _remember_miss(f"{out.name}: force → 重渲")
+    t0 = time.time()
     wf = local.build_workflow(prompt, 1024, 576, length, seed,
                               f"v16/{tid}/{shot['id']}_t2va{suffix}")
     pid = local.submit(wf)
     res = local.wait_and_fetch(pid, out, timeout=1800)
     if not out.is_file():
         raise RuntimeError(f"T2VA 失败: {res}")
+    _render_meta(out, sig, {
+        "kind": "hq-t2va", "h3": True, "ok": True, "mode": "t2va",
+        "workflow": "04_i2v_api.json(t2va)", "prompt_id": str(pid),
+        "seed": int(seed), "duration": round(duration, 3), "length": int(length),
+        "width": 1024, "height": 576, "fps": 24,
+        "shot_id": str(shot["id"]), "template": tid, "style_mode": style_mode,
+        "style_id": style_key, "look": look, "broll": bool(broll),
+        "prompt": prompt, "path": str(out), "gen_sec": round(time.time() - t0, 1),
+        "created_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+    })
     return out
 
 
@@ -689,30 +925,43 @@ def motion_prompt(shot: dict, style_mode: str = "3d", style_id: str = "jp_anime"
 
 def gen_ref2va(tid: str, shot: dict, t2va: pathlib.Path, seed: int,
                style_mode: str = "3d", keyframe: pathlib.Path | None = None,
-               style_id: str = "jp_anime", age_identity: str = "") -> pathlib.Path:
+               style_id: str = "jp_anime", age_identity: str = "",
+               force: bool = False) -> pathlib.Path:
     style_key = resolve_2d_style(style_id)
     suffix = f"{STYLE_2D_CACHE}_{style_key}" if style_mode == "2d" else ""
     out = WORK / "clips" / f"{tid}_{shot['id']}_ref2va1024{suffix}.mp4"
-    if keyframe is not None:
-        # 关键帧模式：旧 ref2va 缓存（V42 T2VA 首帧）不能复用，强制重生成
-        try:
-            if out.is_file():
-                out.unlink()
-        except OSError:
-            pass
-    elif out.is_file() and out.stat().st_size > 200_000:
-        return out
     if keyframe is not None and keyframe.is_file():
         first = keyframe
     else:
         first = WORK / "clips" / f"{tid}_{shot['id']}_first{suffix}.png"
-        subprocess.run([str(FFMPEG), "-y", "-hide_banner", "-loglevel", "error",
-                        "-i", str(t2va), "-frames:v", "1", str(first)], check=False)
+        # 抽首帧：写到临时名再 replace，避免「旧帧还在 + 抽帧失败」被当成新帧
+        tmp_first = first.with_name(first.stem + ".tmp" + first.suffix)
+        try:
+            tmp_first.unlink(missing_ok=True)
+        except OSError:
+            pass
+        proc_first = subprocess.run(
+            [str(FFMPEG), "-y", "-hide_banner", "-loglevel", "error",
+             "-i", str(t2va), "-frames:v", "1", str(tmp_first)],
+            capture_output=True, text=True, encoding="utf-8", errors="replace")
+        if proc_first.returncode != 0 or not tmp_first.is_file():
+            raise RuntimeError(f"ref2va 抽首帧失败: {(proc_first.stderr or '')[-300:]}")
+        os.replace(tmp_first, first)
     audio = t3.V5_OUT / tid / "work" / "audio" / f"{shot['id']}.wav"
-    prompt_file = WORK / "clips" / f"{tid}_{shot['id']}_prompt{suffix}.txt"
-    prompt_file.write_text(motion_prompt(shot, style_mode, style_key, age_identity),
-                           encoding="utf-8")
+    prompt = motion_prompt(shot, style_mode, style_key, age_identity)
     duration = float(shot.get("duration") or 5.0)
+    # 输入指纹：提示词 + 种子 + 时长 + 尺寸/fps + 首帧内容 + 音频内容 + mode/style
+    sig = _clip_sig("hq-ref2va", prompt=prompt, seed=int(seed),
+                    width=1024, height=576, fps=24, duration=round(duration, 3),
+                    mode=style_mode, style_id=style_key, template=tid,
+                    shot=str(shot["id"]),
+                    image=fingerprint.file_signature(first),
+                    audio=fingerprint.file_signature(audio))
+    if not force and _cache_hit(out, sig):
+        return out
+    prompt_file = WORK / "clips" / f"{tid}_{shot['id']}_prompt{suffix}.txt"
+    prompt_file.write_text(prompt, encoding="utf-8")
+    t0 = time.time()
     proc = subprocess.run([
         sys.executable, str(H3_REF), "--mode", "audio_ref",
         "--image", str(first), "--audio", str(audio), "--out", str(out),
@@ -722,14 +971,59 @@ def gen_ref2va(tid: str, shot: dict, t2va: pathlib.Path, seed: int,
     ], capture_output=True, text=True, encoding="utf-8", errors="replace")
     if proc.returncode != 0 or not out.is_file():
         raise RuntimeError(f"ref2va 失败: {(proc.stderr or '')[-300:]}")
+    # CLI 最后一行是结果 JSON：解析出真实 prompt_id / workflow，写进证据
+    cli = _last_json_line(proc.stdout)
+    _render_meta(out, sig, {
+        "kind": "hq-ref2va", "h3": True, "ok": bool(cli.get("ok", True)),
+        "mode": "ref2va",
+        "workflow": str(cli.get("workflow") or "05_ref2va_4step_sla.json"),
+        "prompt_id": str(cli.get("prompt_id") or ""),
+        "seed": int(seed), "duration": round(duration, 3),
+        "length": cli.get("length"), "width": 1024, "height": 576, "fps": 24,
+        "ref_image": str(first), "audio": str(audio),
+        "shot_id": str(shot["id"]), "template": tid, "style_mode": style_mode,
+        "style_id": style_key, "prompt": prompt, "path": str(out),
+        "gen_sec": cli.get("gen_sec", round(time.time() - t0, 1)),
+        "probe": cli.get("probe"),
+        "created_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+    })
     return out
 
 
+def _last_json_line(text: str) -> dict:
+    """取子进程 stdout 里最后一行合法 JSON（run_h3_ref 的结果行）。"""
+    for line in reversed((text or "").strip().splitlines()):
+        line = line.strip()
+        if not line.startswith("{"):
+            continue
+        try:
+            data = json.loads(line)
+        except ValueError:
+            continue
+        if isinstance(data, dict):
+            return data
+    return {}
+
+
 def _ensure_card_shots(tid: str) -> None:
-    """V42：custom 模板首次生成时没有旧 V5 卡片 clip；按 episode 补生成片头/片尾卡。"""
+    """V42：custom 模板首次生成时没有旧 V5 卡片 clip；按 episode 补生成片头/片尾卡。
+
+    时间线优先用 `t3.resolve_timeline()`（V49：assemble 会按镜头覆盖率在
+    out3d / templates_v5 / semantic brief 里选一条）；拿不到再退回 `load_episode`。
+    否则卡片会补到 assemble 根本不会读的那条时间线上 → 合成时缺 `v5_card_*`。
+    """
     from pipeline import render_v5, v5_catalog
 
-    episode = t3.load_episode(tid)
+    episode = None
+    resolver = getattr(t3, "resolve_timeline", None)
+    if callable(resolver):
+        try:
+            resolved = resolver(tid)
+            episode = resolved[0] if isinstance(resolved, (tuple, list)) and resolved else None
+        except Exception as exc:  # noqa: BLE001 - 时间线解析失败不阻塞补卡
+            log(f"卡片：resolve_timeline 失败，回退 load_episode：{exc}")
+    if not isinstance(episode, dict):
+        episode = t3.load_episode(tid)
     template = t3.load_template(tid)
     catalog = v5_catalog.load_catalog()
     style = (catalog.get("styles") or {}).get(str(template.get("style") or ""))
@@ -778,20 +1072,35 @@ def main(argv=None) -> int:
                     help="V45.2：2D 关键帧抽卡数（>1 时同 prompt 多 seed，出候选图+选卡图）")
     ap.add_argument("--keyframe-pick", dest="keyframe_pick", type=int, default=None,
                     help="V45.2：指定候选序号（缺省读 tmp/v16/keyframe_picks.json，再退回自动分）")
+    ap.add_argument("--identity", choices=("prompt", "keyframe"), default="prompt",
+                    help="V68：keyframe=用资产库立绘锁脸（每镜先出关键帧再 ref2va）")
+    ap.add_argument("--look", choices=("3d_anim", "2d_anim", "realistic"),
+                    default="3d_anim",
+                    help="V61：观感——3D 动画 / 2D 动画 / 真实（写实实拍感）")
     ap.add_argument("--skip-t2va", action="store_true")
     ap.add_argument("--skip-ref2va", action="store_true")
+    ap.add_argument("--force", action="store_true",
+                    help="忽略所有缓存（关键帧/镜头），prompt 改动后强制重渲")
     ap.add_argument("--reuse-shots", action="store_true",
                     help="已有 shots/<sid>.mp4 时跳过生成，直接复用（用于快速重剪辑/UI「复用已有镜头」）")
+    ap.add_argument("--limit", type=int, default=0,
+                    help="只渲前 N 镜（冒烟/省 GPU 用；0=全部；合成时不足的时长按 target 补空镜）")
     args = ap.parse_args(argv)
     tid = args.template
     style_mode = str(args.style_mode or "3d")
+    look = str(getattr(args, "look", "3d_anim") or "3d_anim")
+    if look == "2d_anim":
+        style_mode = "2d"
     style_2d = resolve_2d_style(getattr(args, "style_2d", "jp_anime"))
     ip_strength = getattr(args, "ip_strength", None)
     ip_end = getattr(args, "ip_end", None)
     keyframe_candidates = max(1, int(getattr(args, "keyframe_candidates", 1) or 1))
     keyframe_pick = getattr(args, "keyframe_pick", None)
+    limit = max(0, int(getattr(args, "limit", 0) or 0))
     briefs = briefs_for(tid)
     shots = [s for s in briefs["shots"] if s.get("prompt")]
+    if limit:
+        shots = shots[:limit]
     archive = REPO / f"outputs/_archive_v15_ref2va_768/{tid}/shots"
     archive.mkdir(parents=True, exist_ok=True)
     out_shots = t3.OUT3D / tid / "shots"
@@ -807,48 +1116,175 @@ def main(argv=None) -> int:
         style_note = (f"，2d_style={style_2d}/{style_conf['label']}，ckpt={style_conf['ckpt']}，"
                       f"IP={style_conf['ip_strength']:.2f}→{style_conf['ip_end']:.2f}"
                       f"/{style_conf['ip_weight_type']}")
-    log(f"=== {tid}: {len(shots)} 镜，1024×576 T2VA + ref2va（style_mode={style_mode}{style_note}）===")
+    log(f"=== {tid}: {len(shots)} 镜，1024×576 T2VA + ref2va（style_mode={style_mode}，look={look}{style_note}）===")
+    if limit:
+        log(f"--limit {limit}：只渲前 {len(shots)} 镜（冒烟模式；成片不足的时长由 compose 补空镜）")
+    force = bool(getattr(args, "force", False))
+    fallbacks: list[dict] = []
+    shot_metas: list[dict] = []
+    brief_path = REPO / f"contract/v5/cinema3d/templates3d/{tid}_semantic.json"
+    try:
+        brief_mtime = brief_path.stat().st_mtime
+    except OSError:
+        brief_mtime = 0.0
     for i, shot in enumerate(shots, 1):
-        existing = out_shots / f"{shot['id']}.mp4"
-        if args.reuse_shots and existing.is_file() and existing.stat().st_size > 100_000:
-            log(f"[{i}/{len(shots)}] {shot['id']} ok (reuse)")
-            continue
+        sid = str(shot["id"])
+        existing = out_shots / f"{sid}.mp4"
         # V45：用 crc32 而不是内置 hash()（后者受 PYTHONHASHSEED 随机化，重跑同模板会换 seed）
-        seed = 20261102 + zlib.crc32((tid + shot["id"]).encode("utf-8")) % 100000
+        seed = 20261102 + zlib.crc32((tid + sid).encode("utf-8")) % 100000
+        if (args.reuse_shots and not force
+            and existing.is_file() and existing.stat().st_size > 100_000):
+            meta = fingerprint.read_meta(existing)
+            current_prompt = str(shot.get("prompt") or "").strip()
+            saved_prompt = str(meta.get("brief_prompt") or "").strip()
+            # 新 meta 精确比台词；旧 meta 没有 brief_prompt —— 用「镜头文件不旧于 brief」
+            # 兜底（brief 改过就重渲），避免改台词仍复用旧片。
+            prompt_ok = (saved_prompt == current_prompt) if saved_prompt else (
+                existing.stat().st_mtime >= brief_mtime)
+            reuse_ok = bool(meta) and prompt_ok \
+                and meta.get("seed") == seed \
+                and str(meta.get("style_mode") or "") == style_mode \
+                and str(meta.get("style_2d") or "") == style_2d \
+                and str(meta.get("look") or "") == look
+            if reuse_ok:
+                log(f"[{i}/{len(shots)}] {sid} ok (reuse，指纹一致)")
+                shot_metas.append({"shot_id": sid, "reused": True, "meta_ok": True,
+                                   "path": str(existing)})
+                continue
+            log(f"[{i}/{len(shots)}] {sid} 缓存不匹配（prompt/seed/风格），重渲")
         has_line = bool(str(shot.get("line") or "").strip())
         age_identity = ""
         if style_mode == "2d" and has_line:
             cid = _shot_character_id(tid, shot)
             if cid:
                 age_identity = _character_look(cid)["motion"]
+        shot_t0 = time.time()
         final_src = None
+        method = ""
+        fallback = ""
+        if (getattr(args, "identity", "prompt") == "keyframe" and has_line
+                and look in ("3d_anim", "realistic") and not args.skip_ref2va):
+            try:
+                audio = _ensure_silence(tid, shot)
+                keyframe = _identity_keyframe(tid, shot, seed, look)
+                final_src = gen_ref2va(tid, shot, keyframe, seed, "3d",
+                                       keyframe=keyframe, style_id=style_2d,
+                                       force=force)
+                method = "identity_keyframe+ref2va"
+                log(f"[{i}/{len(shots)}] {sid} ok (identity keyframe+ref2va)")
+            except Exception as exc:  # noqa: BLE001
+                fallback = f"锁脸失败→回退 T2VA：{exc}"
+                fallbacks.append({"shot": sid, "from": "identity_keyframe", "error": str(exc)[-400:]})
+                log(f"[{i}/{len(shots)}] {sid} 锁脸失败，回退 T2VA：{exc}")
         if style_mode == "2d" and has_line and not args.skip_ref2va:
             visual = str(shot.get("semantic_visual") or "").strip()
             try:
                 keyframe = _generate_keyframe(tid, shot, visual, seed, style_2d,
                                              ip_strength, ip_end,
                                              candidates=keyframe_candidates,
-                                             pick=keyframe_pick)
+                                             pick=keyframe_pick,
+                                             force=force)
                 final_src = gen_ref2va(tid, shot, keyframe, seed, style_mode,
                                        keyframe=keyframe, style_id=style_2d,
-                                       age_identity=age_identity)
-                log(f"[{i}/{len(shots)}] {shot['id']} ok (keyframe+ref2va)")
+                                       age_identity=age_identity, force=force)
+                method = "keyframe+ref2va"
+                log(f"[{i}/{len(shots)}] {sid} ok (keyframe+ref2va)")
             except Exception as exc:  # noqa: BLE001 - 关键帧失败回退 T2VA
-                log(f"[{i}/{len(shots)}] {shot['id']} 关键帧失败，回退 T2VA：{exc}")
+                fallback = f"关键帧失败→回退 T2VA：{exc}"
+                fallbacks.append({"shot": sid, "from": "keyframe", "error": str(exc)[-400:]})
+                log(f"[{i}/{len(shots)}] {sid} 关键帧失败，回退 T2VA：{exc}")
         if final_src is None:
             t2va = gen_t2va(tid, shot, seed, style_mode,
+                            look=look,
                             broll=(style_mode == "2d" and not has_line),
-                            style_id=style_2d)
+                            style_id=style_2d, force=force)
             final_src = t2va
+            method = "t2va"
             if has_line and not args.skip_ref2va:
                 final_src = gen_ref2va(tid, shot, t2va, seed, style_mode,
-                                       style_id=style_2d, age_identity=age_identity)
-            log(f"[{i}/{len(shots)}] {shot['id']} ok "
+                                       style_id=style_2d, age_identity=age_identity,
+                                       force=force)
+                method = "t2va+ref2va"
+            log(f"[{i}/{len(shots)}] {sid} ok "
                 f"({'ref2va' if final_src != t2va else 't2va'})")
-        shutil.copy2(final_src, out_shots / f"{shot['id']}.mp4")
+        dest = out_shots / f"{sid}.mp4"
+        # 原子落盘：拷贝中断不能留下"半截 mp4 被下次当有效镜头"的毒缓存。
+        tmp_dest = dest.with_suffix(dest.suffix + ".tmp")
+        shutil.copy2(final_src, tmp_dest)
+        copied_dur = utils.probe_duration(tmp_dest)
+        if copied_dur <= 0.1:
+            tmp_dest.unlink(missing_ok=True)
+            raise RuntimeError(f"{sid}: 镜头拷贝后时长异常（{copied_dur}s），已丢弃 {tmp_dest.name}")
+        os.replace(tmp_dest, dest)
+        # 每镜证据（字段名与 h3_comfy 的证据链同名：h3/workflow/prompt_id/seed/duration/...）
+        src_meta = fingerprint.read_meta(final_src)
+        shot_meta = {
+            "h3": True, "ok": True, "provider": "hq-local",
+            "mode": method,
+            "workflow": str(src_meta.get("workflow") or ""),
+            "workflow_file": str(src_meta.get("workflow") or ""),
+            "prompt_id": str(src_meta.get("prompt_id") or ""),
+            "seed": int(seed),
+            "duration": round(float(shot.get("duration") or 5.0), 3),
+            "length": src_meta.get("length"),
+            "width": 1024, "height": 576, "fps": 24,
+            "ref_image": str(src_meta.get("ref_image") or ""),
+            "audio": str(src_meta.get("audio") or ""),
+            "shot_id": sid, "shot_index": i, "template": tid,
+            "style_mode": style_mode, "style_2d": style_2d, "look": look,
+            "prompt": str(src_meta.get("prompt") or shot.get("prompt") or ""),
+            # 复用判据用「brief 原文」，不能拿上游改写过的 H3 prompt 比（见上方 reuse 分支）
+            "brief_prompt": str(shot.get("prompt") or ""),
+            "source": str(final_src),
+            "clip_fingerprint": str(src_meta.get(fingerprint.SIG_KEY) or ""),
+            "gen_sec": round(time.time() - shot_t0, 1),
+            "fallback": fallback,
+            "path": str(dest),
+            "created_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+        }
+        try:
+            shot_meta["bytes"] = dest.stat().st_size
+        except OSError:
+            pass
+        utils.write_json(fingerprint.meta_path_for(dest), shot_meta)
+        if not shot_meta["prompt_id"]:
+            log(f"[{i}/{len(shots)}] {sid} ⚠ 无 prompt_id（H3 证据不可追溯）")
+        shot_metas.append({**shot_meta, "meta_ok": bool(shot_meta["prompt_id"])})
+    # 每镜证据汇总（与 shots/<sid>.meta.json 同源）：出问题先看这份，不用翻日志
+    counts: dict[str, int] = {}
+    for item in shots:
+        counts[str(item.get("id"))] = counts.get(str(item.get("id")), 0) + 1
+    dup_ids = sorted(k for k, v in counts.items() if v > 1)
+    if dup_ids:
+        log(f"⚠ brief 里有重复 shot id（同 id 会互相覆盖 clip/meta）：{dup_ids[:8]}"
+            f"（共 {len(dup_ids)} 个）｜根因 scripts/expand_3d_shots.py，修完需重跑该脚本")
+    run_report = {
+        "template": tid, "style_mode": style_mode, "look": look, "style_2d": style_2d,
+        "shots": len(shots), "force": force,
+        "unique_shot_ids": not dup_ids, "duplicate_ids": dup_ids,
+        "meta_ok": sum(1 for m in shot_metas if m.get("meta_ok")),
+        "missing_prompt_id": [m["shot_id"] for m in shot_metas
+                              if m.get("meta_ok") is False],
+        "fallbacks": fallbacks,
+        "cache_miss": LOG_HIT_MISS[-50:],
+        "items": shot_metas,
+        "created_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+    utils.write_json(t3.OUT3D / tid / "work" / "hq_run.json", run_report)
     log("=== 剪辑 ===")
     _ensure_card_shots(tid)
-    report = t3.assemble(tid)
+    if limit:
+        # --limit 是冒烟模式：覆盖率天然不足，t3.assemble 的覆盖率断言必然失败。
+        # 这里跳过它（成片由 unique_fill.compose 另做），并把这个决定写进证据。
+        log(f"--limit {limit}：跳过 t3.assemble（{len(shots)}/{len(briefs['shots'])} 镜，"
+            "覆盖率不足是预期的；成片走 unique_fill.compose）")
+        run_report["assemble"] = "skipped(limit)"
+        utils.write_json(t3.OUT3D / tid / "work" / "hq_run.json", run_report)
+        report = {"skipped": True, "reason": "limit"}
+    else:
+        report = t3.assemble(tid)
+        run_report["assemble"] = "ok"
+        utils.write_json(t3.OUT3D / tid / "work" / "hq_run.json", run_report)
     final = t3.OUT3D / tid / "final.mp4"
     # V45：海报优先用「有台词镜头」的风格关键帧（带角色 + 该风格的脸/服装），
     # 这样 4 种风格的封面才看得出差异；没有关键帧时回落到该镜头 1.2s 处抽帧。

@@ -54,8 +54,11 @@ NAME_MAP = {
 _nllb = {"model": None, "tokenizer": None}
 
 
-def prepare_source(text: str) -> str:
+def prepare_source(text: str, target_lang: str = "") -> str:
+    """把中文人名替换成拉丁写法（给 NLLB/LLM 更好译）；目标为中日文时保持原名。"""
     out = text or ""
+    if str(target_lang).lower().startswith(("zh", "ja")):
+        return out
     for zh, ro in NAME_MAP.items():
         out = out.replace(zh, ro)
     return out
@@ -152,7 +155,7 @@ def _translate_nllb(units: list[dict], target_lang: str, batch_size: int = 8) ->
 
     tokenizer.src_lang = LANG_CODES["zh"]
     forced_bos = tokenizer.convert_tokens_to_ids(LANG_CODES[target_lang])
-    texts = [prepare_source(str(u.get("text") or "")) for u in units]
+    texts = [prepare_source(str(u.get("text") or ""), target_lang) for u in units]
     out: dict[str, str] = {}
     for i in range(0, len(texts), batch_size):
         batch = texts[i:i + batch_size]

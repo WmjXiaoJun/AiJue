@@ -136,6 +136,7 @@ CLIP_OK_STATUSES = ("ok", "cached", "card-skip")
 
 T3D_ROOT = config.OUTPUTS_DIR / "templates_3d"
 T2D_ROOT = config.OUTPUTS_DIR / "templates_2d"
+V5_ROOT = config.OUTPUTS_DIR / "templates_v5"
 PROGRESS_PATH = T3D_ROOT / "progress.json"
 V5_ROOT = config.OUTPUTS_DIR / "templates_v5"
 BRIEFS_DIR = config.CONTRACT_DIR / "v5" / "cinema3d" / "templates3d"
@@ -618,16 +619,25 @@ def _preferred_final_path(tid: str) -> Path:
     return root / tid / "final.mp4"
 
 
-def _final_path(tid: str) -> Path:
-    """V41：优先按 render_type 选目录；另一目录已有成片时兼容回退。"""
+FINAL_NAMES = ("final_300s.mp4", "final.mp4",
+               "final_300s_3d_anim.mp4", "final_300s_2d_anim.mp4",
+               "final_300s_realistic.mp4")
+LOOK_SUFFIX = {"3d_anim": "_3d_anim", "2d_anim": "_2d_anim", "realistic": "_realistic"}
+LOOK_KEYS = tuple(LOOK_SUFFIX)
+
+
+def _final_path(tid: str, look: str = "") -> Path:
+    """V59/V62：可选观感（3d_anim/2d_anim/realistic）→ 5 分钟版 > 普通成片。"""
     preferred = _preferred_final_path(tid)
     other_root = T3D_ROOT if preferred.parent.parent == T2D_ROOT else T2D_ROOT
-    other = other_root / tid / "final.mp4"
+    roots = (preferred.parent.parent, other_root, V5_ROOT)
+    names = ([f"final_300s{LOOK_SUFFIX[look]}.mp4"] if look in LOOK_SUFFIX else []) + list(FINAL_NAMES)
     try:
-        if preferred.is_file() and preferred.stat().st_size > 0:
-            return preferred
-        if other.is_file() and other.stat().st_size > 0:
-            return other
+        for name in names:
+            for root in roots:
+                candidate = root / tid / name
+                if candidate.is_file() and candidate.stat().st_size > 0:
+                    return candidate
     except OSError:
         pass
     return preferred
@@ -638,20 +648,31 @@ def _final_media_url(path: Path, tid: str) -> str:
         root_name = path.parent.parent.name
     except Exception:  # noqa: BLE001
         root_name = "templates_3d"
-    return _media_url(f"{root_name}/{tid}/final.mp4")
+    return _media_url(f"{root_name}/{tid}/{path.name}")
 
 
-def _final_info(tid: str) -> Dict[str, Any]:
-    path = _final_path(tid)
+def _look_path(tid: str, look: str) -> Path:
+    """严格取某个观感的成片（不存在就返回“预期路径”，不回落其它观感）。"""
+    name = f"final_300s{LOOK_SUFFIX[look]}.mp4"
+    for root in (T3D_ROOT, V5_ROOT):
+        candidate = root / tid / name
+        if candidate.is_file() and candidate.stat().st_size > 0:
+            return candidate
+    return T3D_ROOT / tid / name
+
+
+def _final_info(tid: str, look: str = "") -> Dict[str, Any]:
+    path = _look_path(tid, look) if look in LOOK_SUFFIX else _final_path(tid)
     url = _final_media_url(path, tid)
     try:
         stat = path.stat()
     except OSError:
         return {"exists": False, "duration": 0.0, "size": 0, "mtime": None, "url": url}
-    key = (stat.st_mtime_ns, stat.st_size)
+    key = (stat.st_mtime_ns, stat.st_size, look)
     now = time.monotonic()
+    cache_key = f"{tid}|{look}"
     with _FINAL_LOCK:
-        hit = _FINAL_CACHE.get(tid)
+        hit = _FINAL_CACHE.get(cache_key)
         if hit is not None and hit[0] == key and (now - hit[1]) < FINAL_CACHE_TTL:
             return dict(hit[2])
     duration = float(jobs.probe_video_duration(path) or 0.0)
@@ -663,17 +684,17 @@ def _final_info(tid: str) -> Dict[str, Any]:
         "url": url,
     }
     with _FINAL_LOCK:
-        _FINAL_CACHE[tid] = (key, now, value)
+        _FINAL_CACHE[cache_key] = (key, now, value)
     return dict(value)
 
 
-def _final_info_many(tids: Sequence[str]) -> Dict[str, Dict[str, Any]]:
+def _final_info_many(tids: Sequence[str], look: str = "") -> Dict[str, Dict[str, Any]]:
     """并行 ffprobe（首次 16 个成片约 0.3-0.8s；缓存命中则纯 stat）。"""
     if not tids:
         return {}
     workers = max(1, min(8, len(tids)))
     with ThreadPoolExecutor(max_workers=workers) as pool:
-        values = list(pool.map(_final_info, tids))
+        values = list(pool.map(lambda t: _final_info(t, look), tids))
     return dict(zip(tids, values))
 
 
@@ -762,8 +783,101 @@ def _contract_poster_url(tid: str) -> Optional[str]:
     return None
 
 
+def _dialogue_moments(tid: str, duration: float) -> list[float]:
+    """封面优先取“有人物出镜的对白镜”（timeline.json 的绝对时间最准）。"""
+    base = _final_path(tid).parent
+    moments: list[float] = []
+    timeline = base / "timeline.json"
+    if timeline.is_file():
+        try:
+            data = json.loads(timeline.read_text(encoding="utf-8"))
+            for track in data.get("tracks") or []:
+                if track.get("kind") != "video":
+                    continue
+                for clip in track.get("clips") or []:
+                    role = clip.get("role")
+                    dur = float(clip.get("out") or 0.0)
+                    at = float(clip.get("at") or 0.0)
+                    if role and dur >= 1.6 and not str(clip.get("id", "")).startswith("v5_ch"):
+                        moments.append(at + dur * 0.62)
+                        if len(moments) >= 4:
+                            break
+        except (OSError, ValueError):
+            moments = []
+    if not moments:
+        ep = base / "work" / "episode.json"
+        if ep.is_file():
+            try:
+                data = json.loads(ep.read_text(encoding="utf-8"))
+                cursor = 0.0
+                for shot in data.get("shots") or []:
+                    dur = float(shot.get("duration") or 0.0)
+                    if str(shot.get("line") or "").strip() and dur >= 2.0:
+                        moments.append(cursor + dur * 0.6)
+                        if len(moments) >= 3:
+                            break
+                    cursor += dur
+            except (OSError, ValueError):
+                moments = []
+    return [min(max(0.0, m), max(0.0, duration - 1.0)) for m in moments]
+
+
+def _poster_candidates(tid: str, final: Path) -> list[float]:
+    """封面取“正片画面”而不是片头卡：优先对白镜头中段，再退到 18%/35%/55%。"""
+    duration = float(jobs.probe_video_duration(final) or 0.0)
+    if duration <= 12:
+        return [max(0.0, duration * 0.5)]
+    moments = _dialogue_moments(tid, duration)
+    lo, hi = 6.0, max(6.5, duration - 5.0)
+    marks = [duration * 0.18, duration * 0.35, duration * 0.55]
+    moments += [min(hi, max(lo, m)) for m in marks]
+    return moments[:5]
+
+
+def _frame_score(path: Path) -> float:
+    """封面打分：肤色像素占比（有人在画面里）+ 细节方差；片头卡/纯景会低分。"""
+    try:
+        from PIL import Image
+        import numpy as np
+        img = Image.open(path).convert("RGB").resize((160, 90))
+        arr = np.asarray(img, dtype=np.float32)
+        r, g, b = arr[..., 0], arr[..., 1], arr[..., 2]
+        mx = arr.max(axis=-1)
+        mn = arr.min(axis=-1)
+        skin = ((r > 95) & (g > 40) & (b > 20) & ((mx - mn) > 15)
+                & (abs(r - g) > 15) & (r > g) & (r > b))
+        gray = arr.mean(axis=-1) / 255.0
+        return float(skin.mean()) * 3.0 + float(gray.std()) * 0.6
+    except Exception:  # noqa: BLE001
+        return 0.0
+
+
+def _extract_frame(final: Path, moment: float, out: Path) -> bool:
+    cmd = [str(jobs.ffmpeg_bin()), "-y", "-ss", f"{moment:.2f}", "-i", str(final),
+           "-frames:v", "1", "-q:v", "2", str(out)]
+    try:
+        proc = subprocess.run(cmd, capture_output=True, timeout=120)
+    except (OSError, subprocess.SubprocessError) as exc:
+        logger.warning("抽帧失败（%s）：%s", final.name, exc)
+        return False
+    try:
+        return proc.returncode == 0 and out.is_file() and out.stat().st_size > 0
+    except OSError:
+        return False
+
+
+def _frame_mean(path: Path) -> float:
+    try:
+        from PIL import Image
+        import numpy as np
+        img = Image.open(path).convert("L").resize((64, 36))
+        return float(np.asarray(img, dtype=np.float32).mean() / 255.0)
+    except Exception:  # noqa: BLE001
+        return 0.5
+
+
 def _generate_poster(tid: str) -> bool:
-    """用 ffmpeg 从 final.mp4 抽一帧做海报（同目录临时文件 + os.replace 原子落盘）。"""
+    """从成片正片里挑一张“最有内容”的帧做海报（不再用片头卡）。"""
     final = _final_path(tid)
     if not final.is_file():
         return False
@@ -772,44 +886,35 @@ def _generate_poster(tid: str) -> bool:
         target.parent.mkdir(parents=True, exist_ok=True)
     except OSError:
         return False
-    tmp = target.with_name(f"poster.tmp-{os.getpid()}-{threading.get_ident()}.jpg")
-    cmd = [
-        str(jobs.ffmpeg_bin()),
-        "-y",
-        "-ss",
-        "0.8",
-        "-i",
-        str(final),
-        "-frames:v",
-        "1",
-        "-q:v",
-        "3",
-        str(tmp),
-    ]
+    tmp_dir = target.parent / "_poster_tmp"
     try:
-        proc = subprocess.run(cmd, capture_output=True, timeout=120)
-    except (OSError, subprocess.SubprocessError) as exc:
-        logger.warning("生成模板海报失败（%s）：%s", tid, exc)
-        return False
-    try:
-        ok = proc.returncode == 0 and tmp.is_file() and tmp.stat().st_size > 0
+        tmp_dir.mkdir(parents=True, exist_ok=True)
     except OSError:
-        ok = False
-    if not ok:
-        try:
-            tmp.unlink(missing_ok=True)
-        except OSError:
-            pass
+        return False
+    # 候选顺序 = 有人物的对白镜在前：取第一张“不黑不白”的即可，不再用肤色打分
+    # （霓虹/赛博风格的粉紫会骗过肤色规则，反而选到空镜）。
+    chosen: Path | None = None
+    for idx, moment in enumerate(_poster_candidates(tid, final)):
+        cand = tmp_dir / f"{tid}_{idx}.jpg"
+        if not _extract_frame(final, moment, cand):
+            continue
+        if _frame_mean(cand) < 0.06:
+            continue
+        chosen = cand
+        break
+    if chosen is None:
         return False
     try:
-        os.replace(tmp, target)
+        os.replace(chosen, target)
     except OSError as exc:
         logger.warning("写入模板海报失败（%s）：%s", tid, exc)
-        try:
-            tmp.unlink(missing_ok=True)
-        except OSError:
-            pass
         return False
+    finally:
+        for leftover in tmp_dir.glob(f"{tid}_*.jpg"):
+            try:
+                leftover.unlink()
+            except OSError:
+                pass
     return True
 
 
@@ -850,9 +955,15 @@ def _media_for_root(root_name: str, tid: str, rel: str) -> str:
 def _poster_url(tid: str, final_exists: bool, allow_generate: bool) -> Optional[str]:
     """海报 URL：优先 final 同目录 poster.jpg；成片已出但海报未生成时抽帧
     （列表异步/详情同步）；成片还没出来时回落到 contract 声明海报 / 旧 2D 产物。"""
-    root_name = _final_path(tid).parent.parent.name
-    if _poster_exists(tid):
-        return _media_for_root(root_name, tid, POSTER_FILENAME)
+    poster = _poster_path(tid)
+    if poster.is_file() and poster.stat().st_size > 0:
+        root_name = poster.parent.parent.name
+        url = _media_url(f"{root_name}/{tid}/{POSTER_FILENAME}")
+        try:
+            stamp = int(poster.stat().st_mtime)
+        except OSError:
+            stamp = 0
+        return f"{url}?v={stamp}" if stamp else url
     if final_exists:
         if allow_generate:
             if _generate_poster(tid):
@@ -882,6 +993,7 @@ def _template_view(
     progress: Dict[str, Any],
     final_info: Optional[Dict[str, Any]] = None,
     allow_poster_generate: bool = False,
+    looks: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     final = final_info if final_info is not None else _final_info(tid)
     report_url = _report_url(tid)
@@ -900,6 +1012,7 @@ def _template_view(
         "progress": state["progress"],
         "clips": state["clips"],
         "final": final,
+        "looks": looks or {},
         "poster_url": _poster_url(tid, bool(final.get("exists")), allow_poster_generate),
         "report_url": report_url,
         "error": state["error"],
@@ -1711,15 +1824,39 @@ def _spawn_template_job(job_id: str) -> None:
 # --------------------------------------------------------------------------- #
 @router.get("")
 @router.get("/")
-def list_templates(response: Response) -> Dict[str, Any]:
+def list_templates(response: Response, look: str = "") -> Dict[str, Any]:
     response.headers["Cache-Control"] = "no-store, max-age=0"
     _refresh_template_ids()  # V21：新建 custom 模板后列表即时可见
     progress = _load_progress()
-    finals = _final_info_many(TEMPLATES)
-    views = [
-        _template_view(tid, progress, finals.get(tid), allow_poster_generate=False)
-        for tid in TEMPLATES
-    ]
+    ids = list(TEMPLATES)
+    # V54：成片库要覆盖全部模板（含 V5 栈的 relic_talk / custom_holo_talk）
+    try:
+        from pipeline import v5_catalog  # noqa: PLC0415
+
+        catalog = (v5_catalog.load_catalog().get("templates") or {})
+    except Exception:  # noqa: BLE001
+        catalog = {}
+    for tid in catalog:
+        if tid in TEMPLATE_SET:
+            continue
+        if _final_path(tid).is_file():
+            ids.append(tid)
+    finals = _final_info_many(ids, look)
+    look_infos = {key: _final_info_many(ids, key) for key in LOOK_KEYS}
+    views = []
+    for tid in ids:
+        tid_looks = {key: look_infos[key].get(tid, {}) for key in LOOK_KEYS}
+        try:
+            views.append(_template_view(tid, progress, finals.get(tid),
+                                        allow_poster_generate=False,
+                                        looks=tid_looks))
+        except Exception:  # noqa: BLE001 - V5 模板没有 3D 看板数据
+            tpl = catalog.get(tid) or {}
+            views.append({"id": tid, "label": tpl.get("label") or tid,
+                          "style": tpl.get("style") or "",
+                          "render_type": tpl.get("render_type") or "v5",
+                          "status": "ready" if (finals.get(tid) or {}).get("exists") else "pending",
+                          "final": finals.get(tid) or {"exists": False}})
     return {
         "templates": views,
         "summary": _summary(views),
@@ -2316,7 +2453,8 @@ def _publish_cover(tid: str, workdir: Path, warnings: List[str]) -> Optional[Pat
     cover = workdir / "cover.jpg"
     try:
         proc = subprocess.run(
-            [str(jobs.ffmpeg_bin()), "-y", "-ss", "1.0", "-i", str(final),
+            [str(jobs.ffmpeg_bin()), "-y", "-ss",
+             f"{(_poster_candidates(tid, final) or [1.0])[0]:.2f}", "-i", str(final),
              "-frames:v", "1", "-q:v", "3", str(cover)],
             capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=60,
         )

@@ -3,7 +3,7 @@ import { ApiError, API_BASE, api, errorText } from "../lib/api";
 import type { Health, LLMConfig, LLMProviderInfo, LLMTestResult, Settings } from "../types";
 import { useToast } from "./Toast";
 import { Spinner } from "./ui";
-import { IconAlert, IconCheck, IconClose, IconGlobe, IconRefresh, IconSettings, IconSpark } from "./icons";
+import { IconAlert, IconCheck, IconClose, IconExternal, IconGlobe, IconRefresh, IconSettings, IconSpark } from "./icons";
 import "../styles/settings.css";
 
 interface Props {
@@ -165,6 +165,11 @@ export function SettingsModal({ open, onClose, health }: Props) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [metasoKeyConfigured, setMetasoKeyConfigured] = useState<boolean | null>(null);
+  // V73：MetaSo H3 Key 输入（只写，不回显；PATCH 仅提交 metaso_key）
+  const [metasoKeyInput, setMetasoKeyInput] = useState("");
+  const [metasoKeySaving, setMetasoKeySaving] = useState(false);
+  const [metasoKeyError, setMetasoKeyError] = useState<string | null>(null);
+  const [metasoMeta, setMetasoMeta] = useState({ baseUrl: "", resolution: "", duration: 0 });
   const [h3ProviderSupported, setH3ProviderSupported] = useState(true);
   const [publish, setPublish] = useState<PublishForm>(EMPTY_PUBLISH);
   const [publishSupported, setPublishSupported] = useState(true);
@@ -182,6 +187,11 @@ export function SettingsModal({ open, onClose, health }: Props) {
       const settings = await api.settings();
       setForm(toForm(settings));
       setMetasoKeyConfigured(typeof settings.metaso_key_configured === "boolean" ? settings.metaso_key_configured : null);
+      setMetasoMeta({
+        baseUrl: settings.metaso_base_url || "",
+        resolution: settings.metaso_resolution || "",
+        duration: Number(settings.metaso_duration) || 0,
+      });
       setH3ProviderSupported(typeof settings.h3_provider === "string");
       const hasPublishConfig =
         typeof settings.upload_post_username === "string" ||
@@ -241,6 +251,32 @@ export function SettingsModal({ open, onClose, health }: Props) {
   }, [open]);
 
   const update = (key: keyof FormState, value: string) => setForm((prev) => ({ ...prev, [key]: value }));
+
+  /** V73：只保存 MetaSo Key —— PATCH 体仅 { metaso_key }，成功/失败都即时反映到状态 */
+  const saveMetasoKey = async () => {
+    const key = metasoKeyInput.trim();
+    if (!key || metasoKeySaving) return;
+    setMetasoKeySaving(true);
+    setMetasoKeyError(null);
+    try {
+      const next = await api.patchSettings({ metaso_key: key });
+      const configured = typeof next.metaso_key_configured === "boolean" ? next.metaso_key_configured : true;
+      setMetasoKeyConfigured(configured);
+      setMetasoMeta((prev) => ({
+        baseUrl: next.metaso_base_url || prev.baseUrl,
+        resolution: next.metaso_resolution || prev.resolution,
+        duration: Number(next.metaso_duration) || prev.duration,
+      }));
+      setMetasoKeyInput("");
+      notify("MetaSo Key 已保存", "success");
+    } catch (err) {
+      const detail = errorText(err);
+      setMetasoKeyError(detail);
+      notify("保存 MetaSo Key 失败：" + detail, "error");
+    } finally {
+      setMetasoKeySaving(false);
+    }
+  };
 
   const save = async () => {
     setSaving(true);
@@ -344,7 +380,7 @@ export function SettingsModal({ open, onClose, health }: Props) {
       }
     } catch (err) {
       if (err instanceof ApiError && (err.status === 404 || err.status === 405)) {
-        setLlmTestError("AI 模型测试接口未就绪（等待后端 task-45：POST /api/llm/test）");
+        setLlmTestError("AI 模型测试接口返回 404（POST /api/llm/test）：请确认后端已启动");
       } else {
         setLlmTestError("测试连接失败：" + errorText(err));
       }
@@ -396,7 +432,7 @@ export function SettingsModal({ open, onClose, health }: Props) {
             <div className="cm-set-notice is-warn">
               <IconAlert size={15} />
               <span>
-                设置接口不可用：{error}（后端 PATCH/GET /settings 未就绪时功能自动降级，不影响制作流程）
+                设置接口不可用：{error}（设置读写不可用时功能自动降级，不影响制作流程）
               </span>
               <button type="button" className="cm-set-link" onClick={() => void load()}>
                 重试
@@ -532,6 +568,61 @@ export function SettingsModal({ open, onClose, health }: Props) {
                 <span>
                   计价 ¥{(Number(form.h3_price_per_second) || 0.09).toFixed(2)}/秒 · 5s ≈ ¥
                   {((Number(form.h3_price_per_second) || 0.09) * 5).toFixed(2)}
+                </span>
+              </div>
+
+              {/* V73：MetaSo H3 Key 输入（只写，不回显；PATCH 仅 { metaso_key }） */}
+              <div className="cm-set-inline cm-set-key-row">
+                <input
+                  className="cm-set-input cm-set-key-input"
+                  type="password"
+                  autoComplete="new-password"
+                  spellCheck={false}
+                  value={metasoKeyInput}
+                  onChange={(event) => {
+                    setMetasoKeyInput(event.target.value);
+                    setMetasoKeyError(null);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") void saveMetasoKey();
+                  }}
+                  placeholder={metasoKeyConfigured ? "已配置，留空不修改" : "sk-..."}
+                  aria-label="MetaSo H3 API Key"
+                  disabled={metasoKeySaving}
+                />
+                <button
+                  type="button"
+                  className="cm-btn cm-btn-sm cm-btn-primary"
+                  onClick={() => void saveMetasoKey()}
+                  disabled={!metasoKeyInput.trim() || metasoKeySaving}
+                  title="PATCH /api/settings { metaso_key }（只提交这一个字段）"
+                >
+                  {metasoKeySaving ? <Spinner size={12} /> : <IconCheck size={12} />} 保存密钥
+                </button>
+                {metasoKeyConfigured === false && (
+                  <a
+                    className="cm-set-key-link"
+                    href="https://metaso.cn/minimax-h3/new-api-guide"
+                    target="_blank"
+                    rel="noreferrer"
+                    title="打开秘塔 H3 API 开通指南"
+                  >
+                    <IconExternal size={12} /> 去秘塔开通 H3
+                  </a>
+                )}
+              </div>
+              {metasoKeyError && (
+                <span className="cm-set-hint is-warn" role="alert">
+                  保存失败：{metasoKeyError}
+                </span>
+              )}
+              <div className="cm-set-meta-row">
+                <span>
+                  视频接口：
+                  <code className="cm-set-code">{metasoMeta.baseUrl ? metasoMeta.baseUrl + "/v1/videos" : "（未配置 METASO_BASE_URL）"}</code>
+                  {" · "}模型 MiniMax-H3{" · "}计费 ¥{(Number(form.h3_price_per_second) || 0.09).toFixed(2)}/秒
+                  {metasoMeta.resolution ? " · " + metasoMeta.resolution : ""}
+                  {metasoMeta.duration ? " / 单段 " + metasoMeta.duration + "s" : ""}
                 </span>
               </div>
               {form.h3_provider === "metaso" && (
@@ -692,7 +783,7 @@ export function SettingsModal({ open, onClose, health }: Props) {
                 <p className="cm-set-section-sub">LLM · 台本 / 内容生成（本地 Ollama 或 OpenAI 兼容）</p>
               </div>
               <span className={"cm-set-badge " + (llmSupported ? "is-jade" : "is-soft")}>
-                {llmSupported ? "接口可用" : "接口未就绪"}
+                {llmSupported ? "接口可用" : "接口不可用"}
               </span>
             </header>
 

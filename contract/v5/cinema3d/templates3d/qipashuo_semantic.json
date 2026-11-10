@@ -7,7 +7,8 @@
   {
    "id": "v5_card_title",
    "kind": "card",
-   "prompt": null
+   "prompt": null,
+   "act_index": -1
   },
   {
    "id": "v5_001",
@@ -17,7 +18,8 @@
    "line": "",
    "semantic_visual": "",
    "framing": "",
-   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate hall draped in pale silk, dramatic spotlights and microphone stands. The camera surveys the space, atmospheric and cinematic. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: hall reverb, a tense hush. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate hall draped in pale silk, dramatic spotlights and microphone stands. The camera surveys the space, atmospheric and cinematic. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: hall reverb, a tense hush. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_002",
@@ -27,7 +29,8 @@
    "line": "曹孟德，你可是个狡猾的奸雄啊！",
    "semantic_visual": "A robed strategist with a feather fan narrows his eyes and points sharply across a split silk scroll, where a rival warlord in dark armor smirks. Candlelight casts long shadows in a tense arena.",
    "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a long hanging scroll backdrop illuminated by stage lights. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed strategist with a feather fan narrows his eyes and points sharply across a split silk scroll, where a rival warlord in dark armor smirks. Candlelight casts long shadows in a tense arena.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow orbiting camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: hall reverb, a tense hush. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a long hanging scroll backdrop illuminated by stage lights. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed strategist with a feather fan narrows his eyes and points sharply across a split silk scroll, where a rival warlord in dark armor smirks. Candlelight casts long shadows in a tense arena.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow orbiting camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: hall reverb, a tense hush. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_003",
@@ -37,7 +40,8 @@
    "line": "没错没错，诸葛亮同志你俩都是史上有名的风云人物！",
    "semantic_visual": "An animated host in a plain robe gestures enthusiastically between two costumed historical figures seated on silk cushions, a cheering court audience blurred behind them under warm lantern glow.",
    "framing": "wide",
-   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate arena audience in warm shadow, faces lit by stage light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: An animated host in a plain robe gestures enthusiastically between two costumed historical figures seated on silk cushions, a cheering court audience blurred behind them under warm lantern glow.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: hall reverb, a tense hush. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate arena audience in warm shadow, faces lit by stage light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: An animated host in a plain robe gestures enthusiastically between two costumed historical figures seated on silk cushions, a cheering court audience blurred behind them under warm lantern glow.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: hall reverb, a tense hush. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_004",
@@ -47,7 +51,8 @@
    "line": "脸皮薄点才容易出人头地嘛，我曹操就是个活生生的例子！",
    "semantic_visual": "A female warrior in armor steps forward in an ink-wash arena, tapping her chest with a confident grin as black brushstrokes swirl around her feet.",
    "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. Featuring a stylized 3D animated woman in her 20s, ponytail black hair, wearing a red-brown armor with gold accents, with sword and bow; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A female warrior in armor steps forward in an ink-wash arena, tapping her chest with a confident grin as black brushstrokes swirl around her feet.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: hall reverb, a tense hush. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. Featuring a stylized 3D animated woman in her 20s, ponytail black hair, wearing a red-brown armor with gold accents, with sword and bow; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A female warrior in armor steps forward in an ink-wash arena, tapping her chest with a confident grin as black brushstrokes swirl around her feet.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: hall reverb, a tense hush. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_005",
@@ -57,7 +62,8 @@
    "line": "哼，你那脸皮薄得跟纸一样，哪比得上我蜀国的仁德之师？",
    "semantic_visual": "The strategist flicks his feather fan dismissively toward a thin paper scroll that flutters and tears, while banners of his kingdom ripple behind him in dramatic light.",
    "framing": "close",
-   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a long hanging scroll backdrop illuminated by stage lights. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan. The shot shows the idea through visible action: The strategist flicks his feather fan dismissively toward a thin paper scroll that flutters and tears, while banners of his kingdom ripple behind him in dramatic light.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow orbiting camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: hall reverb, a tense hush. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a long hanging scroll backdrop illuminated by stage lights. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan. The shot shows the idea through visible action: The strategist flicks his feather fan dismissively toward a thin paper scroll that flutters and tears, while banners of his kingdom ripple behind him in dramatic light.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow orbiting camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: hall reverb, a tense hush. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_006",
@@ -67,7 +73,8 @@
    "line": "有理有据，这辩论真是精彩！",
    "semantic_visual": "The host claps and leans forward with a delighted expression, nodding between the two debaters as the court audience raises hands in approval under glowing lanterns.",
    "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate arena audience in warm shadow, faces lit by stage light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan. The shot shows the idea through visible action: The host claps and leans forward with a delighted expression, nodding between the two debaters as the court audience raises hands in approval under glowing lanterns.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: quick whip pan. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: hall reverb, a tense hush. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate arena audience in warm shadow, faces lit by stage light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan. The shot shows the idea through visible action: The host claps and leans forward with a delighted expression, nodding between the two debaters as the court audience raises hands in approval under glowing lanterns.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: quick whip pan. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: hall reverb, a tense hush. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_007",
@@ -77,7 +84,8 @@
    "line": "仁德？你诸葛亮可是个小心眼，连庞统都忌惮三分！",
    "semantic_visual": "The armored warrior leans in and jabs a finger toward the strategist, whose fan freezes mid-motion; ink splashes across the arena floor as tension fills the air.",
    "framing": "close",
-   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. Featuring a stylized 3D animated woman in her 20s, ponytail black hair, wearing a red-brown armor with gold accents, with sword and bow. The shot shows the idea through visible action: The armored warrior leans in and jabs a finger toward the strategist, whose fan freezes mid-motion; ink splashes across the arena floor as tension fills the air.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow rack focus between foreground and background. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: hall reverb, a tense hush. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. Featuring a stylized 3D animated woman in her 20s, ponytail black hair, wearing a red-brown armor with gold accents, with sword and bow. The shot shows the idea through visible action: The armored warrior leans in and jabs a finger toward the strategist, whose fan freezes mid-motion; ink splashes across the arena floor as tension fills the air.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow rack focus between foreground and background. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: hall reverb, a tense hush. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_008",
@@ -87,12 +95,696 @@
    "line": "",
    "semantic_visual": "",
    "framing": "",
-   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. The camera surveys the space, atmospheric and cinematic. Camera: slow pull-back revealing the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: hall reverb, a tense hush. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. The camera surveys the space, atmospheric and cinematic. Camera: slow pull-back revealing the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: hall reverb, a tense hush. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_card_end",
    "kind": "card",
-   "prompt": null
+   "prompt": null,
+   "act_index": -1
+  },
+  {
+   "id": "v5_e001",
+   "kind": "broll",
+   "scene": "silk_debate_hall",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate hall draped in pale silk, dramatic spotlights and microphone stands. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e002",
+   "kind": "dialogue",
+   "scene": "scroll_split",
+   "duration": 3.57,
+   "line": "",
+   "semantic_visual": "A robed strategist with a feather fan narrows his eyes and points sharply across a split silk scroll, where a rival warlord in dark armor smirks. Candlelight casts long shadows in a tense arena. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a long hanging scroll backdrop illuminated by stage lights. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed strategist with a feather fan narrows his eyes and points sharply across a split silk scroll, where a rival warlord in dark armor smirks. Candlelight casts long shadows in a tense arena.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e003",
+   "kind": "dialogue",
+   "scene": "court_audience",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An animated host in a plain robe gestures enthusiastically between two costumed historical figures seated on silk cushions, a cheering court audience blurred behind them under warm lantern glow. The character walks slowly through the space, glancing around.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate arena audience in warm shadow, faces lit by stage light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: An animated host in a plain robe gestures enthusiastically between two costumed historical figures seated on silk cushions, a cheering court audience blurred behind them under warm lantern glow.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e004",
+   "kind": "dialogue",
+   "scene": "ink_arena",
+   "duration": 4.77,
+   "line": "",
+   "semantic_visual": "A female warrior in armor steps forward in an ink-wash arena, tapping her chest with a confident grin as black brushstrokes swirl around her feet. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. Featuring a stylized 3D animated woman in her 20s, ponytail black hair, wearing a red-brown armor with gold accents, with sword and bow; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A female warrior in armor steps forward in an ink-wash arena, tapping her chest with a confident grin as black brushstrokes swirl around her feet.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e005",
+   "kind": "dialogue",
+   "scene": "scroll_split",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The strategist flicks his feather fan dismissively toward a thin paper scroll that flutters and tears, while banners of his kingdom ripple behind him in dramatic light. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a long hanging scroll backdrop illuminated by stage lights. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan. The shot shows the idea through visible action: The strategist flicks his feather fan dismissively toward a thin paper scroll that flutters and tears, while banners of his kingdom ripple behind him in dramatic light.. Framing: close shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e006",
+   "kind": "dialogue",
+   "scene": "court_audience",
+   "duration": 4.69,
+   "line": "",
+   "semantic_visual": "The host claps and leans forward with a delighted expression, nodding between the two debaters as the court audience raises hands in approval under glowing lanterns. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate arena audience in warm shadow, faces lit by stage light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan. The shot shows the idea through visible action: The host claps and leans forward with a delighted expression, nodding between the two debaters as the court audience raises hands in approval under glowing lanterns.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e007",
+   "kind": "dialogue",
+   "scene": "ink_arena",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The armored warrior leans in and jabs a finger toward the strategist, whose fan freezes mid-motion; ink splashes across the arena floor as tension fills the air. The character pauses, looks off frame, then continues.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. Featuring a stylized 3D animated woman in her 20s, ponytail black hair, wearing a red-brown armor with gold accents, with sword and bow. The shot shows the idea through visible action: The armored warrior leans in and jabs a finger toward the strategist, whose fan freezes mid-motion; ink splashes across the arena floor as tension fills the air.. Framing: close shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e008",
+   "kind": "broll",
+   "scene": "ink_arena",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character leans on the table and gestures while speaking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. The camera surveys the space, atmospheric and cinematic. The character leans on the table and gestures while speaking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e009",
+   "kind": "broll",
+   "scene": "silk_debate_hall",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character walks slowly through the space, glancing around.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate hall draped in pale silk, dramatic spotlights and microphone stands. The camera surveys the space, atmospheric and cinematic. The character walks slowly through the space, glancing around. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e010",
+   "kind": "dialogue",
+   "scene": "scroll_split",
+   "duration": 3.57,
+   "line": "",
+   "semantic_visual": "A robed strategist with a feather fan narrows his eyes and points sharply across a split silk scroll, where a rival warlord in dark armor smirks. Candlelight casts long shadows in a tense arena. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a long hanging scroll backdrop illuminated by stage lights. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed strategist with a feather fan narrows his eyes and points sharply across a split silk scroll, where a rival warlord in dark armor smirks. Candlelight casts long shadows in a tense arena.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e011",
+   "kind": "dialogue",
+   "scene": "court_audience",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An animated host in a plain robe gestures enthusiastically between two costumed historical figures seated on silk cushions, a cheering court audience blurred behind them under warm lantern glow. Two characters exchange a look; one nods.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate arena audience in warm shadow, faces lit by stage light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: An animated host in a plain robe gestures enthusiastically between two costumed historical figures seated on silk cushions, a cheering court audience blurred behind them under warm lantern glow.. Framing: wide shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e012",
+   "kind": "dialogue",
+   "scene": "ink_arena",
+   "duration": 4.77,
+   "line": "",
+   "semantic_visual": "A female warrior in armor steps forward in an ink-wash arena, tapping her chest with a confident grin as black brushstrokes swirl around her feet. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. Featuring a stylized 3D animated woman in her 20s, ponytail black hair, wearing a red-brown armor with gold accents, with sword and bow; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A female warrior in armor steps forward in an ink-wash arena, tapping her chest with a confident grin as black brushstrokes swirl around her feet.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e013",
+   "kind": "dialogue",
+   "scene": "scroll_split",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The strategist flicks his feather fan dismissively toward a thin paper scroll that flutters and tears, while banners of his kingdom ripple behind him in dramatic light. The character pauses, looks off frame, then continues.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a long hanging scroll backdrop illuminated by stage lights. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan. The shot shows the idea through visible action: The strategist flicks his feather fan dismissively toward a thin paper scroll that flutters and tears, while banners of his kingdom ripple behind him in dramatic light.. Framing: close shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e014",
+   "kind": "dialogue",
+   "scene": "court_audience",
+   "duration": 4.69,
+   "line": "",
+   "semantic_visual": "The host claps and leans forward with a delighted expression, nodding between the two debaters as the court audience raises hands in approval under glowing lanterns. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate arena audience in warm shadow, faces lit by stage light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan. The shot shows the idea through visible action: The host claps and leans forward with a delighted expression, nodding between the two debaters as the court audience raises hands in approval under glowing lanterns.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e015",
+   "kind": "dialogue",
+   "scene": "ink_arena",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The armored warrior leans in and jabs a finger toward the strategist, whose fan freezes mid-motion; ink splashes across the arena floor as tension fills the air. The character walks slowly through the space, glancing around.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. Featuring a stylized 3D animated woman in her 20s, ponytail black hair, wearing a red-brown armor with gold accents, with sword and bow. The shot shows the idea through visible action: The armored warrior leans in and jabs a finger toward the strategist, whose fan freezes mid-motion; ink splashes across the arena floor as tension fills the air.. Framing: close shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e016",
+   "kind": "broll",
+   "scene": "ink_arena",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character turns toward the window, thinking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. The camera surveys the space, atmospheric and cinematic. The character turns toward the window, thinking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e017",
+   "kind": "broll",
+   "scene": "silk_debate_hall",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " Two characters exchange a look; one nods.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate hall draped in pale silk, dramatic spotlights and microphone stands. The camera surveys the space, atmospheric and cinematic. Two characters exchange a look; one nods. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e018",
+   "kind": "dialogue",
+   "scene": "scroll_split",
+   "duration": 3.57,
+   "line": "",
+   "semantic_visual": "A robed strategist with a feather fan narrows his eyes and points sharply across a split silk scroll, where a rival warlord in dark armor smirks. Candlelight casts long shadows in a tense arena. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a long hanging scroll backdrop illuminated by stage lights. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed strategist with a feather fan narrows his eyes and points sharply across a split silk scroll, where a rival warlord in dark armor smirks. Candlelight casts long shadows in a tense arena.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e019",
+   "kind": "dialogue",
+   "scene": "court_audience",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An animated host in a plain robe gestures enthusiastically between two costumed historical figures seated on silk cushions, a cheering court audience blurred behind them under warm lantern glow. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate arena audience in warm shadow, faces lit by stage light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: An animated host in a plain robe gestures enthusiastically between two costumed historical figures seated on silk cushions, a cheering court audience blurred behind them under warm lantern glow.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e020",
+   "kind": "dialogue",
+   "scene": "ink_arena",
+   "duration": 4.77,
+   "line": "",
+   "semantic_visual": "A female warrior in armor steps forward in an ink-wash arena, tapping her chest with a confident grin as black brushstrokes swirl around her feet. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. Featuring a stylized 3D animated woman in her 20s, ponytail black hair, wearing a red-brown armor with gold accents, with sword and bow; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A female warrior in armor steps forward in an ink-wash arena, tapping her chest with a confident grin as black brushstrokes swirl around her feet.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e021",
+   "kind": "dialogue",
+   "scene": "scroll_split",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The strategist flicks his feather fan dismissively toward a thin paper scroll that flutters and tears, while banners of his kingdom ripple behind him in dramatic light. The character walks slowly through the space, glancing around.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a long hanging scroll backdrop illuminated by stage lights. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan. The shot shows the idea through visible action: The strategist flicks his feather fan dismissively toward a thin paper scroll that flutters and tears, while banners of his kingdom ripple behind him in dramatic light.. Framing: close shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e022",
+   "kind": "dialogue",
+   "scene": "court_audience",
+   "duration": 4.69,
+   "line": "",
+   "semantic_visual": "The host claps and leans forward with a delighted expression, nodding between the two debaters as the court audience raises hands in approval under glowing lanterns. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate arena audience in warm shadow, faces lit by stage light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan. The shot shows the idea through visible action: The host claps and leans forward with a delighted expression, nodding between the two debaters as the court audience raises hands in approval under glowing lanterns.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e023",
+   "kind": "dialogue",
+   "scene": "ink_arena",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The armored warrior leans in and jabs a finger toward the strategist, whose fan freezes mid-motion; ink splashes across the arena floor as tension fills the air. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. Featuring a stylized 3D animated woman in her 20s, ponytail black hair, wearing a red-brown armor with gold accents, with sword and bow. The shot shows the idea through visible action: The armored warrior leans in and jabs a finger toward the strategist, whose fan freezes mid-motion; ink splashes across the arena floor as tension fills the air.. Framing: close shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e024",
+   "kind": "broll",
+   "scene": "ink_arena",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character picks up an object and examines it.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. The camera surveys the space, atmospheric and cinematic. The character picks up an object and examines it. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e025",
+   "kind": "broll",
+   "scene": "silk_debate_hall",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate hall draped in pale silk, dramatic spotlights and microphone stands. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e026",
+   "kind": "dialogue",
+   "scene": "scroll_split",
+   "duration": 3.57,
+   "line": "",
+   "semantic_visual": "A robed strategist with a feather fan narrows his eyes and points sharply across a split silk scroll, where a rival warlord in dark armor smirks. Candlelight casts long shadows in a tense arena. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a long hanging scroll backdrop illuminated by stage lights. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed strategist with a feather fan narrows his eyes and points sharply across a split silk scroll, where a rival warlord in dark armor smirks. Candlelight casts long shadows in a tense arena.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e027",
+   "kind": "dialogue",
+   "scene": "court_audience",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An animated host in a plain robe gestures enthusiastically between two costumed historical figures seated on silk cushions, a cheering court audience blurred behind them under warm lantern glow. The character walks slowly through the space, glancing around.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate arena audience in warm shadow, faces lit by stage light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: An animated host in a plain robe gestures enthusiastically between two costumed historical figures seated on silk cushions, a cheering court audience blurred behind them under warm lantern glow.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e028",
+   "kind": "dialogue",
+   "scene": "ink_arena",
+   "duration": 4.77,
+   "line": "",
+   "semantic_visual": "A female warrior in armor steps forward in an ink-wash arena, tapping her chest with a confident grin as black brushstrokes swirl around her feet. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. Featuring a stylized 3D animated woman in her 20s, ponytail black hair, wearing a red-brown armor with gold accents, with sword and bow; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A female warrior in armor steps forward in an ink-wash arena, tapping her chest with a confident grin as black brushstrokes swirl around her feet.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e029",
+   "kind": "dialogue",
+   "scene": "scroll_split",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The strategist flicks his feather fan dismissively toward a thin paper scroll that flutters and tears, while banners of his kingdom ripple behind him in dramatic light. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a long hanging scroll backdrop illuminated by stage lights. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan. The shot shows the idea through visible action: The strategist flicks his feather fan dismissively toward a thin paper scroll that flutters and tears, while banners of his kingdom ripple behind him in dramatic light.. Framing: close shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e030",
+   "kind": "dialogue",
+   "scene": "court_audience",
+   "duration": 4.69,
+   "line": "",
+   "semantic_visual": "The host claps and leans forward with a delighted expression, nodding between the two debaters as the court audience raises hands in approval under glowing lanterns. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate arena audience in warm shadow, faces lit by stage light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan. The shot shows the idea through visible action: The host claps and leans forward with a delighted expression, nodding between the two debaters as the court audience raises hands in approval under glowing lanterns.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e031",
+   "kind": "dialogue",
+   "scene": "ink_arena",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The armored warrior leans in and jabs a finger toward the strategist, whose fan freezes mid-motion; ink splashes across the arena floor as tension fills the air. The character pauses, looks off frame, then continues.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. Featuring a stylized 3D animated woman in her 20s, ponytail black hair, wearing a red-brown armor with gold accents, with sword and bow. The shot shows the idea through visible action: The armored warrior leans in and jabs a finger toward the strategist, whose fan freezes mid-motion; ink splashes across the arena floor as tension fills the air.. Framing: close shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e032",
+   "kind": "broll",
+   "scene": "ink_arena",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character leans on the table and gestures while speaking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. The camera surveys the space, atmospheric and cinematic. The character leans on the table and gestures while speaking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e033",
+   "kind": "broll",
+   "scene": "silk_debate_hall",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character walks slowly through the space, glancing around.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate hall draped in pale silk, dramatic spotlights and microphone stands. The camera surveys the space, atmospheric and cinematic. The character walks slowly through the space, glancing around. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e034",
+   "kind": "dialogue",
+   "scene": "scroll_split",
+   "duration": 3.57,
+   "line": "",
+   "semantic_visual": "A robed strategist with a feather fan narrows his eyes and points sharply across a split silk scroll, where a rival warlord in dark armor smirks. Candlelight casts long shadows in a tense arena. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a long hanging scroll backdrop illuminated by stage lights. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed strategist with a feather fan narrows his eyes and points sharply across a split silk scroll, where a rival warlord in dark armor smirks. Candlelight casts long shadows in a tense arena.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e035",
+   "kind": "dialogue",
+   "scene": "court_audience",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An animated host in a plain robe gestures enthusiastically between two costumed historical figures seated on silk cushions, a cheering court audience blurred behind them under warm lantern glow. Two characters exchange a look; one nods.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate arena audience in warm shadow, faces lit by stage light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: An animated host in a plain robe gestures enthusiastically between two costumed historical figures seated on silk cushions, a cheering court audience blurred behind them under warm lantern glow.. Framing: wide shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e036",
+   "kind": "dialogue",
+   "scene": "ink_arena",
+   "duration": 4.77,
+   "line": "",
+   "semantic_visual": "A female warrior in armor steps forward in an ink-wash arena, tapping her chest with a confident grin as black brushstrokes swirl around her feet. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. Featuring a stylized 3D animated woman in her 20s, ponytail black hair, wearing a red-brown armor with gold accents, with sword and bow; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A female warrior in armor steps forward in an ink-wash arena, tapping her chest with a confident grin as black brushstrokes swirl around her feet.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e037",
+   "kind": "dialogue",
+   "scene": "scroll_split",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The strategist flicks his feather fan dismissively toward a thin paper scroll that flutters and tears, while banners of his kingdom ripple behind him in dramatic light. The character pauses, looks off frame, then continues.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a long hanging scroll backdrop illuminated by stage lights. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan. The shot shows the idea through visible action: The strategist flicks his feather fan dismissively toward a thin paper scroll that flutters and tears, while banners of his kingdom ripple behind him in dramatic light.. Framing: close shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e038",
+   "kind": "dialogue",
+   "scene": "court_audience",
+   "duration": 4.69,
+   "line": "",
+   "semantic_visual": "The host claps and leans forward with a delighted expression, nodding between the two debaters as the court audience raises hands in approval under glowing lanterns. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate arena audience in warm shadow, faces lit by stage light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan. The shot shows the idea through visible action: The host claps and leans forward with a delighted expression, nodding between the two debaters as the court audience raises hands in approval under glowing lanterns.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e039",
+   "kind": "dialogue",
+   "scene": "ink_arena",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The armored warrior leans in and jabs a finger toward the strategist, whose fan freezes mid-motion; ink splashes across the arena floor as tension fills the air. The character walks slowly through the space, glancing around.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. Featuring a stylized 3D animated woman in her 20s, ponytail black hair, wearing a red-brown armor with gold accents, with sword and bow. The shot shows the idea through visible action: The armored warrior leans in and jabs a finger toward the strategist, whose fan freezes mid-motion; ink splashes across the arena floor as tension fills the air.. Framing: close shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e040",
+   "kind": "broll",
+   "scene": "ink_arena",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character turns toward the window, thinking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. The camera surveys the space, atmospheric and cinematic. The character turns toward the window, thinking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e041",
+   "kind": "broll",
+   "scene": "silk_debate_hall",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " Two characters exchange a look; one nods.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate hall draped in pale silk, dramatic spotlights and microphone stands. The camera surveys the space, atmospheric and cinematic. Two characters exchange a look; one nods. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e042",
+   "kind": "dialogue",
+   "scene": "scroll_split",
+   "duration": 3.57,
+   "line": "",
+   "semantic_visual": "A robed strategist with a feather fan narrows his eyes and points sharply across a split silk scroll, where a rival warlord in dark armor smirks. Candlelight casts long shadows in a tense arena. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a long hanging scroll backdrop illuminated by stage lights. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed strategist with a feather fan narrows his eyes and points sharply across a split silk scroll, where a rival warlord in dark armor smirks. Candlelight casts long shadows in a tense arena.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e043",
+   "kind": "dialogue",
+   "scene": "court_audience",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An animated host in a plain robe gestures enthusiastically between two costumed historical figures seated on silk cushions, a cheering court audience blurred behind them under warm lantern glow. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate arena audience in warm shadow, faces lit by stage light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: An animated host in a plain robe gestures enthusiastically between two costumed historical figures seated on silk cushions, a cheering court audience blurred behind them under warm lantern glow.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e044",
+   "kind": "dialogue",
+   "scene": "ink_arena",
+   "duration": 4.77,
+   "line": "",
+   "semantic_visual": "A female warrior in armor steps forward in an ink-wash arena, tapping her chest with a confident grin as black brushstrokes swirl around her feet. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. Featuring a stylized 3D animated woman in her 20s, ponytail black hair, wearing a red-brown armor with gold accents, with sword and bow; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A female warrior in armor steps forward in an ink-wash arena, tapping her chest with a confident grin as black brushstrokes swirl around her feet.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e045",
+   "kind": "dialogue",
+   "scene": "scroll_split",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The strategist flicks his feather fan dismissively toward a thin paper scroll that flutters and tears, while banners of his kingdom ripple behind him in dramatic light. The character walks slowly through the space, glancing around.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a long hanging scroll backdrop illuminated by stage lights. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan. The shot shows the idea through visible action: The strategist flicks his feather fan dismissively toward a thin paper scroll that flutters and tears, while banners of his kingdom ripple behind him in dramatic light.. Framing: close shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e046",
+   "kind": "dialogue",
+   "scene": "court_audience",
+   "duration": 4.69,
+   "line": "",
+   "semantic_visual": "The host claps and leans forward with a delighted expression, nodding between the two debaters as the court audience raises hands in approval under glowing lanterns. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate arena audience in warm shadow, faces lit by stage light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan. The shot shows the idea through visible action: The host claps and leans forward with a delighted expression, nodding between the two debaters as the court audience raises hands in approval under glowing lanterns.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e047",
+   "kind": "dialogue",
+   "scene": "ink_arena",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The armored warrior leans in and jabs a finger toward the strategist, whose fan freezes mid-motion; ink splashes across the arena floor as tension fills the air. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. Featuring a stylized 3D animated woman in her 20s, ponytail black hair, wearing a red-brown armor with gold accents, with sword and bow. The shot shows the idea through visible action: The armored warrior leans in and jabs a finger toward the strategist, whose fan freezes mid-motion; ink splashes across the arena floor as tension fills the air.. Framing: close shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e048",
+   "kind": "broll",
+   "scene": "ink_arena",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character picks up an object and examines it.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. The camera surveys the space, atmospheric and cinematic. The character picks up an object and examines it. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e049",
+   "kind": "broll",
+   "scene": "silk_debate_hall",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate hall draped in pale silk, dramatic spotlights and microphone stands. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e050",
+   "kind": "dialogue",
+   "scene": "scroll_split",
+   "duration": 3.57,
+   "line": "",
+   "semantic_visual": "A robed strategist with a feather fan narrows his eyes and points sharply across a split silk scroll, where a rival warlord in dark armor smirks. Candlelight casts long shadows in a tense arena. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a long hanging scroll backdrop illuminated by stage lights. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed strategist with a feather fan narrows his eyes and points sharply across a split silk scroll, where a rival warlord in dark armor smirks. Candlelight casts long shadows in a tense arena.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e051",
+   "kind": "dialogue",
+   "scene": "court_audience",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An animated host in a plain robe gestures enthusiastically between two costumed historical figures seated on silk cushions, a cheering court audience blurred behind them under warm lantern glow. The character walks slowly through the space, glancing around.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate arena audience in warm shadow, faces lit by stage light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: An animated host in a plain robe gestures enthusiastically between two costumed historical figures seated on silk cushions, a cheering court audience blurred behind them under warm lantern glow.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e052",
+   "kind": "dialogue",
+   "scene": "ink_arena",
+   "duration": 4.77,
+   "line": "",
+   "semantic_visual": "A female warrior in armor steps forward in an ink-wash arena, tapping her chest with a confident grin as black brushstrokes swirl around her feet. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. Featuring a stylized 3D animated woman in her 20s, ponytail black hair, wearing a red-brown armor with gold accents, with sword and bow; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A female warrior in armor steps forward in an ink-wash arena, tapping her chest with a confident grin as black brushstrokes swirl around her feet.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e053",
+   "kind": "dialogue",
+   "scene": "scroll_split",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The strategist flicks his feather fan dismissively toward a thin paper scroll that flutters and tears, while banners of his kingdom ripple behind him in dramatic light. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a long hanging scroll backdrop illuminated by stage lights. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan. The shot shows the idea through visible action: The strategist flicks his feather fan dismissively toward a thin paper scroll that flutters and tears, while banners of his kingdom ripple behind him in dramatic light.. Framing: close shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e054",
+   "kind": "dialogue",
+   "scene": "court_audience",
+   "duration": 4.69,
+   "line": "",
+   "semantic_visual": "The host claps and leans forward with a delighted expression, nodding between the two debaters as the court audience raises hands in approval under glowing lanterns. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate arena audience in warm shadow, faces lit by stage light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan. The shot shows the idea through visible action: The host claps and leans forward with a delighted expression, nodding between the two debaters as the court audience raises hands in approval under glowing lanterns.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e055",
+   "kind": "dialogue",
+   "scene": "ink_arena",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The armored warrior leans in and jabs a finger toward the strategist, whose fan freezes mid-motion; ink splashes across the arena floor as tension fills the air. The character pauses, looks off frame, then continues.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. Featuring a stylized 3D animated woman in her 20s, ponytail black hair, wearing a red-brown armor with gold accents, with sword and bow. The shot shows the idea through visible action: The armored warrior leans in and jabs a finger toward the strategist, whose fan freezes mid-motion; ink splashes across the arena floor as tension fills the air.. Framing: close shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e056",
+   "kind": "broll",
+   "scene": "ink_arena",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character leans on the table and gestures while speaking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. The camera surveys the space, atmospheric and cinematic. The character leans on the table and gestures while speaking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e057",
+   "kind": "broll",
+   "scene": "silk_debate_hall",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character walks slowly through the space, glancing around.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate hall draped in pale silk, dramatic spotlights and microphone stands. The camera surveys the space, atmospheric and cinematic. The character walks slowly through the space, glancing around. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e058",
+   "kind": "dialogue",
+   "scene": "scroll_split",
+   "duration": 3.57,
+   "line": "",
+   "semantic_visual": "A robed strategist with a feather fan narrows his eyes and points sharply across a split silk scroll, where a rival warlord in dark armor smirks. Candlelight casts long shadows in a tense arena. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a long hanging scroll backdrop illuminated by stage lights. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed strategist with a feather fan narrows his eyes and points sharply across a split silk scroll, where a rival warlord in dark armor smirks. Candlelight casts long shadows in a tense arena.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e059",
+   "kind": "dialogue",
+   "scene": "court_audience",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An animated host in a plain robe gestures enthusiastically between two costumed historical figures seated on silk cushions, a cheering court audience blurred behind them under warm lantern glow. Two characters exchange a look; one nods.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate arena audience in warm shadow, faces lit by stage light. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: An animated host in a plain robe gestures enthusiastically between two costumed historical figures seated on silk cushions, a cheering court audience blurred behind them under warm lantern glow.. Framing: wide shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e060",
+   "kind": "dialogue",
+   "scene": "ink_arena",
+   "duration": 4.77,
+   "line": "",
+   "semantic_visual": "A female warrior in armor steps forward in an ink-wash arena, tapping her chest with a confident grin as black brushstrokes swirl around her feet. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a modern debate arena with ink-wash silk curtains and glowing podiums. Featuring a stylized 3D animated woman in her 20s, ponytail black hair, wearing a red-brown armor with gold accents, with sword and bow; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A female warrior in armor steps forward in an ink-wash arena, tapping her chest with a confident grin as black brushstrokes swirl around her feet.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e061",
+   "kind": "dialogue",
+   "scene": "scroll_split",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "The strategist flicks his feather fan dismissively toward a thin paper scroll that flutters and tears, while banners of his kingdom ripple behind him in dramatic light. The character pauses, looks off frame, then continues.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a long hanging scroll backdrop illuminated by stage lights. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan. The shot shows the idea through visible action: The strategist flicks his feather fan dismissively toward a thin paper scroll that flutters and tears, while banners of his kingdom ripple behind him in dramatic light.. Framing: close shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_x001",
+   "kind": "broll",
+   "scene": "silk_debate_hall",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] dramatic 3D debate arena, silk drapes, glowing podiums, strong spotlights. Set in a debate hall draped in pale silk, dramatic spotlights and microphone stands. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
   }
  ]
 }

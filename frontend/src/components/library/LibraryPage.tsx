@@ -6,16 +6,26 @@ import { errorText } from "../../lib/api";
 import { mediaSrc } from "../../lib/v5";
 import { ApiError } from "../../lib/api";
 import type { CinemaTemplate } from "../../lib/cinema";
-import { cinemaApi, fmtDuration, fmtSize, isRealTemplate } from "../../lib/cinema";
+import {
+  CINEMA_LOOK_META,
+  CINEMA_LOOK_ORDER,
+  cinemaApi,
+  fmtDuration,
+  fmtSize,
+  isRealTemplate,
+  lookOfTemplate,
+  type CinemaLook,
+  type CinemaTemplateFinal,
+} from "../../lib/cinema";
 import { isPublishBatchActive, publishPackageBatchApi } from "../../lib/cinema";
 import type { PublishPackageBatch, PublishPackageBatchItem, PublishPlatform } from "../../lib/cinema";
 import { downloadUrlAsBlob } from "../../lib/download";
 import { isBatchActive, isRunActive, pipelineApi, pipelineBatchApi } from "../../lib/pipeline";
 import type { PipelineBatch, PipelineBatchItem } from "../../lib/pipeline";
 import type { V5CatalogResponse, V5Series, V5SeriesExport } from "../../lib/v5";
-import { v5api } from "../../lib/v5";
+import { deleteFinalOutput, FINAL_DELETE_ENABLED, FINAL_DELETE_PATH, v5api } from "../../lib/v5";
 import { useToast } from "../Toast";
-import { Spinner } from "../ui";
+import { Modal, Spinner } from "../ui";
 import {
   IconAlert,
   IconCheck,
@@ -30,9 +40,12 @@ import {
   IconSearch,
   IconSpark,
   IconTemplate,
+  IconTrash,
   IconVideo,
 } from "../icons";
 import { AppShell } from "../shell/AppShell";
+import { PageHeader } from "../ui/PageHeader";
+import { Stat, StatRow } from "../ui/Stat";
 import { CinemaTemplates } from "../cinema/Templates";
 import { CreateTemplateWizard } from "./CreateTemplateWizard";
 import { PublishPackageModal } from "../publish/PublishPackageModal";
@@ -41,6 +54,8 @@ import { V5Scenes } from "../v5world/Scenes";
 import "../../styles/cinema.css";
 import "../../styles/v18.css";
 import "../../styles/library.css";
+import "../../styles/v54.css";
+import "../../styles/v62.css";
 // V5 World 复用页（风格 / 场景）的样式：v5w-* 全在这份 CSS 里，缺了就会「图片铺满 + 标签挤成一行」
 import "../../styles/v5world.css";
 
@@ -54,10 +69,13 @@ const TAB_META: { key: LibraryTab; no: string; label: string; en: string }[] = [
 
 interface Props {
   tab: LibraryTab;
+  /** V63：URL 里的观感（?look=），undefined = 全部观感 */
+  look?: CinemaLook;
+  onLookChange?: (next: "" | CinemaLook) => void;
   onOpenSettings: () => void;
 }
 
-export function LibraryPage({ tab, onOpenSettings }: Props) {
+export function LibraryPage({ tab, look: lookProp, onLookChange, onOpenSettings }: Props) {
   const notify = useToast();
   const [catalog, setCatalog] = useState<V5CatalogResponse | null>(null);
   const [templates3d, setTemplates3d] = useState<Record<string, CinemaTemplate>>({});
@@ -78,29 +96,61 @@ export function LibraryPage({ tab, onOpenSettings }: Props) {
   const [batchError, setBatchError] = useState("");
   const [confirmCancel, setConfirmCancel] = useState(false);
   const inFlightRef = useRef(false);
+  // V62/V63：成片观感（"" = 全部观感）；初值来自 URL ?look=，切换时写回 URL
+  const [look, setLook] = useState<"" | CinemaLook>(lookProp || "");
+  const lookRef = useRef<"" | CinemaLook>(lookProp || "");
 
-  const load = useCallback(async (silent: boolean) => {
-    if (inFlightRef.current) return;
+  /**
+   * 目录加载。返回 true = 本轮真的跑了且没有接口错误；false = 被并发跳过，或有关键接口失败。
+   * 并发标志与 loading/refreshing 一律在 finally 复位，避免「刷新按钮永久 spinner」。
+   */
+  const load = useCallback(async (silent: boolean): Promise<boolean> => {
+    if (inFlightRef.current) return false;
     inFlightRef.current = true;
     if (!silent) setLoading(true);
-    const [catRes, tplRes] = await Promise.allSettled([v5api.catalog(), cinemaApi.templates()]);
-    const errors: string[] = [];
-    if (catRes.status === "fulfilled") setCatalog(catRes.value);
-    else errors.push("V5 目录：" + errorText(catRes.reason));
-    if (tplRes.status === "fulfilled") {
-      const map: Record<string, CinemaTemplate> = {};
-      for (const item of tplRes.value.templates) map[item.id] = item;
-      setTemplates3d(map);
-    } else errors.push("3D 模板：" + errorText(tplRes.reason));
-    setError(errors.join("；"));
-    inFlightRef.current = false;
-    setLoading(false);
-    setRefreshing(false);
+    try {
+      const [catRes, tplRes] = await Promise.allSettled([v5api.catalog(), cinemaApi.templates(lookRef.current)]);
+      const errors: string[] = [];
+      if (catRes.status === "fulfilled") setCatalog(catRes.value);
+      else errors.push("V5 目录：" + errorText(catRes.reason));
+      if (tplRes.status === "fulfilled") {
+        const map: Record<string, CinemaTemplate> = {};
+        for (const item of tplRes.value.templates) map[item.id] = item;
+        setTemplates3d(map);
+      } else errors.push("3D 模板：" + errorText(tplRes.reason));
+      setError(errors.join("；"));
+      return errors.length === 0;
+    } finally {
+      inFlightRef.current = false;
+      setLoading(false);
+      setRefreshing(false);
+    }
   }, []);
 
   useEffect(() => {
     void load(false);
   }, [load]);
+
+  /** V63：切观感 → 写回 URL（App replaceState）+ 整页重拉，筛选/搜索/删除状态保留 */
+  const switchLook = useCallback(
+    (next: "" | CinemaLook) => {
+      if (next === lookRef.current) return;
+      lookRef.current = next;
+      setLook(next);
+      void load(false);
+      onLookChange?.(next);
+    },
+    [load, onLookChange],
+  );
+
+  // V63：地址栏/前进后退改变 ?look= → 同步并重拉
+  useEffect(() => {
+    const next = lookProp || "";
+    if (next === lookRef.current) return;
+    lookRef.current = next;
+    setLook(next);
+    void load(false);
+  }, [lookProp, load]);
 
   // V25：进入页面时恢复正在运行的 batch（刷新/切页后继续看进度）
   useEffect(() => {
@@ -164,9 +214,14 @@ export function LibraryPage({ tab, onOpenSettings }: Props) {
 
   const refresh = useCallback(async () => {
     setRefreshing(true);
-    await load(true);
-    if (refreshing === false) notify("模板与素材数据已刷新", "success");
-  }, [load, notify, refreshing]);
+    try {
+      const ok = await load(true);
+      if (ok) notify("模板与素材数据已刷新", "success");
+      else notify("刷新未完成：上一轮还没结束，或有接口失败（见页内错误条）", "error");
+    } finally {
+      setRefreshing(false);
+    }
+  }, [load, notify]);
 
   /* ------------------------------ V25：批量选择 / 队列 ------------------------------ */
   const toggleBatchMode = useCallback(() => {
@@ -207,8 +262,8 @@ export function LibraryPage({ tab, onOpenSettings }: Props) {
         const status = err instanceof ApiError ? err.status : 0;
         const message = err instanceof Error ? err.message : String(err);
         if (status === 404 || status === 405) {
-          setBatchError("批量接口尚未就绪（后端 V25 实现中），请稍后重试");
-          notify("批量接口尚未就绪（后端 V25 实现中）", "info");
+          setBatchError("批量接口返回 404：请确认后端已启动，稍后重试");
+          notify("批量接口返回 404", "info");
         } else if (status === 409) {
           setBatchError("已有任务运行中（单发或批量队列），请等待完成或取消后再试");
           notify("已有任务运行中，请等待完成或取消后再批量提交", "error");
@@ -274,7 +329,11 @@ export function LibraryPage({ tab, onOpenSettings }: Props) {
       chips={
         tab === "final"
           ? [
-              { label: "3D 成片", value: `${doneCount}/${templates.length || 19}`, tone: "gold" },
+              {
+                label: look ? CINEMA_LOOK_META[look].short + " 成片" : "成片",
+                value: `${doneCount}/${templates.length || 19}`,
+                tone: "gold",
+              },
               { label: "写实", value: String(realCount), tone: "slate" },
               { label: "时长", value: fmtDuration(templates.reduce((sum, item) => sum + (item.final.duration || 0), 0)), tone: "slate" },
             ]
@@ -293,6 +352,22 @@ export function LibraryPage({ tab, onOpenSettings }: Props) {
       refreshing={refreshing}
       onOpenSettings={onOpenSettings}
     >
+      <PageHeader
+        title={tab === "final" ? "成片与合集" : tab === "templates" ? "模板库" : tab === "styles" ? "画面风格" : "场景底板"}
+        subtitle={
+          tab === "final"
+            ? "已出片的模板、季合集与 QC / 发布包入口，都从这里进。"
+            : "素材与模板的目录；点击卡片查看详情或直接进生产。"
+        }
+        meta={
+          <StatRow>
+            <Stat label="已出片" value={`${doneCount}/${templates.length || "—"}`} tone="accent" hint="含 3D 样片" />
+            <Stat label="已选" value={selectedIds.size} hint="删除 / 批量导出" />
+            <Stat label="批量任务" value={batch ? isBatchActive(batch) ? "进行中" : "已结束" : "空闲"} />
+          </StatRow>
+        }
+      />
+
       {error && (
         <div className="v18-error" style={{ marginBottom: 14 }}>
           <IconAlert size={15} />
@@ -388,7 +463,16 @@ export function LibraryPage({ tab, onOpenSettings }: Props) {
           onRenderTemplate={() => (window.location.hash = "#/pipeline")}
         />
       )}
-      {tab === "final" && <FinalLibrary templates={templates} loading={loading} onRefresh={() => void refresh()} batchStatus={batchStatusMap} />}
+      {tab === "final" && (
+        <FinalLibrary
+          templates={templates}
+          loading={loading}
+          onRefresh={() => void refresh()}
+          batchStatus={batchStatusMap}
+          look={look}
+          onLookChange={switchLook}
+        />
+      )}
 
       {tab === "templates" && batchMode && (
         <div className="v25-batchbar" role="region" aria-label="批量操作">
@@ -524,21 +608,32 @@ function FinalLibrary({
   loading,
   onRefresh,
   batchStatus,
+  look,
+  onLookChange,
 }: {
   templates: CinemaTemplate[];
   loading: boolean;
   onRefresh: () => void;
   batchStatus?: Map<string, { status: string; done?: number; total?: number }>;
+  /** V62："": 全部观感；否则 3d_anim | 2d_anim | realistic */
+  look: "" | CinemaLook;
+  onLookChange: (next: "" | CinemaLook) => void;
 }) {
   const notify = useToast();
   const [filter, setFilter] = useState<"all" | "classic" | "real">("all");
   const [query, setQuery] = useState("");
-  const [playing, setPlaying] = useState<CinemaTemplate | null>(null);
+  const [playing, setPlaying] = useState<{ template: CinemaTemplate; look: "" | CinemaLook } | null>(null);
   const [assembling, setAssembling] = useState<string | null>(null);
   const [publishTemplate, setPublishTemplate] = useState<CinemaTemplate | null>(null);
   // V29：批量导出发布包
   const [exportMode, setExportMode] = useState(false);
   const [exportIds, setExportIds] = useState<Set<string>>(new Set());
+  // V54：成片删除（单条/批量）——后端 DELETE 未上线时只展示确认弹层并禁用执行
+  const [delMode, setDelMode] = useState(false);
+  const [delIds, setDelIds] = useState<Set<string>>(new Set());
+  const [delConfirm, setDelConfirm] = useState<string[] | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [delError, setDelError] = useState("");
   const [exportPlatform, setExportPlatform] = useState<PublishPlatform>("generic");
   const [exportVertical, setExportVertical] = useState(false);
   const [exportVerticalMode, setExportVerticalMode] = useState<"blur_pad" | "crop">("blur_pad");
@@ -553,6 +648,29 @@ function FinalLibrary({
   const [seriesPlaying, setSeriesPlaying] = useState<{ series: V5Series; index: number } | null>(null);
   const [seriesBusy, setSeriesBusy] = useState<string | null>(null);
   const [seriesFiles, setSeriesFiles] = useState<Record<string, V5SeriesExport>>({});
+
+  /** 取某个观感的成片（"" = 当前/默认成片） */
+  const finalOf = useCallback(
+    (template: CinemaTemplate, which: "" | CinemaLook): CinemaTemplateFinal | undefined =>
+      which ? template.looks?.[which] ?? template.final : template.final,
+    [],
+  );
+
+  /** 点播放/状态点：未生成 → 提示不播放；已生成 → 打开弹层 */
+  const openPlayer = useCallback(
+    (template: CinemaTemplate, which: "" | CinemaLook) => {
+      const fin = finalOf(template, which);
+      if (!fin || !fin.exists || !fin.url) {
+        notify("该观感未生成" + (which ? "：" + CINEMA_LOOK_META[which].label : ""), "info");
+        return;
+      }
+      setPlaying({ template, look: which });
+    },
+    [finalOf, notify],
+  );
+
+  const playingFinal = playing ? finalOf(playing.template, playing.look) : undefined;
+  const playingLookMeta = playing && playing.look ? CINEMA_LOOK_META[playing.look] : null;
 
   useEffect(() => {
     if (!playing) return;
@@ -614,6 +732,33 @@ function FinalLibrary({
 
   const realCount = templates.filter((item) => isRealTemplate(item.id)).length;
 
+  // V63：系列 → 模板 looks 映射（系列合同无观感字段，按该观感 final 是否存在判断）
+  const templateById = useMemo(() => {
+    const map: Record<string, CinemaTemplate> = {};
+    templates.forEach((item) => {
+      map[item.id] = item;
+    });
+    return map;
+  }, [templates]);
+
+  const seriesFinal = useCallback(
+    (templateId: string) => {
+      const tpl = templateById[templateId];
+      if (!tpl) return undefined;
+      return look ? tpl.looks?.[look] ?? tpl.final : tpl.final;
+    },
+    [look, templateById],
+  );
+
+  const seriesLookReady = useCallback(
+    (member: { template: string; ready: boolean }) => {
+      const fin = seriesFinal(member.template);
+      if (look) return Boolean(fin && fin.exists && fin.url);
+      return Boolean(member.ready && (fin ? fin.exists : true));
+    },
+    [look, seriesFinal],
+  );
+
   const reassemble = useCallback(
     async (template: CinemaTemplate) => {
       if (!window.confirm(`重新合成「${template.label}」的 3D 成片？（复用已有镜头跑剪辑合成）`)) return;
@@ -630,6 +775,50 @@ function FinalLibrary({
     },
     [notify, onRefresh],
   );
+
+  const toggleDelMode = useCallback(() => {
+    setDelMode((prev) => {
+      if (prev) setDelIds(new Set());
+      return !prev;
+    });
+    setDelError("");
+  }, []);
+
+  const toggleDelSelect = useCallback((templateId: string) => {
+    setDelIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(templateId)) next.delete(templateId);
+      else next.add(templateId);
+      return next;
+    });
+  }, []);
+
+  const askDelete = useCallback((ids: string[]) => {
+    setDelError("");
+    setDelConfirm(ids);
+  }, []);
+
+  const runDelete = useCallback(async () => {
+    if (!delConfirm || !delConfirm.length) return;
+    if (!FINAL_DELETE_ENABLED) {
+      setDelError("删除入口已在前端关闭（lib/v5.ts 的 FINAL_DELETE_ENABLED = false），未执行删除。");
+      return;
+    }
+    setDeleting(true);
+    setDelError("");
+    try {
+      for (const id of delConfirm) await deleteFinalOutput(id);
+      notify("已删除 " + delConfirm.length + " 支成片", "success");
+      setDelConfirm(null);
+      setDelIds(new Set());
+      setDelMode(false);
+      onRefresh();
+    } catch (err) {
+      setDelError(errorText(err));
+    } finally {
+      setDeleting(false);
+    }
+  }, [delConfirm, notify, onRefresh]);
 
   const toggleExportMode = useCallback(() => {
     setExportMode((prev) => {
@@ -719,8 +908,8 @@ function FinalLibrary({
       const status = err instanceof ApiError ? err.status : 0;
       const message = err instanceof Error ? err.message : String(err);
       if (status === 404 || status === 405) {
-        setPubError("批量导出接口尚未就绪（后端 V29 实现中），请稍后重试");
-        notify("批量导出接口尚未就绪（后端 V29 实现中）", "info");
+        setPubError("批量导出接口返回 404：请确认后端已启动，稍后重试");
+        notify("批量导出接口返回 404", "info");
       } else {
         setPubError("批量导出失败：" + message);
         notify("批量导出失败：" + message, "error");
@@ -818,6 +1007,8 @@ function FinalLibrary({
             </button>
           ))}
         </div>
+        {/* V62/V63：观感分段（切换时写 URL + 整页重拉） */}
+        <LookSegmented look={look} onChange={onLookChange} />
         <span className="v18-filter-count">
           {list.length} / {templates.length} 支
         </span>
@@ -829,6 +1020,38 @@ function FinalLibrary({
         >
           <IconDownload size={12} /> {exportMode ? "退出批量导出" : "批量导出"}
         </button>
+        <button
+          type="button"
+          className={"cm-btn cm-btn-sm" + (delMode ? " cm-btn-primary" : "")}
+          onClick={toggleDelMode}
+          title="多选成片后批量删除（需要后端 DELETE 接口）"
+        >
+          <IconTrash size={12} /> {delMode ? "退出删除模式" : "删除成片"}
+        </button>
+        {delMode && (
+          <>
+            <span className="v29-export-hint">
+              勾选要删除的成片（{delIds.size} 已选）
+            </span>
+            <button
+              type="button"
+              className="cm-btn cm-btn-sm"
+              onClick={() => setDelIds(new Set(list.map((item) => item.id).filter((id) => templates.find((t) => t.id === id)?.final.exists)))}
+              title="全选当前筛选下已有成片的条目"
+            >
+              全选已出片
+            </button>
+            <button
+              type="button"
+              className="cm-btn cm-btn-sm v54-del-btn"
+              disabled={!delIds.size}
+              onClick={() => askDelete(Array.from(delIds))}
+              title="批量删除所选成片"
+            >
+              <IconTrash size={12} /> 删除所选（{delIds.size}）
+            </button>
+          </>
+        )}
         {exportMode && <span className="v29-export-hint">勾选成片后使用底部批量条统一设置平台/竖版</span>}
         {pubError && !pubBatch && <span className="v25-batch-error">{pubError}</span>}
       </div>
@@ -838,6 +1061,7 @@ function FinalLibrary({
           <div className="v20-series-head">
             <b>系列</b>
             <span>{series.length} 条 · 同世界观连续播放</span>
+            <LookSegmented look={look} onChange={onLookChange} ariaLabel="系列观感" />
           </div>
           <div className="v20-series-grid">
             {series.map((item) => (
@@ -845,8 +1069,12 @@ function FinalLibrary({
                 <button
                   type="button"
                   className="v20-series-cover"
-                  onClick={() => setSeriesPlaying({ series: item, index: 0 })}
-                  title={item.label}
+                  onClick={() => {
+                    // V63：即使当前观感一集都没有，也打开弹层看每集状态（播放按钮本身会禁用）
+                    const first = item.members.findIndex(seriesLookReady);
+                    setSeriesPlaying({ series: item, index: first < 0 ? 0 : first });
+                  }}
+                  title={item.label + (look ? " · " + CINEMA_LOOK_META[look].label : "")}
                 >
                   {item.cover_url ? <img src={mediaSrc(item.cover_url)} alt={item.label} loading="lazy" /> : <span className="v20-final-fallback">{item.label.slice(0, 1)}</span>}
                   <span className="v20-series-count">{item.members.length} 集</span>
@@ -857,22 +1085,47 @@ function FinalLibrary({
                   <span className="v20-series-desc">{item.description}</span>
                   <div className="v20-series-meta">
                     <span>{item.style}</span>
-                    <span>{item.ready_count}/{item.members.length} 可用</span>
+                    <span>
+                      {item.members.filter(seriesLookReady).length}/{item.members.length} 可用
+                      {look ? " · " + CINEMA_LOOK_META[look].label : ""}
+                    </span>
                     {item.total_duration ? <span>{fmtDuration(item.total_duration)}</span> : null}
+                  </div>
+                  <div className="v62-series-members">
+                    {item.members.map((member, i) => {
+                      const ready = seriesLookReady(member);
+                      return (
+                        <span
+                          key={member.template}
+                          className={"v62-series-ep is-" + (ready ? "on" : "off")}
+                          title={member.template + (ready ? " · 已生成" : " · " + (look ? CINEMA_LOOK_META[look].label : "成片") + " 未生成")}
+                        >
+                          <i />
+                          {i + 1}. {member.label}
+                        </span>
+                      );
+                    })}
                   </div>
                   <div className="v20-series-actions">
                     <button
                       type="button"
                       className="cm-btn cm-btn-primary cm-btn-sm"
-                      onClick={() => setSeriesPlaying({ series: item, index: 0 })}
-                      disabled={!item.ready_count}
+                      onClick={() => {
+                        const first = item.members.findIndex(seriesLookReady);
+                        if (first < 0) {
+                          notify("该系列没有" + (look ? CINEMA_LOOK_META[look].label : "") + "成片", "info");
+                          return;
+                        }
+                        setSeriesPlaying({ series: item, index: first });
+                      }}
+                      disabled={!item.members.some(seriesLookReady)}
                     >
                       <IconPlay size={12} /> 连续播放
                     </button>
                     <button
                       type="button"
                       className="cm-btn cm-btn-sm cm-btn-ghost"
-                      onClick={() => setSeriesPlaying({ series: item, index: Math.max(0, item.members.findIndex((m) => m.ready)) })}
+                      onClick={() => setSeriesPlaying({ series: item, index: Math.max(0, item.members.findIndex(seriesLookReady)) })}
                     >
                       从第一部开始
                     </button>
@@ -880,8 +1133,12 @@ function FinalLibrary({
                       type="button"
                       className="cm-btn cm-btn-sm cm-btn-ghost"
                       onClick={() => void exportSeries(item)}
-                      disabled={seriesBusy === item.id || !item.ready_count}
-                      title="片头卡 + 全部集数串成一个 mp4"
+                      disabled={seriesBusy === item.id || !item.ready_count || Boolean(look)}
+                      title={
+                        look
+                          ? "合集导出目前按模板级成片（/api/v5/series 无观感字段），选「全部观感」可用"
+                          : "片头卡 + 全部集数串成一个 mp4"
+                      }
                     >
                       <IconDownload size={12} /> {seriesBusy === item.id ? "合成中…" : "导出合集"}
                     </button>
@@ -912,8 +1169,12 @@ function FinalLibrary({
       ) : (
         <div className="v20-final-grid">
           {list.map((template) => {
-            const ready = Boolean(template.final.exists && template.final.url);
-            const videoUrl = mediaSrc(template.final.url || `/media/templates_3d/${template.id}/final.mp4`);
+            // V62：当前观感的成片（look 为空 → 后端给的默认成片，可能没有 looks 字段）
+            const shownFinal = look ? template.looks?.[look] ?? template.final : template.final;
+            const ready = Boolean(shownFinal && shownFinal.exists && shownFinal.url);
+            const cardLook = look || lookOfTemplate(template);
+            const cardLookMeta = CINEMA_LOOK_META[cardLook];
+            const videoUrl = mediaSrc(shownFinal?.url || `/media/templates_3d/${template.id}/final.mp4`);
             const qcUrl = mediaSrc(`/media/templates_3d/${template.id}/qc_report.json`);
             return (
               <article
@@ -923,7 +1184,9 @@ function FinalLibrary({
                   (ready ? " is-ready" : "") +
                   (isRealTemplate(template.id) ? " is-real" : "") +
                   (exportMode ? " is-batch-mode" : "") +
-                  (exportIds.has(template.id) ? " is-selected" : "")
+                  (exportIds.has(template.id) ? " is-selected" : "") +
+                  (delMode ? " is-batch-mode" : "") +
+                  (delIds.has(template.id) ? " is-del-selected" : "")
                 }
               >
                 {exportMode && (
@@ -936,12 +1199,27 @@ function FinalLibrary({
                     />
                   </label>
                 )}
+                {delMode && (
+                  <label className="v54-card-check" onClick={(event) => event.stopPropagation()} title={delIds.has(template.id) ? "取消选择" : "选择该成片（待删除）"}>
+                    <input
+                      type="checkbox"
+                      checked={delIds.has(template.id)}
+                      onChange={() => toggleDelSelect(template.id)}
+                      aria-label={"选择待删除成片 " + template.id}
+                    />
+                  </label>
+                )}
                 <button
                   type="button"
                   className="v20-final-poster"
-                  onClick={() => (exportMode ? toggleExportSelect(template.id) : ready && setPlaying(template))}
-                  disabled={!exportMode && !ready}
-                  title={exportMode ? "点击选择/取消该成片" : ready ? "播放 3D 成片" : "尚无成片"}
+                  onClick={() => (exportMode ? toggleExportSelect(template.id) : openPlayer(template, look))}
+                  title={
+                    exportMode
+                      ? "点击选择/取消该成片"
+                      : ready
+                        ? "播放 " + cardLookMeta.label + " 成片"
+                        : cardLookMeta.label + " 未生成"
+                  }
                 >
                   {template.poster_url ? (
                     <img src={mediaSrc(template.poster_url)} alt={template.label} loading="lazy" />
@@ -949,11 +1227,11 @@ function FinalLibrary({
                     <span className="v20-final-fallback">{template.label.slice(0, 1)}</span>
                   )}
                   {ready ? (
-                    <span className="v20-final-badge"><IconPlay size={13} /> 3D</span>
+                    <span className="v20-final-badge"><IconPlay size={13} /> {cardLookMeta.short}</span>
                   ) : (
-                    <span className="v20-final-badge is-pending">待生成</span>
+                    <span className="v20-final-badge is-pending">待生成 · {cardLookMeta.short}</span>
                   )}
-                  {isRealTemplate(template.id) && <span className="tpl-real-badge v20-final-real">写实</span>}
+                  {isRealTemplate(template.id) && !look && <span className="tpl-real-badge v20-final-real">写实</span>}
                   {batchStatus?.get(template.id) && (
                     <span className={"v20-final-batch is-" + batchStatus.get(template.id)?.status}>
                       {batchStatus.get(template.id)?.status === "queued"
@@ -969,17 +1247,44 @@ function FinalLibrary({
                     <span className="cm-mono">{template.id}</span>
                   </div>
                   <div className="v20-final-meta">
-                    <span>{fmtDuration(template.final.duration || 0)}</span>
-                    <span>{fmtSize(template.final.size)}</span>
+                    <span className={"v62-look-badge is-" + cardLookMeta.tone}>{cardLookMeta.label}</span>
+                    <span>{fmtDuration(shownFinal?.duration || 0)}</span>
+                    <span>{fmtSize(shownFinal?.size || 0)}</span>
                     <span>镜头 {template.clips.done}/{template.clips.total || "—"}</span>
-                    <span className="v18-tag is-gold">{template.status === "done" ? "已完成" : template.status}</span>
                     <a className="v20-final-source cm-mono" href={videoUrl} target="_blank" rel="noreferrer" title="打开原片">
                       <IconDownload size={11} /> 原片
                     </a>
                   </div>
+                  {template.looks && (
+                    <div className="v62-looks" role="group" aria-label={"观感状态 · " + template.id}>
+                      <span className="v62-looks-label">观感</span>
+                      {CINEMA_LOOK_ORDER.map((key) => {
+                        const fin = template.looks?.[key];
+                        const on = Boolean(fin && fin.exists && fin.url);
+                        const meta = CINEMA_LOOK_META[key];
+                        return (
+                          <button
+                            key={key}
+                            type="button"
+                            className={"v62-look-dot is-" + meta.tone + (on ? " is-on" : " is-off")}
+                            onClick={() => openPlayer(template, key)}
+                            title={
+                              on
+                                ? meta.label + " · " + fmtDuration(fin?.duration || 0) + "（点击播放）"
+                                : meta.label + " · 未生成（点击提示）"
+                            }
+                            aria-pressed={on}
+                          >
+                            <i />
+                            <span>{meta.short}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                   <div className="v20-final-actions">
-                    <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" disabled={!ready} onClick={() => setPlaying(template)}>
-                      <IconPlay size={12} /> 播放
+                    <button type="button" className="cm-btn cm-btn-primary cm-btn-sm" onClick={() => openPlayer(template, look)}>
+                      <IconPlay size={12} /> 播放 {cardLookMeta.short}
                     </button>
                     {template.report_url && (
                       <a className="cm-btn cm-btn-sm" href={mediaSrc(template.report_url)} target="_blank" rel="noreferrer">
@@ -989,6 +1294,15 @@ function FinalLibrary({
                     <a className="cm-btn cm-btn-sm" href={qcUrl} target="_blank" rel="noreferrer" title="QC 报告 JSON（黑帧/响度/字幕覆盖/时长偏差）">
                       <IconImage size={12} /> QC
                     </a>
+                    <button
+                      type="button"
+                      className="cm-btn cm-btn-sm v54-del-btn"
+                      onClick={() => askDelete([template.id])}
+                      disabled={!ready}
+                      title={ready ? "删除这支成片（后端 DELETE 接口）" : "尚无成片可删"}
+                    >
+                      <IconTrash size={12} /> 删除
+                    </button>
                     <button
                       type="button"
                       className="cm-btn cm-btn-sm is-publish"
@@ -1197,6 +1511,70 @@ function FinalLibrary({
         </div>
       )}
 
+      <Modal
+        open={Boolean(delConfirm && delConfirm.length)}
+        title="删除成片"
+        subtitle={
+          delConfirm
+            ? delConfirm.length + " 支 · " + (look ? CINEMA_LOOK_META[look].label + " 观感 · " : "") + "不可撤销"
+            : ""
+        }
+        onClose={() => {
+          if (!deleting) setDelConfirm(null);
+        }}
+        size="sm"
+        footer={
+          <>
+            <button type="button" className="cm-btn cm-btn-sm" onClick={() => setDelConfirm(null)} disabled={deleting}>
+              取消
+            </button>
+            <button
+              type="button"
+              className="cm-btn cm-btn-sm v54-del-btn"
+              onClick={() => void runDelete()}
+              disabled={deleting || !FINAL_DELETE_ENABLED}
+              title={FINAL_DELETE_ENABLED ? "调用 DELETE 接口删除成片" : "删除入口已在前端关闭"}
+            >
+              {deleting ? <Spinner size={12} /> : <IconTrash size={12} />} 确认删除
+            </button>
+          </>
+        }
+      >
+        <div className="v54-del-list">
+          {(delConfirm || []).map((id) => {
+            const item = templates.find((t) => t.id === id);
+            return (
+              <div key={id} className="cm-mono">
+                {item?.label || id} · {id}
+                {item?.final?.duration ? " · " + fmtDuration(item.final.duration) : ""}
+              </div>
+            );
+          })}
+        </div>
+        {!FINAL_DELETE_ENABLED ? (
+          <div className="v54-del-warn" style={{ marginTop: 10 }}>
+            <IconAlert size={14} />
+            <span>
+              删除入口已在前端关闭（<code>lib/v5.ts</code> 的 <code>FINAL_DELETE_ENABLED = false</code>）。
+              后端接口 <code>DELETE {FINAL_DELETE_PATH.replace("{template}", "{template}")}</code> 本身可用，改回 true 即恢复。
+            </span>
+          </div>
+        ) : (
+          <p className="v18-note" style={{ marginTop: 10 }}>
+            <IconAlert size={13} />
+            <span>删除后成片文件不可恢复；镜头/模板合同不受影响。</span>
+          </p>
+        )}
+        {delError && (
+          <div className="v18-error" style={{ marginTop: 10 }}>
+            <IconAlert size={14} />
+            <div className="v18-error-main">
+              <p className="v18-error-text">{delError}</p>
+            </div>
+          </div>
+        )}
+      </Modal>
+
       {publishTemplate && (
         <PublishPackageModal
           open
@@ -1207,12 +1585,20 @@ function FinalLibrary({
       )}
 
       {playing && (
-        <div className="v20-modal-mask" onMouseDown={() => setPlaying(null)} role="dialog" aria-modal="true" aria-label={playing.label}>
+        <div
+          className="v20-modal-mask"
+          onMouseDown={() => setPlaying(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={playing.template.label}
+        >
           <div className="v20-modal" onMouseDown={(event) => event.stopPropagation()}>
             <header className="v20-modal-head">
               <div>
-                <span className="v20-modal-kicker">FINAL · 3D 成片 · {playing.id}</span>
-                <h3 className="v20-modal-title">{playing.label}</h3>
+                <span className="v20-modal-kicker">
+                  FINAL · {playingLookMeta ? playingLookMeta.label : "当前成片"} · {playing.template.id}
+                </span>
+                <h3 className="v20-modal-title">{playing.template.label}</h3>
               </div>
               <button type="button" className="v18-voice-close" onClick={() => setPlaying(null)} aria-label="关闭">
                 <IconClose size={16} />
@@ -1220,15 +1606,20 @@ function FinalLibrary({
             </header>
             <video
               className="v20-video"
-              src={mediaSrc(playing.final.url || `/media/templates_3d/${playing.id}/final.mp4`)}
+              src={mediaSrc(playingFinal?.url || `/media/templates_3d/${playing.template.id}/final.mp4`)}
               controls
               autoPlay
               playsInline
               preload="metadata"
             />
             <footer className="v20-modal-foot">
-              <span>{fmtDuration(playing.final.duration)} · {fmtSize(playing.final.size)} · 1280×720 / 25fps</span>
-              <span style={{ marginLeft: "auto" }}>镜头 {playing.clips.done}/{playing.clips.total || "—"}</span>
+              <span>
+                {fmtDuration(playingFinal?.duration || 0)} · {fmtSize(playingFinal?.size || 0)}
+                {playingLookMeta ? " · " + playingLookMeta.label : ""}
+              </span>
+              <span style={{ marginLeft: "auto" }}>
+                镜头 {playing.template.clips.done}/{playing.template.clips.total || "—"}
+              </span>
             </footer>
           </div>
         </div>
@@ -1238,24 +1629,28 @@ function FinalLibrary({
         const item = seriesPlaying.series;
         const index = Math.min(seriesPlaying.index, item.members.length - 1);
         const current = item.members[index];
-        const nextIndex = item.members.findIndex((member, i) => i > index && member.ready);
+        const currentFinal = current ? seriesFinal(current.template) : undefined;
+        const nextIndex = item.members.findIndex((member, i) => i > index && seriesLookReady(member));
+        const lookLabel = look ? CINEMA_LOOK_META[look].label : "全部观感";
         return (
           <div className="v20-modal-mask" onMouseDown={() => setSeriesPlaying(null)} role="dialog" aria-modal="true" aria-label={item.label}>
             <div className="v20-modal v20-series-modal" onMouseDown={(event) => event.stopPropagation()}>
               <header className="v20-modal-head">
                 <div>
-                  <span className="v20-modal-kicker">SERIES · {item.label} · {index + 1}/{item.members.length}</span>
+                  <span className="v20-modal-kicker">
+                    SERIES · {item.label} · {index + 1}/{item.members.length} · {lookLabel}
+                  </span>
                   <h3 className="v20-modal-title">{current?.label || item.label}</h3>
                 </div>
                 <button type="button" className="v18-voice-close" onClick={() => setSeriesPlaying(null)} aria-label="关闭">
                   <IconClose size={16} />
                 </button>
               </header>
-              {current?.final_url ? (
+              {currentFinal?.exists && currentFinal?.url ? (
                 <video
-                  key={current.template}
+                  key={current.template + look}
                   className="v20-video"
-                  src={mediaSrc(current.final_url)}
+                  src={mediaSrc(currentFinal.url)}
                   controls
                   autoPlay
                   playsInline
@@ -1265,23 +1660,35 @@ function FinalLibrary({
                   }}
                 />
               ) : (
-                <div className="v18-empty"><span>这一集还没生成成片</span></div>
+                <div className="v18-empty">
+                  <span>这一集还没有「{lookLabel}」成片</span>
+                </div>
               )}
               <footer className="v20-modal-foot v20-series-foot">
                 <div className="v20-series-queue">
-                  {item.members.map((member, i) => (
-                    <button
-                      key={member.template}
-                      type="button"
-                      className={"v20-series-item" + (i === index ? " is-active" : "")}
-                      onClick={() => setSeriesPlaying({ series: item, index: i })}
-                      disabled={!member.ready}
-                    >
-                      <span className="v20-series-index">{i + 1}</span>
-                      <span>{member.label}</span>
-                      {member.duration ? <em>{fmtDuration(member.duration)}</em> : null}
-                    </button>
-                  ))}
+                  {item.members.map((member, i) => {
+                    const ready = seriesLookReady(member);
+                    const fin = seriesFinal(member.template);
+                    return (
+                      <button
+                        key={member.template}
+                        type="button"
+                        className={"v20-series-item" + (i === index ? " is-active" : "") + (ready ? "" : " is-missing")}
+                        onClick={() => {
+                          if (!ready) {
+                            notify("该集没有「" + lookLabel + "」成片", "info");
+                            return;
+                          }
+                          setSeriesPlaying({ series: item, index: i });
+                        }}
+                        title={ready ? member.label : member.label + " · " + lookLabel + " 未生成"}
+                      >
+                        <span className="v20-series-index">{i + 1}</span>
+                        <span>{member.label}</span>
+                        {(fin?.duration || member.duration) ? <em>{fmtDuration(fin?.duration || member.duration || 0)}</em> : null}
+                      </button>
+                    );
+                  })}
                 </div>
               </footer>
             </div>
@@ -1292,6 +1699,39 @@ function FinalLibrary({
   );
 }
 
+
+/* ------------------------------ V63：观感分段控件 ------------------------------ */
+function LookSegmented({
+  look,
+  onChange,
+  ariaLabel = "成片观感",
+}: {
+  look: "" | CinemaLook;
+  onChange: (next: "" | CinemaLook) => void;
+  ariaLabel?: string;
+}) {
+  const options: { id: "" | CinemaLook; label: string }[] = [
+    { id: "", label: "全部观感" },
+    ...CINEMA_LOOK_ORDER.map((key) => ({ id: key as "" | CinemaLook, label: CINEMA_LOOK_META[key].label })),
+  ];
+  return (
+    <div className="tpl-seg v62-look-seg" role="group" aria-label={ariaLabel}>
+      {options.map((item) => (
+        <button
+          key={item.id || "all"}
+          type="button"
+          className={look === item.id ? "is-active" : ""}
+          onClick={() => onChange(item.id)}
+          aria-pressed={look === item.id}
+          title={item.id ? "只看 " + item.label + " 成片（?look=" + item.id + "）" : "不传 look，显示当前成片"}
+          data-look={item.id || "all"}
+        >
+          {item.label}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 /* ------------------------------ V25：批量队列 item 行 ------------------------------ */
 function BatchItemRow({ item, index, active }: { item: PipelineBatchItem; index: number; active: boolean }) {

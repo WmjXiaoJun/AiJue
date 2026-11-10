@@ -17,5 +17,25 @@
       "template": "custom_tpl_v46_duologue",
       "label": "第三部 · 装配夜话"
     }
-  ]
+  ],
+  "season": {
+    "order": 1,
+    "target_count": 3,
+    "style_tag": "赛博电影感 · 底城世界",
+    "premise": "底城三部曲：街上的人、车间里的机器、深夜里的一场对话。",
+    "rules": {
+      "episode_sec": [
+        13,
+        25
+      ],
+      "acts": [
+        4,
+        6
+      ],
+      "same_cast": false,
+      "same_style": true,
+      "same_world": true,
+      "cast_note": "三部曲共用一个世界与 2D 风格，但第一部（老周/阿栗/甜妹）与第二、三部（老秦/小满）不同角色组；同 cast 只要求在同一条主线内成立。"
+    }
+  }
 }

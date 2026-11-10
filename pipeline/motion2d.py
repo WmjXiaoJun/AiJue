@@ -912,15 +912,21 @@ def _get_layerset(layers: Any, size: tuple[int, int], camera: Any = None,
     camspec = json.dumps({k: v for k, v in (cam_for_prep or {}).items()
                           if not callable(v)}, sort_keys=True, default=str)
     style_key = _style_sig(style)
+    # V49 修复：缓存键原来只有 id(layers)+camspec+style+size，漏了 duration/seed ——
+    # prepare_layers 会按 duration 决定缓动/关键帧、按 seed 决定抖动，漏参就会拿 3s 的
+    # 结果去渲 5s 镜头（画面提前结束/黑边）。这里把两者并入命中判定。
+    dur_key = round(float(duration or 0.0), 3)
+    seed_key = int(seed or 0)
     hit = _PREP_CACHE.get(key)
     if hit is not None and hit[0] is layers and hit[2] == camspec \
             and hit[1].style_key == style_key \
-            and hit[1].size == (int(size[0]), int(size[1])):
+            and hit[1].size == (int(size[0]), int(size[1])) \
+            and hit[3] == (dur_key, seed_key):
         return hit[1]
     prepared = prepare_layers(layers, size, cam_for_prep, duration, seed, style=style)
     if len(_PREP_CACHE) >= _PREP_CACHE_MAX:
         _PREP_CACHE.pop(next(iter(_PREP_CACHE)))
-    _PREP_CACHE[key] = (layers, prepared, camspec)
+    _PREP_CACHE[key] = (layers, prepared, camspec, (dur_key, seed_key))
     return prepared
 
 

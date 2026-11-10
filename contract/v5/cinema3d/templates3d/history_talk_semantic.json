@@ -7,7 +7,8 @@
   {
    "id": "v5_card_title",
    "kind": "card",
-   "prompt": null
+   "prompt": null,
+   "act_index": -1
   },
   {
    "id": "v5_002",
@@ -17,7 +18,8 @@
    "line": "今天把官渡之战摊在地图上，换个问法：如果曹操输了，历史会怎么走？",
    "semantic_visual": "An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges.",
    "framing": "wide",
-   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow crane descend. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: wind outside, a quiet candle flame. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow crane descend. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: wind outside, a quiet candle flame. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_003",
@@ -27,7 +29,8 @@
    "line": "我输不起，因为我的粮道只有一条，烧了就什么都没了。",
    "semantic_visual": "A lone supply road winds along a dark river under moonlight, a single line of grain carts exposed and vulnerable, distant torchlight threatening from the hills.",
    "framing": "wide",
-   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a misty ancient battlefield at dawn, broken banners and spears in the mud. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A lone supply road winds along a dark river under moonlight, a single line of grain carts exposed and vulnerable, distant torchlight threatening from the hills.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: wind outside, a quiet candle flame. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a misty ancient battlefield at dawn, broken banners and spears in the mud. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A lone supply road winds along a dark river under moonlight, a single line of grain carts exposed and vulnerable, distant torchlight threatening from the hills.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: wind outside, a quiet candle flame. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_004",
@@ -37,7 +40,8 @@
    "line": "可你赢了，也只是把乱世推迟了二十年。",
    "semantic_visual": "A robed strategist stands in a vast palace hall, pale light through tall pillars, a long shadow stretching across polished stone as he gazes at an empty throne.",
    "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient Chinese palace hall at night, candles and deep shadows. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed strategist stands in a vast palace hall, pale light through tall pillars, a long shadow stretching across polished stone as he gazes at an empty throne.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow rack focus between foreground and background. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: wind outside, a quiet candle flame. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient Chinese palace hall at night, candles and deep shadows. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed strategist stands in a vast palace hall, pale light through tall pillars, a long shadow stretching across polished stone as he gazes at an empty throne.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow rack focus between foreground and background. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: wind outside, a quiet candle flame. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_005",
@@ -47,7 +51,8 @@
    "line": "地图上这条线，就是两个人的生死线。",
    "semantic_visual": "Close view of a brush tracing a thin ink line across an old map, the line glowing faintly red, two small carved figures standing at either end.",
    "framing": "close",
-   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a moonlit study with scroll maps and hanging brushes. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Close view of a brush tracing a thin ink line across an old map, the line glowing faintly red, two small carved figures standing at either end.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: wind outside, a quiet candle flame. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a moonlit study with scroll maps and hanging brushes. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Close view of a brush tracing a thin ink line across an old map, the line glowing faintly red, two small carved figures standing at either end.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: wind outside, a quiet candle flame. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_006",
@@ -57,12 +62,652 @@
    "line": "先看这张地图，许攸投奔那晚，乌巢的粮仓就在这条河边。",
    "semantic_visual": "A night map spreads beside a river of ink, tiny granary models clustered on the bank, a hooded figure approaching a flickering campfire in the distance.",
    "framing": "wide",
-   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A night map spreads beside a river of ink, tiny granary models clustered on the bank, a hooded figure approaching a flickering campfire in the distance.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow pull-back revealing the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: wind outside, a quiet candle flame. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A night map spreads beside a river of ink, tiny granary models clustered on the bank, a hooded figure approaching a flickering campfire in the distance.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow pull-back revealing the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: wind outside, a quiet candle flame. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_card_end",
    "kind": "card",
-   "prompt": null
+   "prompt": null,
+   "act_index": -1
+  },
+  {
+   "id": "v5_e001",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e002",
+   "kind": "dialogue",
+   "scene": "battlefield",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A lone supply road winds along a dark river under moonlight, a single line of grain carts exposed and vulnerable, distant torchlight threatening from the hills. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a misty ancient battlefield at dawn, broken banners and spears in the mud. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A lone supply road winds along a dark river under moonlight, a single line of grain carts exposed and vulnerable, distant torchlight threatening from the hills.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e003",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 3.33,
+   "line": "",
+   "semantic_visual": "A robed strategist stands in a vast palace hall, pale light through tall pillars, a long shadow stretching across polished stone as he gazes at an empty throne. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient Chinese palace hall at night, candles and deep shadows. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed strategist stands in a vast palace hall, pale light through tall pillars, a long shadow stretching across polished stone as he gazes at an empty throne.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e004",
+   "kind": "dialogue",
+   "scene": "scholar_study",
+   "duration": 4.13,
+   "line": "",
+   "semantic_visual": "Close view of a brush tracing a thin ink line across an old map, the line glowing faintly red, two small carved figures standing at either end. The character turns toward the window, thinking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a moonlit study with scroll maps and hanging brushes. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Close view of a brush tracing a thin ink line across an old map, the line glowing faintly red, two small carved figures standing at either end.. Framing: close shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e005",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A night map spreads beside a river of ink, tiny granary models clustered on the bank, a hooded figure approaching a flickering campfire in the distance. Two characters exchange a look; one nods.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A night map spreads beside a river of ink, tiny granary models clustered on the bank, a hooded figure approaching a flickering campfire in the distance.. Framing: wide shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e006",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e007",
+   "kind": "dialogue",
+   "scene": "battlefield",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A lone supply road winds along a dark river under moonlight, a single line of grain carts exposed and vulnerable, distant torchlight threatening from the hills. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a misty ancient battlefield at dawn, broken banners and spears in the mud. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A lone supply road winds along a dark river under moonlight, a single line of grain carts exposed and vulnerable, distant torchlight threatening from the hills.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e008",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 3.33,
+   "line": "",
+   "semantic_visual": "A robed strategist stands in a vast palace hall, pale light through tall pillars, a long shadow stretching across polished stone as he gazes at an empty throne. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient Chinese palace hall at night, candles and deep shadows. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed strategist stands in a vast palace hall, pale light through tall pillars, a long shadow stretching across polished stone as he gazes at an empty throne.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e009",
+   "kind": "dialogue",
+   "scene": "scholar_study",
+   "duration": 4.13,
+   "line": "",
+   "semantic_visual": "Close view of a brush tracing a thin ink line across an old map, the line glowing faintly red, two small carved figures standing at either end. The character walks slowly through the space, glancing around.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a moonlit study with scroll maps and hanging brushes. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Close view of a brush tracing a thin ink line across an old map, the line glowing faintly red, two small carved figures standing at either end.. Framing: close shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e010",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A night map spreads beside a river of ink, tiny granary models clustered on the bank, a hooded figure approaching a flickering campfire in the distance. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A night map spreads beside a river of ink, tiny granary models clustered on the bank, a hooded figure approaching a flickering campfire in the distance.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e011",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges. Two characters exchange a look; one nods.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges.. Framing: wide shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e012",
+   "kind": "dialogue",
+   "scene": "battlefield",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A lone supply road winds along a dark river under moonlight, a single line of grain carts exposed and vulnerable, distant torchlight threatening from the hills. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a misty ancient battlefield at dawn, broken banners and spears in the mud. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A lone supply road winds along a dark river under moonlight, a single line of grain carts exposed and vulnerable, distant torchlight threatening from the hills.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e013",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 3.33,
+   "line": "",
+   "semantic_visual": "A robed strategist stands in a vast palace hall, pale light through tall pillars, a long shadow stretching across polished stone as he gazes at an empty throne. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient Chinese palace hall at night, candles and deep shadows. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed strategist stands in a vast palace hall, pale light through tall pillars, a long shadow stretching across polished stone as he gazes at an empty throne.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e014",
+   "kind": "dialogue",
+   "scene": "scholar_study",
+   "duration": 4.13,
+   "line": "",
+   "semantic_visual": "Close view of a brush tracing a thin ink line across an old map, the line glowing faintly red, two small carved figures standing at either end. The character leans on the table and gestures while speaking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a moonlit study with scroll maps and hanging brushes. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Close view of a brush tracing a thin ink line across an old map, the line glowing faintly red, two small carved figures standing at either end.. Framing: close shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e015",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A night map spreads beside a river of ink, tiny granary models clustered on the bank, a hooded figure approaching a flickering campfire in the distance. The character walks slowly through the space, glancing around.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A night map spreads beside a river of ink, tiny granary models clustered on the bank, a hooded figure approaching a flickering campfire in the distance.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e016",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e017",
+   "kind": "dialogue",
+   "scene": "battlefield",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A lone supply road winds along a dark river under moonlight, a single line of grain carts exposed and vulnerable, distant torchlight threatening from the hills. Two characters exchange a look; one nods.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a misty ancient battlefield at dawn, broken banners and spears in the mud. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A lone supply road winds along a dark river under moonlight, a single line of grain carts exposed and vulnerable, distant torchlight threatening from the hills.. Framing: wide shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e018",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 3.33,
+   "line": "",
+   "semantic_visual": "A robed strategist stands in a vast palace hall, pale light through tall pillars, a long shadow stretching across polished stone as he gazes at an empty throne. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient Chinese palace hall at night, candles and deep shadows. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed strategist stands in a vast palace hall, pale light through tall pillars, a long shadow stretching across polished stone as he gazes at an empty throne.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e019",
+   "kind": "dialogue",
+   "scene": "scholar_study",
+   "duration": 4.13,
+   "line": "",
+   "semantic_visual": "Close view of a brush tracing a thin ink line across an old map, the line glowing faintly red, two small carved figures standing at either end. The character pauses, looks off frame, then continues.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a moonlit study with scroll maps and hanging brushes. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Close view of a brush tracing a thin ink line across an old map, the line glowing faintly red, two small carved figures standing at either end.. Framing: close shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e020",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A night map spreads beside a river of ink, tiny granary models clustered on the bank, a hooded figure approaching a flickering campfire in the distance. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A night map spreads beside a river of ink, tiny granary models clustered on the bank, a hooded figure approaching a flickering campfire in the distance.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e021",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges. The character walks slowly through the space, glancing around.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e022",
+   "kind": "dialogue",
+   "scene": "battlefield",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A lone supply road winds along a dark river under moonlight, a single line of grain carts exposed and vulnerable, distant torchlight threatening from the hills. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a misty ancient battlefield at dawn, broken banners and spears in the mud. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A lone supply road winds along a dark river under moonlight, a single line of grain carts exposed and vulnerable, distant torchlight threatening from the hills.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e023",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 3.33,
+   "line": "",
+   "semantic_visual": "A robed strategist stands in a vast palace hall, pale light through tall pillars, a long shadow stretching across polished stone as he gazes at an empty throne. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient Chinese palace hall at night, candles and deep shadows. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed strategist stands in a vast palace hall, pale light through tall pillars, a long shadow stretching across polished stone as he gazes at an empty throne.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e024",
+   "kind": "dialogue",
+   "scene": "scholar_study",
+   "duration": 4.13,
+   "line": "",
+   "semantic_visual": "Close view of a brush tracing a thin ink line across an old map, the line glowing faintly red, two small carved figures standing at either end. The character picks up an object and examines it.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a moonlit study with scroll maps and hanging brushes. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Close view of a brush tracing a thin ink line across an old map, the line glowing faintly red, two small carved figures standing at either end.. Framing: close shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e025",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A night map spreads beside a river of ink, tiny granary models clustered on the bank, a hooded figure approaching a flickering campfire in the distance. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A night map spreads beside a river of ink, tiny granary models clustered on the bank, a hooded figure approaching a flickering campfire in the distance.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e026",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e027",
+   "kind": "dialogue",
+   "scene": "battlefield",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A lone supply road winds along a dark river under moonlight, a single line of grain carts exposed and vulnerable, distant torchlight threatening from the hills. The character walks slowly through the space, glancing around.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a misty ancient battlefield at dawn, broken banners and spears in the mud. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A lone supply road winds along a dark river under moonlight, a single line of grain carts exposed and vulnerable, distant torchlight threatening from the hills.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e028",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 3.33,
+   "line": "",
+   "semantic_visual": "A robed strategist stands in a vast palace hall, pale light through tall pillars, a long shadow stretching across polished stone as he gazes at an empty throne. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient Chinese palace hall at night, candles and deep shadows. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed strategist stands in a vast palace hall, pale light through tall pillars, a long shadow stretching across polished stone as he gazes at an empty throne.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e029",
+   "kind": "dialogue",
+   "scene": "scholar_study",
+   "duration": 4.13,
+   "line": "",
+   "semantic_visual": "Close view of a brush tracing a thin ink line across an old map, the line glowing faintly red, two small carved figures standing at either end. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a moonlit study with scroll maps and hanging brushes. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Close view of a brush tracing a thin ink line across an old map, the line glowing faintly red, two small carved figures standing at either end.. Framing: close shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e030",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A night map spreads beside a river of ink, tiny granary models clustered on the bank, a hooded figure approaching a flickering campfire in the distance. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A night map spreads beside a river of ink, tiny granary models clustered on the bank, a hooded figure approaching a flickering campfire in the distance.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e031",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e032",
+   "kind": "dialogue",
+   "scene": "battlefield",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A lone supply road winds along a dark river under moonlight, a single line of grain carts exposed and vulnerable, distant torchlight threatening from the hills. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a misty ancient battlefield at dawn, broken banners and spears in the mud. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A lone supply road winds along a dark river under moonlight, a single line of grain carts exposed and vulnerable, distant torchlight threatening from the hills.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e033",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 3.33,
+   "line": "",
+   "semantic_visual": "A robed strategist stands in a vast palace hall, pale light through tall pillars, a long shadow stretching across polished stone as he gazes at an empty throne. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient Chinese palace hall at night, candles and deep shadows. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed strategist stands in a vast palace hall, pale light through tall pillars, a long shadow stretching across polished stone as he gazes at an empty throne.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e034",
+   "kind": "dialogue",
+   "scene": "scholar_study",
+   "duration": 4.13,
+   "line": "",
+   "semantic_visual": "Close view of a brush tracing a thin ink line across an old map, the line glowing faintly red, two small carved figures standing at either end. The character turns toward the window, thinking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a moonlit study with scroll maps and hanging brushes. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Close view of a brush tracing a thin ink line across an old map, the line glowing faintly red, two small carved figures standing at either end.. Framing: close shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e035",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A night map spreads beside a river of ink, tiny granary models clustered on the bank, a hooded figure approaching a flickering campfire in the distance. Two characters exchange a look; one nods.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A night map spreads beside a river of ink, tiny granary models clustered on the bank, a hooded figure approaching a flickering campfire in the distance.. Framing: wide shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e036",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e037",
+   "kind": "dialogue",
+   "scene": "battlefield",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A lone supply road winds along a dark river under moonlight, a single line of grain carts exposed and vulnerable, distant torchlight threatening from the hills. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a misty ancient battlefield at dawn, broken banners and spears in the mud. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A lone supply road winds along a dark river under moonlight, a single line of grain carts exposed and vulnerable, distant torchlight threatening from the hills.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e038",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 3.33,
+   "line": "",
+   "semantic_visual": "A robed strategist stands in a vast palace hall, pale light through tall pillars, a long shadow stretching across polished stone as he gazes at an empty throne. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient Chinese palace hall at night, candles and deep shadows. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed strategist stands in a vast palace hall, pale light through tall pillars, a long shadow stretching across polished stone as he gazes at an empty throne.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e039",
+   "kind": "dialogue",
+   "scene": "scholar_study",
+   "duration": 4.13,
+   "line": "",
+   "semantic_visual": "Close view of a brush tracing a thin ink line across an old map, the line glowing faintly red, two small carved figures standing at either end. The character walks slowly through the space, glancing around.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a moonlit study with scroll maps and hanging brushes. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Close view of a brush tracing a thin ink line across an old map, the line glowing faintly red, two small carved figures standing at either end.. Framing: close shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e040",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A night map spreads beside a river of ink, tiny granary models clustered on the bank, a hooded figure approaching a flickering campfire in the distance. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A night map spreads beside a river of ink, tiny granary models clustered on the bank, a hooded figure approaching a flickering campfire in the distance.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e041",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges. Two characters exchange a look; one nods.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges.. Framing: wide shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e042",
+   "kind": "dialogue",
+   "scene": "battlefield",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A lone supply road winds along a dark river under moonlight, a single line of grain carts exposed and vulnerable, distant torchlight threatening from the hills. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a misty ancient battlefield at dawn, broken banners and spears in the mud. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A lone supply road winds along a dark river under moonlight, a single line of grain carts exposed and vulnerable, distant torchlight threatening from the hills.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e043",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 3.33,
+   "line": "",
+   "semantic_visual": "A robed strategist stands in a vast palace hall, pale light through tall pillars, a long shadow stretching across polished stone as he gazes at an empty throne. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient Chinese palace hall at night, candles and deep shadows. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed strategist stands in a vast palace hall, pale light through tall pillars, a long shadow stretching across polished stone as he gazes at an empty throne.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e044",
+   "kind": "dialogue",
+   "scene": "scholar_study",
+   "duration": 4.13,
+   "line": "",
+   "semantic_visual": "Close view of a brush tracing a thin ink line across an old map, the line glowing faintly red, two small carved figures standing at either end. The character leans on the table and gestures while speaking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a moonlit study with scroll maps and hanging brushes. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Close view of a brush tracing a thin ink line across an old map, the line glowing faintly red, two small carved figures standing at either end.. Framing: close shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e045",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A night map spreads beside a river of ink, tiny granary models clustered on the bank, a hooded figure approaching a flickering campfire in the distance. The character walks slowly through the space, glancing around.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A night map spreads beside a river of ink, tiny granary models clustered on the bank, a hooded figure approaching a flickering campfire in the distance.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e046",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e047",
+   "kind": "dialogue",
+   "scene": "battlefield",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A lone supply road winds along a dark river under moonlight, a single line of grain carts exposed and vulnerable, distant torchlight threatening from the hills. Two characters exchange a look; one nods.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a misty ancient battlefield at dawn, broken banners and spears in the mud. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A lone supply road winds along a dark river under moonlight, a single line of grain carts exposed and vulnerable, distant torchlight threatening from the hills.. Framing: wide shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e048",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 3.33,
+   "line": "",
+   "semantic_visual": "A robed strategist stands in a vast palace hall, pale light through tall pillars, a long shadow stretching across polished stone as he gazes at an empty throne. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient Chinese palace hall at night, candles and deep shadows. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed strategist stands in a vast palace hall, pale light through tall pillars, a long shadow stretching across polished stone as he gazes at an empty throne.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e049",
+   "kind": "dialogue",
+   "scene": "scholar_study",
+   "duration": 4.13,
+   "line": "",
+   "semantic_visual": "Close view of a brush tracing a thin ink line across an old map, the line glowing faintly red, two small carved figures standing at either end. The character pauses, looks off frame, then continues.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a moonlit study with scroll maps and hanging brushes. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Close view of a brush tracing a thin ink line across an old map, the line glowing faintly red, two small carved figures standing at either end.. Framing: close shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e050",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A night map spreads beside a river of ink, tiny granary models clustered on the bank, a hooded figure approaching a flickering campfire in the distance. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A night map spreads beside a river of ink, tiny granary models clustered on the bank, a hooded figure approaching a flickering campfire in the distance.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e051",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges. The character walks slowly through the space, glancing around.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e052",
+   "kind": "dialogue",
+   "scene": "battlefield",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A lone supply road winds along a dark river under moonlight, a single line of grain carts exposed and vulnerable, distant torchlight threatening from the hills. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a misty ancient battlefield at dawn, broken banners and spears in the mud. Featuring a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A lone supply road winds along a dark river under moonlight, a single line of grain carts exposed and vulnerable, distant torchlight threatening from the hills.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e053",
+   "kind": "dialogue",
+   "scene": "palace_hall",
+   "duration": 3.33,
+   "line": "",
+   "semantic_visual": "A robed strategist stands in a vast palace hall, pale light through tall pillars, a long shadow stretching across polished stone as he gazes at an empty throne. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient Chinese palace hall at night, candles and deep shadows. Featuring a stylized 3D animated man in his 40s, ancient guan black hair, wearing a white hanfu with navy accents, with feather fan; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A robed strategist stands in a vast palace hall, pale light through tall pillars, a long shadow stretching across polished stone as he gazes at an empty throne.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e054",
+   "kind": "dialogue",
+   "scene": "scholar_study",
+   "duration": 4.13,
+   "line": "",
+   "semantic_visual": "Close view of a brush tracing a thin ink line across an old map, the line glowing faintly red, two small carved figures standing at either end. The character picks up an object and examines it.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in a moonlit study with scroll maps and hanging brushes. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: Close view of a brush tracing a thin ink line across an old map, the line glowing faintly red, two small carved figures standing at either end.. Framing: close shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e055",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A night map spreads beside a river of ink, tiny granary models clustered on the bank, a hooded figure approaching a flickering campfire in the distance. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: A night map spreads beside a river of ink, tiny granary models clustered on the bank, a hooded figure approaching a flickering campfire in the distance.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e056",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_x001",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_x002",
+   "kind": "dialogue",
+   "scene": "war_council",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] cinematic 3D ink-wash chronicle, blue-grey moonlit atmosphere, silk and bronze. Set in an ancient war council tent with a sand table, copper lamps and silk maps. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 50s, ancient guan black hair, wearing a black hanfu with red-brown accents, with sword. The shot shows the idea through visible action: An aged scholar unrolls a large weathered map across a wooden war table, candlelight flickering over painted rivers and troop markers, ink-wash shadows pooling at the edges.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
   }
  ]
 }

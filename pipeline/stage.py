@@ -47,7 +47,7 @@ LOG = __import__("logging").getLogger("pipeline")
 REPO = config.REPO_ROOT
 DEFAULT_W, DEFAULT_H = 1024, 576
 PLATE_DIR = REPO / "outputs" / "scene_plates"
-CHARS_DIR = REPO / "outputs" / "characters"
+CHARS_DIR = config.CHARS_ROOT  # 真相源在 assets/v5/characters（见 config）
 # 卡片字体缓存目录（ensure_fonts 只复制一次，~32MB；避免每个输出目录各拷一份）
 DEFAULT_FONT_SCRATCH = REPO / "tmp" / "v3_stage" / "_fonts"
 
@@ -310,6 +310,9 @@ def _style_preset(template: dict) -> dict:
 
 
 _PORTRAIT_FALLBACKS = (
+    # 资产库实际布局：<cid>/cutout.png（RGBA 全身透明）—— 之前没查这里，
+    # 于是 26 个角色全被判 "cutout 文件缺失"，合成时整镜无角色。
+    ("cutout.png", "full_body"),
     ("cutout_2d/three_quarter.png", "full_body"),
     ("cutout/portrait.png", "bust"),
     ("2d/portrait.png", "bust"),

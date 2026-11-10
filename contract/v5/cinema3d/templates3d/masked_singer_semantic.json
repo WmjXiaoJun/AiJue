@@ -7,7 +7,8 @@
   {
    "id": "v5_card_title",
    "kind": "card",
-   "prompt": null
+   "prompt": null,
+   "act_index": -1
   },
   {
    "id": "v5_001",
@@ -17,7 +18,8 @@
    "line": "",
    "semantic_visual": "",
    "framing": "",
-   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a futuristic holographic concert stage with floating light rings and laser beams. The camera surveys the space, atmospheric and cinematic. Camera: slow crane rise. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: deep concert hum, distant crowd roar. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a futuristic holographic concert stage with floating light rings and laser beams. The camera surveys the space, atmospheric and cinematic. Camera: slow crane rise. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: deep concert hum, distant crowd roar. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_002",
@@ -27,7 +29,8 @@
    "line": "阿栗，你这新歌听着挺新鲜的，全息舞台也挺酷啊！",
    "semantic_visual": "In a mirrored room, a man gestures toward a glowing holographic stage where a shimmering figure performs, reflections multiplying around them. Cool blue light, curious and impressed mood.",
    "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a mirrored dressing room with ring lights and reflective surfaces. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: In a mirrored room, a man gestures toward a glowing holographic stage where a shimmering figure performs, reflections multiplying around them. Cool blue light, curious and impressed mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: deep concert hum, distant crowd roar. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a mirrored dressing room with ring lights and reflective surfaces. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: In a mirrored room, a man gestures toward a glowing holographic stage where a shimmering figure performs, reflections multiplying around them. Cool blue light, curious and impressed mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: deep concert hum, distant crowd roar. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_003",
@@ -37,7 +40,8 @@
    "line": "哈哈，多亏了AI帮我写词谱曲，这次真的是跨界合作",
    "semantic_visual": "A performer on a hologram stage spreads arms wide as a sea of audience star-lights twinkles below. Neon glow and sparkling particles, joyful collaborative energy.",
    "framing": "wide",
-   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a vast concert audience holding glowing lights like a star sea. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: A performer on a hologram stage spreads arms wide as a sea of audience star-lights twinkles below. Neon glow and sparkling particles, joyful collaborative energy.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: deep concert hum, distant crowd roar. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a vast concert audience holding glowing lights like a star sea. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: A performer on a hologram stage spreads arms wide as a sea of audience star-lights twinkles below. Neon glow and sparkling particles, joyful collaborative energy.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: deep concert hum, distant crowd roar. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_004",
@@ -47,7 +51,8 @@
    "line": "那你说说，AI写的歌到底算不算音乐呢？",
    "semantic_visual": "Two silhouettes face each other inside a tunnel of rushing light streaks, one raising a hand in question. Swirling cyan and violet light, thoughtful tension.",
    "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a tunnel of prismatic light and floating particles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: Two silhouettes face each other inside a tunnel of rushing light streaks, one raising a hand in question. Swirling cyan and violet light, thoughtful tension.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: deep concert hum, distant crowd roar. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a tunnel of prismatic light and floating particles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: Two silhouettes face each other inside a tunnel of rushing light streaks, one raising a hand in question. Swirling cyan and violet light, thoughtful tension.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: deep concert hum, distant crowd roar. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_005",
@@ -57,7 +62,8 @@
    "line": "这还用说，当然算啦！就是现代版的‘人工’音乐呗！",
    "semantic_visual": "In the mirrored room, a performer laughs and taps a floating holographic keyboard, notes drifting upward. Warm pink reflections, playful confident mood.",
    "framing": "close",
-   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a mirrored dressing room with ring lights and reflective surfaces. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: In the mirrored room, a performer laughs and taps a floating holographic keyboard, notes drifting upward. Warm pink reflections, playful confident mood.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: deep concert hum, distant crowd roar. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a mirrored dressing room with ring lights and reflective surfaces. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: In the mirrored room, a performer laughs and taps a floating holographic keyboard, notes drifting upward. Warm pink reflections, playful confident mood.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: deep concert hum, distant crowd roar. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_006",
@@ -67,7 +73,8 @@
    "line": "但我也觉得，关键还是得有人的情感在里面，AI再先进也替代不了感情",
    "semantic_visual": "A young woman in the audience clutches her chest, star-lights glowing around her as she looks up at the stage. Soft warm bokeh, heartfelt mood.",
    "framing": "close",
-   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a vast concert audience holding glowing lights like a star sea. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A young woman in the audience clutches her chest, star-lights glowing around her as she looks up at the stage. Soft warm bokeh, heartfelt mood.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: deep concert hum, distant crowd roar. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a vast concert audience holding glowing lights like a star sea. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A young woman in the audience clutches her chest, star-lights glowing around her as she looks up at the stage. Soft warm bokeh, heartfelt mood.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: deep concert hum, distant crowd roar. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_007",
@@ -77,12 +84,608 @@
    "line": "对头，感情是音乐的灵魂，缺了它就是冷冰冰的科技产品",
    "semantic_visual": "A man nods firmly in the light tunnel as glowing musical notes dissolve into cold metallic shards around him. Sharp white-blue lighting, serious mood.",
    "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a tunnel of prismatic light and floating particles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A man nods firmly in the light tunnel as glowing musical notes dissolve into cold metallic shards around him. Sharp white-blue lighting, serious mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow pull-back revealing the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: deep concert hum, distant crowd roar. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a tunnel of prismatic light and floating particles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A man nods firmly in the light tunnel as glowing musical notes dissolve into cold metallic shards around him. Sharp white-blue lighting, serious mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow pull-back revealing the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: deep concert hum, distant crowd roar. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_card_end",
    "kind": "card",
-   "prompt": null
+   "prompt": null,
+   "act_index": -1
+  },
+  {
+   "id": "v5_e001",
+   "kind": "broll",
+   "scene": "hologram_stage",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a futuristic holographic concert stage with floating light rings and laser beams. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e002",
+   "kind": "dialogue",
+   "scene": "mirror_room",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In a mirrored room, a man gestures toward a glowing holographic stage where a shimmering figure performs, reflections multiplying around them. Cool blue light, curious and impressed mood. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a mirrored dressing room with ring lights and reflective surfaces. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: In a mirrored room, a man gestures toward a glowing holographic stage where a shimmering figure performs, reflections multiplying around them. Cool blue light, curious and impressed mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e003",
+   "kind": "dialogue",
+   "scene": "audience_star_sea",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A performer on a hologram stage spreads arms wide as a sea of audience star-lights twinkles below. Neon glow and sparkling particles, joyful collaborative energy. The character walks slowly through the space, glancing around.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a vast concert audience holding glowing lights like a star sea. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: A performer on a hologram stage spreads arms wide as a sea of audience star-lights twinkles below. Neon glow and sparkling particles, joyful collaborative energy.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e004",
+   "kind": "dialogue",
+   "scene": "light_tunnel",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Two silhouettes face each other inside a tunnel of rushing light streaks, one raising a hand in question. Swirling cyan and violet light, thoughtful tension. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a tunnel of prismatic light and floating particles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: Two silhouettes face each other inside a tunnel of rushing light streaks, one raising a hand in question. Swirling cyan and violet light, thoughtful tension.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e005",
+   "kind": "dialogue",
+   "scene": "mirror_room",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In the mirrored room, a performer laughs and taps a floating holographic keyboard, notes drifting upward. Warm pink reflections, playful confident mood. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a mirrored dressing room with ring lights and reflective surfaces. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: In the mirrored room, a performer laughs and taps a floating holographic keyboard, notes drifting upward. Warm pink reflections, playful confident mood.. Framing: close shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e006",
+   "kind": "dialogue",
+   "scene": "audience_star_sea",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A young woman in the audience clutches her chest, star-lights glowing around her as she looks up at the stage. Soft warm bokeh, heartfelt mood. The character picks up an object and examines it.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a vast concert audience holding glowing lights like a star sea. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A young woman in the audience clutches her chest, star-lights glowing around her as she looks up at the stage. Soft warm bokeh, heartfelt mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e007",
+   "kind": "dialogue",
+   "scene": "light_tunnel",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A man nods firmly in the light tunnel as glowing musical notes dissolve into cold metallic shards around him. Sharp white-blue lighting, serious mood. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a tunnel of prismatic light and floating particles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A man nods firmly in the light tunnel as glowing musical notes dissolve into cold metallic shards around him. Sharp white-blue lighting, serious mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e008",
+   "kind": "broll",
+   "scene": "hologram_stage",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character leans on the table and gestures while speaking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a futuristic holographic concert stage with floating light rings and laser beams. The camera surveys the space, atmospheric and cinematic. The character leans on the table and gestures while speaking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e009",
+   "kind": "dialogue",
+   "scene": "mirror_room",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In a mirrored room, a man gestures toward a glowing holographic stage where a shimmering figure performs, reflections multiplying around them. Cool blue light, curious and impressed mood. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a mirrored dressing room with ring lights and reflective surfaces. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: In a mirrored room, a man gestures toward a glowing holographic stage where a shimmering figure performs, reflections multiplying around them. Cool blue light, curious and impressed mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e010",
+   "kind": "dialogue",
+   "scene": "audience_star_sea",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A performer on a hologram stage spreads arms wide as a sea of audience star-lights twinkles below. Neon glow and sparkling particles, joyful collaborative energy. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a vast concert audience holding glowing lights like a star sea. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: A performer on a hologram stage spreads arms wide as a sea of audience star-lights twinkles below. Neon glow and sparkling particles, joyful collaborative energy.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e011",
+   "kind": "dialogue",
+   "scene": "light_tunnel",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Two silhouettes face each other inside a tunnel of rushing light streaks, one raising a hand in question. Swirling cyan and violet light, thoughtful tension. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a tunnel of prismatic light and floating particles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: Two silhouettes face each other inside a tunnel of rushing light streaks, one raising a hand in question. Swirling cyan and violet light, thoughtful tension.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e012",
+   "kind": "dialogue",
+   "scene": "mirror_room",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In the mirrored room, a performer laughs and taps a floating holographic keyboard, notes drifting upward. Warm pink reflections, playful confident mood. The character picks up an object and examines it.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a mirrored dressing room with ring lights and reflective surfaces. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: In the mirrored room, a performer laughs and taps a floating holographic keyboard, notes drifting upward. Warm pink reflections, playful confident mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e013",
+   "kind": "dialogue",
+   "scene": "audience_star_sea",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A young woman in the audience clutches her chest, star-lights glowing around her as she looks up at the stage. Soft warm bokeh, heartfelt mood. The character pauses, looks off frame, then continues.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a vast concert audience holding glowing lights like a star sea. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A young woman in the audience clutches her chest, star-lights glowing around her as she looks up at the stage. Soft warm bokeh, heartfelt mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e014",
+   "kind": "dialogue",
+   "scene": "light_tunnel",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A man nods firmly in the light tunnel as glowing musical notes dissolve into cold metallic shards around him. Sharp white-blue lighting, serious mood. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a tunnel of prismatic light and floating particles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A man nods firmly in the light tunnel as glowing musical notes dissolve into cold metallic shards around him. Sharp white-blue lighting, serious mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e015",
+   "kind": "broll",
+   "scene": "hologram_stage",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character walks slowly through the space, glancing around.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a futuristic holographic concert stage with floating light rings and laser beams. The camera surveys the space, atmospheric and cinematic. The character walks slowly through the space, glancing around. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e016",
+   "kind": "dialogue",
+   "scene": "mirror_room",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In a mirrored room, a man gestures toward a glowing holographic stage where a shimmering figure performs, reflections multiplying around them. Cool blue light, curious and impressed mood. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a mirrored dressing room with ring lights and reflective surfaces. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: In a mirrored room, a man gestures toward a glowing holographic stage where a shimmering figure performs, reflections multiplying around them. Cool blue light, curious and impressed mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e017",
+   "kind": "dialogue",
+   "scene": "audience_star_sea",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A performer on a hologram stage spreads arms wide as a sea of audience star-lights twinkles below. Neon glow and sparkling particles, joyful collaborative energy. Two characters exchange a look; one nods.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a vast concert audience holding glowing lights like a star sea. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: A performer on a hologram stage spreads arms wide as a sea of audience star-lights twinkles below. Neon glow and sparkling particles, joyful collaborative energy.. Framing: wide shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e018",
+   "kind": "dialogue",
+   "scene": "light_tunnel",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Two silhouettes face each other inside a tunnel of rushing light streaks, one raising a hand in question. Swirling cyan and violet light, thoughtful tension. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a tunnel of prismatic light and floating particles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: Two silhouettes face each other inside a tunnel of rushing light streaks, one raising a hand in question. Swirling cyan and violet light, thoughtful tension.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e019",
+   "kind": "dialogue",
+   "scene": "mirror_room",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In the mirrored room, a performer laughs and taps a floating holographic keyboard, notes drifting upward. Warm pink reflections, playful confident mood. The character pauses, looks off frame, then continues.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a mirrored dressing room with ring lights and reflective surfaces. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: In the mirrored room, a performer laughs and taps a floating holographic keyboard, notes drifting upward. Warm pink reflections, playful confident mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e020",
+   "kind": "dialogue",
+   "scene": "audience_star_sea",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A young woman in the audience clutches her chest, star-lights glowing around her as she looks up at the stage. Soft warm bokeh, heartfelt mood. The character leans on the table and gestures while speaking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a vast concert audience holding glowing lights like a star sea. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A young woman in the audience clutches her chest, star-lights glowing around her as she looks up at the stage. Soft warm bokeh, heartfelt mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e021",
+   "kind": "dialogue",
+   "scene": "light_tunnel",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A man nods firmly in the light tunnel as glowing musical notes dissolve into cold metallic shards around him. Sharp white-blue lighting, serious mood. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a tunnel of prismatic light and floating particles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A man nods firmly in the light tunnel as glowing musical notes dissolve into cold metallic shards around him. Sharp white-blue lighting, serious mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e022",
+   "kind": "broll",
+   "scene": "hologram_stage",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character turns toward the window, thinking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a futuristic holographic concert stage with floating light rings and laser beams. The camera surveys the space, atmospheric and cinematic. The character turns toward the window, thinking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e023",
+   "kind": "dialogue",
+   "scene": "mirror_room",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In a mirrored room, a man gestures toward a glowing holographic stage where a shimmering figure performs, reflections multiplying around them. Cool blue light, curious and impressed mood. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a mirrored dressing room with ring lights and reflective surfaces. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: In a mirrored room, a man gestures toward a glowing holographic stage where a shimmering figure performs, reflections multiplying around them. Cool blue light, curious and impressed mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e024",
+   "kind": "dialogue",
+   "scene": "audience_star_sea",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A performer on a hologram stage spreads arms wide as a sea of audience star-lights twinkles below. Neon glow and sparkling particles, joyful collaborative energy. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a vast concert audience holding glowing lights like a star sea. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: A performer on a hologram stage spreads arms wide as a sea of audience star-lights twinkles below. Neon glow and sparkling particles, joyful collaborative energy.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e025",
+   "kind": "dialogue",
+   "scene": "light_tunnel",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Two silhouettes face each other inside a tunnel of rushing light streaks, one raising a hand in question. Swirling cyan and violet light, thoughtful tension. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a tunnel of prismatic light and floating particles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: Two silhouettes face each other inside a tunnel of rushing light streaks, one raising a hand in question. Swirling cyan and violet light, thoughtful tension.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e026",
+   "kind": "dialogue",
+   "scene": "mirror_room",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In the mirrored room, a performer laughs and taps a floating holographic keyboard, notes drifting upward. Warm pink reflections, playful confident mood. The character leans on the table and gestures while speaking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a mirrored dressing room with ring lights and reflective surfaces. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: In the mirrored room, a performer laughs and taps a floating holographic keyboard, notes drifting upward. Warm pink reflections, playful confident mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e027",
+   "kind": "dialogue",
+   "scene": "audience_star_sea",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A young woman in the audience clutches her chest, star-lights glowing around her as she looks up at the stage. Soft warm bokeh, heartfelt mood. The character walks slowly through the space, glancing around.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a vast concert audience holding glowing lights like a star sea. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A young woman in the audience clutches her chest, star-lights glowing around her as she looks up at the stage. Soft warm bokeh, heartfelt mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e028",
+   "kind": "dialogue",
+   "scene": "light_tunnel",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A man nods firmly in the light tunnel as glowing musical notes dissolve into cold metallic shards around him. Sharp white-blue lighting, serious mood. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a tunnel of prismatic light and floating particles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A man nods firmly in the light tunnel as glowing musical notes dissolve into cold metallic shards around him. Sharp white-blue lighting, serious mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e029",
+   "kind": "broll",
+   "scene": "hologram_stage",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " Two characters exchange a look; one nods.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a futuristic holographic concert stage with floating light rings and laser beams. The camera surveys the space, atmospheric and cinematic. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e030",
+   "kind": "dialogue",
+   "scene": "mirror_room",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In a mirrored room, a man gestures toward a glowing holographic stage where a shimmering figure performs, reflections multiplying around them. Cool blue light, curious and impressed mood. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a mirrored dressing room with ring lights and reflective surfaces. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: In a mirrored room, a man gestures toward a glowing holographic stage where a shimmering figure performs, reflections multiplying around them. Cool blue light, curious and impressed mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e031",
+   "kind": "dialogue",
+   "scene": "audience_star_sea",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A performer on a hologram stage spreads arms wide as a sea of audience star-lights twinkles below. Neon glow and sparkling particles, joyful collaborative energy. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a vast concert audience holding glowing lights like a star sea. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: A performer on a hologram stage spreads arms wide as a sea of audience star-lights twinkles below. Neon glow and sparkling particles, joyful collaborative energy.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e032",
+   "kind": "dialogue",
+   "scene": "light_tunnel",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Two silhouettes face each other inside a tunnel of rushing light streaks, one raising a hand in question. Swirling cyan and violet light, thoughtful tension. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a tunnel of prismatic light and floating particles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: Two silhouettes face each other inside a tunnel of rushing light streaks, one raising a hand in question. Swirling cyan and violet light, thoughtful tension.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e033",
+   "kind": "dialogue",
+   "scene": "mirror_room",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In the mirrored room, a performer laughs and taps a floating holographic keyboard, notes drifting upward. Warm pink reflections, playful confident mood. The character walks slowly through the space, glancing around.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a mirrored dressing room with ring lights and reflective surfaces. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: In the mirrored room, a performer laughs and taps a floating holographic keyboard, notes drifting upward. Warm pink reflections, playful confident mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e034",
+   "kind": "dialogue",
+   "scene": "audience_star_sea",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A young woman in the audience clutches her chest, star-lights glowing around her as she looks up at the stage. Soft warm bokeh, heartfelt mood. The character turns toward the window, thinking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a vast concert audience holding glowing lights like a star sea. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A young woman in the audience clutches her chest, star-lights glowing around her as she looks up at the stage. Soft warm bokeh, heartfelt mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e035",
+   "kind": "dialogue",
+   "scene": "light_tunnel",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A man nods firmly in the light tunnel as glowing musical notes dissolve into cold metallic shards around him. Sharp white-blue lighting, serious mood. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a tunnel of prismatic light and floating particles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A man nods firmly in the light tunnel as glowing musical notes dissolve into cold metallic shards around him. Sharp white-blue lighting, serious mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e036",
+   "kind": "broll",
+   "scene": "hologram_stage",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character picks up an object and examines it.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a futuristic holographic concert stage with floating light rings and laser beams. The camera surveys the space, atmospheric and cinematic. The character picks up an object and examines it. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e037",
+   "kind": "dialogue",
+   "scene": "mirror_room",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In a mirrored room, a man gestures toward a glowing holographic stage where a shimmering figure performs, reflections multiplying around them. Cool blue light, curious and impressed mood. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a mirrored dressing room with ring lights and reflective surfaces. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: In a mirrored room, a man gestures toward a glowing holographic stage where a shimmering figure performs, reflections multiplying around them. Cool blue light, curious and impressed mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e038",
+   "kind": "dialogue",
+   "scene": "audience_star_sea",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A performer on a hologram stage spreads arms wide as a sea of audience star-lights twinkles below. Neon glow and sparkling particles, joyful collaborative energy. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a vast concert audience holding glowing lights like a star sea. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: A performer on a hologram stage spreads arms wide as a sea of audience star-lights twinkles below. Neon glow and sparkling particles, joyful collaborative energy.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e039",
+   "kind": "dialogue",
+   "scene": "light_tunnel",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Two silhouettes face each other inside a tunnel of rushing light streaks, one raising a hand in question. Swirling cyan and violet light, thoughtful tension. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a tunnel of prismatic light and floating particles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: Two silhouettes face each other inside a tunnel of rushing light streaks, one raising a hand in question. Swirling cyan and violet light, thoughtful tension.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e040",
+   "kind": "dialogue",
+   "scene": "mirror_room",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In the mirrored room, a performer laughs and taps a floating holographic keyboard, notes drifting upward. Warm pink reflections, playful confident mood. The character turns toward the window, thinking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a mirrored dressing room with ring lights and reflective surfaces. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: In the mirrored room, a performer laughs and taps a floating holographic keyboard, notes drifting upward. Warm pink reflections, playful confident mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e041",
+   "kind": "dialogue",
+   "scene": "audience_star_sea",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A young woman in the audience clutches her chest, star-lights glowing around her as she looks up at the stage. Soft warm bokeh, heartfelt mood. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a vast concert audience holding glowing lights like a star sea. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A young woman in the audience clutches her chest, star-lights glowing around her as she looks up at the stage. Soft warm bokeh, heartfelt mood.. Framing: close shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e042",
+   "kind": "dialogue",
+   "scene": "light_tunnel",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A man nods firmly in the light tunnel as glowing musical notes dissolve into cold metallic shards around him. Sharp white-blue lighting, serious mood. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a tunnel of prismatic light and floating particles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A man nods firmly in the light tunnel as glowing musical notes dissolve into cold metallic shards around him. Sharp white-blue lighting, serious mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e043",
+   "kind": "broll",
+   "scene": "hologram_stage",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a futuristic holographic concert stage with floating light rings and laser beams. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e044",
+   "kind": "dialogue",
+   "scene": "mirror_room",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In a mirrored room, a man gestures toward a glowing holographic stage where a shimmering figure performs, reflections multiplying around them. Cool blue light, curious and impressed mood. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a mirrored dressing room with ring lights and reflective surfaces. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: In a mirrored room, a man gestures toward a glowing holographic stage where a shimmering figure performs, reflections multiplying around them. Cool blue light, curious and impressed mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e045",
+   "kind": "dialogue",
+   "scene": "audience_star_sea",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A performer on a hologram stage spreads arms wide as a sea of audience star-lights twinkles below. Neon glow and sparkling particles, joyful collaborative energy. The character walks slowly through the space, glancing around.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a vast concert audience holding glowing lights like a star sea. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: A performer on a hologram stage spreads arms wide as a sea of audience star-lights twinkles below. Neon glow and sparkling particles, joyful collaborative energy.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e046",
+   "kind": "dialogue",
+   "scene": "light_tunnel",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Two silhouettes face each other inside a tunnel of rushing light streaks, one raising a hand in question. Swirling cyan and violet light, thoughtful tension. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a tunnel of prismatic light and floating particles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: Two silhouettes face each other inside a tunnel of rushing light streaks, one raising a hand in question. Swirling cyan and violet light, thoughtful tension.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e047",
+   "kind": "dialogue",
+   "scene": "mirror_room",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In the mirrored room, a performer laughs and taps a floating holographic keyboard, notes drifting upward. Warm pink reflections, playful confident mood. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a mirrored dressing room with ring lights and reflective surfaces. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: In the mirrored room, a performer laughs and taps a floating holographic keyboard, notes drifting upward. Warm pink reflections, playful confident mood.. Framing: close shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e048",
+   "kind": "dialogue",
+   "scene": "audience_star_sea",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A young woman in the audience clutches her chest, star-lights glowing around her as she looks up at the stage. Soft warm bokeh, heartfelt mood. The character picks up an object and examines it.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a vast concert audience holding glowing lights like a star sea. Featuring a stylized 3D animated woman in her 20s, twin bun amber hair, wearing a amber dress, with hairclip and phone; a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A young woman in the audience clutches her chest, star-lights glowing around her as she looks up at the stage. Soft warm bokeh, heartfelt mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e049",
+   "kind": "dialogue",
+   "scene": "light_tunnel",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A man nods firmly in the light tunnel as glowing musical notes dissolve into cold metallic shards around him. Sharp white-blue lighting, serious mood. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a tunnel of prismatic light and floating particles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic. The shot shows the idea through visible action: A man nods firmly in the light tunnel as glowing musical notes dissolve into cold metallic shards around him. Sharp white-blue lighting, serious mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e050",
+   "kind": "broll",
+   "scene": "hologram_stage",
+   "duration": 3.0,
+   "line": "",
+   "semantic_visual": " The character leans on the table and gestures while speaking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a futuristic holographic concert stage with floating light rings and laser beams. The camera surveys the space, atmospheric and cinematic. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e051",
+   "kind": "dialogue",
+   "scene": "mirror_room",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In a mirrored room, a man gestures toward a glowing holographic stage where a shimmering figure performs, reflections multiplying around them. Cool blue light, curious and impressed mood. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a mirrored dressing room with ring lights and reflective surfaces. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: In a mirrored room, a man gestures toward a glowing holographic stage where a shimmering figure performs, reflections multiplying around them. Cool blue light, curious and impressed mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e052",
+   "kind": "dialogue",
+   "scene": "audience_star_sea",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A performer on a hologram stage spreads arms wide as a sea of audience star-lights twinkles below. Neon glow and sparkling particles, joyful collaborative energy. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a vast concert audience holding glowing lights like a star sea. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: A performer on a hologram stage spreads arms wide as a sea of audience star-lights twinkles below. Neon glow and sparkling particles, joyful collaborative energy.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e053",
+   "kind": "dialogue",
+   "scene": "light_tunnel",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Two silhouettes face each other inside a tunnel of rushing light streaks, one raising a hand in question. Swirling cyan and violet light, thoughtful tension. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a tunnel of prismatic light and floating particles. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: Two silhouettes face each other inside a tunnel of rushing light streaks, one raising a hand in question. Swirling cyan and violet light, thoughtful tension.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e054",
+   "kind": "dialogue",
+   "scene": "mirror_room",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In the mirrored room, a performer laughs and taps a floating holographic keyboard, notes drifting upward. Warm pink reflections, playful confident mood. The character picks up an object and examines it.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] futuristic 3D holographic concert film, lasers, glossy black stage, star-field audience. Set in a mirrored dressing room with ring lights and reflective surfaces. Featuring a stylized 3D animated woman in her 20s, twin tail navy hair, wearing a purple hoodie with blue accents, with headphones. The shot shows the idea through visible action: In the mirrored room, a performer laughs and taps a floating holographic keyboard, notes drifting upward. Warm pink reflections, playful confident mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
   }
  ]
 }

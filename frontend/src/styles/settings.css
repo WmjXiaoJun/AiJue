@@ -468,3 +468,28 @@
   .cm-set-foot-hint { display: none; }
   .cm-set-foot-actions { width: 100%; justify-content: flex-end; }
 }
+
+/* V73：MetaSo H3 Key 输入行 */
+.cm-set-key-row { align-items: stretch; }
+.cm-set-key-input {
+  flex: 1 1 240px;
+  min-width: 0;
+  font-family: var(--font-mono);
+  letter-spacing: 0.06em;
+}
+.cm-set-key-row .cm-btn { height: 36px; flex: 0 0 auto; }
+.cm-set-key-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px dashed var(--c-line-strong);
+  border-radius: 8px;
+  color: var(--c-gold-soft);
+  font-size: 11px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.cm-set-key-link:hover { background: rgba(201, 162, 39, 0.08); border-style: solid; text-decoration: none; }
+.cm-set-code { font-family: var(--font-mono); font-size: 9.5px; color: var(--c-sub); }

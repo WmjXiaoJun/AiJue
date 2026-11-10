@@ -7,7 +7,8 @@
   {
    "id": "v5_card_title",
    "kind": "card",
-   "prompt": null
+   "prompt": null,
+   "act_index": -1
   },
   {
    "id": "v5_002",
@@ -17,7 +18,8 @@
    "line": "今天咱们聊聊手机，你有没有觉得手机就像个定时炸弹？",
    "semantic_visual": "A comedian on a dim brick-wall stage holds a smartphone up like a ticking bomb, its screen glowing red, while vintage VHS grain ripples across the smoky club lighting.",
    "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a comedy club stage with a red brick wall and a microphone stand. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A comedian on a dim brick-wall stage holds a smartphone up like a ticking bomb, its screen glowing red, while vintage VHS grain ripples across the smoky club lighting.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: club room tone, a distant laugh. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a comedy club stage with a red brick wall and a microphone stand. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A comedian on a dim brick-wall stage holds a smartphone up like a ticking bomb, its screen glowing red, while vintage VHS grain ripples across the smoky club lighting.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: club room tone, a distant laugh. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_003",
@@ -27,7 +29,8 @@
    "line": "那必须的，手机不响我还真觉得哪儿不对劲。",
    "semantic_visual": "A heavyset man in a cramped dressing room stares at a silent phone on the makeup counter, frowning and tapping his foot as neon light flickers over him.",
    "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a retro dressing room with bulb mirrors and a worn sofa. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A heavyset man in a cramped dressing room stares at a silent phone on the makeup counter, frowning and tapping his foot as neon light flickers over him.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: club room tone, a distant laugh. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a retro dressing room with bulb mirrors and a worn sofa. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A heavyset man in a cramped dressing room stares at a silent phone on the makeup counter, frowning and tapping his foot as neon light flickers over him.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: club room tone, a distant laugh. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_004",
@@ -37,7 +40,8 @@
    "line": "对，就是那种响个不停，生怕漏了任何一条信息的感觉。",
    "semantic_visual": "A night city street glows with stacked neon signs while a lone figure walks hurriedly, phone buzzing nonstop in hand, headlights streaking past in VHS haze.",
    "framing": "wide",
-   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a VHS-lit city street at night, warm tungsten signs. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A night city street glows with stacked neon signs while a lone figure walks hurriedly, phone buzzing nonstop in hand, headlights streaking past in VHS haze.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: club room tone, a distant laugh. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a VHS-lit city street at night, warm tungsten signs. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A night city street glows with stacked neon signs while a lone figure walks hurriedly, phone buzzing nonstop in hand, headlights streaking past in VHS haze.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: club room tone, a distant laugh. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_005",
@@ -47,7 +51,8 @@
    "line": "我还真琢磨过，要是手机突然没电了，是不是整个世界都会跟着安静几分？",
    "semantic_visual": "A deadpan performer stands motionless before the brick wall as his phone screen fades to black; the room dims and the crowd stills in sudden quiet.",
    "framing": "close",
-   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a comedy club stage with a red brick wall and a microphone stand. Featuring a stylized 3D animated man in his 30s, slick back black hair, wearing a black turtleneck with purple accents, with sunglasses. The shot shows the idea through visible action: A deadpan performer stands motionless before the brick wall as his phone screen fades to black; the room dims and the crowd stills in sudden quiet.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: club room tone, a distant laugh. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a comedy club stage with a red brick wall and a microphone stand. Featuring a stylized 3D animated man in his 30s, slick back black hair, wearing a black turtleneck with purple accents, with sunglasses. The shot shows the idea through visible action: A deadpan performer stands motionless before the brick wall as his phone screen fades to black; the room dims and the crowd stills in sudden quiet.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: club room tone, a distant laugh. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_006",
@@ -57,7 +62,8 @@
    "line": "那可不一定，没电了得找充电宝，还得担心别人给你发信息。",
    "semantic_visual": "In the dressing room, a man rummages frantically through drawers for a power bank, cables tangled around his arms, a dying phone blinking nearby.",
    "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a retro dressing room with bulb mirrors and a worn sofa. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: In the dressing room, a man rummages frantically through drawers for a power bank, cables tangled around his arms, a dying phone blinking nearby.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: smooth lateral pan. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: club room tone, a distant laugh. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a retro dressing room with bulb mirrors and a worn sofa. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: In the dressing room, a man rummages frantically through drawers for a power bank, cables tangled around his arms, a dying phone blinking nearby.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: smooth lateral pan. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: club room tone, a distant laugh. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_007",
@@ -67,12 +73,619 @@
    "line": "说到底，还不是因为手机里的朋友比现实中的多，多到天天要关注。",
    "semantic_visual": "A crowded city crosswalk glows with countless phone screens held by pedestrians, their faces lit blue, while the lone heavyset man watches from the curb.",
    "framing": "wide",
-   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a VHS-lit city street at night, warm tungsten signs. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A crowded city crosswalk glows with countless phone screens held by pedestrians, their faces lit blue, while the lone heavyset man watches from the curb.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow pull-back revealing the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: club room tone, a distant laugh. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a VHS-lit city street at night, warm tungsten signs. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A crowded city crosswalk glows with countless phone screens held by pedestrians, their faces lit blue, while the lone heavyset man watches from the curb.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow pull-back revealing the space. Rich physical materials, volumetric light, shallow depth of field, 3D animated feature film quality. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: club room tone, a distant laugh. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_card_end",
    "kind": "card",
-   "prompt": null
+   "prompt": null,
+   "act_index": -1
+  },
+  {
+   "id": "v5_e001",
+   "kind": "dialogue",
+   "scene": "brick_wall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A comedian on a dim brick-wall stage holds a smartphone up like a ticking bomb, its screen glowing red, while vintage VHS grain ripples across the smoky club lighting. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a comedy club stage with a red brick wall and a microphone stand. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A comedian on a dim brick-wall stage holds a smartphone up like a ticking bomb, its screen glowing red, while vintage VHS grain ripples across the smoky club lighting.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e002",
+   "kind": "dialogue",
+   "scene": "dressing_room_vhs",
+   "duration": 4.05,
+   "line": "",
+   "semantic_visual": "A heavyset man in a cramped dressing room stares at a silent phone on the makeup counter, frowning and tapping his foot as neon light flickers over him. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a retro dressing room with bulb mirrors and a worn sofa. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A heavyset man in a cramped dressing room stares at a silent phone on the makeup counter, frowning and tapping his foot as neon light flickers over him.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e003",
+   "kind": "dialogue",
+   "scene": "city_vhs",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A night city street glows with stacked neon signs while a lone figure walks hurriedly, phone buzzing nonstop in hand, headlights streaking past in VHS haze. The character walks slowly through the space, glancing around.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a VHS-lit city street at night, warm tungsten signs. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A night city street glows with stacked neon signs while a lone figure walks hurriedly, phone buzzing nonstop in hand, headlights streaking past in VHS haze.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e004",
+   "kind": "dialogue",
+   "scene": "brick_wall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A deadpan performer stands motionless before the brick wall as his phone screen fades to black; the room dims and the crowd stills in sudden quiet. The character turns toward the window, thinking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a comedy club stage with a red brick wall and a microphone stand. Featuring a stylized 3D animated man in his 30s, slick back black hair, wearing a black turtleneck with purple accents, with sunglasses. The shot shows the idea through visible action: A deadpan performer stands motionless before the brick wall as his phone screen fades to black; the room dims and the crowd stills in sudden quiet.. Framing: close shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e005",
+   "kind": "dialogue",
+   "scene": "dressing_room_vhs",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In the dressing room, a man rummages frantically through drawers for a power bank, cables tangled around his arms, a dying phone blinking nearby. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a retro dressing room with bulb mirrors and a worn sofa. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: In the dressing room, a man rummages frantically through drawers for a power bank, cables tangled around his arms, a dying phone blinking nearby.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e006",
+   "kind": "dialogue",
+   "scene": "city_vhs",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A crowded city crosswalk glows with countless phone screens held by pedestrians, their faces lit blue, while the lone heavyset man watches from the curb. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a VHS-lit city street at night, warm tungsten signs. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A crowded city crosswalk glows with countless phone screens held by pedestrians, their faces lit blue, while the lone heavyset man watches from the curb.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e007",
+   "kind": "dialogue",
+   "scene": "brick_wall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A comedian on a dim brick-wall stage holds a smartphone up like a ticking bomb, its screen glowing red, while vintage VHS grain ripples across the smoky club lighting. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a comedy club stage with a red brick wall and a microphone stand. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A comedian on a dim brick-wall stage holds a smartphone up like a ticking bomb, its screen glowing red, while vintage VHS grain ripples across the smoky club lighting.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e008",
+   "kind": "dialogue",
+   "scene": "dressing_room_vhs",
+   "duration": 4.05,
+   "line": "",
+   "semantic_visual": "A heavyset man in a cramped dressing room stares at a silent phone on the makeup counter, frowning and tapping his foot as neon light flickers over him. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a retro dressing room with bulb mirrors and a worn sofa. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A heavyset man in a cramped dressing room stares at a silent phone on the makeup counter, frowning and tapping his foot as neon light flickers over him.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e009",
+   "kind": "dialogue",
+   "scene": "city_vhs",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A night city street glows with stacked neon signs while a lone figure walks hurriedly, phone buzzing nonstop in hand, headlights streaking past in VHS haze. The character walks slowly through the space, glancing around.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a VHS-lit city street at night, warm tungsten signs. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A night city street glows with stacked neon signs while a lone figure walks hurriedly, phone buzzing nonstop in hand, headlights streaking past in VHS haze.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e010",
+   "kind": "dialogue",
+   "scene": "brick_wall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A deadpan performer stands motionless before the brick wall as his phone screen fades to black; the room dims and the crowd stills in sudden quiet. The character turns toward the window, thinking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a comedy club stage with a red brick wall and a microphone stand. Featuring a stylized 3D animated man in his 30s, slick back black hair, wearing a black turtleneck with purple accents, with sunglasses. The shot shows the idea through visible action: A deadpan performer stands motionless before the brick wall as his phone screen fades to black; the room dims and the crowd stills in sudden quiet.. Framing: close shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e011",
+   "kind": "dialogue",
+   "scene": "dressing_room_vhs",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In the dressing room, a man rummages frantically through drawers for a power bank, cables tangled around his arms, a dying phone blinking nearby. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a retro dressing room with bulb mirrors and a worn sofa. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: In the dressing room, a man rummages frantically through drawers for a power bank, cables tangled around his arms, a dying phone blinking nearby.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e012",
+   "kind": "dialogue",
+   "scene": "city_vhs",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A crowded city crosswalk glows with countless phone screens held by pedestrians, their faces lit blue, while the lone heavyset man watches from the curb. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a VHS-lit city street at night, warm tungsten signs. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A crowded city crosswalk glows with countless phone screens held by pedestrians, their faces lit blue, while the lone heavyset man watches from the curb.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e013",
+   "kind": "dialogue",
+   "scene": "brick_wall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A comedian on a dim brick-wall stage holds a smartphone up like a ticking bomb, its screen glowing red, while vintage VHS grain ripples across the smoky club lighting. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a comedy club stage with a red brick wall and a microphone stand. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A comedian on a dim brick-wall stage holds a smartphone up like a ticking bomb, its screen glowing red, while vintage VHS grain ripples across the smoky club lighting.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e014",
+   "kind": "dialogue",
+   "scene": "dressing_room_vhs",
+   "duration": 4.05,
+   "line": "",
+   "semantic_visual": "A heavyset man in a cramped dressing room stares at a silent phone on the makeup counter, frowning and tapping his foot as neon light flickers over him. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a retro dressing room with bulb mirrors and a worn sofa. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A heavyset man in a cramped dressing room stares at a silent phone on the makeup counter, frowning and tapping his foot as neon light flickers over him.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e015",
+   "kind": "dialogue",
+   "scene": "city_vhs",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A night city street glows with stacked neon signs while a lone figure walks hurriedly, phone buzzing nonstop in hand, headlights streaking past in VHS haze. The character walks slowly through the space, glancing around.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a VHS-lit city street at night, warm tungsten signs. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A night city street glows with stacked neon signs while a lone figure walks hurriedly, phone buzzing nonstop in hand, headlights streaking past in VHS haze.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e016",
+   "kind": "dialogue",
+   "scene": "brick_wall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A deadpan performer stands motionless before the brick wall as his phone screen fades to black; the room dims and the crowd stills in sudden quiet. The character turns toward the window, thinking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a comedy club stage with a red brick wall and a microphone stand. Featuring a stylized 3D animated man in his 30s, slick back black hair, wearing a black turtleneck with purple accents, with sunglasses. The shot shows the idea through visible action: A deadpan performer stands motionless before the brick wall as his phone screen fades to black; the room dims and the crowd stills in sudden quiet.. Framing: close shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e017",
+   "kind": "dialogue",
+   "scene": "dressing_room_vhs",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In the dressing room, a man rummages frantically through drawers for a power bank, cables tangled around his arms, a dying phone blinking nearby. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a retro dressing room with bulb mirrors and a worn sofa. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: In the dressing room, a man rummages frantically through drawers for a power bank, cables tangled around his arms, a dying phone blinking nearby.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e018",
+   "kind": "dialogue",
+   "scene": "city_vhs",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A crowded city crosswalk glows with countless phone screens held by pedestrians, their faces lit blue, while the lone heavyset man watches from the curb. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a VHS-lit city street at night, warm tungsten signs. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A crowded city crosswalk glows with countless phone screens held by pedestrians, their faces lit blue, while the lone heavyset man watches from the curb.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e019",
+   "kind": "dialogue",
+   "scene": "brick_wall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A comedian on a dim brick-wall stage holds a smartphone up like a ticking bomb, its screen glowing red, while vintage VHS grain ripples across the smoky club lighting. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a comedy club stage with a red brick wall and a microphone stand. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A comedian on a dim brick-wall stage holds a smartphone up like a ticking bomb, its screen glowing red, while vintage VHS grain ripples across the smoky club lighting.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e020",
+   "kind": "dialogue",
+   "scene": "dressing_room_vhs",
+   "duration": 4.05,
+   "line": "",
+   "semantic_visual": "A heavyset man in a cramped dressing room stares at a silent phone on the makeup counter, frowning and tapping his foot as neon light flickers over him. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a retro dressing room with bulb mirrors and a worn sofa. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A heavyset man in a cramped dressing room stares at a silent phone on the makeup counter, frowning and tapping his foot as neon light flickers over him.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e021",
+   "kind": "dialogue",
+   "scene": "city_vhs",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A night city street glows with stacked neon signs while a lone figure walks hurriedly, phone buzzing nonstop in hand, headlights streaking past in VHS haze. The character walks slowly through the space, glancing around.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a VHS-lit city street at night, warm tungsten signs. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A night city street glows with stacked neon signs while a lone figure walks hurriedly, phone buzzing nonstop in hand, headlights streaking past in VHS haze.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e022",
+   "kind": "dialogue",
+   "scene": "brick_wall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A deadpan performer stands motionless before the brick wall as his phone screen fades to black; the room dims and the crowd stills in sudden quiet. The character turns toward the window, thinking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a comedy club stage with a red brick wall and a microphone stand. Featuring a stylized 3D animated man in his 30s, slick back black hair, wearing a black turtleneck with purple accents, with sunglasses. The shot shows the idea through visible action: A deadpan performer stands motionless before the brick wall as his phone screen fades to black; the room dims and the crowd stills in sudden quiet.. Framing: close shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e023",
+   "kind": "dialogue",
+   "scene": "dressing_room_vhs",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In the dressing room, a man rummages frantically through drawers for a power bank, cables tangled around his arms, a dying phone blinking nearby. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a retro dressing room with bulb mirrors and a worn sofa. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: In the dressing room, a man rummages frantically through drawers for a power bank, cables tangled around his arms, a dying phone blinking nearby.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e024",
+   "kind": "dialogue",
+   "scene": "city_vhs",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A crowded city crosswalk glows with countless phone screens held by pedestrians, their faces lit blue, while the lone heavyset man watches from the curb. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a VHS-lit city street at night, warm tungsten signs. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A crowded city crosswalk glows with countless phone screens held by pedestrians, their faces lit blue, while the lone heavyset man watches from the curb.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e025",
+   "kind": "dialogue",
+   "scene": "brick_wall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A comedian on a dim brick-wall stage holds a smartphone up like a ticking bomb, its screen glowing red, while vintage VHS grain ripples across the smoky club lighting. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a comedy club stage with a red brick wall and a microphone stand. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A comedian on a dim brick-wall stage holds a smartphone up like a ticking bomb, its screen glowing red, while vintage VHS grain ripples across the smoky club lighting.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e026",
+   "kind": "dialogue",
+   "scene": "dressing_room_vhs",
+   "duration": 4.05,
+   "line": "",
+   "semantic_visual": "A heavyset man in a cramped dressing room stares at a silent phone on the makeup counter, frowning and tapping his foot as neon light flickers over him. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a retro dressing room with bulb mirrors and a worn sofa. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A heavyset man in a cramped dressing room stares at a silent phone on the makeup counter, frowning and tapping his foot as neon light flickers over him.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e027",
+   "kind": "dialogue",
+   "scene": "city_vhs",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A night city street glows with stacked neon signs while a lone figure walks hurriedly, phone buzzing nonstop in hand, headlights streaking past in VHS haze. The character walks slowly through the space, glancing around.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a VHS-lit city street at night, warm tungsten signs. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A night city street glows with stacked neon signs while a lone figure walks hurriedly, phone buzzing nonstop in hand, headlights streaking past in VHS haze.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e028",
+   "kind": "dialogue",
+   "scene": "brick_wall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A deadpan performer stands motionless before the brick wall as his phone screen fades to black; the room dims and the crowd stills in sudden quiet. The character turns toward the window, thinking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a comedy club stage with a red brick wall and a microphone stand. Featuring a stylized 3D animated man in his 30s, slick back black hair, wearing a black turtleneck with purple accents, with sunglasses. The shot shows the idea through visible action: A deadpan performer stands motionless before the brick wall as his phone screen fades to black; the room dims and the crowd stills in sudden quiet.. Framing: close shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e029",
+   "kind": "dialogue",
+   "scene": "dressing_room_vhs",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In the dressing room, a man rummages frantically through drawers for a power bank, cables tangled around his arms, a dying phone blinking nearby. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a retro dressing room with bulb mirrors and a worn sofa. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: In the dressing room, a man rummages frantically through drawers for a power bank, cables tangled around his arms, a dying phone blinking nearby.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e030",
+   "kind": "dialogue",
+   "scene": "city_vhs",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A crowded city crosswalk glows with countless phone screens held by pedestrians, their faces lit blue, while the lone heavyset man watches from the curb. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a VHS-lit city street at night, warm tungsten signs. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A crowded city crosswalk glows with countless phone screens held by pedestrians, their faces lit blue, while the lone heavyset man watches from the curb.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e031",
+   "kind": "dialogue",
+   "scene": "brick_wall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A comedian on a dim brick-wall stage holds a smartphone up like a ticking bomb, its screen glowing red, while vintage VHS grain ripples across the smoky club lighting. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a comedy club stage with a red brick wall and a microphone stand. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A comedian on a dim brick-wall stage holds a smartphone up like a ticking bomb, its screen glowing red, while vintage VHS grain ripples across the smoky club lighting.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e032",
+   "kind": "dialogue",
+   "scene": "dressing_room_vhs",
+   "duration": 4.05,
+   "line": "",
+   "semantic_visual": "A heavyset man in a cramped dressing room stares at a silent phone on the makeup counter, frowning and tapping his foot as neon light flickers over him. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a retro dressing room with bulb mirrors and a worn sofa. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A heavyset man in a cramped dressing room stares at a silent phone on the makeup counter, frowning and tapping his foot as neon light flickers over him.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e033",
+   "kind": "dialogue",
+   "scene": "city_vhs",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A night city street glows with stacked neon signs while a lone figure walks hurriedly, phone buzzing nonstop in hand, headlights streaking past in VHS haze. The character walks slowly through the space, glancing around.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a VHS-lit city street at night, warm tungsten signs. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A night city street glows with stacked neon signs while a lone figure walks hurriedly, phone buzzing nonstop in hand, headlights streaking past in VHS haze.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e034",
+   "kind": "dialogue",
+   "scene": "brick_wall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A deadpan performer stands motionless before the brick wall as his phone screen fades to black; the room dims and the crowd stills in sudden quiet. The character turns toward the window, thinking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a comedy club stage with a red brick wall and a microphone stand. Featuring a stylized 3D animated man in his 30s, slick back black hair, wearing a black turtleneck with purple accents, with sunglasses. The shot shows the idea through visible action: A deadpan performer stands motionless before the brick wall as his phone screen fades to black; the room dims and the crowd stills in sudden quiet.. Framing: close shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e035",
+   "kind": "dialogue",
+   "scene": "dressing_room_vhs",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In the dressing room, a man rummages frantically through drawers for a power bank, cables tangled around his arms, a dying phone blinking nearby. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a retro dressing room with bulb mirrors and a worn sofa. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: In the dressing room, a man rummages frantically through drawers for a power bank, cables tangled around his arms, a dying phone blinking nearby.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e036",
+   "kind": "dialogue",
+   "scene": "city_vhs",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A crowded city crosswalk glows with countless phone screens held by pedestrians, their faces lit blue, while the lone heavyset man watches from the curb. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a VHS-lit city street at night, warm tungsten signs. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A crowded city crosswalk glows with countless phone screens held by pedestrians, their faces lit blue, while the lone heavyset man watches from the curb.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e037",
+   "kind": "dialogue",
+   "scene": "brick_wall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A comedian on a dim brick-wall stage holds a smartphone up like a ticking bomb, its screen glowing red, while vintage VHS grain ripples across the smoky club lighting. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a comedy club stage with a red brick wall and a microphone stand. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A comedian on a dim brick-wall stage holds a smartphone up like a ticking bomb, its screen glowing red, while vintage VHS grain ripples across the smoky club lighting.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e038",
+   "kind": "dialogue",
+   "scene": "dressing_room_vhs",
+   "duration": 4.05,
+   "line": "",
+   "semantic_visual": "A heavyset man in a cramped dressing room stares at a silent phone on the makeup counter, frowning and tapping his foot as neon light flickers over him. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a retro dressing room with bulb mirrors and a worn sofa. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A heavyset man in a cramped dressing room stares at a silent phone on the makeup counter, frowning and tapping his foot as neon light flickers over him.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e039",
+   "kind": "dialogue",
+   "scene": "city_vhs",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A night city street glows with stacked neon signs while a lone figure walks hurriedly, phone buzzing nonstop in hand, headlights streaking past in VHS haze. The character walks slowly through the space, glancing around.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a VHS-lit city street at night, warm tungsten signs. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A night city street glows with stacked neon signs while a lone figure walks hurriedly, phone buzzing nonstop in hand, headlights streaking past in VHS haze.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e040",
+   "kind": "dialogue",
+   "scene": "brick_wall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A deadpan performer stands motionless before the brick wall as his phone screen fades to black; the room dims and the crowd stills in sudden quiet. The character turns toward the window, thinking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a comedy club stage with a red brick wall and a microphone stand. Featuring a stylized 3D animated man in his 30s, slick back black hair, wearing a black turtleneck with purple accents, with sunglasses. The shot shows the idea through visible action: A deadpan performer stands motionless before the brick wall as his phone screen fades to black; the room dims and the crowd stills in sudden quiet.. Framing: close shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e041",
+   "kind": "dialogue",
+   "scene": "dressing_room_vhs",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In the dressing room, a man rummages frantically through drawers for a power bank, cables tangled around his arms, a dying phone blinking nearby. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a retro dressing room with bulb mirrors and a worn sofa. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: In the dressing room, a man rummages frantically through drawers for a power bank, cables tangled around his arms, a dying phone blinking nearby.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e042",
+   "kind": "dialogue",
+   "scene": "city_vhs",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A crowded city crosswalk glows with countless phone screens held by pedestrians, their faces lit blue, while the lone heavyset man watches from the curb. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a VHS-lit city street at night, warm tungsten signs. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A crowded city crosswalk glows with countless phone screens held by pedestrians, their faces lit blue, while the lone heavyset man watches from the curb.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e043",
+   "kind": "dialogue",
+   "scene": "brick_wall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A comedian on a dim brick-wall stage holds a smartphone up like a ticking bomb, its screen glowing red, while vintage VHS grain ripples across the smoky club lighting. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a comedy club stage with a red brick wall and a microphone stand. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A comedian on a dim brick-wall stage holds a smartphone up like a ticking bomb, its screen glowing red, while vintage VHS grain ripples across the smoky club lighting.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e044",
+   "kind": "dialogue",
+   "scene": "dressing_room_vhs",
+   "duration": 4.05,
+   "line": "",
+   "semantic_visual": "A heavyset man in a cramped dressing room stares at a silent phone on the makeup counter, frowning and tapping his foot as neon light flickers over him. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a retro dressing room with bulb mirrors and a worn sofa. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A heavyset man in a cramped dressing room stares at a silent phone on the makeup counter, frowning and tapping his foot as neon light flickers over him.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e045",
+   "kind": "dialogue",
+   "scene": "city_vhs",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A night city street glows with stacked neon signs while a lone figure walks hurriedly, phone buzzing nonstop in hand, headlights streaking past in VHS haze. The character walks slowly through the space, glancing around.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a VHS-lit city street at night, warm tungsten signs. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A night city street glows with stacked neon signs while a lone figure walks hurriedly, phone buzzing nonstop in hand, headlights streaking past in VHS haze.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e046",
+   "kind": "dialogue",
+   "scene": "brick_wall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A deadpan performer stands motionless before the brick wall as his phone screen fades to black; the room dims and the crowd stills in sudden quiet. The character turns toward the window, thinking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a comedy club stage with a red brick wall and a microphone stand. Featuring a stylized 3D animated man in his 30s, slick back black hair, wearing a black turtleneck with purple accents, with sunglasses. The shot shows the idea through visible action: A deadpan performer stands motionless before the brick wall as his phone screen fades to black; the room dims and the crowd stills in sudden quiet.. Framing: close shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e047",
+   "kind": "dialogue",
+   "scene": "dressing_room_vhs",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In the dressing room, a man rummages frantically through drawers for a power bank, cables tangled around his arms, a dying phone blinking nearby. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a retro dressing room with bulb mirrors and a worn sofa. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: In the dressing room, a man rummages frantically through drawers for a power bank, cables tangled around his arms, a dying phone blinking nearby.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e048",
+   "kind": "dialogue",
+   "scene": "city_vhs",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A crowded city crosswalk glows with countless phone screens held by pedestrians, their faces lit blue, while the lone heavyset man watches from the curb. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a VHS-lit city street at night, warm tungsten signs. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A crowded city crosswalk glows with countless phone screens held by pedestrians, their faces lit blue, while the lone heavyset man watches from the curb.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e049",
+   "kind": "dialogue",
+   "scene": "brick_wall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A comedian on a dim brick-wall stage holds a smartphone up like a ticking bomb, its screen glowing red, while vintage VHS grain ripples across the smoky club lighting. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a comedy club stage with a red brick wall and a microphone stand. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A comedian on a dim brick-wall stage holds a smartphone up like a ticking bomb, its screen glowing red, while vintage VHS grain ripples across the smoky club lighting.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e050",
+   "kind": "dialogue",
+   "scene": "dressing_room_vhs",
+   "duration": 4.05,
+   "line": "",
+   "semantic_visual": "A heavyset man in a cramped dressing room stares at a silent phone on the makeup counter, frowning and tapping his foot as neon light flickers over him. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a retro dressing room with bulb mirrors and a worn sofa. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A heavyset man in a cramped dressing room stares at a silent phone on the makeup counter, frowning and tapping his foot as neon light flickers over him.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e051",
+   "kind": "dialogue",
+   "scene": "city_vhs",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A night city street glows with stacked neon signs while a lone figure walks hurriedly, phone buzzing nonstop in hand, headlights streaking past in VHS haze. The character walks slowly through the space, glancing around.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a VHS-lit city street at night, warm tungsten signs. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A night city street glows with stacked neon signs while a lone figure walks hurriedly, phone buzzing nonstop in hand, headlights streaking past in VHS haze.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e052",
+   "kind": "dialogue",
+   "scene": "brick_wall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A deadpan performer stands motionless before the brick wall as his phone screen fades to black; the room dims and the crowd stills in sudden quiet. The character turns toward the window, thinking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a comedy club stage with a red brick wall and a microphone stand. Featuring a stylized 3D animated man in his 30s, slick back black hair, wearing a black turtleneck with purple accents, with sunglasses. The shot shows the idea through visible action: A deadpan performer stands motionless before the brick wall as his phone screen fades to black; the room dims and the crowd stills in sudden quiet.. Framing: close shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e053",
+   "kind": "dialogue",
+   "scene": "dressing_room_vhs",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "In the dressing room, a man rummages frantically through drawers for a power bank, cables tangled around his arms, a dying phone blinking nearby. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a retro dressing room with bulb mirrors and a worn sofa. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: In the dressing room, a man rummages frantically through drawers for a power bank, cables tangled around his arms, a dying phone blinking nearby.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e054",
+   "kind": "dialogue",
+   "scene": "city_vhs",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A crowded city crosswalk glows with countless phone screens held by pedestrians, their faces lit blue, while the lone heavyset man watches from the curb. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a VHS-lit city street at night, warm tungsten signs. Featuring a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A crowded city crosswalk glows with countless phone screens held by pedestrians, their faces lit blue, while the lone heavyset man watches from the curb.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e055",
+   "kind": "dialogue",
+   "scene": "brick_wall",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "A comedian on a dim brick-wall stage holds a smartphone up like a ticking bomb, its screen glowing red, while vintage VHS grain ripples across the smoky club lighting. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] retro VHS-lit 3D comedy club, warm tungsten light, brick wall, grain. Set in a comedy club stage with a red brick wall and a microphone stand. Featuring a stylized 3D animated man in his 40s, black hair, wearing a navy suit with gold accents, with watch and mic; a stylized 3D animated man in his 30s, crew short black hair, wearing a green tee with amber accents, with snack. The shot shows the idea through visible action: A comedian on a dim brick-wall stage holds a smartphone up like a ticking bomb, its screen glowing red, while vintage VHS grain ripples across the smoky club lighting.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
   }
  ]
 }

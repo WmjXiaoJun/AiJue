@@ -29,7 +29,7 @@ REPO = config.REPO_ROOT
 SCENE_MAP_PATH = REPO / "contract" / "scene_map.json"
 PLATE_DIR = REPO / "outputs" / "scene_plates"
 THREED_DIR = REPO / "outputs" / "3d_scenes"
-CHARS_DIR = REPO / "outputs" / "characters"
+CHARS_DIR = config.CHARS_ROOT  # 真相源在 assets/v5/characters（见 config）
 
 CARD_TYPES = ("title_card", "end_card", "meme_card")
 DEFAULT_SCENE = {"plate": "late_night_desk", "camera": "slow push-in", "3d": None}
@@ -97,8 +97,12 @@ def _asset_character(asset: dict | None) -> str:
 
 
 def cutout_path(char_id: str) -> Path | None:
-    """优先全身透明 PNG（1024x1536），回退头肩 cutout。"""
-    for rel in ("cutout_3d/front.png", "cutout_2d/front.png"):
+    """优先全身透明 PNG，回退头肩 cutout。
+
+    资产库实际布局是 `<cid>/cutout.png`（RGBA 全身，293x961 量级）；旧清单里
+    只有 cutout_3d/cutout_2d 两个子目录，导致 26 个角色全部"无 cutout"。
+    """
+    for rel in ("cutout.png", "cutout_3d/front.png", "cutout_2d/front.png"):
         p = CHARS_DIR / char_id / rel
         if p.is_file() and p.stat().st_size > 5000:
             return p
@@ -106,8 +110,19 @@ def cutout_path(char_id: str) -> Path | None:
 
 
 def _is_full_body(path: Path | None) -> bool:
-    p = str(path or "").replace("\\", "/")
-    return bool(path and ("cutout_2d" in p or "cutout_3d" in p))
+    """是否全身图：先看路径约定，再看图片纵横比（高/宽≥1.6 视为全身立绘）。"""
+    if not path:
+        return False
+    p = str(path).replace("\\", "/")
+    if "cutout_2d" in p or "cutout_3d" in p or p.endswith("/cutout.png"):
+        return True
+    try:
+        from PIL import Image
+        with Image.open(path) as im:
+            w, h = im.size
+        return bool(w and (h / float(w)) >= 1.6)
+    except Exception:  # noqa: BLE001
+        return False
 
 
 def _plan(shot: dict, index: int) -> dict:

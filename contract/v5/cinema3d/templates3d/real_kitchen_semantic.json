@@ -12,7 +12,8 @@
    "line": "",
    "semantic_visual": "",
    "framing": "",
-   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in close on a real gas stove with a wok and rising steam. The camera surveys the space, atmospheric and cinematic. Camera: slow push-in toward the subject. photorealistic cinematic live-action quality, realistic human skin and materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: kitchen room tone, sizzling oil, a quiet night. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in close on a real gas stove with a wok and rising steam. The camera surveys the space, atmospheric and cinematic. Camera: slow push-in toward the subject. photorealistic cinematic live-action quality, realistic human skin and materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: kitchen room tone, sizzling oil, a quiet night. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_002",
@@ -22,7 +23,8 @@
    "line": "深夜的厨房，是这座城市最后的客厅，谁都能坐。",
    "semantic_visual": "Wide shot of a warm, lived-in home kitchen at night; a man sits alone at a small table under a hanging lamp, empty chairs around him, soft amber light and quiet inviting mood.",
    "framing": "wide",
-   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. Featuring a real 38-year-old Chinese man, black hair, wearing a black coat with gold accents, with watch. The shot shows the idea through visible action: Wide shot of a warm, lived-in home kitchen at night; a man sits alone at a small table under a hanging lamp, empty chairs around him, soft amber light and quiet inviting mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. photorealistic cinematic live-action quality, realistic human skin and materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: kitchen room tone, sizzling oil, a quiet night. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. Featuring a real 38-year-old Chinese man, black hair, wearing a black coat with gold accents, with watch. The shot shows the idea through visible action: Wide shot of a warm, lived-in home kitchen at night; a man sits alone at a small table under a hanging lamp, empty chairs around him, soft amber light and quiet inviting mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow dolly move through the space. photorealistic cinematic live-action quality, realistic human skin and materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: kitchen room tone, sizzling oil, a quiet night. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_003",
@@ -32,7 +34,8 @@
    "line": "开火就行，想吃啥说一声，锅里正热着。",
    "semantic_visual": "Close shot of a gas stove flame under a wok, steam rising into warm range-hood light; a weathered hand lifts the lid as glistening food sizzles, cozy and appetizing mood.",
    "framing": "close",
-   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in close on a real gas stove with a wok and rising steam. Featuring a real 48-year-old Chinese man, black hair, wearing a black apron with red-brown accents. The shot shows the idea through visible action: Close shot of a gas stove flame under a wok, steam rising into warm range-hood light; a weathered hand lifts the lid as glistening food sizzles, cozy and appetizing mood.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: subtle handheld camera drift. photorealistic cinematic live-action quality, realistic human skin and materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: kitchen room tone, sizzling oil, a quiet night. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in close on a real gas stove with a wok and rising steam. Featuring a real 48-year-old Chinese man, black hair, wearing a black apron with red-brown accents. The shot shows the idea through visible action: Close shot of a gas stove flame under a wok, steam rising into warm range-hood light; a weathered hand lifts the lid as glistening food sizzles, cozy and appetizing mood.. Framing: close shot, characters seen naturally, mouth not emphasized. Camera: subtle handheld camera drift. photorealistic cinematic live-action quality, realistic human skin and materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: kitchen room tone, sizzling oil, a quiet night. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_004",
@@ -42,7 +45,8 @@
    "line": "",
    "semantic_visual": "",
    "framing": "",
-   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real kitchen table with bowls of food, steam rising, warm lamp above. The camera surveys the space, atmospheric and cinematic. Camera: slow dolly move through the space. photorealistic cinematic live-action quality, realistic human skin and materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: kitchen room tone, sizzling oil, a quiet night. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real kitchen table with bowls of food, steam rising, warm lamp above. The camera surveys the space, atmospheric and cinematic. Camera: slow dolly move through the space. photorealistic cinematic live-action quality, realistic human skin and materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: kitchen room tone, sizzling oil, a quiet night. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_005",
@@ -52,7 +56,8 @@
    "line": "加完班闻到这口热气，才觉得自己又活过来了。",
    "semantic_visual": "Medium shot of a tired young man in work clothes sitting at a wooden table, steam curling from a hot bowl before him; he closes his eyes and breathes in, warm lamplight, relieved mood.",
    "framing": "medium",
-   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real kitchen table with bowls of food, steam rising, warm lamp above. Featuring a real 26-year-old Chinese man, spiky black hair, wearing a grey hoodie with purple accents, with glasses. The shot shows the idea through visible action: Medium shot of a tired young man in work clothes sitting at a wooden table, steam curling from a hot bowl before him; he closes his eyes and breathes in, warm lamplight, relieved mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. photorealistic cinematic live-action quality, realistic human skin and materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: kitchen room tone, sizzling oil, a quiet night. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real kitchen table with bowls of food, steam rising, warm lamp above. Featuring a real 26-year-old Chinese man, spiky black hair, wearing a grey hoodie with purple accents, with glasses. The shot shows the idea through visible action: Medium shot of a tired young man in work clothes sitting at a wooden table, steam curling from a hot bowl before him; he closes his eyes and breathes in, warm lamplight, relieved mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Camera: slow push-in toward the subject. photorealistic cinematic live-action quality, realistic human skin and materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: kitchen room tone, sizzling oil, a quiet night. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_006",
@@ -62,7 +67,8 @@
    "line": "一日三餐认真吃，就是普通人最了不起的坚持。",
    "semantic_visual": "Wide shot of a modest home kitchen at night; a man sets a simple steaming meal on the table, pauses, then sits down to eat alone, warm pendant light, calm and earnest mood.",
    "framing": "wide",
-   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. Featuring a real 38-year-old Chinese man, black hair, wearing a black coat with gold accents, with watch. The shot shows the idea through visible action: Wide shot of a modest home kitchen at night; a man sets a simple steaming meal on the table, pauses, then sits down to eat alone, warm pendant light, calm and earnest mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. photorealistic cinematic live-action quality, realistic human skin and materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: kitchen room tone, sizzling oil, a quiet night. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. Featuring a real 38-year-old Chinese man, black hair, wearing a black coat with gold accents, with watch. The shot shows the idea through visible action: Wide shot of a modest home kitchen at night; a man sets a simple steaming meal on the table, pauses, then sits down to eat alone, warm pendant light, calm and earnest mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. Camera: slow cinematic camera move. photorealistic cinematic live-action quality, realistic human skin and materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: kitchen room tone, sizzling oil, a quiet night. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
   },
   {
    "id": "v5_007",
@@ -72,7 +78,635 @@
    "line": "",
    "semantic_visual": "",
    "framing": "",
-   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. The camera surveys the space, atmospheric and cinematic. Camera: slow crane rise. photorealistic cinematic live-action quality, realistic human skin and materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: kitchen room tone, sizzling oil, a quiet night. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A"
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. The camera surveys the space, atmospheric and cinematic. Camera: slow crane rise. photorealistic cinematic live-action quality, realistic human skin and materials, volumetric light, shallow depth of field. no text, no subtitles, no captions, no watermark, no logo, no UI, no distorted faces, no deformed hands, no extra people, no plastic toy look.\n\noverall_soundscape: kitchen room tone, sizzling oil, a quiet night. No dialogue, no human voices, no music.\n\nnon_diegetic_music: N/A",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e001",
+   "kind": "broll",
+   "scene": "kitchen_stove",
+   "duration": 4.8,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in close on a real gas stove with a wok and rising steam. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e002",
+   "kind": "dialogue",
+   "scene": "kitchen_home",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Wide shot of a warm, lived-in home kitchen at night; a man sits alone at a small table under a hanging lamp, empty chairs around him, soft amber light and quiet inviting mood. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. Featuring a real 38-year-old Chinese man, black hair, wearing a black coat with gold accents, with watch. The shot shows the idea through visible action: Wide shot of a warm, lived-in home kitchen at night; a man sits alone at a small table under a hanging lamp, empty chairs around him, soft amber light and quiet inviting mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e003",
+   "kind": "dialogue",
+   "scene": "kitchen_stove",
+   "duration": 4.8,
+   "line": "",
+   "semantic_visual": "Close shot of a gas stove flame under a wok, steam rising into warm range-hood light; a weathered hand lifts the lid as glistening food sizzles, cozy and appetizing mood. The character walks slowly through the space, glancing around.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in close on a real gas stove with a wok and rising steam. Featuring a real 48-year-old Chinese man, black hair, wearing a black apron with red-brown accents. The shot shows the idea through visible action: Close shot of a gas stove flame under a wok, steam rising into warm range-hood light; a weathered hand lifts the lid as glistening food sizzles, cozy and appetizing mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e004",
+   "kind": "broll",
+   "scene": "kitchen_table",
+   "duration": 4.6,
+   "line": "",
+   "semantic_visual": " The character turns toward the window, thinking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real kitchen table with bowls of food, steam rising, warm lamp above. The camera surveys the space, atmospheric and cinematic. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e005",
+   "kind": "dialogue",
+   "scene": "kitchen_table",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Medium shot of a tired young man in work clothes sitting at a wooden table, steam curling from a hot bowl before him; he closes his eyes and breathes in, warm lamplight, relieved mood. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real kitchen table with bowls of food, steam rising, warm lamp above. Featuring a real 26-year-old Chinese man, spiky black hair, wearing a grey hoodie with purple accents, with glasses. The shot shows the idea through visible action: Medium shot of a tired young man in work clothes sitting at a wooden table, steam curling from a hot bowl before him; he closes his eyes and breathes in, warm lamplight, relieved mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e006",
+   "kind": "dialogue",
+   "scene": "kitchen_home",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Wide shot of a modest home kitchen at night; a man sets a simple steaming meal on the table, pauses, then sits down to eat alone, warm pendant light, calm and earnest mood. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. Featuring a real 38-year-old Chinese man, black hair, wearing a black coat with gold accents, with watch. The shot shows the idea through visible action: Wide shot of a modest home kitchen at night; a man sets a simple steaming meal on the table, pauses, then sits down to eat alone, warm pendant light, calm and earnest mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e007",
+   "kind": "broll",
+   "scene": "kitchen_home",
+   "duration": 4.2,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e008",
+   "kind": "broll",
+   "scene": "kitchen_stove",
+   "duration": 4.8,
+   "line": "",
+   "semantic_visual": " The character leans on the table and gestures while speaking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in close on a real gas stove with a wok and rising steam. The camera surveys the space, atmospheric and cinematic. The character leans on the table and gestures while speaking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e009",
+   "kind": "dialogue",
+   "scene": "kitchen_home",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Wide shot of a warm, lived-in home kitchen at night; a man sits alone at a small table under a hanging lamp, empty chairs around him, soft amber light and quiet inviting mood. The character walks slowly through the space, glancing around.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. Featuring a real 38-year-old Chinese man, black hair, wearing a black coat with gold accents, with watch. The shot shows the idea through visible action: Wide shot of a warm, lived-in home kitchen at night; a man sits alone at a small table under a hanging lamp, empty chairs around him, soft amber light and quiet inviting mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e010",
+   "kind": "dialogue",
+   "scene": "kitchen_stove",
+   "duration": 4.8,
+   "line": "",
+   "semantic_visual": "Close shot of a gas stove flame under a wok, steam rising into warm range-hood light; a weathered hand lifts the lid as glistening food sizzles, cozy and appetizing mood. The character turns toward the window, thinking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in close on a real gas stove with a wok and rising steam. Featuring a real 48-year-old Chinese man, black hair, wearing a black apron with red-brown accents. The shot shows the idea through visible action: Close shot of a gas stove flame under a wok, steam rising into warm range-hood light; a weathered hand lifts the lid as glistening food sizzles, cozy and appetizing mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e011",
+   "kind": "broll",
+   "scene": "kitchen_table",
+   "duration": 4.6,
+   "line": "",
+   "semantic_visual": " Two characters exchange a look; one nods.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real kitchen table with bowls of food, steam rising, warm lamp above. The camera surveys the space, atmospheric and cinematic. Two characters exchange a look; one nods. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e012",
+   "kind": "dialogue",
+   "scene": "kitchen_table",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Medium shot of a tired young man in work clothes sitting at a wooden table, steam curling from a hot bowl before him; he closes his eyes and breathes in, warm lamplight, relieved mood. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real kitchen table with bowls of food, steam rising, warm lamp above. Featuring a real 26-year-old Chinese man, spiky black hair, wearing a grey hoodie with purple accents, with glasses. The shot shows the idea through visible action: Medium shot of a tired young man in work clothes sitting at a wooden table, steam curling from a hot bowl before him; he closes his eyes and breathes in, warm lamplight, relieved mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e013",
+   "kind": "dialogue",
+   "scene": "kitchen_home",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Wide shot of a modest home kitchen at night; a man sets a simple steaming meal on the table, pauses, then sits down to eat alone, warm pendant light, calm and earnest mood. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. Featuring a real 38-year-old Chinese man, black hair, wearing a black coat with gold accents, with watch. The shot shows the idea through visible action: Wide shot of a modest home kitchen at night; a man sets a simple steaming meal on the table, pauses, then sits down to eat alone, warm pendant light, calm and earnest mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e014",
+   "kind": "broll",
+   "scene": "kitchen_home",
+   "duration": 4.2,
+   "line": "",
+   "semantic_visual": " The character leans on the table and gestures while speaking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. The camera surveys the space, atmospheric and cinematic. The character leans on the table and gestures while speaking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e015",
+   "kind": "broll",
+   "scene": "kitchen_stove",
+   "duration": 4.8,
+   "line": "",
+   "semantic_visual": " The character walks slowly through the space, glancing around.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in close on a real gas stove with a wok and rising steam. The camera surveys the space, atmospheric and cinematic. The character walks slowly through the space, glancing around. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e016",
+   "kind": "dialogue",
+   "scene": "kitchen_home",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Wide shot of a warm, lived-in home kitchen at night; a man sits alone at a small table under a hanging lamp, empty chairs around him, soft amber light and quiet inviting mood. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. Featuring a real 38-year-old Chinese man, black hair, wearing a black coat with gold accents, with watch. The shot shows the idea through visible action: Wide shot of a warm, lived-in home kitchen at night; a man sits alone at a small table under a hanging lamp, empty chairs around him, soft amber light and quiet inviting mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e017",
+   "kind": "dialogue",
+   "scene": "kitchen_stove",
+   "duration": 4.8,
+   "line": "",
+   "semantic_visual": "Close shot of a gas stove flame under a wok, steam rising into warm range-hood light; a weathered hand lifts the lid as glistening food sizzles, cozy and appetizing mood. Two characters exchange a look; one nods.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in close on a real gas stove with a wok and rising steam. Featuring a real 48-year-old Chinese man, black hair, wearing a black apron with red-brown accents. The shot shows the idea through visible action: Close shot of a gas stove flame under a wok, steam rising into warm range-hood light; a weathered hand lifts the lid as glistening food sizzles, cozy and appetizing mood.. Framing: close shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e018",
+   "kind": "broll",
+   "scene": "kitchen_table",
+   "duration": 4.6,
+   "line": "",
+   "semantic_visual": " The character picks up an object and examines it.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real kitchen table with bowls of food, steam rising, warm lamp above. The camera surveys the space, atmospheric and cinematic. The character picks up an object and examines it. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e019",
+   "kind": "dialogue",
+   "scene": "kitchen_table",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Medium shot of a tired young man in work clothes sitting at a wooden table, steam curling from a hot bowl before him; he closes his eyes and breathes in, warm lamplight, relieved mood. The character pauses, looks off frame, then continues.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real kitchen table with bowls of food, steam rising, warm lamp above. Featuring a real 26-year-old Chinese man, spiky black hair, wearing a grey hoodie with purple accents, with glasses. The shot shows the idea through visible action: Medium shot of a tired young man in work clothes sitting at a wooden table, steam curling from a hot bowl before him; he closes his eyes and breathes in, warm lamplight, relieved mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e020",
+   "kind": "dialogue",
+   "scene": "kitchen_home",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Wide shot of a modest home kitchen at night; a man sets a simple steaming meal on the table, pauses, then sits down to eat alone, warm pendant light, calm and earnest mood. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. Featuring a real 38-year-old Chinese man, black hair, wearing a black coat with gold accents, with watch. The shot shows the idea through visible action: Wide shot of a modest home kitchen at night; a man sets a simple steaming meal on the table, pauses, then sits down to eat alone, warm pendant light, calm and earnest mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e021",
+   "kind": "broll",
+   "scene": "kitchen_home",
+   "duration": 4.2,
+   "line": "",
+   "semantic_visual": " The character walks slowly through the space, glancing around.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. The camera surveys the space, atmospheric and cinematic. The character walks slowly through the space, glancing around. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e022",
+   "kind": "broll",
+   "scene": "kitchen_stove",
+   "duration": 4.8,
+   "line": "",
+   "semantic_visual": " The character turns toward the window, thinking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in close on a real gas stove with a wok and rising steam. The camera surveys the space, atmospheric and cinematic. The character turns toward the window, thinking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e023",
+   "kind": "dialogue",
+   "scene": "kitchen_home",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Wide shot of a warm, lived-in home kitchen at night; a man sits alone at a small table under a hanging lamp, empty chairs around him, soft amber light and quiet inviting mood. Two characters exchange a look; one nods.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. Featuring a real 38-year-old Chinese man, black hair, wearing a black coat with gold accents, with watch. The shot shows the idea through visible action: Wide shot of a warm, lived-in home kitchen at night; a man sits alone at a small table under a hanging lamp, empty chairs around him, soft amber light and quiet inviting mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e024",
+   "kind": "dialogue",
+   "scene": "kitchen_stove",
+   "duration": 4.8,
+   "line": "",
+   "semantic_visual": "Close shot of a gas stove flame under a wok, steam rising into warm range-hood light; a weathered hand lifts the lid as glistening food sizzles, cozy and appetizing mood. The character picks up an object and examines it.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in close on a real gas stove with a wok and rising steam. Featuring a real 48-year-old Chinese man, black hair, wearing a black apron with red-brown accents. The shot shows the idea through visible action: Close shot of a gas stove flame under a wok, steam rising into warm range-hood light; a weathered hand lifts the lid as glistening food sizzles, cozy and appetizing mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e025",
+   "kind": "broll",
+   "scene": "kitchen_table",
+   "duration": 4.6,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real kitchen table with bowls of food, steam rising, warm lamp above. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e026",
+   "kind": "dialogue",
+   "scene": "kitchen_table",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Medium shot of a tired young man in work clothes sitting at a wooden table, steam curling from a hot bowl before him; he closes his eyes and breathes in, warm lamplight, relieved mood. The character leans on the table and gestures while speaking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real kitchen table with bowls of food, steam rising, warm lamp above. Featuring a real 26-year-old Chinese man, spiky black hair, wearing a grey hoodie with purple accents, with glasses. The shot shows the idea through visible action: Medium shot of a tired young man in work clothes sitting at a wooden table, steam curling from a hot bowl before him; he closes his eyes and breathes in, warm lamplight, relieved mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e027",
+   "kind": "dialogue",
+   "scene": "kitchen_home",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Wide shot of a modest home kitchen at night; a man sets a simple steaming meal on the table, pauses, then sits down to eat alone, warm pendant light, calm and earnest mood. The character walks slowly through the space, glancing around.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. Featuring a real 38-year-old Chinese man, black hair, wearing a black coat with gold accents, with watch. The shot shows the idea through visible action: Wide shot of a modest home kitchen at night; a man sets a simple steaming meal on the table, pauses, then sits down to eat alone, warm pendant light, calm and earnest mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e028",
+   "kind": "broll",
+   "scene": "kitchen_home",
+   "duration": 4.2,
+   "line": "",
+   "semantic_visual": " The character turns toward the window, thinking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. The camera surveys the space, atmospheric and cinematic. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e029",
+   "kind": "broll",
+   "scene": "kitchen_stove",
+   "duration": 4.8,
+   "line": "",
+   "semantic_visual": " Two characters exchange a look; one nods.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in close on a real gas stove with a wok and rising steam. The camera surveys the space, atmospheric and cinematic. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e030",
+   "kind": "dialogue",
+   "scene": "kitchen_home",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Wide shot of a warm, lived-in home kitchen at night; a man sits alone at a small table under a hanging lamp, empty chairs around him, soft amber light and quiet inviting mood. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. Featuring a real 38-year-old Chinese man, black hair, wearing a black coat with gold accents, with watch. The shot shows the idea through visible action: Wide shot of a warm, lived-in home kitchen at night; a man sits alone at a small table under a hanging lamp, empty chairs around him, soft amber light and quiet inviting mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e031",
+   "kind": "dialogue",
+   "scene": "kitchen_stove",
+   "duration": 4.8,
+   "line": "",
+   "semantic_visual": "Close shot of a gas stove flame under a wok, steam rising into warm range-hood light; a weathered hand lifts the lid as glistening food sizzles, cozy and appetizing mood. The character pauses, looks off frame, then continues.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in close on a real gas stove with a wok and rising steam. Featuring a real 48-year-old Chinese man, black hair, wearing a black apron with red-brown accents. The shot shows the idea through visible action: Close shot of a gas stove flame under a wok, steam rising into warm range-hood light; a weathered hand lifts the lid as glistening food sizzles, cozy and appetizing mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e032",
+   "kind": "broll",
+   "scene": "kitchen_table",
+   "duration": 4.6,
+   "line": "",
+   "semantic_visual": " The character leans on the table and gestures while speaking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real kitchen table with bowls of food, steam rising, warm lamp above. The camera surveys the space, atmospheric and cinematic. The character leans on the table and gestures while speaking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e033",
+   "kind": "dialogue",
+   "scene": "kitchen_table",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Medium shot of a tired young man in work clothes sitting at a wooden table, steam curling from a hot bowl before him; he closes his eyes and breathes in, warm lamplight, relieved mood. The character walks slowly through the space, glancing around.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real kitchen table with bowls of food, steam rising, warm lamp above. Featuring a real 26-year-old Chinese man, spiky black hair, wearing a grey hoodie with purple accents, with glasses. The shot shows the idea through visible action: Medium shot of a tired young man in work clothes sitting at a wooden table, steam curling from a hot bowl before him; he closes his eyes and breathes in, warm lamplight, relieved mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e034",
+   "kind": "dialogue",
+   "scene": "kitchen_home",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Wide shot of a modest home kitchen at night; a man sets a simple steaming meal on the table, pauses, then sits down to eat alone, warm pendant light, calm and earnest mood. The character turns toward the window, thinking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. Featuring a real 38-year-old Chinese man, black hair, wearing a black coat with gold accents, with watch. The shot shows the idea through visible action: Wide shot of a modest home kitchen at night; a man sets a simple steaming meal on the table, pauses, then sits down to eat alone, warm pendant light, calm and earnest mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e035",
+   "kind": "broll",
+   "scene": "kitchen_home",
+   "duration": 4.2,
+   "line": "",
+   "semantic_visual": " Two characters exchange a look; one nods.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. The camera surveys the space, atmospheric and cinematic. Two characters exchange a look; one nods. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e036",
+   "kind": "broll",
+   "scene": "kitchen_stove",
+   "duration": 4.8,
+   "line": "",
+   "semantic_visual": " The character picks up an object and examines it.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in close on a real gas stove with a wok and rising steam. The camera surveys the space, atmospheric and cinematic. The character picks up an object and examines it. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e037",
+   "kind": "dialogue",
+   "scene": "kitchen_home",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Wide shot of a warm, lived-in home kitchen at night; a man sits alone at a small table under a hanging lamp, empty chairs around him, soft amber light and quiet inviting mood. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. Featuring a real 38-year-old Chinese man, black hair, wearing a black coat with gold accents, with watch. The shot shows the idea through visible action: Wide shot of a warm, lived-in home kitchen at night; a man sits alone at a small table under a hanging lamp, empty chairs around him, soft amber light and quiet inviting mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e038",
+   "kind": "dialogue",
+   "scene": "kitchen_stove",
+   "duration": 4.8,
+   "line": "",
+   "semantic_visual": "Close shot of a gas stove flame under a wok, steam rising into warm range-hood light; a weathered hand lifts the lid as glistening food sizzles, cozy and appetizing mood. The character leans on the table and gestures while speaking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in close on a real gas stove with a wok and rising steam. Featuring a real 48-year-old Chinese man, black hair, wearing a black apron with red-brown accents. The shot shows the idea through visible action: Close shot of a gas stove flame under a wok, steam rising into warm range-hood light; a weathered hand lifts the lid as glistening food sizzles, cozy and appetizing mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e039",
+   "kind": "broll",
+   "scene": "kitchen_table",
+   "duration": 4.6,
+   "line": "",
+   "semantic_visual": " The character walks slowly through the space, glancing around.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real kitchen table with bowls of food, steam rising, warm lamp above. The camera surveys the space, atmospheric and cinematic. The character walks slowly through the space, glancing around. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e040",
+   "kind": "dialogue",
+   "scene": "kitchen_table",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Medium shot of a tired young man in work clothes sitting at a wooden table, steam curling from a hot bowl before him; he closes his eyes and breathes in, warm lamplight, relieved mood. The character turns toward the window, thinking.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real kitchen table with bowls of food, steam rising, warm lamp above. Featuring a real 26-year-old Chinese man, spiky black hair, wearing a grey hoodie with purple accents, with glasses. The shot shows the idea through visible action: Medium shot of a tired young man in work clothes sitting at a wooden table, steam curling from a hot bowl before him; he closes his eyes and breathes in, warm lamplight, relieved mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e041",
+   "kind": "dialogue",
+   "scene": "kitchen_home",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Wide shot of a modest home kitchen at night; a man sets a simple steaming meal on the table, pauses, then sits down to eat alone, warm pendant light, calm and earnest mood. Two characters exchange a look; one nods.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. Featuring a real 38-year-old Chinese man, black hair, wearing a black coat with gold accents, with watch. The shot shows the idea through visible action: Wide shot of a modest home kitchen at night; a man sets a simple steaming meal on the table, pauses, then sits down to eat alone, warm pendant light, calm and earnest mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e042",
+   "kind": "broll",
+   "scene": "kitchen_home",
+   "duration": 4.2,
+   "line": "",
+   "semantic_visual": " The character picks up an object and examines it.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. The camera surveys the space, atmospheric and cinematic. The character picks up an object and examines it. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e043",
+   "kind": "broll",
+   "scene": "kitchen_stove",
+   "duration": 4.8,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in close on a real gas stove with a wok and rising steam. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e044",
+   "kind": "dialogue",
+   "scene": "kitchen_home",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Wide shot of a warm, lived-in home kitchen at night; a man sits alone at a small table under a hanging lamp, empty chairs around him, soft amber light and quiet inviting mood. The character leans on the table and gestures while speaking.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. Featuring a real 38-year-old Chinese man, black hair, wearing a black coat with gold accents, with watch. The shot shows the idea through visible action: Wide shot of a warm, lived-in home kitchen at night; a man sits alone at a small table under a hanging lamp, empty chairs around him, soft amber light and quiet inviting mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character leans on the table and gestures while speaking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e045",
+   "kind": "dialogue",
+   "scene": "kitchen_stove",
+   "duration": 4.8,
+   "line": "",
+   "semantic_visual": "Close shot of a gas stove flame under a wok, steam rising into warm range-hood light; a weathered hand lifts the lid as glistening food sizzles, cozy and appetizing mood. The character walks slowly through the space, glancing around.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in close on a real gas stove with a wok and rising steam. Featuring a real 48-year-old Chinese man, black hair, wearing a black apron with red-brown accents. The shot shows the idea through visible action: Close shot of a gas stove flame under a wok, steam rising into warm range-hood light; a weathered hand lifts the lid as glistening food sizzles, cozy and appetizing mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e046",
+   "kind": "broll",
+   "scene": "kitchen_table",
+   "duration": 4.6,
+   "line": "",
+   "semantic_visual": " The character turns toward the window, thinking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real kitchen table with bowls of food, steam rising, warm lamp above. The camera surveys the space, atmospheric and cinematic. The character turns toward the window, thinking. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e047",
+   "kind": "dialogue",
+   "scene": "kitchen_table",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Medium shot of a tired young man in work clothes sitting at a wooden table, steam curling from a hot bowl before him; he closes his eyes and breathes in, warm lamplight, relieved mood. Two characters exchange a look; one nods.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real kitchen table with bowls of food, steam rising, warm lamp above. Featuring a real 26-year-old Chinese man, spiky black hair, wearing a grey hoodie with purple accents, with glasses. The shot shows the idea through visible action: Medium shot of a tired young man in work clothes sitting at a wooden table, steam curling from a hot bowl before him; he closes his eyes and breathes in, warm lamplight, relieved mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. Two characters exchange a look; one nods. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e048",
+   "kind": "dialogue",
+   "scene": "kitchen_home",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Wide shot of a modest home kitchen at night; a man sets a simple steaming meal on the table, pauses, then sits down to eat alone, warm pendant light, calm and earnest mood. The character picks up an object and examines it.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. Featuring a real 38-year-old Chinese man, black hair, wearing a black coat with gold accents, with watch. The shot shows the idea through visible action: Wide shot of a modest home kitchen at night; a man sets a simple steaming meal on the table, pauses, then sits down to eat alone, warm pendant light, calm and earnest mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e049",
+   "kind": "broll",
+   "scene": "kitchen_home",
+   "duration": 4.2,
+   "line": "",
+   "semantic_visual": " The character pauses, looks off frame, then continues.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. The camera surveys the space, atmospheric and cinematic. The character pauses, looks off frame, then continues. Camera: slow push in, subtle handheld.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e050",
+   "kind": "broll",
+   "scene": "kitchen_stove",
+   "duration": 4.8,
+   "line": "",
+   "semantic_visual": " The character leans on the table and gestures while speaking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in close on a real gas stove with a wok and rising steam. The camera surveys the space, atmospheric and cinematic. The character leans on the table and gestures while speaking. Camera: lateral tracking left to right, shallow depth of field.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e051",
+   "kind": "dialogue",
+   "scene": "kitchen_home",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Wide shot of a warm, lived-in home kitchen at night; a man sits alone at a small table under a hanging lamp, empty chairs around him, soft amber light and quiet inviting mood. The character walks slowly through the space, glancing around.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. Featuring a real 38-year-old Chinese man, black hair, wearing a black coat with gold accents, with watch. The shot shows the idea through visible action: Wide shot of a warm, lived-in home kitchen at night; a man sits alone at a small table under a hanging lamp, empty chairs around him, soft amber light and quiet inviting mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character walks slowly through the space, glancing around. Camera: slow pull back revealing the room, steady dolly.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e052",
+   "kind": "dialogue",
+   "scene": "kitchen_stove",
+   "duration": 4.8,
+   "line": "",
+   "semantic_visual": "Close shot of a gas stove flame under a wok, steam rising into warm range-hood light; a weathered hand lifts the lid as glistening food sizzles, cozy and appetizing mood. The character turns toward the window, thinking.",
+   "framing": "close",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in close on a real gas stove with a wok and rising steam. Featuring a real 48-year-old Chinese man, black hair, wearing a black apron with red-brown accents. The shot shows the idea through visible action: Close shot of a gas stove flame under a wok, steam rising into warm range-hood light; a weathered hand lifts the lid as glistening food sizzles, cozy and appetizing mood.. Framing: close shot, characters seen naturally, mouth not emphasized. The character turns toward the window, thinking. Camera: gentle orbit around the subject, 35mm lens.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e053",
+   "kind": "broll",
+   "scene": "kitchen_table",
+   "duration": 4.6,
+   "line": "",
+   "semantic_visual": " Two characters exchange a look; one nods.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real kitchen table with bowls of food, steam rising, warm lamp above. The camera surveys the space, atmospheric and cinematic. Two characters exchange a look; one nods. Camera: low angle tilt up, practical lights flaring.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e054",
+   "kind": "dialogue",
+   "scene": "kitchen_table",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Medium shot of a tired young man in work clothes sitting at a wooden table, steam curling from a hot bowl before him; he closes his eyes and breathes in, warm lamplight, relieved mood. The character picks up an object and examines it.",
+   "framing": "medium",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real kitchen table with bowls of food, steam rising, warm lamp above. Featuring a real 26-year-old Chinese man, spiky black hair, wearing a grey hoodie with purple accents, with glasses. The shot shows the idea through visible action: Medium shot of a tired young man in work clothes sitting at a wooden table, steam curling from a hot bowl before him; he closes his eyes and breathes in, warm lamplight, relieved mood.. Framing: medium shot, characters seen naturally, mouth not emphasized. The character picks up an object and examines it. Camera: over-the-shoulder framing, slow drift forward.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e055",
+   "kind": "dialogue",
+   "scene": "kitchen_home",
+   "duration": 5.0,
+   "line": "",
+   "semantic_visual": "Wide shot of a modest home kitchen at night; a man sets a simple steaming meal on the table, pauses, then sits down to eat alone, warm pendant light, calm and earnest mood. The character pauses, looks off frame, then continues.",
+   "framing": "wide",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. Featuring a real 38-year-old Chinese man, black hair, wearing a black coat with gold accents, with watch. The shot shows the idea through visible action: Wide shot of a modest home kitchen at night; a man sets a simple steaming meal on the table, pauses, then sits down to eat alone, warm pendant light, calm and earnest mood.. Framing: wide shot, characters seen naturally, mouth not emphasized. The character pauses, looks off frame, then continues. Camera: static wide shot, actors move within frame.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e056",
+   "kind": "broll",
+   "scene": "kitchen_home",
+   "duration": 4.2,
+   "line": "",
+   "semantic_visual": " The character leans on the table and gestures while speaking.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in a real home kitchen at night, warm lights, vegetables and a wok on the stove. The camera surveys the space, atmospheric and cinematic. The character leans on the table and gestures while speaking. Camera: rack focus from foreground object to the character.",
+   "act_index": -1
+  },
+  {
+   "id": "v5_e057",
+   "kind": "broll",
+   "scene": "kitchen_stove",
+   "duration": 4.8,
+   "line": "",
+   "semantic_visual": " The character walks slowly through the space, glancing around.",
+   "framing": "",
+   "prompt": "integrated_multimodal_description: [Shot 1] photorealistic cinematic live-action, real home kitchen at night, warm tungsten light, steam and cooking smoke, realistic human faces, 35mm film look. Set in close on a real gas stove with a wok and rising steam. The camera surveys the space, atmospheric and cinematic. The character walks slowly through the space, glancing around. Camera: slow push in, subtle handheld.",
+   "act_index": -1
   }
  ]
 }

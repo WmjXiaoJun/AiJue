@@ -1,4 +1,4 @@
-# 一键自检
+﻿# 一键自检
 $ErrorActionPreference = 'Continue'
 $root = Split-Path -Parent $PSScriptRoot
 Set-Location $root

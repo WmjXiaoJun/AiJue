@@ -21,7 +21,7 @@ interface Props {
   onTabChange(tab: StudioTabKey): void;
   onBack: () => void;
   onEpisodeUpdate: (episode: Episode) => void;
-  onSwitchEpisode: (eid: string) => void;
+  onSwitchEpisode: (eid: string) => void | Promise<void>;
   /** V19：AppShell 设置入口 */
   onOpenSettings?: () => void;
 }
@@ -150,7 +150,11 @@ export function ProjectStudio({
             disabled={switching}
             onChange={(e) => {
               setSwitching(true);
-              onSwitchEpisode(e.target.value);
+              // 切换失败也要解锁：之前只在 initialEpisode.id 变化时复位，
+              // 一次网络抖动/404 会让期数下拉框永久禁用。
+              void Promise.resolve(onSwitchEpisode(e.target.value)).finally(() =>
+                setSwitching(false)
+              );
             }}
             title="切换期数"
           >

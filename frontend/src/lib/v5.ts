@@ -413,6 +413,26 @@ export interface V5PutResponse {
   warnings?: unknown[];
 }
 
+/**
+ * V54：成片删除。
+ * 后端已实现 `DELETE /api/v5/outputs/{template}`（backend/app/routers/v5_studio.py，删除
+ * outputs/templates_2d|3d/<tid>/final*.mp4，返回 {ok, removed[], removed_bytes}），
+ * 因此这里默认开启；`FINAL_DELETE_ENABLED` 保留为 UI 侧的总开关（LibraryPage 的删除护栏与按钮禁用
+ * 都读它），要临时下线删除功能把它置 false 即可，页面无需再改。
+ */
+export const FINAL_DELETE_ENABLED = true;
+export const FINAL_DELETE_PATH = "/v5/outputs/{template}";
+
+export function finalDeletePath(template: string): string {
+  return FINAL_DELETE_PATH.replace("{template}", enc(template));
+}
+
+/** 删除一条成片（后端返回 4xx/5xx 时抛 V5ApiError，UI 展示后端 detail，不静默失败） */
+export async function deleteFinalOutput(template: string): Promise<{ ok: boolean; template: string }> {
+  await request<unknown>(finalDeletePath(template), { method: "DELETE" }, 30000);
+  return { ok: true, template };
+}
+
 export const v5api = {
   outputs: (includeCustom = false) =>
     request<V5OutputsResponse>("/v5/outputs" + qs({ include_custom: includeCustom ? "true" : undefined })),

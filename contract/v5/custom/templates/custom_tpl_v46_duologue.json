@@ -126,5 +126,6 @@
     "keyframe_candidates": 2,
     "created_at": "2026-11-05 02:54:29",
     "created_by": "api"
-  }
+  },
+  "note": "audit"
 }

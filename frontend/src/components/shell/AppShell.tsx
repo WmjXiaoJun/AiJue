@@ -1,29 +1,30 @@
-// V19 · 全站唯一 AppShell：240px 主轨（≤1280 图标轨 / <1024 抽屉）+ 64px 顶栏
-// + 可选上下文水平 tabs + 统一内容容器（max 1600 / padding 28）。
-// 只负责外壳与导航；页面内容/数据逻辑由各页面保留。
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
-import { api } from "../../lib/api";
-import { cinemaApi } from "../../lib/cinema";
-import { pipelineApi } from "../../lib/pipeline";
+// R6 · 应用外壳（大幅减法版）：左侧只有 4 项（模板 / 生产 / 成片 / 设置）。
+// 路由与页面能力都保留，只是不再从导航暴露；顶栏只留页面名 + 一个主按钮 + 设置。
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import {
   IconBoard,
-  IconClose,
+  IconChevronLeft,
+  IconChevronRight,
   IconFilm,
-  IconGlobe,
-  IconGrid,
-  IconPalette,
+  IconJobs,
   IconProjects,
-  IconRefresh,
+  IconScript,
   IconSettings,
-  IconSpark,
   IconTemplate,
   IconUsers,
-  IconVideo,
 } from "../icons";
 import "../../styles/cinema.css";
 import "../../styles/shell.css";
 
-export type ShellNavKey = "projects" | "pipeline" | "characters" | "library" | "final" | "settings";
+export type ShellNavKey =
+  | "projects"
+  | "pipeline"
+  | "agent"
+  | "characters"
+  | "library"
+  | "final"
+  | "settings"
+  | "cinema";
 
 export interface ShellTab {
   key: string;
@@ -59,32 +60,76 @@ export interface AppShellProps {
   tabs?: ShellTab[];
   activeTab?: string;
   onTabChange?: (key: string) => void;
+  /** 页面级指标（减法后默认不展示，保留兼容） */
   chips?: ShellChip[];
   primaryAction?: ShellPrimaryAction;
-  /** 页头附加操作（渲染在主操作左侧） */
   extraActions?: ReactNode;
+  chipsExtra?: ReactNode;
   onRefresh?: () => void;
   refreshing?: boolean;
   onOpenSettings: () => void;
   children: ReactNode;
 }
 
-const NAV_ITEMS: { key: ShellNavKey; no: string; label: string; href?: string; icon: ReactNode }[] = [
-  { key: "projects", no: "01", label: "项目大厅", href: "#/projects", icon: <IconProjects /> },
-  { key: "pipeline", no: "02", label: "一键成片", href: "#/pipeline", icon: <IconSpark /> },
-  { key: "characters", no: "03", label: "角色与声音", href: "#/characters", icon: <IconUsers /> },
-  { key: "library", no: "04", label: "模板与素材", href: "#/library/templates", icon: <IconTemplate /> },
-  { key: "final", no: "05", label: "成片库", href: "#/library/final", icon: <IconVideo /> },
-  { key: "settings", no: "06", label: "设置", icon: <IconSettings /> },
+interface NavItem {
+  key: string;
+  no: string;
+  label: string;
+  href?: string;
+  icon: ReactNode;
+  match: ShellNavKey[];
+  /** 02–06 需要「当前这一集」，没有就禁用并提示 */
+  needEpisode?: boolean;
+  onClick?: "settings";
+}
+
+/** 一级导航：项目大厅 + 五步创作 + 模板 + 设置（其余页面留在路由里，不进导航） */
+const NAV_ITEMS: NavItem[] = [
+  { key: "projects", no: "01", label: "项目大厅", href: "#/projects", icon: <IconProjects />, match: ["projects"] },
+  { key: "script", no: "02", label: "剧本间", icon: <IconScript />, match: [], needEpisode: true },
+  { key: "assets", no: "03", label: "资产库", icon: <IconUsers />, match: [], needEpisode: true },
+  { key: "storyboard", no: "04", label: "分镜台", icon: <IconBoard />, match: [], needEpisode: true },
+  { key: "generate", no: "05", label: "生成台", icon: <IconJobs />, match: [], needEpisode: true },
+  { key: "finish", no: "06", label: "成片房", icon: <IconFilm />, match: [], needEpisode: true },
+  { key: "templates", no: "07", label: "模板", href: "#/library/templates", icon: <IconTemplate />, match: ["library"] },
 ];
 
-interface SystemStatus {
-  backend: "on" | "off" | "wait";
-  version: string;
-  gpu: "on" | "off" | "wait";
-  queue: number;
-  pipelineActive: number;
-  pipelineLabel: string;
+const NAV_SETTINGS: NavItem = {
+  key: "settings",
+  no: "08",
+  label: "设置",
+  icon: <IconSettings />,
+  match: ["settings"],
+  onClick: "settings",
+};
+
+/** 当前这一集（App 打开工作台时写入），用于 02–06 的直达链接 */
+function readEpisode(): string {
+  try {
+    return localStorage.getItem("zpj_current_episode") || "";
+  } catch {
+    return "";
+  }
+}
+
+function episodeHref(key: string): string {
+  const eid = readEpisode();
+  return eid ? `#/episodes/${encodeURIComponent(eid)}/${key}` : "";
+}
+
+const STORAGE_KEY = "zpj_shell_open_v1";
+
+function readStoredOpen(): boolean {
+  // 窄屏默认收起抽屉：否则 236px 侧栏会盖住内容（截图/手机首屏都会只剩半页）。
+  if (typeof window !== "undefined" && window.innerWidth <= 900) return false;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw === "1") return true;
+    if (raw === "0") return false;
+  } catch {
+    /* ignore */
+  }
+  return true;
 }
 
 export function AppShell({
@@ -96,267 +141,169 @@ export function AppShell({
   tabs,
   activeTab,
   onTabChange,
-  chips,
   primaryAction,
   extraActions,
-  onRefresh,
-  refreshing,
+  chipsExtra,
   onOpenSettings,
   children,
 }: AppShellProps) {
-  const [status, setStatus] = useState<SystemStatus>({
-    backend: "wait",
-    version: "",
-    gpu: "wait",
-    queue: 0,
-    pipelineActive: 0,
-    pipelineLabel: "空闲",
-  });
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [open, setOpen] = useState<boolean>(() => readStoredOpen());
 
-  const loadStatus = useCallback(async () => {
-    const next: SystemStatus = { backend: "wait", version: "", gpu: "wait", queue: 0, pipelineActive: 0, pipelineLabel: "空闲" };
-    try {
-      const health = await api.health();
-      next.backend = "on";
-      next.version = health.version || "";
-    } catch {
-      next.backend = "off";
-    }
-    try {
-      const workers = await cinemaApi.workers();
-      next.gpu = workers.comfyui ? "on" : "off";
-      next.queue = workers.comfyui_queue || 0;
-    } catch {
-      next.gpu = "wait";
-    }
-    try {
-      const runs = await pipelineApi.runs();
-      const activeRuns = runs.filter((run) => run.status === "queued" || run.status === "running");
-      next.pipelineActive = activeRuns.length;
-      next.pipelineLabel = activeRuns.length
-        ? `运行中 ${activeRuns.length}`
-        : runs.some((run) => run.status === "queued" || run.status === "running")
-          ? "运行中"
-          : "空闲";
-    } catch {
-      next.pipelineLabel = "—";
-    }
-    setStatus(next);
+  const toggleOpen = useCallback(() => {
+    setOpen((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem(STORAGE_KEY, next ? "1" : "0");
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
   }, []);
 
   useEffect(() => {
-    void loadStatus();
-    const timer = window.setInterval(() => void loadStatus(), 12000);
-    return () => window.clearInterval(timer);
-  }, [loadStatus]);
-
-  useEffect(() => {
-    if (!drawerOpen) return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setDrawerOpen(false);
+      if (event.key === "Escape") setOpen(false);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [drawerOpen]);
+  }, []);
 
-  const systemChips = useMemo<ShellChip[]>(() => {
-    return [
-      {
-        label: "后端",
-        value: status.backend === "on" ? "已连接" : status.backend === "off" ? "离线" : "检测中",
-        tone: status.backend === "on" ? "jade" : status.backend === "off" ? "red" : "slate",
-        title: status.version ? `后端 v${status.version}` : "后端健康检查 /api/health",
-      },
-      {
-        label: "GPU",
-        value: status.gpu === "on" ? `ComfyUI ${status.queue} 队` : status.gpu === "off" ? "离线" : "检测中",
-        tone: status.gpu === "on" ? "gold" : status.gpu === "off" ? "red" : "slate",
-        title: "ComfyUI 生成环境 / 队列",
-      },
-      {
-        label: "任务",
-        value: status.pipelineActive ? `pipeline ${status.pipelineLabel}` : "pipeline 空闲",
-        tone: status.pipelineActive ? "gold" : "slate",
-        title: "pipeline 单并发任务状态",
-      },
-    ];
-  }, [status]);
+  const isActive = (item: NavItem) => Boolean(active && item.match.includes(active));
 
-  const navItems = (
-    <nav className="shell-nav" aria-label="全局导航">
-      {NAV_ITEMS.map((item) =>
-        item.key === "settings" ? (
-          <button
-            key={item.key}
-            type="button"
-            className="shell-nav-item"
-            onClick={() => {
-              setDrawerOpen(false);
-              onOpenSettings();
-            }}
-            title={item.label}
-          >
-            <span className="shell-nav-icon">{item.icon}</span>
-            <span className="shell-nav-label">{item.label}</span>
-            <span className="shell-nav-no">{item.no}</span>
-          </button>
-        ) : (
-          <a
-            key={item.key}
-            className={"shell-nav-item" + (active === item.key ? " is-active" : "")}
-            href={item.href}
-            onClick={() => setDrawerOpen(false)}
-            aria-current={active === item.key ? "page" : undefined}
-            title={item.label}
-          >
-            <span className="shell-nav-icon">{item.icon}</span>
-            <span className="shell-nav-label">{item.label}</span>
-            <span className="shell-nav-no">{item.no}</span>
-          </a>
-        ),
-      )}
-    </nav>
-  );
-
-  const railFoot = (
-    <div className="shell-rail-foot">
-      <div className="shell-rail-status" title="后端健康检查 /api/health">
-        <i className={"shell-dot is-" + (status.backend === "on" ? "jade" : status.backend === "off" ? "red" : "slate")} />
-        <span>后端</span>
-        <b>{status.backend === "on" ? "已连接" : status.backend === "off" ? "离线" : "检测中"}</b>
-      </div>
-      <div className="shell-rail-status" title="ComfyUI 生成环境 / 队列">
-        <i className={"shell-dot is-" + (status.gpu === "on" ? "gold" : status.gpu === "off" ? "red" : "slate")} />
-        <span>GPU</span>
-        <b>{status.gpu === "on" ? `ComfyUI ${status.queue} 队` : status.gpu === "off" ? "离线" : "检测中"}</b>
-      </div>
-      <div className="shell-rail-status" title="pipeline 单并发任务">
-        <i className={"shell-dot is-" + (status.pipelineActive ? "gold" : "jade")} />
-        <span>任务</span>
-        <b>{status.pipelineLabel}</b>
-      </div>
-      <div className="shell-rail-version">V19 · 造片局工作台</div>
-    </div>
-  );
+  const renderItem = (item: NavItem) => {
+    const cls = "sh-nav-item" + (isActive(item) ? " is-active" : "");
+    const label = (
+      <>
+        <span className="sh-nav-icon">{item.icon}</span>
+        <span className="sh-nav-no">{item.no}</span>
+        <span className="sh-nav-label">{item.label}</span>
+      </>
+    );
+    if (item.onClick === "settings") {
+      return (
+        <button key={item.key} type="button" className={cls} onClick={onOpenSettings} title={item.label}>
+          {label}
+        </button>
+      );
+    }
+    const href = item.needEpisode ? episodeHref(item.key) : item.href;
+    if (!href) {
+      return (
+        <span key={item.key} className="sh-nav-item is-disabled" title="先在项目大厅选一个项目/一期">
+          {label}
+        </span>
+      );
+    }
+    return (
+      <a
+        key={item.key}
+        className={cls}
+        href={href}
+        title={item.label}
+        aria-current={isActive(item) ? "page" : undefined}
+      >
+        {label}
+      </a>
+    );
+  };
 
   return (
-    <div className="cm-app shell-app">
-      <aside className="shell-rail">
-        <a className="shell-brand" href="#/projects" title="造片局 · 项目大厅">
-          <span className="shell-brand-seal">造</span>
-          <span className="shell-brand-text">
+    <div className={"sh-app" + (open ? " is-open" : "")}>
+      <div className="sh-scrim" onClick={() => setOpen(false)} role="presentation" />
+
+      <aside className="sh-rail sh-rail-lite" aria-label="主导航">
+        <a className="sh-brand" href="#/projects" title="造片局">
+          <span className="sh-brand-seal">造</span>
+          <span className="sh-brand-text">
             <b>造片局</b>
-            <em>ZAOPIANJU</em>
+            <em>AI 漫剧工坊</em>
           </span>
         </a>
-        {navItems}
-        {railFoot}
+        <nav className="sh-groups">
+          {NAV_ITEMS.map(renderItem)}
+          {renderItem(NAV_SETTINGS)}
+        </nav>
+        <div className="sh-rail-foot">
+          <button type="button" className="sh-collapse-btn" onClick={toggleOpen} title={open ? "收起" : "展开"}>
+            {open ? <IconChevronLeft size={14} /> : <IconChevronRight size={14} />}
+            <span className="sh-nav-label">收起</span>
+          </button>
+        </div>
       </aside>
 
-      {drawerOpen && (
-        <div className="shell-drawer-mask" onMouseDown={() => setDrawerOpen(false)} role="presentation">
-          <aside className="shell-drawer" onMouseDown={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-label="全局导航">
-            <div className="shell-drawer-head">
-              <span className="shell-brand-seal">造</span>
-              <b>造片局</b>
-              <button type="button" className="shell-drawer-close" onClick={() => setDrawerOpen(false)} aria-label="关闭导航">
-                <IconClose size={16} />
-              </button>
-            </div>
-            {navItems}
-            {railFoot}
-          </aside>
-        </div>
-      )}
-
-      <div className="shell-main">
-        <header className="shell-topbar">
-          <button type="button" className="shell-menu-btn" onClick={() => setDrawerOpen(true)} aria-label="打开导航">
-            <span />
-            <span />
-            <span />
+      <div className="sh-main">
+        <header className="sh-top">
+          <button type="button" className="sh-ico-btn sh-menu-btn" onClick={toggleOpen} aria-label="展开或收起导航">
+            <IconTemplate size={15} />
           </button>
-          <div className="shell-topbar-main">
-            <div className="shell-crumbs">
-              {kicker && <span className="shell-kicker">{kicker}</span>}
-              {(breadcrumb || []).map((crumb, index) => (
-                <span key={`${crumb.label}-${index}`} className="shell-crumb">
-                  {index > 0 && <i>/</i>}
-                  {crumb.href ? <a href={crumb.href}>{crumb.label}</a> : <b>{crumb.label}</b>}
-                </span>
-              ))}
-            </div>
-            <div className="shell-title-row">
-              <h1 className="shell-title">{title}</h1>
-              {titleExtra}
-            </div>
-          </div>
-          <div className="shell-topbar-right">
-            <div className="shell-chips">
-              {systemChips.map((chip) => (
-                <span key={chip.label} className={"shell-chip is-" + (chip.tone || "slate")} title={chip.title}>
-                  <em>{chip.label}</em>
-                  {chip.value}
-                </span>
-              ))}
-              {(chips || []).map((chip) => (
-                <span key={chip.label} className={"shell-chip is-" + (chip.tone || "slate")} title={chip.title}>
-                  <em>{chip.label}</em>
-                  {chip.value}
-                </span>
-              ))}
-            </div>
-            {onRefresh && (
-              <button type="button" className={"shell-icon-btn" + (refreshing ? " is-busy" : "")} onClick={onRefresh} title="刷新数据">
-                <IconRefresh size={15} />
-              </button>
+          <div className="sh-top-main">
+            {(kicker || (breadcrumb && breadcrumb.length > 0)) && (
+              <div className="sh-crumbs">
+                {kicker && <span>{kicker}</span>}
+                {(breadcrumb || []).map((crumb, index) => (
+                  <span key={`${crumb.label}-${index}`}>
+                    {(index > 0 || kicker) && <i>/</i>}
+                    {crumb.href ? <a href={crumb.href}>{crumb.label}</a> : <b>{crumb.label}</b>}
+                  </span>
+                ))}
+              </div>
             )}
-            {extraActions && <div className="shell-extra-actions">{extraActions}</div>}
-            {primaryAction && (
-              primaryAction.href ? (
-                <a className="cm-btn cm-btn-primary shell-cta" href={primaryAction.href} title={primaryAction.title}>
-                  {primaryAction.icon} {primaryAction.label}
+            <h1 className="sh-title">{title}</h1>
+            {(chipsExtra || titleExtra) && (
+              <div className="sh-title-meta">
+                {chipsExtra}
+                {titleExtra}
+              </div>
+            )}
+          </div>
+          <div className="sh-top-actions">
+            {extraActions}
+            {primaryAction &&
+              (primaryAction.href ? (
+                <a className="ui-btn is-primary" href={primaryAction.href} title={primaryAction.title}>
+                  {primaryAction.icon}
+                  {primaryAction.label}
                 </a>
               ) : (
                 <button
                   type="button"
-                  className="cm-btn cm-btn-primary shell-cta"
+                  className="ui-btn is-primary"
                   onClick={primaryAction.onClick}
                   disabled={primaryAction.disabled}
                   title={primaryAction.title}
                 >
-                  {primaryAction.icon} {primaryAction.label}
+                  {primaryAction.icon}
+                  {primaryAction.label}
                 </button>
-              )
-            )}
+              ))}
+            <button type="button" className="sh-ico-btn" onClick={onOpenSettings} title="设置" aria-label="设置">
+              <IconSettings size={15} />
+            </button>
           </div>
         </header>
 
         {tabs && tabs.length > 0 && (
-          <div className="shell-tabs" role="tablist" aria-label="模块导航">
+          <div className="sh-tabs" role="tablist" aria-label="模块导航">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
                 type="button"
                 role="tab"
                 aria-selected={activeTab === tab.key}
-                className={"shell-tab" + (activeTab === tab.key ? " is-active" : "")}
+                className={"sh-tab" + (activeTab === tab.key ? " is-active" : "")}
                 onClick={() => onTabChange?.(tab.key)}
                 disabled={tab.disabled}
-                title={tab.en ? `${tab.label} · ${tab.en}` : tab.label}
               >
-                {tab.no && <span className="shell-tab-no">{tab.no}</span>}
-                <span className="shell-tab-label">{tab.label}</span>
-                {tab.en && <span className="shell-tab-en">{tab.en}</span>}
-                {tab.badge && <span className="shell-tab-badge">{tab.badge}</span>}
+                {tab.label}
+                {tab.badge && <span className="sh-tab-badge">{tab.badge}</span>}
               </button>
             ))}
           </div>
         )}
 
-        <main className="shell-content">
-          <div className="shell-content-inner">{children}</div>
+        <main className="sh-content">
+          <div className="sh-content-inner">{children}</div>
         </main>
       </div>
     </div>

@@ -1,9 +1,15 @@
-# 造片局 · AI 微综艺
+# 造片局 · AI 微综艺 / 漫剧工作台
 
-> 横屏 5–10 分钟 AI 微综艺成片平台（demo）：**选模式 → 写台本 → 管资产 → 出分镜 → 批量生成 → 包装成片**。
-> 品牌：造片局 ｜ 品类：AI 微综艺 ｜ 构建时间：2026-10-23 夜
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB.svg)](https://www.python.org/)
+[![React 18](https://img.shields.io/badge/React-18-61DAFB.svg)](https://react.dev/)
 
-![项目列表](docs/screenshots/01_projects.png)
+> 横屏 AI 微综艺 / 漫剧生产工作台：**选模式 → 写台本 → 管资产 → 出分镜 → 批量生成 → 包装成片**。
+> 品牌：造片局 ｜ 代码许可：MIT ｜ 2026-11 版本：33 模板 + 智能体编排 + Muse 视频/口型 + 漫剧工坊风 UI。
+
+> **开源说明**：代码采用 MIT；AI 生成素材、第三方模型与服务的使用边界见 [NOTICE.md](NOTICE.md)。仓库**不包含**模型权重、API Key、成片与第三方二进制。
+
+![项目大厅](docs/screenshots/ui_redesign_home.png)
 
 ## 这是什么
 
@@ -182,3 +188,74 @@ FastAPI · SQLAlchemy · SQLite · Vite · React · TypeScript · FFmpeg 6.1 · 
 - **验收门 + run 证据**：每次执行写 `outputs/agent_runs/<run_id>/{run.json,events.jsonl,summary.md}`，
   QC 硬门不过即失败；
 - 文档：`AGENTS.md`、`docs/V6_AGENT_ORCHESTRATION.md`；CLI：`python -m pipeline.agents list|inspect|run|edit|status`。
+
+
+## V7–V49 概览（2026-11-05 更新）
+
+> 完整功能梳理与计划核对：[docs/V49_FEATURE_MAP_AND_PLAN_CHECK.md](docs/V49_FEATURE_MAP_AND_PLAN_CHECK.md)；
+> V49 主线与验收：[docs/PLAN_V49_SHORTS_SEASON.md](docs/PLAN_V49_SHORTS_SEASON.md)。
+> 上面 V3–V6 章节保留为历史记录；当前平台规模以本节为准。
+
+- **平台**：15 个页面（项目大厅 / 编剧间 / 资产库 / 分镜台 / 生成台 / 成片房 / 3D 镜头台 / 生成队列 / 剪辑台 / 一键成片 / 角色与声音 / 模板库 / 风格墙 / 场景库 / 成片库）+ **142 个 API 端点**（17 功能域）；前端 hash 路由，后端托管 dist。
+- **内容**：**33 个模板**（16 内建综艺 + 17 custom 短片/示例）、17 种风格、74 个场景、50 个角色、44 个道具、16 份剪辑档案；每模板一份可编辑工作流。
+- **智能体（V49 上线）**：8 角色 + 13 工具 + 33 份工作流；两条生产栈（base 走 `render_v5`，`custom_tpl_*` 走 `templates3d_hq`）；页面 `#/agent`（模板/工作流/运行/季面板），CLI 与页面等价（`python -m pipeline.agents ...`）。
+- **季（Season）**：`contract/v5/series/<sid>.json` + `/api/v6/agent/season/{sid}/run`（`dry_run`/`only_missing`）+ 合集导出 `POST /api/v5/series/{sid}/export`（片头卡 + 串片 + manifest）。
+- **已交付产物**：30 部 3D 成片（`outputs/templates_3d`）、9 部 2D 短片（`templates_2d`）、18 部 V3 样片、2 部 5 分钟长片（`tonight_show_5min` 299s / `relic_talk_3d` 325s）、系列合集 49.2s。
+- **测试**：`pytest tests -q`（21 文件 343 用例）+ `pytest pipeline/tests -q`（17 文件 185 用例）。
+
+**当前主线（用户 2026-11-05 决策）**：短片线——一个世界 = 一季，一季 = N 集（13–25s/集），每集由智能体工作流生产，一季导出合集；长片能力保留（`relic_talk`/`relic_talk_3d`）但不再扩产。
+
+## V50 Muse（MuseTalk 1.5）口型生成（2026-11-05）
+
+> 文档：[docs/V50_MUSE_GENERATION.md](docs/V50_MUSE_GENERATION.md)
+
+- **真实可用**：MuseTalk 1.5 权重与 venv 已在本机（`local_models/lipsync*`，torch 2.9.1+cu128 / RTX 3080 Ti）；实测单镜 **21s**（3.29s / 79 帧 / 1024×576 / 56ms 每帧 / 显存 6.8GB）。
+- **三个入口**：`POST /api/v6/muse/sync`、`python -m pipeline.agents run --stages muse`、页面 `#/agent` 的「Muse 口型修正」卡片（可用性 / 最近片段 / 日志）。
+- **产物**：`outputs/muse/<template>/<shot>_muse.mp4`（h264 + aac）→ `/media/muse/...`；`params.apply=true` 可回写 `shots/` 并重新合成成片（原件备份 `shots/_orig/`）。
+- **并发安全**：跨进程独占锁 `tmp/v5_lipsync/.muse.lock`（死锁持有者按 PID 立即回收），CLI / API / agent 同时只跑 1 个任务。
+
+## V50.1 Muse 视频模型接入（MuseV / MusePose / 云端）
+
+> 手册：[docs/MUSE_VIDEO_INTEGRATION.md](docs/MUSE_VIDEO_INTEGRATION.md)
+
+- **适配层**：`pipeline/muse_video.py`，四类 provider 同一签名：`musev_local` / `musepose_local` / `muse_cloud` / `stub`；`python -m pipeline.muse_video --check` 自检。
+- **入口**：`POST /api/v6/muse/video`（后台任务 + 轮询）、智能体工具 `muse_video`、工作流阶段 `musev`（默认关）、页面「Muse 视频」卡片。
+- **云端分支已实测**：POST → 轮询 → 下载 → ffprobe（640×360 / 2s / 3.04s 完成）。本地分支需按手册安装 MuseV/MusePose。
+- **同步分**：`measure_sync()` 返回「嘴动 ↔ 语音包络」相关（实测 corr_best=0.21 / lag=-1 帧）；SyncNet 权重损坏（886MB 下载中断），暂不出 LSE 分。
+- **季批量口型**：`POST /api/v6/agent/season/{sid}/run {with_muse:true}` → 全部集数只跑 `muse`。
+- **1080P 合集**：`POST /api/v5/series/{sid}/export?force=true&hd=true` → 1920×1080 / 38.1MB。
+
+## V51 Muse 进片 + 季批量口型 + 1080P（2026-11-05）
+
+> 记录：[docs/V51_MUSE_INTO_FILM.md](docs/V51_MUSE_INTO_FILM.md)
+
+- **阶段参数可覆盖**：`--stage-params '{"muse":{"apply":true}}'`（API 同名字段），不改合同、只对本次 run 生效。
+- **Muse 进片**：口型结果回写 `shots/`（原件 `_orig/`）+ 重新合成；实测 cyber `final.mp4` sha 由 `7cfbd90e` → `5d58619d`，QC 全绿。
+- **季批量口型**：`season/run {with_muse:true, muse_apply:true, dry_run:false}` → 3 集一次跑完，三集成片 sha 全变。
+- **修 bug**：短片在 `templates_2d`/`templates_3d` 各有一份成片，导出改按 **mtime 取最新**（否则合集一直用旧片）。
+- **单集 1080P / 竖版**：`python -m pipeline.deliver --template X --hd|--vertical` → `final_1080p.mp4` / `final_9x16.mp4`。
+
+## V52 全量代码审查与修复（2026-11-05）
+
+> 记录：[docs/V52_CODE_REVIEW_FIXES.md](docs/V52_CODE_REVIEW_FIXES.md)｜明细：docs/audit/REVIEW_{BACKEND,PIPELINE,AGENTS,FRONTEND}.md
+
+- 4 个只读审查员分头审全仓，汇总 P0–P3 后逐条修：**2 个 P0、6 个 P1、16 个 P2/P3** 已修；
+- 典型：`render_v5` 分支缩进致成片不渲、音色 PUT 毁角色合同、模板替换污染同进程、SystemExit 卡死 job、发布静默发中文母版、合集缓存不随单集更新；
+- 回归：`pytest tests -q` 491 passed；58 条 GET 探针 0 个 5xx；季证据三链接全 200。
+
+## V53 把审查 backlog 全部修完（2026-11-05）
+
+- 关键帧缓存加入 prompt 指纹 + `hq --force`；`render_v5` 台词镜不再假封顶、trim 先缩 b-roll；
+- `qc_v5` 的 `lip_sync` 硬门终于有数据（viseme 时间轴）；`video_raw`/`narration` 拷贝失败改为硬失败；
+- 工作流 JSON 损坏不再静默回退（`degraded` → 拒绝执行）；Muse 回写/重合成失败自动回滚并刷新 QC；
+- 季合同改为 `same_cast:false, same_world:true` + `season_warnings` + `scripts/check_seasons.py`；
+- `gen-shot` 加超时、job spec 自动裁剪、输出目录统一 `OUTPUTS_DIR`、预检只认 ready 本地化；
+- 新增 `scripts/fetch_syncnet.py`（权重校验/重下）；回归：491 passed，58 条 GET 0 个 5xx。
+
+## V53.1 第二轮审查的回归修复（2026-11-05）
+
+- 修掉自己引入的 3 个 P0：`/muse/sync`、`/muse/video` 缺 `global` 导致 100% 500，`/muse/video` 输出路径未校验；
+- 输出根统一 `pipeline.config.OUTPUTS_ROOT`（env 优先），不再“写仓库读 config”；
+- `hq --force` 真正生效、关键帧缓存不再被旧图毒化；`render_v5` trim 后重建音轨（消除音画错位）；
+- `lip_sync` 改成真检查（viseme 张嘴覆盖率），工作流保存校验依赖/工具，悬空依赖判 failed；
+- 新增 `tests/test_v53_agents.py`（10 条）；回归：**501 passed**，58 条 GET 0 个 5xx。

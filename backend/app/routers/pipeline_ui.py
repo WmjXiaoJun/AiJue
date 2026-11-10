@@ -245,14 +245,18 @@ def _generate_hq_command(tid: str, style_mode: str = "3d",
         cmd.extend(["--2d-style", _template_render_style(tid) or "jp_anime"])
         # V46：模板可选抽卡数（contract 里 keyframe_candidates，默认 1）
         cands = 1
-        for path in (_TEMPLATE_CONTRACT_DIR / f"{tid}.json", _CUSTOM_TEMPLATE_DIR / f"{tid}.json"):
+        # custom 覆盖优先（与 cinema_templates._template_contract 口径一致）；读不到才看内建
+        for path in (_CUSTOM_TEMPLATE_DIR / f"{tid}.json", _TEMPLATE_CONTRACT_DIR / f"{tid}.json"):
+            if not path.is_file():
+                continue
             try:
                 data = json.loads(path.read_text(encoding="utf-8"))
             except (OSError, ValueError):
                 continue
-            if isinstance(data, dict) and data.get("keyframe_candidates"):
-                cands = max(1, min(6, int(data["keyframe_candidates"])))
-            break
+            if isinstance(data, dict):
+                if data.get("keyframe_candidates"):
+                    cands = max(1, min(6, int(data["keyframe_candidates"])))
+                break
         if cands > 1:
             cmd.extend(["--keyframe-candidates", str(cands)])
     if reuse:
@@ -261,7 +265,7 @@ def _generate_hq_command(tid: str, style_mode: str = "3d",
 
 
 def _template_label(tid: str) -> Optional[str]:
-    for path in (_TEMPLATE_CONTRACT_DIR / f"{tid}.json", _CUSTOM_TEMPLATE_DIR / f"{tid}.json"):
+    for path in (_CUSTOM_TEMPLATE_DIR / f"{tid}.json", _TEMPLATE_CONTRACT_DIR / f"{tid}.json"):
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, ValueError):

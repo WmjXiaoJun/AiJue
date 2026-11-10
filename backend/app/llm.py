@@ -240,9 +240,14 @@ def complete(
     temperature: float = 0.7,
     system: Optional[str] = None,
     provider: Optional[str] = None,
+    cfg_override: Optional[LLMConfig] = None,
 ) -> str:
-    """调用当前配置的 LLM，返回文本（json_schema 时调用方负责解析/校验）。"""
-    cfg = load_config()
+    """调用当前配置的 LLM，返回文本（json_schema 时调用方负责解析/校验）。
+
+    ``cfg_override`` 仅供 `test_connection` 这类"用临时配置试一次"的调用方使用；
+    常规调用不传，始终以 `load_config()` 为准。
+    """
+    cfg = cfg_override or load_config()
     if provider:
         cfg.provider = str(provider).strip().lower()
     if not (prompt or "").strip():
@@ -256,14 +261,29 @@ def complete(
     raise LLMError(f"不支持的 LLM provider: {cfg.provider}", provider=cfg.provider)
 
 
-def test_connection(provider: Optional[str] = None) -> Dict[str, Any]:
-    """连接测试：发一条最小 prompt，返回 ok/provider/model/latency/error。"""
+def test_connection(provider: Optional[str] = None,
+                    base_url: Optional[str] = None,
+                    model: Optional[str] = None,
+                    api_key: Optional[str] = None) -> Dict[str, Any]:
+    """连接测试：发一条最小 prompt，返回 ok/provider/model/latency/error。
+
+    覆盖值只作用于本次测试，不写配置文件。安全约束：调用方指定 ``base_url`` 却没给
+    ``api_key`` 时，**不带**已保存的 Key（避免"改地址 → 测试 → Key 外泄"）。
+    """
     cfg = load_config()
     if provider:
         cfg.provider = str(provider).strip().lower()
+    if base_url:
+        cfg.base_url = str(base_url).strip().rstrip("/")
+        if api_key is None:
+            cfg.api_key = ""
+    if model:
+        cfg.model = str(model).strip()
+    if api_key is not None:
+        cfg.api_key = str(api_key).strip()
     started = time.monotonic()
     try:
-        text = complete("请只回复：OK", temperature=0.0)
+        text = complete("请只回复：OK", temperature=0.0, cfg_override=cfg)
         return {
             "ok": True,
             "provider": cfg.provider,

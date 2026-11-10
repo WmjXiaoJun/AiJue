@@ -169,7 +169,7 @@ export function CreateCharacterDrawer({ open, presets, auditionCharacter, onClos
       const items = creationErrorMessage(err);
       setErrors(items);
       if (isCreationNotReady(err)) {
-        notify("创建接口尚未就绪（后端 V21 API 实现中），可稍后重试", "info");
+        notify("创建接口返回 404：请确认后端已启动，可稍后重试", "info");
       }
     } finally {
       setSaving(false);

@@ -378,7 +378,12 @@ class LLMConfigOut(BaseModel):
 
 
 class LLMTestRequest(BaseModel):
+    """连接测试参数：只作用于本次测试，不写 llm.env（Key 不回传/不落库）。"""
+
     provider: Optional[str] = None
+    base_url: Optional[str] = None
+    model: Optional[str] = None
+    api_key: Optional[str] = None
 
 
 class LLMTestResult(BaseModel):

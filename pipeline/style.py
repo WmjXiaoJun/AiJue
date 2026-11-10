@@ -40,7 +40,7 @@ def _corner_alpha(path: Path) -> float | None:
 REPO = config.REPO_ROOT
 STYLE_MAP_PATH = REPO / "contract" / "style_map.json"
 PLATE_DIR = REPO / "outputs" / "scene_plates"
-CHARS_DIR = REPO / "outputs" / "characters"
+CHARS_DIR = config.CHARS_ROOT  # 真相源在 assets/v5/characters（见 config）
 
 DEFAULT_STYLE = "3d_anime"
 
@@ -131,11 +131,9 @@ def plate_path(plate: str, style_name: str, style: dict | None = None,
     base = base_dir / f"{name}.png"
     if base.is_file():
         return base, ("2d_anime" if style_name != "2d_anime" else style_name), (style_name != "2d_anime")
-    # 兜底：任选一个存在的 plate
-    for alt in ("late_night_desk", "history_study", "roundtable_studio"):
-        p = base_dir / f"{alt}.png"
-        if p.is_file():
-            return p, "2d_anime", True
+    # 注意：这里**不再**"任选一个存在的 plate" 兜底。旧逻辑会让缺底板的模板
+    # 静默借用 late_night_desk/history_study/roundtable_studio，16 部片共用同一背景
+    # 却没人报错（P0-1 的陷阱）。缺就是缺，让上层拿到 missing 并显式失败/报警。
     return base, style_name, True
 
 
@@ -150,7 +148,7 @@ def cutout_path(char_id: str, style_name: str = "3d_anime",
             # 左上角 alpha 高 = 背景没抠干净（不是透明 cutout），回退 2D 全身
             if alpha is None or alpha <= 32:
                 return p, "3d_anime", False
-    for rel in ("cutout_2d/front.png", "cutout_3d/front.png",
+    for rel in ("cutout.png", "cutout_2d/front.png", "cutout_3d/front.png",
                 "2d/portrait.png", "portrait.png"):
         p = base / char_id / rel
         if p.is_file() and p.stat().st_size > 1000:

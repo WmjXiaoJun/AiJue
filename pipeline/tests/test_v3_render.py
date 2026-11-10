@@ -167,6 +167,8 @@ def test_storyboard_30s(template):
     # demo 首尾保护：首镜=台本首句（长句按标点切分）、末镜=台本最后 1 句
     script = storyboard_v3.load_script(template["id"])
     all_lines = storyboard_v3.script_lines(script)
+    if not all_lines:
+        pytest.skip(f"缺少 LLM 台本 outputs/llm_scripts/{template['id']}.json（先生成台本再验首尾保护）")
     assert all_lines[0]["text"].startswith(dialogue[0]["line"])
     assert all_lines[-1]["text"].endswith(dialogue[-1]["line"])
     assert plan["meta"]["opening_line_protected"] is True

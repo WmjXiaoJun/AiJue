@@ -703,8 +703,15 @@ def create_promo(character: str, payload: PromoBody = Body(default=PromoBody(sho
         "finished_ts": None,
     }
     with _LOCK:
+        running = _PROMOS.get(_ACTIVE_PROMO) or {}
+        if str(running.get("status")) in ("queued", "running"):
+            raise HTTPException(status_code=409, detail=f"已有宣传任务在跑: {_ACTIVE_PROMO}")
         _PROMOS[promo_id] = promo
         _ACTIVE_PROMO = promo_id
+        if len(_PROMOS) > 50:
+            for old_id in sorted(_PROMOS, key=lambda k: _PROMOS[k].get("created_ts") or 0)[:-50]:
+                if old_id != _ACTIVE_PROMO:
+                    _PROMOS.pop(old_id, None)
     _persist(promo)
     try:
         threading.Thread(target=_run_promo, args=(promo_id,), daemon=True,

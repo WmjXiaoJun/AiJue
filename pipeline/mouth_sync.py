@@ -76,21 +76,30 @@ def envelope_timeline(audio_path: str | Path, fps: float = 25.0,
     for i in range(1, n_frames - 1):
         smooth[i] = 0.25 * norm[i - 1] + 0.5 * norm[i] + 0.25 * norm[i + 1]
     chars = [c for c in str(text) if not c.isspace()]
+    # lead：开头 N 帧强制闭口（TTS 起始静音/换气），此参数以前被忽略
+    lead_frames = max(0, int(round(max(0.0, float(lead)) * fps)))
+    voiced = [i for i in range(n_frames) if float(smooth[i]) >= 0.30]
+    voiced_count = max(1, len(voiced))
+    voiced_seen = 0
     out: list[dict] = []
     for i in range(n_frames):
         level = float(smooth[i])
         t0 = round(i * frame, 3)
         t1 = round((i + 1) * frame, 3)
-        if level < 0.10:
+        if i < lead_frames or level < 0.10:
             viseme = "closed"
         elif level < 0.30:
-            viseme = _shape_for(chars[i % len(chars)] if chars else "a", i)
+            # 低能量段按「当前发声进度」取字，和台词位置对齐（不再 i%len 循环）
+            ci = min(len(chars) - 1, int(voiced_seen * len(chars) / voiced_count)) if chars else 0
+            viseme = _shape_for(chars[ci] if chars else "a", i)
             if viseme == "a":
                 viseme = "e"
         elif level < 0.60:
             viseme = "o" if (i % 3) else "e"
+            voiced_seen += 1
         else:
             viseme = "a"
+            voiced_seen += 1
         if out and out[-1]["viseme"] == viseme:
             out[-1]["t1"] = t1
         else:

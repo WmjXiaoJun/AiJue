@@ -10,7 +10,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-REPO = Path(".").resolve()
+REPO = Path(__file__).resolve().parents[1]
 OUT = REPO / "contract" / "v5" / "templates" / "relic_talk.json"
 
 CAST = [

@@ -35,6 +35,8 @@ import time
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
+from . import config  # noqa: E402
+
 MT_DIR = REPO / "local_models" / "lipsync" / "MuseTalk"
 MODELS = REPO / "local_models" / "lipsync_models"
 VENV_PY = REPO / "local_models" / "lipsync-venv" / "Scripts" / "python.exe"
@@ -126,10 +128,23 @@ def available() -> dict:
         "syncnet": mp["syncnet"].exists(),
     }
     ok = all(v for k, v in deps.items() if k not in ("syncnet",))
+    syncnet = _syncnet_status()
     return {
         "ok": ok,
         "provider_default": "musetalk",
         "providers": {"musetalk": ok, "wav2lip": False},
+        "families": {
+            "musetalk": {"installed": ok, "kind": "lip_sync",
+                         "hint": "" if ok else "见 docs/MUSE_SETUP_HOWTO.md §2"},
+            "musev": {"installed": (REPO / "local_models" / "lipsync" / "MuseV").exists(),
+                      "kind": "text_to_video",
+                      "hint": "未安装：clone TMElyralab/MuseV 到 local_models/lipsync/MuseV + 权重"},
+            "musepose": {"installed": (REPO / "local_models" / "lipsync" / "MusePose").exists(),
+                         "kind": "pose_driven",
+                         "hint": "未安装：clone TMElyralab/MusePose；dwpose 权重已在 lipsync_models/dwpose"},
+        },
+        "syncnet_ready": syncnet.get("ready"),
+        "syncnet_reason": syncnet.get("reason", ""),
         # ---- V5_INTERFACES §5 契约字段（扁平布尔）----
         "musetalk": ok,
         "wav2lip": False,
@@ -142,6 +157,49 @@ def available() -> dict:
         "venv_python": str(VENV_PY),
         "reason": "" if ok else "缺失: " + ", ".join(k for k, v in deps.items() if not v and k != "syncnet"),
     }
+
+
+# --------------------------------------------------------------------------- #
+# V50：按模板找「对白镜头 + 音频」对（供 API / agent 工具共用）
+# --------------------------------------------------------------------------- #
+OUT_ROOTS = (config.OUTPUTS_ROOT / "templates_3d", config.OUTPUTS_ROOT / "templates_2d")
+
+
+def episode_shots(template_id: str) -> list:
+    path = REPO / "outputs" / "templates_v5" / template_id / "work" / "episode.json"
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return []
+    return [s for s in (data.get("shots") or []) if isinstance(s, dict)]
+
+
+def dialogue_pairs(template_id: str, limit: int = 2) -> list:
+    """返回 [{shot, clip, audio}]：优先 type=dialogue / 有 line 的镜头，其次任意有音频的镜头。"""
+    meta = episode_shots(template_id)
+    prefer = [str(s.get("id")) for s in meta
+              if str(s.get("line") or "").strip() or s.get("type") == "dialogue"]
+    audio_roots = [root / template_id / "work" / "audio" for root in OUT_ROOTS]
+    for root in OUT_ROOTS:
+        shots_dir = root / template_id / "shots"
+        if not shots_dir.is_dir():
+            continue
+        ids = prefer or sorted(p.stem for p in shots_dir.glob("*.mp4"))
+        pairs = []
+        for sid in ids:
+            clip = shots_dir / f"{sid}.mp4"
+            if not clip.is_file():
+                continue
+            audio = next((a / f"{sid}.wav" for a in audio_roots
+                          if (a / f"{sid}.wav").is_file()), None)
+            if audio is None or audio.stat().st_size <= 0:
+                continue
+            pairs.append({"shot": sid, "clip": clip, "audio": audio})
+            if len(pairs) >= limit:
+                break
+        if pairs:
+            return pairs
+    return []
 
 
 def _venv_ready() -> bool:
@@ -741,10 +799,113 @@ def _sync_in_process(clip, audio, out, *, provider, device, workdir, start, dura
     }
 
 
+_LOCK_PATH = REPO / "tmp" / "v5_lipsync" / ".muse.lock"
+
+
+def _pid_alive(pid: int) -> bool:
+    if pid <= 0:
+        return False
+    if os.name != "nt":
+        try:
+            os.kill(pid, 0)
+            return True
+        except OSError:
+            return False
+    import ctypes  # noqa: PLC0415
+
+    kernel32 = ctypes.windll.kernel32  # type: ignore[attr-defined]
+    handle = kernel32.OpenProcess(0x1000, False, pid)  # QUERY_LIMITED_INFORMATION
+    if not handle:
+        return False
+    try:
+        return True
+    finally:
+        kernel32.CloseHandle(handle)
+
+
+def _lock_owner() -> int:
+    try:
+        raw = _LOCK_PATH.read_text(encoding="utf-8", errors="replace").strip()
+        return int(raw.split()[0])
+    except (OSError, ValueError, IndexError):
+        return 0
+
+
+def _acquire_lock(timeout: float = 600.0, stale: float = 21600.0) -> None:
+    """跨进程互斥：Muse 独占 GPU，CLI / API / agent 同时只允许一个任务。
+
+    僵尸锁回收：持有者 PID 已不存在 → 立即抢占；否则超过 stale 秒也回收。
+    """
+    _LOCK_PATH.parent.mkdir(parents=True, exist_ok=True)
+    started = time.time()
+    while True:
+        try:
+            fd = os.open(str(_LOCK_PATH), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            os.write(fd, f"{os.getpid()} {time.time():.0f}".encode("utf-8"))
+            os.close(fd)
+            return
+        except FileExistsError:
+            owner = _lock_owner()
+            try:
+                age = time.time() - _LOCK_PATH.stat().st_mtime
+            except OSError:
+                age = 0.0
+            if owner and not _pid_alive(owner):
+                # 持有者进程已死 → 立即回收（唯一安全的抢占条件）
+                try:
+                    _LOCK_PATH.unlink()
+                except OSError:
+                    pass
+                continue
+            if age > stale:
+                # 活着但超过 6 小时：极端卡死兜底，避免真的把活任务抢掉
+                try:
+                    _LOCK_PATH.unlink()
+                except OSError:
+                    pass
+                continue
+            if time.time() - started > timeout:
+                raise RuntimeError(
+                    f"Muse 忙：等待独占锁超时（owner={owner or '?'}，{_LOCK_PATH}）")
+            time.sleep(3)
+        except OSError:
+            return  # 盘不可写时不阻塞
+
+
+def _release_lock() -> None:
+    # 只释放自己持有的锁：否则 A 结束会把 B 的锁删掉
+    if _lock_owner() not in (0, os.getpid()):
+        return
+    try:
+        _LOCK_PATH.unlink()
+    except OSError:
+        pass
+
+
 def sync_clip(clip_mp4, audio_wav, out_mp4, *, provider="musetalk", device="cuda",
               workdir=None, start=None, duration=None, face_hint=None,
               dump_frames=(0,), fp16=True, max_frames: int = 600,
               mask_params: dict | None = None) -> dict:
+    """串行入口：先拿跨进程独占锁，再执行（子进程 LIPSYNC_CHILD=1 跳过加锁）。"""
+    if os.environ.get("LIPSYNC_CHILD") == "1":
+        return _sync_clip_impl(clip_mp4, audio_wav, out_mp4, provider=provider, device=device,
+                               workdir=workdir, start=start, duration=duration,
+                               face_hint=face_hint, dump_frames=dump_frames, fp16=fp16,
+                               max_frames=max_frames, mask_params=mask_params)
+    _acquire_lock()
+    try:
+        return _sync_clip_impl(clip_mp4, audio_wav, out_mp4, provider=provider, device=device,
+                               workdir=workdir, start=start, duration=duration,
+                               face_hint=face_hint, dump_frames=dump_frames, fp16=fp16,
+                               max_frames=max_frames, mask_params=mask_params)
+    finally:
+        _release_lock()
+
+
+def _sync_clip_impl(clip_mp4, audio_wav, out_mp4, *, provider="musetalk", device="cuda",
+                    workdir=None, start=None, duration=None, face_hint=None,
+                    dump_frames=(0,), fp16=True, max_frames: int = 600,
+                    mask_params: dict | None = None) -> dict:
     """给单镜头视频对口型。
 
     Args:
@@ -813,6 +974,7 @@ def sync_clip(clip_mp4, audio_wav, out_mp4, *, provider="musetalk", device="cuda
     env["PYTHONIOENCODING"] = "utf-8"
     env["LIPSYNC_FORWARD_DEPTH"] = str(depth + 1)
     env["LIPSYNC_INPROC"] = "1"          # 子进程必须就地跑，禁止再转发
+    env["LIPSYNC_CHILD"] = "1"           # 锁由父进程持有，子进程不再抢锁
     timeout = float(os.environ.get("LIPSYNC_TIMEOUT", "900"))
     try:
         proc = subprocess.run([str(c) for c in cmd], cwd=str(REPO), capture_output=True,
@@ -836,21 +998,213 @@ def sync_clip(clip_mp4, audio_wav, out_mp4, *, provider="musetalk", device="cuda
     return payload
 
 
-def measure_sync(clip_mp4, audio_wav=None, *, device="cuda") -> dict:
-    """SyncNet 同步度测量（可选能力，V5_INTERFACES §5 契约字段 lse_c/lse_d）。
+def _audio_env(audio_wav, fps: float, n_frames: int, start: float = 0.0) -> list:
+    """按视频帧率切音频，返回每帧 RMS 包络。"""
+    import tempfile
 
-    当前**未接入**（需要 xformers + LatentSync syncnet config；优先级低于主链路），
-    返回 {"ok": False, "reason": ...}，调用方应视为"无同步度分数"并继续。
+    import numpy as np
+
+    fd, raw = tempfile.mkstemp(suffix=".raw")
+    os.close(fd)
+    try:
+        _run([_ffmpeg(), "-y", "-v", "error", "-i", str(audio_wav), "-ac", "1",
+              "-ar", "16000", "-f", "s16le", raw], capture=True)
+        pcm = np.fromfile(raw, dtype=np.int16).astype(np.float32) / 32768.0
+    finally:
+        try:
+            Path(raw).unlink()
+        except OSError:
+            pass
+    env = []
+    base = int(max(0.0, float(start)) * 16000)
+    for i in range(n_frames):
+        a = base + int(i * 16000.0 / fps)
+        b = base + int((i + 1) * 16000.0 / fps)
+        seg = pcm[a:b]
+        env.append(float(np.sqrt(np.mean(seg ** 2))) if seg.size else 0.0)
+    return env
+
+
+def _pearson(a, b) -> float | None:
+    import numpy as np
+
+    x = np.asarray(a, dtype=float)
+    y = np.asarray(b, dtype=float)
+    mask = np.isfinite(x) & np.isfinite(y)
+    if mask.sum() < 8:
+        return None
+    x = x[mask] - x[mask].mean()
+    y = y[mask] - y[mask].mean()
+    den = float(np.linalg.norm(x) * np.linalg.norm(y))
+    return float(x.dot(y) / den) if den > 1e-8 else None
+
+
+def _sync_fail(reason: str, **extra) -> dict:
+    """口型检测失败/不可用时也必须返回契约字典（ok/reason），绝不抛。"""
+    out = {"ok": False, "reason": str(reason),
+           "method": "mouth_motion_vs_audio_rms",
+           "corr_best": None, "lag_frames": 0, "corr_zero": None,
+           "frames": 0, "valid_frames": 0, "fps": 0.0, "face_ratio": 0.0,
+           "motion_mean": None, "audio_rms_mean": None, "note": ""}
+    out.update(extra)
+    return out
+
+
+def mouth_audio_sync(clip_mp4, audio_wav=None, *, max_frames: int = 600,
+                     start: float = 0.0) -> dict:
+    """口型-语音同步度（无额外权重的客观代理指标）。
+
+    做法：YuNet 逐帧跟脸 → 取「鼻下→下巴」嘴部 ROI → 相邻帧运动量（嘴动）
+    + 音频 RMS 包络；在 ±3 帧内取最佳 Pearson 相关（corr_best）与滞后帧数。
+
+    说明：这不是 SyncNet 的 LSE-C/LSE-D（本机 syncnet 权重不完整，见 available()），
+    而是「嘴动 ↔ 语音能量」的轻量指标，秒级可算，适合作为 Muse 产物的抽检/回归门。
+    """
+    import numpy as np  # noqa: PLC0415
+
+    clip = Path(str(clip_mp4 or ""))
+    if not clip.is_file():
+        return _sync_fail(f"视频不存在: {clip_mp4}")
+    audio = Path(str(audio_wav or clip))
+    if not audio.is_file():
+        return _sync_fail(f"音频不存在: {audio}")
+    # ffprobe 只是"可探测性"校验：坏容器/半截文件在这里就应该返回字典而不是抛
+    try:
+        probe(clip)
+    except Exception as exc:  # noqa: BLE001
+        return _sync_fail(f"ffprobe 读取失败: {type(exc).__name__}: {exc}")
+    try:
+        frames, fps = _ffmpeg_frames_in(str(clip))
+    except Exception as exc:  # noqa: BLE001
+        return _sync_fail(f"视频解码失败: {type(exc).__name__}: {exc}")
+    if max_frames and len(frames) > max_frames:
+        frames = frames[:max_frames]
+    n = len(frames)
+    if n < 4:
+        return _sync_fail(f"帧数过少: {n}", frames=n)
+    try:
+        import cv2  # noqa: PLC0415
+    except Exception as exc:  # noqa: BLE001
+        return _sync_fail(f"cv2 不可用: {exc}", frames=n)
+
+    prev_face = None
+    prev_gray = None
+    motion: list[float] = []
+    dark: list[float] = []
+    detected = 0
+    for fr in frames:
+        faces = detect_faces(fr)
+        face = pick_face(faces, prev_face)
+        if not face:
+            motion.append(float("nan"))
+            dark.append(float("nan"))
+            prev_face = None
+            prev_gray = None
+            continue
+        detected += 1
+        box = bbox_to_crop(face["bbox"], face.get("landmarks"))
+        prev_face = face["bbox"]
+        x1, y1, x2, y2 = (int(v) for v in box)
+        crop = fr[max(0, y1):max(0, y1) + (y2 - y1), max(0, x1):max(0, x1) + (x2 - x1)]
+        if crop.size == 0:
+            motion.append(float("nan"))
+            dark.append(float("nan"))
+            prev_gray = None
+            continue
+        gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY).astype(np.float32)
+        h = gray.shape[0]
+        roi = gray[int(h * 0.55):, :]
+        if prev_gray is not None and prev_gray.shape == gray.shape:
+            diff = np.abs(gray[int(h * 0.45):, :] - prev_gray[int(h * 0.45):, :])
+            motion.append(float(diff.mean()))
+        else:
+            motion.append(0.0)
+        if roi.size:
+            thr = float(roi.mean() - 0.7 * roi.std())
+            dark.append(float((roi < thr).mean()))
+        else:
+            dark.append(float("nan"))
+        prev_gray = gray
+    try:
+        env = _audio_env(str(audio), fps, n, start=start)
+    except Exception as exc:  # noqa: BLE001
+        return _sync_fail(f"音频包络提取失败: {type(exc).__name__}: {exc}", frames=n)
+    corr_zero = _pearson(motion[1:], env[: len(motion) - 1])
+    best = {"corr": None, "lag": 0}
+    for lag in range(-3, 4):
+        if lag < 0:
+            a, b = motion[-lag:], env[: len(env) + lag]
+        elif lag > 0:
+            a, b = motion[: len(motion) - lag], env[lag:]
+        else:
+            a, b = motion[1:], env[: len(motion) - 1]
+        c = _pearson(a, b)
+        if c is not None and (best["corr"] is None or abs(c) > abs(best["corr"])):
+            best = {"corr": c, "lag": lag}
+    motion_arr = np.asarray(motion, dtype=float)
+    # 只有“真有位移”的帧才算有效（0.0 是首帧/丢脸占位，不能算样本）
+    valid = int(((np.isfinite(motion_arr)) & (motion_arr > 0.05)).sum())
+    motion_mean = None
+    if np.isfinite(motion_arr).any():
+        motion_mean = round(float(np.nanmean(motion_arr)), 3)
+    ok = bool(valid >= 8 and detected > 0)
+    return {
+        "ok": ok,
+        "method": "mouth_motion_vs_audio_rms",
+        "corr_best": round(best["corr"], 4) if best["corr"] is not None else None,
+        "lag_frames": best["lag"],
+        "corr_zero": round(corr_zero, 4) if corr_zero is not None else None,
+        "frames": n,
+        "valid_frames": valid,
+        "fps": round(fps, 3),
+        "face_ratio": round(detected / max(n, 1), 3),
+        "motion_mean": motion_mean,
+        "audio_rms_mean": round(float(np.mean(env)), 5),
+        "reason": "" if ok else "有效帧不足（<8）或没检出人脸，无法给出同步度",
+        "note": "corr_best=嘴动与语音包络最佳相关（±3 帧）；>0.25 可视为同向，接近 0 说明嘴动与语音无关",
+    }
+
+
+def _syncnet_status() -> dict:
+    """SyncNet 权重完整性（MuseTalk configs/training/syncnet.yaml 可用，但权重需可读）。"""
+    path = _model_paths()["syncnet"]
+    if not path.exists():
+        return {"ready": False, "reason": "权重缺失", "bytes": 0}
+    size = path.stat().st_size
+    try:
+        import zipfile  # noqa: PLC0415
+
+        with zipfile.ZipFile(path) as zf:
+            entries = len(zf.namelist())
+        return {"ready": True, "bytes": size, "entries": entries}
+    except Exception as exc:  # noqa: BLE001
+        return {"ready": False, "bytes": size,
+                "reason": f"权重文件损坏（zip 中央目录缺失，疑似下载中断）: {exc}"}
+
+
+def measure_sync(clip_mp4, audio_wav=None, *, device="cuda",
+                 start: float = 0.0) -> dict:
+    """口型同步度：当前实现是嘴动-语音包络相关（代理指标），SyncNet LSE 分尚未接入。
+
+    返回字段：provider / corr_best / lag_frames / corr_zero / syncnet{ready,reason}。
     """
     try:
-        _setup_vendor_path()
-        from musetalk.models.syncnet import SyncNet  # noqa: F401  (存在性检查)
-        _ = SyncNet
-    except Exception as exc:  # noqa: BLE001
-        return {"ok": False, "reason": f"syncnet 不可用: {type(exc).__name__}: {exc}"}
-    return {"ok": False,
-            "reason": "SyncNet 权重存在但同步度打分未接入（需 xformers + LatentSync syncnet config），"
-                      "见 docs/LIPSYNC_FEASIBILITY.md §8"}
+        syncnet = _syncnet_status()
+    except Exception as exc:  # noqa: BLE001 - 权重状态查不到也不能让接口崩
+        syncnet = {"ready": False, "reason": f"{type(exc).__name__}: {exc}", "bytes": 0}
+    try:
+        result = mouth_audio_sync(clip_mp4, audio_wav, start=start)
+    except Exception as exc:  # noqa: BLE001 - 契约要求永远返回字典
+        result = _sync_fail(f"{type(exc).__name__}: {exc}")
+    if not isinstance(result, dict):
+        result = _sync_fail("内部错误：口型检测未返回字典")
+    result.setdefault("ok", False)
+    result.setdefault("reason", "" if result["ok"] else "未知原因")
+    result["syncnet"] = syncnet
+    # 注意：SyncNet 的 LSE-C/LSE-D 推理尚未接入；权重可读也不能冒充 syncnet 分数
+    result["provider"] = "mouth_audio_corr"
+    result["device"] = str(device)
+    return result
 
 
 # --------------------------------------------------------------------------- #

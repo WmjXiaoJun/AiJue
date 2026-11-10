@@ -15,6 +15,7 @@ CLI:
 """
 from __future__ import annotations
 
+import inspect
 import json
 import logging
 import math
@@ -34,10 +35,49 @@ MIN_SHOT = 1.4
 MAX_SHOT = 12.0
 TRANSITION_DUR = 0.35
 BGM_GAIN = 0.16
+#: `--duration` 是**下限**不是等号：成片短于 target×此比例直接判失败（P1-9）
+MIN_DURATION_RATIO = 0.6
 
 
 class RenderV5Error(RuntimeError):
     pass
+
+
+def _voice_entry_ok(info, text: str, spec: dict) -> tuple[bool, str]:
+    """voice_cache 条目是否还能用：文件在 + 大小没变 + 台词指纹/音色一致。
+
+    P0-1 的另一半：缓存 key 是台词原文，但 value 里的 path 以前只按内下标命名，
+    命中了却指向被覆盖/被截断的文件。现在 value 带 `text_sha1`/`bytes`/`voice_key`，
+    任一对不上就当未命中，重新合成。
+    """
+    if not isinstance(info, dict):
+        return False, "no_entry"
+    path = Path(str(info.get("path") or ""))
+    if not path.is_file():
+        return False, "file_missing"
+    try:
+        size = path.stat().st_size
+    except OSError:
+        return False, "stat_failed"
+    try:
+        recorded_bytes = int(info.get("bytes") or 0)
+    except (TypeError, ValueError):
+        recorded_bytes = 0
+    if recorded_bytes and size != recorded_bytes:
+        return False, "size_changed"
+    recorded_text = str(info.get("text_sha1") or "")
+    if recorded_text:
+        try:
+            from . import tts_breeze as _tts  # noqa: PLC0415
+
+            if recorded_text != _tts.text_sha1(text):
+                return False, "text_hash_mismatch"
+        except Exception:  # noqa: BLE001
+            pass
+    recorded_voice = str(info.get("voice_key") or "")
+    if recorded_voice and recorded_voice != str(spec.get("key") or ""):
+        return False, "voice_changed"
+    return True, ""
 
 
 # ---------------------------------------------------------------------------
@@ -177,7 +217,20 @@ def tts_and_pace(plan: dict, catalog: dict, paths: dict, prog, force: bool = Fal
         role_texts.setdefault(char_id, []).append(line)
 
     if not role_texts:
-        raise RenderV5Error("计划里没有任何台词，无法配音")
+        # 纯视觉模板（custom_holo_talk 等）：不配音，按预估时长铺静音轨后直接返回
+        total = 0.0
+        for shot in shots:
+            dur = float(shot.get("duration") or 2.6)
+            out_wav = audio_dir / f"{shot['id']}.wav"
+            _build_shot_audio(out_wav, None, dur, workdir)
+            shot["audio"] = str(out_wav)
+            shot["speech_duration"] = 0.0
+            shot.setdefault("voice", {})
+            total += dur
+        plan["episode"]["total_duration"] = round(total, 3)
+        LOG.info("无台词模板：%d 镜全部静音轨（%.1fs）", len(shots), total)
+        return {"shots": len(shots), "trimmed": [], "duration": round(total, 3),
+                "voices": [], "silent": True}
 
     # 2) 声音锁 + 缓存检查：全部就绪时不启动 Breeze（纯 CPU 重渲可省一次模型加载）
     if prog:
@@ -190,9 +243,16 @@ def tts_and_pace(plan: dict, catalog: dict, paths: dict, prog, force: bool = Fal
         cache = {}
     pending: dict[str, list[str]] = {}
     for char_id, texts in role_texts.items():
-        key_prefix = f"{char_id}|{char_specs[char_id]['key']}|"
+        spec = char_specs[char_id]
+        key_prefix = f"{char_id}|{spec['key']}|"
         for text in texts:
-            if key_prefix + text not in cache:
+            if pending.get(char_id) and text in pending[char_id]:
+                continue  # 同一句被多镜共用：只合成一次
+            ok, why = _voice_entry_ok(cache.get(key_prefix + text), text, spec)
+            if not ok:
+                if key_prefix + text in cache:
+                    LOG.warning("voice_cache 失效(%s)，重新合成：%s / %s",
+                                why, char_id, str(text)[:20])
                 pending.setdefault(char_id, []).append(text)
     locks: dict[str, dict] = {}
     missing_lock = False
@@ -247,6 +307,8 @@ def tts_and_pace(plan: dict, catalog: dict, paths: dict, prog, force: bool = Fal
                           "voice": item.get("voice", ""),
                           "voice_id": char_specs[cid]["voice_id"],
                           "voice_key": char_specs[cid]["key"],
+                          "text_sha1": item.get("text_sha1", ""),
+                          "bytes": item.get("bytes", 0),
                           "ref": refs.get(cid, (None, ""))[0] or ""}
         utils.write_json(cache_path, cache)
     meta = plan.setdefault("meta", {})
@@ -280,11 +342,19 @@ def tts_and_pace(plan: dict, catalog: dict, paths: dict, prog, force: bool = Fal
             info = cache.get(f"{char_id}|{spec['key']}|{line}")
             if not info:
                 raise RenderV5Error(f"配音缺失: {char_id} / {line[:20]}")
-            speech = float(info.get("duration") or 0.0)
-            src_voice = Path(info["path"])
-            dur = min(MAX_SHOT, max(MIN_SHOT, round(speech + LEAD_SEC + TAIL_SEC, 2)))
-            if dur < speech + LEAD_SEC + TAIL_SEC - 0.01:
-                dur = round(speech + LEAD_SEC + TAIL_SEC, 2)
+            src_voice = Path(str(info.get("path") or ""))
+            if not src_voice.is_file():
+                raise RenderV5Error(f"配音文件缺失: {src_voice}（{char_id} / {line[:20]}）")
+            # 时长以文件真实长度为准：缓存里的旧时长会让 atrim 把新音频从中间截断
+            speech = float(utils.probe_duration(src_voice) or info.get("duration") or 0.0)
+            info["duration"] = round(speech, 3)
+            # 语音优先：先保 speech 不被截断，再尽量压到 MAX_SHOT 内（只能压 lead/tail）
+            needed = round(speech + LEAD_SEC + TAIL_SEC, 2)
+            dur = max(MIN_SHOT, needed)
+            if needed > MAX_SHOT:
+                shot["over_max_sec"] = round(needed - MAX_SHOT, 2)
+                LOG.warning("镜头 %s 台词长于 MAX_SHOT：%.2fs（不截断语音，改用裁 b-roll 控总长）",
+                            shot.get("id"), needed)
         else:
             dur = float(shot.get("duration") or 2.6)
         shot["speech_duration"] = round(speech, 3)
@@ -314,11 +384,29 @@ def tts_and_pace(plan: dict, catalog: dict, paths: dict, prog, force: bool = Fal
                                      "voice_key": shot["voice"].get("voice_key")})
         shot["audio"] = str(out_wav)
 
+    target = float((plan.get("meta") or {}).get("target_duration") or 0.0)
+    # 4.5) 真实语音比预估短 → 长版会在 TTS 后缩水；这里再扩一遍“已成音的镜头”（直接复制音轨，不再合成）
+    if target >= 120 and total < target * 0.95:
+        total = _append_fillers(plan, target, audio_dir,
+                                Path(paths["shots_dir"]), workdir, total)
     plan["episode"]["total_duration"] = round(total, 3)
     plan["meta"]["speech_driven"] = True
     # 5) 自然语速超目标 → 裁掉尾部多余镜头（保留最后 1 镜）
-    target = float((plan.get("meta") or {}).get("target_duration") or 0.0)
     trimmed = _trim_to_target(plan, target)
+    # trim 只缩短 b-roll（无台词）：把它们的静音轨按新时长重建，否则音画会整体错位
+    for shot in plan["shots"]:
+        if not shot.pop("_trimmed_duration", False):
+            continue
+        audio_path = Path(str(shot.get("audio") or ""))
+        if not audio_path:
+            continue
+        _build_shot_audio(audio_path, None, float(shot.get("duration") or 0), workdir)
+        utils.write_json(audio_path.with_suffix(".meta.json"),
+                         {"hash": "trimmed", "duration": float(shot.get("duration") or 0),
+                          "speech": 0.0, "voice_key": ""})
+    if trimmed:
+        plan["episode"]["total_duration"] = round(
+            sum(float(s.get("duration") or 0) for s in plan["shots"]), 3)
     if prog:
         prog(16, f"语音驱动分镜：{len(plan['shots'])} 镜 / "
                  f"{plan['episode']['total_duration']:.2f}s")
@@ -346,13 +434,55 @@ def _build_shot_audio(out_wav: Path, voice: Path | None, duration: float,
                          "-ac", "2", "-c:a", "pcm_s16le", str(out_wav)], cwd=workdir)
 
 
+def _expand_after_tts(plan: dict, target: float, audio_dir: Path, total: float) -> float:
+    """长版：TTS 后按真实时长把镜头循环补到 target（音轨直接复制，不再调 TTS）。"""
+    import shutil as _shutil
+
+    base = list(plan["shots"])
+    rounds = 0
+    while total < target and base and rounds < 20:
+        rounds += 1
+        for src_shot in base:
+            clone = dict(src_shot)
+            clone["id"] = f"v5_x{len(plan['shots']) + 1:03d}"
+            clone["act_id"] = f"{src_shot.get('act_id')}_p{rounds}"
+            clone["act_name"] = f"{src_shot.get('act_name')} · 第{rounds + 1}遍"
+            clone["camera"] = _vary_camera(src_shot.get("camera"), rounds + 1)
+            src_audio = Path(str(src_shot.get("audio") or ""))
+            if src_audio.is_file():
+                dst = audio_dir / f"{clone['id']}.wav"
+                _shutil.copy2(src_audio, dst)
+                clone["audio"] = str(dst)
+            plan["shots"].append(clone)
+            total += float(clone.get("duration") or 0)
+    for idx, shot in enumerate(plan["shots"], start=1):
+        shot["no"] = idx
+    LOG.info("长版扩写：%d 镜 / %.1fs（%d 遍）", len(plan["shots"]), total, rounds)
+    return round(total, 3)
+
+
 def _trim_to_target(plan: dict, target: float) -> list[str]:
     if not target:
         return []
-    max_total = max(target, 45.0) if target <= 60 else target * 1.15
+    # 长版（≥120s）只允许 1% 溢出，保证“满 5 分钟”但不超太多；短模板保持原宽松度
+    max_total = (target * 1.01 if target >= 120
+                 else (max(target, 45.0) if target <= 60 else target * 1.15))
     shots = plan["shots"]
     trimmed: list[str] = []
     while sum(float(s.get("duration") or 0) for s in shots) > max_total and len(shots) > 3:
+        # 先压 b-roll 时长（min 1.2s），不整镜删除；删镜会与 episode.json 不一致
+        shrunk = False
+        for s in shots:
+            if s.get("type") == "broll" and float(s.get("duration") or 0) > 1.2:
+                over = sum(float(x.get("duration") or 0) for x in shots) - max_total
+                cut = min(float(s["duration"]) - 1.2, max(0.2, over))
+                if cut > 0:
+                    s["duration"] = round(float(s["duration"]) - cut, 2)
+                    s["_trimmed_duration"] = True  # 音轨必须按新时长重建
+                    shrunk = True
+                    break
+        if shrunk:
+            continue
         idx = None
         for i in range(len(shots) - 2, 0, -1):
             if shots[i].get("type") == "broll":
@@ -591,6 +721,13 @@ def render_shot_clips(plan: dict, catalog: dict, style: dict, paths: dict,
         sid = str(shot["id"])
         out_mp4 = Path(paths["shots_dir"]) / f"{sid}.mp4"
         dur = float(shot.get("duration") or 2.6)
+        if shot.get("_prerendered") and out_mp4.is_file():
+            shot_paths[sid] = str(out_mp4)
+            metas[sid] = {"id": sid, "scene": shot.get("scene"),
+                          "characters": [], "duration": dur, "fps": FPS,
+                          "elapsed_sec": 0.0, "motion": {"prerendered": True},
+                          "filler": shot.get("_filler")}
+            continue
         if str(shot.get("type")) == "card":
             if prog and i % 2 == 0:
                 prog(22 + 55.0 * i / max(1, len(shots)), f"逐镜动画 {i + 1}/{len(shots)}（卡片）")
@@ -690,17 +827,12 @@ def render_shot_clips(plan: dict, catalog: dict, style: dict, paths: dict,
         if prog and i % 2 == 0:
             prog(22 + 55.0 * i / max(1, len(shots)), f"逐镜动画 {i + 1}/{len(shots)}")
         t0 = time.time()
-        try:
-            res = motion2d.render_shot(layers, chars_spec, cam,
-                                       dur, FPS, out_mp4, style,
-                                       width=FINAL_W, height=FINAL_H, seed=(i + 1) * 31,
-                                       workdir=paths["workdir"], mouth_strength=0.85)
-        except TypeError:
-            # 旧版 motion2d 不支持 mouth_strength
-            res = motion2d.render_shot(layers, chars_spec, cam,
-                                       dur, FPS, out_mp4, style,
-                                       width=FINAL_W, height=FINAL_H, seed=(i + 1) * 31,
-                                       workdir=paths["workdir"])
+        _shot_kwargs = dict(width=FINAL_W, height=FINAL_H, seed=(i + 1) * 31,
+                            workdir=paths["workdir"])
+        if "mouth_strength" in inspect.signature(motion2d.render_shot).parameters:
+            _shot_kwargs["mouth_strength"] = 0.85
+        res = motion2d.render_shot(layers, chars_spec, cam, dur, FPS, out_mp4, style,
+                                   **_shot_kwargs)
         shot_paths[sid] = str(out_mp4)
         metas[sid] = {"id": sid, "scene": shot.get("scene"),
                       "characters": [c["char"].get("id") for c in chars_spec],
@@ -772,14 +904,17 @@ def assemble(plan: dict, catalog: dict, style: dict, paths: dict, prog) -> dict:
         transition = {"mode": transition[0], "style": transition[1]}
     # 关键：final_encode 读取 workdir/video_raw.mp4；把本次拼好的视频同步到该文件名，
     # 避免使用上一轮遗留的 video_raw.mp4（否则 per-cut 转场不会进入成片）。
+    import shutil as _shutil
+    target = Path(paths["workdir"]) / "video_raw.mp4"
     try:
-        import shutil as _shutil
-        target = Path(paths["workdir"]) / "video_raw.mp4"
         if Path(video_raw).resolve() != target.resolve():
             _shutil.copy2(video_raw, target)
         LOG.info("video_raw 同步: %s -> %s", video_raw, target)
     except Exception as exc:  # noqa: BLE001
-        LOG.warning("video_raw 同步失败: %s", exc)
+        # 不能吞：final_encode 固定读 workdir/video_raw.mp4，吞掉就会用上一轮的旧画面出片
+        raise RenderV5Error(f"video_raw 同步失败（拒绝用旧素材出片）: {exc}") from exc
+    if not target.is_file() or target.stat().st_size <= 0:
+        raise RenderV5Error(f"video_raw 缺失或为空: {target}")
     LOG.info("video_raw: %s (%.2fs)", video_raw, utils.probe_duration(video_raw))
 
     # 字幕：优先风格化 subtitle_ass，否则 ass_builder
@@ -805,7 +940,19 @@ def assemble(plan: dict, catalog: dict, style: dict, paths: dict, prog) -> dict:
                         item["start"] + shot.get("speech_duration", 0) + 0.5), 3)
         events.append({"start": start, "end": max(start + 0.4, end),
                        "text": line, "speaker": shot.get("speaker_name") or ""})
-    style_v5.subtitle_ass(style, events, ass_path, FINAL_W, FINAL_H)
+    # 综艺花字字幕（主字幕 + 花字 + 人名条 + 空镜标签）
+    from . import variety_subs  # noqa: PLC0415
+    sub_shots = []
+    for item in timings:
+        shot = item["shot"]
+        sub_shots.append({"id": shot.get("id"), "line": str(shot.get("line") or ""),
+                          "speaker_name": str(shot.get("speaker_name") or ""),
+                          "scene": str(shot.get("scene") or ""),
+                          "start": float(item["start"]), "end": float(item["end"]),
+                          "filler": bool(shot.get("_prerendered"))})
+    sub_info = variety_subs.build_ass(sub_shots, ass_path, FINAL_W, FINAL_H, style=style)
+    LOG.info("综艺字幕：%s 条（对白 %s / 花字 %s）", sub_info.get("count"),
+             sub_info.get("dialogue"), sub_info.get("punch"))
     narration = None
     if editing_mod is not None:
         try:
@@ -827,9 +974,9 @@ def assemble(plan: dict, catalog: dict, style: dict, paths: dict, prog) -> dict:
         narration = render_mod.concat_audio(shots, paths["workdir"], render_total)
     # final_encode/render_mix_wav 固定读 audio/narration.wav；把本次混音结果同步过去，
     # 避免新模板（无历史缓存）最终编码报 "Error opening input file audio/narration.wav"。
+    import shutil as _shutil
+    narr_target = Path(paths["workdir"]) / "audio" / "narration.wav"
     try:
-        import shutil as _shutil
-        narr_target = Path(paths["workdir"]) / "audio" / "narration.wav"
         if narration and Path(narration).is_file() and \
                 Path(narration).resolve() != narr_target.resolve():
             utils.ensure_dir(narr_target.parent)
@@ -837,7 +984,7 @@ def assemble(plan: dict, catalog: dict, style: dict, paths: dict, prog) -> dict:
             LOG.info("narration 同步: %s -> %s", narration, narr_target)
             narration = str(narr_target)
     except Exception as exc:  # noqa: BLE001
-        LOG.warning("narration 同步失败: %s", exc)
+        raise RenderV5Error(f"narration 同步失败（拒绝用旧音轨出片）: {exc}") from exc
     bgm = None
     try:
         from . import v5_audio
@@ -862,6 +1009,12 @@ def assemble(plan: dict, catalog: dict, style: dict, paths: dict, prog) -> dict:
         grade_filter=grade or None,
         packaging_filter=packaging or None,
         duck_bgm=True)
+    # 长版（≥120s）：转场重叠会让成片比目标短（66 个转场 ≈ 16s），编码后补齐到目标时长
+    long_target = float((plan.get("meta") or {}).get("target_duration") or 0.0)
+    if long_target >= 120:
+        render_total = _conform_duration(Path(paths["out"]), long_target, Path(paths["workdir"]))
+        plan["episode"]["total_duration"] = round(render_total, 3)
+        plan["meta"]["_render_total"] = render_total
     # timeline 产物
     tl = _build_timeline(plan, style, paths, "editorial", "per-cut")
 
@@ -872,6 +1025,102 @@ def assemble(plan: dict, catalog: dict, style: dict, paths: dict, prog) -> dict:
             else {"mode": str(transition[0]), "style": str(transition[1])},
             "boundaries": boundaries,
             "timeline": timeline_art}
+
+
+def _append_fillers(plan: dict, target: float, audio_dir: Path, shots_dir: Path,
+                    workdir: Path, total: float) -> float:
+    """零重复长版：用该模板自己的素材生成**新的** b-roll 镜（不同取景/运镜/调色），
+    不再循环复用已有镜头。填充镜预渲染到 shots_dir，render_shot_clips 会跳过它们。"""
+    from . import unique_fill  # noqa: PLC0415
+
+    tid = str(plan.get("meta", {}).get("template") or plan["episode"]["id"])
+    template = (plan.get("meta", {}).get("template_contract") or {"id": tid})
+    need = max(0.0, target * 1.01 - total)
+    fillers = unique_fill.make_fillers(tid, template, need, shots_dir, seed=int(plan["meta"].get("seed") or 7))
+    scene_pool = [str(s.get("scene")) for s in plan["shots"] if s.get("scene")] or ["stage"]
+    # 章节卡：把空镜分成 4 段，段间插一张「第 N 章 · 幕名」卡（综艺段落感）
+    acts = [a for a in ((template or {}).get("acts") or []) if isinstance(a, dict)]
+    try:
+        from . import v5_catalog as _v5c  # noqa: PLC0415
+        _scenes = _v5c.load_catalog().get("scenes") or {}
+    except Exception:  # noqa: BLE001
+        _scenes = {}
+
+    def _scene_label(scene_id: str) -> str:
+        scene = _scenes.get(str(scene_id)) or {}
+        return str(scene.get("label") or scene_id or "")
+
+    # 章节名优先用场景中文标签（第1章 · 霓虹天际线），拿不到再退回幕名
+    chapter_names = []
+    for act in acts:
+        label = _scene_label(str(act.get("scene") or ""))
+        chapter_names.append(label or str(act.get("name") or act.get("id") or ""))
+    chapter_names = [n for n in chapter_names if n][:3]
+    chapter_at = {max(1, len(fillers) * k // 4) for k in (1, 2, 3)} if len(acts) >= 3 else set()
+    chapter_idx = 0
+    for idx, item in enumerate(fillers):
+        if idx in chapter_at and chapter_idx < len(chapter_names):
+            chapter_idx += 1
+            card_id = f"v5_ch{chapter_idx}"
+            card = {"id": card_id, "no": len(plan["shots"]) + 1, "type": "card",
+                    "card": "title", "act_id": "chapter", "act_name": "章节",
+                    "role": None, "character": None, "speaker_name": "",
+                    "scene": None, "camera": {"type": "static"}, "characters": [],
+                    "duration": 2.2, "line": "",
+                    "title": f"第{chapter_idx}章 · {chapter_names[chapter_idx - 1]}",
+                    "subtitle": ""}
+            card_wav = audio_dir / f"{card_id}.wav"
+            _build_shot_audio(card_wav, None, 2.2, workdir)
+            card["audio"] = str(card_wav)
+            plan["shots"].append(card)
+            total += 2.2
+        sid = item["id"]
+        shot = {"id": sid, "no": len(plan["shots"]) + 1, "type": "broll",
+                "act_id": "fill", "act_name": "空镜补充",
+                "scene": scene_pool[idx % len(scene_pool)],
+                "camera": {"type": "push_in", "strength": 0.12},
+                "role": None, "character": None, "speaker_name": "",
+                "characters": [], "duration": float(item["duration"]),
+                "line": "", "speech_duration": 0.0,
+                "_prerendered": True, "_filler": item}
+        out_wav = audio_dir / f"{sid}.wav"
+        _build_shot_audio(out_wav, None, float(item["duration"]), workdir)
+        shot["audio"] = str(out_wav)
+        shot["voice"] = {"provider": "", "character": "", "voice_id": "", "voice_key": "",
+                         "seed": None, "ref": "", "text": "", "speech_duration": 0.0}
+        plan["shots"].append(shot)
+        total += float(item["duration"])
+    for idx, shot in enumerate(plan["shots"], start=1):
+        shot["no"] = idx
+    LOG.info("长版空镜：新增 %d 条不重复镜头 / %.1fs", len(fillers), total)
+    return round(total, 3)
+
+
+def _conform_duration(path: Path, target: float, workdir: Path) -> float:
+    """把成片精确拉到 target 秒：短了用末帧定格补（最多 40s），长了直接裁。"""
+    actual = float(utils.probe_duration(path) or 0.0)
+    if actual <= 0 or abs(actual - target) < 0.2:
+        return actual
+    tmp = path.with_name(path.stem + "_conform.mp4")
+    if actual < target:
+        pad = min(40.0, target - actual + 0.05)
+        utils.ffmpeg(["-i", str(path),
+                      "-vf", f"tpad=stop_mode=clone:stop_duration={pad:.3f},fps=25,format=yuv420p",
+                      "-af", f"apad=whole_dur={target:.3f}",
+                      "-t", f"{target:.3f}",
+                      "-c:v", "libx264", "-preset", "veryfast", "-crf", "20",
+                      "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-ac", "2",
+                      "-movflags", "+faststart", "-y", str(tmp)])
+    else:
+        utils.ffmpeg(["-i", str(path), "-t", f"{target:.3f}",
+                      "-c:v", "libx264", "-preset", "veryfast", "-crf", "20",
+                      "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-ac", "2",
+                      "-movflags", "+faststart", "-y", str(tmp)])
+    if tmp.is_file() and tmp.stat().st_size > 0:
+        tmp.replace(path)
+    final = float(utils.probe_duration(path) or 0.0)
+    LOG.info("长版对齐：%.2fs -> %.2fs（目标 %.1fs）", actual, final, target)
+    return final
 
 
 def _build_timeline(plan: dict, style: dict, paths: dict, t_mode: str,
@@ -946,10 +1195,87 @@ def _build_timeline(plan: dict, style: dict, paths: dict, t_mode: str,
 # ---------------------------------------------------------------------------
 # 4) QC + 产物
 # ---------------------------------------------------------------------------
+def _duration_gate(target: float, actual: float, *, ratio: float | None = None,
+                   shots: int = 0) -> dict:
+    """时长门：期望/实际/差值/下限一次算清，既能 raise 也能直接进报告。"""
+    target = float(target or 0.0)
+    actual = float(actual or 0.0)
+    r = float(MIN_DURATION_RATIO if ratio is None else ratio)
+    try:  # 允许用环境变量放宽（例如 5s 也合规的短模板）
+        r = float(os.environ.get("V5_MIN_DURATION_RATIO") or r)
+    except (TypeError, ValueError):
+        pass
+    floor = round(target * r, 3)
+    return {"target": round(target, 3), "actual": round(actual, 3),
+            "floor": floor, "ratio": round(r, 3),
+            "delta": round(actual - target, 3),
+            "short_by": round(max(0.0, target - actual), 3),
+            "shots": int(shots),
+            "ok": bool(target > 0 and actual >= floor),
+            "detail": (f"成片 {actual:.2f}s / 目标 {target:.2f}s"
+                       f"（下限 {floor:.2f}s，差 {actual - target:+.2f}s）")}
+
+
 def run_qc(plan: dict, style: dict, paths: dict, prog=None) -> dict:
     from . import qc_v5
+    dialogue = [s for s in plan.get("shots") or [] if str(s.get("line") or "").strip()]
+    no_speech = [str(s.get("id")) for s in dialogue
+                 if float(s.get("speech_duration") or 0) <= 0.2]
+    # 口型真检查：对白镜的 viseme 时间轴里必须有≥5% 的张嘴段（coverage），否则等于没驱动
+    per_shot = []
+    low_cov = []
+    failures: list[dict] = []
+    try:
+        from . import mouth_sync as _mouth_sync  # noqa: PLC0415
+    except Exception as exc:  # noqa: BLE001
+        _mouth_sync = None
+        failures.append({"shot": "*", "reason": "mouth_sync_import_failed",
+                         "error": f"{type(exc).__name__}: {exc}"[-200:]})
+    for shot in dialogue:
+        sid = str(shot.get("id"))
+        audio_path = Path(str(shot.get("audio") or ""))
+        if _mouth_sync is None:
+            continue
+        if not audio_path.is_file():
+            failures.append({"shot": sid, "reason": "audio_missing",
+                             "audio": str(audio_path)})
+            continue
+        # envelope_timeline 会抛（非 pcm_s16le wav 等）→ 不能让它把整条 run 判失败
+        try:
+            timeline = _mouth_sync.envelope_timeline(
+                audio_path, config.FPS, str(shot.get("line") or ""), lead=LEAD_SEC)
+            window = max(0.2, float(shot.get("duration") or 0.2))
+            cov = _mouth_sync.coverage_ratio(timeline, 0.0, window)
+        except Exception as exc:  # noqa: BLE001
+            failures.append({"shot": sid, "reason": "envelope_failed",
+                             "error": f"{type(exc).__name__}: {exc}"[-300:]})
+            continue
+        per_shot.append({"shot": sid, "coverage": round(cov, 3)})
+        if cov < 0.05:
+            low_cov.append(sid)
+    # fail-open 修正：有对白镜但一行口型数据都没有 → ok=False + reason="no_data"
+    reason = ""
+    if no_speech:
+        reason = "no_speech"
+    elif failures:
+        reason = "no_data" if not per_shot else "partial_data"
+    elif low_cov:
+        reason = "low_coverage"
+    elif dialogue and not per_shot:
+        reason = "no_data"
+    lip_ok = not reason
     qc_extra = {"style": {"style": style.get("id"), "label": style.get("label")},
-                "fallbacks": []}
+                "fallbacks": [],
+                # 口型是 motion2d 的 viseme 时间轴驱动：对白镜必须有 speech_duration
+                "lip_sync": {"ok": lip_ok, "provider": "viseme", "reason": reason,
+                             "detail": (
+                                 f"{len(per_shot) or len(dialogue)} 个对白镜 viseme 覆盖达标"
+                                 if lip_ok else
+                                 f"口型异常[{reason or 'unknown'}]：缺语音时长 {no_speech}；"
+                                 f"张嘴覆盖过低 {low_cov}；取数失败 {len(failures)} 镜"),
+                             "shots": len(dialogue), "no_speech": no_speech,
+                             "low_coverage": low_cov, "per_shot": per_shot,
+                             "failures": failures}}
     report = qc_v5.evaluate(video=paths["out"], plan=plan,
                             qc_extra=qc_extra,
                             subtitles=Path(paths["workdir"]) / "final.ass")
@@ -1008,6 +1334,7 @@ def run_render(args) -> int:
     from . import v5_story
     plan = v5_story.build_plan(template, duration, seed=seed)
     plan["meta"]["template"] = template_id
+    plan["meta"]["template_contract"] = template
     # 片头/片尾卡（风格化包装；不参与 TTS，固定时长）
     _add_card_shots(plan, template)
     utils.write_json(paths["workdir"] / "episode.json", plan)
@@ -1025,7 +1352,7 @@ def run_render(args) -> int:
         except Exception as exc:  # noqa: BLE001
             LOG.warning("停止 Breeze TTS 服务失败: %s", exc)
 
-        style = _style(catalog, str(plan["episode"].get("style") or template.get("style") or ""))
+    style = _style(catalog, str(plan["episode"].get("style") or template.get("style") or ""))
     # V5.4 剪辑计划（每模板不同：景别/运镜/取景/转场/J-L cut）
     try:
         from . import editorial
@@ -1061,6 +1388,21 @@ def run_render(args) -> int:
     if not Path(paths["out"]).is_file():
         raise RenderV5Error(f"成片未生成: {paths['out']}")
     probe = utils.probe_video(paths["out"])
+    # 时长硬门（P1-9）：`--duration` 是下限，不是等号。
+    # custom_holo_talk --duration 30 实际只出 7.8s 时 QC 会拿 7.8 比 7.8 自证全绿 → 必须在编码后拦一次。
+    gate = _duration_gate(duration, float(probe.get("duration") or 0.0),
+                            shots=len(plan.get("shots") or []))
+    utils.write_json(Path(paths["out_dir"]) / "duration_gate.json", gate)
+    plan.setdefault("meta", {})["duration_gate"] = gate
+    if not gate["ok"]:
+        msg = (f"成片时长不足：{gate['actual']:.2f}s < 目标 {gate['target']:.1f}s × "
+               f"{gate['ratio']:.2f} = {gate['floor']:.2f}s（差 {gate['delta']:.2f}s，"
+               f"镜头 {gate['shots']} 个）")
+        LOG.error("%s", msg)
+        utils.emit_json_line({"ok": False, "error": "duration_below_floor", **gate})
+        raise RenderV5Error(msg)
+    LOG.info("时长门通过：实际 %.2fs / 目标 %.1fs（下限 %.2fs）",
+             gate["actual"], gate["target"], gate["floor"])
     prog(99, "QC + 抽帧")
     qc = run_qc(plan, style, paths, prog)
     frames = extract_frames(paths["out"], paths, float(probe["duration"]))
@@ -1079,6 +1421,7 @@ def run_render(args) -> int:
         "characters": sorted({str(s.get("character")) for s in plan["shots"] if s.get("character")}),
         "qc_ok": qc["ok"],
         "qc_failed": [k for k, v in qc["checks"].items() if not v.get("ok")],
+        "duration_gate": gate,
         "qc_report": str(paths["out_dir"] / "qc_report.json"),
         "timeline": asm.get("timeline"),
         "storyboard": storyboard_art,

@@ -296,6 +296,14 @@ export interface Settings {
   h3_provider?: string;
   /** MetaSo 云端 API Key 是否已配置（只读） */
   metaso_key_configured?: boolean;
+  /** 只写：PATCH { metaso_key } 保存新 Key，空串表示清除（GET 永不回传明文） */
+  metaso_key?: string;
+  /** MetaSo 视频接口基址（只读） */
+  metaso_base_url?: string;
+  /** MetaSo 分辨率（只读，如 768P） */
+  metaso_resolution?: string;
+  /** MetaSo 单段时长（秒，只读） */
+  metaso_duration?: number;
   /** 海外发布（Upload-Post） */
   upload_post_username?: string;
   upload_post_enabled?: boolean;
@@ -314,6 +322,12 @@ export interface Settings {
   llm_api_key_configured?: boolean;
   /** 只写：PATCH 时传空串表示清除 */
   llm_api_key?: string;
+  /** 多语种本地化（后端 schemas.SettingsOut.localize_*；当前 UI 未提供编辑入口，仅在读到时透传） */
+  localize_langs?: string[];
+  localize_translator?: string;
+  localize_voices?: Record<string, unknown>;
+  /** 发布品牌标题（后端 schemas.SettingsOut.publish_brand_title；当前 UI 未提供编辑入口） */
+  publish_brand_title?: string;
 }
 
 /** LLM 配置（GET /api/llm/config） */

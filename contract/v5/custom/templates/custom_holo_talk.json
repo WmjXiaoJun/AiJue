@@ -2,12 +2,22 @@
   "id": "custom_holo_talk",
   "label": "全息史料夜话（示例）",
   "description": "示例自定义模板：引用 custom_holo_paper 风格 + laozhou 角色 + custom_holo_gallery 场景，展示模板/acts 写法。",
-  "tags": ["custom", "example"],
+  "tags": [
+    "custom",
+    "example"
+  ],
   "style": "custom_holo_paper",
   "target_duration": 30,
-  "aspect": [16, 9],
+  "aspect": [
+    16,
+    9
+  ],
   "cast": [
-    { "role": "host", "character": "laozhou", "wardrobe": "hanfu_jacket" }
+    {
+      "role": "host",
+      "character": "laozhou",
+      "wardrobe": "hanfu_jacket"
+    }
   ],
   "acts": [
     {
@@ -18,8 +28,13 @@
       "camera": "slow_push",
       "camera_zone": "wide",
       "line": "host",
-      "beats": ["全息画廊亮起", "host 转身面向镜头"],
-      "characters": ["host"],
+      "beats": [
+        "全息画廊亮起",
+        "host 转身面向镜头"
+      ],
+      "characters": [
+        "host"
+      ],
       "transition": "ink_wipe"
     },
     {
@@ -30,7 +45,9 @@
       "camera": "pan_right",
       "camera_zone": "detail",
       "line": "",
-      "beats": ["镜头扫过地形等高线"],
+      "beats": [
+        "镜头扫过地形等高线"
+      ],
       "transition": "fade"
     },
     {
@@ -41,7 +58,9 @@
       "camera": "static",
       "camera_zone": "host_close",
       "line": "host",
-      "beats": ["host 收束观点"]
+      "beats": [
+        "host 收束观点"
+      ]
     }
   ],
   "packaging": {
@@ -50,5 +69,6 @@
     "title": "全息史料夜话",
     "lower_third": "ink_seal_cyan"
   },
-  "format": "talk_show"
+  "format": "talk_show",
+  "note": "audit"
 }
